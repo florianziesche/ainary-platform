@@ -15,8 +15,8 @@
 | 3 | Investment Stages (NYC funding history) | 🟡 Draft Ready | 1-2h | `step-3-investment-stages.md` |
 | 4 | VC Terminology (glossary) | ✅ Draft Ready | 30min | `step-4-vc-terminology.md` |
 | 5 | Secret Sauce (investor edge) | ✅ Draft Ready | 1h | `step-5-secret-sauce.md` |
-| 6 | On-Thesis Networking (8 events) | ⬜ Not Started | 1-2h | |
-| 7 | Hub Pipelines (Decile Hub setup) | ⬜ Not Started | 1h | |
+| 6 | On-Thesis Networking (8 events) | 🟡 Draft Ready | 1-2h | `step-6-networking-events.md` |
+| 7 | Hub Pipelines (Decile Hub setup) | ⬜ Needs Florian | 1h | *Decile Hub access required* |
 | 8 | Thought Leadership (LinkedIn) | ✅ Draft Ready | 30min | `step-8-thought-leadership.md` |
 
 ---
