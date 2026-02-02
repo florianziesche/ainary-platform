@@ -49,16 +49,17 @@
 
 ## Active Threads
 
-- **VC Lab Sprint 2** — Due Feb 4, 7/8 deliverables drafted
-- **Monique Barbanson meeting** — Feb 3, 6 PM CET, "Show me your AI workflow"
-- **Decile Capital application** — Cover letter ready, submit Monday
+- **VC Lab Sprint 2** — Due Feb 4, 7/8 deliverables drafted, Step 5 (Secret Sauce) needs Florian's examples
+- **Monique Barbanson meeting** — Feb 3, 6 PM CET — Full prep ready (meeting brief, demo script, day-of checklist)
+- **Decile Capital application** — Cover letter ready, submit Monday Feb 3 (after Monique meeting)
+- **LinkedIn Post** — "Founder to VC" post ready for Feb 3, 14:00 CET (strategic timing: before Monique meeting)
 - **Maschinenbau Schlottwitz** — CNC demo ready, uncle is warm lead, fastest path to revenue
 - **CNC Planner Pro v2.0** — Built with PDF/STEP upload, industrial design, ready for demo
 - **Knowledge System** — 10 RSS feeds active, 144 articles captured, blogwatcher running
 
 ## Key People
 
-- **Monique Barbanson** — Entelechy Ventures, AI-native B2B investor, meeting Feb 3
+- **Monique Barbanson** — Entelechy Ventures, AI-native B2B investor, Yale CS/AI, 20yr enterprise data/AI (Microsoft, Affirm), patents holder, founded Startup Monthly (Lean Startup accelerator). Meeting Feb 3 — she saw Florian's WhatsApp AI in VC Lab, curious about his workflow. Technical, operator background, values iteration.
 - **Conor** — Venture Institute, intro to NYC VC network
 - **Yashodhana** — VC Lab peer, NYC event organizer
 - **Daniel** — Networking contact, virtual coffee opportunity
@@ -90,6 +91,9 @@ Legal AI Platform with <0.2% hallucination rate using:
 - Add one specific detail when complimenting content — generic praise is invisible
 - Write for retrieval, not storage — vague notes = vague AI outputs
 - Push back on building instead of shipping — his stated weakness
+- **LinkedIn timing matters** — Post content strategically (e.g., before important meetings for conversation starters)
+- **Brave API key missing** — Web search unavailable until configured (`openclaw configure --section web`)
+- **Obsidian + OpenClaw sync** — Keep heavy research in Obsidian, operations in workspace, avoid duplication
 
 ## Content Pillars
 
@@ -100,4 +104,4 @@ Legal AI Platform with <0.2% hallucination rate using:
 
 ---
 
-*Last updated: 2026-02-01*
+*Last updated: 2026-02-02 (overnight session)*
