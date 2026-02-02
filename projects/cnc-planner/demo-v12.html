@@ -2663,12 +2663,16 @@ END PGM FLANSCH MM`
             dims: { x, y, z, allowance }
         };
 
+        // Konsistente Werte berechnen (Material inkl. Verschnitt)
+        const materialWithScrapLive = materialCost * 1.1;
+        const finalTotalCostLive = materialWithScrapLive + machineCost + toolCost;
+
         // Display updaten - Live-Kalkulation
         document.getElementById('liveWeight').textContent = weightKg.toFixed(2).replace('.', ',') + ' kg';
-        document.getElementById('liveMaterialCost').textContent = '€ ' + materialCost.toFixed(2).replace('.', ',');
+        document.getElementById('liveMaterialCost').textContent = '€ ' + materialWithScrapLive.toFixed(2).replace('.', ',');
         document.getElementById('liveTime').textContent = machiningTime.toFixed(1).replace('.', ',') + ' min';
         document.getElementById('liveMachineCost').textContent = '€ ' + machineCost.toFixed(2).replace('.', ',');
-        document.getElementById('liveTotalCost').textContent = '€ ' + totalCost.toFixed(2).replace('.', ',');
+        document.getElementById('liveTotalCost').textContent = '€ ' + finalTotalCostLive.toFixed(2).replace('.', ',');
 
         // Gesamtkalkulation synchronisieren (gleiche Werte!)
         const calcMachineCost = document.getElementById('calcMachineCost');
@@ -2679,15 +2683,6 @@ END PGM FLANSCH MM`
         const calcMachineDetail = document.getElementById('calcMachineDetail');
         const calcMaterialDetail = document.getElementById('calcMaterialDetail');
 
-        if (calcMachineCost) calcMachineCost.textContent = '€' + machineCost.toFixed(2).replace('.', ',');
-        if (calcMaterialCost) calcMaterialCost.textContent = '€' + materialCost.toFixed(2).replace('.', ',');
-        if (calcToolCost) calcToolCost.textContent = '€' + toolCost.toFixed(2).replace('.', ',');
-        if (calcTotalCost) calcTotalCost.textContent = '€' + totalCost.toFixed(2).replace('.', ',');
-        const margin = parseFloat(document.getElementById('marginInput')?.value) || 10;
-        if (calcSellPrice) calcSellPrice.textContent = '€' + (totalCost * (1 + margin / 100)).toFixed(2).replace('.', ',');
-        if (calcMachineDetail) calcMachineDetail.textContent = machiningTime.toFixed(1).replace('.', ',') + ' min × €85/h';
-        if (calcMaterialDetail) calcMaterialDetail.textContent = weightKg.toFixed(2).replace('.', ',') + ' kg × €' + mat.price.toFixed(2).replace('.', ',') + '/kg';
-
         // Detaillierte Kalkulation aktualisieren
         const volumeMm3 = currentProject.isRound 
             ? Math.PI * Math.pow(x / 2, 2) * z 
@@ -2695,6 +2690,19 @@ END PGM FLANSCH MM`
         const hauptzeit = machiningTime * 0.72; // ca. 72% Hauptzeit
         const nebenzeit = machiningTime * 0.28; // ca. 28% Nebenzeit
         const materialWithScrap = materialCost * 1.1; // +10% Verschnitt
+        
+        // Gesamtkosten mit konsistenten Werten berechnen
+        const finalTotalCost = materialWithScrap + machineCost + toolCost;
+
+        // Gesamtkalkulation synchronisieren (GLEICHE Werte wie oben!)
+        if (calcMachineCost) calcMachineCost.textContent = '€' + machineCost.toFixed(2).replace('.', ',');
+        if (calcMaterialCost) calcMaterialCost.textContent = '€' + materialWithScrap.toFixed(2).replace('.', ',');
+        if (calcToolCost) calcToolCost.textContent = '€' + toolCost.toFixed(2).replace('.', ',');
+        if (calcTotalCost) calcTotalCost.textContent = '€' + finalTotalCost.toFixed(2).replace('.', ',');
+        const margin = parseFloat(document.getElementById('marginInput')?.value) || 10;
+        if (calcSellPrice) calcSellPrice.textContent = '€' + (finalTotalCost * (1 + margin / 100)).toFixed(2).replace('.', ',');
+        if (calcMachineDetail) calcMachineDetail.textContent = machiningTime.toFixed(1).replace('.', ',') + ' min × €85/h';
+        if (calcMaterialDetail) calcMaterialDetail.textContent = weightKg.toFixed(2).replace('.', ',') + ' kg × €' + mat.price.toFixed(2).replace('.', ',') + '/kg + 10%';
 
         // Material-Detail-Felder
         const calcRawDims = document.getElementById('calcRawDims');
@@ -2845,8 +2853,10 @@ END PGM FLANSCH MM`
     function updateMargin() {
         const margin = parseFloat(document.getElementById('marginInput').value) || 10;
         const calc = currentProject._calculated || {};
-        const totalCost = calc.totalCost || 122.07;
-        const sellPrice = totalCost * (1 + margin / 100);
+        // Materialkosten inkl. Verschnitt verwenden
+        const materialWithScrap = (calc.materialCost || 50) * 1.1;
+        const finalTotalCost = materialWithScrap + (calc.machineCost || 59) + (calc.toolCost || 29);
+        const sellPrice = finalTotalCost * (1 + margin / 100);
         document.getElementById('calcSellPrice').textContent = '€' + sellPrice.toFixed(2).replace('.', ',');
     }
 
