@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CNC Fertigungsplaner — Von der Zeichnung zum Angebot in 2 Minuten statt 30.">
+  <title>CNC Planner Pro — Zeitberechnung & Angebote automatisieren</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1a365d;
+      --primary-light: #2c5282;
+      --accent: #ed8936;
+      --accent-hover: #dd6b20;
+      --success: #38a169;
+      --bg-dark: #0f1419;
+      --bg-section: #1a1f2e;
+      --bg-card: #242b3d;
+      --text: #f7fafc;
+      --text-muted: #a0aec0;
+      --border: #3d4663;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      padding: 16px 24px;
+      background: rgba(15, 20, 25, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo { font-weight: 800; font-size: 20px; }
+    .logo span { color: var(--accent); }
+
+    .nav-links { display: flex; gap: 24px; align-items: center; }
+    .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 14px; }
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      background: var(--accent);
+      color: white !important;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .nav-cta:hover { background: var(--accent-hover); }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      background: linear-gradient(135deg, var(--bg-dark) 0%, var(--primary-light) 100%);
+    }
+
+    .hero-content { max-width: 800px; }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(237, 137, 54, 0.15);
+      color: var(--accent);
+      padding: 8px 16px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      font-size: clamp(32px, 6vw, 56px);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 span { color: var(--accent); }
+
+    .hero p {
+      font-size: 20px;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto 40px;
+    }
+
+    .hero-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 32px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 18px;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+    .btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px); }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 2px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--text); }
+
+    .hero-sub {
+      margin-top: 24px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .stats-bar {
+      background: var(--bg-section);
+      padding: 40px 24px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stats-grid {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px;
+      text-align: center;
+    }
+
+    .stat-number { font-size: 48px; font-weight: 800; color: var(--accent); }
+    .stat-label { font-size: 14px; color: var(--text-muted); margin-top: 8px; }
+
+    .section { padding: 100px 24px; }
+
+    .section-header {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 60px;
+    }
+
+    .section-header h2 { font-size: 36px; font-weight: 800; margin-bottom: 16px; }
+    .section-header p { color: var(--text-muted); font-size: 18px; }
+
+    /* Demo Section */
+    .demo-section { background: var(--bg-section); }
+    
+    .demo-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .demo-header {
+      padding: 16px 24px;
+      background: var(--bg-dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .demo-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .demo-dot.red { background: #ff5f56; }
+    .demo-dot.yellow { background: #ffbd2e; }
+    .demo-dot.green { background: #27c93f; }
+
+    .demo-iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+
+    /* ROI Calculator */
+    .calculator-section { background: var(--bg-dark); }
+
+    .calculator {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border-radius: 24px;
+      padding: 48px;
+      border: 1px solid var(--border);
+    }
+
+    .calc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+    }
+
+    @media (max-width: 768px) {
+      .calc-grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr; gap: 24px; }
+      .hero-buttons { flex-direction: column; align-items: center; }
+    }
+
+    .calc-inputs h3 { font-size: 20px; margin-bottom: 24px; }
+
+    .input-group { margin-bottom: 20px; }
+    .input-group label { display: block; font-size: 14px; color: var(--text-muted); margin-bottom: 8px; }
+    .input-group input, .input-group select {
+      width: 100%;
+      padding: 14px 16px;
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 16px;
+      font-family: inherit;
+    }
+    .input-group input:focus, .input-group select:focus { outline: none; border-color: var(--accent); }
+
+    .calc-results {
+      background: var(--bg-dark);
+      border-radius: 16px;
+      padding: 32px;
+    }
+
+    .calc-results h3 {
+      font-size: 16px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .result-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .result-item:last-child { border-bottom: none; }
+    .result-label { color: var(--text-muted); }
+    .result-value { font-size: 24px; font-weight: 700; }
+    .result-value.highlight { color: var(--success); font-size: 32px; }
+    .result-value.negative { color: #e53e3e; }
+
+    /* Pricing */
+    .pricing-grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .pricing-grid { grid-template-columns: 1fr; max-width: 400px; }
+    }
+
+    .pricing-card {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 40px 32px;
+      border: 1px solid var(--border);
+      text-align: center;
+      position: relative;
+    }
+
+    .pricing-card.featured {
+      border-color: var(--accent);
+      transform: scale(1.05);
+    }
+
+    .pricing-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent);
+      color: white;
+      padding: 6px 16px;
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .pricing-card h3 { font-size: 24px; margin-bottom: 8px; }
+    .pricing-card .price { font-size: 48px; font-weight: 800; margin: 24px 0; }
+    .pricing-card .price span { font-size: 18px; font-weight: 400; color: var(--text-muted); }
+    .pricing-card .setup { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
+
+    .pricing-features { text-align: left; margin: 24px 0; }
+    .pricing-features li {
+      padding: 8px 0;
+      padding-left: 24px;
+      position: relative;
+      list-style: none;
+      color: var(--text-muted);
+    }
+    .pricing-features li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--success);
+    }
+
+    .pricing-cta {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      margin-top: 24px;
+      transition: all 0.2s;
+      background: var(--bg-dark);
+      color: var(--text);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .pricing-card.featured .pricing-cta {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .pricing-cta:hover { transform: translateY(-2px); }
+
+    .guarantee {
+      max-width: 700px;
+      margin: 60px auto 0;
+      text-align: center;
+      padding: 32px;
+      background: rgba(56, 161, 105, 0.1);
+      border-radius: 16px;
+      border: 1px solid rgba(56, 161, 105, 0.3);
+    }
+    .guarantee h4 { font-size: 20px; margin-bottom: 12px; color: var(--success); }
+    .guarantee p { color: var(--text-muted); }
+
+    .cta-section {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      text-align: center;
+    }
+    .cta-section h2 { font-size: 36px; margin-bottom: 16px; }
+    .cta-section p { color: var(--text-muted); font-size: 18px; margin-bottom: 32px; }
+
+    .footer {
+      padding: 40px 24px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.active { display: flex; }
+
+    .modal {
+      background: var(--bg-card);
+      border-radius: 24px;
+      padding: 48px;
+      max-width: 500px;
+      width: 90%;
+      position: relative;
+      border: 1px solid var(--border);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .modal h2 { margin-bottom: 8px; }
+    .modal .subtitle { color: var(--text-muted); margin-bottom: 24px; }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; margin-bottom: 8px; font-weight: 500; }
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 14px;
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 16px;
+    }
+
+    .form-submit {
+      width: 100%;
+      padding: 16px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .form-submit:hover { background: var(--accent-hover); }
+
+    .form-note {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .success-message {
+      text-align: center;
+      padding: 40px;
+    }
+    .success-message .icon { font-size: 64px; margin-bottom: 16px; }
+    .success-message h2 { color: var(--success); margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="logo">CNC<span>Planner</span> Pro</div>
+    <div class="nav-links">
+      <a href="#demo">Live Demo</a>
+      <a href="#roi">ROI Rechner</a>
+      <a href="#pricing">Preise</a>
+      <a href="#" class="nav-cta" onclick="openModal('trial')">Kostenlos testen</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">🏭 Für Lohnfertiger & CNC-Betriebe</div>
+      <h1>Von der Zeichnung zum Angebot in <span>2 Minuten</span> statt 30</h1>
+      <p>Automatische Zeitberechnung, professionelle Angebote, weniger Fehler. Endlich Zeit für das, was zählt: Fertigen.</p>
+      <div class="hero-buttons">
+        <button class="btn btn-primary" onclick="openModal('trial')">🚀 30 Tage kostenlos testen</button>
+        <a href="#demo" class="btn btn-secondary">▶️ Live Demo ansehen</a>
+      </div>
+      <p class="hero-sub">✓ Keine Kreditkarte nötig &nbsp; ✓ 30 Tage Geld-zurück-Garantie &nbsp; ✓ In 5 Minuten startklar</p>
+    </div>
+  </section>
+
+  <section class="stats-bar">
+    <div class="stats-grid">
+      <div class="stat">
+        <div class="stat-number">28 min</div>
+        <div class="stat-label">Zeitersparnis pro Kalkulation</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">93%</div>
+        <div class="stat-label">weniger Kalkulationsfehler</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">4.200€</div>
+        <div class="stat-label">Ersparnis pro Jahr (Ø)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live Demo Section -->
+  <section class="section demo-section" id="demo">
+    <div class="section-header">
+      <h2>🖥️ Live Demo</h2>
+      <p>Sehen Sie selbst, wie einfach CNC-Kalkulation sein kann</p>
+    </div>
+    <div class="demo-container">
+      <div class="demo-header">
+        <div class="demo-dot red"></div>
+        <div class="demo-dot yellow"></div>
+        <div class="demo-dot green"></div>
+        <span style="margin-left: 16px; color: var(--text-muted); font-size: 14px;">CNC Planner Pro — Demo</span>
+      </div>
+      <iframe src="app-v3.html" class="demo-iframe"></iframe>
+    </div>
+  </section>
+
+  <!-- ROI Calculator -->
+  <section class="section calculator-section" id="roi">
+    <div class="section-header">
+      <h2>💰 Was sparen Sie wirklich?</h2>
+      <p>Rechnen Sie selbst — mit Ihren echten Zahlen</p>
+    </div>
+    <div class="calculator">
+      <div class="calc-grid">
+        <div class="calc-inputs">
+          <h3>Ihre Situation</h3>
+          <div class="input-group">
+            <label>Kalkulationen pro Monat</label>
+            <input type="number" id="calcsPerMonth" value="40" min="1">
+          </div>
+          <div class="input-group">
+            <label>Minuten pro Kalkulation (aktuell)</label>
+            <input type="number" id="minsPerCalc" value="30" min="1">
+          </div>
+          <div class="input-group">
+            <label>Ihr Stundensatz (€/h)</label>
+            <input type="number" id="hourlyRate" value="65" min="1">
+          </div>
+          <div class="input-group">
+            <label>Gewählter Plan</label>
+            <select id="selectedPlan" onchange="calculate()">
+              <option value="49">Starter (€49/Monat)</option>
+              <option value="149" selected>Professional (€149/Monat)</option>
+              <option value="399">Enterprise (€399/Monat)</option>
+            </select>
+          </div>
+        </div>
+        <div class="calc-results">
+          <h3>Ihre Ersparnis</h3>
+          <div class="result-item">
+            <span class="result-label">Zeitersparnis / Monat</span>
+            <span class="result-value" id="timeSaved">18,7 Std</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Wert der Zeit</span>
+            <span class="result-value" id="timeSavedValue">1.213 €</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">CNC Planner Kosten</span>
+            <span class="result-value negative" id="toolCost">- 149 €</span>
+          </div>
+          <div class="result-item" style="border-top: 2px solid var(--success); margin-top: 16px; padding-top: 24px;">
+            <span class="result-label"><strong>Netto-Ersparnis / Monat</strong></span>
+            <span class="result-value highlight" id="netSavings">1.064 €</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Ersparnis / Jahr</span>
+            <span class="result-value highlight" id="yearlySavings">12.768 €</span>
+          </div>
+        </div>
+      </div>
+      <div style="text-align: center; margin-top: 32px;">
+        <button class="btn btn-primary" onclick="openModal('trial')">Jetzt starten und sparen →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section class="section" id="pricing">
+    <div class="section-header">
+      <h2>Einfache, faire Preise</h2>
+      <p>Keine versteckten Kosten. Monatlich kündbar. 30 Tage Geld-zurück.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <h3>Starter</h3>
+        <p style="color: var(--text-muted);">Für Einzelunternehmer</p>
+        <div class="price">€49<span>/Monat</span></div>
+        <div class="setup">Keine Einrichtgebühr</div>
+        <ul class="pricing-features">
+          <li>Unbegrenzte Kalkulationen</li>
+          <li>3 Maschinen-Profile</li>
+          <li>PDF-Export</li>
+          <li>E-Mail Support</li>
+        </ul>
+        <button class="pricing-cta" onclick="openModal('starter')">30 Tage kostenlos testen</button>
+      </div>
+      <div class="pricing-card featured">
+        <div class="pricing-badge">BELIEBT</div>
+        <h3>Professional</h3>
+        <p style="color: var(--text-muted);">Für wachsende Betriebe</p>
+        <div class="price">€149<span>/Monat</span></div>
+        <div class="setup">€500 Einrichtung (inkl. 2h Onboarding)</div>
+        <ul class="pricing-features">
+          <li>Alles aus Starter</li>
+          <li>Unbegrenzte Maschinen</li>
+          <li>Angebots-Generator mit Logo</li>
+          <li>Werkzeugdatenbank</li>
+          <li>3 Benutzer</li>
+          <li>Telefon-Support</li>
+        </ul>
+        <button class="pricing-cta" onclick="openModal('professional')">30 Tage kostenlos testen</button>
+      </div>
+      <div class="pricing-card">
+        <h3>Enterprise</h3>
+        <p style="color: var(--text-muted);">Für größere Fertiger</p>
+        <div class="price">€399<span>/Monat</span></div>
+        <div class="setup">Individuelle Einrichtung</div>
+        <ul class="pricing-features">
+          <li>Alles aus Professional</li>
+          <li>API-Zugang</li>
+          <li>ERP-Integration</li>
+          <li>Unbegrenzte Benutzer</li>
+          <li>Dedizierter Support</li>
+          <li>Custom Features</li>
+        </ul>
+        <button class="pricing-cta" onclick="openModal('enterprise')">Kontakt aufnehmen</button>
+      </div>
+    </div>
+    <div class="guarantee">
+      <h4>🛡️ 30 Tage Geld-zurück-Garantie</h4>
+      <p>Nicht zufrieden? Volle Erstattung, keine Fragen. Wir sind überzeugt, dass Sie bleiben werden.</p>
+    </div>
+  </section>
+
+  <section class="section cta-section">
+    <h2>Bereit, Zeit und Geld zu sparen?</h2>
+    <p>Starten Sie heute — in 5 Minuten eingerichtet, 30 Tage kostenlos.</p>
+    <button class="btn btn-primary" onclick="openModal('trial')" style="font-size: 20px; padding: 20px 40px;">
+      🚀 Jetzt kostenlos starten
+    </button>
+  </section>
+
+  <footer class="footer">
+    <p>© 2026 CNC Planner Pro • Ein Produkt von Florian Ziesche</p>
+    <p style="margin-top: 8px;">
+      <a href="#" style="color: var(--text-muted);">Impressum</a> • 
+      <a href="#" style="color: var(--text-muted);">Datenschutz</a> • 
+      <a href="#" style="color: var(--text-muted);">AGB</a> •
+      <a href="mailto:florian@example.com" style="color: var(--text-muted);">Kontakt</a>
+    </p>
+  </footer>
+
+  <!-- Trial Modal -->
+  <div class="modal-overlay" id="trialModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <div id="modalContent">
+        <h2>🚀 30 Tage kostenlos testen</h2>
+        <p class="subtitle">Keine Kreditkarte nötig. Sofort loslegen.</p>
+        <form id="trialForm" onsubmit="submitForm(event)">
+          <div class="form-group">
+            <label>Firma / Betrieb *</label>
+            <input type="text" name="company" required placeholder="Mustermann CNC GmbH">
+          </div>
+          <div class="form-group">
+            <label>Ihr Name *</label>
+            <input type="text" name="name" required placeholder="Max Mustermann">
+          </div>
+          <div class="form-group">
+            <label>E-Mail *</label>
+            <input type="email" name="email" required placeholder="max@mustermann-cnc.de">
+          </div>
+          <div class="form-group">
+            <label>Telefon (optional)</label>
+            <input type="tel" name="phone" placeholder="+49 123 456789">
+          </div>
+          <div class="form-group">
+            <label>Gewünschter Plan</label>
+            <select name="plan" id="modalPlan">
+              <option value="starter">Starter (€49/Monat)</option>
+              <option value="professional" selected>Professional (€149/Monat)</option>
+              <option value="enterprise">Enterprise (€399/Monat)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Anzahl CNC-Maschinen</label>
+            <select name="machines">
+              <option value="1-3">1-3 Maschinen</option>
+              <option value="4-10">4-10 Maschinen</option>
+              <option value="10+">Mehr als 10</option>
+            </select>
+          </div>
+          <button type="submit" class="form-submit">Kostenlos starten →</button>
+          <p class="form-note">🔒 Ihre Daten sind sicher. Wir hassen Spam genauso wie Sie.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ROI Calculator
+    const inputs = ['calcsPerMonth', 'minsPerCalc', 'hourlyRate', 'selectedPlan'];
+    
+    function calculate() {
+      const calcs = parseFloat(document.getElementById('calcsPerMonth').value) || 40;
+      const mins = parseFloat(document.getElementById('minsPerCalc').value) || 30;
+      const rate = parseFloat(document.getElementById('hourlyRate').value) || 65;
+      const planCost = parseFloat(document.getElementById('selectedPlan').value) || 149;
+      
+      const minsWithTool = 2;
+      const minsSaved = (mins - minsWithTool) * calcs;
+      const hoursSaved = minsSaved / 60;
+      const timeSavedValue = hoursSaved * rate;
+      const netSavings = timeSavedValue - planCost;
+      const yearlySavings = netSavings * 12;
+      
+      document.getElementById('timeSaved').textContent = hoursSaved.toFixed(1).replace('.', ',') + ' Std';
+      document.getElementById('timeSavedValue').textContent = Math.round(timeSavedValue).toLocaleString('de-DE') + ' €';
+      document.getElementById('toolCost').textContent = '- ' + planCost + ' €';
+      document.getElementById('netSavings').textContent = Math.round(netSavings).toLocaleString('de-DE') + ' €';
+      document.getElementById('yearlySavings').textContent = Math.round(yearlySavings).toLocaleString('de-DE') + ' €';
+    }
+    
+    inputs.forEach(id => {
+      document.getElementById(id).addEventListener('input', calculate);
+    });
+    calculate();
+
+    // Modal functions
+    function openModal(plan) {
+      document.getElementById('trialModal').classList.add('active');
+      if (plan && document.getElementById('modalPlan')) {
+        const planMap = { 'trial': 'professional', 'starter': 'starter', 'professional': 'professional', 'enterprise': 'enterprise' };
+        document.getElementById('modalPlan').value = planMap[plan] || 'professional';
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('trialModal').classList.remove('active');
+      // Reset form if needed
+      document.getElementById('modalContent').innerHTML = `
+        <h2>🚀 30 Tage kostenlos testen</h2>
+        <p class="subtitle">Keine Kreditkarte nötig. Sofort loslegen.</p>
+        <form id="trialForm" onsubmit="submitForm(event)">
+          <div class="form-group">
+            <label>Firma / Betrieb *</label>
+            <input type="text" name="company" required placeholder="Mustermann CNC GmbH">
+          </div>
+          <div class="form-group">
+            <label>Ihr Name *</label>
+            <input type="text" name="name" required placeholder="Max Mustermann">
+          </div>
+          <div class="form-group">
+            <label>E-Mail *</label>
+            <input type="email" name="email" required placeholder="max@mustermann-cnc.de">
+          </div>
+          <div class="form-group">
+            <label>Telefon (optional)</label>
+            <input type="tel" name="phone" placeholder="+49 123 456789">
+          </div>
+          <div class="form-group">
+            <label>Gewünschter Plan</label>
+            <select name="plan" id="modalPlan">
+              <option value="starter">Starter (€49/Monat)</option>
+              <option value="professional" selected>Professional (€149/Monat)</option>
+              <option value="enterprise">Enterprise (€399/Monat)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Anzahl CNC-Maschinen</label>
+            <select name="machines">
+              <option value="1-3">1-3 Maschinen</option>
+              <option value="4-10">4-10 Maschinen</option>
+              <option value="10+">Mehr als 10</option>
+            </select>
+          </div>
+          <button type="submit" class="form-submit">Kostenlos starten →</button>
+          <p class="form-note">🔒 Ihre Daten sind sicher. Wir hassen Spam genauso wie Sie.</p>
+        </form>
+      `;
+    }
+
+    function submitForm(e) {
+      e.preventDefault();
+      const form = e.target;
+      const data = new FormData(form);
+      const lead = {
+        company: data.get('company'),
+        name: data.get('name'),
+        email: data.get('email'),
+        phone: data.get('phone'),
+        plan: data.get('plan'),
+        machines: data.get('machines'),
+        timestamp: new Date().toISOString()
+      };
+      
+      // Save to localStorage
+      let leads = JSON.parse(localStorage.getItem('cnc_leads') || '[]');
+      leads.push(lead);
+      localStorage.setItem('cnc_leads', JSON.stringify(leads));
+      
+      // Show success message
+      document.getElementById('modalContent').innerHTML = `
+        <div class="success-message">
+          <div class="icon">✅</div>
+          <h2>Vielen Dank!</h2>
+          <p style="color: var(--text-muted); margin-bottom: 24px;">
+            Wir haben Ihre Anfrage erhalten und melden uns innerhalb von 24 Stunden bei Ihnen.
+          </p>
+          <p style="margin-bottom: 24px;">
+            <strong>In der Zwischenzeit:</strong><br>
+            Testen Sie die Demo-Version direkt hier auf der Seite.
+          </p>
+          <a href="#demo" class="btn btn-primary" onclick="closeModal()" style="text-decoration: none;">
+            → Zur Demo
+          </a>
+        </div>
+      `;
+      
+      // Also send notification (you'd replace this with actual email/webhook)
+      console.log('New lead:', lead);
+      
+      // Optional: Send to webhook/email service
+      // fetch('YOUR_WEBHOOK_URL', { method: 'POST', body: JSON.stringify(lead) });
+    }
+
+    // Close modal on outside click
+    document.getElementById('trialModal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+
+    // Close modal on escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeModal();
+    });
+  </script>
+</body>
+</html>

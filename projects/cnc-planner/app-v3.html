@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CNC Planner Pro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1a365d;
+      --primary-light: #2c5282;
+      --accent: #ed8936;
+      --accent-hover: #dd6b20;
+      --success: #38a169;
+      --warning: #e53e3e;
+      --bg-dark: #0f1419;
+      --bg-main: #1a1f2e;
+      --bg-card: #242b3d;
+      --bg-elevated: #2d3548;
+      --border: #3d4663;
+      --text: #f7fafc;
+      --text-secondary: #a0aec0;
+      --text-muted: #718096;
+      --font-sans: 'Inter', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-dark);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 240px;
+      background: var(--bg-main);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      height: 100vh;
+    }
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo {
+      font-weight: 700;
+      font-size: 18px;
+    }
+    .logo span { color: var(--accent); }
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 12px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-bottom: 4px;
+    }
+    .nav-item:hover { background: var(--bg-elevated); color: var(--text); }
+    .nav-item.active { background: var(--accent); color: white; }
+    .nav-item .icon { font-size: 18px; }
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Main Content */
+    .main {
+      flex: 1;
+      margin-left: 240px;
+      min-height: 100vh;
+    }
+    .header {
+      padding: 20px 32px;
+      background: var(--bg-main);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header h1 { font-size: 20px; font-weight: 600; }
+    .header-actions { display: flex; gap: 12px; }
+    
+    .content {
+      padding: 32px;
+    }
+
+    /* Page Sections */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 24px;
+    }
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-body { padding: 20px; }
+
+    /* Forms */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .form-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .form-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+    .form-group { margin-bottom: 16px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+    .form-input, .form-select {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--bg-main);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+    }
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .form-input.mono { font-family: var(--font-mono); }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-secondary { background: var(--bg-elevated); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--border); }
+    .btn-success { background: var(--success); color: white; }
+    .btn-sm { padding: 6px 12px; font-size: 13px; }
+
+    /* Tables */
+    .table-container { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    th {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      background: var(--bg-elevated);
+    }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+    .mono { font-family: var(--font-mono); }
+    .text-accent { color: var(--accent); }
+    .text-success { color: var(--success); }
+    .text-muted { color: var(--text-muted); }
+
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .stat-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value { font-size: 28px; font-weight: 700; font-family: var(--font-mono); margin-top: 8px; }
+    .stat-value.accent { color: var(--accent); }
+
+    /* Badge */
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+    }
+    .badge-primary { background: var(--primary); color: white; }
+    .badge-warning { background: rgba(229, 62, 62, 0.2); color: var(--warning); }
+
+    /* Upload Zone */
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 32px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s;
+      background: var(--bg-main);
+    }
+    .upload-zone:hover { border-color: var(--accent); background: rgba(237, 137, 54, 0.05); }
+    .upload-zone.has-file { border-color: var(--success); border-style: solid; }
+    .upload-icon { font-size: 32px; margin-bottom: 12px; }
+    .upload-text { font-weight: 500; margin-bottom: 4px; }
+    .upload-hint { font-size: 13px; color: var(--text-muted); }
+    .file-info {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--bg-elevated);
+      border-radius: 6px;
+      margin-top: 12px;
+    }
+    .file-info.visible { display: flex; }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--bg-main);
+      padding: 4px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+    }
+    .tab {
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { background: var(--accent); color: white; }
+
+    /* Print Styles */
+    @media print {
+      body { background: white; color: black; }
+      .sidebar, .header { display: none; }
+      .main { margin-left: 0; }
+      .card { border: 1px solid #ddd; }
+      .btn { display: none; }
+    }
+
+    /* Quote Print Layout */
+    .quote-document {
+      background: white;
+      color: #1a1a1a;
+      padding: 40px;
+      border-radius: 12px;
+      max-width: 800px;
+    }
+    .quote-document .header-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    .quote-document .company-info { font-size: 14px; color: #666; }
+    .quote-document .doc-title { font-size: 28px; font-weight: 700; color: var(--primary); }
+    .quote-document .doc-number { font-size: 14px; color: #666; }
+    .quote-document h3 { font-size: 16px; margin: 24px 0 12px; color: var(--primary); }
+    .quote-document table { font-size: 14px; }
+    .quote-document th { background: #f7fafc; color: #1a1a1a; }
+    .quote-document td { border-color: #e2e8f0; color: #1a1a1a; }
+    .quote-document .total-row { font-weight: 700; background: #f7fafc; }
+    .quote-document .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #666; }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">CNC<span>Planner</span> Pro</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active" onclick="showPage('kalkulation')">
+        <span class="icon">⚙️</span> Kalkulation
+      </div>
+      <div class="nav-item" onclick="showPage('angebot')">
+        <span class="icon">📄</span> Angebot
+      </div>
+      <div class="nav-item" onclick="showPage('fertigung')">
+        <span class="icon">🔧</span> Fertigungsanweisung
+      </div>
+      <div class="nav-item" onclick="showPage('einstellungen')">
+        <span class="icon">⚡</span> Einstellungen
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div style="margin-bottom: 8px;"><strong>Demo-Version</strong></div>
+      CNC Planner Pro v3.0<br>
+      © 2026 Florian Ziesche
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+    <!-- KALKULATION PAGE -->
+    <div id="page-kalkulation" class="page active">
+      <div class="header">
+        <h1>⚙️ Zeitkalkulation</h1>
+        <div class="header-actions">
+          <button class="btn btn-secondary" onclick="resetCalculation()">🔄 Zurücksetzen</button>
+          <button class="btn btn-primary" onclick="calculateAndShowQuote()">📄 Angebot erstellen →</button>
+        </div>
+      </div>
+      <div class="content">
+        <!-- Stats -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Fertigungszeit</div>
+            <div class="stat-value accent" id="stat-time">41.8 min</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Stückpreis</div>
+            <div class="stat-value" id="stat-price">€127.50</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Teile / Schicht</div>
+            <div class="stat-value" id="stat-parts">14 Stk</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Gesamtpreis</div>
+            <div class="stat-value text-success" id="stat-total">€1,275.00</div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 350px 1fr; gap: 24px;">
+          <!-- Left: Inputs -->
+          <div>
+            <!-- Upload -->
+            <div class="card">
+              <div class="card-header">📐 Zeichnung / 3D-Modell</div>
+              <div class="card-body">
+                <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+                  <div class="upload-icon">📄</div>
+                  <div class="upload-text">Datei hochladen</div>
+                  <div class="upload-hint">PDF, DXF, STEP oder STP</div>
+                </div>
+                <input type="file" id="fileInput" accept=".pdf,.dxf,.step,.stp" hidden onchange="handleFileUpload(this)">
+                <div class="file-info" id="fileInfo">
+                  <span>📄</span>
+                  <span id="fileName">-</span>
+                  <button class="btn btn-sm btn-secondary" onclick="removeFile()">✕</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Parameters -->
+            <div class="card">
+              <div class="card-header">📋 Parameter</div>
+              <div class="card-body">
+                <div class="form-group">
+                  <label class="form-label">Werkstoff</label>
+                  <select class="form-select" id="material" onchange="recalculate()">
+                    <option value="1.4571">1.4571 - Edelstahl V4A</option>
+                    <option value="1.4301">1.4301 - Edelstahl V2A</option>
+                    <option value="alu7075">Aluminium 7075</option>
+                    <option value="st37">St37 - Baustahl</option>
+                    <option value="42crmo4">42CrMo4 - Vergütungsstahl</option>
+                  </select>
+                </div>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label">Stückzahl</label>
+                    <input type="number" class="form-input" id="quantity" value="10" min="1" onchange="recalculate()">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Losgröße</label>
+                    <input type="number" class="form-input" id="batchSize" value="10" min="1" onchange="recalculate()">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Maschine</label>
+                  <select class="form-select" id="machine" onchange="recalculate()">
+                    <option value="versa943">FEHLMANN VERSA 943</option>
+                    <option value="dmg">DMG MORI CMX 50</option>
+                    <option value="mazak">MAZAK VCN-530C</option>
+                  </select>
+                </div>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label">Stundensatz (€/h)</label>
+                    <input type="number" class="form-input" id="hourlyRate" value="85" onchange="recalculate()">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Materialkosten (€)</label>
+                    <input type="number" class="form-input" id="materialCost" value="45" onchange="recalculate()">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Gewinnmarge (%)</label>
+                  <input type="number" class="form-input" id="margin" value="20" onchange="recalculate()">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Operations Table -->
+          <div class="card">
+            <div class="card-header">
+              <span>🔧 Arbeitsschritte</span>
+              <button class="btn btn-sm btn-secondary" onclick="addOperation()">+ Schritt hinzufügen</button>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <div class="table-container">
+                <table id="opsTable">
+                  <thead>
+                    <tr>
+                      <th>OP</th>
+                      <th>Beschreibung</th>
+                      <th>Werkzeug</th>
+                      <th>n (U/min)</th>
+                      <th>f (mm/min)</th>
+                      <th>t_h (min)</th>
+                      <th>t_n (min)</th>
+                      <th>Σ (min)</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="opsBody">
+                    <!-- Filled by JS -->
+                  </tbody>
+                  <tfoot>
+                    <tr style="background: var(--bg-elevated); font-weight: 600;">
+                      <td colspan="5" style="text-align: right;">SUMME</td>
+                      <td class="mono text-accent" id="sumTh">33.2</td>
+                      <td class="mono" id="sumTn">8.6</td>
+                      <td class="mono text-accent" id="sumTotal">41.8</td>
+                      <td></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANGEBOT PAGE -->
+    <div id="page-angebot" class="page">
+      <div class="header">
+        <h1>📄 Angebot</h1>
+        <div class="header-actions">
+          <button class="btn btn-secondary" onclick="window.print()">🖨️ Drucken</button>
+          <button class="btn btn-primary" onclick="downloadPDF()">📥 PDF speichern</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="card">
+          <div class="card-body">
+            <div class="quote-document" id="quoteDocument">
+              <div class="header-row">
+                <div>
+                  <div style="font-size: 24px; font-weight: 700; color: #1a365d;">CNC<span style="color: #ed8936;">Planner</span> Pro</div>
+                  <div class="company-info" style="margin-top: 8px;">
+                    <span id="quote-company">Mustermann CNC GmbH</span><br>
+                    <span id="quote-address">Musterstraße 123, 12345 Musterstadt</span><br>
+                    <span id="quote-contact">Tel: +49 123 456789</span>
+                  </div>
+                </div>
+                <div style="text-align: right;">
+                  <div class="doc-title">ANGEBOT</div>
+                  <div class="doc-number">Nr. <span id="quote-number">2026-0001</span></div>
+                  <div style="margin-top: 8px; font-size: 14px;">Datum: <span id="quote-date">01.02.2026</span></div>
+                </div>
+              </div>
+
+              <h3>Kunde</h3>
+              <div style="background: #f7fafc; padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+                <strong id="quote-customer">Kunde XY GmbH</strong><br>
+                <span id="quote-customer-address">Kundenstraße 456, 67890 Kundenstadt</span>
+              </div>
+
+              <h3>Projekt: <span id="quote-project">Grundplatte Antriebseinheit</span></h3>
+
+              <table style="margin-top: 16px;">
+                <thead>
+                  <tr>
+                    <th>Pos.</th>
+                    <th>Beschreibung</th>
+                    <th>Werkstoff</th>
+                    <th>Menge</th>
+                    <th>Einzelpreis</th>
+                    <th>Gesamt</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td id="quote-item-desc">Grundplatte nach Zeichnung</td>
+                    <td id="quote-item-material">1.4571</td>
+                    <td id="quote-item-qty">10 Stk</td>
+                    <td id="quote-item-price">€127.50</td>
+                    <td id="quote-item-total">€1,275.00</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="5" style="text-align: right;">Zwischensumme</td>
+                    <td id="quote-subtotal">€1,275.00</td>
+                  </tr>
+                  <tr>
+                    <td colspan="5" style="text-align: right;">MwSt. (19%)</td>
+                    <td id="quote-vat">€242.25</td>
+                  </tr>
+                  <tr class="total-row">
+                    <td colspan="5" style="text-align: right;"><strong>Gesamtbetrag</strong></td>
+                    <td><strong id="quote-grand-total">€1,517.25</strong></td>
+                  </tr>
+                </tfoot>
+              </table>
+
+              <h3>Konditionen</h3>
+              <ul style="font-size: 14px; color: #666; padding-left: 20px;">
+                <li>Lieferzeit: <span id="quote-delivery">2-3 Wochen nach Auftragserteilung</span></li>
+                <li>Zahlungsziel: 14 Tage netto</li>
+                <li>Gültigkeit: 30 Tage</li>
+              </ul>
+
+              <div class="footer">
+                <p>Wir freuen uns auf Ihre Auftragserteilung.</p>
+                <p style="margin-top: 12px;">
+                  <strong>Bankverbindung:</strong> IBAN: DE89 3704 0044 0532 0130 00 | BIC: COBADEFFXXX
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FERTIGUNGSANWEISUNG PAGE -->
+    <div id="page-fertigung" class="page">
+      <div class="header">
+        <h1>🔧 Fertigungsanweisung</h1>
+        <div class="header-actions">
+          <button class="btn btn-secondary" onclick="window.print()">🖨️ Drucken</button>
+          <button class="btn btn-primary" onclick="exportNC()">💾 NC-Code exportieren</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="stats-grid" style="grid-template-columns: repeat(5, 1fr);">
+          <div class="stat-card">
+            <div class="stat-label">Auftrag</div>
+            <div class="stat-value" style="font-size: 20px;" id="fa-order">2026-0001</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Teil</div>
+            <div class="stat-value" style="font-size: 20px;" id="fa-part">Grundplatte</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Werkstoff</div>
+            <div class="stat-value" style="font-size: 20px;" id="fa-material">1.4571</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Stückzahl</div>
+            <div class="stat-value" style="font-size: 20px;" id="fa-qty">10</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Maschine</div>
+            <div class="stat-value" style="font-size: 20px;" id="fa-machine">VERSA 943</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">Arbeitsfolge</div>
+          <div class="card-body" style="padding: 0;">
+            <table>
+              <thead>
+                <tr>
+                  <th>OP</th>
+                  <th>Arbeitsgang</th>
+                  <th>Werkzeug</th>
+                  <th>Halter</th>
+                  <th>n (U/min)</th>
+                  <th>f (mm/min)</th>
+                  <th>ap (mm)</th>
+                  <th>ae (mm)</th>
+                  <th>Zeit</th>
+                  <th>Hinweise</th>
+                </tr>
+              </thead>
+              <tbody id="faOpsBody">
+                <!-- Filled by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+          <div class="card">
+            <div class="card-header">Werkzeugliste</div>
+            <div class="card-body" style="padding: 0;">
+              <table>
+                <thead>
+                  <tr><th>T-Nr</th><th>Werkzeug</th><th>Ø</th><th>Länge</th></tr>
+                </thead>
+                <tbody id="toolList">
+                  <!-- Filled by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">Prüfmerkmale</div>
+            <div class="card-body" style="padding: 0;">
+              <table>
+                <thead>
+                  <tr><th>Merkmal</th><th>Soll</th><th>Toleranz</th><th>Prüfmittel</th></tr>
+                </thead>
+                <tbody id="inspectionList">
+                  <!-- Filled by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EINSTELLUNGEN PAGE -->
+    <div id="page-einstellungen" class="page">
+      <div class="header">
+        <h1>⚡ Einstellungen</h1>
+        <div class="header-actions">
+          <button class="btn btn-primary" onclick="saveSettings()">💾 Speichern</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="tabs">
+          <div class="tab active" onclick="showSettingsTab('firma')">Firma</div>
+          <div class="tab" onclick="showSettingsTab('maschinen')">Maschinen</div>
+          <div class="tab" onclick="showSettingsTab('werkzeuge')">Werkzeuge</div>
+          <div class="tab" onclick="showSettingsTab('kalkulation')">Kalkulation</div>
+        </div>
+
+        <div id="settings-firma" class="settings-tab">
+          <div class="card">
+            <div class="card-header">Firmendaten</div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Firmenname</label>
+                  <input type="text" class="form-input" id="set-company" value="Mustermann CNC GmbH">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Inhaber / GF</label>
+                  <input type="text" class="form-input" id="set-owner" value="Max Mustermann">
+                </div>
+                <div class="form-group full">
+                  <label class="form-label">Adresse</label>
+                  <input type="text" class="form-input" id="set-address" value="Musterstraße 123, 12345 Musterstadt">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Telefon</label>
+                  <input type="text" class="form-input" id="set-phone" value="+49 123 456789">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">E-Mail</label>
+                  <input type="email" class="form-input" id="set-email" value="info@mustermann-cnc.de">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">USt-IdNr.</label>
+                  <input type="text" class="form-input" id="set-vatid" value="DE123456789">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">IBAN</label>
+                  <input type="text" class="form-input" id="set-iban" value="DE89 3704 0044 0532 0130 00">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="settings-maschinen" class="settings-tab" style="display: none;">
+          <div class="card">
+            <div class="card-header">
+              <span>Maschinenpark</span>
+              <button class="btn btn-sm btn-secondary">+ Maschine hinzufügen</button>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <table>
+                <thead>
+                  <tr><th>Name</th><th>Typ</th><th>Steuerung</th><th>Stundensatz</th><th>Status</th><th></th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>FEHLMANN VERSA 943</strong></td>
+                    <td>5-Achs Fräsen</td>
+                    <td>Heidenhain TNC 640</td>
+                    <td>€85/h</td>
+                    <td><span class="badge" style="background: rgba(56, 161, 105, 0.2); color: var(--success);">Aktiv</span></td>
+                    <td><button class="btn btn-sm btn-secondary">✏️</button></td>
+                  </tr>
+                  <tr>
+                    <td><strong>DMG MORI CMX 50</strong></td>
+                    <td>3-Achs Fräsen</td>
+                    <td>Siemens 840D</td>
+                    <td>€75/h</td>
+                    <td><span class="badge" style="background: rgba(56, 161, 105, 0.2); color: var(--success);">Aktiv</span></td>
+                    <td><button class="btn btn-sm btn-secondary">✏️</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="settings-werkzeuge" class="settings-tab" style="display: none;">
+          <div class="card">
+            <div class="card-header">
+              <span>Werkzeugdatenbank</span>
+              <button class="btn btn-sm btn-secondary">+ Werkzeug hinzufügen</button>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <table>
+                <thead>
+                  <tr><th>T-Nr</th><th>Bezeichnung</th><th>Typ</th><th>Ø</th><th>Schneiden</th><th></th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>T1</td><td>Ø63 Planfräser</td><td>Planfräser</td><td>63mm</td><td>6</td><td><button class="btn btn-sm btn-secondary">✏️</button></td></tr>
+                  <tr><td>T2</td><td>Ø20 VHM-Fräser</td><td>Schaftfräser</td><td>20mm</td><td>4</td><td><button class="btn btn-sm btn-secondary">✏️</button></td></tr>
+                  <tr><td>T3</td><td>Ø16 VHM-Fräser</td><td>Schaftfräser</td><td>16mm</td><td>4</td><td><button class="btn btn-sm btn-secondary">✏️</button></td></tr>
+                  <tr><td>T4</td><td>Ø9 VHM-Bohrer</td><td>Bohrer</td><td>9mm</td><td>2</td><td><button class="btn btn-sm btn-secondary">✏️</button></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="settings-kalkulation" class="settings-tab" style="display: none;">
+          <div class="card">
+            <div class="card-header">Kalkulationsparameter</div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Standard-Stundensatz (€/h)</label>
+                  <input type="number" class="form-input" value="85">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Standard-Marge (%)</label>
+                  <input type="number" class="form-input" value="20">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Rüstzeit-Faktor</label>
+                  <input type="number" class="form-input" value="1.0" step="0.1">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Nebenzeit-Faktor</label>
+                  <input type="number" class="form-input" value="1.2" step="0.1">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">MwSt.-Satz (%)</label>
+                  <input type="number" class="form-input" value="19">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Währung</label>
+                  <select class="form-select">
+                    <option>EUR (€)</option>
+                    <option>CHF (Fr.)</option>
+                    <option>USD ($)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Demo operations data
+    let operations = [
+      { op: 'OP10', desc: 'Planfräsen', tool: 'Ø63 Planfräser', n: 1200, f: 300, th: 1.9, tn: 0.8 },
+      { op: 'OP20', desc: 'Schruppen Außenkontur', tool: 'Ø20 VHM-Fräser', n: 2500, f: 400, th: 7.2, tn: 0.8 },
+      { op: 'OP30', desc: 'Schruppen Innenkontur', tool: 'Ø16 VHM-Fräser', n: 3000, f: 350, th: 4.0, tn: 0.8 },
+      { op: 'OP40', desc: 'Lochkreis bohren (8×)', tool: 'Ø9 VHM-Bohrer', n: 3500, f: 280, th: 3.2, tn: 1.2 },
+      { op: 'OP50', desc: 'Schlichten Ø120 h5', tool: 'Ø20 Schlichtfräser', n: 3000, f: 250, th: 4.3, tn: 0.8, critical: true },
+      { op: 'OP60', desc: 'Feinbohren Ø26 H7', tool: 'Feinbohrkopf', n: 800, f: 100, th: 3.3, tn: 0.8, critical: true },
+      { op: 'OP70', desc: 'Feinbohren Ø44 H7', tool: 'Feinbohrkopf', n: 600, f: 80, th: 2.3, tn: 0.8 },
+      { op: 'OP80', desc: 'Stufenfräsen', tool: 'Ø10 VHM-Fräser', n: 4000, f: 300, th: 3.1, tn: 0.8 },
+      { op: 'OP90', desc: 'Gewindefräsen M10 (4×)', tool: 'Gewindefräser M10', n: 2000, f: 200, th: 2.4, tn: 1.0 },
+      { op: 'OP100', desc: 'Anfasen', tool: 'Ø16 Fasenfräser 45°', n: 3000, f: 300, th: 1.5, tn: 0.8 }
+    ];
+
+    // Page navigation
+    function showPage(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById('page-' + page).classList.add('active');
+      event.target.closest('.nav-item').classList.add('active');
+      
+      if (page === 'fertigung') updateFertigungsanweisung();
+    }
+
+    // Settings tabs
+    function showSettingsTab(tab) {
+      document.querySelectorAll('.settings-tab').forEach(t => t.style.display = 'none');
+      document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('settings-' + tab).style.display = 'block';
+      event.target.classList.add('active');
+    }
+
+    // Render operations table
+    function renderOperations() {
+      const tbody = document.getElementById('opsBody');
+      tbody.innerHTML = operations.map((op, i) => `
+        <tr>
+          <td><span class="badge ${op.critical ? 'badge-warning' : 'badge-primary'}">${op.op}</span></td>
+          <td>${op.desc}</td>
+          <td>${op.tool}</td>
+          <td class="mono">${op.n}</td>
+          <td class="mono">${op.f}</td>
+          <td class="mono text-accent">${op.th.toFixed(1)}</td>
+          <td class="mono">${op.tn.toFixed(1)}</td>
+          <td class="mono text-accent">${(op.th + op.tn).toFixed(1)}</td>
+          <td><button class="btn btn-sm btn-secondary" onclick="removeOperation(${i})">✕</button></td>
+        </tr>
+      `).join('');
+      
+      const sumTh = operations.reduce((a, b) => a + b.th, 0);
+      const sumTn = operations.reduce((a, b) => a + b.tn, 0);
+      document.getElementById('sumTh').textContent = sumTh.toFixed(1);
+      document.getElementById('sumTn').textContent = sumTn.toFixed(1);
+      document.getElementById('sumTotal').textContent = (sumTh + sumTn).toFixed(1);
+    }
+
+    function addOperation() {
+      const num = operations.length + 1;
+      operations.push({
+        op: 'OP' + (num * 10),
+        desc: 'Neuer Arbeitsschritt',
+        tool: 'Werkzeug',
+        n: 2000,
+        f: 200,
+        th: 2.0,
+        tn: 0.8
+      });
+      renderOperations();
+      recalculate();
+    }
+
+    function removeOperation(index) {
+      operations.splice(index, 1);
+      renderOperations();
+      recalculate();
+    }
+
+    // Recalculate
+    function recalculate() {
+      const qty = parseInt(document.getElementById('quantity').value) || 10;
+      const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 85;
+      const materialCost = parseFloat(document.getElementById('materialCost').value) || 45;
+      const margin = parseFloat(document.getElementById('margin').value) || 20;
+      
+      const totalTime = operations.reduce((a, b) => a + b.th + b.tn, 0);
+      const laborCost = (totalTime / 60) * hourlyRate;
+      const unitPrice = (laborCost + materialCost) * (1 + margin / 100);
+      const totalPrice = unitPrice * qty;
+      const partsPerShift = Math.floor(480 / totalTime);
+      
+      document.getElementById('stat-time').textContent = totalTime.toFixed(1) + ' min';
+      document.getElementById('stat-price').textContent = '€' + unitPrice.toFixed(2);
+      document.getElementById('stat-parts').textContent = partsPerShift + ' Stk';
+      document.getElementById('stat-total').textContent = '€' + totalPrice.toLocaleString('de-DE', {minimumFractionDigits: 2});
+      
+      // Store for quote
+      window.calcData = { qty, unitPrice, totalPrice, totalTime, materialCost, margin };
+    }
+
+    // File upload
+    function handleFileUpload(input) {
+      if (input.files.length > 0) {
+        const file = input.files[0];
+        document.getElementById('fileName').textContent = file.name;
+        document.getElementById('fileInfo').classList.add('visible');
+        document.getElementById('uploadZone').classList.add('has-file');
+      }
+    }
+
+    function removeFile() {
+      document.getElementById('fileInput').value = '';
+      document.getElementById('fileInfo').classList.remove('visible');
+      document.getElementById('uploadZone').classList.remove('has-file');
+    }
+
+    // Quote
+    function calculateAndShowQuote() {
+      recalculate();
+      updateQuote();
+      showPage('angebot');
+      document.querySelectorAll('.nav-item')[1].click();
+    }
+
+    function updateQuote() {
+      const data = window.calcData || { qty: 10, unitPrice: 127.50, totalPrice: 1275 };
+      const material = document.getElementById('material').value;
+      const subtotal = data.totalPrice;
+      const vat = subtotal * 0.19;
+      const grandTotal = subtotal + vat;
+      
+      document.getElementById('quote-number').textContent = '2026-' + String(Math.floor(Math.random() * 9000) + 1000).padStart(4, '0');
+      document.getElementById('quote-date').textContent = new Date().toLocaleDateString('de-DE');
+      document.getElementById('quote-item-material').textContent = material;
+      document.getElementById('quote-item-qty').textContent = data.qty + ' Stk';
+      document.getElementById('quote-item-price').textContent = '€' + data.unitPrice.toFixed(2);
+      document.getElementById('quote-item-total').textContent = '€' + data.totalPrice.toLocaleString('de-DE', {minimumFractionDigits: 2});
+      document.getElementById('quote-subtotal').textContent = '€' + subtotal.toLocaleString('de-DE', {minimumFractionDigits: 2});
+      document.getElementById('quote-vat').textContent = '€' + vat.toLocaleString('de-DE', {minimumFractionDigits: 2});
+      document.getElementById('quote-grand-total').textContent = '€' + grandTotal.toLocaleString('de-DE', {minimumFractionDigits: 2});
+    }
+
+    // Fertigungsanweisung
+    function updateFertigungsanweisung() {
+      const material = document.getElementById('material').value;
+      const qty = document.getElementById('quantity').value;
+      const machine = document.getElementById('machine').options[document.getElementById('machine').selectedIndex].text;
+      
+      document.getElementById('fa-material').textContent = material;
+      document.getElementById('fa-qty').textContent = qty;
+      document.getElementById('fa-machine').textContent = machine.split(' ')[0];
+      
+      // Operations
+      document.getElementById('faOpsBody').innerHTML = operations.map(op => `
+        <tr>
+          <td><span class="badge ${op.critical ? 'badge-warning' : 'badge-primary'}">${op.op}</span></td>
+          <td>${op.desc}</td>
+          <td>${op.tool}</td>
+          <td>-</td>
+          <td class="mono">${op.n}</td>
+          <td class="mono">${op.f}</td>
+          <td class="mono">-</td>
+          <td class="mono">-</td>
+          <td class="mono text-accent">${(op.th + op.tn).toFixed(1)} min</td>
+          <td class="text-muted">${op.critical ? '⚠️ Toleranz prüfen' : ''}</td>
+        </tr>
+      `).join('');
+      
+      // Tool list
+      const tools = [...new Set(operations.map(o => o.tool))];
+      document.getElementById('toolList').innerHTML = tools.map((t, i) => `
+        <tr><td>T${i+1}</td><td>${t}</td><td>-</td><td>-</td></tr>
+      `).join('');
+      
+      // Inspection
+      document.getElementById('inspectionList').innerHTML = `
+        <tr><td>Ø120 h5</td><td>120.000</td><td>-0.013</td><td>Bügelmessschraube</td></tr>
+        <tr><td>Ø26 H7</td><td>26.000</td><td>+0.021</td><td>Innenmessschraube</td></tr>
+        <tr><td>Ø44 H7</td><td>44.000</td><td>+0.025</td><td>Innenmessschraube</td></tr>
+        <tr><td>Planfläche</td><td>Ra 1.6</td><td>-</td><td>Rauheitsmessgerät</td></tr>
+      `;
+    }
+
+    function resetCalculation() {
+      document.getElementById('quantity').value = 10;
+      document.getElementById('materialCost').value = 45;
+      document.getElementById('margin').value = 20;
+      removeFile();
+      recalculate();
+    }
+
+    function downloadPDF() {
+      alert('PDF-Export wird vorbereitet...\n\nIn der Vollversion wird hier ein professionelles PDF generiert.');
+      window.print();
+    }
+
+    function exportNC() {
+      alert('NC-Code Export (Heidenhain TNC 640)\n\nDiese Funktion ist in der Vollversion verfügbar.');
+    }
+
+    function saveSettings() {
+      alert('Einstellungen gespeichert!');
+    }
+
+    // Initialize
+    renderOperations();
+    recalculate();
+  </script>
+</body>
+</html>

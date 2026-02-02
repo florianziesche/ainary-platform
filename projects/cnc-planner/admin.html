@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CNC Planner Pro — Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1a365d;
+      --accent: #ed8936;
+      --success: #38a169;
+      --bg-dark: #0f1419;
+      --bg-card: #242b3d;
+      --text: #f7fafc;
+      --text-muted: #a0aec0;
+      --border: #3d4663;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      padding: 24px;
+      min-height: 100vh;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+    }
+    .header h1 { font-size: 24px; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .stat-card {
+      background: var(--bg-card);
+      padding: 24px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    .stat-card .label { font-size: 14px; color: var(--text-muted); }
+    .stat-card .value { font-size: 36px; font-weight: 700; margin-top: 8px; }
+    .stat-card .value.accent { color: var(--accent); }
+    .stat-card .value.success { color: var(--success); }
+    .card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-header h2 { font-size: 18px; }
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-secondary { background: var(--border); color: var(--text); }
+    .btn-danger { background: #e53e3e; color: white; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 16px 24px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      font-size: 12px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+    .badge {
+      padding: 4px 12px;
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge-new { background: rgba(237, 137, 54, 0.2); color: var(--accent); }
+    .badge-contacted { background: rgba(49, 130, 206, 0.2); color: #3182ce; }
+    .badge-trial { background: rgba(56, 161, 105, 0.2); color: var(--success); }
+    .empty {
+      padding: 60px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+    .actions { display: flex; gap: 8px; }
+    @media (max-width: 900px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>📊 CNC Planner Pro — Admin</h1>
+    <div style="display: flex; gap: 12px;">
+      <button class="btn btn-secondary" onclick="exportCSV()">📥 Export CSV</button>
+      <button class="btn btn-danger" onclick="clearLeads()">🗑️ Alle löschen</button>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card">
+      <div class="label">Leads gesamt</div>
+      <div class="value accent" id="totalLeads">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Diese Woche</div>
+      <div class="value" id="weekLeads">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Starter</div>
+      <div class="value" id="starterLeads">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Professional</div>
+      <div class="value success" id="proLeads">0</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2>📋 Lead-Übersicht</h2>
+      <button class="btn btn-secondary" onclick="loadLeads()">🔄 Aktualisieren</button>
+    </div>
+    <div id="leadsTable">
+      <div class="empty">Keine Leads vorhanden. Teilen Sie die Landing Page!</div>
+    </div>
+  </div>
+
+  <script>
+    function loadLeads() {
+      const leads = JSON.parse(localStorage.getItem('cnc_leads') || '[]');
+      
+      // Update stats
+      document.getElementById('totalLeads').textContent = leads.length;
+      
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      const weekLeads = leads.filter(l => new Date(l.timestamp) > weekAgo);
+      document.getElementById('weekLeads').textContent = weekLeads.length;
+      
+      document.getElementById('starterLeads').textContent = leads.filter(l => l.plan === 'starter').length;
+      document.getElementById('proLeads').textContent = leads.filter(l => l.plan === 'professional').length;
+      
+      // Render table
+      if (leads.length === 0) {
+        document.getElementById('leadsTable').innerHTML = '<div class="empty">Keine Leads vorhanden. Teilen Sie die Landing Page!</div>';
+        return;
+      }
+      
+      const rows = leads.reverse().map((lead, i) => {
+        const date = new Date(lead.timestamp);
+        const dateStr = date.toLocaleDateString('de-DE') + ' ' + date.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit'});
+        const planLabel = {starter: 'Starter €49', professional: 'Pro €149', enterprise: 'Enterprise €399'}[lead.plan] || lead.plan;
+        
+        return `
+          <tr>
+            <td><strong>${lead.company || '-'}</strong><br><span style="color: var(--text-muted); font-size: 13px;">${lead.name}</span></td>
+            <td>${lead.email}</td>
+            <td>${lead.phone || '-'}</td>
+            <td><span class="badge badge-new">${planLabel}</span></td>
+            <td>${lead.machines || '-'}</td>
+            <td style="color: var(--text-muted); font-size: 13px;">${dateStr}</td>
+            <td class="actions">
+              <button class="btn btn-secondary" onclick="copyEmail('${lead.email}')">📧</button>
+              <button class="btn btn-secondary" onclick="deleteLead(${leads.length - 1 - i})">🗑️</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      
+      document.getElementById('leadsTable').innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Firma / Name</th>
+              <th>E-Mail</th>
+              <th>Telefon</th>
+              <th>Plan</th>
+              <th>Maschinen</th>
+              <th>Datum</th>
+              <th>Aktionen</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+    
+    function copyEmail(email) {
+      navigator.clipboard.writeText(email);
+      alert('E-Mail kopiert: ' + email);
+    }
+    
+    function deleteLead(index) {
+      if (!confirm('Lead wirklich löschen?')) return;
+      let leads = JSON.parse(localStorage.getItem('cnc_leads') || '[]');
+      leads.splice(index, 1);
+      localStorage.setItem('cnc_leads', JSON.stringify(leads));
+      loadLeads();
+    }
+    
+    function clearLeads() {
+      if (!confirm('ALLE Leads löschen? Das kann nicht rückgängig gemacht werden!')) return;
+      localStorage.removeItem('cnc_leads');
+      loadLeads();
+    }
+    
+    function exportCSV() {
+      const leads = JSON.parse(localStorage.getItem('cnc_leads') || '[]');
+      if (leads.length === 0) {
+        alert('Keine Leads zum Exportieren.');
+        return;
+      }
+      
+      const headers = ['Firma', 'Name', 'E-Mail', 'Telefon', 'Plan', 'Maschinen', 'Datum'];
+      const rows = leads.map(l => [
+        l.company || '',
+        l.name || '',
+        l.email || '',
+        l.phone || '',
+        l.plan || '',
+        l.machines || '',
+        l.timestamp || ''
+      ]);
+      
+      const csv = [headers.join(';'), ...rows.map(r => r.join(';'))].join('\n');
+      const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'cnc-planner-leads-' + new Date().toISOString().split('T')[0] + '.csv';
+      a.click();
+    }
+    
+    // Load on page load
+    loadLeads();
+  </script>
+</body>
+</html>

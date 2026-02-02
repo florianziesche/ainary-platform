@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Zeitberechnung und Angebotsgenerator für die CNC-Grundplatte WCAD-15-02-2020.">
+  <title>Zeitberechnung & Angebot - Grundplatte WCAD-15-02-2020</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="assets/css/shared.css">
+  <link rel="stylesheet" href="assets/css/zeitberechnung.css">
+  <script src="assets/js/quote.js" defer></script>
+</head>
+<body>
+  <main class="container">
+    <header class="page-header">
+      <h1 class="page-title">Zeitberechnung & Angebot – Grundplatte WCAD-15-02-2020</h1>
+      <p class="lead-text">Demo für die automatische Angebotserstellung mit Zeitkalkulation und Fertigungsdetails.</p>
+    </header>
+
+    <section class="quote-generator" aria-labelledby="quote-heading">
+      <form id="quoteForm" novalidate>
+        <div class="quote-header">
+          <h2 id="quote-heading">💰 Angebot automatisch erstellen</h2>
+          <div class="form-actions">
+            <button class="btn btn-ghost" type="submit">📄 Angebot generieren</button>
+            <span class="form-hint" id="quoteStatus" role="status" aria-live="polite"></span>
+          </div>
+        </div>
+
+        <div class="quote-fields">
+          <div class="form-group">
+            <label for="customerName">Kunde / Firma</label>
+            <input type="text" id="customerName" name="customerName" placeholder="z.B. Mustermann GmbH" autocomplete="organization">
+          </div>
+          <div class="form-group">
+            <label for="contactPerson">Ansprechpartner</label>
+            <input type="text" id="contactPerson" name="contactPerson" placeholder="z.B. Herr Müller" autocomplete="name">
+          </div>
+          <div class="form-group">
+            <label for="projectRef">Anfrage-Nr.</label>
+            <input type="text" id="projectRef" name="projectRef" placeholder="z.B. ANF-2026-0042">
+          </div>
+          <div class="form-group">
+            <label for="quantity">Stückzahl</label>
+            <input type="number" id="quantity" name="quantity" value="10" min="1" inputmode="numeric" required>
+          </div>
+          <div class="form-group">
+            <label for="machineRate">Maschinenstundensatz (€/h)</label>
+            <input type="number" id="machineRate" name="machineRate" value="85" step="5" min="0" inputmode="decimal">
+          </div>
+          <div class="form-group">
+            <label for="materialCost">Materialpreis Rohteil (€)</label>
+            <input type="number" id="materialCost" name="materialCost" value="45" step="5" min="0" inputmode="decimal">
+          </div>
+          <div class="form-group">
+            <label for="materialMarkup">Material-Aufschlag (%)</label>
+            <input type="number" id="materialMarkup" name="materialMarkup" value="15" step="5" min="0" max="200" inputmode="decimal">
+          </div>
+          <div class="form-group">
+            <label for="profitMargin">Gewinnmarge (%)</label>
+            <input type="number" id="profitMargin" name="profitMargin" value="20" step="5" min="0" max="200" inputmode="decimal">
+          </div>
+          <div class="form-group">
+            <label for="deliveryWeeks">Lieferzeit (Wochen)</label>
+            <input type="number" id="deliveryWeeks" name="deliveryWeeks" value="3" min="1" max="52" inputmode="numeric">
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <section class="quote-output" id="quoteOutput" hidden aria-live="polite">
+      <div class="quote-header-row">
+        <div>
+          <h2 class="section-title">ANGEBOT</h2>
+          <p class="text-muted">Angebots-Nr.: <span class="editable" contenteditable="true">ANG-2026-____</span></p>
+        </div>
+        <div class="quote-meta">
+          <p>Datum: <span id="quoteDate"></span></p>
+          <p>Gültig bis: <span id="quoteValidUntil"></span></p>
+        </div>
+      </div>
+
+      <div class="quote-company">
+        <div class="company-info">
+          <h4>Absender:</h4>
+          <p><strong><span class="editable" contenteditable="true">[Ihre Firma GmbH]</span></strong></p>
+          <p><span class="editable" contenteditable="true">[Straße Nr.]</span></p>
+          <p><span class="editable" contenteditable="true">[PLZ Ort]</span></p>
+          <p>Tel: <span class="editable" contenteditable="true">[Telefon]</span></p>
+        </div>
+        <div class="company-info">
+          <h4>Empfänger:</h4>
+          <p><strong id="quoteCustomer"></strong></p>
+          <p>z.Hd. <span id="quoteContact"></span></p>
+          <p><span class="editable" contenteditable="true">[Kundenadresse eintragen]</span></p>
+        </div>
+      </div>
+
+      <p class="quote-intro">Sehr geehrte Damen und Herren,</p>
+      <p class="quote-intro">vielen Dank für Ihre Anfrage <strong id="quoteProjectRef"></strong>. Gerne unterbreiten wir Ihnen folgendes Angebot für die Fertigung von CNC-Drehteilen:</p>
+
+      <table class="quote-table">
+        <caption class="visually-hidden">Positionsliste des Angebots</caption>
+        <thead>
+          <tr>
+            <th class="col-pos">Pos.</th>
+            <th>Beschreibung</th>
+            <th class="col-qty">Menge</th>
+            <th class="col-unit">Einheit</th>
+            <th class="col-price price-cell">EP (€)</th>
+            <th class="col-price price-cell">GP (€)</th>
+          </tr>
+        </thead>
+        <tbody id="quoteTableBody"></tbody>
+      </table>
+
+      <div class="quote-total">
+        <div class="quote-total-row">
+          <span>Zwischensumme:</span>
+          <span id="quoteSubtotal"></span>
+        </div>
+        <div class="quote-total-row">
+          <span>Einmalige Rüstkosten (30 min):</span>
+          <span id="quoteSetup"></span>
+        </div>
+        <div class="quote-total-row">
+          <span><strong>Nettosumme:</strong></span>
+          <span id="quoteNet"></span>
+        </div>
+        <div class="quote-total-row">
+          <span>zzgl. MwSt. 19%:</span>
+          <span id="quoteVat"></span>
+        </div>
+        <div class="quote-total-row grand">
+          <span>GESAMTBETRAG BRUTTO:</span>
+          <span id="quoteGross"></span>
+        </div>
+      </div>
+
+      <div class="page-break">
+        <h3 class="section-heading">📋 Technische Details</h3>
+        <table class="data-table detail-table">
+          <tbody>
+            <tr><td><strong>Zeichnungs-Nr.:</strong></td><td>WCAD-15-02-2020</td></tr>
+            <tr><td><strong>Benennung:</strong></td><td>Grundplatte (Zahnradpumpe)</td></tr>
+            <tr><td><strong>Werkstoff:</strong></td><td>Edelstahl 1.4571 (X6CrNiMoTi17-12-2)</td></tr>
+            <tr><td><strong>Gewicht:</strong></td><td>1,903 kg</td></tr>
+            <tr><td><strong>Bearbeitungszeit:</strong></td><td>41,8 min/Stück</td></tr>
+            <tr><td><strong>Toleranzen:</strong></td><td>Ø120 h5, Ø26 H7, Ø44 H7</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h3 class="section-heading">📦 Lieferbedingungen</h3>
+        <ul class="quote-intro">
+          <li>Lieferzeit: <strong id="quoteDelivery"></strong> ab Auftragserteilung</li>
+          <li>Lieferung: <span class="editable" contenteditable="true">frei Haus / ab Werk</span></li>
+          <li>Verpackung: Industrieverpackung inklusive</li>
+          <li>Erstmusterprüfbericht auf Anfrage</li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="section-heading">💳 Zahlungsbedingungen</h3>
+        <p class="quote-intro"><span class="editable" contenteditable="true">30 Tage netto / 2% Skonto bei Zahlung innerhalb 14 Tagen</span></p>
+      </div>
+
+      <div class="note-box">
+        <strong>Hinweis:</strong> Dieses Angebot basiert auf den angegebenen Stückzahlen. Bei Änderungen der Menge können sich die Stückpreise ändern. Technische Änderungen vorbehalten.
+      </div>
+
+      <p class="quote-intro">Wir freuen uns auf Ihren Auftrag und stehen für Rückfragen gerne zur Verfügung.</p>
+      <p class="quote-intro">Mit freundlichen Grüßen</p>
+      <p class="quote-intro"><span class="editable" contenteditable="true">[Ihr Name]</span><br><span class="editable" contenteditable="true">[Position]</span></p>
+
+      <div class="quote-actions no-print">
+        <button class="btn btn-primary" type="button" id="printQuote">🖨️ Drucken / PDF</button>
+        <button class="btn btn-secondary" type="button" id="copyQuote">📋 Kopieren</button>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="timecalc-heading">
+      <div class="card-header">
+        <h2 id="timecalc-heading">📊 Zeitberechnung - Grundplatte WCAD-15-02-2020</h2>
+      </div>
+      <div class="card-content">
+        <h3 class="section-heading">1. Berechnungsgrundlagen</h3>
+        <div class="formula-box">
+          <div class="formula">t_h = L / v_f = L / (f × n) [min]</div>
+          <p class="lead-text">t_h = Hauptzeit | L = Schnittweg [mm] | f = Vorschub [mm/min] | n = Drehzahl [U/min]</p>
+        </div>
+
+        <h3 class="section-heading">2. Maschinendaten FEHLMANN VERSA® 943</h3>
+        <table class="data-table" aria-label="Maschinendaten">
+          <tbody>
+            <tr><td><strong>Eilgang X/Y/Z</strong></td><td>40.000 mm/min</td><td><strong>Werkzeugwechsel</strong></td><td>0,5 min</td></tr>
+            <tr><td><strong>Spindel max.</strong></td><td>12.000 U/min</td><td><strong>Steuerung</strong></td><td>Heidenhain TNC 640</td></tr>
+          </tbody>
+        </table>
+
+        <h3 class="section-heading">3. Detaillierte Zeitberechnung</h3>
+        <table class="data-table" aria-label="Detaillierte Zeitberechnung">
+          <thead>
+            <tr><th>OP</th><th>Beschreibung</th><th>Berechnung</th><th>t_h</th><th>t_n</th><th>Gesamt</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>OP10</strong></td><td>Planfräsen</td><td class="calc">L=750mm / f=300</td><td class="result">1,9</td><td>0,8</td><td class="result">2,7</td></tr>
+            <tr><td><strong>OP20</strong></td><td>Schruppen Außen</td><td class="calc">π×120×14 / f=400</td><td class="result">7,2</td><td>0,8</td><td class="result">8,0</td></tr>
+            <tr><td><strong>OP30</strong></td><td>Schruppen Innen</td><td class="calc">Kreistasche / f=350</td><td class="result">4,0</td><td>0,8</td><td class="result">4,8</td></tr>
+            <tr><td><strong>OP40</strong></td><td>Lochkreis 8×</td><td class="calc">8×45mm×9 Hübe</td><td class="result">3,2</td><td>1,2</td><td class="result">4,4</td></tr>
+            <tr class="critical-row"><td><strong>OP50</strong></td><td>Schlichten Ø120 h5</td><td class="calc">π×120×42 / f=250</td><td class="result">4,3</td><td>0,8</td><td class="result">5,1</td></tr>
+            <tr class="critical-row"><td><strong>OP60</strong></td><td>Feinbohren Ø26 H7</td><td class="calc">45mm×3,3 / f=100</td><td class="result">3,3</td><td>0,8</td><td class="result">4,1</td></tr>
+            <tr><td><strong>OP70</strong></td><td>Feinbohren Ø44 H7</td><td class="calc">15mm×3 / f=80</td><td class="result">2,3</td><td>0,8</td><td class="result">3,1</td></tr>
+            <tr><td><strong>OP80</strong></td><td>Stufenfräsen</td><td class="calc">Tasche / f=300</td><td class="result">3,1</td><td>0,8</td><td class="result">3,9</td></tr>
+            <tr><td><strong>OP90</strong></td><td>Gewindefräsen 4×</td><td class="calc">4×π×8×12 / f=200</td><td class="result">2,4</td><td>1,0</td><td class="result">3,4</td></tr>
+            <tr><td><strong>OP100</strong></td><td>Anfasen</td><td class="calc">L=450mm / f=300</td><td class="result">1,5</td><td>0,8</td><td class="result">2,3</td></tr>
+            <tr class="subtotal-row"><td colspan="3" class="cell-right"><strong>Summe:</strong></td><td><strong>33,2</strong></td><td><strong>8,6</strong></td><td><strong>41,8 min</strong></td></tr>
+            <tr class="total-row"><td colspan="5" class="cell-right"><strong>ERSTMUSTER (+30 min Rüsten):</strong></td><td><strong>71,8 min</strong></td></tr>
+          </tbody>
+        </table>
+
+        <h3 class="section-heading">4. Zusammenfassung</h3>
+        <div class="summary-grid">
+          <div class="summary-card">
+            <div class="summary-value">41,8</div>
+            <div class="summary-label">Min/Teil</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-value">71,8</div>
+            <div class="summary-label">Min Erstmuster</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-value">~14</div>
+            <div class="summary-label">Teile/Schicht</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-value">79%</div>
+            <div class="summary-label">Schnittzeit</div>
+          </div>
+        </div>
+
+        <div class="note-box">
+          <strong>📝 Hinweis:</strong> Zeiten sind Richtwerte für Edelstahl 1.4571. Tatsächliche Zeiten können je nach Werkzeugzustand und Maschineneinstellung variieren. Werkzeugwechsel VERSA 943: 0,5 min (Kettenmagazin).
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p><strong>WeserCAD GmbH</strong> | Zeitkalkulation & Angebotsgenerator | WCAD-15-02-2020 | 25.01.2026</p>
+    </footer>
+  </main>
+</body>
+</html>

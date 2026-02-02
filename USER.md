@@ -6,16 +6,75 @@
 
 - **Name:** Florian Ziesche
 - **What to call them:** Florian
-- **Pronouns:** *(optional)* He/ Him
-- **Timezone:** America/New_York
-- **Notes:** 
+- **Pronouns:** He/Him
+- **Timezone:** America/New_York (but currently in Germany)
+- **Notes:** German native, works in English
+
+## Family
+
+- **Wife:** Nancy
+  - Based in NYC (her life center, apartment very important to her)
+  - Freelancer: Massage therapist (Soothe), caregiver for her mother (paid), gigs (US Open, etc.)
+  - Building: Personal Assistant services + Digital Marketing freelance
+  - Open to moving to Germany, but NYC apartment is anchor
+- **Daughter:** Floriana (3 years old, birthday: December 25, 2022)
+  - Currently in German kindergarten (learning German)
+  - Major factor in all life/career decisions
+  - Quality time: 18:00-20:30 daily (protected)
+
+## Current Location (Feb 2026)
+
+- **Temporarily:** Schlottwitz, near Glashütte, Germany (parents' house, with grandparents)
+- **Home base:** NYC — 550 10th Ave, NY, NY
+- Apartment won through housing lottery (rent discount + Section 8 voucher)
+- Effective rent: ~$1,300 USD/month
+
+## Financial Reality
+
+- **Current income:** ~€3,000/month freelance (insufficient)
+- **ALG 1:** ~€2,700/month (applying next week, can de-register daily for freelance gigs)
+- **Target:** €6,000/month to "breathe easy"
+- **Minimum:** €3,000/month to cover basic bills
+
+### Debt (~€70K total)
+| Creditor | Amount | Notes |
+|----------|--------|-------|
+| Parents | ~€35,000 | Deutsche Bank loan (NYC deposit/furniture), wedding 2024 (€10K), school loan (€3.5K) |
+| KfW + BAföG | ~€10,000 | Education loans |
+| Finanzamt | ~€5,000 | Tax debt |
+| Health Insurance | ~€5,000 | Back payments |
+
+### Fixed Costs
+- NYC rent: ~$1,300/month (after lottery discount + Section 8)
+- Storage unit NYC
+- Flights DE↔US
+- Occasional car rental
+- Loans/debt payments
+
+### Background
+Overspent in NYC supporting family, expected a good-paying job that didn't materialize. Now in Germany for ALG1 + lower cost of living while job searching.
 
 ## Communication Channels
 
-- **Primary:** Telegram (for King)
+- **Primary:** Telegram (most stable)
+- **Backup:** WhatsApp (disconnects often, avoid as primary)
 - **Work:** Email, LinkedIn
-- **Personal:** WhatsApp, iMessage
+- **Personal:** iMessage
 - **Calendar:** Google Calendar
+
+## Energy & Rhythms
+
+- **Peak hours:** 8:30-17:30 (when Floriana at Kindergarten), most productive in morning
+- **Evening work:** 22:00-24:00 (~2 hours)
+- **Weekends/no school:** Evening work, ~3 hours productive
+- **No-contact times:** 18:00-20:30 (quality time with Floriana)
+- **Note:** Currently adjusting from jetlag
+
+## What Makes Him Happy
+
+- Floriana (daughter) — primary source of joy
+- Sports: Gym, MMA, sports in general
+- Meeting people (but currently limited due to daughter + finances)
 
 ## Energy & Rhythms
 

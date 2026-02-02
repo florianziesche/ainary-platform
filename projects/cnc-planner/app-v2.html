@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CNC Fertigungsplaner - Professionelle Zeitberechnung und Angebotserstellung">
+  <title>CNC Fertigungsplaner Pro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Corporate Identity - Industrial Professional */
+      --primary: #1a365d;        /* Deep Navy */
+      --primary-light: #2c5282;
+      --primary-dark: #0d1f3c;
+      --accent: #ed8936;         /* Industrial Orange */
+      --accent-hover: #dd6b20;
+      --success: #38a169;
+      --warning: #e53e3e;
+      --info: #3182ce;
+      
+      /* Neutrals - Steel Tones */
+      --bg-dark: #0f1419;
+      --bg-main: #1a1f2e;
+      --bg-card: #242b3d;
+      --bg-elevated: #2d3548;
+      --border: #3d4663;
+      --border-light: #4a5578;
+      
+      /* Text */
+      --text-primary: #f7fafc;
+      --text-secondary: #a0aec0;
+      --text-muted: #718096;
+      
+      /* Fonts */
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      
+      /* Spacing & Radius */
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--accent);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .logo-text {
+      font-weight: 700;
+      font-size: 20px;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-text span {
+      color: var(--accent);
+    }
+
+    .header-nav {
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-btn {
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover, .nav-btn.active {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border-color: var(--border-light);
+    }
+
+    /* Main Layout */
+    .main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 400px 1fr;
+      gap: 24px;
+      min-height: calc(100vh - 64px);
+    }
+
+    @media (max-width: 1024px) {
+      .main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Sidebar - File Upload */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+    }
+
+    .card-body {
+      padding: 20px;
+    }
+
+    /* File Upload Zone */
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-md);
+      padding: 32px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--bg-main);
+    }
+
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(237, 137, 54, 0.05);
+    }
+
+    .upload-zone.has-file {
+      border-color: var(--success);
+      border-style: solid;
+    }
+
+    .upload-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 12px;
+      background: var(--bg-elevated);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .upload-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .upload-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .upload-formats {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .format-badge {
+      padding: 4px 10px;
+      background: var(--bg-elevated);
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      color: var(--text-secondary);
+    }
+
+    .file-preview {
+      display: none;
+      padding: 16px;
+      background: var(--bg-elevated);
+      border-radius: var(--radius-md);
+      margin-top: 16px;
+    }
+
+    .file-preview.visible {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .file-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--primary);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .file-info {
+      flex: 1;
+    }
+
+    .file-name {
+      font-weight: 500;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .file-size {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .file-remove {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: var(--warning);
+      color: white;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    /* Form Inputs */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--bg-main);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-secondary {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+
+    /* Results Panel */
+    .results {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 20px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+
+    .stat-value.accent {
+      color: var(--accent);
+    }
+
+    .stat-unit {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-left: 4px;
+    }
+
+    /* Operations Table */
+    .ops-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .ops-table th {
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-elevated);
+    }
+
+    .ops-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    .ops-table tr:hover td {
+      background: var(--bg-elevated);
+    }
+
+    .op-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      background: var(--primary);
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+    }
+
+    .op-badge.critical {
+      background: var(--warning);
+    }
+
+    .time-cell {
+      font-family: var(--font-mono);
+      color: var(--accent);
+    }
+
+    /* Quote Section */
+    .quote-preview {
+      background: white;
+      color: #1a1a1a;
+      border-radius: var(--radius-lg);
+      padding: 40px;
+    }
+
+    .quote-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .quote-logo {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .quote-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--primary);
+      text-align: right;
+    }
+
+    .quote-number {
+      font-size: 14px;
+      color: #718096;
+      text-align: right;
+    }
+
+    /* Status indicator */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-badge.ready {
+      background: rgba(56, 161, 105, 0.15);
+      color: var(--success);
+    }
+
+    .status-badge.pending {
+      background: rgba(237, 137, 54, 0.15);
+      color: var(--accent);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    /* Empty State */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 40px;
+      text-align: center;
+    }
+
+    .empty-icon {
+      width: 80px;
+      height: 80px;
+      background: var(--bg-elevated);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+
+    .empty-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .empty-text {
+      color: var(--text-muted);
+      max-width: 300px;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 24px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    /* Animations */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .loading {
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    /* Print Styles */
+    @media print {
+      body { background: white; }
+      .header, .sidebar, .footer { display: none; }
+      .main { display: block; padding: 0; }
+      .card { border: none; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon">FZ</div>
+        <div class="logo-text">CNC<span>Planner</span> Pro</div>
+      </div>
+      <nav class="header-nav">
+        <button class="nav-btn active">Kalkulation</button>
+        <button class="nav-btn">Angebot</button>
+        <button class="nav-btn">Fertigungsanweisung</button>
+        <button class="nav-btn">Einstellungen</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- Sidebar - Inputs -->
+    <aside class="sidebar">
+      <!-- Drawing Upload -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📐 Technische Zeichnung</span>
+          <span class="status-badge pending">
+            <span class="status-dot"></span>
+            Ausstehend
+          </span>
+        </div>
+        <div class="card-body">
+          <div class="upload-zone" id="pdfUpload" onclick="document.getElementById('pdfInput').click()">
+            <div class="upload-icon">📄</div>
+            <div class="upload-title">Zeichnung hochladen</div>
+            <div class="upload-subtitle">Klicken oder Datei hierher ziehen</div>
+            <div class="upload-formats">
+              <span class="format-badge">.PDF</span>
+              <span class="format-badge">.DXF</span>
+              <span class="format-badge">.DWG</span>
+            </div>
+          </div>
+          <input type="file" id="pdfInput" accept=".pdf,.dxf,.dwg" hidden>
+          <div class="file-preview" id="pdfPreview">
+            <div class="file-icon">📄</div>
+            <div class="file-info">
+              <div class="file-name" id="pdfFileName">-</div>
+              <div class="file-size" id="pdfFileSize">-</div>
+            </div>
+            <button class="file-remove" onclick="removePdf()">✕</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP Upload -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🔧 3D-Modell</span>
+          <span class="status-badge pending">
+            <span class="status-dot"></span>
+            Optional
+          </span>
+        </div>
+        <div class="card-body">
+          <div class="upload-zone" id="stepUpload" onclick="document.getElementById('stepInput').click()">
+            <div class="upload-icon">📦</div>
+            <div class="upload-title">STEP-Datei hochladen</div>
+            <div class="upload-subtitle">Für automatische Geometrie-Erkennung</div>
+            <div class="upload-formats">
+              <span class="format-badge">.STEP</span>
+              <span class="format-badge">.STP</span>
+              <span class="format-badge">.IGES</span>
+            </div>
+          </div>
+          <input type="file" id="stepInput" accept=".step,.stp,.iges,.igs" hidden>
+          <div class="file-preview" id="stepPreview">
+            <div class="file-icon">📦</div>
+            <div class="file-info">
+              <div class="file-name" id="stepFileName">-</div>
+              <div class="file-size" id="stepFileSize">-</div>
+            </div>
+            <button class="file-remove" onclick="removeStep()">✕</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Parameters -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">⚙️ Parameter</span>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label">Werkstoff</label>
+            <select class="form-input" id="material">
+              <option value="1.4571">1.4571 - Edelstahl (X6CrNiMoTi17-12-2)</option>
+              <option value="1.4301">1.4301 - Edelstahl (V2A)</option>
+              <option value="alu7075">AlMgZn - Aluminium 7075</option>
+              <option value="st37">St37 - Baustahl</option>
+              <option value="42crmo4">42CrMo4 - Vergütungsstahl</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Stückzahl</label>
+              <input type="number" class="form-input" id="quantity" value="10" min="1">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Losgröße</label>
+              <input type="number" class="form-input" id="batchSize" value="10" min="1">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Maschine</label>
+              <select class="form-input" id="machine">
+                <option value="versa943">FEHLMANN VERSA 943</option>
+                <option value="dmg">DMG MORI CMX 50</option>
+                <option value="mazak">MAZAK VCN-530C</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Stundensatz (€/h)</label>
+              <input type="number" class="form-input" id="hourlyRate" value="85" step="5">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Materialpreis (€)</label>
+              <input type="number" class="form-input" id="materialCost" value="45" step="5">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Gewinnmarge (%)</label>
+              <input type="number" class="form-input" id="margin" value="20" step="5">
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="calculate()" style="margin-top: 8px;">
+            ⚡ Berechnung starten
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Results Panel -->
+    <section class="results">
+      <!-- Stats Overview -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Fertigungszeit</div>
+          <div class="stat-value accent" id="totalTime">41.8<span class="stat-unit">min</span></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Stückpreis</div>
+          <div class="stat-value" id="unitPrice">127.50<span class="stat-unit">€</span></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Teile/Schicht</div>
+          <div class="stat-value" id="partsPerShift">14<span class="stat-unit">Stk</span></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Schnittanteil</div>
+          <div class="stat-value" id="cuttingRatio">79<span class="stat-unit">%</span></div>
+        </div>
+      </div>
+
+      <!-- Operations Table -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📋 Arbeitsschritte</span>
+          <button class="btn btn-secondary" style="width: auto; padding: 8px 16px; font-size: 13px;">
+            Export NC-Code
+          </button>
+        </div>
+        <div class="card-body" style="padding: 0;">
+          <table class="ops-table">
+            <thead>
+              <tr>
+                <th>OP</th>
+                <th>Beschreibung</th>
+                <th>Werkzeug</th>
+                <th>Parameter</th>
+                <th>t_h</th>
+                <th>t_n</th>
+                <th>Gesamt</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="op-badge">OP10</span></td>
+                <td>Planfräsen</td>
+                <td>Ø63 Planfräser</td>
+                <td>n=1200, f=300</td>
+                <td class="time-cell">1.9</td>
+                <td>0.8</td>
+                <td class="time-cell">2.7</td>
+              </tr>
+              <tr>
+                <td><span class="op-badge">OP20</span></td>
+                <td>Schruppen Außenkontur</td>
+                <td>Ø20 VHM-Fräser</td>
+                <td>n=2500, f=400</td>
+                <td class="time-cell">7.2</td>
+                <td>0.8</td>
+                <td class="time-cell">8.0</td>
+              </tr>
+              <tr>
+                <td><span class="op-badge">OP30</span></td>
+                <td>Schruppen Innenkontur</td>
+                <td>Ø16 VHM-Fräser</td>
+                <td>n=3000, f=350</td>
+                <td class="time-cell">4.0</td>
+                <td>0.8</td>
+                <td class="time-cell">4.8</td>
+              </tr>
+              <tr>
+                <td><span class="op-badge">OP40</span></td>
+                <td>Lochkreis bohren (8×)</td>
+                <td>Ø9 VHM-Bohrer</td>
+                <td>n=3500, f=280</td>
+                <td class="time-cell">3.2</td>
+                <td>1.2</td>
+                <td class="time-cell">4.4</td>
+              </tr>
+              <tr>
+                <td><span class="op-badge critical">OP50</span></td>
+                <td>Schlichten Ø120 h5</td>
+                <td>Ø20 Schlichtfräser</td>
+                <td>n=3000, f=250</td>
+                <td class="time-cell">4.3</td>
+                <td>0.8</td>
+                <td class="time-cell">5.1</td>
+              </tr>
+              <tr>
+                <td><span class="op-badge critical">OP60</span></td>
+                <td>Feinbohren Ø26 H7</td>
+                <td>Feinbohrkopf</td>
+                <td>n=800, f=100</td>
+                <td class="time-cell">3.3</td>
+                <td>0.8</td>
+                <td class="time-cell">4.1</td>
+              </tr>
+              <tr>
+                <td><span class="op-badge">OP70</span></td>
+                <td>Feinbohren Ø44 H7</td>
+                <td>Feinbohrkopf</td>
+                <td>n=600, f=80</td>
+                <td class="time-cell">2.3</td>
+                <td>0.8</td>
+                <td class="time-cell">3.1</td>
+              </tr>
+              <tr>
+                <td><span class="op-badge">OP80</span></td>
+                <td>Stufenfräsen</td>
+                <td>Ø10 VHM-Fräser</td>
+                <td>n=4000, f=300</td>
+                <td class="time-cell">3.1</td>
+                <td>0.8</td>
+                <td class="time-cell">3.9</td>
+              </tr>
+              <tr>
+                <td><span class="op-badge">OP90</span></td>
+                <td>Gewindefräsen M10 (4×)</td>
+                <td>Gewindefräser M10</td>
+                <td>n=2000, f=200</td>
+                <td class="time-cell">2.4</td>
+                <td>1.0</td>
+                <td class="time-cell">3.4</td>
+              </tr>
+              <tr>
+                <td><span class="op-badge">OP100</span></td>
+                <td>Anfasen</td>
+                <td>Ø16 Fasenfräser 45°</td>
+                <td>n=3000, f=300</td>
+                <td class="time-cell">1.5</td>
+                <td>0.8</td>
+                <td class="time-cell">2.3</td>
+              </tr>
+              <tr style="background: var(--bg-elevated); font-weight: 600;">
+                <td colspan="4" style="text-align: right;">SUMME</td>
+                <td class="time-cell">33.2</td>
+                <td>8.6</td>
+                <td class="time-cell">41.8</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="display: flex; gap: 12px;">
+        <button class="btn btn-primary" onclick="generateQuote()">
+          📄 Angebot erstellen
+        </button>
+        <button class="btn btn-secondary" onclick="generateWorkInstructions()">
+          📋 Fertigungsanweisung
+        </button>
+        <button class="btn btn-secondary" onclick="exportNC()">
+          💾 NC-Code exportieren
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>CNC Fertigungsplaner Pro · © 2026 Florian Ziesche · Version 2.0</p>
+  </footer>
+
+  <script>
+    // File Upload Handlers
+    const pdfInput = document.getElementById('pdfInput');
+    const stepInput = document.getElementById('stepInput');
+    const pdfUpload = document.getElementById('pdfUpload');
+    const stepUpload = document.getElementById('stepUpload');
+
+    // Drag & Drop for PDF
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
+      pdfUpload.addEventListener(evt, preventDefaults, false);
+      stepUpload.addEventListener(evt, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(evt => {
+      pdfUpload.addEventListener(evt, () => pdfUpload.classList.add('dragover'));
+      stepUpload.addEventListener(evt, () => stepUpload.classList.add('dragover'));
+    });
+
+    ['dragleave', 'drop'].forEach(evt => {
+      pdfUpload.addEventListener(evt, () => pdfUpload.classList.remove('dragover'));
+      stepUpload.addEventListener(evt, () => stepUpload.classList.remove('dragover'));
+    });
+
+    pdfUpload.addEventListener('drop', (e) => handleDrop(e, 'pdf'));
+    stepUpload.addEventListener('drop', (e) => handleDrop(e, 'step'));
+
+    function handleDrop(e, type) {
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        if (type === 'pdf') {
+          handlePdfFile(files[0]);
+        } else {
+          handleStepFile(files[0]);
+        }
+      }
+    }
+
+    pdfInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handlePdfFile(e.target.files[0]);
+      }
+    });
+
+    stepInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleStepFile(e.target.files[0]);
+      }
+    });
+
+    function handlePdfFile(file) {
+      document.getElementById('pdfFileName').textContent = file.name;
+      document.getElementById('pdfFileSize').textContent = formatFileSize(file.size);
+      document.getElementById('pdfPreview').classList.add('visible');
+      pdfUpload.classList.add('has-file');
+      
+      // Update status badge
+      pdfUpload.closest('.card').querySelector('.status-badge').className = 'status-badge ready';
+      pdfUpload.closest('.card').querySelector('.status-badge').innerHTML = '<span class="status-dot"></span>Geladen';
+    }
+
+    function handleStepFile(file) {
+      document.getElementById('stepFileName').textContent = file.name;
+      document.getElementById('stepFileSize').textContent = formatFileSize(file.size);
+      document.getElementById('stepPreview').classList.add('visible');
+      stepUpload.classList.add('has-file');
+      
+      stepUpload.closest('.card').querySelector('.status-badge').className = 'status-badge ready';
+      stepUpload.closest('.card').querySelector('.status-badge').innerHTML = '<span class="status-dot"></span>Geladen';
+    }
+
+    function removePdf() {
+      pdfInput.value = '';
+      document.getElementById('pdfPreview').classList.remove('visible');
+      pdfUpload.classList.remove('has-file');
+      pdfUpload.closest('.card').querySelector('.status-badge').className = 'status-badge pending';
+      pdfUpload.closest('.card').querySelector('.status-badge').innerHTML = '<span class="status-dot"></span>Ausstehend';
+    }
+
+    function removeStep() {
+      stepInput.value = '';
+      document.getElementById('stepPreview').classList.remove('visible');
+      stepUpload.classList.remove('has-file');
+      stepUpload.closest('.card').querySelector('.status-badge').className = 'status-badge pending';
+      stepUpload.closest('.card').querySelector('.status-badge').innerHTML = '<span class="status-dot"></span>Optional';
+    }
+
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    function calculate() {
+      // Animate stats
+      const quantity = parseInt(document.getElementById('quantity').value) || 10;
+      const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 85;
+      const materialCost = parseFloat(document.getElementById('materialCost').value) || 45;
+      const margin = parseFloat(document.getElementById('margin').value) || 20;
+      
+      const timePerPart = 41.8; // minutes
+      const laborCost = (timePerPart / 60) * hourlyRate;
+      const unitPrice = (laborCost + materialCost) * (1 + margin / 100);
+      
+      document.getElementById('unitPrice').innerHTML = unitPrice.toFixed(2) + '<span class="stat-unit">€</span>';
+      
+      alert('Berechnung abgeschlossen!\n\nStückpreis: ' + unitPrice.toFixed(2) + ' €\nGesamtpreis (' + quantity + ' Stk): ' + (unitPrice * quantity).toFixed(2) + ' €');
+    }
+
+    function generateQuote() {
+      window.open('Zeitberechnung_mit_Angebot.html', '_blank');
+    }
+
+    function generateWorkInstructions() {
+      window.open('Fertigungsanweisung_Grundplatte_V3.html', '_blank');
+    }
+
+    function exportNC() {
+      alert('NC-Code Export (Heidenhain TNC 640) wird vorbereitet...\n\nDiese Funktion ist in der Demo-Version noch nicht verfügbar.');
+    }
+  </script>
+</body>
+</html>

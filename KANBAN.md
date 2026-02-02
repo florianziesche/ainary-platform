@@ -1,104 +1,129 @@
 # KANBAN — Task Board
 
-*Last updated: 2026-01-31 20:35 CET*
+*Last updated: 2026-02-01 02:30 CET*
 
 ---
 
-## 🔴 URGENT (Due This Week)
+## 🔴 URGENT — This Weekend
 
-### VC Lab Sprint 2 — Due Feb 4 (3 days)
-| Task | Status | Owner | Notes |
-|------|--------|-------|-------|
-| Step 1: NYC Ecosystem | ✅ Draft Ready | Review needed | `step-1-nyc-vc-ecosystem.md` — need 3 more allocators |
-| Step 2: Investment Process | ✅ Draft Ready | Review needed | `step-2-investment-process.md` |
-| Step 3: Investment Stages | ✅ Draft Ready | Review needed | `step-3-investment-stages.md` — needs NYC data |
-| Step 4: VC Terminology | ✅ Complete | — | `step-4-vc-terminology.md` — 30+ terms |
-| Step 5: Secret Sauce | ✅ Draft Ready | **Florian input needed** | `step-5-secret-sauce.md` — needs your examples |
-| Step 6: Networking Events | ✅ Draft Ready | **Florian to register** | `step-6-networking-events.md` — 8 events found |
-| Step 7: Hub Pipelines | ⬜ Not Started | **Florian only** | Needs Decile Hub access |
-| Step 8: Thought Leadership | ✅ Draft Ready | Florian to post | `step-8-thought-leadership.md` — 3 post ideas |
+### Revenue Sprint (Do These First!)
 
-**Sprint Status:** 7/8 deliverables drafted. ~1-2 hours to finalize.
-
-### Monique Meeting — Feb 3, 6 PM CET (3 days)
-| Task | Status | Owner | Notes |
-|------|--------|-------|-------|
-| Meeting brief | ✅ Complete | — | `monique-barbanson-meeting-brief.md` |
-| Demo script | ✅ Included | — | In brief — show AI workflow |
-| Talking points | ✅ Included | — | Aligned to her interests |
-| Questions to ask | ✅ Included | — | 6 questions ready |
-| Pre-meeting checklist | ✅ Included | Florian to confirm | Platform, test demo |
+| Task | Status | File | Next Step |
+|------|--------|------|-----------|
+| Submit Decile application | ✅ Draft Ready | `job-applications/decile-capital-resident/` | Review + submit Monday |
+| Send 10 VC applications | ✅ Drafts Ready | `job-applications/vc-applications-batch-1.md` | Customize + send |
+| Publish LinkedIn post #1 | ✅ Draft Ready | `content/linkedin-posts-batch-1.md` | Review + publish |
+| Publish LinkedIn post #2 | ✅ Draft Ready | `content/linkedin-posts-batch-1.md` | Review + publish |
+| Launch CEO Framework on Gumroad | ✅ Copy Ready | `content/gumroad-ceo-framework-listing.md` | Create listing + publish |
+| Reach out to 5 contacts | ✅ Templates Ready | `outreach/consulting-outreach-templates.md` | Fill names + send |
 
 ---
 
-## 🟠 THIS WEEK — Job Applications
+## 🟠 This Week — VC Lab Sprint 2
 
-| Task | Status | Owner | Notes |
-|------|--------|-------|-------|
-| Decile Capital Resident | ✅ Cover letter drafted | **Review Monday** | `job-applications/decile-capital-resident/` |
-| Update resume | ⬜ Not Started | Florian | Need resume file to review |
-| Plan 2 more applications | ⬜ Monday | Atlas + Florian | Part of review session |
+**Due:** Feb 4 (3 days)
 
-**Send Decile application: Monday after review**
-
----
-
-## 🟡 IN PROGRESS
-
-| Task | Status | Owner | Notes |
-|------|--------|-------|-------|
-| OpenClaw setup | 🟡 Partial | Both | WhatsApp ✅, Telegram ⬜, Email ⬜, Calendar ⬜ |
-| Systems walkthrough | 📅 Rescheduled | Both | Missed 11 AM — do tonight or tomorrow |
+| Step | Status | File | Action Needed |
+|------|--------|------|---------------|
+| Step 1: NYC Ecosystem | ✅ Draft | `vc-lab/sprint-2/step-1-nyc-vc-ecosystem.md` | Review |
+| Step 2: Investment Process | ✅ Draft | `vc-lab/sprint-2/step-2-investment-process.md` | Review |
+| Step 3: Investment Stages | ✅ Draft | `vc-lab/sprint-2/step-3-investment-stages.md` | Review |
+| Step 4: VC Terminology | ✅ Complete | `vc-lab/sprint-2/step-4-vc-terminology.md` | — |
+| Step 5: Secret Sauce | ✅ Draft | `vc-lab/sprint-2/step-5-secret-sauce.md` | **Add your examples** |
+| Step 6: Networking Events | ✅ Draft | `vc-lab/sprint-2/step-6-networking-events.md` | **Register** |
+| Step 7: Decile Hub Pipelines | ⬜ Not Started | — | **Only you can do** |
+| Step 8: Thought Leadership | ✅ Draft | `vc-lab/sprint-2/step-8-thought-leadership.md` | Post from batch |
 
 ---
 
-## 🟢 BACKLOG (After Sprint)
+## 🟡 Meetings This Week
 
-| Task | Priority | Notes |
-|------|----------|-------|
-| Configure Brave API key | High | Enables web search |
-| Connect Google Calendar | High | Enables morning briefings |
-| Connect Gmail | High | Enables inbox monitoring |
-| Set up Telegram bot | Medium | Second channel |
-| Notion template "x100" | Medium | Ship MVP in one weekend |
-| Legal AI Platform work | Low | Parked for now |
-| Manufacturing Software | Low | Parked for now |
+| Date | Meeting | Prep | Status |
+|------|---------|------|--------|
+| **Feb 3 (Mon)** | Submit Decile app | Cover letter ready | ✅ Ready |
+| **Feb 3 (Tue)** | Monique Barbanson, 6 PM CET | Brief ready | ✅ Ready |
+| **Feb 4 (Wed)** | VC Lab Sprint 2 due | 7/8 drafted | 🟡 Review |
+| **Feb 5 (Thu)** | NYU Law Legal Tech Demo Day | Register! | ⬜ Register |
 
 ---
 
-## ✅ DONE TODAY (Jan 31)
+## ✅ DONE Today (Feb 1)
 
-| Task | Time | Notes |
-|------|------|-------|
-| Workspace files setup | AM | IDENTITY, USER, SOUL, AGENTS, TOOLS, HEARTBEAT |
-| Atlas identity established | AM | ♔ |
-| Memory system initialized | AM | MEMORY.md + daily files |
-| Monique meeting brief | PM | Full research + strategy |
-| Decile application draft | PM | Cover letter v1 |
-| Sprint 2 Steps 1-6, 8 drafted | PM | 7/8 complete |
+| Task | Notes |
+|------|-------|
+| Organized Downloads folder | 53 files + 70 folders → Clean |
+| Processed 3 Claude exports | 103KB of knowledge extracted |
+| Set up Obsidian vault structure | iCloud sync enabled |
+| Created Notion structure | VC Career, Ainary, Content pages |
+| Drafted 10 VC applications | Ready to customize |
+| Drafted 2 LinkedIn posts | Ready to publish |
+| Created Gumroad listing copy | Ready to launch |
+| Created consulting outreach templates | 5 templates ready |
+| Updated MEMORY.md | Full context captured |
+| Organized ~/FZ/ drive | 22GB+ organized |
 
 ---
 
 ## 📊 Weekly Metrics
 
 **Week of Jan 27 - Feb 2:**
-- Applications sent: 0 / 2 target (Decile ready for Monday)
-- Networking touches: 1 (Monique scheduled) / 2 target  
-- Follow-ups: 0 / 2 target
-- Content published: 0 (drafts ready)
-- Events registered: 0 / 8 target (events identified)
+
+| Metric | Done | Target | Status |
+|--------|------|--------|--------|
+| Applications sent | 0 | 10 | 🔴 Drafts ready |
+| LinkedIn posts | 0 | 2 | 🔴 Drafts ready |
+| Template launched | No | Yes | 🔴 Copy ready |
+| Consulting outreach | 0 | 5 | 🔴 Templates ready |
+| Networking events | 0 | 2 | 🟡 Register |
+
+**Everything is drafted. You need to SHIP.**
 
 ---
 
-## 🎯 Key Dates
+## 🎯 Priority Order for Tomorrow
 
-| Date | Event | Status |
-|------|-------|--------|
-| **Feb 3 (Mon)** | Decile application → submit | Cover letter ready |
-| **Feb 3 (Tue)** | Monique meeting, 6 PM CET | Brief ready |
-| **Feb 4 (Wed)** | VC Lab Sprint 2 due | 7/8 drafted |
-| **Feb 5 (Thu)** | NYU Law Legal Tech Demo Day | Register! |
+1. **Send VC applications** (30 min) — customize and email
+2. **Launch Gumroad template** (15 min) — create listing
+3. **Publish LinkedIn post** (5 min) — copy from draft
+4. **Send consulting outreach** (20 min) — personalize templates
+5. **Register for events** (10 min) — NYU Legal Tech + others
+
+---
+
+## 📁 File Locations
+
+```
+~/.openclaw/workspace/
+├── job-applications/
+│   ├── decile-capital-resident/
+│   │   └── cover-letter-draft-v1.md
+│   └── vc-applications-batch-1.md      ← 10 drafts
+├── content/
+│   ├── linkedin-posts-batch-1.md       ← 2 posts
+│   └── gumroad-ceo-framework-listing.md
+├── outreach/
+│   └── consulting-outreach-templates.md ← 5 templates
+├── vc-lab/
+│   ├── monique-barbanson-meeting-brief.md
+│   └── sprint-2/                        ← All steps
+└── KANBAN.md                            ← This file
+```
+
+---
+
+## 💰 Revenue Path
+
+| Stream | This Week | This Month | Action |
+|--------|-----------|------------|--------|
+| VC Job | Apply to 10 | Get 2+ interviews | Send applications |
+| Templates | Launch | 20 sales ($2K) | Gumroad + LinkedIn |
+| Consulting | Outreach to 5 | Close 1 ($10K) | Send messages |
+| Content | 2 posts | 8 posts | Publish + engage |
+
+**Minimum viable month:** $12K (1 client + 20 template sales)  
+**Target:** $20K+
 
 ---
 
 *Board maintained by Atlas. Update as tasks move.*
+*Everything is ready. Time to execute.*

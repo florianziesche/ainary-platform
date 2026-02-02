@@ -85,26 +85,33 @@ Add whatever helps you do your job. This is your cheat sheet.
   - ASK before deleting anything
 
 ### 🗄️ Obsidian
-- **Status:** ⬜ Not configured
-- **Vault location:** `~/FZ-Brain/`
+- **Status:** ✅ Configured
+- **Vault location:** `/Users/florianziesche/Library/Mobile Documents/iCloud~md~obsidian/Documents/System_OS/`
+- **Vault name:** System_OS (syncs via iCloud)
 - **Use for:**
   - Private notes and thinking
-  - Daily notes
-  - Research capture
+  - Prompts library
+  - Knowledge base (compounds over time)
+  - Lessons learned (your moat)
+  - People notes (CRM-lite)
 - **Folder structure:**
 ```
-  /00-Inbox
-  /01-Daily
-  /02-VC-Research
-  /03-Ainary
-  /04-Blog-Drafts
-  /05-People
-  /06-Legal-AI
-  /99-Templates
+  /00-Inbox          — Quick capture, process weekly
+  /01-Daily          — Daily notes
+  /10-Projects       — Active work by priority
+  /20-Knowledge      — Evergreen reference (AI, VC, Fundraising)
+  /30-People         — Notes on people you meet
+  /40-Prompts        — Your prompt library
+  /50-Tools          — How you use your stack
+  /60-Lessons        — Hard-won insights (FEED TO AI)
+  /70-Templates      — Reusable structures
+  /80-Archive        — Done but worth keeping
+  /99-System         — Meta, vault guide
 ```
 - **Rules:**
   - Can READ and WRITE freely
   - This is the private thinking space
+  - Knowledge + Lessons = your compound moat
 
 ### 🧠 Local Memory
 - **Location:** `./memory/`
@@ -360,3 +367,24 @@ When a new tool is added:
 
 *Last updated: 2026-01-31*
 *Update this file as tools are configured and local details are learned*
+---
+
+## 📁 Local File System (~/FZ/)
+
+- **Status:** ✅ Configured
+- **Location:** `~/FZ/`
+- **Use for:**
+  - Heavy files (PDFs, code archives, exports)
+  - AI conversation exports
+  - Project assets that don't fit in Obsidian
+- **Structure:**
+```
+  /AI-Conversations    — ChatGPT, Claude exports
+  /Projects            — Mirrors Obsidian 10-Projects (heavy files)
+  /Resources           — CVs, contracts, templates, reference docs
+  /Inbox               — Temporary landing zone
+```
+- **Rules:**
+  - Can READ and WRITE freely
+  - Process Inbox weekly
+  - Heavy files here, notes in Obsidian
