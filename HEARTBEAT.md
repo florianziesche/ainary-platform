@@ -6,22 +6,29 @@
 
 ## 🌅 Morning Check (wenn Florian online kommt)
 
-1. **Calendar:** Was steht heute an?
-2. **Überfällig:** Was aus COCKPIT.md ist rot?
-3. **Push:** Eine proaktive Nachricht
+**FIRST: Read NORTH_STAR.md** — Goals > Systems
+
+1. **The ONE Thing:** Was hat heute den höchsten Hebel für VC Job / Revenue / Audience?
+2. **Calendar:** Was steht an?
+3. **Accountability:** Was wurde gestern NICHT gemacht das sollte?
 
 **Output Format:**
 ```
 Guten Morgen ♔
 
+🎯 THE ONE THING heute:
+[Die Sache die dich am meisten Richtung Ziel bringt]
+
 📅 Heute:
 - [Events/Deadlines]
 
-⚠️ Überfällig:
-- [Was sollte erledigt sein]
+⚠️ Accountability:
+- [Was liegt noch offen]
 
-🎯 Empfehlung:
-[Die EINE Sache die heute den größten Hebel hat]
+📊 This Week So Far:
+- Applications: X/3
+- Outreach: X/5
+- Content: X/3
 ```
 
 ---
