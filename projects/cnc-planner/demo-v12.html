@@ -1344,14 +1344,26 @@
     </div>
 
     <!-- CTA: Eigenes Bauteil testen -->
-    <div style="background: white; border: 1px solid var(--gray-200); border-radius: 12px; padding: 32px; max-width: 700px; margin: 0 auto 40px; text-align: center;">
-        <h3 style="font-size: 1.1rem; font-weight: 600; color: var(--gray-800); margin-bottom: 8px;">Individuelle Analyse für Ihr Bauteil</h3>
-        <p style="color: var(--gray-500); font-size: 0.9rem; margin-bottom: 20px;">Laden Sie Ihre STEP- oder PDF-Datei hoch — wir senden Ihnen die vollständige Kalkulation per E-Mail.</p>
-        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-            <input type="email" placeholder="ihre@email.de" style="padding: 12px 16px; border: 1px solid var(--gray-300); border-radius: var(--radius); font-size: 0.95rem; width: 220px;">
-            <button class="btn btn-primary" onclick="alert('Demo-Modus: In der Vollversion können Sie hier Ihre Datei hochladen.')">Analyse anfordern</button>
-        </div>
-        <p style="font-size: 0.75rem; color: var(--gray-400); margin-top: 12px;">Kostenlos und unverbindlich — Antwort innerhalb von 24 Stunden</p>
+    <div style="background: white; border: 1px solid var(--gray-200); border-radius: 12px; padding: 40px; max-width: 600px; margin: 0 auto 40px;">
+        <form id="demoRequestForm" onsubmit="submitDemoRequest(event)">
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 500; color: var(--gray-700); margin-bottom: 6px;">Ihre E-Mail-Adresse</label>
+                <input type="email" required placeholder="name@firma.de" style="width: 100%; padding: 14px 16px; border: 1px solid var(--gray-300); border-radius: 6px; font-size: 1rem;">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 500; color: var(--gray-700); margin-bottom: 6px;">STEP- oder PDF-Datei</label>
+                <div id="dropZone" style="border: 2px dashed var(--gray-300); border-radius: 8px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s;" onclick="document.getElementById('fileInput').click()">
+                    <input type="file" id="fileInput" accept=".step,.stp,.pdf" style="display: none;" onchange="handleFileSelect(this)">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="1.5" style="margin-bottom: 8px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <div id="fileLabel" style="color: var(--gray-600); font-size: 0.9rem;">Datei hierher ziehen oder klicken</div>
+                    <div style="color: var(--gray-400); font-size: 0.8rem; margin-top: 4px;">.step, .stp, .pdf</div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 14px;">Kostenlose Analyse anfordern</button>
+            <p style="font-size: 0.75rem; color: var(--gray-400); text-align: center; margin-top: 12px;">
+                Wir senden Ihnen die Analyse innerhalb von 24 Stunden. Keine Kosten, keine Verpflichtung.
+            </p>
+        </form>
     </div>
 
     <!-- Demo-Bereich Titel -->
@@ -1492,90 +1504,6 @@
         </div>
     </div>
 
-    <!-- ============ FEATURE 3: IST/SOLL VERGLEICH ============ -->
-    <div class="comparison-section">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <div>
-                <h3 style="font-size: 1.1rem; font-weight: 600; color: var(--gray-800); margin-bottom: 4px;">Ist/Soll-Vergleich</h3>
-                <p style="font-size: 0.85rem; color: var(--gray-500);">Tatsächliche Zeiten erfassen — Abweichungen dokumentieren</p>
-            </div>
-            <span class="badge badge-info">Qualitätssicherung</span>
-        </div>
-        <table class="comparison-table">
-            <thead>
-                <tr>
-                    <th>Operation</th>
-                    <th style="text-align: center;">Soll (min)</th>
-                    <th style="text-align: center;">Ist (min)</th>
-                    <th style="text-align: center;">Differenz</th>
-                    <th style="width: 150px;">Abweichung</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="op-name">OP10 Planfräsen</td>
-                    <td style="text-align: center;">2,7</td>
-                    <td style="text-align: center;"><input type="number" class="actual-input" id="actual-op10" value="2.5" step="0.1" oninput="updateComparison()"></td>
-                    <td style="text-align: center;" class="diff-positive" id="diff-op10">-0,2</td>
-                    <td>
-                        <div class="diff-bar">
-                            <div class="diff-bar-center"></div>
-                            <div class="diff-bar-fill under" id="bar-op10" style="width: 15%;"></div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="op-name">OP20 Schruppen Außen</td>
-                    <td style="text-align: center;">8,0</td>
-                    <td style="text-align: center;"><input type="number" class="actual-input" id="actual-op20" value="8.3" step="0.1" oninput="updateComparison()"></td>
-                    <td style="text-align: center;" class="diff-negative" id="diff-op20">+0,3</td>
-                    <td>
-                        <div class="diff-bar">
-                            <div class="diff-bar-center"></div>
-                            <div class="diff-bar-fill over" id="bar-op20" style="width: 8%;"></div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="op-name">OP50 Schlichten h5</td>
-                    <td style="text-align: center;">5,1</td>
-                    <td style="text-align: center;"><input type="number" class="actual-input" id="actual-op50" value="5.4" step="0.1" oninput="updateComparison()"></td>
-                    <td style="text-align: center;" class="diff-negative" id="diff-op50">+0,3</td>
-                    <td>
-                        <div class="diff-bar">
-                            <div class="diff-bar-center"></div>
-                            <div class="diff-bar-fill over" id="bar-op50" style="width: 12%;"></div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="op-name">OP60 Feinbohren Ø26</td>
-                    <td style="text-align: center;">4,1</td>
-                    <td style="text-align: center;"><input type="number" class="actual-input" id="actual-op60" value="4.0" step="0.1" oninput="updateComparison()"></td>
-                    <td style="text-align: center;" class="diff-positive" id="diff-op60">-0,1</td>
-                    <td>
-                        <div class="diff-bar">
-                            <div class="diff-bar-center"></div>
-                            <div class="diff-bar-fill under" id="bar-op60" style="width: 5%;"></div>
-                        </div>
-                    </td>
-                </tr>
-                <tr style="background: var(--gray-50); font-weight: 600;">
-                    <td>GESAMT</td>
-                    <td style="text-align: center;">41,8</td>
-                    <td style="text-align: center;" id="actualTotal">42,1</td>
-                    <td style="text-align: center;" id="diffTotal" class="diff-negative">+0,3</td>
-                    <td>
-                        <div class="diff-bar">
-                            <div class="diff-bar-center"></div>
-                            <div class="diff-bar-fill over" id="bar-total" style="width: 3%;"></div>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
     <!-- Project Selection -->
     <div class="projects-section">
         <h3 style="font-size: 1rem; font-weight: 600; color: var(--gray-700); margin-bottom: 16px;">Beispielprojekte</h3>
@@ -1631,6 +1559,7 @@
         <div class="app-tabs">
             <button class="app-tab active" onclick="showTab('quote')">Angebot</button>
             <button class="app-tab" onclick="showTab('calculation')">Kalkulation</button>
+            <button class="app-tab" onclick="showTab('tools')">Werkzeuge</button>
             <button class="app-tab" onclick="showTab('code')">Maschinencode</button>
             <button class="app-tab" onclick="showTab('instructions')">Fertigungsanweisung</button>
         </div>
@@ -1839,14 +1768,47 @@
                 </div>
             </div>
 
+            <!-- ================ TAB: WERKZEUGE ================ -->
+            <div class="tab-panel" id="panel-tools">
+                <div style="margin-bottom: 20px;">
+                    <p style="font-size: 0.85rem; color: var(--gray-600);">Werkzeugkosten werden automatisch basierend auf Schnittzeit und Standzeit berechnet.</p>
+                </div>
+                <table class="calc-table">
+                    <thead>
+                        <tr>
+                            <th>Werkzeug</th>
+                            <th>Bezeichnung</th>
+                            <th style="text-align: right;">Preis</th>
+                            <th style="text-align: right;">Standzeit</th>
+                            <th style="text-align: right;">Einsatzzeit</th>
+                            <th style="text-align: right;">Kosten/Teil</th>
+                        </tr>
+                    </thead>
+                    <tbody id="toolsTableBody">
+                        <tr><td><strong>T1</strong></td><td>Planfräser Ø63 WSP</td><td style="text-align: right;">€45,00</td><td style="text-align: right;">60 min</td><td style="text-align: right;">1,9 min</td><td style="text-align: right;"><strong>€1,43</strong></td></tr>
+                        <tr><td><strong>T2</strong></td><td>VHM-Fräser Ø20</td><td style="text-align: right;">€120,00</td><td style="text-align: right;">180 min</td><td style="text-align: right;">11,2 min</td><td style="text-align: right;"><strong>€7,47</strong></td></tr>
+                        <tr><td><strong>T3</strong></td><td>VHM-Schlichtfräser Ø16</td><td style="text-align: right;">€95,00</td><td style="text-align: right;">120 min</td><td style="text-align: right;">7,4 min</td><td style="text-align: right;"><strong>€5,86</strong></td></tr>
+                        <tr><td><strong>T11</strong></td><td>Feinbohrkopf Ø26</td><td style="text-align: right;">€350,00</td><td style="text-align: right;">500 min</td><td style="text-align: right;">3,3 min</td><td style="text-align: right;"><strong>€2,31</strong></td></tr>
+                        <tr><td><strong>T12</strong></td><td>Feinbohrkopf Ø44</td><td style="text-align: right;">€380,00</td><td style="text-align: right;">500 min</td><td style="text-align: right;">3,8 min</td><td style="text-align: right;"><strong>€2,89</strong></td></tr>
+                        <tr><td><strong>T13</strong></td><td>Gewindefräser M8</td><td style="text-align: right;">€65,00</td><td style="text-align: right;">200 min</td><td style="text-align: right;">2,4 min</td><td style="text-align: right;"><strong>€0,78</strong></td></tr>
+                        <tr style="background: #fef9e6;"><td colspan="5" style="text-align: right; font-weight: 600;">Werkzeugkosten gesamt:</td><td style="text-align: right; font-weight: 700; color: #92400e;"><strong>€20,74</strong></td></tr>
+                    </tbody>
+                </table>
+                <div style="background: #fef9e6; border-left: 4px solid #fbbf24; padding: 16px; border-radius: 0 6px 6px 0; margin-top: 20px;">
+                    <strong style="color: #92400e;">Hinweis:</strong> Bei hartem Werkstoff (1.4571) können Werkzeugkosten 15-20% der Gesamtkosten ausmachen. Standzeiten sind werkstoffabhängig.
+                </div>
+            </div>
+
             <!-- ================ TAB: MASCHINENCODE ================ -->
             <div class="tab-panel" id="panel-code">
-                <div style="display: flex; gap: 12px; margin-bottom: 20px;">
-                    <button class="btn btn-secondary btn-sm active">Heidenhain TNC</button>
-                    <button class="btn btn-secondary btn-sm">Siemens 840D</button>
-                    <button class="btn btn-secondary btn-sm">Fanuc</button>
-                    <button class="btn btn-primary btn-sm" style="margin-left: auto;" onclick="copyCode()">📋 Kopieren</button>
-                    <button class="btn btn-accent btn-sm" onclick="downloadCode()">⬇️ Download .H</button>
+                <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <div class="code-format-tabs" style="display: flex; gap: 4px; background: var(--gray-100); padding: 4px; border-radius: var(--radius);">
+                        <button class="btn btn-sm" id="btn-heidenhain" onclick="setCodeFormat('heidenhain')" style="background: var(--primary); color: white;">Heidenhain TNC</button>
+                        <button class="btn btn-sm" id="btn-siemens" onclick="setCodeFormat('siemens')" style="background: transparent; color: var(--gray-600);">Siemens 840D</button>
+                        <button class="btn btn-sm" id="btn-fanuc" onclick="setCodeFormat('fanuc')" style="background: transparent; color: var(--gray-600);">Fanuc</button>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" style="margin-left: auto;" onclick="copyCode()">Kopieren</button>
+                    <button class="btn btn-primary btn-sm" onclick="downloadCode()">Download</button>
                 </div>
 
                 <div class="code-block" id="codeBlock">
@@ -2817,6 +2779,234 @@ END PGM FLANSCH MM`
         a.download = 'Kalkulation_' + currentProject.name.replace(/\s+/g, '_') + '.csv';
         a.click();
         URL.revokeObjectURL(url);
+    }
+
+    // ================================================================================
+    // FILE UPLOAD HANDLING
+    // ================================================================================
+
+    function handleFileSelect(input) {
+        const file = input.files[0];
+        if (file) {
+            document.getElementById('fileLabel').textContent = file.name;
+            document.getElementById('dropZone').style.borderColor = 'var(--success)';
+            document.getElementById('dropZone').style.background = '#ecfdf5';
+        }
+    }
+
+    function submitDemoRequest(event) {
+        event.preventDefault();
+        alert('Demo-Modus: In der Vollversion wird Ihre Anfrage verarbeitet und Sie erhalten die Analyse per E-Mail.');
+    }
+
+    // ================================================================================
+    // CODE FORMAT SWITCHING
+    // ================================================================================
+
+    let currentCodeFormat = 'heidenhain';
+
+    const CODE_TEMPLATES = {
+        heidenhain: `; ============================================
+; CNC PLANNER PRO — Automatisch generiert
+; ============================================
+; Werkstück:  {name}
+; Werkstoff:  {material}
+; Maschine:   FEHLMANN VERSA 943
+; Steuerung:  Heidenhain TNC 640
+; Erstellt:   {date}
+; ============================================
+
+BEGIN PGM {progName} MM
+
+; --- WERKZEUGLISTE ---
+; T1  = Planfräser Ø63 (WSP)
+; T2  = VHM-Fräser Ø20
+; T3  = VHM-Schlichtfräser Ø16
+; T11 = Feinbohrkopf
+
+; ============================================
+; OP10: PLANFRÄSEN OBERSEITE
+; ============================================
+TOOL CALL 1 Z S800
+L Z+100 R0 FMAX M3
+L X+0 Y-40 FMAX
+L Z+2 FMAX
+L Z+0 F200
+L X+{dimX} F300
+L Z+100 FMAX
+
+; ============================================
+; OP20: SCHRUPPEN AUSSENKONTUR
+; ============================================
+TOOL CALL 2 Z S2500
+L Z+100 R0 FMAX M3
+CYCL DEF 14.0 KONTUR
+CYCL DEF 14.1 KONTURLABEL 1
+L X+0 Y+0 FMAX M99
+L Z+5 FMAX
+CYCL CALL
+L Z+100 FMAX
+
+; ============================================
+; OP50: SCHLICHTEN — KRITISCH!
+; Toleranz: {tolerance}
+; ============================================
+TOOL CALL 3 Z S3000
+L Z+100 R0 FMAX M3
+; WERKZEUG VOR BEARBEITUNG PRÜFEN!
+L X+{finishRadius} Y+0 FMAX
+L Z+2 FMAX
+CC X+0 Y+0
+CP IPA+360 DR+ F250
+L Z+100 FMAX
+
+M30
+END PGM {progName} MM`,
+
+        siemens: `; ============================================
+; CNC PLANNER PRO — Automatisch generiert
+; ============================================
+; Werkstück:  {name}
+; Werkstoff:  {material}
+; Steuerung:  Siemens SINUMERIK 840D
+; Erstellt:   {date}
+; ============================================
+
+%_N_{progName}_MPF
+;$PATH=/_N_WKS_DIR/_N_TEILE_WPD
+
+; --- WERKZEUGAUFRUF ---
+N10 G90 G54 G17
+N20 T1 D1 M6              ; Planfräser Ø63
+N30 S800 M3 F300
+
+; OP10: PLANFRÄSEN
+N40 G0 X0 Y-40 Z100
+N50 G0 Z2
+N60 G1 Z0 F200
+N70 G1 X{dimX} F300
+N80 G0 Z100
+
+; OP20: SCHRUPPEN AUSSENKONTUR
+N90 T2 D1 M6              ; VHM-Fräser Ø20
+N100 S2500 M3 F400
+N110 G0 X0 Y0 Z100
+N120 CYCLE72("KONTUR",1,0,0,0,2,0.5,0.1,1,41,1,1,0)
+N130 G0 Z100
+
+; OP50: SCHLICHTEN — KRITISCH!
+N140 T3 D1 M6             ; Schlichtfräser Ø16
+N150 S3000 M3 F250
+; ACHTUNG: Toleranz {tolerance}!
+N160 G0 X{finishRadius} Y0 Z2
+N170 G1 Z-{dimZ}
+N180 G3 X{finishRadius} Y0 I-{finishRadius} J0
+N190 G0 Z100
+
+N200 M30`,
+
+        fanuc: `( ============================================ )
+( CNC PLANNER PRO — Automatisch generiert )
+( ============================================ )
+( Werkstück:  {name} )
+( Werkstoff:  {material} )
+( Steuerung:  Fanuc 0i-MF )
+( Erstellt:   {date} )
+( ============================================ )
+
+O0001 ({progName})
+
+( WERKZEUGWECHSEL T1 - PLANFRÄSER )
+N10 G90 G54 G17 G21
+N20 T1 M6
+N30 S800 M3
+N40 G43 H1 Z100.
+
+( OP10: PLANFRÄSEN )
+N50 G0 X0. Y-40.
+N60 G0 Z2.
+N70 G1 Z0. F200
+N80 G1 X{dimX}. F300
+N90 G0 Z100.
+
+( WERKZEUGWECHSEL T2 - SCHRUPPFRÄSER )
+N100 T2 M6
+N110 S2500 M3
+N120 G43 H2 Z100.
+
+( OP20: SCHRUPPEN AUSSENKONTUR )
+N130 G0 X0. Y0.
+N140 G0 Z5.
+N150 G12 I{finishRadius}. K0. D2 F400
+N160 G0 Z100.
+
+( WERKZEUGWECHSEL T3 - SCHLICHTFRÄSER )
+( ACHTUNG: KRITISCHE OPERATION! )
+( Toleranz: {tolerance} )
+N170 T3 M6
+N180 S3000 M3
+N190 G43 H3 Z100.
+
+( OP50: SCHLICHTEN )
+N200 G0 X{finishRadius}. Y0.
+N210 G0 Z2.
+N220 G1 Z-{dimZ}. F250
+N230 G3 X{finishRadius}. Y0. I-{finishRadius}. J0.
+N240 G0 Z100.
+
+N250 M30
+%`
+    };
+
+    function setCodeFormat(format) {
+        currentCodeFormat = format;
+        
+        // Update button styles
+        ['heidenhain', 'siemens', 'fanuc'].forEach(f => {
+            const btn = document.getElementById('btn-' + f);
+            if (f === format) {
+                btn.style.background = 'var(--primary)';
+                btn.style.color = 'white';
+            } else {
+                btn.style.background = 'transparent';
+                btn.style.color = 'var(--gray-600)';
+            }
+        });
+
+        updateNCCode();
+    }
+
+    // Override updateNCCode to use format templates
+    function updateNCCode() {
+        const codeBlock = document.getElementById('codeBlock');
+        if (!codeBlock) return;
+
+        const calc = currentProject._calculated || {};
+        const dims = calc.dims || currentProject.dims;
+        const mat = MATERIALS[document.getElementById('materialSelect').value];
+        const today = new Date().toLocaleDateString('de-DE');
+
+        const template = CODE_TEMPLATES[currentCodeFormat];
+        
+        let code = template
+            .replace(/{name}/g, currentProject.name)
+            .replace(/{progName}/g, currentProject.name.split(' ')[0].toUpperCase())
+            .replace(/{material}/g, mat.name)
+            .replace(/{date}/g, today)
+            .replace(/{dimX}/g, dims.x)
+            .replace(/{dimY}/g, dims.y)
+            .replace(/{dimZ}/g, dims.z)
+            .replace(/{finishRadius}/g, ((currentProject.finishDims?.diameter || dims.x - dims.allowance * 2) / 2).toFixed(1))
+            .replace(/{tolerance}/g, currentProject.operations?.find(op => op.critical)?.tolerance || 'Standard');
+
+        // Syntax highlighting
+        code = code.replace(/^;.*$/gm, '<span class="code-comment">$&</span>');
+        code = code.replace(/^\(.*\)$/gm, '<span class="code-comment">$&</span>');
+        code = code.replace(/KRITISCH|ACHTUNG|PRÜFEN/g, '<span style="color: var(--danger); font-weight: bold;">$&</span>');
+        code = code.replace(/\b(BEGIN PGM|END PGM|TOOL CALL|CYCL DEF|CYCL CALL|FMAX|MM)\b/g, '<span class="code-keyword">$&</span>');
+        code = code.replace(/\b(G[0-9]+|M[0-9]+|T[0-9]+|S[0-9]+|F[0-9]+|N[0-9]+)\b/g, '<span class="code-gcode">$&</span>');
+
+        codeBlock.innerHTML = '<pre>' + code + '</pre>';
     }
 
     // ================================================================================
