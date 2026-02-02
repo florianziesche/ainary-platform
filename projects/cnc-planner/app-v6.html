@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CNC Planner Pro v6</title>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0b4aa2;
+      --primary-dark: #07377a;
+      --primary-light: #e8f0fe;
+      --accent: #ff7a3d;
+      --accent-hover: #e56a2f;
+      --success: #2e9d55;
+      --success-light: #e8f5ed;
+      --warning: #d44c3c;
+      --warning-light: #fdf2f1;
+      --info: #2b8bbd;
+      --bg: #f4f6f9;
+      --card: #ffffff;
+      --text: #1f2937;
+      --text-secondary: #5d6b82;
+      --text-muted: #8896a9;
+      --border: #dfe6ee;
+      --border-light: #eef2f6;
+      --font-sans: 'Source Sans Pro', -apple-system, sans-serif;
+      --font-mono: 'Roboto Mono', monospace;
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 20px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 40px rgba(0,0,0,0.12);
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 260px;
+      background: var(--card);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      height: 100vh;
+      box-shadow: var(--shadow-sm);
+    }
+    .sidebar-header {
+      padding: 24px;
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      color: white;
+    }
+    .logo { font-weight: 700; font-size: 22px; }
+    .logo span { color: var(--accent); }
+    .version { font-size: 12px; opacity: 0.8; margin-top: 4px; }
+    .sidebar-nav { flex: 1; padding: 16px; }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      border-radius: 10px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-bottom: 4px;
+    }
+    .nav-item:hover { background: var(--bg); color: var(--text); }
+    .nav-item.active { background: var(--primary); color: white; }
+    .nav-item .icon { font-size: 20px; }
+    .sidebar-footer {
+      padding: 20px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .sidebar-footer .company { font-weight: 600; color: var(--text); margin-bottom: 4px; }
+
+    /* Main */
+    .main { flex: 1; margin-left: 260px; }
+    .header {
+      padding: 20px 32px;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header h1 { font-size: 22px; font-weight: 700; color: var(--primary-dark); }
+    .header-actions { display: flex; gap: 12px; }
+    .content { padding: 32px; }
+
+    /* Pages */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* Cards */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 18px 24px;
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      color: white;
+      font-weight: 600;
+      font-size: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-header.light {
+      background: var(--bg);
+      color: var(--primary-dark);
+      border-bottom: 1px solid var(--border);
+    }
+    .card-body { padding: 24px; }
+
+    /* Forms */
+    .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .form-group { margin-bottom: 0; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    .form-input, .form-select {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 15px;
+      font-family: inherit;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-light);
+    }
+    .form-input.mono { font-family: var(--font-mono); }
+    .form-input[readonly] { background: var(--border-light); color: var(--text-secondary); }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 15px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    .btn-accent { background: var(--accent); color: white; }
+    .btn-accent:hover { background: var(--accent-hover); }
+    .btn-secondary { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--border-light); }
+    .btn-sm { padding: 8px 16px; font-size: 14px; }
+
+    /* Stats */
+    .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      border-left: 4px solid var(--primary);
+    }
+    .stat-card.accent { border-left-color: var(--accent); }
+    .stat-card.success { border-left-color: var(--success); }
+    .stat-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+    .stat-value { font-size: 28px; font-weight: 700; color: var(--primary-dark); font-family: var(--font-mono); margin-top: 8px; }
+    .stat-value.accent { color: var(--accent); }
+    .stat-value.success { color: var(--success); }
+    .stat-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border-light); font-size: 14px; }
+    th { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); background: var(--bg); }
+    tr:hover td { background: var(--primary-light); }
+    .mono { font-family: var(--font-mono); }
+    .text-primary { color: var(--primary); }
+    .text-accent { color: var(--accent); }
+    .text-success { color: var(--success); }
+    .text-warning { color: var(--warning); }
+    .text-muted { color: var(--text-muted); }
+
+    /* Badge */
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+    .badge-primary { background: var(--primary-light); color: var(--primary); }
+    .badge-warning { background: var(--warning-light); color: var(--warning); }
+    .badge-success { background: var(--success-light); color: var(--success); }
+    .badge-accent { background: #fff2eb; color: var(--accent); }
+
+    /* Progress Bar */
+    .progress-bar {
+      height: 48px;
+      background: var(--bg);
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+    }
+    .progress-segment {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+      transition: filter 0.15s;
+      border-right: 2px solid rgba(255,255,255,0.3);
+    }
+    .progress-segment:last-child { border-right: none; }
+    .progress-segment:hover { filter: brightness(1.1); }
+    .progress-legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 16px; font-size: 13px; }
+    .legend-item { display: flex; align-items: center; gap: 8px; }
+    .legend-color { width: 14px; height: 14px; border-radius: 4px; }
+
+    /* Alerts */
+    .alert {
+      padding: 18px 24px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .alert-warning { background: #fff8f0; border: 1px solid #ffd9b3; }
+    .alert-danger { background: var(--warning-light); border: 1px solid #f5c6c0; }
+    .alert-info { background: var(--success-light); border: 1px solid #b8e0c8; }
+    .alert-icon { font-size: 22px; }
+    .alert-content h4 { font-size: 15px; font-weight: 700; margin-bottom: 4px; color: var(--text); }
+    .alert-content p { font-size: 14px; color: var(--text-secondary); }
+
+    /* Checklist */
+    .checklist { list-style: none; }
+    .checklist li {
+      padding: 12px 16px;
+      background: var(--bg);
+      margin-bottom: 8px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.15s;
+      border: 1px solid var(--border-light);
+    }
+    .checklist li:hover { background: var(--primary-light); }
+    .checklist li.checked { background: var(--success-light); border-color: var(--success); }
+    .checkbox {
+      width: 22px;
+      height: 22px;
+      border: 2px solid var(--primary);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .checklist li.checked .checkbox { background: var(--success); border-color: var(--success); color: white; }
+
+    /* Tool Life Bar */
+    .tool-life-bar {
+      width: 100px;
+      height: 22px;
+      background: var(--bg);
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .tool-life-fill {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: white;
+    }
+    .tool-life-fill.good { background: linear-gradient(90deg, var(--success), #4ade80); }
+    .tool-life-fill.warning { background: linear-gradient(90deg, var(--accent), #fbbf24); }
+    .tool-life-fill.critical { background: linear-gradient(90deg, var(--warning), #f87171); }
+
+    /* Correction Cards */
+    .correction-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .correction-card {
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+    .correction-card h4 { color: var(--text-secondary); font-size: 13px; margin-bottom: 8px; }
+    .correction-value { font-size: 32px; font-weight: 700; color: var(--accent); font-family: var(--font-mono); }
+    .correction-unit { font-size: 13px; color: var(--text-muted); }
+    .correction-note { font-size: 12px; color: var(--text-muted); margin-top: 10px; font-style: italic; }
+
+    /* Dimension Cards */
+    .dimension-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .dim-card {
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .dim-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+    .dim-card.critical { border-color: var(--warning); background: var(--warning-light); }
+    .dim-value { font-size: 24px; font-weight: 700; color: var(--primary-dark); font-family: var(--font-mono); }
+    .dim-tolerance { font-size: 14px; color: var(--accent); font-weight: 600; margin-top: 4px; }
+    .dim-label { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+
+    /* Material Card */
+    .material-card {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 20px;
+      background: linear-gradient(135deg, var(--primary-light) 0%, #f0f7ff 100%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      align-items: center;
+    }
+    .material-icon {
+      width: 56px;
+      height: 56px;
+      background: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      color: white;
+    }
+    .material-details h4 { color: var(--primary-dark); font-size: 18px; margin-bottom: 4px; }
+    .material-details p { color: var(--text-secondary); font-size: 14px; }
+    .material-cert {
+      background: var(--card);
+      padding: 14px 20px;
+      border-radius: 8px;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+    .material-cert-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; }
+    .material-cert-field {
+      border: 2px dashed var(--primary);
+      padding: 10px 16px;
+      margin-top: 8px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      min-width: 140px;
+      font-size: 15px;
+      color: var(--text-secondary);
+    }
+
+    /* NC Code */
+    .nc-code-block {
+      background: #1e293b;
+      border-radius: 10px;
+      padding: 24px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.7;
+      overflow-x: auto;
+      white-space: pre;
+      color: #e2e8f0;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+    .nc-code-block .comment { color: #6ee7b7; }
+    .nc-code-block .keyword { color: #93c5fd; }
+    .nc-code-block .tool { color: #fbbf24; }
+    .nc-code-block .gcode { color: #f9a8d4; }
+
+    /* QR Code */
+    .qr-container {
+      background: white;
+      padding: 16px;
+      border-radius: 12px;
+      display: inline-block;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+    .qr-code { width: 110px; height: 110px; }
+    .qr-label { font-size: 12px; color: var(--text-secondary); margin-top: 8px; font-weight: 600; }
+
+    /* Feedback Panel */
+    .feedback-panel {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: var(--radius);
+      padding: 24px;
+      color: white;
+    }
+    .feedback-panel h3 { font-size: 18px; margin-bottom: 16px; }
+    .feedback-item {
+      background: rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .feedback-item:last-child { margin-bottom: 0; }
+    .feedback-header { display: flex; justify-content: space-between; font-size: 12px; opacity: 0.9; margin-bottom: 8px; }
+    .feedback-stars { color: #fbbf24; }
+    .feedback-tag {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      margin-right: 8px;
+      font-weight: 600;
+    }
+
+    /* Dropdown */
+    .dropdown { position: relative; display: inline-block; }
+    .dropdown-menu {
+      position: absolute;
+      right: 0;
+      top: 100%;
+      margin-top: 6px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      min-width: 200px;
+      box-shadow: var(--shadow-lg);
+      z-index: 100;
+      display: none;
+    }
+    .dropdown-menu.show { display: block; }
+    .dropdown-item {
+      padding: 14px 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: var(--text);
+      transition: background 0.15s;
+    }
+    .dropdown-item:hover { background: var(--bg); }
+    .dropdown-item:first-child { border-radius: 10px 10px 0 0; }
+    .dropdown-item:last-child { border-radius: 0 0 10px 10px; }
+
+    /* Collapsible */
+    .collapsible-toggle {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .collapsible-content { display: none; }
+    .collapsible-content.show { display: block; }
+
+    /* Print */
+    @media print {
+      .sidebar, .header { display: none !important; }
+      .main { margin-left: 0; }
+      .card { box-shadow: none; border: 1px solid #ddd; }
+      .btn { display: none; }
+    }
+
+    @media (max-width: 1200px) {
+      .stats-grid { grid-template-columns: repeat(3, 1fr); }
+      .dimension-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .form-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">CNC<span>Planner</span> Pro</div>
+      <div class="version">v6.0 — Enterprise</div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-item active" onclick="showPage('kalkulation')"><span class="icon">📊</span> Kalkulation</div>
+      <div class="nav-item" onclick="showPage('angebot')"><span class="icon">📄</span> Angebot</div>
+      <div class="nav-item" onclick="showPage('fertigung')"><span class="icon">🔧</span> Fertigungsanweisung</div>
+      <div class="nav-item" onclick="showPage('nccode')"><span class="icon">💻</span> NC-Programm</div>
+      <div class="nav-item" onclick="showPage('einstellungen')"><span class="icon">⚙️</span> Einstellungen</div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="company" id="sidebarCompany">Maschinenbau Schlottwitz</div>
+      <div>Demo Version</div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ===== KALKULATION ===== -->
+    <div id="page-kalkulation" class="page active">
+      <div class="header">
+        <h1>📊 Zeitkalkulation</h1>
+        <div class="header-actions">
+          <button class="btn btn-secondary" onclick="resetForm()">↺ Zurücksetzen</button>
+          <button class="btn btn-primary" onclick="goToQuote()">Angebot erstellen →</button>
+        </div>
+      </div>
+      <div class="content">
+        <!-- Stats -->
+        <div class="stats-grid">
+          <div class="stat-card accent">
+            <div class="stat-label">Stückzeit</div>
+            <div class="stat-value accent" id="stat-time">41.8 min</div>
+            <div class="stat-sub">pro Teil</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Schnittzeit</div>
+            <div class="stat-value" id="stat-th">33.2 min</div>
+            <div class="stat-sub">79% Anteil</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Teile/Schicht</div>
+            <div class="stat-value" id="stat-parts">11</div>
+            <div class="stat-sub">bei 8h</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Stückpreis</div>
+            <div class="stat-value" id="stat-price">€139.76</div>
+            <div class="stat-sub">netto</div>
+          </div>
+          <div class="stat-card success">
+            <div class="stat-label">Auftragswert</div>
+            <div class="stat-value success" id="stat-total">€1,398</div>
+            <div class="stat-sub" id="stat-qty-display">10 Stück</div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+          <!-- Left: Projekt -->
+          <div class="card">
+            <div class="card-header light">📐 Projekt & Werkstück</div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Projektname</label>
+                  <input type="text" class="form-input" id="projectName" value="Grundplatte Antriebseinheit">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Zeichnungs-Nr.</label>
+                  <input type="text" class="form-input mono" id="drawingNr" value="WCAD-15-02-2020">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Werkstoff</label>
+                  <select class="form-select" id="material" onchange="onMaterialChange()">
+                    <option value="1.4571">1.4571 (Edelstahl V4A)</option>
+                    <option value="1.4301">1.4301 (Edelstahl V2A)</option>
+                    <option value="AlMg3">AlMg3 (Aluminium)</option>
+                    <option value="S235">S235JR (Baustahl)</option>
+                    <option value="C45">C45 (Vergütungsstahl)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Maschine</label>
+                  <select class="form-select" id="machine">
+                    <option value="versa943">FEHLMANN VERSA® 943</option>
+                    <option value="dmg50">DMG MORI CMX 50 U</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Rohteilmaße (mm)</label>
+                  <input type="text" class="form-input mono" id="rawDims" value="Ø130 × 50" onchange="onDimsChange()" placeholder="Ø130 × 50 oder 100 × 80 × 50">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Gewicht (berechnet)</label>
+                  <input type="text" class="form-input mono" id="weight" value="5.31 kg" readonly>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Kalkulation -->
+          <div class="card">
+            <div class="card-header light">💰 Kalkulation</div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Stückzahl</label>
+                  <input type="number" class="form-input mono" id="quantity" value="10" min="1" onchange="recalculate()">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Rüstzeit (min)</label>
+                  <input type="number" class="form-input mono" id="setupTime" value="30" onchange="recalculate()">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Stundensatz (€/h)</label>
+                  <input type="number" class="form-input mono" id="hourlyRate" value="85" onchange="recalculate()">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Materialkosten (€/Stk)</label>
+                  <input type="number" class="form-input mono" id="materialCost" value="45.14" step="0.01" onchange="recalculate()">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Werkzeugkosten (€/Stk)</label>
+                  <input type="number" class="form-input mono" id="toolCost" value="8" step="0.01" onchange="recalculate()">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Marge (%)</label>
+                  <input type="number" class="form-input mono" id="margin" value="20" onchange="recalculate()">
+                </div>
+              </div>
+              
+              <!-- Calculation Breakdown -->
+              <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+                <div class="collapsible-toggle" onclick="toggleCalcDetails()">
+                  <span id="calcToggleIcon">▶</span>
+                  <span style="font-weight: 600; color: var(--text-secondary);">Berechnungsdetails</span>
+                </div>
+                <div id="calcDetails" class="collapsible-content" style="margin-top: 16px; font-size: 14px;">
+                  <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-light);">
+                    <span class="text-secondary">Bearbeitungskosten:</span>
+                    <span class="mono" id="calc-labor">€59.22</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-light);">
+                    <span class="text-secondary">Materialkosten:</span>
+                    <span class="mono" id="calc-material">€45.14</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-light);">
+                    <span class="text-secondary">Werkzeugkosten:</span>
+                    <span class="mono" id="calc-tool">€8.00</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-light);">
+                    <span class="text-secondary">Rüstkosten/Stk:</span>
+                    <span class="mono" id="calc-setup">€4.25</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; padding: 12px 0; font-weight: 700; border-top: 2px solid var(--border);">
+                    <span>Selbstkosten:</span>
+                    <span class="mono" id="calc-base">€116.61</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                    <span class="text-secondary">+ Marge (20%):</span>
+                    <span class="mono text-accent" id="calc-final">€139.93</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Operations Table -->
+        <div class="card">
+          <div class="card-header light">
+            <span>🔧 Arbeitsfolge</span>
+            <button class="btn btn-sm btn-secondary" onclick="addOperation()">+ Arbeitsgang</button>
+          </div>
+          <div class="card-body" style="padding: 0; overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>OP</th>
+                  <th>Arbeitsgang</th>
+                  <th>Werkzeug</th>
+                  <th>n (U/min)</th>
+                  <th>f (mm/min)</th>
+                  <th>aₚ</th>
+                  <th>tₕ (min)</th>
+                  <th>tₙ (min)</th>
+                  <th>Σ</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="opsBody"></tbody>
+              <tfoot>
+                <tr style="background: var(--primary-light); font-weight: 700;">
+                  <td colspan="6" style="text-align: right;">SUMME</td>
+                  <td class="mono text-primary" id="sumTh">33.2</td>
+                  <td class="mono" id="sumTn">8.6</td>
+                  <td class="mono text-primary" id="sumTotal">41.8</td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ANGEBOT ===== -->
+    <div id="page-angebot" class="page">
+      <div class="header">
+        <h1>📄 Angebot</h1>
+        <div class="header-actions">
+          <button class="btn btn-secondary" onclick="window.print()">🖨️ Drucken</button>
+          <div class="dropdown">
+            <button class="btn btn-primary" onclick="toggleDropdown('downloadMenu')">📥 Download ▼</button>
+            <div id="downloadMenu" class="dropdown-menu">
+              <div class="dropdown-item" onclick="downloadAs('pdf')">📄 PDF speichern</div>
+              <div class="dropdown-item" onclick="downloadAs('csv')">📊 CSV (Excel)</div>
+              <div class="dropdown-item" onclick="downloadAs('docx')">📝 Word (.docx)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="card" style="max-width: 850px; margin: 0 auto;">
+          <div class="card-body" style="padding: 48px;">
+            <!-- Quote content rendered by JS -->
+            <div id="quoteContent"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== FERTIGUNGSANWEISUNG ===== -->
+    <div id="page-fertigung" class="page">
+      <div class="header">
+        <h1>🔧 Fertigungsanweisung</h1>
+        <div class="header-actions">
+          <button class="btn btn-secondary" onclick="window.print()">🖨️ Drucken</button>
+          <button class="btn btn-primary" onclick="showPage('nccode')">NC-Programm →</button>
+        </div>
+      </div>
+      <div class="content">
+        <!-- Header Card with QR -->
+        <div class="card" style="background: linear-gradient(135deg, var(--primary-dark), var(--primary)); color: white;">
+          <div class="card-body">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <h2 style="font-size: 26px; margin-bottom: 8px;">Fertigungsanweisung</h2>
+                <p style="opacity: 0.9; font-size: 16px;" id="fa-subtitle">Grundplatte | FEHLMANN VERSA® 943 | Heidenhain TNC 640</p>
+                <div style="display: flex; gap: 32px; margin-top: 20px;">
+                  <div><div style="font-size: 11px; opacity: 0.7; text-transform: uppercase;">Zeichnung</div><div style="font-size: 16px; font-weight: 600;" id="fa-drawing">WCAD-15-02-2020</div></div>
+                  <div><div style="font-size: 11px; opacity: 0.7; text-transform: uppercase;">Werkstoff</div><div style="font-size: 16px; font-weight: 600;" id="fa-material">1.4571</div></div>
+                  <div><div style="font-size: 11px; opacity: 0.7; text-transform: uppercase;">Stückzahl</div><div style="font-size: 16px; font-weight: 600;" id="fa-qty">10</div></div>
+                  <div><div style="font-size: 11px; opacity: 0.7; text-transform: uppercase;">Rohteil</div><div style="font-size: 16px; font-weight: 600;" id="fa-raw">Ø130 × 50</div></div>
+                  <div><div style="font-size: 11px; opacity: 0.7; text-transform: uppercase;">Datum</div><div style="font-size: 16px; font-weight: 600;" id="fa-date">02.02.2026</div></div>
+                </div>
+              </div>
+              <div class="qr-container">
+                <svg class="qr-code" viewBox="0 0 100 100"><rect fill="white" width="100" height="100"/><g fill="black"><rect x="4" y="4" width="24" height="24"/><rect x="7" y="7" width="18" height="18" fill="white"/><rect x="10" y="10" width="12" height="12"/><rect x="72" y="4" width="24" height="24"/><rect x="75" y="7" width="18" height="18" fill="white"/><rect x="78" y="10" width="12" height="12"/><rect x="4" y="72" width="24" height="24"/><rect x="7" y="75" width="18" height="18" fill="white"/><rect x="10" y="78" width="12" height="12"/><rect x="32" y="4" width="4" height="4"/><rect x="40" y="4" width="4" height="4"/><rect x="48" y="8" width="4" height="4"/><rect x="56" y="4" width="4" height="4"/><rect x="32" y="12" width="4" height="4"/><rect x="44" y="16" width="4" height="4"/></g></svg>
+                <div class="qr-label">NC-Programm<br><span style="font-family: var(--font-mono);" id="fa-ncname">GRUNDPLATTE.H</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="stats-grid" style="grid-template-columns: repeat(6, 1fr);">
+          <div class="stat-card accent"><div class="stat-label">Stückzeit</div><div class="stat-value accent" id="fa-time">41.8 min</div></div>
+          <div class="stat-card"><div class="stat-label">Schnittzeit</div><div class="stat-value" id="fa-th">33.2 min</div></div>
+          <div class="stat-card"><div class="stat-label">Nebenzeit</div><div class="stat-value" id="fa-tn">8.6 min</div></div>
+          <div class="stat-card"><div class="stat-label">Effizienz</div><div class="stat-value" id="fa-eff">79%</div></div>
+          <div class="stat-card"><div class="stat-label">Rüstzeit</div><div class="stat-value" id="fa-setup">30 min</div></div>
+          <div class="stat-card success"><div class="stat-label">Teile/Schicht</div><div class="stat-value success" id="fa-parts">~11</div></div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="card">
+          <div class="card-header light">⏱️ Zeitverteilung</div>
+          <div class="card-body">
+            <div class="progress-bar" id="progressBar"></div>
+            <div class="progress-legend" id="progressLegend"></div>
+          </div>
+        </div>
+
+        <!-- Material Warning -->
+        <div class="alert alert-danger" id="materialAlert">
+          <span class="alert-icon">🚨</span>
+          <div class="alert-content">
+            <h4 id="alertTitle">Werkstoff 1.4571 — Edelstahl austenitisch</h4>
+            <p id="alertText">Kaltverfestigung vermeiden! Nie mit zu niedrigem Vorschub arbeiten. Bei Rattern: Drehzahl -15%.</p>
+          </div>
+        </div>
+
+        <!-- Drawing & Dimensions -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+          <div class="card">
+            <div class="card-header light">📐 Werkstückübersicht</div>
+            <div class="card-body" style="display: flex; justify-content: center; background: var(--bg);">
+              <svg viewBox="0 0 400 400" style="max-width: 320px;">
+                <defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="#dfe6ee" stroke-width="0.5"/></pattern></defs>
+                <rect width="400" height="400" fill="#f4f6f9"/>
+                <rect width="400" height="400" fill="url(#grid)"/>
+                <circle cx="200" cy="200" r="140" fill="none" stroke="#8896a9" stroke-width="1"/>
+                <circle cx="200" cy="200" r="120" fill="none" stroke="var(--accent)" stroke-width="3"/>
+                <circle cx="200" cy="200" r="60" fill="none" stroke="#8896a9" stroke-width="1"/>
+                <circle cx="200" cy="200" r="44" fill="none" stroke="var(--primary)" stroke-width="2"/>
+                <circle cx="200" cy="200" r="26" fill="none" stroke="var(--primary)" stroke-width="2" stroke-dasharray="5,3"/>
+                <circle cx="200" cy="200" r="52" fill="none" stroke="#a0aec0" stroke-width="1" stroke-dasharray="10,5"/>
+                <g fill="#5d6b82"><circle cx="200" cy="148" r="5"/><circle cx="237" cy="163" r="5"/><circle cx="252" cy="200" r="5"/><circle cx="237" cy="237" r="5"/><circle cx="200" cy="252" r="5"/><circle cx="163" cy="237" r="5"/><circle cx="148" cy="200" r="5"/><circle cx="163" cy="163" r="5"/></g>
+                <text x="55" y="200" fill="var(--accent)" font-weight="bold" font-size="12" transform="rotate(-90, 55, 200)">Ø120 h5</text>
+                <text x="200" y="125" fill="var(--primary)" font-size="11" text-anchor="middle">Ø44 H7</text>
+                <text x="200" y="178" fill="var(--primary)" font-size="10" text-anchor="middle">Ø26 H7</text>
+                <text x="200" y="385" fill="#8896a9" font-size="11" text-anchor="middle">Draufsicht</text>
+              </svg>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header light">📏 Kritische Maße</div>
+            <div class="card-body">
+              <div class="dimension-grid" style="grid-template-columns: repeat(2, 1fr);">
+                <div class="dim-card critical"><div class="dim-value">Ø120</div><div class="dim-tolerance">h5 (0/-0,013)</div><div class="dim-label">Außendurchmesser</div></div>
+                <div class="dim-card critical"><div class="dim-value">Ø26</div><div class="dim-tolerance">H7 (+0,021/0)</div><div class="dim-label">Innenbohrung</div></div>
+                <div class="dim-card critical"><div class="dim-value">Ø44</div><div class="dim-tolerance">H7 (+0,025/0)</div><div class="dim-label">Stufenbohrung</div></div>
+                <div class="dim-card"><div class="dim-value" id="fa-height">42</div><div class="dim-tolerance">±0,1</div><div class="dim-label">Gesamthöhe</div></div>
+              </div>
+              <div class="material-card" style="margin-top: 20px;">
+                <div class="material-icon">🔩</div>
+                <div class="material-details"><h4 id="fa-matname">Edelstahl 1.4571 (V4A)</h4><p id="fa-matinfo">ρ = 8.0 kg/dm³ | Rm ~580 MPa</p></div>
+                <div class="material-cert"><div class="material-cert-label">Chargen-Nr.</div><div class="material-cert-field">__________</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Operations Detail -->
+        <div class="card">
+          <div class="card-header light">🔧 Arbeitsfolge (Detail)</div>
+          <div class="card-body" style="padding: 0; overflow-x: auto;">
+            <table>
+              <thead><tr><th>OP</th><th>Arbeitsgang</th><th>Werkzeug</th><th>n</th><th>f</th><th>aₚ</th><th>Ra</th><th>Zeit</th><th>Hinweise</th></tr></thead>
+              <tbody id="faOpsBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tool List -->
+        <div class="card">
+          <div class="card-header light">🔧 Werkzeugliste</div>
+          <div class="card-body" style="padding: 0; overflow-x: auto;">
+            <table>
+              <thead><tr><th>T-Nr</th><th>Werkzeug</th><th>Ø</th><th>n</th><th>f</th><th>vᶜ</th><th>Standzeit</th><th>Status</th><th>Wechsel</th></tr></thead>
+              <tbody id="faToolsBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Correction & Inspection -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+          <div class="card">
+            <div class="card-header light">🔄 Korrekturwerte</div>
+            <div class="card-body">
+              <div class="correction-grid">
+                <div class="correction-card"><h4>Ø120 h5</h4><div class="correction-value">-0,005</div><div class="correction-unit">mm pro 5 Teile</div><div class="correction-note">DR anpassen wenn >119,990</div></div>
+                <div class="correction-card"><h4>Ø26 H7</h4><div class="correction-value">+0,003</div><div class="correction-unit">mm pro 5 Teile</div><div class="correction-note">Nachstellen wenn <26,010</div></div>
+                <div class="correction-card"><h4>Ø44 H7</h4><div class="correction-value">+0,004</div><div class="correction-unit">mm pro 5 Teile</div><div class="correction-note">Nachstellen wenn <44,012</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header light">📏 Prüfintervalle</div>
+            <div class="card-body" style="padding: 0;">
+              <table>
+                <thead><tr><th>Merkmal</th><th>Toleranz</th><th>Prüfmittel</th><th>Intervall</th></tr></thead>
+                <tbody>
+                  <tr style="background: var(--warning-light);"><td><strong>Ø120 h5</strong></td><td class="mono">-0,013</td><td>Bügelmessschraube</td><td>100% Erst., 1:5</td></tr>
+                  <tr style="background: var(--warning-light);"><td><strong>Ø26 H7</strong></td><td class="mono">+0,021</td><td>Innenmessschraube</td><td>100% Erst., 1:5</td></tr>
+                  <tr style="background: var(--warning-light);"><td><strong>Ø44 H7</strong></td><td class="mono">+0,025</td><td>Innenmessschraube</td><td>100% Erst., 1:5</td></tr>
+                  <tr><td>Gewinde M8</td><td>6H</td><td>Lehrdorn</td><td>1:10</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Troubleshooting -->
+        <div class="card">
+          <div class="card-header light">⚠️ Störungsbeseitigung</div>
+          <div class="card-body" style="padding: 0;">
+            <table>
+              <thead><tr style="background: var(--warning-light);"><th>Problem</th><th>Ursache</th><th>Lösung</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Rattern</strong></td><td>Drehzahl zu hoch, stumpfes WZ</td><td class="text-success">✅ n -15%, WZ wechseln</td></tr>
+                <tr><td><strong>Maß zu groß</strong></td><td>WZ-Verschleiß, Wärme</td><td class="text-success">✅ Ausdrehkopf nachstellen</td></tr>
+                <tr><td><strong>Schlechte Oberfläche</strong></td><td>Stumpfes WZ, falscher Vorschub</td><td class="text-success">✅ WZ wechseln, f anpassen</td></tr>
+                <tr><td><strong>Kaltverfestigung</strong></td><td>Vorschub zu niedrig</td><td class="text-success">✅ f erhöhen, nie verweilen!</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Checklists -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+          <div class="card">
+            <div class="card-header light">📋 VOR dem Start</div>
+            <div class="card-body">
+              <ul class="checklist">
+                <li onclick="toggleCheck(this)"><span class="checkbox"></span>Werkzeuglängen geprüft</li>
+                <li onclick="toggleCheck(this)"><span class="checkbox"></span>Kühlmittel 8–10%</li>
+                <li onclick="toggleCheck(this)"><span class="checkbox"></span>Nullpunkt angetastet</li>
+                <li onclick="toggleCheck(this)"><span class="checkbox"></span>Simulation OK</li>
+                <li onclick="toggleCheck(this)"><span class="checkbox"></span>Chargen-Nr. notiert</li>
+              </ul>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header light">✅ NACH Bearbeitung</div>
+            <div class="card-body">
+              <ul class="checklist">
+                <li onclick="toggleCheck(this)"><span class="checkbox"></span>Kritische Maße geprüft</li>
+                <li onclick="toggleCheck(this)"><span class="checkbox"></span>Oberflächengüte OK</li>
+                <li onclick="toggleCheck(this)"><span class="checkbox"></span>Teil entgratet</li>
+                <li onclick="toggleCheck(this)"><span class="checkbox"></span>Messwerte dokumentiert</li>
+                <li onclick="toggleCheck(this)"><span class="checkbox"></span>WZ-Verschleiß kontrolliert</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feedback -->
+        <div class="feedback-panel">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3>💬 Feedback zur Fertigungsanweisung</h3>
+            <button class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: white;" onclick="toggleFeedback()">Feedback geben ▼</button>
+          </div>
+          <div class="feedback-item"><div class="feedback-header"><span><strong>M. Schmidt</strong> | Schicht 2 | 01.02.2026</span><span class="feedback-stars">★★★★☆</span></div><div><span class="feedback-tag">OP50</span>Bei Ø120 h5 besser mit 3200 U/min — weniger Rattern.</div></div>
+          <div class="feedback-item"><div class="feedback-header"><span><strong>K. Weber</strong> | Schicht 1 | 31.01.2026</span><span class="feedback-stars">★★★★★</span></div><div><span class="feedback-tag">Allgemein</span>Zeitangaben stimmen gut. T8 nach 12 Teilen gewechselt.</div></div>
+          <div id="feedbackForm" style="display: none; margin-top: 16px; background: rgba(255,255,255,0.1); border-radius: 10px; padding: 20px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <input type="text" placeholder="Name / Personalnummer" style="padding: 12px; border: none; border-radius: 6px;">
+              <input type="text" placeholder="Schicht / Datum" style="padding: 12px; border: none; border-radius: 6px;">
+              <select style="padding: 12px; border: none; border-radius: 6px;"><option>Allgemein</option><option>OP10</option><option>OP20</option><option>OP30</option><option>OP40</option><option>OP50</option><option>OP60</option></select>
+              <div style="font-size: 24px; cursor: pointer;" id="stars">☆☆☆☆☆</div>
+              <textarea placeholder="Ihr Feedback..." style="grid-column: 1/-1; padding: 12px; border: none; border-radius: 6px; min-height: 80px;"></textarea>
+            </div>
+            <button onclick="submitFeedback()" style="margin-top: 12px; background: white; color: #667eea; border: none; padding: 12px 24px; border-radius: 20px; font-weight: 600; cursor: pointer;">📤 Absenden</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== NC-CODE ===== -->
+    <div id="page-nccode" class="page">
+      <div class="header">
+        <h1>💻 NC-Programm (Heidenhain TNC 640)</h1>
+        <div class="header-actions">
+          <button class="btn btn-secondary" onclick="copyNC()">📋 Kopieren</button>
+          <button class="btn btn-primary" onclick="downloadNC()">💾 Als .H speichern</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="alert alert-info">
+          <span class="alert-icon">ℹ️</span>
+          <div class="alert-content">
+            <h4>Programm generiert aus Rohteil <span id="nc-raw">Ø130 × 50</span></h4>
+            <p>BLK FORM und Z-Tiefen wurden automatisch aus den Rohteilmaßen berechnet. Vor Erstlauf: Simulation prüfen!</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header light"><span>GRUNDPLATTE.H</span><span class="badge badge-success">Heidenhain TNC 640</span></div>
+          <div class="card-body" style="padding: 0;">
+            <div class="nc-code-block" id="ncCode"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== EINSTELLUNGEN ===== -->
+    <div id="page-einstellungen" class="page">
+      <div class="header">
+        <h1>⚙️ Einstellungen</h1>
+        <div class="header-actions">
+          <button class="btn btn-primary" onclick="saveSettings()">💾 Speichern</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="card">
+          <div class="card-header light">🏭 Firmendaten</div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-group"><label class="form-label">Firmenname</label><input type="text" class="form-input" id="companyName" value="Maschinenbau Schlottwitz GmbH"></div>
+              <div class="form-group"><label class="form-label">Inhaber</label><input type="text" class="form-input" id="ownerName" value="Andreas Brand"></div>
+              <div class="form-group full"><label class="form-label">Adresse</label><input type="text" class="form-input" id="companyAddress" value="Liebstädter Str. 3, 01768 Glashütte OT Schlottwitz"></div>
+              <div class="form-group"><label class="form-label">Telefon</label><input type="text" class="form-input" id="companyPhone" value="(035053) 412-0"></div>
+              <div class="form-group"><label class="form-label">E-Mail</label><input type="email" class="form-input" id="companyEmail" value="info@maschinenbau-schlottwitz.de"></div>
+              <div class="form-group"><label class="form-label">USt-IdNr.</label><input type="text" class="form-input" id="vatId" value="DE123456789"></div>
+              <div class="form-group"><label class="form-label">Handelsregister</label><input type="text" class="form-input" id="regId" value="HRB 12345 AG Dresden"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // === DATA ===
+    const materialData = {
+      '1.4571': { name: 'Edelstahl 1.4571 (V4A)', density: 8.0, factor: 0.6, cost: 8.50, vc: '60–120', alert: 'danger', info: 'ρ = 8.0 kg/dm³ | Rm ~580 MPa', warning: 'Kaltverfestigung vermeiden! Nie mit zu niedrigem Vorschub arbeiten. Bei Rattern: n -15%.' },
+      '1.4301': { name: 'Edelstahl 1.4301 (V2A)', density: 7.9, factor: 0.65, cost: 6.50, vc: '70–130', alert: 'danger', info: 'ρ = 7.9 kg/dm³ | Rm ~520 MPa', warning: 'Kaltverfestigung beachten! Gute Kühlung erforderlich.' },
+      'AlMg3': { name: 'Aluminium AlMg3', density: 2.66, factor: 2.5, cost: 4.00, vc: '200–500', alert: 'info', info: 'ρ = 2.66 kg/dm³ | Rm ~190 MPa', warning: 'Gute Zerspanbarkeit. Hohe vc möglich. Aufbauschneiden beachten.' },
+      'S235': { name: 'Baustahl S235JR', density: 7.85, factor: 1.0, cost: 1.20, vc: '150–250', alert: 'info', info: 'ρ = 7.85 kg/dm³ | Rm ~360 MPa', warning: 'Unlegierter Baustahl. Standard-Schnittdaten anwendbar.' },
+      'C45': { name: 'Vergütungsstahl C45', density: 7.85, factor: 0.8, cost: 1.80, vc: '120–200', alert: 'warning', info: 'ρ = 7.85 kg/dm³ | Rm ~580 MPa', warning: 'Mittlere Zerspanbarkeit. Werkzeugverschleiß beachten.' }
+    };
+
+    let operations = [
+      { op: 'OP10', desc: 'Planfräsen', tool: 'T1 Ø63 Planfräser', n: 800, f: 300, ap: 0.5, th: 1.9, tn: 0.8, ra: '1,6', critical: false },
+      { op: 'OP20', desc: 'Schruppen Außen', tool: 'T2 Ø20 VHM', n: 2500, f: 400, ap: 3.0, th: 7.2, tn: 0.8, ra: '3,2', critical: false, note: '+0,3mm Aufmaß' },
+      { op: 'OP30', desc: 'Schruppen Innen Ø26', tool: 'T4 Ø12 VHM', n: 3000, f: 350, ap: 3.0, th: 4.0, tn: 0.8, ra: '3,2', critical: false },
+      { op: 'OP40', desc: 'Lochkreis 8×Ø6,8', tool: 'T8 Ø6,8 Bohrer', n: 2800, f: 180, ap: 47, th: 3.2, tn: 1.2, ra: '—', critical: false },
+      { op: 'OP50', desc: 'Schlichten Ø120 h5', tool: 'T3 Ø16 VHM', n: 3500, f: 250, ap: 42, th: 4.3, tn: 0.8, ra: '0,8', critical: true, note: '⚠️ h5!' },
+      { op: 'OP60', desc: 'Feinbohren Ø26 H7', tool: 'T11 Ausdrehkopf', n: 1500, f: 100, ap: 45, th: 3.3, tn: 0.8, ra: '0,4', critical: true, note: '⚠️ H7!' },
+      { op: 'OP70', desc: 'Feinbohren Ø44 H7', tool: 'T12 Ausdrehkopf', n: 1200, f: 80, ap: 15, th: 2.3, tn: 0.8, ra: '0,4', critical: false },
+      { op: 'OP80', desc: 'Stufe fräsen', tool: 'T3 Ø16 VHM', n: 3000, f: 300, ap: 15, th: 3.1, tn: 0.8, ra: '1,6', critical: false },
+      { op: 'OP90', desc: 'Gewinde M8 (4×)', tool: 'T13 Gewindefräser', n: 2000, f: 200, ap: 20, th: 2.4, tn: 1.0, ra: '—', critical: false },
+      { op: 'OP100', desc: 'Anfasen', tool: 'T15 Ø12 Fase 45°', n: 4000, f: 300, ap: 0.5, th: 1.5, tn: 0.8, ra: '—', critical: false }
+    ];
+    const baseOps = JSON.parse(JSON.stringify(operations));
+
+    const colors = ['#3b82f6','#2563eb','#10b981','#059669','#ef4444','#dc2626','#8b5cf6','#7c3aed','#f59e0b','#d97706'];
+
+    // === HELPERS ===
+    function parseDims(str) {
+      const s = str.replace(/,/g, '.').replace(/\s/g, '');
+      const cyl = s.match(/[ØD]?(\d+\.?\d*)[×x](\d+\.?\d*)/i);
+      if (cyl && s.includes('Ø')) {
+        const d = parseFloat(cyl[1]), h = parseFloat(cyl[2]);
+        return { type: 'cyl', d, h, vol: Math.PI * (d/2)**2 * h / 1e6 };
+      }
+      const box = s.match(/(\d+\.?\d*)[×x](\d+\.?\d*)[×x](\d+\.?\d*)/i);
+      if (box) {
+        const l = parseFloat(box[1]), w = parseFloat(box[2]), h = parseFloat(box[3]);
+        return { type: 'box', l, w, h, vol: l * w * h / 1e6 };
+      }
+      return null;
+    }
+
+    // === CORE FUNCTIONS ===
+    function onMaterialChange() {
+      const mat = materialData[document.getElementById('material').value];
+      const factor = 1 / mat.factor;
+      operations.forEach((op, i) => {
+        op.th = baseOps[i].th * factor;
+        op.n = Math.round(baseOps[i].n * mat.factor);
+        op.f = Math.round(baseOps[i].f * mat.factor);
+      });
+      updateWeight();
+      renderOps();
+      recalculate();
+    }
+
+    function onDimsChange() {
+      updateWeight();
+      recalculate();
+      generateNC();
+    }
+
+    function updateWeight() {
+      const mat = materialData[document.getElementById('material').value];
+      const dims = parseDims(document.getElementById('rawDims').value);
+      if (dims && mat) {
+        const wt = dims.vol * mat.density;
+        document.getElementById('weight').value = wt.toFixed(2) + ' kg';
+        document.getElementById('materialCost').value = (wt * mat.cost).toFixed(2);
+      }
+    }
+
+    function renderOps() {
+      const tbody = document.getElementById('opsBody');
+      tbody.innerHTML = operations.map((op, i) => `
+        <tr${op.critical ? ' style="background: var(--warning-light);"' : ''}>
+          <td><span class="badge ${op.critical ? 'badge-warning' : 'badge-primary'}">${op.op}</span></td>
+          <td>${op.critical ? '🎯 ' : ''}${op.desc}</td>
+          <td>${op.tool}</td>
+          <td class="mono">${op.n}</td>
+          <td class="mono">${op.f}</td>
+          <td class="mono">${op.ap}</td>
+          <td class="mono text-primary">${op.th.toFixed(1)}</td>
+          <td class="mono">${op.tn}</td>
+          <td class="mono text-primary">${(op.th + op.tn).toFixed(1)}</td>
+          <td><button class="btn btn-sm btn-secondary" onclick="removeOp(${i})">✕</button></td>
+        </tr>
+      `).join('');
+      const th = operations.reduce((a, b) => a + b.th, 0);
+      const tn = operations.reduce((a, b) => a + b.tn, 0);
+      document.getElementById('sumTh').textContent = th.toFixed(1);
+      document.getElementById('sumTn').textContent = tn.toFixed(1);
+      document.getElementById('sumTotal').textContent = (th + tn).toFixed(1);
+    }
+
+    function addOperation() {
+      operations.push({ op: 'OP' + ((operations.length + 1) * 10), desc: 'Neuer Schritt', tool: 'Werkzeug', n: 2000, f: 200, ap: 1, th: 2, tn: 0.8, ra: '—', critical: false });
+      renderOps();
+      recalculate();
+    }
+
+    function removeOp(i) { operations.splice(i, 1); renderOps(); recalculate(); }
+
+    function recalculate() {
+      const qty = +document.getElementById('quantity').value || 10;
+      const rate = +document.getElementById('hourlyRate').value || 85;
+      const matCost = +document.getElementById('materialCost').value || 45;
+      const toolCost = +document.getElementById('toolCost').value || 8;
+      const setup = +document.getElementById('setupTime').value || 30;
+      const margin = +document.getElementById('margin').value || 20;
+
+      const th = operations.reduce((a, b) => a + b.th, 0);
+      const tn = operations.reduce((a, b) => a + b.tn, 0);
+      const total = th + tn;
+      const labor = (total / 60) * rate;
+      const setupPer = (setup / 60) * rate / qty;
+      const base = labor + matCost + toolCost + setupPer;
+      const price = base * (1 + margin / 100);
+      const parts = Math.floor((480 - setup) / total);
+      const eff = Math.round((th / total) * 100);
+
+      document.getElementById('stat-time').textContent = total.toFixed(1) + ' min';
+      document.getElementById('stat-th').textContent = th.toFixed(1) + ' min';
+      document.getElementById('stat-parts').textContent = parts;
+      document.getElementById('stat-price').textContent = '€' + price.toFixed(2);
+      document.getElementById('stat-total').textContent = '€' + (price * qty).toLocaleString('de-DE', { minimumFractionDigits: 0 });
+      document.getElementById('stat-qty-display').textContent = qty + ' Stück';
+
+      document.getElementById('calc-labor').textContent = '€' + labor.toFixed(2);
+      document.getElementById('calc-material').textContent = '€' + matCost.toFixed(2);
+      document.getElementById('calc-tool').textContent = '€' + toolCost.toFixed(2);
+      document.getElementById('calc-setup').textContent = '€' + setupPer.toFixed(2);
+      document.getElementById('calc-base').textContent = '€' + base.toFixed(2);
+      document.getElementById('calc-final').textContent = '€' + price.toFixed(2);
+
+      window.calcData = { qty, price, total: price * qty, time: total, th, tn, eff, parts, setup, labor, matCost, toolCost, setupPer, base, margin };
+    }
+
+    // === PAGES ===
+    function showPage(p) {
+      document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      document.getElementById('page-' + p).classList.add('active');
+      event.target.closest('.nav-item').classList.add('active');
+      if (p === 'angebot') renderQuote();
+      if (p === 'fertigung') renderFA();
+      if (p === 'nccode') generateNC();
+    }
+
+    function goToQuote() { showPage('angebot'); document.querySelectorAll('.nav-item')[1].click(); }
+
+    function renderQuote() {
+      const d = window.calcData || {};
+      const s = getSettings();
+      const mat = document.getElementById('material').value;
+      const proj = document.getElementById('projectName').value;
+      const draw = document.getElementById('drawingNr').value;
+      const sub = d.total || 0;
+      const vat = sub * 0.19;
+      const tot = sub + vat;
+      const today = new Date().toLocaleDateString('de-DE');
+      const valid = new Date(Date.now() + 30*24*60*60*1000).toLocaleDateString('de-DE');
+
+      document.getElementById('quoteContent').innerHTML = `
+        <div style="display: flex; justify-content: space-between; border-bottom: 3px solid var(--primary-dark); padding-bottom: 24px; margin-bottom: 32px;">
+          <div>
+            <div style="font-size: 28px; font-weight: 700; color: var(--primary-dark);">${s.companyName}</div>
+            <div style="margin-top: 12px; color: var(--text-secondary); line-height: 1.6;">${s.ownerName}<br>${s.companyAddress}<br>Tel: ${s.companyPhone}<br>${s.companyEmail}</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 32px; font-weight: 700; color: var(--primary-dark);">ANGEBOT</div>
+            <div style="font-size: 18px; margin-top: 8px;">Nr. 2026-${String(Math.floor(Math.random()*9000)+1000)}</div>
+            <div style="margin-top: 12px; color: var(--text-secondary);">Datum: ${today}<br>Gültig bis: ${valid}</div>
+          </div>
+        </div>
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead><tr style="background: var(--bg);"><th style="padding: 14px; text-align: left; border-bottom: 2px solid var(--primary-dark);">Pos.</th><th style="padding: 14px; text-align: left; border-bottom: 2px solid var(--primary-dark);">Beschreibung</th><th style="padding: 14px; text-align: left; border-bottom: 2px solid var(--primary-dark);">Material</th><th style="padding: 14px; text-align: right; border-bottom: 2px solid var(--primary-dark);">Menge</th><th style="padding: 14px; text-align: right; border-bottom: 2px solid var(--primary-dark);">Einzelpreis</th><th style="padding: 14px; text-align: right; border-bottom: 2px solid var(--primary-dark);">Gesamt</th></tr></thead>
+          <tbody><tr><td style="padding: 16px; border-bottom: 1px solid var(--border);">1</td><td style="padding: 16px; border-bottom: 1px solid var(--border);"><strong>${proj}</strong><br><span style="color: var(--text-secondary); font-size: 13px;">Zeichnung: ${draw}</span></td><td style="padding: 16px; border-bottom: 1px solid var(--border);">${mat}</td><td style="padding: 16px; border-bottom: 1px solid var(--border); text-align: right; font-family: var(--font-mono);">${d.qty || 10} Stk</td><td style="padding: 16px; border-bottom: 1px solid var(--border); text-align: right; font-family: var(--font-mono);">€${(d.price || 0).toFixed(2)}</td><td style="padding: 16px; border-bottom: 1px solid var(--border); text-align: right; font-family: var(--font-mono); font-weight: 600;">€${sub.toLocaleString('de-DE', {minimumFractionDigits:2})}</td></tr></tbody>
+          <tfoot>
+            <tr><td colspan="5" style="padding: 14px; text-align: right; border-top: 2px solid var(--border);">Netto</td><td style="padding: 14px; text-align: right; border-top: 2px solid var(--border); font-family: var(--font-mono);">€${sub.toLocaleString('de-DE', {minimumFractionDigits:2})}</td></tr>
+            <tr><td colspan="5" style="padding: 14px; text-align: right;">MwSt. 19%</td><td style="padding: 14px; text-align: right; font-family: var(--font-mono);">€${vat.toLocaleString('de-DE', {minimumFractionDigits:2})}</td></tr>
+            <tr style="font-size: 20px; font-weight: 700;"><td colspan="5" style="padding: 16px; text-align: right; background: var(--bg);">Gesamtbetrag</td><td style="padding: 16px; text-align: right; background: var(--bg); color: var(--primary-dark); font-family: var(--font-mono);">€${tot.toLocaleString('de-DE', {minimumFractionDigits:2})}</td></tr>
+          </tfoot>
+        </table>
+        <div style="margin-top: 32px; color: var(--text-secondary); font-size: 14px;"><strong>Konditionen:</strong><ul style="margin-top: 8px; padding-left: 20px;"><li>Lieferzeit: 2–3 Wochen</li><li>Zahlung: 14 Tage netto</li><li>Lieferung: Ab Werk</li></ul></div>
+        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-muted); text-align: center;">${s.companyName} | ${s.vatId} | ${s.regId}</div>
+      `;
+    }
+
+    function renderFA() {
+      const d = window.calcData || {};
+      const mat = materialData[document.getElementById('material').value];
+      const raw = document.getElementById('rawDims').value;
+      const dims = parseDims(raw);
+      const height = dims ? (dims.type === 'cyl' ? dims.h : dims.h) : 42;
+
+      document.getElementById('fa-subtitle').textContent = document.getElementById('projectName').value + ' | ' + document.getElementById('machine').options[document.getElementById('machine').selectedIndex].text + ' | Heidenhain TNC 640';
+      document.getElementById('fa-drawing').textContent = document.getElementById('drawingNr').value;
+      document.getElementById('fa-material').textContent = document.getElementById('material').value;
+      document.getElementById('fa-qty').textContent = document.getElementById('quantity').value;
+      document.getElementById('fa-raw').textContent = raw;
+      document.getElementById('fa-date').textContent = new Date().toLocaleDateString('de-DE');
+      document.getElementById('fa-time').textContent = (d.time || 41.8).toFixed(1) + ' min';
+      document.getElementById('fa-th').textContent = (d.th || 33.2).toFixed(1) + ' min';
+      document.getElementById('fa-tn').textContent = (d.tn || 8.6).toFixed(1) + ' min';
+      document.getElementById('fa-eff').textContent = (d.eff || 79) + '%';
+      document.getElementById('fa-setup').textContent = (d.setup || 30) + ' min';
+      document.getElementById('fa-parts').textContent = '~' + (d.parts || 11);
+      document.getElementById('fa-height').textContent = Math.round(height);
+      document.getElementById('fa-matname').textContent = mat.name;
+      document.getElementById('fa-matinfo').textContent = mat.info;
+      document.getElementById('alertTitle').textContent = 'Werkstoff ' + document.getElementById('material').value + ' — ' + mat.name.split('(')[0];
+      document.getElementById('alertText').textContent = mat.warning;
+      document.getElementById('materialAlert').className = 'alert alert-' + mat.alert;
+
+      // Progress bar
+      const total = d.time || operations.reduce((a, b) => a + b.th + b.tn, 0);
+      document.getElementById('progressBar').innerHTML = operations.map((op, i) => {
+        const pct = ((op.th + op.tn) / total * 100).toFixed(1);
+        return `<div class="progress-segment" style="width:${pct}%;background:${colors[i]};" title="${op.op}: ${(op.th+op.tn).toFixed(1)} min">${op.op.replace('OP','')}</div>`;
+      }).join('');
+      document.getElementById('progressLegend').innerHTML = operations.map((op, i) => `<div class="legend-item"><div class="legend-color" style="background:${colors[i]};"></div>${op.op}: ${(op.th+op.tn).toFixed(1)} min${op.critical ? ' ⚠️' : ''}</div>`).join('');
+
+      // Ops table
+      document.getElementById('faOpsBody').innerHTML = operations.map(op => `
+        <tr${op.critical ? ' style="background:var(--warning-light);"' : ''}>
+          <td><span class="badge ${op.critical ? 'badge-warning' : 'badge-primary'}">${op.op}</span></td>
+          <td>${op.critical ? '🎯 ' : ''}${op.desc}</td><td>${op.tool}</td><td class="mono">${op.n}</td><td class="mono">${op.f}</td><td class="mono">${op.ap}</td><td class="mono">${op.ra}</td><td class="mono text-primary">${(op.th+op.tn).toFixed(1)}</td><td class="text-muted">${op.note || ''}</td>
+        </tr>
+      `).join('');
+
+      // Tools table
+      const tools = [];
+      operations.forEach(op => {
+        const t = op.tool.split(' ')[0];
+        if (!tools.find(x => x.t === t)) {
+          const d = parseFloat(op.tool.match(/Ø(\d+)/)?.[1] || 10);
+          const vc = Math.round(Math.PI * d * op.n / 1000);
+          const life = op.critical ? 60 : 90;
+          const pct = op.critical ? 70 : 85;
+          const status = pct > 75 ? 'good' : pct > 50 ? 'warning' : 'critical';
+          tools.push({ t, tool: op.tool.split(' ').slice(1).join(' '), d, n: op.n, f: op.f, vc, life, pct, status, wechsel: '~' + Math.round(life / ((op.th + op.tn) || 1)) + ' Teile' });
+        }
+      });
+      document.getElementById('faToolsBody').innerHTML = tools.map(t => `
+        <tr><td><strong>${t.t}</strong></td><td>${t.tool}</td><td class="mono">Ø${t.d}</td><td class="mono">${t.n}</td><td class="mono">${t.f}</td><td class="mono">${t.vc}</td><td class="mono">${t.life} min</td>
+        <td><div class="tool-life-bar"><div class="tool-life-fill ${t.status}" style="width:${t.pct}%;">${t.pct}%</div></div></td><td class="text-muted">${t.wechsel}</td></tr>
+      `).join('');
+    }
+
+    function generateNC() {
+      const raw = document.getElementById('rawDims').value;
+      const dims = parseDims(raw);
+      const mat = document.getElementById('material').value;
+      const proj = document.getElementById('projectName').value;
+      const draw = document.getElementById('drawingNr').value;
+      
+      let blk = 'BLK FORM 0.1 Z X-65 Y-65 Z-50\nBLK FORM 0.2 X+65 Y+65 Z+0';
+      let maxZ = 42;
+      if (dims) {
+        if (dims.type === 'cyl') {
+          const r = dims.d / 2;
+          blk = `BLK FORM CYLINDER Z R${r.toFixed(0)} L-${dims.h.toFixed(0)} RI0`;
+          maxZ = dims.h;
+        } else {
+          blk = `BLK FORM 0.1 Z X-${(dims.l/2).toFixed(0)} Y-${(dims.w/2).toFixed(0)} Z-${dims.h.toFixed(0)}\nBLK FORM 0.2 X+${(dims.l/2).toFixed(0)} Y+${(dims.w/2).toFixed(0)} Z+0`;
+          maxZ = dims.h;
+        }
+      }
+
+      document.getElementById('nc-raw').textContent = raw;
+
+      const code = `<span class="comment">; ============================================================</span>
+<span class="comment">; NC-PROGRAMM: GRUNDPLATTE.H</span>
+<span class="comment">; TEIL: ${proj}</span>
+<span class="comment">; ZEICHNUNG: ${draw}</span>
+<span class="comment">; WERKSTOFF: ${mat}</span>
+<span class="comment">; ROHTEIL: ${raw}</span>
+<span class="comment">; MASCHINE: FEHLMANN VERSA 943 / Heidenhain TNC 640</span>
+<span class="comment">; ERSTELLT: ${new Date().toLocaleDateString('de-DE')}</span>
+<span class="comment">; BEARBEITUNGSZEIT: ca. ${(window.calcData?.time || 41.8).toFixed(1)} min</span>
+<span class="comment">; ============================================================</span>
+
+<span class="keyword">BEGIN PGM</span> GRUNDPLATTE <span class="keyword">MM</span>
+
+<span class="comment">; --- ROHTEIL-DEFINITION (aus ${raw}) ---</span>
+${blk}
+
+<span class="comment">; --- WERKZEUGE ---</span>
+<span class="comment">; T1  = Planfräser Ø63</span>
+<span class="comment">; T2  = VHM-Schruppfräser Ø20</span>
+<span class="comment">; T3  = VHM-Schlichtfräser Ø16</span>
+<span class="comment">; T4  = VHM-Schaftfräser Ø12</span>
+<span class="comment">; T8  = VHM-Spiralbohrer Ø6,8</span>
+<span class="comment">; T11 = Ausdrehwerkzeug Ø26</span>
+<span class="comment">; T12 = Ausdrehwerkzeug Ø44</span>
+<span class="comment">; T13 = Gewindefräser M8</span>
+<span class="comment">; T15 = Fasenfräser 45° Ø12</span>
+
+<span class="comment">; Sicherheitsebene</span>
+<span class="gcode">L Z+100 R0 FMAX M3</span>
+
+<span class="comment">; ============================================================</span>
+<span class="comment">; OP10 - PLANFRÄSEN (Z-Tiefe aus Rohteil: -0,5 von Z0)</span>
+<span class="comment">; ============================================================</span>
+<span class="tool">TOOL CALL 1 Z S800</span>
+<span class="gcode">L X-80 Y+0 R0 FMAX</span>
+<span class="gcode">L Z+2 R0 FMAX</span>
+<span class="gcode">L Z-0.5 R0 F100 M8</span>
+<span class="gcode">L X+80 R0 F300</span>
+<span class="gcode">L Z+100 R0 FMAX M9</span>
+
+<span class="comment">; ============================================================</span>
+<span class="comment">; OP20 - SCHRUPPEN AUSSEN (Tiefe: -${maxZ} aus Rohteilhöhe)</span>
+<span class="comment">; ============================================================</span>
+<span class="tool">TOOL CALL 2 Z S2500</span>
+<span class="gcode">CYCL DEF 256 RECHTECKTASCHE</span>
+  <span class="gcode">Q202=-${maxZ}</span>     <span class="comment">;TIEFE (aus Rohteil)</span>
+  <span class="gcode">Q368=0.3</span>   <span class="comment">;AUFMASS SEITE</span>
+  <span class="gcode">Q207=400</span>   <span class="comment">;VORSCHUB</span>
+<span class="gcode">CYCL CALL</span>
+<span class="gcode">L Z+100 R0 FMAX M9</span>
+
+<span class="comment">; ============================================================</span>
+<span class="comment">; OP30 - SCHRUPPEN INNEN Ø26</span>
+<span class="comment">; ============================================================</span>
+<span class="tool">TOOL CALL 4 Z S3000</span>
+<span class="gcode">CYCL DEF 253 NUT FRÄSEN</span>
+  <span class="gcode">Q223=25.8</span>  <span class="comment">;DURCHMESSER</span>
+  <span class="gcode">Q202=-${maxZ + 3}</span>   <span class="comment">;TIEFE (durchgehend)</span>
+  <span class="gcode">Q207=350</span>   <span class="comment">;VORSCHUB</span>
+<span class="gcode">CYCL CALL</span>
+<span class="gcode">L Z+100 R0 FMAX M9</span>
+
+<span class="comment">; ============================================================</span>
+<span class="comment">; OP40 - LOCHKREIS 8× Ø6,8</span>
+<span class="comment">; ============================================================</span>
+<span class="tool">TOOL CALL 8 Z S2800</span>
+<span class="gcode">CYCL DEF 203 UNIVERSAL-BOHREN</span>
+  <span class="gcode">Q201=-${maxZ + 5}</span>   <span class="comment">;TIEFE (durchgehend)</span>
+  <span class="gcode">Q206=180</span>   <span class="comment">;VORSCHUB</span>
+<span class="gcode">CYCL DEF 220 MUSTER KREIS</span>
+  <span class="gcode">Q244=52</span>    <span class="comment">;LOCHKREIS-Ø</span>
+  <span class="gcode">Q241=8</span>     <span class="comment">;ANZAHL</span>
+<span class="gcode">CYCL CALL M8</span>
+<span class="gcode">L Z+100 R0 FMAX M9</span>
+
+<span class="comment">; ============================================================</span>
+<span class="comment">; OP50 - SCHLICHTEN Ø120 h5 **KRITISCH**</span>
+<span class="comment">; ============================================================</span>
+<span class="tool">TOOL CALL 3 Z S3500</span>
+<span class="gcode">L X+0 Y+68 R0 FMAX M8</span>
+<span class="gcode">L Z-${maxZ} R0 F150</span>
+<span class="gcode">CC X+0 Y+0</span>
+<span class="gcode">C X+0 Y+60 DR- RL F250</span>
+<span class="gcode">C X+0 Y+60 DR- RL F250</span>
+<span class="gcode">L Z+100 R0 FMAX M9</span>
+
+<span class="comment">; ============================================================</span>
+<span class="comment">; OP60 - FEINBOHREN Ø26 H7 **KRITISCH**</span>
+<span class="comment">; ============================================================</span>
+<span class="tool">TOOL CALL 11 Z S1500</span>
+<span class="gcode">L X+0 Y+0 R0 FMAX M8</span>
+<span class="gcode">CYCL DEF 201 REIBEN</span>
+  <span class="gcode">Q201=-${maxZ + 3}</span>   <span class="comment">;TIEFE</span>
+  <span class="gcode">Q206=100</span>   <span class="comment">;VORSCHUB</span>
+<span class="gcode">CYCL CALL</span>
+<span class="gcode">L Z+100 R0 FMAX M9</span>
+
+<span class="comment">; ============================================================</span>
+<span class="comment">; OP70-100: WEITERE OPERATIONEN</span>
+<span class="comment">; (Stufe, Gewinde, Fase - analog)</span>
+<span class="comment">; ============================================================</span>
+
+<span class="comment">; PROGRAMMENDE</span>
+<span class="gcode">L Z+150 R0 FMAX</span>
+<span class="gcode">L X+0 Y+150 R0 FMAX M5 M9</span>
+<span class="gcode">M30</span>
+
+<span class="keyword">END PGM</span> GRUNDPLATTE <span class="keyword">MM</span>`;
+
+      document.getElementById('ncCode').innerHTML = code;
+    }
+
+    // === SETTINGS ===
+    function getSettings() {
+      const s = localStorage.getItem('cncSettings');
+      if (s) return JSON.parse(s);
+      return {
+        companyName: document.getElementById('companyName')?.value || 'Maschinenbau Schlottwitz GmbH',
+        ownerName: document.getElementById('ownerName')?.value || 'Andreas Brand',
+        companyAddress: document.getElementById('companyAddress')?.value || 'Liebstädter Str. 3, 01768 Glashütte',
+        companyPhone: document.getElementById('companyPhone')?.value || '(035053) 412-0',
+        companyEmail: document.getElementById('companyEmail')?.value || 'info@maschinenbau-schlottwitz.de',
+        vatId: document.getElementById('vatId')?.value || 'DE123456789',
+        regId: document.getElementById('regId')?.value || 'HRB 12345'
+      };
+    }
+
+    function saveSettings() {
+      const s = {
+        companyName: document.getElementById('companyName').value,
+        ownerName: document.getElementById('ownerName').value,
+        companyAddress: document.getElementById('companyAddress').value,
+        companyPhone: document.getElementById('companyPhone').value,
+        companyEmail: document.getElementById('companyEmail').value,
+        vatId: document.getElementById('vatId').value,
+        regId: document.getElementById('regId').value
+      };
+      localStorage.setItem('cncSettings', JSON.stringify(s));
+      document.getElementById('sidebarCompany').textContent = s.companyName;
+      alert('✅ Einstellungen gespeichert!');
+    }
+
+    function loadSettings() {
+      const s = getSettings();
+      document.getElementById('companyName').value = s.companyName;
+      document.getElementById('ownerName').value = s.ownerName;
+      document.getElementById('companyAddress').value = s.companyAddress;
+      document.getElementById('companyPhone').value = s.companyPhone;
+      document.getElementById('companyEmail').value = s.companyEmail;
+      document.getElementById('vatId').value = s.vatId;
+      document.getElementById('regId').value = s.regId;
+      document.getElementById('sidebarCompany').textContent = s.companyName;
+    }
+
+    // === UI HELPERS ===
+    function toggleDropdown(id) {
+      const m = document.getElementById(id);
+      m.classList.toggle('show');
+    }
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.dropdown')) document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+    });
+
+    function toggleCalcDetails() {
+      const c = document.getElementById('calcDetails');
+      const i = document.getElementById('calcToggleIcon');
+      c.classList.toggle('show');
+      i.textContent = c.classList.contains('show') ? '▼' : '▶';
+    }
+
+    function toggleCheck(el) { el.classList.toggle('checked'); }
+    function toggleFeedback() { document.getElementById('feedbackForm').style.display = document.getElementById('feedbackForm').style.display === 'none' ? 'block' : 'none'; }
+    function submitFeedback() { alert('✅ Feedback gesendet! (Demo)'); toggleFeedback(); }
+    function resetForm() { location.reload(); }
+
+    function downloadAs(fmt) {
+      document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+      alert(`📥 ${fmt.toUpperCase()} Export\n\nIn der Vollversion verfügbar.`);
+      if (fmt === 'pdf') window.print();
+    }
+
+    function copyNC() {
+      navigator.clipboard.writeText(document.getElementById('ncCode').innerText);
+      alert('✅ NC-Code kopiert!');
+    }
+
+    function downloadNC() {
+      const blob = new Blob([document.getElementById('ncCode').innerText], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'GRUNDPLATTE.H';
+      a.click();
+    }
+
+    // === INIT ===
+    loadSettings();
+    updateWeight();
+    renderOps();
+    recalculate();
+  </script>
+</body>
+</html>

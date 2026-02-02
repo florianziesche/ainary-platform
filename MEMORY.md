@@ -54,8 +54,16 @@
 - **Decile Capital application** — Cover letter ready, submit Monday Feb 3 (after Monique meeting)
 - **LinkedIn Post** — "Founder to VC" post ready for Feb 3, 14:00 CET (strategic timing: before Monique meeting)
 - **Maschinenbau Schlottwitz** — CNC demo ready, uncle is warm lead, fastest path to revenue
-- **CNC Planner Pro v2.0** — Built with PDF/STEP upload, industrial design, ready for demo
+- **CNC Planner Pro** — Mehrere Versionen existieren (v2, v3, v4). v4 = Enhanced Fertigungsanweisung mit Progress Bar, Material-Warnungen, Werkzeug-Standzeitbalken, etc. Alle in `projects/cnc-planner/`
 - **Knowledge System** — 10 RSS feeds active, 144 articles captured, blogwatcher running
+
+## CNC Planner Status (Quick Reference)
+
+- **Location:** `~/.openclaw/workspace/projects/cnc-planner/`
+- **Versionen:** v2 (PDF/STEP upload), v3 (verbessert), v4 (Enhanced FA mit Checklisten)
+- **Pricing:** Pro €49/mo, Business €149/mo
+- **Target:** Onkel als erster Pilot → €750/Monat recurring
+- **Related files:** `products/cnc-planner/PRICING.md`, `ROI-CALCULATOR.md`
 
 ## Key People
 
@@ -94,6 +102,8 @@ Legal AI Platform with <0.2% hallucination rate using:
 - **LinkedIn timing matters** — Post content strategically (e.g., before important meetings for conversation starters)
 - **Brave API key missing** — Web search unavailable until configured (`openclaw configure --section web`)
 - **Obsidian + OpenClaw sync** — Keep heavy research in Obsidian, operations in workspace, avoid duplication
+- **ACTIVE_TASK.md** — Neue Datei für laufende Aufgaben. Überlebt Context-Kompaktierung. Bei neuer Aufgabe: erst dokumentieren, dann arbeiten. (Added 2026-02-02)
+- **Keine "mental notes"** — Alles Wichtige sofort in Datei schreiben. Memory ist begrenzt, Dateien überleben. (Added 2026-02-02)
 
 ## Content Pillars
 
@@ -104,4 +114,4 @@ Legal AI Platform with <0.2% hallucination rate using:
 
 ---
 
-*Last updated: 2026-02-02 (overnight session)*
+*Last updated: 2026-02-02 08:55 CET*
