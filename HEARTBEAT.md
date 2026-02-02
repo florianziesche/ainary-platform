@@ -46,6 +46,7 @@ Guten Morgen ♔
 ### Alle 2-3 Tage:
 - [ ] Job Pipeline: Neue Opportunities? Follow-ups fällig?
 - [ ] Content: Was wurde gepostet? Engagement?
+- [ ] **RSS Feeds scannen** → `blogwatcher scan` → Restack-Queue updaten
 
 ### Wöchentlich (Sonntag/Montag):
 - [ ] COCKPIT.md aktualisieren
