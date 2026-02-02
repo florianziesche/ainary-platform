@@ -1843,33 +1843,6 @@
                     </div>
                 </div>
 
-                <!-- Werkzeugkosten -->
-                <div class="calc-section">
-                    <h4>Werkzeugkosten</h4>
-                    <p style="font-size: 0.8rem; color: var(--gray-600); margin-bottom: 16px;">Kosten basierend auf Standzeit und Einsatzzeit pro Teil.</p>
-                    <table class="calc-table">
-                        <thead>
-                            <tr>
-                                <th>Werkzeug</th>
-                                <th>Bezeichnung</th>
-                                <th style="text-align: right;">Preis</th>
-                                <th style="text-align: right;">Standzeit</th>
-                                <th style="text-align: right;">Einsatzzeit</th>
-                                <th style="text-align: right;">Kosten/Teil</th>
-                            </tr>
-                        </thead>
-                        <tbody id="toolsTableBody">
-                            <tr><td><strong>T1</strong></td><td>Planfräser Ø63 WSP</td><td style="text-align: right;">€45,00</td><td style="text-align: right;">60 min</td><td style="text-align: right;">1,9 min</td><td style="text-align: right;"><strong>€1,43</strong></td></tr>
-                            <tr><td><strong>T2</strong></td><td>VHM-Fräser Ø20</td><td style="text-align: right;">€120,00</td><td style="text-align: right;">180 min</td><td style="text-align: right;">11,2 min</td><td style="text-align: right;"><strong>€7,47</strong></td></tr>
-                            <tr><td><strong>T3</strong></td><td>VHM-Schlichtfräser Ø16</td><td style="text-align: right;">€95,00</td><td style="text-align: right;">120 min</td><td style="text-align: right;">7,4 min</td><td style="text-align: right;"><strong>€5,86</strong></td></tr>
-                            <tr><td><strong>T11</strong></td><td>Feinbohrkopf Ø26</td><td style="text-align: right;">€350,00</td><td style="text-align: right;">500 min</td><td style="text-align: right;">3,3 min</td><td style="text-align: right;"><strong>€2,31</strong></td></tr>
-                            <tr><td><strong>T12</strong></td><td>Feinbohrkopf Ø44</td><td style="text-align: right;">€380,00</td><td style="text-align: right;">500 min</td><td style="text-align: right;">3,8 min</td><td style="text-align: right;"><strong>€2,89</strong></td></tr>
-                            <tr><td><strong>T13</strong></td><td>Gewindefräser M8</td><td style="text-align: right;">€65,00</td><td style="text-align: right;">200 min</td><td style="text-align: right;">2,4 min</td><td style="text-align: right;"><strong>€0,78</strong></td></tr>
-                            <tr style="background: #fef9e6;"><td colspan="5" style="text-align: right; font-weight: 600;">Werkzeugkosten gesamt:</td><td style="text-align: right; font-weight: 700; color: #92400e;" id="toolsTotalCost"><strong>€20,74</strong></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-
                 <div style="background: #fef9e6; border-left: 4px solid #fbbf24; padding: 16px; border-radius: 0 6px 6px 0;">
                     <strong style="color: #92400e;">Hinweis:</strong> Bei hartem Werkstoff (1.4571) können Werkzeugkosten 15-20% der Gesamtkosten ausmachen. Standzeiten sind werkstoffabhängig.
                 </div>
@@ -2977,10 +2950,20 @@ BEGIN PGM {progName} MM
 ; ============================================
 TOOL CALL 1 Z S800
 L Z+100 R0 FMAX M3
-L X+0 Y-40 FMAX
-L Z+2 FMAX
+; Anfahrt: Außerhalb Werkstück positionieren
+L X-40 Y-40 FMAX
+L Z+5 FMAX
+; Eintauchen auf Arbeitstiefe
 L Z+0 F200
-L X+{dimX} F300
+; Planfräsen in Bahnen
+L X+{dimX}+40 F300
+L Y+0
+L X-40
+L Y+40
+L X+{dimX}+40
+L Y+80
+L X-40
+; Rückzug
 L Z+100 FMAX
 
 ; ============================================
@@ -2988,10 +2971,13 @@ L Z+100 FMAX
 ; ============================================
 TOOL CALL 2 Z S2500
 L Z+100 R0 FMAX M3
+; Anfahrt: Sicherheitsabstand zum Rohteil
+L X+{dimX}+20 Y+0 FMAX
+L Z+5 FMAX
+; Konturparallel anfahren
 CYCL DEF 14.0 KONTUR
 CYCL DEF 14.1 KONTURLABEL 1
-L X+0 Y+0 FMAX M99
-L Z+5 FMAX
+L X+{dimX}+10 Y+0 FMAX M99
 CYCL CALL
 L Z+100 FMAX
 
@@ -3002,10 +2988,20 @@ L Z+100 FMAX
 TOOL CALL 3 Z S3000
 L Z+100 R0 FMAX M3
 ; WERKZEUG VOR BEARBEITUNG PRÜFEN!
-L X+{finishRadius} Y+0 FMAX
+M0
+; Anfahrt: Außerhalb Fertigkontur positionieren
+L X+{finishRadius}+10 Y+0 FMAX
 L Z+2 FMAX
+; Auf Arbeitstiefe absenken
+L Z-{dimZ}+5 F150
+; Tangentiale Anfahrt zur Kontur
+L X+{finishRadius}+2 F100
+; Kreisförmiges Schlichten
 CC X+0 Y+0
 CP IPA+360 DR+ F250
+; Tangentiales Abfahren
+L X+{finishRadius}+10 F100
+; Rückzug
 L Z+100 FMAX
 
 M30
@@ -3026,32 +3022,48 @@ END PGM {progName} MM`,
 ; --- WERKZEUGAUFRUF ---
 N10 G90 G54 G17
 N20 T1 D1 M6              ; Planfräser Ø63
-N30 S800 M3 F300
+N30 S800 M3
 
 ; OP10: PLANFRÄSEN
-N40 G0 X0 Y-40 Z100
-N50 G0 Z2
+; Anfahrt außerhalb Werkstück
+N40 G0 X-40 Y-40 Z100
+N50 G0 Z5
 N60 G1 Z0 F200
-N70 G1 X{dimX} F300
-N80 G0 Z100
+; Planfräsen in Bahnen
+N70 G1 X{dimX}+40 F300
+N80 Y0
+N90 X-40
+N100 Y40
+N110 X{dimX}+40
+N120 G0 Z100
 
 ; OP20: SCHRUPPEN AUSSENKONTUR
-N90 T2 D1 M6              ; VHM-Fräser Ø20
-N100 S2500 M3 F400
-N110 G0 X0 Y0 Z100
-N120 CYCLE72("KONTUR",1,0,0,0,2,0.5,0.1,1,41,1,1,0)
-N130 G0 Z100
+N130 T2 D1 M6             ; VHM-Fräser Ø20
+N140 S2500 M3
+; Anfahrt mit Sicherheitsabstand
+N150 G0 X{dimX}+20 Y0 Z100
+N160 G0 Z5
+N170 CYCLE72("KONTUR",1,0,0,0,2,0.5,0.1,1,41,1,1,0)
+N180 G0 Z100
 
 ; OP50: SCHLICHTEN — KRITISCH!
-N140 T3 D1 M6             ; Schlichtfräser Ø16
-N150 S3000 M3 F250
+N190 T3 D1 M6             ; Schlichtfräser Ø16
+N200 S3000 M3
 ; ACHTUNG: Toleranz {tolerance}!
-N160 G0 X{finishRadius} Y0 Z2
-N170 G1 Z-{dimZ}
-N180 G3 X{finishRadius} Y0 I-{finishRadius} J0
-N190 G0 Z100
+N210 M0                   ; Halt - Werkzeugkontrolle
+; Anfahrt außerhalb Fertigkontur
+N220 G0 X{finishRadius}+10 Y0 Z5
+N230 G1 Z-{dimZ}+5 F150
+; Tangentiale Anfahrt
+N240 G1 X{finishRadius}+2 F100
+; Kreisförmiges Schlichten
+N250 G3 X{finishRadius} Y2 CR=2
+N260 G3 X{finishRadius} Y0 I-{finishRadius} J0 F250
+; Tangentiales Abfahren
+N270 G1 X{finishRadius}+10 F100
+N280 G0 Z100
 
-N200 M30`,
+N290 M30`,
 
         fanuc: `( ============================================ )
 ( CNC PLANNER PRO — Automatisch generiert )
@@ -3071,38 +3083,53 @@ N30 S800 M3
 N40 G43 H1 Z100.
 
 ( OP10: PLANFRÄSEN )
-N50 G0 X0. Y-40.
-N60 G0 Z2.
+( Anfahrt außerhalb Werkstück )
+N50 G0 X-40. Y-40.
+N60 G0 Z5.
 N70 G1 Z0. F200
-N80 G1 X{dimX}. F300
-N90 G0 Z100.
+( Planfräsen in Bahnen )
+N80 G1 X{dimX}+40. F300
+N90 Y0.
+N100 X-40.
+N110 Y40.
+N120 X{dimX}+40.
+N130 G0 Z100.
 
 ( WERKZEUGWECHSEL T2 - SCHRUPPFRÄSER )
-N100 T2 M6
-N110 S2500 M3
-N120 G43 H2 Z100.
+N140 T2 M6
+N150 S2500 M3
+N160 G43 H2 Z100.
 
 ( OP20: SCHRUPPEN AUSSENKONTUR )
-N130 G0 X0. Y0.
-N140 G0 Z5.
-N150 G12 I{finishRadius}. K0. D2 F400
-N160 G0 Z100.
+( Anfahrt mit Sicherheitsabstand )
+N170 G0 X{dimX}+20. Y0.
+N180 G0 Z5.
+N190 G12 I{finishRadius}. K0. D2 F400
+N200 G0 Z100.
 
 ( WERKZEUGWECHSEL T3 - SCHLICHTFRÄSER )
 ( ACHTUNG: KRITISCHE OPERATION! )
 ( Toleranz: {tolerance} )
-N170 T3 M6
-N180 S3000 M3
-N190 G43 H3 Z100.
+N210 T3 M6
+N220 S3000 M3
+N230 G43 H3 Z100.
+N240 M0                   ( Halt - Werkzeugkontrolle )
 
 ( OP50: SCHLICHTEN )
-N200 G0 X{finishRadius}. Y0.
-N210 G0 Z2.
-N220 G1 Z-{dimZ}. F250
-N230 G3 X{finishRadius}. Y0. I-{finishRadius}. J0.
-N240 G0 Z100.
+( Anfahrt außerhalb Fertigkontur )
+N250 G0 X{finishRadius}+10. Y0.
+N260 G0 Z5.
+N270 G1 Z-{dimZ}+5. F150
+( Tangentiale Anfahrt )
+N280 G1 X{finishRadius}+2. F100
+( Kreisförmiges Schlichten )
+N290 G3 X{finishRadius}. Y2. R2.
+N300 G3 X{finishRadius}. Y0. I-{finishRadius}. J0. F250
+( Tangentiales Abfahren )
+N310 G1 X{finishRadius}+10. F100
+N320 G0 Z100.
 
-N250 M30
+N330 M30
 %`
     };
 
