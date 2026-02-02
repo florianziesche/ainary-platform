@@ -1399,100 +1399,75 @@
         </div>
     </div>
 
-    <!-- ============ FEATURE 1: LIVE ROHMASS → ZEIT ============ -->
+    <!-- ============ ROHMASZE & WERKSTOFF ============ -->
     <div class="dimension-editor">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <div>
-                <h3 style="font-size: 1.1rem; font-weight: 600; color: var(--gray-800); margin-bottom: 4px;">Live-Kalkulation</h3>
-                <p style="font-size: 0.85rem; color: var(--gray-500);">Rohmaße anpassen — Bearbeitungszeit berechnet sich automatisch</p>
+                <h3 style="font-size: 1.1rem; font-weight: 600; color: var(--gray-800); margin-bottom: 4px;">Werkstück-Parameter</h3>
+                <p style="font-size: 0.85rem; color: var(--gray-500);">Rohmaße und Werkstoff anpassen — Kosten berechnen sich automatisch</p>
             </div>
-            <span class="badge badge-info">Echtzeit</span>
+            <span class="badge badge-info">Live-Kalkulation</span>
         </div>
-        <div class="dimension-grid">
+        
+        <!-- Werkstoff Auswahl -->
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; font-size: 0.75rem; color: var(--gray-500); margin-bottom: 6px; text-transform: uppercase;">Werkstoff</label>
+            <select id="materialSelect" onchange="recalculateAll()" style="width: 100%; padding: 12px 16px; border: 2px solid var(--gray-200); border-radius: var(--radius); font-size: 1rem; background: white; cursor: pointer;">
+                <option value="1.4571" selected>1.4571 (V4A) — Edelstahl rostfrei</option>
+                <option value="1.4301">1.4301 (V2A) — Edelstahl</option>
+                <option value="42CrMo4">42CrMo4 — Vergütungsstahl</option>
+                <option value="S355">S355 — Baustahl</option>
+                <option value="AlMg3">AlMg3 — Aluminium</option>
+                <option value="CuZn39Pb3">CuZn39Pb3 — Messing</option>
+            </select>
+        </div>
+
+        <!-- Rohmaße -->
+        <div class="dimension-grid" style="grid-template-columns: repeat(3, 1fr);">
             <div class="dim-input">
-                <label>Durchmesser</label>
-                <input type="number" id="dimDiameter" value="120" min="20" max="500" oninput="recalculateTime()">
-                <div class="unit">mm</div>
+                <label>Rohteil-Durchmesser</label>
+                <input type="number" id="dimRawDiameter" value="130" min="20" max="500" oninput="recalculateAll()">
+                <div class="unit">mm (inkl. Aufmaß)</div>
             </div>
             <div class="dim-input">
-                <label>Höhe</label>
-                <input type="number" id="dimHeight" value="42" min="5" max="200" oninput="recalculateTime()">
-                <div class="unit">mm</div>
+                <label>Rohteil-Höhe</label>
+                <input type="number" id="dimRawHeight" value="47" min="5" max="200" oninput="recalculateAll()">
+                <div class="unit">mm (inkl. Aufmaß)</div>
             </div>
             <div class="dim-input">
-                <label>Bohrung innen</label>
-                <input type="number" id="dimBore" value="26" min="0" max="200" oninput="recalculateTime()">
+                <label>Fertigmaß-Durchmesser</label>
+                <input type="number" id="dimFinishDiameter" value="120" min="20" max="500" oninput="recalculateAll()">
                 <div class="unit">mm</div>
-            </div>
-            <div class="dim-input">
-                <label>Gewinde</label>
-                <input type="number" id="dimThreads" value="6" min="0" max="24" oninput="recalculateTime()">
-                <div class="unit">Stk.</div>
             </div>
         </div>
-        <div class="live-result">
+
+        <!-- Ergebnisse -->
+        <div class="live-result" style="margin-top: 20px;">
+            <div class="live-result-item">
+                <div class="live-result-label">Rohteil-Gewicht</div>
+                <div class="live-result-value" id="liveWeight">4,87 kg</div>
+            </div>
+            <div class="live-result-item">
+                <div class="live-result-label">Materialkosten</div>
+                <div class="live-result-value" id="liveMaterialCost">€ 34,09</div>
+            </div>
             <div class="live-result-item">
                 <div class="live-result-label">Bearbeitungszeit</div>
                 <div class="live-result-value" id="liveTime">41,8 min</div>
             </div>
             <div class="live-result-item">
-                <div class="live-result-label">Materialvolumen</div>
-                <div class="live-result-value" id="liveVolume">476 cm³</div>
-            </div>
-            <div class="live-result-item">
-                <div class="live-result-label">Kosten/Teil</div>
-                <div class="live-result-value" id="liveCost">€ 122,07</div>
-            </div>
-            <div class="live-result-item">
-                <div class="live-result-label">Änderung</div>
-                <div class="live-result-value" id="liveChange" style="color: var(--gray-400);">±0%</div>
+                <div class="live-result-label">Maschinenkosten</div>
+                <div class="live-result-value" id="liveMachineCost">€ 59,22</div>
             </div>
         </div>
-    </div>
 
-    <!-- ============ FEATURE 2: SERIENKALKULATION ============ -->
-    <div class="series-calc">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <!-- Gesamtkosten -->
+        <div style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; padding: 20px; border-radius: var(--radius); margin-top: 16px; display: flex; justify-content: space-between; align-items: center;">
             <div>
-                <h3 style="font-size: 1.1rem; font-weight: 600; color: var(--gray-800); margin-bottom: 4px;">Serienkalkulation</h3>
-                <p style="font-size: 0.85rem; color: var(--gray-500);">Rüstzeit auf Stückzahl verteilen — Break-even berechnen</p>
+                <div style="font-size: 0.85rem; opacity: 0.9;">Gesamtkosten pro Teil</div>
+                <div style="font-size: 0.75rem; opacity: 0.7;">Material + Bearbeitung + Werkzeugverschleiß</div>
             </div>
-            <span class="badge badge-success">Kostenoptimierung</span>
-        </div>
-        <div class="series-inputs">
-            <div class="input-group">
-                <label>Stückzahl</label>
-                <input type="number" id="seriesQty" value="10" min="1" max="10000" oninput="calculateSeries()">
-                <span class="hint">Wie viele Teile sollen gefertigt werden?</span>
-            </div>
-            <div class="input-group">
-                <label>Rüstzeit (Minuten)</label>
-                <input type="number" id="seriesSetup" value="45" min="5" max="480" oninput="calculateSeries()">
-                <span class="hint">Einmalig pro Auftrag</span>
-            </div>
-            <div class="input-group">
-                <label>Rüst-Stundensatz (€)</label>
-                <input type="number" id="seriesSetupRate" value="65" min="20" max="200" oninput="calculateSeries()">
-                <span class="hint">Kosten pro Rüststunde</span>
-            </div>
-        </div>
-        <div class="series-results">
-            <div class="series-result-card">
-                <div class="label">Rüstkosten gesamt</div>
-                <div class="value" id="seriesSetupCost">€ 48,75</div>
-            </div>
-            <div class="series-result-card">
-                <div class="label">Rüstkosten/Teil</div>
-                <div class="value" id="seriesSetupPerPart">€ 4,88</div>
-            </div>
-            <div class="series-result-card">
-                <div class="label">Fertigungskosten/Teil</div>
-                <div class="value" id="seriesProdPerPart">€ 59,19</div>
-            </div>
-            <div class="series-result-card highlight">
-                <div class="label">Gesamtkosten/Teil</div>
-                <div class="value" id="seriesTotalPerPart">€ 64,07</div>
-            </div>
+            <div style="font-size: 2rem; font-weight: 700; font-family: 'JetBrains Mono', monospace;" id="liveTotalCost">€ 122,07</div>
         </div>
     </div>
 
@@ -2618,106 +2593,64 @@
         URL.revokeObjectURL(url);
     }
 
-    // ============ FEATURE 1: LIVE ROHMASS → ZEIT ============
-    const baseTime = 41.8;
-    const baseDiameter = 120;
-    const baseHeight = 42;
-    const baseBore = 26;
-    const baseThreads = 6;
-    const baseCost = 122.07;
+    // ============ WERKSTÜCK-PARAMETER KALKULATION ============
     const machineHourRate = 85;
+    const toolWearCost = 28.76; // Werkzeugverschleiß pro Teil
 
-    function recalculateTime() {
-        const diameter = parseFloat(document.getElementById('dimDiameter').value) || baseDiameter;
-        const height = parseFloat(document.getElementById('dimHeight').value) || baseHeight;
-        const bore = parseFloat(document.getElementById('dimBore').value) || baseBore;
-        const threads = parseInt(document.getElementById('dimThreads').value) || baseThreads;
+    // Werkstoff-Datenbank: Preis €/kg, Dichte g/cm³, Zeitfaktor (1.0 = Baustahl)
+    const materials = {
+        '1.4571': { name: 'V4A Edelstahl', price: 7.00, density: 7.98, timeFactor: 1.35 },
+        '1.4301': { name: 'V2A Edelstahl', price: 5.50, density: 7.90, timeFactor: 1.25 },
+        '42CrMo4': { name: 'Vergütungsstahl', price: 2.80, density: 7.85, timeFactor: 1.15 },
+        'S355': { name: 'Baustahl', price: 1.20, density: 7.85, timeFactor: 1.00 },
+        'AlMg3': { name: 'Aluminium', price: 4.50, density: 2.66, timeFactor: 0.65 },
+        'CuZn39Pb3': { name: 'Messing', price: 8.50, density: 8.47, timeFactor: 0.75 }
+    };
 
-        // Calculate scaling factors
-        const diameterFactor = diameter / baseDiameter;
-        const heightFactor = height / baseHeight;
-        const boreFactor = bore > 0 ? (bore / baseBore) : 1;
-        const threadFactor = threads / baseThreads;
+    // Basis-Bearbeitungszeit für Referenzwerkstück (S355, Ø130×47 → Ø120)
+    const baseTimeS355 = 31.0; // Minuten für Baustahl
 
-        // Time calculation (simplified model)
-        // Outer machining scales with circumference × height
-        const outerTime = 15.8 * diameterFactor * heightFactor;
-        // Inner machining scales with bore and height
-        const innerTime = 8.9 * boreFactor * heightFactor;
-        // Threading scales with count
-        const threadTime = 3.1 * threadFactor;
-        // Base operations (planfräsen, entgraten)
-        const fixedTime = 14.0 * Math.sqrt(diameterFactor);
+    function recalculateAll() {
+        const material = document.getElementById('materialSelect').value;
+        const rawD = parseFloat(document.getElementById('dimRawDiameter').value) || 130;
+        const rawH = parseFloat(document.getElementById('dimRawHeight').value) || 47;
+        const finishD = parseFloat(document.getElementById('dimFinishDiameter').value) || 120;
 
-        const newTime = outerTime + innerTime + threadTime + fixedTime;
+        const mat = materials[material];
+
+        // Volumen Rohteil (Zylinder)
+        const volumeCm3 = Math.PI * Math.pow(rawD / 20, 2) * (rawH / 10); // cm³
         
-        // Volume calculation (cylinder - bore)
-        const outerVolume = Math.PI * Math.pow(diameter/2, 2) * height;
-        const innerVolume = bore > 0 ? Math.PI * Math.pow(bore/2, 2) * height : 0;
-        const volume = (outerVolume - innerVolume) / 1000; // cm³
+        // Gewicht
+        const weightKg = (volumeCm3 * mat.density) / 1000;
 
-        // Cost calculation
-        const newCost = (newTime / 60) * machineHourRate + 63; // machine + material
+        // Materialkosten
+        const materialCost = weightKg * mat.price;
 
-        // Calculate change percentage
-        const changePercent = ((newTime - baseTime) / baseTime) * 100;
+        // Bearbeitungszeit: Basis × Größenfaktor × Werkstoff-Faktor
+        const sizeFactor = (rawD / 130) * (rawH / 47);
+        const removalFactor = 1 + ((rawD - finishD) / rawD) * 0.5; // Mehr Abtrag = mehr Zeit
+        const machiningTime = baseTimeS355 * sizeFactor * removalFactor * mat.timeFactor;
 
-        // Update display with animation
-        const timeEl = document.getElementById('liveTime');
-        const volumeEl = document.getElementById('liveVolume');
-        const costEl = document.getElementById('liveCost');
-        const changeEl = document.getElementById('liveChange');
+        // Maschinenkosten
+        const machineCost = (machiningTime / 60) * machineHourRate;
 
-        timeEl.textContent = newTime.toFixed(1).replace('.', ',') + ' min';
-        volumeEl.textContent = Math.round(volume) + ' cm³';
-        costEl.textContent = '€ ' + newCost.toFixed(2).replace('.', ',');
+        // Gesamtkosten
+        const totalCost = materialCost + machineCost + toolWearCost;
 
-        // Change indicator
-        if (Math.abs(changePercent) < 0.5) {
-            changeEl.textContent = '±0%';
-            changeEl.style.color = 'var(--gray-400)';
-        } else if (changePercent > 0) {
-            changeEl.textContent = '+' + changePercent.toFixed(1).replace('.', ',') + '%';
-            changeEl.style.color = 'var(--danger)';
-        } else {
-            changeEl.textContent = changePercent.toFixed(1).replace('.', ',') + '%';
-            changeEl.style.color = 'var(--success)';
-        }
+        // Update Display
+        document.getElementById('liveWeight').textContent = weightKg.toFixed(2).replace('.', ',') + ' kg';
+        document.getElementById('liveMaterialCost').textContent = '€ ' + materialCost.toFixed(2).replace('.', ',');
+        document.getElementById('liveTime').textContent = machiningTime.toFixed(1).replace('.', ',') + ' min';
+        document.getElementById('liveMachineCost').textContent = '€ ' + machineCost.toFixed(2).replace('.', ',');
+        document.getElementById('liveTotalCost').textContent = '€ ' + totalCost.toFixed(2).replace('.', ',');
 
         // Pulse animation
-        [timeEl, volumeEl, costEl].forEach(el => {
+        document.querySelectorAll('.live-result-value').forEach(el => {
             el.classList.add('updating');
             setTimeout(() => el.classList.remove('updating'), 300);
         });
     }
-
-    // ============ FEATURE 2: SERIENKALKULATION ============
-    function calculateSeries() {
-        const qty = parseInt(document.getElementById('seriesQty').value) || 10;
-        const setupMin = parseFloat(document.getElementById('seriesSetup').value) || 45;
-        const setupRate = parseFloat(document.getElementById('seriesSetupRate').value) || 65;
-
-        // Get current time from live calculation
-        const currentTimeText = document.getElementById('liveTime').textContent;
-        const partTime = parseFloat(currentTimeText.replace(',', '.')) || 41.8;
-
-        // Calculations
-        const setupCost = (setupMin / 60) * setupRate;
-        const setupPerPart = setupCost / qty;
-        const prodPerPart = (partTime / 60) * machineHourRate;
-        const totalPerPart = setupPerPart + prodPerPart;
-
-        // Update display
-        document.getElementById('seriesSetupCost').textContent = '€ ' + setupCost.toFixed(2).replace('.', ',');
-        document.getElementById('seriesSetupPerPart').textContent = '€ ' + setupPerPart.toFixed(2).replace('.', ',');
-        document.getElementById('seriesProdPerPart').textContent = '€ ' + prodPerPart.toFixed(2).replace('.', ',');
-        document.getElementById('seriesTotalPerPart').textContent = '€ ' + totalPerPart.toFixed(2).replace('.', ',');
-
-        // Break-even calculation (when setup < 10% of total)
-        // setupCost / breakeven = 0.1 * (setupCost/breakeven + prodPerPart)
-        // => breakeven = setupCost / (0.1 * prodPerPart) * 0.9
-        const breakeven = Math.ceil(setupCost / (0.1 * prodPerPart / 0.9));
-        }
 
     // ============ FEATURE 3: IST/SOLL VERGLEICH ============
     const sollValues = {
@@ -2800,7 +2733,7 @@
 
     // Initialize all features
     calculateROI();
-    calculateSeries();
+    recalculateAll();
     updateComparison();
 </script>
 
