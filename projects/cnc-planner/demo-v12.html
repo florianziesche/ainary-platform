@@ -228,6 +228,80 @@
         .app-content {
             padding: 24px;
             min-height: 600px;
+            position: relative;
+        }
+
+        .app-content.hidden {
+            display: none;
+        }
+
+        /* Loading / Placeholder */
+        .app-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            color: var(--gray-500);
+            text-align: center;
+            padding: 40px;
+        }
+
+        .app-placeholder-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .app-loading {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .app-loading.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--gray-200);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-steps {
+            margin-top: 24px;
+            text-align: left;
+        }
+
+        .loading-step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+            color: var(--gray-400);
+            font-size: 0.9rem;
+        }
+
+        .loading-step.done {
+            color: var(--success);
+        }
+
+        .loading-step.active {
+            color: var(--primary);
+            font-weight: 500;
         }
 
         .tab-panel {
@@ -1453,7 +1527,7 @@
     <div class="projects-section">
         <h3 style="font-size: 1rem; font-weight: 600; color: var(--gray-700); margin-bottom: 16px;">Beispielprojekte</h3>
         <div class="projects-grid">
-            <div class="project-card active" onclick="loadProject('grundplatte')">
+            <div class="project-card" onclick="loadProject('grundplatte')">
                 <div class="project-header">
                     <div class="project-name">Grundplatte WCAD-15-02-2020</div>
                     <div class="project-date">Heute</div>
@@ -1509,7 +1583,42 @@
             <button class="app-tab" onclick="showTab('instructions')">Fertigungsanweisung</button>
         </div>
 
-        <div class="app-content">
+        <!-- Placeholder: Kein Projekt ausgewählt -->
+        <div class="app-placeholder" id="appPlaceholder">
+            <div class="app-placeholder-icon">📋</div>
+            <h3 style="color: var(--gray-700); margin-bottom: 8px;">Projekt auswählen</h3>
+            <p>Klicken Sie auf eines der Beispielprojekte oben, um die Kalkulation zu starten.</p>
+        </div>
+
+        <!-- Loading Animation -->
+        <div class="app-loading" id="appLoading">
+            <div class="loading-spinner"></div>
+            <h3 style="color: var(--gray-700); margin-bottom: 8px;">Generiere Unterlagen...</h3>
+            <div class="loading-steps">
+                <div class="loading-step" id="loadStep1">
+                    <span class="step-icon">○</span>
+                    <span>Geometrie analysieren</span>
+                </div>
+                <div class="loading-step" id="loadStep2">
+                    <span class="step-icon">○</span>
+                    <span>Bearbeitungszeiten berechnen</span>
+                </div>
+                <div class="loading-step" id="loadStep3">
+                    <span class="step-icon">○</span>
+                    <span>Werkzeugkosten kalkulieren</span>
+                </div>
+                <div class="loading-step" id="loadStep4">
+                    <span class="step-icon">○</span>
+                    <span>Maschinencode generieren</span>
+                </div>
+                <div class="loading-step" id="loadStep5">
+                    <span class="step-icon">○</span>
+                    <span>Fertigungsanweisung erstellen</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="app-content hidden" id="appContent">
             <!-- ================ TAB: ANGEBOT ================ -->
             <div class="tab-panel active" id="panel-quote">
                 <div style="display: flex; gap: 12px; margin-bottom: 24px;">
@@ -2587,29 +2696,75 @@ END PGM FLANSCH MM`
         document.querySelectorAll('.project-card').forEach(c => c.classList.remove('active'));
         document.querySelector(`[onclick="loadProject('${projectId}')"]`).classList.add('active');
 
-        // Werkstoff setzen
-        document.getElementById('materialSelect').value = currentProject.material;
+        // Placeholder verstecken, Loading zeigen
+        document.getElementById('appPlaceholder').style.display = 'none';
+        document.getElementById('appContent').classList.add('hidden');
+        document.getElementById('appLoading').classList.add('active');
 
-        // Maße setzen
-        document.getElementById('dimX').value = currentProject.dims.x;
-        document.getElementById('dimY').value = currentProject.dims.y;
-        document.getElementById('dimZ').value = currentProject.dims.z;
-        document.getElementById('dimAllowance').value = currentProject.dims.allowance;
-
-        // Labels anpassen (Rundteil vs. Quader)
-        if (currentProject.isRound) {
-            document.getElementById('labelDimX').textContent = 'Durchmesser';
-            document.getElementById('labelDimY').textContent = '(= Durchmesser)';
-            document.getElementById('dimY').value = currentProject.dims.x;
-            document.getElementById('dimY').disabled = true;
-        } else {
-            document.getElementById('labelDimX').textContent = 'Länge (X)';
-            document.getElementById('labelDimY').textContent = 'Breite (Y)';
-            document.getElementById('dimY').disabled = false;
+        // Loading Steps zurücksetzen
+        for (let i = 1; i <= 5; i++) {
+            const step = document.getElementById('loadStep' + i);
+            step.classList.remove('done', 'active');
+            step.querySelector('.step-icon').textContent = '○';
         }
 
-        // Alles neu berechnen
-        recalculateAll();
+        // Animierte Loading Steps
+        const steps = [
+            { id: 'loadStep1', delay: 300 },
+            { id: 'loadStep2', delay: 600 },
+            { id: 'loadStep3', delay: 400 },
+            { id: 'loadStep4', delay: 500 },
+            { id: 'loadStep5', delay: 400 }
+        ];
+
+        let totalDelay = 0;
+        steps.forEach((step, index) => {
+            // Step aktiv setzen
+            setTimeout(() => {
+                document.getElementById(step.id).classList.add('active');
+                document.getElementById(step.id).querySelector('.step-icon').textContent = '◉';
+            }, totalDelay);
+
+            totalDelay += step.delay;
+
+            // Step als done markieren
+            setTimeout(() => {
+                const el = document.getElementById(step.id);
+                el.classList.remove('active');
+                el.classList.add('done');
+                el.querySelector('.step-icon').textContent = '✓';
+            }, totalDelay);
+        });
+
+        // Nach allen Steps: Content zeigen
+        setTimeout(() => {
+            document.getElementById('appLoading').classList.remove('active');
+            document.getElementById('appContent').classList.remove('hidden');
+
+            // Werkstoff setzen
+            document.getElementById('materialSelect').value = currentProject.material;
+
+            // Maße setzen
+            document.getElementById('dimX').value = currentProject.dims.x;
+            document.getElementById('dimY').value = currentProject.dims.y;
+            document.getElementById('dimZ').value = currentProject.dims.z;
+            document.getElementById('dimAllowance').value = currentProject.dims.allowance;
+
+            // Labels anpassen (Rundteil vs. Quader)
+            if (currentProject.isRound) {
+                document.getElementById('labelDimX').textContent = 'Durchmesser';
+                document.getElementById('labelDimY').textContent = '(= Durchmesser)';
+                document.getElementById('dimY').value = currentProject.dims.x;
+                document.getElementById('dimY').disabled = true;
+            } else {
+                document.getElementById('labelDimX').textContent = 'Länge (X)';
+                document.getElementById('labelDimY').textContent = 'Breite (Y)';
+                document.getElementById('dimY').disabled = false;
+            }
+
+            // Alles neu berechnen
+            recalculateAll();
+        }, totalDelay + 300);
     }
 
     function recalculateAll() {
