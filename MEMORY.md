@@ -1,4 +1,4 @@
-# MEMORY.md — Atlas's Long-Term Memory
+# MEMORY.md — Mia's Long-Term Memory
 
 *Curated insights, not raw logs. Update during heartbeats.*
 

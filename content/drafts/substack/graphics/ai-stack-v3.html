@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            width: 1100px;
+            height: 600px;
+            background: #0f172a;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Background grid */
+        .grid {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+        
+        .content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        h2 {
+            text-align: center;
+            color: #f1f5f9;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+        }
+        
+        /* Circular layout */
+        .circle-container {
+            position: relative;
+            width: 450px;
+            height: 450px;
+            margin: 0 auto;
+        }
+        
+        .center-hub {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 160px;
+            height: 160px;
+            background: linear-gradient(135deg, #1e3a5f, #1e40af);
+            border: 2px solid #3b82f6;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            box-shadow: 0 0 60px rgba(59, 130, 246, 0.3);
+        }
+        
+        .center-icon {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .center-title {
+            color: #f1f5f9;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .center-sub {
+            color: #94a3b8;
+            font-size: 0.75rem;
+        }
+        
+        .tool-node {
+            position: absolute;
+            width: 90px;
+            height: 90px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .tool-node:hover {
+            border-color: #3b82f6;
+            transform: scale(1.05);
+        }
+        
+        .tool-icon {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .tool-name {
+            color: #f1f5f9;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        /* Position nodes in circle */
+        .tool-node:nth-child(2) { top: 0; left: 50%; transform: translateX(-50%); }
+        .tool-node:nth-child(3) { top: 12%; right: 5%; }
+        .tool-node:nth-child(4) { top: 50%; right: -5%; transform: translateY(-50%); }
+        .tool-node:nth-child(5) { bottom: 12%; right: 5%; }
+        .tool-node:nth-child(6) { bottom: 0; left: 50%; transform: translateX(-50%); }
+        .tool-node:nth-child(7) { bottom: 12%; left: 5%; }
+        .tool-node:nth-child(8) { top: 50%; left: -5%; transform: translateY(-50%); }
+        .tool-node:nth-child(9) { top: 12%; left: 5%; }
+        
+        /* Connection lines */
+        .connections {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300px;
+            height: 300px;
+            transform: translate(-50%, -50%);
+            border: 1px dashed rgba(59, 130, 246, 0.3);
+            border-radius: 50%;
+        }
+        
+        /* Right side panel */
+        .side-panel {
+            position: absolute;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 280px;
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 25px;
+        }
+        
+        .panel-title {
+            color: #f1f5f9;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .panel-text {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .highlight {
+            color: #3b82f6;
+            font-weight: 600;
+        }
+        
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 15px;
+            border-top: 1px solid #334155;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            color: #10b981;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        
+        .stat-label {
+            color: #64748b;
+            font-size: 0.7rem;
+        }
+        
+        .formula {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            text-align: center;
+            color: #10b981;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="grid"></div>
+    
+    <div class="content">
+        <h2>Mein AI-Stack: Das Ökosystem</h2>
+        
+        <div class="circle-container">
+            <div class="connections"></div>
+            
+            <div class="center-hub">
+                <div class="center-icon">👤</div>
+                <div class="center-title">Du</div>
+                <div class="center-sub">Gouverneur</div>
+            </div>
+            
+            <div class="tool-node">
+                <div class="tool-icon">🧠</div>
+                <div class="tool-name">Claude</div>
+            </div>
+            
+            <div class="tool-node">
+                <div class="tool-icon">💻</div>
+                <div class="tool-name">Claude Code</div>
+            </div>
+            
+            <div class="tool-node">
+                <div class="tool-icon">🔍</div>
+                <div class="tool-name">Perplexity</div>
+            </div>
+            
+            <div class="tool-node">
+                <div class="tool-icon">🎯</div>
+                <div class="tool-name">Mia</div>
+            </div>
+            
+            <div class="tool-node">
+                <div class="tool-icon">⚡</div>
+                <div class="tool-name">n8n</div>
+            </div>
+            
+            <div class="tool-node">
+                <div class="tool-icon">📚</div>
+                <div class="tool-name">Obsidian</div>
+            </div>
+            
+            <div class="tool-node">
+                <div class="tool-icon">📡</div>
+                <div class="tool-name">blogwatcher</div>
+            </div>
+            
+            <div class="tool-node">
+                <div class="tool-icon">🏗️</div>
+                <div class="tool-name">Notion</div>
+            </div>
+        </div>
+        
+        <div class="side-panel">
+            <div class="panel-title">🏎️ Das Learning</div>
+            <div class="panel-text">
+                Der Stack ist ein Ferrari.<br>
+                Aber ein Ferrari ohne Ziel fährt nur im Kreis.<br><br>
+                Der Stack ist nicht der Hebel.<br>
+                Der Stack ist der <span class="highlight">Verstärker</span>.
+            </div>
+            <div class="stats-row">
+                <div class="stat">
+                    <div class="stat-value">€250</div>
+                    <div class="stat-label">pro Monat</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">10x</div>
+                    <div class="stat-label">Output</div>
+                </div>
+            </div>
+            <div class="formula">Erst das Ziel. Dann der Stack.</div>
+        </div>
+    </div>
+</body>
+</html>
