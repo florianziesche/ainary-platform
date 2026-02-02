@@ -1494,21 +1494,6 @@
                 <div class="value" id="seriesTotalPerPart">€ 64,07</div>
             </div>
         </div>
-        <div class="breakeven-chart" id="breakevenChart">
-            <div class="breakeven-marker" id="breakevenMarker" style="left: 30%;">Break-even: 5 Stk.</div>
-            <div class="breakeven-bar setup" id="setupBar" style="width: 100px;"></div>
-            <div class="breakeven-bar runtime" id="runtimeBar" style="left: 130px; width: 200px;"></div>
-            <div class="breakeven-labels">
-                <span>1 Stk.</span>
-                <span>5 Stk.</span>
-                <span>10 Stk.</span>
-                <span>25 Stk.</span>
-                <span>50 Stk.</span>
-            </div>
-        </div>
-        <p style="font-size: 0.8rem; color: var(--gray-500); margin-top: 12px; text-align: center;">
-            Ab <strong id="breakevenText">5 Stück</strong> sind die Rüstkosten unter 10% der Gesamtkosten
-        </p>
     </div>
 
     <!-- ============ FEATURE 3: IST/SOLL VERGLEICH ============ -->
@@ -1593,14 +1578,6 @@
                 </tr>
             </tbody>
         </table>
-        <div class="learning-indicator">
-            <div class="learning-icon">AI</div>
-            <div class="learning-text">
-                <strong>Lerneffekt erkannt</strong>
-                <span>OP20 dauert bei 1.4571 durchschnittlich 4% länger. Korrekturwert wird für zukünftige Kalkulationen gespeichert.</span>
-            </div>
-            <button class="btn btn-sm btn-primary" onclick="applyLearning()">Korrektur anwenden</button>
-        </div>
     </div>
 
     <!-- Project Selection -->
@@ -2740,32 +2717,7 @@
         // setupCost / breakeven = 0.1 * (setupCost/breakeven + prodPerPart)
         // => breakeven = setupCost / (0.1 * prodPerPart) * 0.9
         const breakeven = Math.ceil(setupCost / (0.1 * prodPerPart / 0.9));
-        document.getElementById('breakevenText').innerHTML = '<strong>' + breakeven + ' Stück</strong>';
-
-        // Update breakeven marker position
-        const markerPositions = [1, 5, 10, 25, 50];
-        let markerPos = 10;
-        if (breakeven <= 1) markerPos = 10;
-        else if (breakeven <= 5) markerPos = 10 + (breakeven - 1) / 4 * 20;
-        else if (breakeven <= 10) markerPos = 30 + (breakeven - 5) / 5 * 20;
-        else if (breakeven <= 25) markerPos = 50 + (breakeven - 10) / 15 * 20;
-        else if (breakeven <= 50) markerPos = 70 + (breakeven - 25) / 25 * 20;
-        else markerPos = 90;
-
-        const marker = document.getElementById('breakevenMarker');
-        marker.style.left = markerPos + '%';
-        marker.textContent = 'Break-even: ' + breakeven + ' Stk.';
-
-        // Update bars visualization
-        const chartWidth = document.getElementById('breakevenChart').offsetWidth - 40;
-        const maxQty = 50;
-        const setupBarWidth = Math.min((setupCost / (setupCost + prodPerPart * maxQty)) * chartWidth, chartWidth * 0.3);
-        const runtimeBarWidth = Math.min((qty / maxQty) * chartWidth * 0.6, chartWidth * 0.6);
-
-        document.getElementById('setupBar').style.width = setupBarWidth + 'px';
-        document.getElementById('runtimeBar').style.left = (setupBarWidth + 30) + 'px';
-        document.getElementById('runtimeBar').style.width = runtimeBarWidth + 'px';
-    }
+        }
 
     // ============ FEATURE 3: IST/SOLL VERGLEICH ============
     const sollValues = {
@@ -2844,13 +2796,6 @@
         const totalDiffPercent = (totalDiff / totalSoll) * 100;
         totalBar.style.width = Math.min(Math.abs(totalDiffPercent) * 5, 50) + '%';
         totalBar.className = 'diff-bar-fill ' + (totalDiff > 0 ? 'over' : 'under');
-    }
-
-    function applyLearning() {
-        alert('Korrekturwerte wurden gespeichert!\n\n' +
-              'OP20 (1.4571): +4% Zeitkorrektur\n' +
-              'OP50 (h5 Toleranz): +6% Zeitkorrektur\n\n' +
-              'Zukünftige Kalkulationen werden automatisch angepasst.');
     }
 
     // Initialize all features
