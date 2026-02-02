@@ -104,6 +104,8 @@ Legal AI Platform with <0.2% hallucination rate using:
 - **Obsidian + OpenClaw sync** — Keep heavy research in Obsidian, operations in workspace, avoid duplication
 - **ACTIVE_TASK.md** — Neue Datei für laufende Aufgaben. Überlebt Context-Kompaktierung. Bei neuer Aufgabe: erst dokumentieren, dann arbeiten. (Added 2026-02-02)
 - **Keine "mental notes"** — Alles Wichtige sofort in Datei schreiben. Memory ist begrenzt, Dateien überleben. (Added 2026-02-02)
+- **Edit tool whitespace** — `edit` erfordert EXAKTES Match inkl. Whitespace. Bei Fehlern: `read` → dann `write` komplett neu. (Added 2026-02-02)
+- **Git-Sync** — `./scripts/git-sync.sh "message"` für schnelles Workspace-Commit. (Added 2026-02-02)
 
 ## Content Pillars
 
