@@ -1368,63 +1368,6 @@
 
     <!-- Demo-Bereich Titel -->
     <div style="text-align: center; margin-bottom: 24px;">
-        <span style="color: var(--gray-500); font-size: 0.9rem;">— oder erkunden Sie die interaktive Demo —</span>
-    </div>
-
-    <!-- ROI Calculator -->
-    <div class="roi-section">
-        <div class="roi-grid">
-            <div class="roi-inputs">
-                <h3>Ihre aktuellen Werte</h3>
-                <div class="input-group">
-                    <label>Angebote pro Monat</label>
-                    <input type="number" id="quotesPerMonth" value="20" min="1" oninput="calculateROI()">
-                    <span class="hint">Wie viele Anfragen kalkulieren Sie?</span>
-                </div>
-                <div class="input-group">
-                    <label>Zeit pro Kalkulation (Minuten)</label>
-                    <input type="number" id="timePerQuote" value="60" min="5" oninput="calculateROI()">
-                    <span class="hint">Inkl. Recherche, Berechnung, Angebotserstellung</span>
-                </div>
-                <div class="input-group">
-                    <label>Stundenlohn Kalkulation (€)</label>
-                    <input type="number" id="hourlyRate" value="50" min="10" oninput="calculateROI()">
-                    <span class="hint">Meister/Facharbeiter, der kalkuliert</span>
-                </div>
-                <div class="input-group">
-                    <label>Maschinenstundensatz (€)</label>
-                    <input type="number" id="machineRate" value="85" min="30" oninput="calculateROI()">
-                    <span class="hint">Ihr durchschnittlicher Satz</span>
-                </div>
-            </div>
-            <div class="roi-results">
-                <h3>Ihre Ersparnis mit CNC Planner Pro</h3>
-                <div class="result-row">
-                    <span class="result-label">Zeitaufwand aktuell</span>
-                    <span class="result-value negative" id="currentTime">20 h/Monat</span>
-                </div>
-                <div class="result-row">
-                    <span class="result-label">Zeitaufwand mit CNC Planner</span>
-                    <span class="result-value positive" id="newTime">3,3 h/Monat</span>
-                </div>
-                <div class="result-row">
-                    <span class="result-label">Eingesparte Zeit</span>
-                    <span class="result-value positive" id="timeSaved">16,7 h/Monat</span>
-                </div>
-                <div class="result-row">
-                    <span class="result-label">Wert der Ersparnis</span>
-                    <span class="result-value positive" id="moneySaved">€ 835/Monat</span>
-                </div>
-                <div class="result-row">
-                    <span class="result-label">CNC Planner Pro kostet</span>
-                    <span class="result-value" id="softwareCost">€ 49/Monat</span>
-                </div>
-                <div class="roi-highlight">
-                    <div class="roi-highlight-label">Ihr Return on Investment</div>
-                    <div class="roi-highlight-value" id="roiValue">17<span>x</span></div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- ============ ROHMASZE & WERKSTOFF ============ -->
@@ -1742,28 +1685,28 @@
                     <div class="cost-summary-grid">
                         <div class="cost-card">
                             <div class="cost-card-label">Maschinenzeit</div>
-                            <div class="cost-card-value">€59,22</div>
-                            <div class="cost-card-detail">41,8 min × €85/h</div>
+                            <div class="cost-card-value" id="calcMachineCost">€59,22</div>
+                            <div class="cost-card-detail" id="calcMachineDetail">41,8 min × €85/h</div>
                         </div>
                         <div class="cost-card">
                             <div class="cost-card-label">Material</div>
-                            <div class="cost-card-value">€45,00</div>
-                            <div class="cost-card-detail">Rohteil Ø135×50</div>
+                            <div class="cost-card-value" id="calcMaterialCost">€34,09</div>
+                            <div class="cost-card-detail" id="calcMaterialDetail">4,87 kg × €7,00/kg</div>
                         </div>
                         <div class="cost-card">
                             <div class="cost-card-label">Werkzeuge</div>
-                            <div class="cost-card-value">€20,74</div>
+                            <div class="cost-card-value" id="calcToolCost">€28,76</div>
                             <div class="cost-card-detail">Verschleiß anteilig</div>
                         </div>
                         <div class="cost-card total">
                             <div class="cost-card-label">GESAMT</div>
-                            <div class="cost-card-value">€124,96</div>
+                            <div class="cost-card-value" id="calcTotalCost">€122,07</div>
                             <div class="cost-card-detail">Selbstkosten/Teil</div>
                         </div>
                     </div>
                     <div style="text-align: center; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.2);">
                         <span style="opacity: 0.8;">Empfohlener Verkaufspreis (10% Marge):</span>
-                        <strong style="font-size: 1.3rem; margin-left: 12px;">€137,50/Teil</strong>
+                        <strong style="font-size: 1.3rem; margin-left: 12px;" id="calcSellPrice">€134,28/Teil</strong>
                     </div>
                 </div>
             </div>
@@ -2524,10 +2467,6 @@ END PGM FLANSCH MM`
 
         // Alles neu berechnen
         recalculateAll();
-        updateQuote();
-        updateCalculation();
-        updateNCCode();
-        updateComparison();
     }
 
     function recalculateAll() {
@@ -2583,12 +2522,29 @@ END PGM FLANSCH MM`
             dims: { x, y, z, allowance }
         };
 
-        // Display updaten
+        // Display updaten - Live-Kalkulation
         document.getElementById('liveWeight').textContent = weightKg.toFixed(2).replace('.', ',') + ' kg';
         document.getElementById('liveMaterialCost').textContent = '€ ' + materialCost.toFixed(2).replace('.', ',');
         document.getElementById('liveTime').textContent = machiningTime.toFixed(1).replace('.', ',') + ' min';
         document.getElementById('liveMachineCost').textContent = '€ ' + machineCost.toFixed(2).replace('.', ',');
         document.getElementById('liveTotalCost').textContent = '€ ' + totalCost.toFixed(2).replace('.', ',');
+
+        // Gesamtkalkulation synchronisieren (gleiche Werte!)
+        const calcMachineCost = document.getElementById('calcMachineCost');
+        const calcMaterialCost = document.getElementById('calcMaterialCost');
+        const calcToolCost = document.getElementById('calcToolCost');
+        const calcTotalCost = document.getElementById('calcTotalCost');
+        const calcSellPrice = document.getElementById('calcSellPrice');
+        const calcMachineDetail = document.getElementById('calcMachineDetail');
+        const calcMaterialDetail = document.getElementById('calcMaterialDetail');
+
+        if (calcMachineCost) calcMachineCost.textContent = '€' + machineCost.toFixed(2).replace('.', ',');
+        if (calcMaterialCost) calcMaterialCost.textContent = '€' + materialCost.toFixed(2).replace('.', ',');
+        if (calcToolCost) calcToolCost.textContent = '€' + toolCost.toFixed(2).replace('.', ',');
+        if (calcTotalCost) calcTotalCost.textContent = '€' + totalCost.toFixed(2).replace('.', ',');
+        if (calcSellPrice) calcSellPrice.textContent = '€' + (totalCost * 1.1).toFixed(2).replace('.', ',') + '/Teil';
+        if (calcMachineDetail) calcMachineDetail.textContent = machiningTime.toFixed(1).replace('.', ',') + ' min × €85/h';
+        if (calcMaterialDetail) calcMaterialDetail.textContent = weightKg.toFixed(2).replace('.', ',') + ' kg × €' + mat.price.toFixed(2).replace('.', ',') + '/kg';
 
         // Animation
         document.querySelectorAll('.live-result-value').forEach(el => {
@@ -2598,6 +2554,7 @@ END PGM FLANSCH MM`
 
         // Abhängige Bereiche aktualisieren
         updateQuote();
+        updateCalculation();
         updateNCCode();
     }
 
@@ -2690,12 +2647,6 @@ END PGM FLANSCH MM`
         codeBlock.innerHTML = code;
     }
 
-    function updateComparison() {
-        // Ist/Soll mit aktuellem Projekt aktualisieren
-        const ops = currentProject.operations.filter(op => op.critical || ['OP10', 'OP20'].includes(op.op)).slice(0, 4);
-        // Vereinfacht: Behalte aktuelle Werte, da vollständige Implementation aufwändig
-    }
-
     // ================================================================================
     // UI FUNKTIONEN
     // ================================================================================
@@ -2709,24 +2660,6 @@ END PGM FLANSCH MM`
         // Bei Tab-Wechsel Inhalte aktualisieren
         if (tabName === 'calculation') updateCalculation();
         if (tabName === 'code') updateNCCode();
-    }
-
-    function calculateROI() {
-        const quotes = parseFloat(document.getElementById('quotesPerMonth').value) || 20;
-        const timePerQuote = parseFloat(document.getElementById('timePerQuote').value) || 60;
-        const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 50;
-
-        const currentTimeH = (quotes * timePerQuote) / 60;
-        const newTimeH = currentTimeH * 0.15;
-        const timeSavedH = currentTimeH - newTimeH;
-        const moneySaved = timeSavedH * hourlyRate;
-        const roi = moneySaved / 49;
-
-        document.getElementById('currentTime').textContent = currentTimeH.toFixed(1).replace('.', ',') + ' h/Monat';
-        document.getElementById('newTime').textContent = newTimeH.toFixed(1).replace('.', ',') + ' h/Monat';
-        document.getElementById('timeSaved').textContent = timeSavedH.toFixed(1).replace('.', ',') + ' h/Monat';
-        document.getElementById('moneySaved').textContent = '€ ' + Math.round(moneySaved).toLocaleString('de-DE') + '/Monat';
-        document.getElementById('roiValue').innerHTML = Math.round(roi) + '<span>x</span>';
     }
 
     function copyCode() {
@@ -3014,7 +2947,6 @@ N250 M30
     // ================================================================================
 
     document.addEventListener('DOMContentLoaded', function() {
-        calculateROI();
         loadProject('grundplatte');
     });
 </script>
