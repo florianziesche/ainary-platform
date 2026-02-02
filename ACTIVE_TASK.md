@@ -1,77 +1,64 @@
 # ACTIVE_TASK.md — Laufende Aufgabe
 
-*Diese Datei überlebt Context-Kompaktierung. Atlas updated sie bei jeder neuen Aufgabe.*
+---
+
+## ✅ CNC DEMO READY
+
+**Demo-Datei:** `projects/cnc-planner/demo-final.html`
+**Alternativ:** `products/cnc-planner/app.html` (Original)
+**Meeting:** 12:00 Uhr mit Onkel Andreas
 
 ---
 
-## Aktuelle Aufgabe
+## Demo-Flow (für Meeting)
 
-**Was:** CNC Planner Demo v6 für Onkel
-**Deadline:** Heute 11:00 Uhr 
-**Meeting:** 12:00 Uhr mit Onkel
-**Priorität:** 🔴 HÖCHSTE
+### 1. Dashboard zeigen
+- 3 Projekte: Grundplatte, Lagerbock, Flansch
+- Quick Stats: 12 Projekte, 8 Angebote, 32h gespart
 
----
+### 2. "Neue Kalkulation" klicken
+- Upload-Area zeigen (STEP/PDF)
+- "Demo mit Beispielbauteil" klicken
 
-## Status: ✅ V6 FERTIG
+### 3. Simulation beobachten
+- 4 Schritte: Geometrie → Bearbeitungsschritte → Zeiten → FA
+- ~3 Sekunden Ladezeit
 
-**Datei:** `projects/cnc-planner/app-v6.html`
+### 4. Analyse-Tabs durchgehen
+| Tab | Zeigt |
+|-----|-------|
+| **Übersicht** | Werkstückdaten, Toleranzen, Kostenaufstellung |
+| **Zeitberechnung** | 10 OPs mit Formeln, t_h, t_n |
+| **Werkzeugkosten** | 5 Werkzeuge, Standzeit, €/Teil |
+| **Maschinencode** | Heidenhain TNC 640 |
+| **Fertigungsanweisung** | KI-generierte Tipps, Kritische OPs markiert |
+| **Angebot** | Druckfertig, MwSt berechnet |
 
-### Komplett-Neubau mit:
-
-1. **Light Theme** ✅
-   - Weißer Hintergrund wie index.html/landing-page
-   - Blaue Primary-Farbe (#0b4aa2), Orange Akzent (#ff7a3d)
-   - Professionelles, sauberes Design
-
-2. **Rohmaße → NC-Code** ✅
-   - BLK FORM aus Rohmaßen berechnet (Zylinder/Quader)
-   - Z-Tiefen automatisch aus Rohteilhöhe
-   - Format: "Ø130 × 50" oder "100 × 80 × 50"
-
-3. **Vollständiges NC-Programm** ✅
-   - Heidenhain TNC 640 Klartext
-   - Zyklen: 200, 201, 203, 220, 253, 256
-   - Syntax-Highlighting
-   - Kopieren + Download als .H
-
-4. **Material-System** ✅
-   - 5 Werkstoffe mit Dichte, Faktor, Kosten
-   - Gewicht berechnet aus Rohmaßen
-   - Materialkosten automatisch
-   - Schnittzeiten angepasst je Material
-
-5. **Sidebar Navigation** ✅
-   - Kalkulation
-   - Angebot
-   - Fertigungsanweisung
-   - NC-Programm
-   - Einstellungen
-
-6. **Features komplett:**
-   - ✅ Stats Dashboard
-   - ✅ Operations-Tabelle (editierbar)
-   - ✅ Angebot mit Firmenlogo
-   - ✅ Fertigungsanweisung
-   - ✅ Zeitverteilung (Progress Bar)
-   - ✅ Kritische Maße
-   - ✅ Werkzeugliste mit Standzeit
-   - ✅ Korrekturwerte
-   - ✅ Prüfintervalle
-   - ✅ Störungsbeseitigung
-   - ✅ Checklisten (vor/nach)
-   - ✅ Feedback-Panel
-   - ✅ QR-Code
-   - ✅ Settings mit localStorage
+### 5. Abschluss
+- "Angebot erstellen" Button
+- PDF-Export erwähnen
+- Fragen beantworten
 
 ---
 
-## Nächste Schritte
+## Nach der Demo — Implementieren
 
-- [ ] **Florian testen:** `open projects/cnc-planner/app-v6.html`
-- [ ] Feedback (max. 2 Schleifen)
-- [ ] Meeting 12:00 — Demo zeigen!
+1. [ ] Rohmaß → Zeit Berechnung (dynamisch)
+2. [ ] Alle 3 Projekte klickbar machen
+3. [ ] Echte Werkstoff-Faktoren
+4. [ ] PDF-Export funktional
 
 ---
 
-*Letzte Aktualisierung: 2026-02-02 ~10:00 CET*
+## Parallel — Heutige Aufgaben
+
+| Task | Status |
+|------|--------|
+| Onkel anrufen (nach Demo) | ⏳ |
+| Floriana Arzt | ⏳ |
+| ALG1 recherchieren | ⏳ |
+| Finanzamt schreiben | ⏳ |
+
+---
+
+*Stand: 2026-02-02 ~10:45 CET*
