@@ -301,8 +301,107 @@ Recommendation: This deposition provides excellent leverage for settlement negot
     }
 };
 
+// Demo comparison data
+const COMPARISON_DATA = {
+    metadata: {
+        case_name: "Martinez v. Acme Trucking, Inc. and James Wilson",
+        case_number: "2025-CV-04521",
+        depositions_compared: [
+            { witness_name: "James Wilson", date: "2026-01-15", role: "Defendant - Commercial Truck Driver" },
+            { witness_name: "Carlos Rodriguez", date: "2026-01-22", role: "Eyewitness - Bystander at Bus Stop" }
+        ]
+    },
+    contradictions: [
+        {
+            topic: "Traffic Signal Status",
+            witness_1: { name: "James Wilson", statement: "The light turned yellow, and I made the decision to proceed through.", reference: "Wilson Depo, Page 11, Lines 3-4" },
+            witness_2: { name: "Carlos Rodriguez", statement: "It was red. The light had just turned red.", reference: "Rodriguez Depo, Page 6, Lines 12-13" },
+            significance: "Critical contradiction on whether Wilson ran a red light.",
+            exploitation_strategy: "At trial, establish Rodriguez's clear view and lack of bias first. Then confront Wilson with Rodriguez's testimony and the physical reality that the pedestrian walk signal only activates when the traffic light is red.",
+            severity: "critical"
+        },
+        {
+            topic: "Driver Attention/Distraction",
+            witness_1: { name: "James Wilson", statement: "I saw her at the last second. She was in the crosswalk.", reference: "Wilson Depo, Page 11, Lines 23-24" },
+            witness_2: { name: "Carlos Rodriguez", statement: "He was looking down. I could see through the windshield. His head was down, like he was looking at something in his lap.", reference: "Rodriguez Depo, Page 7, Lines 1-3" },
+            significance: "Wilson claims he was watching the road; Rodriguez observed Wilson's head was down for several seconds before impact.",
+            exploitation_strategy: "Wilson can't have 'seen her at the last second' if his head was down. Use Rodriguez's testimony to impeach Wilson and establish distraction (consistent with cell phone records).",
+            severity: "critical"
+        },
+        {
+            topic: "Scene Statement - Distraction",
+            witness_1: { name: "James Wilson", statement: "I might have said something like that [about being distracted]. I was pretty shook up at the time.", reference: "Wilson Depo, Page 31, Lines 17-22" },
+            witness_2: { name: "Carlos Rodriguez", statement: "I heard him say something like, 'Oh God, I didn't see her.'", reference: "Rodriguez Depo, Page 8, Lines 17-18" },
+            significance: "Wilson tried to minimize his scene admission. Rodriguez provides independent corroboration.",
+            exploitation_strategy: "Rodriguez had no reason to fabricate this. His observation corroborates the police report and eliminates Wilson's defense that he 'misspoke.'",
+            severity: "significant"
+        }
+    ],
+    corroborations: [
+        {
+            topic: "Speed of Vehicle",
+            fact_established: "Wilson was traveling approximately 35-40 mph in a 25 mph zone",
+            witnesses: [
+                { name: "James Wilson", statement: "I'd estimate around 35 miles per hour.", reference: "Wilson Depo, Page 11" },
+                { name: "Carlos Rodriguez", statement: "Fast. Too fast. I'd say at least 35 or 40 miles per hour.", reference: "Rodriguez Depo, Page 7" }
+            ],
+            strength: "strong",
+            trial_value: "Both the defendant AND an independent eyewitness agree Wilson was speeding. This fact is now indisputable."
+        },
+        {
+            topic: "Driver Fatigue",
+            fact_established: "Wilson appeared tired/fatigued at the time of the accident",
+            witnesses: [
+                { name: "James Wilson", statement: "A little bit, I suppose. But I've driven on less sleep before.", reference: "Wilson Depo, Page 10" },
+                { name: "Carlos Rodriguez", statement: "He looked tired. His eyes were red, like he hadn't slept much.", reference: "Rodriguez Depo, Page 10" },
+                { name: "Officer Daniels", statement: "Driver appeared fatigued.", reference: "Police Report" }
+            ],
+            strength: "strong",
+            trial_value: "Three independent sources confirm driver fatigue: Wilson's own admission, eyewitness observation, and police officer's notes."
+        },
+        {
+            topic: "Pedestrian Had Right of Way",
+            fact_established: "Martinez was in the crosswalk with the walk signal when struck",
+            witnesses: [
+                { name: "James Wilson", statement: "She was in the crosswalk.", reference: "Wilson Depo, Page 11" },
+                { name: "Carlos Rodriguez", statement: "She had the walk signal... The white walk sign was lit up.", reference: "Rodriguez Depo, Page 5" }
+            ],
+            strength: "strong",
+            trial_value: "Even the defendant admits Martinez was in the crosswalk. Rodriguez confirms she had the walk signal. No viable comparative fault argument."
+        }
+    ],
+    credibility_comparison: {
+        more_credible: "Carlos Rodriguez",
+        less_credible: "James Wilson",
+        reasoning: "Rodriguez is significantly more credible than Wilson. Rodriguez is an independent witness with no stake in the outcome. Wilson, as the defendant, has obvious motivation to minimize his fault. Rodriguez's testimony is internally consistent and corroborated by physical evidence. Wilson's testimony contains contradictions and is contradicted by documentary evidence.",
+        factors: [
+            "Rodriguez is independent with no connection to parties",
+            "Rodriguez has no financial interest in outcome",
+            "Rodriguez's testimony is internally consistent",
+            "Wilson's testimony contains contradictions (sleep duration)",
+            "Wilson's claims are contradicted by documentary evidence",
+            "Rodriguez's observations align with physical evidence",
+            "Wilson has obvious motive to minimize fault"
+        ]
+    },
+    recommended_witness_order: [
+        "Carlos Rodriguez (call first) — establish facts through credible independent witness",
+        "Officer Daniels — corroborate Rodriguez and document scene observations",
+        "James Wilson (call last) — impeach with Rodriguez testimony"
+    ],
+    key_impeachment_opportunities: [
+        "Wilson claims light was yellow; Rodriguez says it was red. If walk signal was on, traffic light must be red.",
+        "Wilson claims he 'saw her at the last second'; Rodriguez saw his head down. Can't see her if not looking.",
+        "Wilson claims he braked immediately; Rodriguez heard no brakes. Corroborates Wilson never saw Martinez.",
+        "Wilson minimizes 'distracted' statement; Rodriguez heard 'I didn't see her' — independent corroboration.",
+        "Both witnesses agree on 35+ mph in 25 zone — speeding is indisputable."
+    ],
+    strategic_summary: "The comparison of Wilson's and Rodriguez's depositions devastates the defense case. On every contested issue, the independent eyewitness contradicts the defendant's self-serving testimony.\n\n**Traffic Signal**: Wilson claims yellow; Rodriguez confirms red. Rodriguez wins—he has no reason to lie, and the walk signal being on proves the light was red.\n\n**Driver Attention**: Wilson implies he was watching the road; Rodriguez saw his head down. Rodriguez's observation explains both the cell phone records and Wilson's 'I didn't see her' admission.\n\n**Braking**: Wilson claims he braked immediately; Rodriguez heard nothing. This corroborates that Wilson never saw Martinez because he was distracted.\n\n**Trial Strategy**: Call Rodriguez first to establish the facts through a credible, independent witness. Then call Wilson and systematically impeach his testimony using Rodriguez's observations."
+};
+
 // Application State
 let analysisData = null;
+let comparisonData = null;
 
 // Tab Navigation
 document.querySelectorAll('.nav-link').forEach(link => {
@@ -363,6 +462,15 @@ document.getElementById('loadDemoBtn').addEventListener('click', () => {
     
     // Switch to analysis tab
     document.querySelector('.nav-link[data-tab="analysis"]').click();
+});
+
+// Load Comparison Demo
+document.getElementById('loadComparisonBtn').addEventListener('click', () => {
+    comparisonData = COMPARISON_DATA;
+    populateComparisonUI(comparisonData);
+    
+    // Switch to comparison tab
+    document.querySelector('.nav-link[data-tab="comparison"]').click();
 });
 
 // Analyze Button
@@ -545,6 +653,109 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
         });
     });
 });
+
+// Populate Comparison UI
+function populateComparisonUI(data) {
+    // Depositions Header
+    const header = document.getElementById('depositionsHeader');
+    header.innerHTML = data.metadata.depositions_compared.map((depo, i) => `
+        <div class="depo-badge ${i === 0 ? 'defendant' : 'witness'}">
+            <div class="depo-icon">${depo.witness_name.split(' ').map(n => n[0]).join('')}</div>
+            <div class="depo-info">
+                <h3>${depo.witness_name}</h3>
+                <span>${depo.role} • ${formatDate(depo.date)}</span>
+            </div>
+        </div>
+    `).join('');
+    
+    // Contradictions
+    const contradictions = document.getElementById('crossContradictions');
+    contradictions.innerHTML = data.contradictions.map(c => `
+        <div class="contradiction-compare-card">
+            <div class="contradiction-compare-header">
+                <span class="contradiction-topic">${c.topic}</span>
+                <span class="severity-badge ${c.severity}">${c.severity}</span>
+            </div>
+            <div class="contradiction-compare-body">
+                <div class="witness-statements">
+                    <div class="witness-statement-box defendant">
+                        <div class="witness-name">${c.witness_1.name}</div>
+                        <div class="witness-quote">"${c.witness_1.statement}"</div>
+                        <div class="witness-ref">${c.witness_1.reference}</div>
+                    </div>
+                    <div class="vs-circle">VS</div>
+                    <div class="witness-statement-box witness">
+                        <div class="witness-name">${c.witness_2.name}</div>
+                        <div class="witness-quote">"${c.witness_2.statement}"</div>
+                        <div class="witness-ref">${c.witness_2.reference}</div>
+                    </div>
+                </div>
+                <div class="exploitation-box">
+                    <h4>Exploitation Strategy</h4>
+                    <p>${c.exploitation_strategy}</p>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    
+    // Corroborations
+    const corroborations = document.getElementById('corroborationsList');
+    corroborations.innerHTML = data.corroborations.map(c => `
+        <div class="corroboration-card">
+            <div class="corroboration-header">
+                <span class="corroboration-topic">${c.topic}</span>
+                <span class="strength-badge">${c.strength}</span>
+            </div>
+            <div class="corroboration-body">
+                <div class="fact-established">${c.fact_established}</div>
+                <div class="witness-quotes">
+                    ${c.witnesses.map(w => `
+                        <div class="witness-quote-item">
+                            <span class="quote-witness">${w.name}:</span>
+                            <span class="quote-text">"${w.statement}"</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="trial-value"><strong>Trial Value:</strong> ${c.trial_value}</div>
+            </div>
+        </div>
+    `).join('');
+    
+    // Credibility Comparison
+    const credCard = document.getElementById('credibilityCard');
+    const cred = data.credibility_comparison;
+    credCard.innerHTML = `
+        <div class="credibility-header">
+            <div class="credibility-item more">
+                <div class="label">More Credible</div>
+                <div class="name">${cred.more_credible}</div>
+            </div>
+            <div class="credibility-item less">
+                <div class="label">Less Credible</div>
+                <div class="name">${cred.less_credible}</div>
+            </div>
+        </div>
+        <div class="credibility-reasoning">${cred.reasoning}</div>
+        <div class="credibility-factors">
+            <h4>Key Factors</h4>
+            <ul>
+                ${cred.factors.map(f => `<li>${f}</li>`).join('')}
+            </ul>
+        </div>
+    `;
+    
+    // Witness Order
+    const witnessOrder = document.getElementById('witnessOrder');
+    witnessOrder.innerHTML = data.recommended_witness_order.map(w => `<li>${w}</li>`).join('');
+    
+    // Impeachment Opportunities
+    const impeachOpps = document.getElementById('impeachmentOpps');
+    impeachOpps.innerHTML = data.key_impeachment_opportunities.map(i => `<li>${i}</li>`).join('');
+    
+    // Strategy Summary
+    const summary = document.getElementById('strategySummary');
+    summary.innerHTML = `<h3>Strategic Analysis</h3>${data.strategic_summary.split('\n\n').map(p => `<p>${p}</p>`).join('')}`;
+}
 
 // Utility Functions
 function formatDate(dateStr) {
