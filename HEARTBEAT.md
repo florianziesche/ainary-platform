@@ -47,10 +47,11 @@ Guten Morgen ♔
 - [ ] Job Pipeline: Neue Opportunities? Follow-ups fällig?
 - [ ] Content: Was wurde gepostet? Engagement?
 
-### Wöchentlich (Sonntag):
+### Wöchentlich (Sonntag/Montag):
 - [ ] COCKPIT.md aktualisieren
 - [ ] Weekly Review prompten
 - [ ] MEMORY.md reviewen und updaten
+- [ ] **SOTA Research Brief** erstellen → Obsidian `20-Knowledge/AI-Research/`
 
 ### Bei Stille (4+ Stunden während Arbeitszeit):
 - Kurzer Check-in: "Alles gut? Was blockiert?"
