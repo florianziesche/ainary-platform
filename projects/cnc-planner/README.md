@@ -1,107 +1,67 @@
-# CNC Fertigungsplaner
+# CNC Planner Pro — Project Files
 
-**Status:** Demo-Ready  
-**Zielgruppe:** Maschinenbaubetriebe (CNC-Fertigung)  
-**Region:** Glashütte / Sachsen / Deutschland
+## Quick Reference
 
----
+| What | File |
+|------|------|
+| **Current Demo** | `demo-v7.html` |
+| **Technical Docs** | `TECHNICAL_DOCS.md` |
+| **Version History** | `CHANGELOG.md` |
+| **Reference Design** | `../products/cnc-planner/app.html` |
+| **Landing Page** | `../products/cnc-planner/landing-page.html` |
 
-## 🎯 Projekt-Ziel
+## Demo v7 — Current Version
 
-Software-Tool für CNC-Fertiger, das:
-1. Fertigungszeiten aus CAD/CAM-Daten berechnet
-2. Automatisch Angebote erstellt
-3. Fertigungsanweisungen für die Werkstatt generiert
-4. Heidenhain-Maschinencode (NC-Code) erzeugt
-
----
-
-## 📁 Dateien
-
-| Datei | Beschreibung |
-|-------|--------------|
-| `index.html` | Landing Page / Demo-Übersicht |
-| `Zeitberechnung_mit_Angebot.html` | Kalkulator + Angebotsgenerator |
-| `Fertigungsanweisung_Grundplatte_V3.html` | Beispiel Fertigungsanweisung |
-
----
-
-## 🚀 Demo starten
-
+**Open in browser:**
 ```bash
-cd ~/.openclaw/workspace/projects/cnc-planner
-python3 -m http.server 8080
-# Dann öffnen: http://localhost:8080
+open demo-v7.html
 ```
 
----
+**Features:**
+- Landing page design (clean cards, no sidebar)
+- Complete Fertigungsanweisung document
+- Progress bar with 10 operations
+- Tool life bars
+- Interactive checklists
+- NC code with copy/download
+- Print-optimized
 
-## 🎪 Demo für Onkel (2026-02-02)
+## File Structure
 
-### Was zeigen:
-1. **Landing Page** — Übersicht der Tools
-2. **Zeitberechnung** — Eingabe von Stückzahl, Stundensatz, Marge → Angebot
-3. **Fertigungsanweisung** — Wie ein Arbeiter die Anleitung sieht
-4. **Live-Edit** — Angebot anpassen, drucken
+```
+projects/cnc-planner/
+├── README.md              # This file
+├── TECHNICAL_DOCS.md      # Full technical documentation
+├── CHANGELOG.md           # Version history
+├── demo-v7.html           # ✅ CURRENT VERSION
+├── demo-final.html        # Sidebar app version (superseded)
+├── demo-final-backup.html # Backup
+└── demo-enhanced.html     # Rejected design
 
-### Talking Points:
-- "Das kann jeder Betrieb hier in der Region nutzen"
-- "Keine Installation nötig — läuft im Browser"
-- "Angebote in Sekunden statt Stunden"
-- "Fehler bei Kalkulation vermeiden = mehr Gewinn"
+products/cnc-planner/
+├── app.html               # Reference sidebar app
+├── landing-page.html      # Marketing page
+├── PRICING.md             # Pricing tiers
+└── ROI-CALCULATOR.md      # ROI logic
+```
 
-### Fragen für Feedback:
-- Was fehlt für deinen Betrieb?
-- Welche Maschinen nutzt ihr? (Heidenhain, Siemens, Fanuc?)
-- Wie kalkuliert ihr heute?
-- Wer würde das nutzen? (Chef, Meister, Programmierer?)
+## Project Data
 
----
+**Grundplatte WCAD-15-02-2020**
+- Material: 1.4571 (Edelstahl)
+- Rohteil: Ø135 × 50 mm
+- Fertigmaß: Ø120 × 42 mm
+- Gewicht: 1,903 kg
+- Bearbeitungszeit: 41,8 min
+- 10 Operationen (OP10-OP100)
+- Kritische Toleranzen: Ø120 h5, Ø26 H7, Ø44 H7
 
-## 🔮 Roadmap
+## Quick Links
 
-### Phase 1: Demo (jetzt)
-- [x] Zeitberechnung
-- [x] Angebotsgenerator
-- [x] Fertigungsanweisung
-- [ ] PDF-Export
-
-### Phase 2: MVP (2 Wochen)
-- [ ] CAD-PDF Upload
-- [ ] Automatische Feature-Erkennung
-- [ ] Heidenhain NC-Code Generator
-- [ ] Datenbank für Werkzeuge/Materialien
-
-### Phase 3: SaaS
-- [ ] User Accounts
-- [ ] Mehrere Projekte
-- [ ] Team-Funktionen
-- [ ] API für ERP-Integration
-
----
-
-## 💰 Business Model
-
-| Modell | Preis | Zielgruppe |
-|--------|-------|------------|
-| Freemium | €0 | Einzelanwender, Tester |
-| Pro | €49/mo | Kleine Betriebe (1-5 MA) |
-| Team | €149/mo | Mittlere Betriebe (5-20 MA) |
-| Enterprise | Custom | Große Fertiger |
+- [TECHNICAL_DOCS.md](./TECHNICAL_DOCS.md) — Design system, calculations, components
+- [CHANGELOG.md](./CHANGELOG.md) — All versions and changes
+- [Landing Page](../products/cnc-planner/landing-page.html) — Design reference
 
 ---
 
-## 🏭 Markt (Sachsen)
-
-- 100+ CNC-Betriebe im Umkreis 50km
-- Glashütte: Uhrenindustrie (Präzisionsfertigung)
-- Viele nutzen noch Excel oder Papier
-- Heidenhain ist dominierender Steuerungshersteller
-
----
-
-## Kontakt
-
-**Florian Ziesche**  
-florian@florianziesche.com  
-+49 XXX XXXXXXX
+*Last Updated: 2026-02-02*
