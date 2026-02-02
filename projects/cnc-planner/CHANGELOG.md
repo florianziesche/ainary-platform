@@ -11,13 +11,50 @@
 | v1-v4 | Jan 2026 | Early iterations | 🗄️ Archived |
 | v5 | 2026-02-01 | Dark theme app | 🗄️ Archived |
 | v6 | 2026-02-02 | Light theme app | 🗄️ Archived |
-| demo-final | 2026-02-02 | Sidebar app + enhancements | ⏸️ Superseded |
+| demo-final | 2026-02-02 | Sidebar app + enhancements | 🗄️ Archived |
 | demo-enhanced | 2026-02-02 | New sidebar design | ❌ Rejected |
-| **v7** | **2026-02-02** | **Landing page document** | ✅ **Current** |
+| v7 | 2026-02-02 | Landing page document | 🗄️ Superseded |
+| **v8** | **2026-02-02** | **Full demo (landing page)** | ✅ **Current** |
 
 ---
 
-## [v7] — 2026-02-02 (CURRENT)
+## [v8] — 2026-02-02 (CURRENT)
+
+**File:** `demo-v8.html`
+**Design:** Landing page style (exact match)
+**Status:** ✅ Active
+
+### Overview
+Vollständige Demo mit allen Landing-Page-Features. Implementiert den kompletten App-Demo-Bereich der Landing Page als eigenständige, voll funktionsfähige Anwendung.
+
+### Added
+- ✅ **ROI-Rechner** — Live-Berechnung mit 4 Eingabefeldern (Angebote/Monat, Zeit/Kalkulation, Stundenlohn, Maschinensatz)
+- ✅ **4-Tab-System** — Angebot, Kalkulation, Maschinencode, Fertigungsanweisung
+- ✅ **Angebots-Tab** — Professionelle Angebotsvorschau mit Tabelle, Positionen, Gesamtberechnung
+- ✅ **Kalkulations-Tab** — Formeln, Zeitberechnung, Werkzeugkosten, Gesamtkostendarstellung
+- ✅ **Werkzeugkosten-Kalkulation** — 6 Werkzeuge mit Standzeit → Kosten/Teil Berechnung
+- ✅ **Gesamtkostendarstellung** — 4-Karten-Grid (Maschinenzeit, Material, Werkzeuge, Gesamt)
+- ✅ **Maschinencode-Tab** — Vollständiger Heidenhain TNC 640 Code mit Syntax-Highlighting
+- ✅ **Code-Export** — Kopieren-Button + Download als .H
+- ✅ **Fertigungsanweisung-Tab** — Document-Header, Info-Grid, kritische Toleranzen
+- ✅ **Operation Details** — OP10, OP20, OP50 (kritisch), OP60 (kritisch) mit allen Parametern
+- ✅ **Tipps-Listen** — Farbcodierte Hinweise (success, warning, danger, info)
+- ✅ **Qualitätsprüfungs-Tabelle** — 6 Prüfmerkmale mit Soll-Werten und Prüfmitteln
+- ✅ **Troubleshooting-Tabelle** — Problem → Ursache → Maßnahme
+
+### Design System
+- Exakte CSS-Variablen aus `landing-page.html`
+- Clean industrial color palette (#1e3a5f, #2563eb, etc.)
+- Inter + JetBrains Mono fonts
+- Responsive (collapsible grids)
+- Print-optimiert
+
+### Size
+72 KB standalone HTML
+
+---
+
+## [v7] — 2026-02-02
 
 **File:** `demo-v7.html`
 **Design:** Landing page style (clean cards, no sidebar)
