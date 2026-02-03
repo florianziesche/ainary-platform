@@ -99,10 +99,36 @@
 
 ## AI-Specialized Funds to Watch
 
-### Conviction
-- **Focus:** AI-native companies
+### Conviction ⭐
+- **Focus:** AI-native companies exclusively
 - **Key people:** Sarah Guo (ex-Greylock)
-- **Note:** Very AI-focused, worth tracking
+- **Why fit:** Operator background valued, technical depth
+- **Action:** Follow Sarah on Twitter, engage with content
+
+### AIX Ventures ⭐
+- **Focus:** "By builders, for builders" AI fund
+- **Key people:** Richard Socher (You.com), Christopher Manning (Stanford), Anthony Goldbloom (Kaggle)
+- **Why fit:** All partners are practitioners — perfect for operator background
+- **Action:** Research portfolio, find connection
+
+### Air Street Capital ⭐
+- **Focus:** AI-first companies
+- **Location:** London (remote?)
+- **Key people:** Nathan Benaich (State of AI author)
+- **Why fit:** Deep AI expertise, values technical founders
+- **Action:** Comment on State of AI Report
+
+### SignalFire
+- **Focus:** Data-driven investing, AI engine "Beacon"
+- **Stage:** Series A
+- **Why fit:** Tech-forward approach, values data skills
+- **Action:** Research Beacon, apply through data angle
+
+### Alumni Ventures AI Fund
+- **Focus:** AI & Robotics syndicate + fund
+- **Why fit:** More accessible than top-tier, explicit AI focus
+- **Website:** av.vc/funds/aifund
+- **Action:** Check for open roles
 
 ### Radical Ventures
 - **Focus:** AI/ML
@@ -112,11 +138,6 @@
 ### Coatue
 - **Focus:** Tech, significant AI exposure
 - **Note:** Large fund, might have analyst roles
-
-### Air Street Capital
-- **Focus:** AI-first companies
-- **Location:** London (remote?)
-- **Key people:** Nathan Benaich (State of AI author)
 
 ---
 
