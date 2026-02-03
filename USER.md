@@ -128,8 +128,8 @@ Overspent in NYC supporting family, expected a good-paying job that didn't mater
 ---
 ## Professional Background
 
-- **Former:** Startup CEO/Founder of a cloud computer vision SaaS startup in Munich, called 36ZERO Vision
-- **Raised:** Multiple Angel and VC rounds
+- **Former:** Startup CEO/Founder, later MD/COO at 36ZERO Vision (cloud computer vision SaaS, Munich)
+- **Raised:** €5.5M+ total (€3M equity as CEO, €1M as MD/COO at 36ZERO Vision, €1.5M grants)
 - **Advised:** German startups on fundraising
 - **Expertise:** LLMs, agentic AI, RAG systems, AI governance, human-centered AI
 

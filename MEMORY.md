@@ -30,8 +30,8 @@
 
 ## Florian — Key Context
 
-- Former startup CEO (36ZERO Vision, cloud computer vision, Munich)
-- Raised €5.5M+ (€4M equity, €1.5M grants) across multiple rounds
+- Former startup CEO, later MD/COO at 36ZERO Vision (cloud computer vision, Munich)
+- Raised €5.5M+ total (€3M equity as CEO, €1M as MD/COO at 36ZERO Vision, €1.5M grants)
 - Currently in Schlottwitz, Germany (parents' house) — moved for ALG1 + lower costs
 - Home base: NYC (550 10th Ave, lottery housing + Section 8)
 - German native, English for work
@@ -137,7 +137,8 @@ Legal AI Platform with <0.2% hallucination rate using:
 - **Delivery = ÖFFNEN** — Keine Pfade zum Kopieren. `open` Befehl nutzen. (Added 2026-02-03)
 - **Dashboard `./d`** — Terminal-basiert funktioniert besser als HTML wegen Browser-Sicherheit. (Added 2026-02-03)
 - **Präsentations-Regel** — Titel und Content müssen sich ergänzen, nie wiederholen. "93% weniger" + "93%" = redundant. (Added 2026-02-03)
-- **Platz nutzen** — Leerer Raum = verschenkte Kommunikation. Mehr Elemente, kleinere Gaps. (Added 2026-02-03)
+- **KORREKTUR: Whitespace ist König** — Leerer Raum ist NICHT verschenkt. Slides brauchen Luft zum Atmen. Nie Margins komprimieren um mehr reinzubekommen. v3 war besser als v4 wegen besserer Abstände. (Added 2026-02-03)
+- **Beim Rewrite: Design beibehalten** — Wenn ich Code neu schreibe, NICHT das CSS komprimieren. Original-Spacing beibehalten. Fokus auf Inhalt, nicht auf Code-Kompaktheit. (Added 2026-02-03)
 
 ## 🔴 CORE LEARNING: Die Qualitäts-Lücke (2026-02-03 04:00)
 

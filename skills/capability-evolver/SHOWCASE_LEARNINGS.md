@@ -94,4 +94,19 @@
 
 ---
 
+## 🔄 Session-Based Learnings (Auto-Updated)
+
+### Translation Workflow (2026-02-03)
+- User frequently needs DE↔EN content translation
+- Pattern: Write in native language → translate → publish both versions
+- Created: `scripts/quick-translate.sh` helper
+- **Optimization opportunity:** Auto-detect language and suggest translation direction
+
+### Banner Generation Workflow (2026-02-03)
+- User requests multiple design variants for comparison
+- 5 concepts × 4K PNGs = ~6MB per batch
+- Consider: Cleanup old exports after selection
+
+---
+
 *Nächster Scan: In 24h automatisch*

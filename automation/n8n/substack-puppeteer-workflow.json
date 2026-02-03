@@ -1,0 +1,99 @@
+{
+  "name": "Substack Post Creator",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "start",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "content": "={{ $json }}",
+        "height": 900,
+        "width": 1280,
+        "headless": false,
+        "stealth": true,
+        "options": {
+          "cookies": [
+            {
+              "name": "substack.sid",
+              "value": "s%3A44AGBo8cH7gb_DNd4bNU388vhrD3Cg5X.gSmNP0RjPvWxNDyyAAhD%2B6rkYS8ComNN%2Fs%2BFl7P93jc",
+              "domain": ".substack.com",
+              "path": "/"
+            }
+          ]
+        }
+      },
+      "id": "puppeteer-launch",
+      "name": "Launch Browser",
+      "type": "n8n-nodes-puppeteer.puppeteer",
+      "typeVersion": 1,
+      "position": [440, 300]
+    },
+    {
+      "parameters": {
+        "operation": "goto",
+        "url": "https://finitematter.substack.com/publish/post"
+      },
+      "id": "goto-substack",
+      "name": "Open Substack Editor",
+      "type": "n8n-nodes-puppeteer.puppeteer",
+      "typeVersion": 1,
+      "position": [640, 300]
+    },
+    {
+      "parameters": {
+        "operation": "type",
+        "selector": "[data-testid='editor-title']",
+        "text": "={{ $node['Set Post Content'].json.title }}"
+      },
+      "id": "type-title",
+      "name": "Type Title",
+      "type": "n8n-nodes-puppeteer.puppeteer",
+      "typeVersion": 1,
+      "position": [840, 300]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "title",
+              "value": "Why Solo Founders Are the New Unicorns"
+            },
+            {
+              "name": "subtitle", 
+              "value": "How AI is rewriting startup economics"
+            }
+          ]
+        }
+      },
+      "id": "set-content",
+      "name": "Set Post Content",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [240, 500]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [[{"node": "Set Post Content", "type": "main", "index": 0}]]
+    },
+    "Set Post Content": {
+      "main": [[{"node": "Launch Browser", "type": "main", "index": 0}]]
+    },
+    "Launch Browser": {
+      "main": [[{"node": "Open Substack Editor", "type": "main", "index": 0}]]
+    },
+    "Open Substack Editor": {
+      "main": [[{"node": "Type Title", "type": "main", "index": 0}]]
+    }
+  },
+  "settings": {
+    "saveManualExecutions": true,
+    "executionOrder": "v1"
+  }
+}
