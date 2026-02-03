@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CNC Planner Pro — Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e3a5f;
+            --primary-dark: #152a45;
+            --primary-light: #2d5a8a;
+            --accent: #2563eb;
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --radius: 6px;
+            --shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--gray-100);
+            color: var(--gray-800);
+            line-height: 1.6;
+        }
+        
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        .logo-text {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--gray-900);
+        }
+        .logo-text span { color: var(--primary); }
+        .demo-badge {
+            background: var(--success);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        /* Main Layout */
+        .main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+        }
+        
+        /* Sidebar - Project List */
+        .sidebar {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        .sidebar-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--gray-200);
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+        .project-list {
+            padding: 12px;
+        }
+        .project-card {
+            padding: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            margin-bottom: 8px;
+            border: 2px solid transparent;
+        }
+        .project-card:hover {
+            background: var(--gray-50);
+        }
+        .project-card.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .project-card.active .project-meta { color: rgba(255,255,255,0.8); }
+        .project-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .project-meta {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+        }
+        .project-price {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--success);
+            margin-top: 8px;
+        }
+        .project-card.active .project-price { color: #86efac; }
+        
+        /* Content */
+        .content {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        
+        /* Info Cards Row */
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+        .info-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+        .info-card-label {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            margin-bottom: 4px;
+        }
+        .info-card-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+        .info-card-value.success { color: var(--success); }
+        .info-card-value.primary { color: var(--primary); }
+        
+        /* Tabs */
+        .tabs-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        .tabs-header {
+            display: flex;
+            border-bottom: 1px solid var(--gray-200);
+            padding: 0 20px;
+        }
+        .tab-btn {
+            padding: 16px 24px;
+            font-weight: 500;
+            color: var(--gray-500);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.15s;
+            background: none;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            font-size: 0.9rem;
+        }
+        .tab-btn:hover { color: var(--gray-700); }
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        .tab-content {
+            display: none;
+            padding: 24px;
+        }
+        .tab-content.active { display: block; }
+        
+        /* Operations Table */
+        .ops-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .ops-table th, .ops-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .ops-table th {
+            background: var(--gray-50);
+            font-weight: 600;
+            color: var(--gray-700);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+        .ops-table td {
+            font-size: 0.9rem;
+        }
+        .ops-table tr:last-child td { border-bottom: none; }
+        .time-bar {
+            height: 6px;
+            background: var(--gray-200);
+            border-radius: 3px;
+            overflow: hidden;
+            width: 100px;
+        }
+        .time-bar-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 3px;
+        }
+        
+        /* NC Code */
+        .nc-format-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .format-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 1px solid var(--gray-300);
+            background: white;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .format-btn:hover { border-color: var(--primary); }
+        .format-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .nc-code {
+            background: var(--gray-900);
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            overflow-x: auto;
+            white-space: pre;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .nc-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            border: none;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary {
+            background: white;
+            border: 1px solid var(--gray-300);
+            color: var(--gray-700);
+        }
+        .btn-secondary:hover { background: var(--gray-50); }
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        /* Series Calc */
+        .series-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+        }
+        .series-card {
+            background: var(--gray-50);
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s;
+            border: 2px solid transparent;
+        }
+        .series-card:hover { border-color: var(--primary); }
+        .series-card.active {
+            background: var(--primary);
+            color: white;
+        }
+        .series-qty {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        .series-label {
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+        .series-price {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        .series-card.active .series-price { color: #86efac; }
+        .series-total {
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--success);
+            color: white;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .series-total-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        
+        /* Cost Breakdown */
+        .cost-breakdown {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        .cost-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .cost-label { color: var(--gray-600); }
+        .cost-value { font-weight: 600; }
+        .cost-total {
+            background: var(--gray-50);
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+        .cost-total .cost-item {
+            border-bottom: none;
+            font-size: 1.1rem;
+        }
+        .cost-total .cost-value {
+            color: var(--success);
+            font-size: 1.3rem;
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--gray-900);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            display: none;
+            z-index: 1000;
+        }
+        .toast.success { background: var(--success); }
+        .toast.show { display: block; animation: slideIn 0.3s ease; }
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        /* Print */
+        @media print {
+            .header, .sidebar, .tabs-header, .nc-actions { display: none; }
+            .main { display: block; padding: 0; }
+            .tabs-container { box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <div class="header-inner">
+        <div class="logo">
+            <div class="logo-icon">CNC</div>
+            <div class="logo-text">CNC Planner <span>Pro</span></div>
+        </div>
+        <div class="demo-badge">LIVE DEMO</div>
+    </div>
+</header>
+
+<main class="main">
+    <aside class="sidebar">
+        <div class="sidebar-header">Beispielprojekte</div>
+        <div class="project-list" id="projectList"></div>
+    </aside>
+    
+    <div class="content">
+        <div class="info-cards">
+            <div class="info-card">
+                <div class="info-card-label">Werkstoff</div>
+                <div class="info-card-value" id="infoMaterial">—</div>
+            </div>
+            <div class="info-card">
+                <div class="info-card-label">Abmessungen</div>
+                <div class="info-card-value" id="infoDimensions">—</div>
+            </div>
+            <div class="info-card">
+                <div class="info-card-label">Fertigungszeit</div>
+                <div class="info-card-value primary" id="infoTime">—</div>
+            </div>
+            <div class="info-card">
+                <div class="info-card-label">Verkaufspreis</div>
+                <div class="info-card-value success" id="infoPrice">—</div>
+            </div>
+        </div>
+        
+        <div class="tabs-container">
+            <div class="tabs-header">
+                <button class="tab-btn active" onclick="showTab('operations')">Operationen</button>
+                <button class="tab-btn" onclick="showTab('nccode')">NC-Code</button>
+                <button class="tab-btn" onclick="showTab('series')">Serienkalkulation</button>
+                <button class="tab-btn" onclick="showTab('costs')">Kostenkalkulation</button>
+            </div>
+            
+            <!-- Operations Tab -->
+            <div class="tab-content active" id="tab-operations">
+                <table class="ops-table">
+                    <thead>
+                        <tr>
+                            <th style="width:40px">#</th>
+                            <th>Operation</th>
+                            <th>Werkzeug</th>
+                            <th style="width:120px">Zeit</th>
+                            <th style="width:120px"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="opsTableBody"></tbody>
+                </table>
+            </div>
+            
+            <!-- NC Code Tab -->
+            <div class="tab-content" id="tab-nccode">
+                <div class="nc-format-selector">
+                    <button class="format-btn active" onclick="setFormat('heidenhain')">Heidenhain</button>
+                    <button class="format-btn" onclick="setFormat('siemens')">Siemens</button>
+                    <button class="format-btn" onclick="setFormat('fanuc')">Fanuc</button>
+                </div>
+                <div class="nc-code" id="ncCodeDisplay"></div>
+                <div class="nc-actions">
+                    <button class="btn btn-primary" onclick="copyCode()">Code kopieren</button>
+                    <button class="btn btn-secondary" onclick="downloadCode()">Herunterladen</button>
+                </div>
+            </div>
+            
+            <!-- Series Tab -->
+            <div class="tab-content" id="tab-series">
+                <div class="series-grid" id="seriesGrid"></div>
+                <div class="series-total">
+                    <div class="series-label">Gesamtpreis bei <span id="seriesQtyLabel">1</span> Stück</div>
+                    <div class="series-total-value" id="seriesTotalPrice">—</div>
+                </div>
+            </div>
+            
+            <!-- Costs Tab -->
+            <div class="tab-content" id="tab-costs">
+                <div class="cost-breakdown">
+                    <div>
+                        <h4 style="margin-bottom:16px; color:var(--gray-700)">Kostenaufstellung</h4>
+                        <div class="cost-item">
+                            <span class="cost-label">Rohmaterial</span>
+                            <span class="cost-value" id="costMaterial">—</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="cost-label">Maschinenkosten</span>
+                            <span class="cost-value" id="costMachine">—</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="cost-label">Werkzeugverschleiß</span>
+                            <span class="cost-value" id="costTools">—</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="cost-label">Rüstzeit</span>
+                            <span class="cost-value" id="costSetup">—</span>
+                        </div>
+                        <div class="cost-total">
+                            <div class="cost-item">
+                                <span class="cost-label"><strong>Selbstkosten</strong></span>
+                                <span class="cost-value" id="costTotal">—</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 style="margin-bottom:16px; color:var(--gray-700)">Preiskalkulation</h4>
+                        <div class="cost-item">
+                            <span class="cost-label">Selbstkosten</span>
+                            <span class="cost-value" id="priceBase">—</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="cost-label">+ Marge (<span id="marginPercent">20</span>%)</span>
+                            <span class="cost-value" id="priceMargin">—</span>
+                        </div>
+                        <div class="cost-total">
+                            <div class="cost-item">
+                                <span class="cost-label"><strong>Verkaufspreis</strong></span>
+                                <span class="cost-value" id="priceSell">—</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-success" style="width:100%; margin-top:16px" onclick="printQuote()">
+                            Angebot drucken (PDF)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// Demo Projects Data
+const projects = [
+    {
+        id: "demo-001",
+        name: "Grundplatte Antriebseinheit",
+        drawingNo: "GP-2026-001",
+        material: "1.4571 (V4A Edelstahl)",
+        dimensions: { l: 160, w: 160, h: 30 },
+        operations: [
+            { name: "Planfräsen", time: 2.7, tool: "Schaftfräser ∅63" },
+            { name: "Schruppen Außenkontur ∅120", time: 8.0, tool: "Schaftfräser ∅20" },
+            { name: "Schruppen Innenkontur ∅44", time: 4.8, tool: "Schaftfräser ∅16" },
+            { name: "Bohren 8× ∅9", time: 4.4, tool: "Spiralbohrer ∅9" },
+            { name: "Schlichten ∅120 h5", time: 5.1, tool: "Schaftfräser ∅20" },
+            { name: "Feinbohren ∅26 H7", time: 4.1, tool: "Feinbohrwerkzeug" },
+            { name: "Feinbohren ∅44 H7", time: 3.1, tool: "Feinbohrwerkzeug" },
+            { name: "Stufen fräsen", time: 3.9, tool: "Schaftfräser ∅10" },
+            { name: "Gewinde 4× M10", time: 3.4, tool: "Gewindefräser M10" },
+            { name: "Anfasen", time: 2.3, tool: "Fasenfräser 45°" }
+        ],
+        totalTime: 41.8,
+        materialCost: 52.80,
+        machineCost: 59.20,
+        toolCost: 8.50,
+        setupCost: 21.25,
+        totalCost: 141.75,
+        margin: 20,
+        sellPrice: 170.10
+    },
+    {
+        id: "demo-002",
+        name: "Flansch Hydraulikzylinder",
+        drawingNo: "FL-2026-042",
+        material: "42CrMo4 (Vergütungsstahl)",
+        dimensions: { l: 200, w: 200, h: 45 },
+        operations: [
+            { name: "Planfräsen beidseitig", time: 4.2, tool: "Planfräser ∅80" },
+            { name: "Außenkontur ∅180", time: 12.5, tool: "Schaftfräser ∅25" },
+            { name: "Zentrierbohrung", time: 0.8, tool: "Zentrierbohrer" },
+            { name: "Kernloch ∅52", time: 3.2, tool: "Spiralbohrer ∅52" },
+            { name: "Aufbohren ∅68 H7", time: 6.4, tool: "Aufbohrwerkzeug" },
+            { name: "Dichtungsnut ∅72×3", time: 4.8, tool: "Nutfräser 3mm" },
+            { name: "Lochkreis 6× ∅13", time: 5.6, tool: "Spiralbohrer ∅13" },
+            { name: "Senkungen 6× ∅24", time: 3.2, tool: "Flachsenker ∅24" },
+            { name: "O-Ring Nut", time: 3.8, tool: "Nutstecher" },
+            { name: "Schlichten + Anfasen", time: 4.5, tool: "Diverse" }
+        ],
+        totalTime: 49.0,
+        materialCost: 89.60,
+        machineCost: 69.40,
+        toolCost: 12.80,
+        setupCost: 21.25,
+        totalCost: 193.05,
+        margin: 20,
+        sellPrice: 231.66
+    },
+    {
+        id: "demo-003",
+        name: "Lagerbock Getriebe",
+        drawingNo: "LB-2026-017",
+        material: "EN-GJS-500-7 (Sphäroguss)",
+        dimensions: { l: 280, w: 120, h: 85 },
+        operations: [
+            { name: "Aufspannen + Ausrichten", time: 8.0, tool: "—" },
+            { name: "Planfräsen Grundfläche", time: 5.2, tool: "Planfräser ∅63" },
+            { name: "Bohrung ∅85 H7 (Lageraufnahme)", time: 12.4, tool: "Bohrstange" },
+            { name: "Bohrung ∅52 H7 (Wellendurchführung)", time: 8.6, tool: "Bohrstange" },
+            { name: "Befestigungsbohrungen 4× ∅18", time: 4.8, tool: "Spiralbohrer ∅18" },
+            { name: "Gewinde 4× M16", time: 5.2, tool: "Gewindebohrer M16" },
+            { name: "Schmiernippel-Gewinde M8", time: 1.8, tool: "Gewindebohrer M8" },
+            { name: "Freistiche + Fasen", time: 3.5, tool: "Diverse" },
+            { name: "Schlichten Lagersitze", time: 8.2, tool: "Feinbohrstange" },
+            { name: "Entgraten + Reinigen", time: 4.0, tool: "—" }
+        ],
+        totalTime: 61.7,
+        materialCost: 78.40,
+        machineCost: 87.40,
+        toolCost: 15.20,
+        setupCost: 21.25,
+        totalCost: 202.25,
+        margin: 20,
+        sellPrice: 242.70
+    }
+];
+
+let currentProject = null;
+let currentFormat = 'heidenhain';
+let currentQty = 1;
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    renderProjectList();
+    selectProject(projects[0]);
+});
+
+function renderProjectList() {
+    const list = document.getElementById('projectList');
+    list.innerHTML = projects.map(p => `
+        <div class="project-card ${currentProject?.id === p.id ? 'active' : ''}" 
+             onclick="selectProject(projects.find(x => x.id === '${p.id}'))">
+            <div class="project-name">${p.name}</div>
+            <div class="project-meta">${p.drawingNo} · ${p.material.split(' ')[0]}</div>
+            <div class="project-price">€${p.sellPrice.toFixed(2)}</div>
+        </div>
+    `).join('');
+}
+
+function selectProject(project) {
+    currentProject = project;
+    currentQty = 1;
+    renderProjectList();
+    updateDisplay();
+}
+
+function updateDisplay() {
+    const p = currentProject;
+    if (!p) return;
+    
+    // Info cards
+    document.getElementById('infoMaterial').textContent = p.material.split(' ')[0];
+    document.getElementById('infoDimensions').textContent = `${p.dimensions.l}×${p.dimensions.w}×${p.dimensions.h}`;
+    document.getElementById('infoTime').textContent = p.totalTime.toFixed(1) + ' min';
+    document.getElementById('infoPrice').textContent = '€' + p.sellPrice.toFixed(2);
+    
+    // Operations table
+    const maxTime = Math.max(...p.operations.map(o => o.time));
+    document.getElementById('opsTableBody').innerHTML = p.operations.map((op, i) => `
+        <tr>
+            <td style="color:var(--gray-400)">${String(i + 1).padStart(2, '0')}</td>
+            <td><strong>${op.name}</strong></td>
+            <td style="color:var(--gray-500)">${op.tool}</td>
+            <td>${op.time.toFixed(1)} min</td>
+            <td>
+                <div class="time-bar">
+                    <div class="time-bar-fill" style="width:${(op.time / maxTime * 100)}%"></div>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+    
+    // NC Code
+    updateNCCode();
+    
+    // Series
+    renderSeries();
+    
+    // Costs
+    document.getElementById('costMaterial').textContent = '€' + p.materialCost.toFixed(2);
+    document.getElementById('costMachine').textContent = '€' + p.machineCost.toFixed(2);
+    document.getElementById('costTools').textContent = '€' + p.toolCost.toFixed(2);
+    document.getElementById('costSetup').textContent = '€' + p.setupCost.toFixed(2);
+    document.getElementById('costTotal').textContent = '€' + p.totalCost.toFixed(2);
+    document.getElementById('priceBase').textContent = '€' + p.totalCost.toFixed(2);
+    document.getElementById('marginPercent').textContent = p.margin;
+    document.getElementById('priceMargin').textContent = '€' + (p.totalCost * p.margin / 100).toFixed(2);
+    document.getElementById('priceSell').textContent = '€' + p.sellPrice.toFixed(2);
+}
+
+function renderSeries() {
+    const p = currentProject;
+    const qtys = [1, 5, 10, 25, 50];
+    const setupCost = 21.25;
+    
+    document.getElementById('seriesGrid').innerHTML = qtys.map(qty => {
+        const unitCost = p.totalCost - setupCost + (setupCost / qty);
+        const unitPrice = unitCost * (1 + p.margin / 100);
+        const discount = qty > 1 ? Math.round((1 - unitPrice / p.sellPrice) * 100) : 0;
+        return `
+            <div class="series-card ${currentQty === qty ? 'active' : ''}" onclick="setQty(${qty})">
+                <div class="series-qty">${qty}</div>
+                <div class="series-label">Stück</div>
+                <div class="series-price">€${unitPrice.toFixed(2)}/Stk</div>
+                ${discount > 0 ? `<div style="font-size:0.7rem; color:${currentQty === qty ? '#86efac' : 'var(--success)'}">-${discount}%</div>` : ''}
+            </div>
+        `;
+    }).join('');
+    
+    updateSeriesTotal();
+}
+
+function setQty(qty) {
+    currentQty = qty;
+    renderSeries();
+}
+
+function updateSeriesTotal() {
+    const p = currentProject;
+    const setupCost = 21.25;
+    const unitCost = p.totalCost - setupCost + (setupCost / currentQty);
+    const unitPrice = unitCost * (1 + p.margin / 100);
+    const total = unitPrice * currentQty;
+    
+    document.getElementById('seriesQtyLabel').textContent = currentQty;
+    document.getElementById('seriesTotalPrice').textContent = '€' + total.toFixed(2);
+}
+
+function showTab(tabId) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
+    document.getElementById('tab-' + tabId).classList.add('active');
+}
+
+function setFormat(format) {
+    currentFormat = format;
+    document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`[onclick="setFormat('${format}')"]`).classList.add('active');
+    updateNCCode();
+}
+
+function updateNCCode() {
+    const p = currentProject;
+    let code = '';
+    
+    if (currentFormat === 'heidenhain') {
+        code = `; ${p.name}
+; Zeichnung: ${p.drawingNo}
+; Werkstoff: ${p.material}
+; Erstellt: ${new Date().toLocaleDateString('de-DE')}
+
+BEGIN PGM ${p.drawingNo.replace(/-/g, '_')} MM
+
+; Werkzeugdefinitionen
+TOOL DEF 1 L+0 R+31.5  ; Planfräser ∅63
+TOOL DEF 2 L+0 R+10    ; Schaftfräser ∅20
+TOOL DEF 3 L+0 R+8     ; Schaftfräser ∅16
+
+; Nullpunkt
+TOOL CALL 1 Z S800 F250
+L Z+100 R0 FMAX M3
+
+; OP10 - Planfräsen
+L X-100 Y-100 FMAX
+L Z+2 F500
+L X+${p.dimensions.l + 20} F250
+L Y+${p.dimensions.w + 20}
+L X-100
+L Y-100
+L Z+100 FMAX
+
+; OP20 - Kontur Schruppen
+TOOL CALL 2 Z S1200 F300
+CYCL DEF 14.0 KONTUR
+CYCL DEF 14.1 KONTURNAME :"${p.drawingNo}"
+L X+0 Y+0 FMAX M3
+L Z+5 F500
+CYCL CALL
+L Z+100 FMAX
+
+; Weitere Operationen...
+${p.operations.slice(2).map((op, i) => `
+; OP${(i + 3) * 10} - ${op.name}
+; Werkzeug: ${op.tool}
+; Zeit: ${op.time.toFixed(1)} min`).join('')}
+
+L Z+100 FMAX M5
+M30
+
+END PGM ${p.drawingNo.replace(/-/g, '_')} MM`;
+    } else if (currentFormat === 'siemens') {
+        code = `; ${p.name}
+; Zeichnung: ${p.drawingNo}
+; Werkstoff: ${p.material}
+
+%_N_${p.drawingNo.replace(/-/g, '_')}_MPF
+;$PATH=/_N_WKS_DIR/_N_${p.drawingNo}_WPD
+
+N10 G90 G17 G54
+N20 T1 D1 ; Planfräser ∅63
+N30 M6
+N40 S800 M3 F250
+N50 G0 X-100 Y-100 Z100
+
+; OP10 - Planfräsen
+N60 G0 Z2
+N70 G1 X${p.dimensions.l + 20} F250
+N80 Y${p.dimensions.w + 20}
+N90 X-100
+N100 Y-100
+N110 G0 Z100
+
+; OP20 - Kontur
+N120 T2 D1 ; Schaftfräser ∅20
+N130 M6
+N140 S1200 M3 F300
+N150 CYCLE832(0.05,0,1)
+N160 G0 X0 Y0
+N170 G1 Z5 F500
+; ... Konturbearbeitung
+N180 G0 Z100
+
+${p.operations.slice(2).map((op, i) => `
+; OP${(i + 3) * 10} - ${op.name}
+N${200 + i * 10} ; ${op.tool}`).join('')}
+
+N990 G0 Z100 M5
+N999 M30`;
+    } else {
+        code = `( ${p.name} )
+( Zeichnung: ${p.drawingNo} )
+( Werkstoff: ${p.material} )
+
+O${p.drawingNo.replace(/[^0-9]/g, '').slice(0, 4)}
+N10 G90 G17 G21 G54
+N20 T01 M06 ( Planfräser D63 )
+N30 S800 M03
+N40 G00 X-100. Y-100. Z100.
+
+( OP10 - Planfräsen )
+N50 G00 Z2.
+N60 G01 X${p.dimensions.l + 20}. F250
+N70 Y${p.dimensions.w + 20}.
+N80 X-100.
+N90 Y-100.
+N100 G00 Z100.
+
+( OP20 - Kontur )
+N110 T02 M06 ( Schaftfräser D20 )
+N120 S1200 M03
+N130 G00 X0. Y0.
+N140 G01 Z5. F500
+N150 G41 D02
+( Konturfahrt )
+N160 G40
+N170 G00 Z100.
+
+${p.operations.slice(2).map((op, i) => `
+( OP${(i + 3) * 10} - ${op.name} )
+N${200 + i * 10} ( ${op.tool} )`).join('')}
+
+N990 G00 Z100. M05
+N999 M30
+%`;
+    }
+    
+    document.getElementById('ncCodeDisplay').textContent = code;
+}
+
+function copyCode() {
+    const code = document.getElementById('ncCodeDisplay').textContent;
+    navigator.clipboard.writeText(code);
+    showToast('NC-Code in Zwischenablage kopiert!', 'success');
+}
+
+function downloadCode() {
+    const code = document.getElementById('ncCodeDisplay').textContent;
+    const ext = currentFormat === 'heidenhain' ? 'h' : currentFormat === 'siemens' ? 'mpf' : 'nc';
+    const filename = currentProject.drawingNo + '.' + ext;
+    
+    const blob = new Blob([code], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    showToast('NC-Code heruntergeladen: ' + filename, 'success');
+}
+
+function printQuote() {
+    const p = currentProject;
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Angebot ${p.drawingNo}</title>
+            <style>
+                body { font-family: Arial, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; }
+                h1 { color: #1e3a5f; border-bottom: 2px solid #1e3a5f; padding-bottom: 10px; }
+                table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+                th { background: #f8f9fa; }
+                .total { font-size: 1.2em; font-weight: bold; }
+                .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 0.9em; color: #666; }
+            </style>
+        </head>
+        <body>
+            <h1>Angebot</h1>
+            <p><strong>Angebots-Nr.:</strong> ANG-${Date.now().toString().slice(-6)}</p>
+            <p><strong>Datum:</strong> ${new Date().toLocaleDateString('de-DE')}</p>
+            
+            <h2>Projektdetails</h2>
+            <table>
+                <tr><td><strong>Benennung</strong></td><td>${p.name}</td></tr>
+                <tr><td><strong>Zeichnung</strong></td><td>${p.drawingNo}</td></tr>
+                <tr><td><strong>Werkstoff</strong></td><td>${p.material}</td></tr>
+                <tr><td><strong>Abmessungen</strong></td><td>${p.dimensions.l} × ${p.dimensions.w} × ${p.dimensions.h} mm</td></tr>
+                <tr><td><strong>Fertigungszeit</strong></td><td>${p.totalTime.toFixed(1)} Minuten</td></tr>
+            </table>
+            
+            <h2>Preiskalkulation</h2>
+            <table>
+                <tr><th>Position</th><th style="text-align:right">Betrag</th></tr>
+                <tr><td>Rohmaterial</td><td style="text-align:right">€${p.materialCost.toFixed(2)}</td></tr>
+                <tr><td>Maschinenkosten</td><td style="text-align:right">€${p.machineCost.toFixed(2)}</td></tr>
+                <tr><td>Werkzeugverschleiß</td><td style="text-align:right">€${p.toolCost.toFixed(2)}</td></tr>
+                <tr><td>Rüstzeit</td><td style="text-align:right">€${p.setupCost.toFixed(2)}</td></tr>
+                <tr style="border-top: 2px solid #333"><td><strong>Gesamt (netto)</strong></td><td style="text-align:right" class="total">€${p.sellPrice.toFixed(2)}</td></tr>
+            </table>
+            
+            <div class="footer">
+                <p>Gültigkeit: 14 Tage | Lieferzeit: ca. 2-3 Wochen | Zahlung: 14 Tage netto</p>
+                <p>Alle Preise verstehen sich zuzüglich der gesetzlichen Mehrwertsteuer.</p>
+            </div>
+            
+            <script>window.onload = () => window.print();<\/script>
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+}
+
+function showToast(message, type = '') {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = 'toast show ' + type;
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+</script>
+
+</body>
+</html>
