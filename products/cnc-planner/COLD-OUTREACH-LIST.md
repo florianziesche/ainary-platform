@@ -18,26 +18,28 @@
 ## 📍 Sachsen (Heimatmarkt — Priorität 1)
 
 ### Glashütte / Erzgebirge Region
-| Firma | Ort | Kontakt | Status |
+| Firma | Ort | Website | Status |
 |-------|-----|---------|--------|
-| **Maschinenbau Schlottwitz** | Schlottwitz | Onkel (Florian) | 🟢 WARM — Meeting 12:00 |
-| Präzisionstechnik Glashütte | Glashütte | TBD | ⬜ Research |
-| CNC Zerspanungstechnik Erzgebirge | Altenberg | TBD | ⬜ Research |
-| Metallbau Müglitztal | Müglitztal | TBD | ⬜ Research |
+| **Maschinenbau Schlottwitz** | Schlottwitz | — | 🟢 WARM — Meeting 12:00 |
 
-### Dresden / Freital
-| Firma | Ort | Kontakt | Status |
+### Dresden / Pirna Region
+| Firma | Ort | Website | Status |
 |-------|-----|---------|--------|
-| Dresdner Feinmechanik | Dresden | TBD | ⬜ Research |
-| Zerspanungstechnik Freital | Freital | TBD | ⬜ Research |
-| PTM Präzisionstechnik | Dresden | TBD | ⬜ Research |
+| **IBEX Lohnfertigung** | Dresden | ibex-lohnfertigung.de | ⬜ Cold Email |
+| **CNC Präzisionsteile Walther** | Pirna | cnc-walther.de | ⬜ Cold Email |
+| **Watercat Manufaktur** | Kamenz | watercat-manufaktur.de | ⬜ Cold Email |
 
-### Chemnitz / Zwickau (Maschinenbau-Zentrum)
-| Firma | Ort | Kontakt | Status |
+### Chemnitz / Leipzig Region
+| Firma | Ort | Website | Status |
 |-------|-----|---------|--------|
-| Chemnitzer Werkzeugmaschinenbau | Chemnitz | TBD | ⬜ Research |
-| Zwickauer Präzisionsteile | Zwickau | TBD | ⬜ Research |
-| Sächsische Zerspanungstechnik | Chemnitz | TBD | ⬜ Research |
+| **Metallbau Mehner** | Colditz | metallbau-mehner.de | ⬜ Cold Email |
+| **MA-IN CNC-Bearbeitung** | Chemnitz | ma-in.de | ⬜ Cold Email |
+| **Kratzmaier CNC-Fertigung** | — | kratzmaier.de | ⬜ Cold Email |
+
+### Recherche-Quellen (wlw.de)
+- wlw.de/de/suche/cnc-drehteile/chemnitz
+- wlw.de/de/suche/cnc-zerspanung/chemnitz
+- Weitere Firmen dort listen
 
 ---
 

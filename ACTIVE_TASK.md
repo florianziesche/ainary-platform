@@ -1,61 +1,81 @@
 # ACTIVE_TASK.md — Crash Recovery
 
-*Bei Context-Fehlern hier weitermachen. Nach Abschluss leeren.*
-
----
-
 ## 🎯 Aktuelle Aufgabe
 
-**Task:** Nachtschicht abgeschlossen — Morning Brief vorbereitet
+**Task:** Nachtschicht abgeschlossen
 
-**Status:** PAUSED (Florian schläft)
+**Status:** DONE
 
-**Gestartet:** 2026-02-03 02:25 CET
-
----
-
-## ✅ Erledigte Schritte
-
-- [x] Demo für Onkel fertig (demo-onkel/)
-- [x] Landing Page mit Impressum + FAQ
-- [x] SOUL.md Aggressive Mode aktiviert
-- [x] CNC Planner Cold Outreach Liste erstellt
-- [x] VC Job Tracker verifiziert
-- [x] Investment Thesis + Deal Memo existieren
+**Zeit:** 02:25 - 03:15 CET
 
 ---
 
-## ⏭️ MORGEN FRÜH (vor 12:00)
+## ✅ Was wurde erstellt
 
-### Onkel-Meeting Prep (Priorität 1)
-1. [ ] Demo testen: `open projects/cnc-planner/demo-onkel/demo.html`
-2. [ ] PITCH-ONKEL.md nochmal lesen
-3. [ ] Laptop laden
+### ISO 27001 / Legal Docs
+- [x] Security Policy (SECURITY-POLICY.md)
+- [x] Datenschutzerklärung DSGVO (PRIVACY-POLICY.md)
+- [x] AGB / Terms of Service (TERMS-OF-SERVICE.md)
 
-### Decile Application (Priorität 2)
-1. [ ] Cover Letter senden
-2. [ ] LinkedIn verbinden
+### User Documentation
+- [x] Vollständiges User Manual (USER-MANUAL.md)
 
-### LinkedIn Post 14:00 (Priorität 3)
-1. [ ] Post kopieren und auf LinkedIn einfügen
-2. [ ] Substack Link in Kommentar
+### Sales Materials
+- [x] **Professionelle Sales Presentation** (presentation.html)
+  - 15 Slides, druckbar als PDF
+  - Cover, Problem, Solution, ROI, Features, Pricing, CTA
 
-### Monique Meeting 18:00 (Priorität 4)
-1. [ ] Meeting Brief lesen
-2. [ ] Demo-Script durchgehen
+### Deployment
+- [x] Deployment README
+- [x] vercel.json Konfiguration
+
+### Strategy
+- [x] **Go-to-Market Strategy** (GO-TO-MARKET.md)
+  - 90-Tage Plan
+  - Pricing Strategy
+  - Marketing Channels
+  - KPIs & Metrics
+
+### Leads
+- [x] 6 echte Firmen in Sachsen recherchiert
+- [x] Cold Outreach Liste aktualisiert
 
 ---
 
-## 📁 Wichtige Dateien
+## 📁 Neue Dateien
 
-| Was | Pfad |
-|-----|------|
-| Demo | `projects/cnc-planner/demo-onkel/demo.html` |
-| Pitch Script | `products/cnc-planner/PITCH-ONKEL.md` |
-| Decile Cover Letter | `job-applications/decile-capital-resident/cover-letter-FINAL.md` |
-| Monique Prep | `memory/2026-01-31-monique-meeting-prep.md` |
-| LinkedIn Post | `content/linkedin/CONTENT-CALENDAR.md` |
+```
+products/cnc-planner/
+├── docs/
+│   ├── iso27001/
+│   │   ├── SECURITY-POLICY.md (6.8KB)
+│   │   └── PRIVACY-POLICY.md (6.5KB)
+│   ├── legal/
+│   │   └── TERMS-OF-SERVICE.md (6.2KB)
+│   └── user/
+│       └── USER-MANUAL.md (9.9KB)
+├── sales/
+│   └── presentation.html (29KB) ← SALES DECK
+├── deploy/
+│   ├── README.md
+│   └── vercel.json
+├── strategy/
+│   └── GO-TO-MARKET.md (8.4KB)
+└── COLD-OUTREACH-LIST.md (updated)
+```
 
 ---
 
-*Letztes Update: 02:40 CET*
+## ⏭️ MORGEN
+
+| Zeit | Was |
+|------|-----|
+| 09:00 | Demo testen |
+| 10:00 | Decile Application senden |
+| **12:00** | **ONKEL-MEETING** |
+| 14:00 | LinkedIn Post |
+| **18:00** | **MONIQUE MEETING** |
+
+---
+
+*Letztes Update: 03:15 CET*
