@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CNC Planner Pro</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --black: #000000;
+            --white: #ffffff;
+            --gray-50: #fafafa;
+            --gray-100: #f5f5f5;
+            --gray-200: #e5e5e5;
+            --gray-300: #d4d4d4;
+            --gray-400: #a3a3a3;
+            --gray-500: #737373;
+            --gray-600: #525252;
+            --gray-700: #404040;
+            --gray-800: #262626;
+            --gray-900: #171717;
+            --green: #22c55e;
+            --red: #ef4444;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        @page {
+            size: 1280px 720px;
+            margin: 0;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--white);
+            color: var(--gray-900);
+            line-height: 1.5;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Slide */
+        .slide {
+            width: 1280px;
+            height: 720px;
+            padding: 64px 80px;
+            background: var(--white);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            page-break-after: always;
+            overflow: hidden;
+        }
+        
+        /* Typography */
+        .slide-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--gray-400);
+            margin-bottom: 16px;
+        }
+        
+        .slide-title {
+            font-size: 40px;
+            font-weight: 700;
+            color: var(--black);
+            line-height: 1.15;
+            letter-spacing: -1px;
+            margin-bottom: 12px;
+            max-width: 900px;
+        }
+        
+        .slide-subtitle {
+            font-size: 18px;
+            font-weight: 400;
+            color: var(--gray-500);
+            margin-bottom: 48px;
+        }
+        
+        .slide-footer {
+            position: absolute;
+            bottom: 32px;
+            left: 80px;
+            right: 80px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--gray-400);
+        }
+        
+        /* Big Number */
+        .big-number {
+            font-size: 120px;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -4px;
+        }
+        
+        .big-number.green { color: var(--green); }
+        .big-number.black { color: var(--black); }
+        
+        .big-label {
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--gray-600);
+            margin-top: 8px;
+        }
+        
+        /* Grid */
+        .content { flex: 1; display: flex; flex-direction: column; }
+        .row { display: flex; gap: 48px; }
+        .col { flex: 1; }
+        .col-2 { flex: 2; }
+        
+        /* Metric Row */
+        .metric-row {
+            display: flex;
+            gap: 64px;
+            margin-bottom: 48px;
+        }
+        
+        .metric {
+            text-align: left;
+        }
+        
+        .metric-value {
+            font-size: 56px;
+            font-weight: 700;
+            color: var(--black);
+            line-height: 1;
+            letter-spacing: -2px;
+        }
+        
+        .metric-value.green { color: var(--green); }
+        
+        .metric-label {
+            font-size: 14px;
+            color: var(--gray-500);
+            margin-top: 8px;
+        }
+        
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 16px 0;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-200);
+            font-size: 15px;
+        }
+        
+        th {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gray-400);
+        }
+        
+        td.number {
+            font-variant-numeric: tabular-nums;
+            text-align: right;
+        }
+        
+        tr.highlight td {
+            font-weight: 600;
+            border-bottom: 2px solid var(--black);
+        }
+        
+        tr.result td {
+            font-weight: 700;
+            font-size: 17px;
+            color: var(--green);
+            border-bottom: none;
+        }
+        
+        /* Cards */
+        .card-row {
+            display: flex;
+            gap: 24px;
+        }
+        
+        .card {
+            flex: 1;
+            background: var(--gray-50);
+            padding: 32px;
+            border-radius: 4px;
+        }
+        
+        .card-number {
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .card-text {
+            font-size: 14px;
+            color: var(--gray-500);
+            line-height: 1.5;
+        }
+        
+        /* Process */
+        .process {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        
+        .process-step {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .process-num {
+            width: 48px;
+            height: 48px;
+            background: var(--black);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            margin: 0 auto 16px;
+        }
+        
+        .process-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .process-sub {
+            font-size: 13px;
+            color: var(--gray-500);
+        }
+        
+        .process-arrow {
+            font-size: 24px;
+            color: var(--gray-300);
+            margin-top: 12px;
+        }
+        
+        /* Comparison */
+        .comparison {
+            display: flex;
+            gap: 48px;
+        }
+        
+        .comparison-col {
+            flex: 1;
+        }
+        
+        .comparison-header {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid var(--gray-200);
+        }
+        
+        .comparison-header.before { color: var(--gray-400); }
+        .comparison-header.after { color: var(--green); }
+        
+        .comparison-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            font-size: 15px;
+        }
+        
+        .comparison-row span:last-child {
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .comparison-total {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px 0;
+            margin-top: 8px;
+            border-top: 2px solid var(--black);
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .comparison-total.green span:last-child {
+            color: var(--green);
+        }
+        
+        /* Bar Chart */
+        .bar-chart {
+            margin-top: 32px;
+        }
+        
+        .bar-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .bar-label {
+            width: 120px;
+            font-size: 14px;
+            color: var(--gray-600);
+        }
+        
+        .bar-track {
+            flex: 1;
+            height: 32px;
+            background: var(--gray-100);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .bar-fill {
+            height: 100%;
+            background: var(--black);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 12px;
+            color: var(--white);
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .bar-fill.green { background: var(--green); }
+        
+        /* Pricing */
+        .pricing {
+            display: flex;
+            gap: 24px;
+        }
+        
+        .price-card {
+            flex: 1;
+            border: 2px solid var(--gray-200);
+            padding: 32px;
+            border-radius: 4px;
+        }
+        
+        .price-card.featured {
+            border-color: var(--black);
+            background: var(--gray-50);
+        }
+        
+        .price-tier {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gray-400);
+            margin-bottom: 8px;
+        }
+        
+        .price-card.featured .price-tier {
+            color: var(--black);
+        }
+        
+        .price-amount {
+            font-size: 40px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .price-period {
+            font-size: 14px;
+            color: var(--gray-500);
+            margin-bottom: 24px;
+        }
+        
+        .price-features {
+            list-style: none;
+        }
+        
+        .price-features li {
+            font-size: 14px;
+            color: var(--gray-600);
+            padding: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .price-features li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--green);
+            font-weight: 600;
+        }
+        
+        /* Cover */
+        .slide-cover {
+            background: var(--black);
+            color: var(--white);
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .slide-cover .slide-title {
+            color: var(--white);
+            font-size: 56px;
+            max-width: 100%;
+        }
+        
+        .slide-cover .slide-subtitle {
+            color: var(--gray-400);
+            font-size: 24px;
+        }
+        
+        .cover-logo {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 32px;
+            color: var(--gray-400);
+        }
+        
+        /* CTA Slide */
+        .cta-box {
+            background: var(--gray-900);
+            color: var(--white);
+            padding: 48px 64px;
+            border-radius: 4px;
+            text-align: center;
+            margin-top: auto;
+        }
+        
+        .cta-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .cta-sub {
+            font-size: 16px;
+            color: var(--gray-400);
+        }
+        
+        /* Source */
+        .source {
+            font-size: 11px;
+            color: var(--gray-400);
+            margin-top: auto;
+            padding-top: 24px;
+        }
+        
+        /* Utils */
+        .mt-auto { margin-top: auto; }
+        .mb-32 { margin-bottom: 32px; }
+        .mb-48 { margin-bottom: 48px; }
+        .text-green { color: var(--green); }
+        
+        @media print {
+            .slide { page-break-after: always; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- SLIDE 1: COVER -->
+<div class="slide slide-cover">
+    <div class="cover-logo">CNC Planner Pro</div>
+    <h1 class="slide-title">Fertigungskalkulation<br>in 2 Minuten</h1>
+    <p class="slide-subtitle">Statt 30</p>
+    <div class="slide-footer" style="color: var(--gray-600);">
+        <span>Vertraulich</span>
+        <span>Februar 2026</span>
+    </div>
+</div>
+
+<!-- SLIDE 2: THE PROBLEM (One Number) -->
+<div class="slide">
+    <span class="slide-label">Das Problem</span>
+    <h1 class="slide-title">Ihre Arbeitsvorbereitung verliert jede Woche</h1>
+    
+    <div class="content" style="justify-content: center; align-items: flex-start;">
+        <div class="big-number black">10,3h</div>
+        <div class="big-label">an manuelle Kalkulation</div>
+    </div>
+    
+    <p class="source">20 Kalkulationen/Woche × 31 Minuten = 10,3 Stunden. Quelle: Erhebung bei 12 Lohnfertigern, Q4/2025</p>
+    <div class="slide-footer">
+        <span>CNC Planner Pro</span>
+        <span>2</span>
+    </div>
+</div>
+
+<!-- SLIDE 3: THE COST -->
+<div class="slide">
+    <span class="slide-label">Die Kosten</span>
+    <h1 class="slide-title">Das sind €27.000 pro Jahr</h1>
+    
+    <div class="content">
+        <div class="metric-row">
+            <div class="metric">
+                <div class="metric-value">€2.266</div>
+                <div class="metric-label">pro Monat</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">€27.192</div>
+                <div class="metric-label">pro Jahr</div>
+            </div>
+        </div>
+        
+        <div class="bar-chart">
+            <div class="bar-row">
+                <span class="bar-label">Zeichnung lesen</span>
+                <div class="bar-track">
+                    <div class="bar-fill" style="width: 26%;">8 min</div>
+                </div>
+            </div>
+            <div class="bar-row">
+                <span class="bar-label">Schnittdaten</span>
+                <div class="bar-track">
+                    <div class="bar-fill" style="width: 19%;">6 min</div>
+                </div>
+            </div>
+            <div class="bar-row">
+                <span class="bar-label">Berechnung</span>
+                <div class="bar-track">
+                    <div class="bar-fill" style="width: 23%;">7 min</div>
+                </div>
+            </div>
+            <div class="bar-row">
+                <span class="bar-label">Kalkulation</span>
+                <div class="bar-track">
+                    <div class="bar-fill" style="width: 16%;">5 min</div>
+                </div>
+            </div>
+            <div class="bar-row">
+                <span class="bar-label">Angebot</span>
+                <div class="bar-track">
+                    <div class="bar-fill" style="width: 16%;">5 min</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <p class="source">Vollkosten AV: €55/h inkl. Lohnnebenkosten</p>
+    <div class="slide-footer">
+        <span>CNC Planner Pro</span>
+        <span>3</span>
+    </div>
+</div>
+
+<!-- SLIDE 4: THE SOLUTION -->
+<div class="slide">
+    <span class="slide-label">Die Lösung</span>
+    <h1 class="slide-title">Von 31 auf 2 Minuten</h1>
+    
+    <div class="content">
+        <div class="comparison">
+            <div class="comparison-col">
+                <div class="comparison-header before">Heute</div>
+                <div class="comparison-row"><span>Zeichnung analysieren</span><span>8 min</span></div>
+                <div class="comparison-row"><span>Schnittdaten nachschlagen</span><span>6 min</span></div>
+                <div class="comparison-row"><span>Zeit berechnen</span><span>7 min</span></div>
+                <div class="comparison-row"><span>Kosten kalkulieren</span><span>5 min</span></div>
+                <div class="comparison-row"><span>Angebot formatieren</span><span>5 min</span></div>
+                <div class="comparison-total"><span>Gesamt</span><span>31 min</span></div>
+            </div>
+            <div class="comparison-col">
+                <div class="comparison-header after">Mit CNC Planner</div>
+                <div class="comparison-row"><span>Maße eingeben</span><span>1 min</span></div>
+                <div class="comparison-row"><span>Werkstoff wählen</span><span>0,2 min</span></div>
+                <div class="comparison-row"><span>Operationen wählen</span><span>0,3 min</span></div>
+                <div class="comparison-row"><span>Automatisch berechnet</span><span>—</span></div>
+                <div class="comparison-row"><span>PDF exportieren</span><span>0,5 min</span></div>
+                <div class="comparison-total green"><span>Gesamt</span><span>2 min</span></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="slide-footer">
+        <span>CNC Planner Pro</span>
+        <span>4</span>
+    </div>
+</div>
+
+<!-- SLIDE 5: THE RESULT -->
+<div class="slide">
+    <span class="slide-label">Das Ergebnis</span>
+    <h1 class="slide-title">93% weniger Zeitaufwand</h1>
+    
+    <div class="content" style="justify-content: center;">
+        <div class="metric-row" style="gap: 120px;">
+            <div class="metric" style="text-align: center;">
+                <div class="metric-value" style="font-size: 72px;">93%</div>
+                <div class="metric-label">Zeitersparnis</div>
+            </div>
+            <div class="metric" style="text-align: center;">
+                <div class="metric-value green" style="font-size: 72px;">€25K</div>
+                <div class="metric-label">Ersparnis pro Jahr</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="slide-footer">
+        <span>CNC Planner Pro</span>
+        <span>5</span>
+    </div>
+</div>
+
+<!-- SLIDE 6: HOW IT WORKS -->
+<div class="slide">
+    <span class="slide-label">So funktioniert es</span>
+    <h1 class="slide-title">Vier Schritte zum fertigen Angebot</h1>
+    
+    <div class="content" style="justify-content: center;">
+        <div class="process">
+            <div class="process-step">
+                <div class="process-num">1</div>
+                <div class="process-title">Eingabe</div>
+                <div class="process-sub">Maße, Material, Toleranzen</div>
+            </div>
+            <div class="process-arrow">→</div>
+            <div class="process-step">
+                <div class="process-num">2</div>
+                <div class="process-title">Berechnung</div>
+                <div class="process-sub">Automatisch nach DIN 6584</div>
+            </div>
+            <div class="process-arrow">→</div>
+            <div class="process-step">
+                <div class="process-num">3</div>
+                <div class="process-title">NC-Code</div>
+                <div class="process-sub">Heidenhain, Siemens, Fanuc</div>
+            </div>
+            <div class="process-arrow">→</div>
+            <div class="process-step">
+                <div class="process-num">4</div>
+                <div class="process-title">Angebot</div>
+                <div class="process-sub">PDF mit Kostenaufstellung</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card-row mt-auto" style="margin-top: 48px;">
+        <div class="card">
+            <div class="card-title">17 Werkstoffe</div>
+            <div class="card-text">Stahl, Edelstahl, Aluminium, Titan, Kunststoffe — mit allen Schnittdaten</div>
+        </div>
+        <div class="card">
+            <div class="card-title">100% Offline</div>
+            <div class="card-text">Ihre Daten verlassen nie Ihren Rechner. Keine Cloud, kein Risiko.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">DIN-konform</div>
+            <div class="card-text">Zeitberechnung nach DIN 6584. Nachvollziehbar und prüfbar.</div>
+        </div>
+    </div>
+    
+    <div class="slide-footer">
+        <span>CNC Planner Pro</span>
+        <span>6</span>
+    </div>
+</div>
+
+<!-- SLIDE 7: ROI -->
+<div class="slide">
+    <span class="slide-label">Investition</span>
+    <h1 class="slide-title">Amortisiert in 3 Tagen</h1>
+    
+    <div class="content">
+        <div class="row">
+            <div class="col">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Position</th>
+                            <th style="text-align: right;">Heute</th>
+                            <th style="text-align: right;">Mit CNC Planner</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Kalkulationen/Monat</td>
+                            <td class="number">86</td>
+                            <td class="number">86</td>
+                        </tr>
+                        <tr>
+                            <td>Zeit pro Kalkulation</td>
+                            <td class="number">31 min</td>
+                            <td class="number">2 min</td>
+                        </tr>
+                        <tr>
+                            <td>Zeitaufwand/Monat</td>
+                            <td class="number">44,4 h</td>
+                            <td class="number">2,9 h</td>
+                        </tr>
+                        <tr>
+                            <td>Personalkosten (€55/h)</td>
+                            <td class="number">€2.442</td>
+                            <td class="number">€160</td>
+                        </tr>
+                        <tr>
+                            <td>Softwarekosten</td>
+                            <td class="number">€0</td>
+                            <td class="number">€49</td>
+                        </tr>
+                        <tr class="result">
+                            <td>Gesamtkosten</td>
+                            <td class="number" style="color: var(--gray-900);">€2.442</td>
+                            <td class="number">€209</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col" style="display: flex; flex-direction: column; justify-content: center; padding-left: 48px;">
+                <div class="metric">
+                    <div class="metric-value green" style="font-size: 64px;">€2.233</div>
+                    <div class="metric-label">Ersparnis pro Monat</div>
+                </div>
+                <div style="margin-top: 32px; padding: 24px; background: var(--gray-50); border-radius: 4px;">
+                    <div style="font-size: 14px; color: var(--gray-500);">Break-Even</div>
+                    <div style="font-size: 32px; font-weight: 700;">Tag 3</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="slide-footer">
+        <span>CNC Planner Pro</span>
+        <span>7</span>
+    </div>
+</div>
+
+<!-- SLIDE 8: PRICING -->
+<div class="slide">
+    <span class="slide-label">Preise</span>
+    <h1 class="slide-title">Ein Preis. Alles drin.</h1>
+    <p class="slide-subtitle">Monatlich kündbar. 30 Tage kostenlos testen.</p>
+    
+    <div class="content" style="justify-content: center;">
+        <div class="pricing">
+            <div class="price-card">
+                <div class="price-tier">Starter</div>
+                <div class="price-amount">€0</div>
+                <div class="price-period">Für immer kostenlos</div>
+                <ul class="price-features">
+                    <li>5 Projekte</li>
+                    <li>Grundkalkulation</li>
+                    <li>1 NC-Format</li>
+                    <li>Dokumentation</li>
+                </ul>
+            </div>
+            <div class="price-card featured">
+                <div class="price-tier">Pro</div>
+                <div class="price-amount">€49</div>
+                <div class="price-period">pro Monat (€490/Jahr)</div>
+                <ul class="price-features">
+                    <li>Unbegrenzte Projekte</li>
+                    <li>17 Werkstoffe</li>
+                    <li>3 NC-Formate</li>
+                    <li>E-Mail Support</li>
+                    <li>Alle Updates</li>
+                </ul>
+            </div>
+            <div class="price-card">
+                <div class="price-tier">Business</div>
+                <div class="price-amount">€149</div>
+                <div class="price-period">pro Monat (€1.490/Jahr)</div>
+                <ul class="price-features">
+                    <li>Alles aus Pro</li>
+                    <li>5 Benutzer</li>
+                    <li>API-Zugang</li>
+                    <li>Priority Support</li>
+                    <li>Eigene Werkstoffe</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="slide-footer">
+        <span>CNC Planner Pro</span>
+        <span>8</span>
+    </div>
+</div>
+
+<!-- SLIDE 9: CTA -->
+<div class="slide">
+    <span class="slide-label">Nächster Schritt</span>
+    <h1 class="slide-title">30-Minuten Demo mit Ihrem Werkstück</h1>
+    <p class="slide-subtitle">Sie sehen genau, was CNC Planner für Ihren Betrieb bringt.</p>
+    
+    <div class="content">
+        <div class="process" style="margin-bottom: 48px;">
+            <div class="process-step">
+                <div class="process-num">1</div>
+                <div class="process-title">Demo</div>
+                <div class="process-sub">30 min, mit echtem Teil</div>
+            </div>
+            <div class="process-arrow">→</div>
+            <div class="process-step">
+                <div class="process-num">2</div>
+                <div class="process-title">Test</div>
+                <div class="process-sub">30 Tage kostenlos</div>
+            </div>
+            <div class="process-arrow">→</div>
+            <div class="process-step">
+                <div class="process-num">3</div>
+                <div class="process-title">Entscheidung</div>
+                <div class="process-sub">Auf Basis echter Daten</div>
+            </div>
+        </div>
+        
+        <div class="cta-box">
+            <div class="cta-title">Ihr Risiko: €0</div>
+            <div class="cta-sub">30 Tage kostenlos. Monatlich kündbar. Kein Vendor Lock-in.</div>
+        </div>
+    </div>
+    
+    <div class="slide-footer">
+        <span>CNC Planner Pro</span>
+        <span>9</span>
+    </div>
+</div>
+
+<!-- SLIDE 10: CONTACT -->
+<div class="slide slide-cover">
+    <div class="cover-logo">CNC Planner Pro</div>
+    <h1 class="slide-title" style="font-size: 40px; margin-bottom: 48px;">Bereit für die Demo?</h1>
+    <p class="slide-subtitle" style="font-size: 20px;">
+        info@cnc-planner.de<br>
+        +49 123 456789
+    </p>
+    <div class="slide-footer" style="color: var(--gray-600);">
+        <span>Vertraulich</span>
+        <span>10</span>
+    </div>
+</div>
+
+</body>
+</html>
