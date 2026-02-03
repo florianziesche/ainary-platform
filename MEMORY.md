@@ -134,6 +134,10 @@ Legal AI Platform with <0.2% hallucination rate using:
 - **Token Budget = Währung** — Context Window wie Bankkonto: nicht alles auf einmal ausgeben. Agent weiß besser was relevant ist. (Added 2026-02-02)
 - **ACTIVE_TASK.md** — Neue Datei für laufende Aufgaben. Überlebt Context-Kompaktierung. Bei neuer Aufgabe: erst dokumentieren, dann arbeiten. (Added 2026-02-02)
 - **Keine "mental notes"** — Alles Wichtige sofort in Datei schreiben. Memory ist begrenzt, Dateien überleben. (Added 2026-02-02)
+- **Definition of Done** — "Fertig" = Florian kann mit EINER Aktion nutzen. Extern = PDF, Intern = MD. (Added 2026-02-03)
+- **Nicht blind arbeiten** — Vor jeder Aktion: "Bringt das uns schneller zu €500K?" Wenn nein, nicht machen. (Added 2026-02-03)
+- **Delivery = ÖFFNEN** — Keine Pfade zum Kopieren. `open` Befehl nutzen. (Added 2026-02-03)
+- **Dashboard `./d`** — Terminal-basiert funktioniert besser als HTML wegen Browser-Sicherheit. (Added 2026-02-03)
 
 ## Content Pillars
 
