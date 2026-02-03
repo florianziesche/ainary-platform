@@ -47,6 +47,13 @@ Capture what matters. Decisions, context, things to remember. Skip the secrets u
 - When you make a mistake → document it so future-you doesn't repeat it
 - **Text > Brain** 📝
 
+### 🔄 ACTIVE_TASK.md — Crash Recovery
+- Bei jeder nicht-trivialen Aufgabe: **ERST** `ACTIVE_TASK.md` updaten, **DANN** arbeiten
+- Dokumentiere: Was, Status, erledigte Schritte, nächste Schritte, Zwischenergebnisse
+- Nach Context-Fehlern oder Session-Neustart: Lies ACTIVE_TASK.md und mach weiter
+- Nach Abschluss: ACTIVE_TASK.md leeren (Status: IDLE)
+- **Warum:** Context Compaction kann tool_use/tool_result Paare trennen → Crash. Die Datei überlebt.
+
 ---
 
 ## Safety

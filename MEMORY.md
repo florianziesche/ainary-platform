@@ -132,6 +132,8 @@ Legal AI Platform with <0.2% hallucination rate using:
 - **Git-Sync** — `./scripts/git-sync.sh "message"` für schnelles Workspace-Commit. (Added 2026-02-02)
 - **Progressive Disclosure** — Index first, dann Details on-demand. ~10x Token-Ersparnis. Observation Types (🔴🟤🟢🟣) für bessere Retrieval. (Added 2026-02-02)
 - **Token Budget = Währung** — Context Window wie Bankkonto: nicht alles auf einmal ausgeben. Agent weiß besser was relevant ist. (Added 2026-02-02)
+- **ACTIVE_TASK.md** — Neue Datei für laufende Aufgaben. Überlebt Context-Kompaktierung. Bei neuer Aufgabe: erst dokumentieren, dann arbeiten. (Added 2026-02-02)
+- **Keine "mental notes"** — Alles Wichtige sofort in Datei schreiben. Memory ist begrenzt, Dateien überleben. (Added 2026-02-02)
 
 ## Content Pillars
 
