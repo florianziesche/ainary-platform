@@ -12,8 +12,8 @@
 |------|------|--------|---------|----------|-----------|
 | Decile Capital | Resident | 📝 Ready | - | - | Send Monday Feb 3 |
 | VC Lab Network | - | 🎯 Active | - | Monique meeting Feb 3 | Follow up |
-| HOF Capital | Associate | 🔍 Research | - | - | Find contact |
-| Primary Venture Partners | Associate | 🔍 Research | - | - | Application |
+| HOF Capital | Associate | 📝 Draft | - | - | `hof-capital/cover-letter.md` |
+| Primary Venture Partners | Associate | 📝 Draft | - | - | `primary-venture-partners/cover-letter.md` |
 | Betaworks | - | 🔍 Research | - | - | Check openings |
 
 **Legend:** 🔍 Research | 📝 Ready | ✉️ Applied | 💬 Response | 🤝 Interview | ❌ Rejected | ✅ Offer
