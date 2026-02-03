@@ -1429,18 +1429,75 @@
                             <button class="btn btn-sm btn-secondary no-print" onclick="exportCostsCSV()">CSV Export</button>
                         </div>
                         <div class="result-card-body">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Position</th>
-                                        <th>Berechnung</th>
-                                        <th class="right">Betrag</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="costBreakdown">
-                                    <!-- Costs will be rendered here -->
-                                </tbody>
-                            </table>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+                                <!-- Left: Kostenaufstellung -->
+                                <div>
+                                    <h4 style="margin-bottom: 16px; color: var(--gray-700); font-size: 1rem; border-bottom: 2px solid var(--primary); padding-bottom: 8px;">Kostenaufstellung</h4>
+                                    <div id="costBreakdownLeft">
+                                        <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--gray-200);">
+                                            <span style="color: var(--gray-600);">Rohmaterial</span>
+                                            <span style="font-weight: 600;" id="costMaterialDisplay">—</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--gray-200);">
+                                            <span style="color: var(--gray-600);">Maschinenkosten</span>
+                                            <span style="font-weight: 600;" id="costMachineDisplay">—</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--gray-200);">
+                                            <span style="color: var(--gray-600);">Werkzeugverschleiß</span>
+                                            <span style="font-weight: 600;" id="costToolsDisplay">—</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--gray-200);">
+                                            <span style="color: var(--gray-600);">Rüstzeit</span>
+                                            <span style="font-weight: 600;" id="costSetupDisplay">—</span>
+                                        </div>
+                                        <div style="background: var(--gray-50); padding: 16px; border-radius: 8px; margin-top: 16px;">
+                                            <div style="display: flex; justify-content: space-between; font-size: 1.1rem;">
+                                                <span><strong>Selbstkosten</strong></span>
+                                                <span style="font-weight: 700; color: var(--gray-900);" id="costTotalDisplay">—</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Right: Preiskalkulation -->
+                                <div>
+                                    <h4 style="margin-bottom: 16px; color: var(--gray-700); font-size: 1rem; border-bottom: 2px solid var(--success); padding-bottom: 8px;">Preiskalkulation</h4>
+                                    <div id="costBreakdownRight">
+                                        <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--gray-200);">
+                                            <span style="color: var(--gray-600);">Selbstkosten</span>
+                                            <span style="font-weight: 600;" id="priceBaseDisplay">—</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--gray-200);">
+                                            <span style="color: var(--gray-600);">+ Marge (<span id="marginPercentDisplay">15</span>%)</span>
+                                            <span style="font-weight: 600;" id="priceMarginDisplay">—</span>
+                                        </div>
+                                        <div style="background: var(--primary); color: white; padding: 16px; border-radius: 8px; margin-top: 16px;">
+                                            <div style="display: flex; justify-content: space-between; font-size: 1.1rem;">
+                                                <span><strong>Verkaufspreis</strong></span>
+                                                <span style="font-weight: 700;" id="priceSellDisplay">—</span>
+                                            </div>
+                                        </div>
+                                        <button class="btn btn-success" style="width: 100%; margin-top: 16px;" onclick="downloadQuotePDF()">
+                                            Angebot drucken (PDF)
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Detailed breakdown table below -->
+                            <div style="margin-top: 32px;">
+                                <h4 style="margin-bottom: 16px; color: var(--gray-600); font-size: 0.9rem;">Detailaufschlüsselung</h4>
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Position</th>
+                                            <th>Berechnung</th>
+                                            <th class="right">Betrag</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="costBreakdown">
+                                        <!-- Costs will be rendered here -->
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2160,7 +2217,24 @@ function calculate() {
     document.getElementById('overviewTotal').textContent = '€' + (sellPrice * p.quantity).toFixed(2);
     document.getElementById('overviewQty').textContent = p.quantity;
     
-    // Cost breakdown
+    // Cost breakdown - Two column display (like demo)
+    const setupCostValue = (setupTime/60) * p.hourlyRate;
+    const machineCostValue = (machiningTime/60) * p.hourlyRate;
+    
+    // Left column: Kostenaufstellung
+    document.getElementById('costMaterialDisplay').textContent = '€' + materialCost.toFixed(2);
+    document.getElementById('costMachineDisplay').textContent = '€' + machineCostValue.toFixed(2);
+    document.getElementById('costToolsDisplay').textContent = '€' + toolCost.toFixed(2);
+    document.getElementById('costSetupDisplay').textContent = '€' + setupCostValue.toFixed(2);
+    document.getElementById('costTotalDisplay').textContent = '€' + selfCost.toFixed(2);
+    
+    // Right column: Preiskalkulation
+    document.getElementById('priceBaseDisplay').textContent = '€' + selfCost.toFixed(2);
+    document.getElementById('marginPercentDisplay').textContent = p.margin;
+    document.getElementById('priceMarginDisplay').textContent = '€' + (sellPrice - selfCost).toFixed(2);
+    document.getElementById('priceSellDisplay').textContent = '€' + sellPrice.toFixed(2);
+    
+    // Detailed breakdown table
     document.getElementById('costBreakdown').innerHTML = `
         <tr>
             <td>Rohmaterial</td>
@@ -2169,19 +2243,19 @@ function calculate() {
         </tr>
         <tr>
             <td>Rüstzeit</td>
-            <td class="mono">${setupTime} min</td>
-            <td class="right mono">€${((setupTime/60) * p.hourlyRate).toFixed(2)}</td>
+            <td class="mono">${setupTime} min × €${(p.hourlyRate/60).toFixed(2)}/min</td>
+            <td class="right mono">€${setupCostValue.toFixed(2)}</td>
         </tr>
         ${timeBreakdown.map(t => `
         <tr>
             <td>${getOpDescription(t.op)}</td>
-            <td class="mono">${t.time.toFixed(1)} min</td>
+            <td class="mono">${t.time.toFixed(1)} min × €${(p.hourlyRate/60).toFixed(2)}/min</td>
             <td class="right mono">€${((t.time/60) * p.hourlyRate).toFixed(2)}</td>
         </tr>
         `).join('')}
         <tr>
             <td>Werkzeugverschleiß</td>
-            <td class="mono">anteilig</td>
+            <td class="mono">anteilig nach Standzeit</td>
             <td class="right mono">€${toolCost.toFixed(2)}</td>
         </tr>
         <tr class="total-row">
@@ -2191,11 +2265,11 @@ function calculate() {
         </tr>
         <tr>
             <td>Marge ${p.margin}%</td>
-            <td></td>
+            <td class="mono">${selfCost.toFixed(2)} × ${p.margin}%</td>
             <td class="right mono">€${(sellPrice - selfCost).toFixed(2)}</td>
         </tr>
         <tr class="total-row" style="background: var(--primary); color: white;">
-            <td><strong>Verkaufspreis</strong></td>
+            <td><strong>Verkaufspreis (netto)</strong></td>
             <td></td>
             <td class="right mono"><strong>€${sellPrice.toFixed(2)}</strong></td>
         </tr>
