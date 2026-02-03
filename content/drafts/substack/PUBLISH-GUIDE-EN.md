@@ -28,7 +28,10 @@ Open these files in Safari and screenshot (Cmd+Shift+4):
 2. **Math Shift** (1200×500) — after "The Math Has Changed"
    `file:///Users/florianziesche/.openclaw/workspace/content/drafts/substack/graphics/pro-math-shift-en.html`
 
-3. **Path Forward** (1200×500) — after "The First Step"
+3. **AI Stack** (1200×700) — after "My AI agent is called Mia" section (optional)
+   `file:///Users/florianziesche/.openclaw/workspace/content/drafts/substack/graphics/ai-stack-v4-en.html`
+
+4. **Path Forward** (1200×500) — after "The First Step"
    `file:///Users/florianziesche/.openclaw/workspace/content/drafts/substack/graphics/pro-path-forward-en.html`
 
 ## Step 4: Settings
