@@ -32,8 +32,9 @@ case "$1" in
         ;;
     "substack"|"4")
         open content/drafts/substack/
+        open content/drafts/substack/graphics/png/
         open "https://finitematter.substack.com/publish/post"
-        echo -e "${GREEN}✓ Substack drafts + editor opened${NC}"
+        echo -e "${GREEN}✓ Substack drafts + graphics + editor opened${NC}"
         ;;
     "outreach"|"5")
         open outreach/ready-to-send/

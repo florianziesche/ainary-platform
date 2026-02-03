@@ -61,7 +61,16 @@
 
 ---
 
-*Arbeit beendet: 03:45*
+### 03:55 — Substack Grafiken
+- Alle 4 Grafiken als PNG generiert
+- `graphics/png/banner-en.png`
+- `graphics/png/math-shift-en.png`
+- `graphics/png/ai-stack-en.png`
+- `graphics/png/path-forward-en.png`
+- PUBLISH-GUIDE-EN.md updated
+- Dashboard `./d 4` öffnet jetzt auch PNG-Ordner
+
+*Arbeit fortgesetzt: 03:55*
 
 ---
 

@@ -18,21 +18,24 @@ How AI is rewriting the rules for founders and freelancers
 ### Article Text:
 Copy everything from `2026-02-03-one-person-company-EN.md`
 
-## Step 3: Add Graphics (Screenshots from Safari)
+## Step 3: Add Graphics (PNGs ready!)
 
-Open these files in Safari and screenshot (Cmd+Shift+4):
+**Alle Grafiken sind als PNG fertig:**
 
-1. **Hero Banner** (1200×630)
-   `file:///Users/florianziesche/.openclaw/workspace/content/drafts/substack/graphics/pro-banner-en.html`
+```
+graphics/png/
+├── banner-en.png      (1200×630) — Hero
+├── math-shift-en.png  (1200×500) — nach "The Math Has Changed"
+├── ai-stack-en.png    (1200×700) — nach "My AI agent" (optional)
+└── path-forward-en.png (1200×500) — nach "The First Step"
+```
 
-2. **Math Shift** (1200×500) — after "The Math Has Changed"
-   `file:///Users/florianziesche/.openclaw/workspace/content/drafts/substack/graphics/pro-math-shift-en.html`
+**Öffne den Ordner:**
+```bash
+open ~/.openclaw/workspace/content/drafts/substack/graphics/png/
+```
 
-3. **AI Stack** (1200×700) — after "My AI agent is called Mia" section (optional)
-   `file:///Users/florianziesche/.openclaw/workspace/content/drafts/substack/graphics/ai-stack-v4-en.html`
-
-4. **Path Forward** (1200×500) — after "The First Step"
-   `file:///Users/florianziesche/.openclaw/workspace/content/drafts/substack/graphics/pro-path-forward-en.html`
+Dann drag & drop in Substack.
 
 ## Step 4: Settings
 - **Section:** Newsletter
