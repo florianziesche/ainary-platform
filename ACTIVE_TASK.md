@@ -2,65 +2,41 @@
 
 ## 🎯 Aktuelle Aufgabe
 
-**Task:** [Keine aktive Aufgabe]
+**Task:** Demo vs v14 Audit — UX/UI Konsistenz
 
-**Status:** IDLE
-
----
-
-## ✅ Nachtschicht abgeschlossen (02:25 - 03:40 CET)
-
-### Erledigt:
-1. ACTIVE_TASK.md Crash Recovery System
-2. ISO 27001 Docs (Security, Privacy, AGB)
-3. User Manual (10 Seiten)
-4. Sales Presentation (15 Slides)
-5. Go-to-Market Strategy
-6. Deployment Config (Vercel)
-7. 6 echte Leads (Sachsen)
-8. **florianziesche.com Website**
-9. **Obsidian Sync** (90-Day-Goals, Welcome, Workspace-Sync)
+**Status:** IN PROGRESS
 
 ---
 
-## 📁 Alle neuen Dateien
+## Analyse: Demo vs v14
 
-### Workspace
-```
-products/cnc-planner/
-├── docs/iso27001/ (Security, Privacy)
-├── docs/legal/ (AGB)
-├── docs/user/ (Manual)
-├── sales/presentation.html
-├── deploy/ (Vercel config)
-├── strategy/GO-TO-MARKET.md
-└── COLD-OUTREACH-LIST.md
+### Demo Features (Gold Standard):
+✅ Info-Cards (4 Spalten): Werkstoff, Abmessungen, Zeit, Preis
+✅ Kosten-Tab mit:
+  - Materialkosten (€52.80)
+  - Maschinenkosten (€59.20)  
+  - Werkzeugkosten (€8.50)
+  - Rüstzeit (€21.25)
+  - Selbstkosten Summe
+  - Marge % + Betrag
+  - Verkaufspreis
+✅ Serienkalkulation mit Rabatt-Anzeige
+✅ NC-Code 3 Formate
+✅ PDF Angebot
 
-websites/florianziesche.com/
-├── index.html
-└── vercel.json
-```
+### v14 Features:
+✅ Vollständige Berechnung
+✅ Cost Breakdown Tabelle
+✅ Quote/Angebot
+⚠️ Info-Cards anders strukturiert
+⚠️ Kosten-Tab weniger übersichtlich
 
-### Obsidian
-```
-System_OS/
-├── Welcome.md (updated)
-├── 10-Projects/90-Day-Goals.md (updated)
-└── 99-System/Workspace-Sync.md (NEW)
-```
-
----
-
-## ⏭️ HEUTE (3. Feb)
-
-| Zeit | Was |
-|------|-----|
-| 09:00 | Demo testen |
-| 10:00 | Decile senden |
-| **12:00** | **ONKEL MEETING** |
-| 14:00 | LinkedIn Post |
-| **18:00** | **MONIQUE MEETING** |
+### Zu verbessern:
+1. Info-Cards wie Demo (4er Grid)
+2. Kosten-Tab zweispaltig wie Demo
+3. Padding/Spacing konsistent
+4. Font-sizes harmonisieren
 
 ---
 
-*Letztes Update: 03:40 CET*
+*Letztes Update: 03:50 CET*
