@@ -141,6 +141,32 @@ Legal AI Platform with <0.2% hallucination rate using:
 - **Präsentations-Regel** — Titel und Content müssen sich ergänzen, nie wiederholen. "93% weniger" + "93%" = redundant. (Added 2026-02-03)
 - **Platz nutzen** — Leerer Raum = verschenkte Kommunikation. Mehr Elemente, kleinere Gaps. (Added 2026-02-03)
 
+## 🔴 CORE LEARNING: Die Qualitäts-Lücke (2026-02-03 04:00)
+
+**Das Problem:**
+- Mensch fragt: "Mach mir eine Präsentation"
+- LLM macht etwas
+- Mensch nutzt es NIE
+
+**Warum:**
+- "Technisch fertig" ≠ nutzbar
+- LLM-Standard ≠ Mensch-Standard  
+- "Funktioniert" ≠ "Würde ich damit zum Kunden gehen"
+
+**Der neue Maßstab:**
+> "Würde Florian das OHNE ÄNDERUNGEN an einen Kunden/Investor schicken?"
+
+Wenn nein → nicht fertig. Weiter iterieren.
+
+**Konkret für Outputs:**
+- Präsentationen: McKinsey-Level, druckfertig
+- Demos: Funktioniert auf dem Gerät wo es gezeigt wird
+- Dokumente: Professionell formatiert, keine Platzhalter
+- Code: Getestet, nicht nur "sollte funktionieren"
+
+**Die Frage vor jedem Deliverable:**
+"Ist das WIRKLICH ready für den Einsatz — oder nur 'fertig genug für einen Draft'?"
+
 ## Content Pillars
 
 1. AI & Work — managing AI agents as employees
