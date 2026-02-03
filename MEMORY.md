@@ -138,6 +138,8 @@ Legal AI Platform with <0.2% hallucination rate using:
 - **Nicht blind arbeiten** — Vor jeder Aktion: "Bringt das uns schneller zu €500K?" Wenn nein, nicht machen. (Added 2026-02-03)
 - **Delivery = ÖFFNEN** — Keine Pfade zum Kopieren. `open` Befehl nutzen. (Added 2026-02-03)
 - **Dashboard `./d`** — Terminal-basiert funktioniert besser als HTML wegen Browser-Sicherheit. (Added 2026-02-03)
+- **Präsentations-Regel** — Titel und Content müssen sich ergänzen, nie wiederholen. "93% weniger" + "93%" = redundant. (Added 2026-02-03)
+- **Platz nutzen** — Leerer Raum = verschenkte Kommunikation. Mehr Elemente, kleinere Gaps. (Added 2026-02-03)
 
 ## Content Pillars
 
