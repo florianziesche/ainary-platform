@@ -30,6 +30,18 @@
 - Bei Unsicherheit: Read → Write komplett neu
 - Keine "Ich glaube das passt"
 
+### LaTeX vs HTML für Documents
+- LaTeX = Overkill für CVs/simple docs
+- HTML + Chrome Print = gleich gut, zero dependencies
+- Keine Package-Installation, keine Compilation-Errors
+- Design control ist besser in CSS als in LaTeX
+
+### Grafiken für Florian
+- Professionell = McKinsey-Level, nicht "gut genug"
+- Immer DE + EN gleichzeitig (nicht nachträglich übersetzen)
+- PNG direkt liefern, nicht HTML das er konvertieren muss
+- Brand Kit in `templates/FLORIAN-BRAND-KIT.md` checken
+
 ### Sub-Agents
 - Für parallele Research-Tasks perfekt
 - Context explizit mitgeben (sie sehen Main Session nicht)
