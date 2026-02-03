@@ -3,6 +3,13 @@
 **Datum:** 3. Februar 2026, 12:00 Uhr
 **Ziel:** Erster zahlender Kunde
 
+## ⚡ Update v2 (03.02.2026 06:30)
+- Komplett neues Design (schwarz/weiß/grün)
+- Professionelleres PDF-Angebot
+- NC-Code mit Syntax Highlighting
+- Cleanere UI, bessere Animationen
+- Mobile-optimiert
+
 ---
 
 ## 📁 Dateien
