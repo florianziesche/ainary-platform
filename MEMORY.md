@@ -4,6 +4,30 @@
 
 ---
 
+## 🎯 MISSION: €500K SO SCHNELL WIE MÖGLICH
+
+**Persönliches Ziel:** €500.000 Umsatz/Einnahmen — keine Deadline, nur Geschwindigkeit.
+**Status:** Aktiv — Wir arbeiten ununterbrochen als Team.
+
+### Schnellste Pfade zu €500K:
+1. **AI Consulting** — €200-500/hr, Enterprise-Deals, schnellster Cash
+2. **CNC Planner SaaS** — €49-149/mo recurring, scalable
+3. **VC Position** — €100-150K/Jahr Gehalt + Carry (langsamer, aber stabil)
+4. **Courses/Info Products** — €500 × 1000 = €500K (braucht Audience)
+5. **Ainary Ventures** — Long-term Equity Play
+
+### Revenue Tracker:
+| Stream | Status | Monthly | Path to €500K |
+|--------|--------|---------|---------------|
+| Freelance/Consulting | 🟡 Active | ~€3K | Scale to €20K/mo |
+| CNC Planner | 🟢 Ready | €0 | €750/mo × 50 customers |
+| VC Salary | 🔴 Pending | €0 | €10K/mo when hired |
+| Content/Courses | 🟡 Building | €0 | €10K/mo with audience |
+
+**Jeden Tag fragen:** Was bringt uns heute näher an €500K?
+
+---
+
 ## Florian — Key Context
 
 - Former startup CEO (36ZERO Vision, cloud computer vision, Munich)
