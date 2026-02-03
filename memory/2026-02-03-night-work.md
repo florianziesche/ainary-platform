@@ -27,11 +27,16 @@
 
 ---
 
+### 03:35 — VC Materials
+- Investment Thesis One-Pager erstellt
+- Deal Memo Sample erstellt
+- VC Job Tracker updated
+
 ## Nächste Tasks (Priorität)
 
-1. [ ] Präsentation prüfen wenn Florian aufwacht
-2. [ ] Weitere Verbesserungen wenn nötig
-3. [ ] Research: Was fehlt für €500K?
+1. [ ] Präsentation v3 prüfen wenn Florian aufwacht
+2. [ ] VC Materials als PDF wenn gewünscht
+3. [ ] Weitere High-Impact Tasks
 
 ---
 

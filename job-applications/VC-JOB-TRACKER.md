@@ -191,8 +191,8 @@
 - [x] Cover letter template
 - [x] LinkedIn profile optimized
 - [x] Personal website / Substack
-- [ ] Deal memo sample
-- [ ] Investment thesis one-pager
+- [x] Deal memo sample → `materials/deal-memo-sample.md`
+- [x] Investment thesis one-pager → `materials/investment-thesis-one-pager.md`
 - [ ] Portfolio company analysis sample
 
 ---
