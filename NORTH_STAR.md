@@ -4,13 +4,35 @@
 
 ---
 
-## 🎯 The 90-Day Mission (bis 1. Mai 2026)
+## 🎯 THE MISSION: €500K SO SCHNELL WIE MÖGLICH
+
+**This is the only thing that matters.**
+
+Everything we do serves this goal. Every hour. Every task.
+
+---
+
+## 📈 Revenue Streams (Fastest to Slowest)
+
+| Stream | Monthly Target | Path to €500K |
+|--------|----------------|---------------|
+| **AI Consulting** | €10K+ | Fastest cash, enterprise deals |
+| **CNC Planner SaaS** | €5K | Scalable, recurring |
+| **VC Position** | €8-12K | Stable base |
+| **Courses** | €10K+ | Needs audience first |
+
+### Parallel Execution
+Don't wait. Run all streams simultaneously.
+
+---
+
+## 🎯 The 90-Day Sprint (bis 1. Mai 2026)
 
 ### Primary Outcomes (in order)
 
-1. **VC Associate Offer** — Everything else is secondary
-2. **€4,500/month Revenue** — Financial runway
-3. **500 Substack Subscribers** — Audience foundation
+1. **€6K/month Revenue** — Break-even + savings
+2. **VC Associate Offer** — Stable income base
+3. **500 Substack Subscribers** — Course launch foundation
 
 ### Leading Indicators (Weekly Targets)
 
