@@ -42,6 +42,13 @@
 - PNG direkt liefern, nicht HTML das er konvertieren muss
 - Brand Kit in `templates/FLORIAN-BRAND-KIT.md` checken
 
+### Delivery = ÖFFNEN, nicht verlinken
+- Terminal-Links/Pfade helfen nicht
+- `open /pfad/` öffnet Finder direkt
+- `open https://...` öffnet Browser direkt
+- Immer BEIDES: Ordner + Ziel-URL öffnen
+- Zero Friction = ich öffne es für ihn
+
 ### Sub-Agents
 - Für parallele Research-Tasks perfekt
 - Context explizit mitgeben (sie sehen Main Session nicht)
