@@ -1,141 +1,133 @@
-# NORTH STAR — The Only Things That Matter
+# NORTH STAR: €500K bis 31.12.2026
 
-*Read this before doing ANYTHING.*
-
----
-
-## 🎯 THE MISSION: €500K SO SCHNELL WIE MÖGLICH
-
-**This is the only thing that matters.**
-
-Everything we do serves this goal. Every hour. Every task.
+*277 Tage. €1.805/Tag im Durchschnitt. Kein Bullshit.*
 
 ---
 
-## 📈 Revenue Streams (Fastest to Slowest)
+## Das Ziel
 
-| Stream | Monthly Target | Path to €500K |
-|--------|----------------|---------------|
-| **AI Consulting** | €10K+ | Fastest cash, enterprise deals |
-| **CNC Planner SaaS** | €5K | Scalable, recurring |
-| **VC Position** | €8-12K | Stable base |
-| **Courses** | €10K+ | Needs audience first |
-
-### Parallel Execution
-Don't wait. Run all streams simultaneously.
+| Metrik | Ziel | Heute |
+|--------|------|-------|
+| **Gesamtumsatz** | €500.000 | €0 |
+| **Deadline** | 31.12.2026 | 277 Tage |
+| **Burn Rate** | €3.000/mo | -€3.000 |
 
 ---
 
-## 🎯 The 90-Day Sprint (bis 1. Mai 2026)
+## Die Maschine (4 Engines)
 
-### Primary Outcomes (in order)
+### Engine 1: CNC Planner SaaS
+**Ziel:** €100K ARR bis EOY
+- Pro: €49/mo × 100 Kunden = €58.800
+- Business: €149/mo × 30 Kunden = €53.640
+- **Combined: €112K ARR**
 
-1. **€6K/month Revenue** — Break-even + savings
-2. **VC Associate Offer** — Stable income base
-3. **500 Substack Subscribers** — Course launch foundation
+**Milestones:**
+- [ ] Woche 1-2: 10 Demos gebucht
+- [ ] Monat 1: 5 zahlende Kunden
+- [ ] Monat 3: 25 Kunden
+- [ ] Monat 6: 50 Kunden
+- [ ] EOY: 130 Kunden
 
-### Leading Indicators (Weekly Targets)
+### Engine 2: AI Consulting
+**Ziel:** €150K Projektvolumen
+- 5× Discovery Workshops: €17.500
+- 5× Prototyp-Projekte: €125.000
+- Ongoing Beratung: €10.000
 
-| Indicator | Target/Week | Why |
-|-----------|-------------|-----|
-| Applications sent | 3+ | More shots = more chances |
-| Outreach messages | 5+ | Network = opportunities |
-| Content published | 3+ | Visibility compounds |
-| Calls/meetings | 2+ | Relationships > cold apps |
+**Milestones:**
+- [ ] Woche 1-2: 20 Outreach-Mails
+- [ ] Monat 1: 3 Erstgespräche
+- [ ] Monat 2: 1. Discovery Workshop
+- [ ] Monat 3: 1. Prototyp-Projekt
 
----
+### Engine 3: VC Position
+**Ziel:** €100K+ Gehalt + Carry
+- Associate: €80-120K Base
+- Carry: Long-term Upside
 
-## ⚡ The Daily Filter
+**Milestones:**
+- [ ] Feb: 10 Bewerbungen raus
+- [ ] März: 5 Interviews
+- [ ] April: Angebot
 
-Before ANY task, ask:
+### Engine 4: Content & Courses
+**Ziel:** €50K
+- Substack Paid: €5K
+- Notion Templates: €10K
+- AI Course: €35K
 
-> "Does this directly move me toward VC Job, Revenue, or Audience?"
-
-- **HELL YES** → Do it now
-- **Maybe** → Don't do it
-- **No** → Definitely don't
-
-### Examples:
-
-| Task | Answer | Action |
-|------|--------|--------|
-| Send Decile application | HELL YES | Do immediately |
-| Call Onkel for CNC deal | HELL YES | €750/month |
-| Post LinkedIn content | HELL YES | Visibility |
-| Build better Notion template | Maybe | Later |
-| Optimize OpenClaw setup | No | Procrastination |
-| Research another tool | No | Shiny object |
-
----
-
-## 🚫 Traps to Avoid
-
-### The Builder's Trap
-> "Let me just set up one more system..."
-
-Building feels productive. Shipping is productive.
-
-### The Research Trap  
-> "Let me just learn more about..."
-
-Research without action = procrastination.
-
-### The Perfection Trap
-> "It's not ready yet..."
-
-Done > Perfect. Always.
-
-### The Tool Trap
-> "Let me try this new tool..."
-
-Tools don't get jobs. Actions get jobs.
+**Milestones:**
+- [ ] Feb: 4 Artikel publiziert
+- [ ] März: 500 Substack Subscribers
+- [ ] April: Erste Notion Template live
+- [ ] Q3: Course Launch
 
 ---
 
-## 📊 Weekly Scorecard
+## Wöchentliche Non-Negotiables
 
-Every Sunday, answer honestly:
+### Outreach (Revenue)
+- [ ] 5 CNC Planner Outreach-Mails
+- [ ] 5 Consulting Outreach-Mails
+- [ ] 3 VC Applications/Follow-ups
 
-```
-Week of: ___________
+### Content (Audience)
+- [ ] 1 Substack Artikel
+- [ ] 3 LinkedIn Posts
+- [ ] 1 Twitter Thread
 
-Applications sent: _____ (target: 3)
-Outreach messages: _____ (target: 5)  
-Content published: _____ (target: 3)
-Calls/meetings: _____ (target: 2)
-Revenue closed: €_____ 
-
-Did I hit my #1 goal? YES / NO
-
-If NO, what blocked me? 
-_________________________________
-
-#1 Focus next week:
-_________________________________
-```
+### Product (Leverage)
+- [ ] CNC Planner Improvements
+- [ ] Demo mit echtem Feedback
 
 ---
 
-## 🔥 The Uncomfortable Truth
+## Diese Woche (KW 6: 3.-9. Feb)
 
-**Your setup is already better than 95% of users.**
+### Montag 3. Feb
+- [x] CNC Demo für Onkel vorbereiten
+- [ ] Onkel Meeting 12:00
+- [ ] LinkedIn Post 14:00
+- [ ] Monique Meeting 18:00
+- [ ] Decile Application absenden
 
-The remaining 5% isn't about better tools.
-It's about USING the tools for the RIGHT things.
-
-The question isn't "how do I improve my system?"
-The question is "am I using my system to WIN?"
-
----
-
-## Atlas's Standing Orders
-
-1. **Always ask:** "Is this the highest-leverage move?"
-2. **Push back** when Florian builds instead of ships
-3. **Track outcomes**, not activity
-4. **Every morning:** What's the ONE thing today?
-5. **Every evening:** Did we move closer to the goals?
+### Rest der Woche
+- [ ] 10 CNC Leads kontaktieren (Sub-Agent recherchiert)
+- [ ] 10 Consulting Leads kontaktieren
+- [ ] Substack Artikel #1 publizieren
+- [ ] VC Lab Sprint 2 finalisieren
 
 ---
 
-*This file overrides everything else. Goals > Systems.*
+## Tracking
+
+### Februar Ziele
+| Metrik | Ziel | Aktuell |
+|--------|------|---------|
+| CNC Demos | 10 | 1 (Onkel) |
+| CNC Kunden | 2 | 0 |
+| Consulting Gespräche | 5 | 0 |
+| VC Applications | 10 | 1 (Decile) |
+| Substack Posts | 4 | 0 |
+| Revenue | €5.000 | €0 |
+
+### Lifetime (2026)
+| Metrik | Ziel | Aktuell |
+|--------|------|---------|
+| Total Revenue | €500.000 | €0 |
+| CNC MRR | €10.000 | €0 |
+| Consulting Revenue | €150.000 | €0 |
+| Content Revenue | €50.000 | €0 |
+
+---
+
+## Die Frage jeden Morgen
+
+**"Was ist die EINE Sache die ich heute tun kann, die uns am schnellsten zu €500K bringt?"**
+
+Nicht 10 Sachen. Eine.
+
+---
+
+*Updated: 2026-02-03 03:15*
