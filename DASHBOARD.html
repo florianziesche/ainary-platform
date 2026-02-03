@@ -3,457 +3,354 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Florian Command Center</title>
+    <title>Night Shift Dashboard — 3. Feb 2026</title>
     <style>
-        :root {
-            --bg: #0f172a;
-            --bg-card: #1e293b;
-            --bg-hover: #334155;
-            --primary: #3b82f6;
-            --success: #22c55e;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --text: #f8fafc;
-            --text-muted: #94a3b8;
-        }
-        
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
-            background: var(--bg);
-            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
             min-height: 100vh;
-            padding: 24px;
+            padding: 2rem;
         }
-        
         .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 32px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--bg-card);
+            text-align: center;
+            margin-bottom: 3rem;
         }
-        
-        .header h1 { font-size: 1.5rem; font-weight: 600; }
-        .header .date { color: var(--text-muted); font-size: 0.9rem; }
-        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .header p {
+            color: #888;
+            font-size: 1.1rem;
+        }
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+        .stat {
+            background: rgba(255,255,255,0.1);
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #4ade80;
+        }
+        .stat-label {
+            color: #888;
+            margin-top: 0.25rem;
+        }
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 20px;
+            gap: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
         }
-        
         .card {
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
         }
-        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .card-icon {
+            font-size: 1.5rem;
+        }
         .card-title {
-            font-size: 0.75rem;
+            font-size: 1.25rem;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-muted);
-            margin-bottom: 16px;
         }
-        
-        .metric {
+        .card-subtitle {
+            color: #888;
+            font-size: 0.85rem;
+        }
+        .item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--bg);
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        
-        .metric:last-child { border-bottom: none; }
-        .metric-label { color: var(--text-muted); }
-        .metric-value { font-weight: 600; font-size: 1.25rem; }
-        .metric-value.success { color: var(--success); }
-        .metric-value.warning { color: var(--warning); }
-        
-        .link-list { list-style: none; }
-        
-        .link-item {
+        .item:last-child {
+            border-bottom: none;
+        }
+        .item-name {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 16px;
-            margin-bottom: 8px;
-            background: var(--bg);
+            flex-direction: column;
+        }
+        .item-label {
+            font-weight: 500;
+        }
+        .item-desc {
+            font-size: 0.8rem;
+            color: #888;
+        }
+        .btn {
+            background: #4ade80;
+            color: #000;
+            padding: 0.5rem 1rem;
             border-radius: 8px;
-            color: var(--text);
             text-decoration: none;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-        
-        .link-item:hover {
-            background: var(--bg-hover);
-            transform: translateX(4px);
-        }
-        
-        .link-content .title { font-weight: 500; margin-bottom: 4px; }
-        .link-content .subtitle { font-size: 0.8rem; color: var(--text-muted); }
-        
-        .link-action {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.75rem;
             font-weight: 600;
-            cursor: pointer;
-            white-space: nowrap;
+            font-size: 0.85rem;
+            transition: all 0.2s;
         }
-        
-        .link-action:hover { filter: brightness(1.1); }
-        .link-action.success { background: var(--success); }
-        
-        .badge {
-            display: inline-block;
-            padding: 2px 8px;
+        .btn:hover {
+            background: #22c55e;
+            transform: translateY(-1px);
+        }
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .priority {
+            background: #ef4444;
+            color: #fff;
+            padding: 0.25rem 0.5rem;
             border-radius: 4px;
             font-size: 0.7rem;
             font-weight: 600;
-            text-transform: uppercase;
-            margin-left: 8px;
+            margin-left: 0.5rem;
         }
-        
-        .badge-ready { background: var(--success); color: #000; }
-        .badge-pending { background: var(--warning); color: #000; }
-        
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
+        .today-section {
+            background: linear-gradient(135deg, rgba(74, 222, 128, 0.1), rgba(34, 197, 94, 0.05));
+            border: 1px solid rgba(74, 222, 128, 0.3);
         }
-        
-        .action-btn {
-            display: block;
-            padding: 16px;
-            background: var(--primary);
-            color: white;
-            text-align: center;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: all 0.2s;
-            cursor: pointer;
-            border: none;
+        .time {
+            color: #4ade80;
+            font-weight: 600;
             font-size: 0.9rem;
         }
-        
-        .action-btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
-        .action-btn.secondary { background: var(--bg-hover); }
-        .action-btn.success { background: var(--success); color: #000; }
-        
-        .status-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-        
-        .status-dot.green { background: var(--success); }
-        .status-dot.yellow { background: var(--warning); }
-        
-        .section-full { grid-column: 1 / -1; }
-        
-        .file-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 12px;
-        }
-        
-        .file-card {
-            background: var(--bg);
-            padding: 16px;
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .file-card:hover { background: var(--bg-hover); transform: translateY(-2px); }
-        .file-icon { font-size: 2rem; margin-bottom: 8px; }
-        .file-name { font-size: 0.8rem; font-weight: 500; margin-bottom: 4px; }
-        .file-meta { font-size: 0.7rem; color: var(--text-muted); }
-        
-        .copy-toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--success);
-            color: #000;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        
-        .copy-toast.show { opacity: 1; }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>♔ Command Center</h1>
-        <div class="date" id="currentDate"></div>
+        <h1>♔ Night Shift Output</h1>
+        <p>3. Februar 2026 — 02:00 bis 04:30 CET</p>
     </div>
-    
+
+    <div class="stats">
+        <div class="stat">
+            <div class="stat-number">23</div>
+            <div class="stat-label">Assets erstellt</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">12</div>
+            <div class="stat-label">Leads gefunden</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">5</div>
+            <div class="stat-label">Emails ready</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">€750</div>
+            <div class="stat-label">/Mo Potential heute</div>
+        </div>
+    </div>
+
     <div class="grid">
-        
-        <!-- Quick Actions -->
-        <div class="card">
-            <div class="card-title">⚡ Quick Actions</div>
-            <div class="quick-actions">
-                <button class="action-btn success" onclick="runCommand('open job-applications/decile-capital-resident/ && open https://jobs.lever.co/decilegroup/a483fcca-97b4-4c78-9a93-48254bac28e4/apply')">📤 Decile JETZT</button>
-                <button class="action-btn" onclick="runCommand('open projects/cnc-planner/demo-onkel/demo.html')">🔧 CNC Demo</button>
-                <button class="action-btn secondary" onclick="runCommand('open content/drafts/substack/')">✍️ Substack</button>
-                <button class="action-btn secondary" onclick="runCommand('open outreach/ready-to-send/')">📧 Outreach</button>
-            </div>
-        </div>
-        
-        <!-- €500K Progress -->
-        <div class="card">
-            <div class="card-title">🎯 €500K Mission</div>
-            <div class="metric">
-                <span class="metric-label">Ziel</span>
-                <span class="metric-value">€500.000</span>
-            </div>
-            <div class="metric">
-                <span class="metric-label">Aktuell</span>
-                <span class="metric-value warning">€0</span>
-            </div>
-            <div class="metric">
-                <span class="metric-label">Tage übrig</span>
-                <span class="metric-value">277</span>
-            </div>
-        </div>
-        
-        <!-- Today -->
-        <div class="card">
-            <div class="card-title">📅 Heute (3. Feb)</div>
-            <ul class="link-list">
-                <li class="link-item" onclick="runCommand('open projects/cnc-planner/demo-onkel/')">
-                    <div class="link-content">
-                        <div class="title"><span class="status-dot yellow"></span>12:00 — Onkel Meeting</div>
-                        <div class="subtitle">CNC Demo</div>
-                    </div>
-                    <button class="link-action">Öffnen</button>
-                </li>
-                <li class="link-item" onclick="runCommand('open content/linkedin/')">
-                    <div class="link-content">
-                        <div class="title"><span class="status-dot yellow"></span>14:00 — LinkedIn Post</div>
-                        <div class="subtitle">Founder to VC</div>
-                    </div>
-                    <button class="link-action">Öffnen</button>
-                </li>
-                <li class="link-item" onclick="runCommand('open job-applications/decile-capital-resident/')">
-                    <div class="link-content">
-                        <div class="title"><span class="status-dot green"></span>Decile Application<span class="badge badge-ready">Ready</span></div>
-                        <div class="subtitle">CV + Cover Letter</div>
-                    </div>
-                    <button class="link-action success">Senden</button>
-                </li>
-            </ul>
-        </div>
-        
-        <!-- Applications -->
-        <div class="card">
-            <div class="card-title">💼 Job Applications</div>
-            <ul class="link-list">
-                <li class="link-item">
-                    <div class="link-content">
-                        <div class="title">Decile Capital<span class="badge badge-ready">Ready</span></div>
-                        <div class="subtitle">Resident Position</div>
-                    </div>
-                    <button class="link-action success" onclick="runCommand('open job-applications/decile-capital-resident/ && open https://jobs.lever.co/decilegroup/a483fcca-97b4-4c78-9a93-48254bac28e4/apply')">Send</button>
-                </li>
-                <li class="link-item" onclick="runCommand('open job-applications/cv-generator/cv-florian.html')">
-                    <div class="link-content">
-                        <div class="title">CV bearbeiten</div>
-                        <div class="subtitle">HTML → PDF</div>
-                    </div>
-                    <button class="link-action">Edit</button>
-                </li>
-                <li class="link-item" onclick="runCommand('open job-applications/VC-JOB-TRACKER.md')">
-                    <div class="link-content">
-                        <div class="title">Job Tracker</div>
-                        <div class="subtitle">Alle Applications</div>
-                    </div>
-                    <button class="link-action">View</button>
-                </li>
-            </ul>
-        </div>
-        
-        <!-- CNC Planner -->
-        <div class="card">
-            <div class="card-title">🔧 CNC Planner Pro</div>
-            <ul class="link-list">
-                <li class="link-item" onclick="runCommand('open projects/cnc-planner/demo-onkel/demo.html')">
-                    <div class="link-content">
-                        <div class="title">Demo</div>
-                        <div class="subtitle">Für Onkel-Meeting</div>
-                    </div>
-                    <button class="link-action">Open</button>
-                </li>
-                <li class="link-item" onclick="runCommand('open products/cnc-planner/sales/presentation-v2.html')">
-                    <div class="link-content">
-                        <div class="title">Sales Deck v2</div>
-                        <div class="subtitle">McKinsey-Level</div>
-                    </div>
-                    <button class="link-action">Open</button>
-                </li>
-                <li class="link-item" onclick="runCommand('open outreach/ready-to-send/')">
-                    <div class="link-content">
-                        <div class="title">Outreach Emails</div>
-                        <div class="subtitle">5 Drafts ready</div>
-                    </div>
-                    <button class="link-action">Open</button>
-                </li>
-            </ul>
-        </div>
-        
-        <!-- Content -->
-        <div class="card">
-            <div class="card-title">✍️ Content</div>
-            <ul class="link-list">
-                <li class="link-item" onclick="runCommand('open content/drafts/substack/')">
-                    <div class="link-content">
-                        <div class="title">Substack Drafts</div>
-                        <div class="subtitle">7 Artikel</div>
-                    </div>
-                    <button class="link-action">Open</button>
-                </li>
-                <li class="link-item" onclick="window.open('https://finitematter.substack.com/publish/post', '_blank')">
-                    <div class="link-content">
-                        <div class="title">→ Substack Editor</div>
-                        <div class="subtitle">Direkt publizieren</div>
-                    </div>
-                    <button class="link-action">Go</button>
-                </li>
-                <li class="link-item" onclick="runCommand('open content/linkedin/')">
-                    <div class="link-content">
-                        <div class="title">LinkedIn Posts</div>
-                        <div class="subtitle">8 Posts ready</div>
-                    </div>
-                    <button class="link-action">Open</button>
-                </li>
-            </ul>
-        </div>
-        
-        <!-- Key Documents -->
-        <div class="card section-full">
-            <div class="card-title">📁 Key Documents</div>
-            <div class="file-grid">
-                <div class="file-card" onclick="runCommand('open NORTH_STAR.md')">
-                    <div class="file-icon">🎯</div>
-                    <div class="file-name">NORTH_STAR</div>
-                    <div class="file-meta">€500K Roadmap</div>
-                </div>
-                <div class="file-card" onclick="runCommand('open MEMORY.md')">
-                    <div class="file-icon">🧠</div>
-                    <div class="file-name">MEMORY</div>
-                    <div class="file-meta">Langzeit</div>
-                </div>
-                <div class="file-card" onclick="runCommand('open DEFINITION-OF-DONE.md')">
-                    <div class="file-icon">✅</div>
-                    <div class="file-name">DEF-OF-DONE</div>
-                    <div class="file-meta">Qualität</div>
-                </div>
-                <div class="file-card" onclick="runCommand('open job-applications/decile-capital-resident/cv-florian-decile.pdf')">
-                    <div class="file-icon">📄</div>
-                    <div class="file-name">CV (PDF)</div>
-                    <div class="file-meta">Decile</div>
-                </div>
-                <div class="file-card" onclick="runCommand('open job-applications/decile-capital-resident/cover-letter.pdf')">
-                    <div class="file-icon">📄</div>
-                    <div class="file-name">Cover Letter</div>
-                    <div class="file-meta">Decile</div>
-                </div>
-                <div class="file-card" onclick="runCommand('open products/cnc-planner/sales/presentation-v2.html')">
-                    <div class="file-icon">📊</div>
-                    <div class="file-name">Sales Deck</div>
-                    <div class="file-meta">CNC v2</div>
+        <!-- TODAY -->
+        <div class="card today-section">
+            <div class="card-header">
+                <span class="card-icon">🎯</span>
+                <div>
+                    <div class="card-title">Heute — 3. Feb</div>
+                    <div class="card-subtitle">3 kritische Termine</div>
                 </div>
             </div>
+            <div class="item">
+                <div class="item-name">
+                    <span class="item-label"><span class="time">12:00</span> Onkel Meeting<span class="priority">€750/Mo</span></span>
+                    <span class="item-desc">Erster zahlender Kunde</span>
+                </div>
+                <a href="file:///Users/florianziesche/.openclaw/workspace/projects/cnc-planner/demo-v12.html" class="btn">Demo</a>
+            </div>
+            <div class="item">
+                <div class="item-name">
+                    <span class="item-label"><span class="time">14:00</span> LinkedIn Post</span>
+                    <span class="item-desc">Founder → VC Transition</span>
+                </div>
+                <a href="file:///Users/florianziesche/.openclaw/workspace/content/linkedin/posts-ready-to-publish.md" class="btn btn-secondary">Posts</a>
+            </div>
+            <div class="item">
+                <div class="item-name">
+                    <span class="item-label"><span class="time">18:00</span> Monique Barbanson</span>
+                    <span class="item-desc">Entelechy Ventures</span>
+                </div>
+                <a href="file:///Users/florianziesche/.openclaw/workspace/vc-lab/monique-barbanson-meeting-brief.md" class="btn btn-secondary">Prep</a>
+            </div>
         </div>
-        
-        <!-- Folders -->
+
+        <!-- CNC PLANNER -->
         <div class="card">
-            <div class="card-title">📂 Ordner</div>
-            <ul class="link-list">
-                <li class="link-item" onclick="runCommand('open .')">
-                    <div class="link-content"><div class="title">Workspace Root</div></div>
-                </li>
-                <li class="link-item" onclick="runCommand('open job-applications/')">
-                    <div class="link-content"><div class="title">Job Applications</div></div>
-                </li>
-                <li class="link-item" onclick="runCommand('open products/')">
-                    <div class="link-content"><div class="title">Products</div></div>
-                </li>
-                <li class="link-item" onclick="runCommand('open outreach/')">
-                    <div class="link-content"><div class="title">Outreach</div></div>
-                </li>
-                <li class="link-item" onclick="runCommand('open memory/')">
-                    <div class="link-content"><div class="title">Memory</div></div>
-                </li>
-            </ul>
+            <div class="card-header">
+                <span class="card-icon">🔧</span>
+                <div>
+                    <div class="card-title">CNC Planner</div>
+                    <div class="card-subtitle">SaaS für Fertigungskalkulation</div>
+                </div>
+            </div>
+            <div class="item">
+                <div class="item-name">
+                    <span class="item-label">Demo v12</span>
+                    <span class="item-desc">PDF-Angebot, ROI-Rechner</span>
+                </div>
+                <a href="file:///Users/florianziesche/.openclaw/workspace/projects/cnc-planner/demo-v12.html" class="btn">Öffnen</a>
+            </div>
+            <div class="item">
+                <div class="item-name">
+                    <span class="item-label">Landing Page</span>
+                    <span class="item-desc">€199/Mo Pricing</span>
+                </div>
+                <a href="file:///Users/florianziesche/.openclaw/workspace/products/cnc-planner/landing-page.html" class="btn btn-secondary">Öffnen</a>
+            </div>
+            <div class="item">
+                <div class="item-name">
+                    <span class="item-label">Sales Deck</span>
+                    <span class="item-desc">15 Slides PDF</span>
+                </div>
+                <a href="file:///Users/florianziesche/.openclaw/workspace/products/cnc-planner/sales/presentation-v3.pdf" class="btn btn-secondary">Öffnen</a>
+            </div>
+            <div class="item">
+                <div class="item-name">
+                    <span class="item-label">12 Leads + 5 Emails</span>
+                    <span class="item-desc">Sachsen/Thüringen CNC-Fertiger</span>
+                </div>
+                <a href="file:///Users/florianziesche/.openclaw/workspace/products/cnc-planner/leads/READY-TO-SEND-EMAILS.md" class="btn btn-secondary">Öffnen</a>
+            </div>
+            <div class="item">
+                <div class="item-name">
+                    <span class="item-label">ISO Docs + Manual</span>
+                    <span class="item-desc">DSGVO, AGB, Security</span>
+                </div>
+                <a href="file:///Users/florianziesche/.openclaw/workspace/products/cnc-planner/docs/" class="btn btn-secondary">Öffnen</a>
+            </div>
         </div>
-        
-        <!-- External -->
+
+        <!-- AI CONSULTING -->
         <div class="card">
-            <div class="card-title">🔗 External</div>
-            <ul class="link-list">
-                <li class="link-item" onclick="window.open('https://finitematter.substack.com/', '_blank')">
-                    <div class="link-content"><div class="title">Substack</div></div>
-                </li>
-                <li class="link-item" onclick="window.open('https://linkedin.com/in/florianziesche', '_blank')">
-                    <div class="link-content"><div class="title">LinkedIn</div></div>
-                </li>
-                <li class="link-item" onclick="window.open('https://notion.so/', '_blank')">
-                    <div class="link-content"><div class="title">Notion</div></div>
-                </li>
-            </ul>
+            <div class="card-header">
+                <span class="card-icon">💼</span>
+                <div>
+                    <div class="card-title">AI Consulting</div>
+                    <div class="card-subtitle">Enterprise AI Services</div>
+                </div>
+            </div>
+            <div class="item">
+                <div class="item-name">
+                    <span class="item-label">Case Studies</span>
+                    <span class="item-desc">Legal AI &lt;0.2% Hallucination</span>
+                </div>
+                <a href="file:///Users/florianziesche/.openclaw/workspace/products/consulting/case-studies/" class="btn btn-secondary">Öffnen</a>
+            </div>
+            <div class="item">
+                <div class="item-name">
+                    <span class="item-label">One-Pager</span>
+                    <span class="item-desc">Services + Pricing</span>
+                </div>
+                <a href="file:///Users/florianziesche/.openclaw/workspace/products/consulting/ONE-PAGER.md" class="btn btn-secondary">Öffnen</a>
+            </div>
+            <div class="item">
+                <div class="item-name">
+                    <span class="item-label">Landing Page</span>
+                    <span class="item-desc">Consulting Website</span>
+                </div>
+                <a href="file:///Users/florianziesche/.openclaw/workspace/products/consulting/landing-page.html" class="btn btn-secondary">Öffnen</a>
+            </div>
         </div>
-        
+
+        <!-- CONTENT -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-icon">✍️</span>
+                <div>
+                    <div class="card-title">Content</div>
+                    <div class="card-subtitle">4 Wochen ready</div>
+                </div>
+            </div>
+            <div class="item">
+                <div class="item-name">
+                    <span class="item-label">8 LinkedIn Posts</span>
+                    <span class="item-desc">AI, VC, Founder Journey</span>
+                </div>
+                <a href="file:///Users/florianziesche/.openclaw/workspace/content/linkedin/posts-ready-to-publish.md" class="btn btn-secondary">Öffnen</a>
+            </div>
+            <div class="item">
+                <div class="item-name">
+                    <span class="item-label">Twitter Threads</span>
+                    <span class="item-desc">AI Chief of Staff (7 Tweets)</span>
+                </div>
+                <a href="file:///Users/florianziesche/.openclaw/workspace/content/twitter/threads/" class="btn btn-secondary">Öffnen</a>
+            </div>
+            <div class="item">
+                <div class="item-name">
+                    <span class="item-label">Substack Draft</span>
+                    <span class="item-desc">Ein-Personen-Firma 2026</span>
+                </div>
+                <a href="file:///Users/florianziesche/.openclaw/workspace/content/drafts/substack/" class="btn btn-secondary">Öffnen</a>
+            </div>
+        </div>
+
+        <!-- VC CAREER -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-icon">🎯</span>
+                <div>
+                    <div class="card-title">VC Career</div>
+                    <div class="card-subtitle">Fund Research + Applications</div>
+                </div>
+            </div>
+            <div class="item">
+                <div class="item-name">
+                    <span class="item-label">VC Lab Sprint 2</span>
+                    <span class="item-desc">Due Feb 4</span>
+                </div>
+                <a href="file:///Users/florianziesche/.openclaw/workspace/vc-lab/sprint-2/" class="btn btn-secondary">Öffnen</a>
+            </div>
+            <div class="item">
+                <div class="item-name">
+                    <span class="item-label">Monique Meeting Prep</span>
+                    <span class="item-desc">Brief + Demo Script</span>
+                </div>
+                <a href="file:///Users/florianziesche/.openclaw/workspace/vc-lab/monique-barbanson-meeting-brief.md" class="btn btn-secondary">Öffnen</a>
+            </div>
+        </div>
+
+        <!-- WEBSITE -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-icon">🌐</span>
+                <div>
+                    <div class="card-title">Website</div>
+                    <div class="card-subtitle">Personal Brand</div>
+                </div>
+            </div>
+            <div class="item">
+                <div class="item-name">
+                    <span class="item-label">florianziesche.com</span>
+                    <span class="item-desc">Portfolio + Services</span>
+                </div>
+                <a href="file:///Users/florianziesche/.openclaw/workspace/websites/florianziesche.com/index.html" class="btn btn-secondary">Preview</a>
+            </div>
+        </div>
     </div>
-    
-    <div class="copy-toast" id="toast">Command copied!</div>
-    
-    <script>
-        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('de-DE', {
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-        });
-        
-        const WORKSPACE = '/Users/florianziesche/.openclaw/workspace/';
-        
-        function runCommand(cmd) {
-            // Build the full command
-            const fullCmd = cmd.startsWith('open ') ? 
-                cmd.replace('open ', 'open ' + WORKSPACE) : cmd;
-            
-            // Copy to clipboard
-            navigator.clipboard.writeText(fullCmd).then(() => {
-                showToast('Command copied! Paste in Terminal: ⌘V');
-            });
-            
-            // Also try to construct a terminal URL (works in some setups)
-            // For now, just copy
-        }
-        
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2000);
-        }
-    </script>
 </body>
 </html>
