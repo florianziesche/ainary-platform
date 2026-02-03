@@ -49,6 +49,13 @@
 - Immer BEIDES: Ordner + Ziel-URL öffnen
 - Zero Friction = ich öffne es für ihn
 
+### KRITISCH: Nicht blind ausführen
+- Vor jeder Aktion fragen: "Macht das uns SCHNELLER zu €500K?"
+- Wenn nein → nicht machen
+- Systeme bauen ≠ Fortschritt (oft Ablenkung)
+- Weniger bauen, mehr bei dem helfen was JETZT ansteht
+- "Busy work" erkennen und stoppen
+
 ### Sub-Agents
 - Für parallele Research-Tasks perfekt
 - Context explizit mitgeben (sie sehen Main Session nicht)

@@ -23,8 +23,12 @@ case "$1" in
         echo -e "${GREEN}✓ CNC Demo opened${NC}"
         ;;
     "deck"|"3")
+        open products/cnc-planner/sales/presentation-v2.pdf
+        echo -e "${GREEN}✓ Sales Deck (PDF) opened${NC}"
+        ;;
+    "deck-edit")
         open products/cnc-planner/sales/presentation-v2.html
-        echo -e "${GREEN}✓ Sales Deck opened${NC}"
+        echo -e "${GREEN}✓ Sales Deck editor opened${NC}"
         ;;
     "substack"|"4")
         open content/drafts/substack/
@@ -36,6 +40,10 @@ case "$1" in
         echo -e "${GREEN}✓ Outreach folder opened${NC}"
         ;;
     "cv"|"6")
+        open job-applications/cv-generator/cv-florian-master.pdf
+        echo -e "${GREEN}✓ CV (PDF) opened${NC}"
+        ;;
+    "cv-edit")
         open job-applications/cv-generator/cv-florian.html
         echo -e "${GREEN}✓ CV editor opened${NC}"
         ;;
@@ -82,7 +90,8 @@ case "$1" in
         echo "  ./d deck      [3]  → Sales Deck öffnen"
         echo "  ./d substack  [4]  → Substack Drafts + Editor"
         echo "  ./d outreach  [5]  → Outreach Emails"
-        echo "  ./d cv        [6]  → CV bearbeiten"
+        echo "  ./d cv        [6]  → CV (PDF)"
+        echo "  ./d cv-edit        → CV bearbeiten (HTML)"
         echo "  ./d linkedin  [7]  → LinkedIn Posts"
         echo ""
         echo -e "${YELLOW}DOCUMENTS:${NC}"
