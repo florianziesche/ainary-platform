@@ -115,9 +115,20 @@
 
 ---
 
-*Nachtarbeit beendet: 04:05*
-*Total commits: 8*
-*Total neue Assets: 12 files*
+### 04:15 — Präsentation Review & Fixes
+- Slide 3: Titel war redundant mit €27K Zahl → gefixt
+- Slide 8: "Ein Preis" falsch bei 3 Tiers → gefixt  
+- Slide 9: "30-Minuten Demo" redundant → gefixt
+- Error Patterns dokumentiert
+
+### Learnings (Präsentationen):
+1. Titel und Content müssen sich ERGÄNZEN, nicht wiederholen
+2. Platz sinnvoll füllen, nicht künstlich leer lassen
+3. Konsistenz bei Zahlen (€27.000 vs €27.192)
+4. Titel muss zum Inhalt passen ("Ein Preis" bei 3 Preisen = falsch)
+
+*Nachtarbeit fortgesetzt: 04:15*
+*Total commits: 10+*
 
 ---
 

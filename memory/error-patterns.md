@@ -12,6 +12,8 @@
 | 2026-02-03 | Presentation v1 | Unprofessionell (Emojis) | Keine Qualitätsprüfung | Scorecard erstellt |
 | 2026-02-03 | v14 vs Demo | Weniger Info im Produkt als Demo | Kein Vergleich gemacht | Immer gegen Referenz prüfen |
 | 2026-02-03 | Sub-Agents | Kein Output (Lead Research) | Sub-Agents haben keinen Web-Search | Research selbst machen oder Tools prüfen |
+| 2026-02-03 | Präsentation | Redundanz (Titel + Content gleich) | Nicht auf Wiederholungen geachtet | Titel und Content müssen sich ergänzen, nicht wiederholen |
+| 2026-02-03 | Präsentation | Zu viel leerer Platz | Zu wenig Elemente pro Slide | Platz sinnvoll füllen, nicht künstlich leer lassen |
 
 ---
 
