@@ -167,8 +167,22 @@
 - Dokumentiert in `memory/research/2026-02-03-moltbot-analysis.md`
 - Learnings: Self-Improving AI ist Key, Community matters
 
-*Nachtarbeit beendet: 04:40*
-*Total commits: 14*
+### 04:45 — Sales Deck Research
+- Kolide: "Perfect B2B SaaS Sales Deck is 14 Slides"
+- Dock.us: 24 Best B2B Sales Deck Examples
+- Key learnings dokumentiert für Deck v4 morgen
+
+### Key Findings:
+1. **5 Chapters:** Undeniable Change → Enemy → Promised Land → Product → Close
+2. **10-20-30 Rule:** 10 slides, 20 min, 30pt font
+3. **Keine Agenda, kein "About Us", kein "Thank You"**
+4. **Mit Frage enden, nicht "Danke"**
+5. **Champion-Thinking:** Deck muss intern weiterverkauft werden können
+
+→ Dokumentiert in `memory/research/2026-02-03-sales-deck-best-practices.md`
+
+*Nachtarbeit beendet: 05:00*
+*Total commits: 15*
 
 ---
 
