@@ -201,8 +201,16 @@
 
 → All documented in `memory/research/`
 
-*Nachtarbeit beendet: 06:00*
-*Total commits: 18*
+### 06:30 — Demo v2 (Surprise!)
+- **Komplett neues Design** (schwarz/weiß/grün)
+- NC-Code mit Syntax Highlighting
+- Professionelleres PDF-Angebot
+- Cleanere UI, bessere Animationen
+- Mobile-optimiert
+- Backup: `demo-v1-backup.html`
+
+*Nachtarbeit beendet: 06:45*
+*Total commits: 19*
 
 ---
 
