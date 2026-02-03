@@ -11,6 +11,7 @@
 | 2026-02-03 | Edit tool | Whitespace mismatch | Nicht exakt kopiert | Read → Write statt Edit bei Unsicherheit |
 | 2026-02-03 | Presentation v1 | Unprofessionell (Emojis) | Keine Qualitätsprüfung | Scorecard erstellt |
 | 2026-02-03 | v14 vs Demo | Weniger Info im Produkt als Demo | Kein Vergleich gemacht | Immer gegen Referenz prüfen |
+| 2026-02-03 | Sub-Agents | Kein Output (Lead Research) | Sub-Agents haben keinen Web-Search | Research selbst machen oder Tools prüfen |
 
 ---
 
