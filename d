@@ -20,7 +20,8 @@ case "$1" in
         ;;
     "demo"|"2")
         open projects/cnc-planner/demo-onkel/demo.html
-        echo -e "${GREEN}✓ CNC Demo opened${NC}"
+        open projects/cnc-planner/demo-onkel/MEETING-CHEATSHEET.md
+        echo -e "${GREEN}✓ CNC Demo + Cheatsheet opened${NC}"
         ;;
     "deck"|"3")
         open products/cnc-planner/sales/presentation-v3.pdf
