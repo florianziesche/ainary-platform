@@ -23,12 +23,12 @@ case "$1" in
         echo -e "${GREEN}✓ CNC Demo opened${NC}"
         ;;
     "deck"|"3")
-        open products/cnc-planner/sales/presentation-v2.pdf
-        echo -e "${GREEN}✓ Sales Deck (PDF) opened${NC}"
+        open products/cnc-planner/sales/presentation-v3.pdf
+        echo -e "${GREEN}✓ Sales Deck v3 (PDF) opened${NC}"
         ;;
     "deck-edit")
-        open products/cnc-planner/sales/presentation-v2.html
-        echo -e "${GREEN}✓ Sales Deck editor opened${NC}"
+        open products/cnc-planner/sales/presentation-v3.html
+        echo -e "${GREEN}✓ Sales Deck v3 editor opened${NC}"
         ;;
     "substack"|"4")
         open content/drafts/substack/
