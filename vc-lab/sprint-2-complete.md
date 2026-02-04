@@ -45,14 +45,14 @@ Newer managers with specific thesis or operator backgrounds — Ainary's peer gr
 | 6 | **BBG Ventures** | Seed | Female founders | Susan Lyne | Gender lens; strong NYC community |
 | 7 | **Contrary Capital** | Pre-seed/Seed | Student founders | Eric Tarczynski | University pipeline; early access to talent |
 | 8 | **XRC Labs** | Seed | Retail/consumer tech | Pano Anthos | Vertical accelerator model |
-| 9 | **Entelechy Ventures** | Angel/Seed | AI-native B2B | Monique Barbanson | Direct thesis overlap; personal connection via VC Lab |
+| 9 | **Conviction** | Seed–Series A | AI infrastructure & applications | Sarah Guo (ex-Greylock) | Leading AI-first fund; thesis overlap on AI-native vertical software |
 | 10 | **ERA (Entrepreneurs Roundtable Accelerator)** | Pre-seed/Seed | Broad | Murat Aktihanoglu | NYC-native accelerator; deal flow source |
 
-**AI-Focused Funds to Co-Invest With:**
+**AI-Focused Funds & Angels to Co-Invest With:**
 - Air Street Capital (Nathan Benaich) — AI-first thesis, Index focus
-- Conviction (Sarah Guo) — AI infrastructure & applications
 - Radical Ventures (Jordan Jacobs) — Pure AI; Toronto/NYC
 - Basis Set Ventures — Enterprise AI focus
+- Entelechy Ventures (Monique Barbanson) — AI-native B2B angel/micro-fund; direct thesis overlap; personal connection via VC Lab
 
 ---
 
@@ -112,6 +112,8 @@ The dominant sourcing channel. Sources include:
 - **Service providers** — Startup lawyers, accountants, recruiters
 
 **Why it dominates:** Trust is pre-established. VCs' time is limited — referrals filter signal from noise.
+
+**From my own experience:** When raising €5.5M across multiple rounds, 4 out of 5 investors who eventually committed came through warm introductions — from advisors, other founders, or existing investors. The one cold outreach that worked was highly personalized and thesis-relevant. This pattern is consistent with industry data and shapes how I think about sourcing for Ainary.
 
 **Ainary's approach:** Leverage founder network (200+ relationships from fundraising advisory and German ecosystem), VC Lab cohort, and cross-border European connections.
 
@@ -445,7 +447,7 @@ Most AI VCs chase the shiny object (foundation models, consumer AI). I focus on 
 
 ## The One-Liner
 
-> **"I'm a technical founder who spent 5 years building AI products, raised €5.5M, and made every mistake in the book. I invest in AI-native B2B because I can tell what's real from what's hype — and I help founders avoid the traps I fell into."**
+> **"I'm a technical founder who spent 5 years building AI products, raised €5.5M, and learned the hardest lessons firsthand. I invest in AI-native B2B because I can tell what's real from what's hype — and I help founders navigate the traps I've already been through."**
 
 ---
 
@@ -462,18 +464,20 @@ Events must align with at least one:
 
 ---
 
-## Registered / Planned Events (February 2026)
+## Registered / Planned Events (February–March 2026)
 
-| # | Event | Date | Category | Why On-Thesis | Status |
-|---|-------|------|----------|---------------|--------|
-| 1 | **NYU Law Legal Tech Demo Day** | Thu Feb 5, 6 PM | Legal AI | Direct thesis overlap — legal AI is core vertical; network with legal tech founders | 🟡 Register |
-| 2 | **PE/VC/Fintech Networking Mixer** | Mon Feb 3, 6 PM | VC/Finance | VC-focused; LP connections; fintech adjacent | ✅ Attended |
-| 3 | **Startup & Tech Networking NYC** | Wed Feb 11, 6 PM | Founder/Startup | General ecosystem; practice deal sourcing conversations | 🟡 Register |
-| 4 | **"Why You Shouldn't Raise VC Yet" — Carolyn Katz** | Tue Feb 17, 5:30 PM | Founder/VC | Contrarian perspective; meet bootstrapping founders; content angle | 🟡 Register |
-| 5 | **AI & Tech Mixer NYC** | Thu Feb 26, 6 PM | AI | AI-focused networking; meet technical founders | 🟡 Register |
-| 6 | **NY's Biggest Business/Tech Networking** | Mon Feb 23, 6:30 PM | Tech/Business | Large event; broad reach; practice elevator pitch | 🟡 Register |
-| 7 | **AI Café by Vercel + Harmonic** | TBD Feb | AI/Developer | Developer-focused AI; infrastructure thesis | 🟡 Watch for dates |
-| 8 | **Growth & PE Happy Hour (Raylu x Litquidity)** | TBD Feb | Finance/PE | LP connections; growth capital network | 🟡 Watch for dates |
+*Note: I am currently based in Germany (temporary, returning to NYC). Events marked "Virtual" I attend remotely; "NYC" events I will attend upon return or send a representative from my VC Lab cohort network. I am also including European events to leverage my cross-border positioning.*
+
+| # | Event | Date | Location | Category | Why On-Thesis | Status |
+|---|-------|------|----------|----------|---------------|--------|
+| 1 | **PE/VC/Fintech Networking Mixer** | Mon Feb 3 | NYC (Virtual) | VC/Finance | VC-focused; LP connections; fintech adjacent | ✅ Attended |
+| 2 | **NYU Law Legal Tech Demo Day** | Thu Feb 5 | NYC (Virtual) | Legal AI | Direct thesis overlap — legal AI is core vertical | 🟡 Register |
+| 3 | **Startup & Tech Networking NYC** | Wed Feb 11 | NYC | Founder/Startup | General ecosystem; deal sourcing conversations | 🟡 Register on return |
+| 4 | **"Why You Shouldn't Raise VC Yet" — Carolyn Katz** | Tue Feb 17 | NYC (Virtual) | Founder/VC | Contrarian perspective; bootstrapping founders; content angle | 🟡 Register |
+| 5 | **AI & Tech Mixer NYC** | Thu Feb 26 | NYC | AI | AI-focused networking; meet technical founders | 🟡 Register on return |
+| 6 | **Bits & Pretzels Founders Festival** | TBD Mar | Munich | Founder/VC | Largest DACH founder event; European deal flow source | 🟡 Research dates |
+| 7 | **AI Café by Vercel + Harmonic** | TBD Feb | NYC (Virtual) | AI/Developer | Developer-focused AI; infrastructure thesis | 🟡 Watch for dates |
+| 8 | **German AI Association Meetup** | TBD Feb | Berlin (Virtual) | AI | European AI ecosystem; cross-border sourcing | 🟡 Research |
 
 ---
 
@@ -589,10 +593,10 @@ Build visibility in the AI + VC intersection through consistent, insight-driven 
 >
 > The honest answer: I realized the skills I built as a founder are exactly what AI startups need from their investors:
 >
-> ✅ I can evaluate if an AI architecture will scale (because I've built them)
-> ✅ I can spot when a founder is building instead of selling (because I did it)
-> ✅ I can help navigate enterprise sales cycles (because I've closed them)
-> ✅ I can pressure-test fundraising strategy (because I've lived it)
+> → I can evaluate if an AI architecture will scale (because I've built them)
+> → I can spot when a founder is building instead of selling (because I did it)
+> → I can help navigate enterprise sales cycles (because I've closed them)
+> → I can pressure-test fundraising strategy (because I've lived it)
 >
 > What doesn't change: the obsession with building something that matters.
 >
