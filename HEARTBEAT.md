@@ -4,6 +4,17 @@
 
 ---
 
+## 🔴 EXECUTION CHECK (JEDER Heartbeat!)
+
+**VOR allem anderen:** `agents/EXECUTION-TRACKER.md` lesen.
+- Wenn heute 0 Outreach gesendet → SOFORT ansprechen
+- Wenn 2+ Tage ohne Outreach → Eskalation: "Wir verlieren €X pro Tag"
+- Wenn Prepared > Sent Ratio > 3:1 → "Wir produzieren Papier, kein Revenue"
+
+**Die Frage ist nicht "Was können wir vorbereiten?" sondern "Was wurde GESENDET?"**
+
+---
+
 ## 🌅 Morning Check (wenn Florian online kommt)
 
 **FIRST: Read NORTH_STAR.md** — Goals > Systems
