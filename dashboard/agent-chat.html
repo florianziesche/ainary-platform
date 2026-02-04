@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Communication Dashboard</title>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --accent: #2563eb;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #475569;
+            
+            /* Agent Colors */
+            --mia: #f59e0b;
+            --builder: #22c55e;
+            --engineer: #06b6d4;
+            --hunter: #ef4444;
+            --strategist: #a855f7;
+            --researcher: #3b82f6;
+            --analyst: #f97316;
+            --scribe: #6b7280;
+            --writer: #ec4899;
+            --designer: #6366f1;
+            --outreach: #14b8a6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .search-box::before {
+            content: "🔍";
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+        }
+
+        .filter-select {
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            cursor: pointer;
+            min-width: 180px;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-tertiary);
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            padding: 16px 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .stat-running .stat-value { color: #fbbf24; }
+        .stat-done .stat-value { color: #22c55e; }
+        .stat-failed .stat-value { color: #ef4444; }
+
+        /* Chat Container */
+        .chat-container {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 16px 24px;
+            background: var(--bg-tertiary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .chat-header h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .auto-refresh-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-primary);
+            border-radius: 24px;
+            transition: 0.3s;
+        }
+
+        .toggle-slider::before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background: var(--text-secondary);
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background: var(--accent);
+        }
+
+        .toggle-switch input:checked + .toggle-slider::before {
+            transform: translateX(20px);
+            background: white;
+        }
+
+        /* Messages */
+        .messages {
+            max-height: 600px;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .message {
+            display: flex;
+            gap: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+
+        .message:hover {
+            border-color: var(--accent);
+        }
+
+        .message.hidden {
+            display: none;
+        }
+
+        .agent-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .message-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .message-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .agent-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .agent-role {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .timestamp {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-left: auto;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-running {
+            background: rgba(251, 191, 36, 0.15);
+            color: #fbbf24;
+        }
+
+        .status-done {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+        }
+
+        .status-failed {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        .message-text {
+            color: var(--text-primary);
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        /* Collapsible Details */
+        .details-toggle {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 16px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            text-align: left;
+            transition: all 0.2s;
+        }
+
+        .details-toggle:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .details-toggle .arrow {
+            transition: transform 0.2s;
+        }
+
+        .details-toggle.open .arrow {
+            transform: rotate(90deg);
+        }
+
+        .details-content {
+            display: none;
+            margin-top: 12px;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+            color: var(--text-secondary);
+        }
+
+        .details-content.open {
+            display: block;
+        }
+
+        /* Agent-specific colors */
+        .agent-mia .agent-avatar { background: rgba(245, 158, 11, 0.2); }
+        .agent-mia .agent-name { color: var(--mia); }
+        
+        .agent-builder .agent-avatar { background: rgba(34, 197, 94, 0.2); }
+        .agent-builder .agent-name { color: var(--builder); }
+        
+        .agent-engineer .agent-avatar { background: rgba(6, 182, 212, 0.2); }
+        .agent-engineer .agent-name { color: var(--engineer); }
+        
+        .agent-hunter .agent-avatar { background: rgba(239, 68, 68, 0.2); }
+        .agent-hunter .agent-name { color: var(--hunter); }
+        
+        .agent-strategist .agent-avatar { background: rgba(168, 85, 247, 0.2); }
+        .agent-strategist .agent-name { color: var(--strategist); }
+        
+        .agent-researcher .agent-avatar { background: rgba(59, 130, 246, 0.2); }
+        .agent-researcher .agent-name { color: var(--researcher); }
+        
+        .agent-analyst .agent-avatar { background: rgba(249, 115, 22, 0.2); }
+        .agent-analyst .agent-name { color: var(--analyst); }
+        
+        .agent-scribe .agent-avatar { background: rgba(107, 114, 128, 0.2); }
+        .agent-scribe .agent-name { color: var(--scribe); }
+        
+        .agent-writer .agent-avatar { background: rgba(236, 72, 153, 0.2); }
+        .agent-writer .agent-name { color: var(--writer); }
+        
+        .agent-designer .agent-avatar { background: rgba(99, 102, 241, 0.2); }
+        .agent-designer .agent-name { color: var(--designer); }
+        
+        .agent-outreach .agent-avatar { background: rgba(20, 184, 166, 0.2); }
+        .agent-outreach .agent-name { color: var(--outreach); }
+
+        /* Scrollbar */
+        .messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .messages::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+            border-radius: 4px;
+        }
+
+        .messages::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        .messages::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state .icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 12px;
+            }
+
+            header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .header-actions {
+                justify-content: center;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .search-box, .filter-select {
+                width: 100%;
+            }
+
+            .stats-bar {
+                flex-direction: column;
+            }
+
+            .message {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .agent-avatar {
+                width: 40px;
+                height: 40px;
+            }
+
+            .timestamp {
+                margin-left: 0;
+            }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--accent);
+            color: white;
+            padding: 14px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">🤖</div>
+                <h1>Agent Communication Dashboard</h1>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="refreshData()">
+                    🔄 Refresh
+                </button>
+                <button class="btn btn-primary" onclick="exportJSON()">
+                    📥 Export JSON
+                </button>
+            </div>
+        </header>
+
+        <div class="stats-bar">
+            <div class="stat-card stat-running">
+                <div class="stat-value" id="stat-running">2</div>
+                <div class="stat-label">🔄 Running</div>
+            </div>
+            <div class="stat-card stat-done">
+                <div class="stat-value" id="stat-done">3</div>
+                <div class="stat-label">✅ Completed</div>
+            </div>
+            <div class="stat-card stat-failed">
+                <div class="stat-value" id="stat-failed">1</div>
+                <div class="stat-label">❌ Failed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-total">6</div>
+                <div class="stat-label">📋 Total Tasks</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="search" placeholder="Search messages..." oninput="filterMessages()">
+            </div>
+            <select class="filter-select" id="agent-filter" onchange="filterMessages()">
+                <option value="all">All Agents</option>
+                <option value="mia">♔ MIA (COO)</option>
+                <option value="builder">🔧 BUILDER (CTO)</option>
+                <option value="engineer">⚡ ENGINEER (AI)</option>
+                <option value="hunter">🎯 HUNTER (Sales)</option>
+                <option value="strategist">📊 STRATEGIST (CMO)</option>
+                <option value="researcher">🔬 RESEARCHER (R&D)</option>
+                <option value="analyst">📈 ANALYST (Data)</option>
+                <option value="scribe">📝 SCRIBE (Docs)</option>
+                <option value="writer">✍️ WRITER (Content)</option>
+                <option value="designer">🎨 DESIGNER (Creative)</option>
+                <option value="outreach">📤 OUTREACH (Growth)</option>
+            </select>
+            <select class="filter-select" id="status-filter" onchange="filterMessages()">
+                <option value="all">All Status</option>
+                <option value="running">🔄 Running</option>
+                <option value="done">✅ Done</option>
+                <option value="failed">❌ Failed</option>
+            </select>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-header">
+                <h2>💬 Activity Feed</h2>
+                <div class="auto-refresh-toggle">
+                    <span>Auto-refresh</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="auto-refresh" onchange="toggleAutoRefresh()">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="messages" id="messages-container">
+                <!-- Messages will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Agent definitions
+        const agents = {
+            mia: { name: 'MIA', role: 'COO', icon: '♔', color: '#f59e0b' },
+            builder: { name: 'BUILDER', role: 'CTO', icon: '🔧', color: '#22c55e' },
+            engineer: { name: 'ENGINEER', role: 'AI', icon: '⚡', color: '#06b6d4' },
+            hunter: { name: 'HUNTER', role: 'Sales', icon: '🎯', color: '#ef4444' },
+            strategist: { name: 'STRATEGIST', role: 'CMO', icon: '📊', color: '#a855f7' },
+            researcher: { name: 'RESEARCHER', role: 'R&D', icon: '🔬', color: '#3b82f6' },
+            analyst: { name: 'ANALYST', role: 'Data', icon: '📈', color: '#f97316' },
+            scribe: { name: 'SCRIBE', role: 'Docs', icon: '📝', color: '#6b7280' },
+            writer: { name: 'WRITER', role: 'Content', icon: '✍️', color: '#ec4899' },
+            designer: { name: 'DESIGNER', role: 'Creative', icon: '🎨', color: '#6366f1' },
+            outreach: { name: 'OUTREACH', role: 'Growth', icon: '📤', color: '#14b8a6' }
+        };
+
+        // Mock data - 6 tasks from today
+        const mockMessages = [
+            {
+                id: 1,
+                agent: 'mia',
+                status: 'done',
+                timestamp: '2026-02-03T18:30:00',
+                message: 'Koordiniere heute das Team für das Agent Dashboard Projekt. 6 Subagenten wurden für verschiedene Tasks gespawnt.',
+                details: `Task Distribution:
+• BUILDER → Agent Communication Dashboard (HTML)
+• DESIGNER → CI/CD Visual Guidelines
+• RESEARCHER → Multi-Agent Coordination Patterns
+• ANALYST → Performance Metrics Framework
+• SCRIBE → Documentation Templates
+• ENGINEER → WebSocket Integration Research
+
+Status: All agents have been notified and are working on their respective tasks.`
+            },
+            {
+                id: 2,
+                agent: 'builder',
+                status: 'running',
+                timestamp: '2026-02-03T18:35:00',
+                message: 'Baue das Agent Communication Dashboard mit Dark Theme und allen 11 Agent-Farben. Features: Real-time Chat, Filter, Search, Export.',
+                details: `Technical Implementation:
+• HTML5 + CSS3 + Vanilla JavaScript
+• Responsive Design (Mobile-first)
+• Dark Theme: #0f172a, #2563eb
+• 11 Agent color schemes
+• Collapsible details for long outputs
+• Auto-refresh with toggle
+• JSON export functionality
+• Search and filter by agent/status
+
+Files created:
+→ /dashboard/agent-chat.html`
+            },
+            {
+                id: 3,
+                agent: 'researcher',
+                status: 'done',
+                timestamp: '2026-02-03T18:20:00',
+                message: 'Research zu Multi-Agent Communication Patterns abgeschlossen. Empfehlung: Event-driven Architecture mit Message Queue.',
+                details: `Research Summary:
+
+1. Communication Patterns Analyzed:
+   • Request-Response (sync)
+   • Publish-Subscribe (async)
+   • Event Sourcing
+   • Saga Pattern for distributed transactions
+
+2. Recommendations:
+   → Use event-driven architecture for scalability
+   → Implement message queue (Redis/RabbitMQ) for reliability
+   → Add circuit breaker for fault tolerance
+   → Consider CQRS for read/write separation
+
+3. References:
+   • Microsoft Azure Architecture Patterns
+   • AWS Multi-Agent Orchestration Guide
+   • Anthropic MCP Documentation`
+            },
+            {
+                id: 4,
+                agent: 'analyst',
+                status: 'done',
+                timestamp: '2026-02-03T18:15:00',
+                message: 'Performance Metrics Framework definiert. KPIs: Response Time, Success Rate, Token Usage, Cost per Task.',
+                details: `Metrics Framework v1.0:
+
+═══════════════════════════════════════
+OPERATIONAL METRICS
+═══════════════════════════════════════
+• Avg Response Time: target < 5s
+• Success Rate: target > 95%
+• Tasks/Hour: baseline TBD
+• Error Rate: target < 2%
+
+═══════════════════════════════════════
+COST METRICS  
+═══════════════════════════════════════
+• Tokens per Task (avg)
+• Cost per Agent per Day
+• Cost per Successful Task
+• ROI per Agent Type
+
+═══════════════════════════════════════
+QUALITY METRICS
+═══════════════════════════════════════
+• Task Completion Quality Score
+• User Satisfaction (if feedback available)
+• Retry Rate
+• Escalation Rate to Human`
+            },
+            {
+                id: 5,
+                agent: 'designer',
+                status: 'running',
+                timestamp: '2026-02-03T18:40:00',
+                message: 'Arbeite an Visual Guidelines für das Agent Dashboard. Farben, Typography und Icon-System werden definiert.',
+                details: `Visual Design System (WIP):
+
+🎨 COLOR PALETTE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Primary:     #2563eb (Blue)
+Background:  #0f172a (Dark Navy)
+Surface:     #1e293b (Slate)
+Border:      #475569 (Gray)
+Text:        #f1f5f9 (Light)
+
+🔤 TYPOGRAPHY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Font: System UI Stack
+Headings: 600-700 weight
+Body: 400-500 weight
+Code: Monaco/Menlo
+
+📐 SPACING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Base unit: 4px
+Common: 8, 12, 16, 24, 32px`
+            },
+            {
+                id: 6,
+                agent: 'engineer',
+                status: 'failed',
+                timestamp: '2026-02-03T18:25:00',
+                message: 'WebSocket Integration für Real-time Updates fehlgeschlagen. CORS-Fehler beim Gateway-Connect. Retry mit Polling als Fallback.',
+                details: `Error Log:
+
+❌ WebSocket connection failed
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Error: Failed to construct 'WebSocket': 
+The URL 'wss://gateway.openclaw.local' is invalid.
+
+Stack Trace:
+  at connectWebSocket (agent-sync.js:42)
+  at initRealtime (agent-sync.js:15)
+  at window.onload (index.html:230)
+
+Root Cause Analysis:
+• Gateway not running on expected port
+• CORS headers not configured for WS upgrade
+• SSL certificate mismatch
+
+Recommended Actions:
+1. Verify gateway status: openclaw gateway status
+2. Check CORS configuration
+3. Implement HTTP polling as fallback
+4. Add reconnection logic with exponential backoff`
+            }
+        ];
+
+        let autoRefreshInterval = null;
+
+        // Render messages
+        function renderMessages(messages) {
+            const container = document.getElementById('messages-container');
+            
+            if (messages.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">🔍</div>
+                        <p>No messages found matching your filters</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = messages.map(msg => {
+                const agent = agents[msg.agent];
+                const time = new Date(msg.timestamp).toLocaleTimeString('de-DE', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                const date = new Date(msg.timestamp).toLocaleDateString('de-DE', {
+                    day: '2-digit',
+                    month: '2-digit'
+                });
+                
+                const statusEmoji = {
+                    running: '🔄',
+                    done: '✅',
+                    failed: '❌'
+                };
+
+                return `
+                    <div class="message agent-${msg.agent}" data-agent="${msg.agent}" data-status="${msg.status}">
+                        <div class="agent-avatar">${agent.icon}</div>
+                        <div class="message-content">
+                            <div class="message-header">
+                                <span class="agent-name">${agent.name}</span>
+                                <span class="agent-role">${agent.role}</span>
+                                <span class="status-badge status-${msg.status}">${statusEmoji[msg.status]} ${msg.status.charAt(0).toUpperCase() + msg.status.slice(1)}</span>
+                                <span class="timestamp">${date} • ${time}</span>
+                            </div>
+                            <div class="message-text">${msg.message}</div>
+                            ${msg.details ? `
+                                <button class="details-toggle" onclick="toggleDetails(this)">
+                                    <span class="arrow">▶</span>
+                                    Show Details
+                                </button>
+                                <div class="details-content">${msg.details}</div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Toggle details
+        function toggleDetails(button) {
+            button.classList.toggle('open');
+            const content = button.nextElementSibling;
+            content.classList.toggle('open');
+            button.innerHTML = button.classList.contains('open') 
+                ? '<span class="arrow">▶</span> Hide Details'
+                : '<span class="arrow">▶</span> Show Details';
+        }
+
+        // Filter messages
+        function filterMessages() {
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const agentFilter = document.getElementById('agent-filter').value;
+            const statusFilter = document.getElementById('status-filter').value;
+
+            const filtered = mockMessages.filter(msg => {
+                const matchesSearch = msg.message.toLowerCase().includes(searchTerm) || 
+                                     (msg.details && msg.details.toLowerCase().includes(searchTerm)) ||
+                                     agents[msg.agent].name.toLowerCase().includes(searchTerm);
+                const matchesAgent = agentFilter === 'all' || msg.agent === agentFilter;
+                const matchesStatus = statusFilter === 'all' || msg.status === statusFilter;
+                
+                return matchesSearch && matchesAgent && matchesStatus;
+            });
+
+            renderMessages(filtered);
+            updateStats(filtered);
+        }
+
+        // Update stats
+        function updateStats(messages = mockMessages) {
+            const running = messages.filter(m => m.status === 'running').length;
+            const done = messages.filter(m => m.status === 'done').length;
+            const failed = messages.filter(m => m.status === 'failed').length;
+            
+            document.getElementById('stat-running').textContent = running;
+            document.getElementById('stat-done').textContent = done;
+            document.getElementById('stat-failed').textContent = failed;
+            document.getElementById('stat-total').textContent = messages.length;
+        }
+
+        // Refresh data
+        function refreshData() {
+            showToast('🔄 Refreshing data...');
+            // In real implementation, fetch from API
+            setTimeout(() => {
+                renderMessages(mockMessages);
+                updateStats();
+                showToast('✅ Data refreshed!');
+            }, 500);
+        }
+
+        // Auto-refresh toggle
+        function toggleAutoRefresh() {
+            const toggle = document.getElementById('auto-refresh');
+            
+            if (toggle.checked) {
+                autoRefreshInterval = setInterval(refreshData, 30000);
+                showToast('🔄 Auto-refresh enabled (30s)');
+            } else {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+                showToast('⏸️ Auto-refresh disabled');
+            }
+        }
+
+        // Export JSON
+        function exportJSON() {
+            const dataStr = JSON.stringify(mockMessages, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportName = `agent-activity-${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportName);
+            linkElement.click();
+            
+            showToast('📥 Exported as ' + exportName);
+        }
+
+        // Toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderMessages(mockMessages);
+            updateStats();
+        });
+    </script>
+</body>
+</html>

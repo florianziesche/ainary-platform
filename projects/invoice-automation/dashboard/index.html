@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>36ZERO Vision | Invoice Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f1f5f9;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #e2e8f0;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent), #7c3aed);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: white;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .logo-text span {
+            color: var(--accent);
+        }
+
+        .header-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Phase Overview */
+        .phase-overview {
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .phase-overview h3 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .phase-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1rem;
+        }
+
+        .phase-item {
+            text-align: center;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-sm);
+            border-left: 4px solid var(--border);
+        }
+
+        .phase-item.offen { border-left-color: var(--text-muted); }
+        .phase-item.m1 { border-left-color: var(--warning); }
+        .phase-item.m2 { border-left-color: #f97316; }
+        .phase-item.m3 { border-left-color: var(--danger); }
+        .phase-item.total { border-left-color: var(--accent); background: #eff6ff; }
+
+        .phase-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .phase-amount {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .phase-count {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .stat-card.critical {
+            border-color: var(--danger);
+            background: #fef2f2;
+        }
+
+        .stat-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-icon {
+            width: 18px;
+            height: 18px;
+            color: var(--accent);
+        }
+
+        .stat-card.critical .stat-icon {
+            color: var(--danger);
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        select {
+            padding: 0.5rem 2rem 0.5rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            background-size: 1rem;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Table */
+        .table-container {
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: var(--bg-tertiary);
+            padding: 1rem;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.875rem;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .customer-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .invoice-link {
+            font-family: monospace;
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .invoice-link:hover {
+            text-decoration: underline;
+        }
+
+        .pdf-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            background: #eff6ff;
+            border-radius: 4px;
+        }
+
+        .pdf-link:hover {
+            background: #dbeafe;
+        }
+
+        .pdf-link svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .days-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .days-badge.low {
+            background: #f1f5f9;
+            color: var(--text-secondary);
+        }
+
+        .days-badge.medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .days-badge.high {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-badge.offen {
+            background: #f1f5f9;
+            color: var(--text-secondary);
+        }
+
+        .status-badge.m1 {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-badge.m2 {
+            background: #ffedd5;
+            color: #9a3412;
+        }
+
+        .status-badge.m3 {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-badge.bezahlt {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.15s ease;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 0.25rem;
+            border-radius: 4px;
+        }
+
+        .modal-close:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+            background: var(--bg-tertiary);
+        }
+
+        .invoice-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-item {
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-sm);
+        }
+
+        .detail-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .mahnstufe-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .mahnstufe-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .mahnstufe-dot.m1 { background: var(--warning); }
+        .mahnstufe-dot.m2 { background: #f97316; }
+        .mahnstufe-dot.m3 { background: var(--danger); }
+
+        .email-preview {
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .email-preview-header {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .email-preview-subject {
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-secondary);
+        }
+
+        .email-preview-body {
+            padding: 1rem;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            white-space: pre-line;
+            background: var(--bg-secondary);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            background: var(--success);
+            color: white;
+            border-radius: var(--radius-sm);
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            z-index: 1001;
+        }
+
+        .toast.show {
+            display: flex;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .phase-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .phase-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .invoice-details {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .phase-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">36</div>
+                <div>
+                    <div class="logo-text">36<span>ZERO</span> Vision</div>
+                    <div class="header-subtitle">Invoice Tracker Dashboard</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Phase Overview -->
+        <div class="phase-overview">
+            <h3>Offene Beträge nach Phase</h3>
+            <div class="phase-grid">
+                <div class="phase-item offen">
+                    <div class="phase-label">Offen (noch keine Mahnung)</div>
+                    <div class="phase-amount" id="phaseOffen">€0,00</div>
+                    <div class="phase-count" id="phaseOffenCount">0 Rechnungen</div>
+                </div>
+                <div class="phase-item m1">
+                    <div class="phase-label">1. Mahnung</div>
+                    <div class="phase-amount" id="phaseM1">€0,00</div>
+                    <div class="phase-count" id="phaseM1Count">0 Rechnungen</div>
+                </div>
+                <div class="phase-item m2">
+                    <div class="phase-label">2. Mahnung</div>
+                    <div class="phase-amount" id="phaseM2">€0,00</div>
+                    <div class="phase-count" id="phaseM2Count">0 Rechnungen</div>
+                </div>
+                <div class="phase-item m3">
+                    <div class="phase-label">3. Mahnung</div>
+                    <div class="phase-amount" id="phaseM3">€0,00</div>
+                    <div class="phase-count" id="phaseM3Count">0 Rechnungen</div>
+                </div>
+                <div class="phase-item total">
+                    <div class="phase-label">Gesamt Offen</div>
+                    <div class="phase-amount" id="phaseTotal">€0,00</div>
+                    <div class="phase-count" id="phaseTotalCount">0 Rechnungen</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">
+                    <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    Offene Rechnungen
+                </div>
+                <div class="stat-value" id="openCount">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">
+                    <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    In Mahnung
+                </div>
+                <div class="stat-value" id="reminderCount">0</div>
+            </div>
+            <div class="stat-card critical">
+                <div class="stat-label">
+                    <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Kritisch (&gt;42 Tage)
+                </div>
+                <div class="stat-value" id="criticalCount">0</div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+            <div class="filter-group">
+                <span class="filter-label">Status:</span>
+                <select id="statusFilter">
+                    <option value="all">Alle</option>
+                    <option value="offen">Offen</option>
+                    <option value="m1">Mahnung 1</option>
+                    <option value="m2">Mahnung 2</option>
+                    <option value="m3">Mahnung 3</option>
+                    <option value="bezahlt">Bezahlt</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">Sortierung:</span>
+                <select id="sortOrder">
+                    <option value="days-desc">Tage überfällig (höchste zuerst)</option>
+                    <option value="days-asc">Tage überfällig (niedrigste zuerst)</option>
+                    <option value="amount-desc">Betrag (höchste zuerst)</option>
+                    <option value="amount-asc">Betrag (niedrigste zuerst)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-container">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Kunde</th>
+                            <th>Rechnungsnr.</th>
+                            <th>PDF</th>
+                            <th>Betrag</th>
+                            <th>Rechnungsdatum</th>
+                            <th>Tage überfällig</th>
+                            <th>Status</th>
+                            <th>Aktion</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invoiceTable">
+                        <!-- Dynamic content -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Mahnung senden</h2>
+                <button class="modal-close" onclick="closeModal()">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="invoice-details">
+                    <div class="detail-item">
+                        <div class="detail-label">Kunde</div>
+                        <div class="detail-value" id="modalCustomer">-</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Rechnungsnr.</div>
+                        <div class="detail-value" id="modalInvoice">-</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Betrag</div>
+                        <div class="detail-value" id="modalAmount">-</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Mahnstufe</div>
+                        <div class="detail-value">
+                            <div class="mahnstufe-indicator">
+                                <span class="mahnstufe-dot" id="modalMahnstufeDot"></span>
+                                <span id="modalMahnstufe">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="email-preview">
+                    <div class="email-preview-header">
+                        <div><strong>An:</strong> <span id="modalEmailTo">-</span></div>
+                    </div>
+                    <div class="email-preview-subject" id="modalEmailSubject">-</div>
+                    <div class="email-preview-body" id="modalEmailBody">-</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Abbrechen</button>
+                <button class="btn btn-primary" onclick="sendReminder()">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                    Mahnung senden
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        <span id="toastMessage">Mahnung erfolgreich gesendet!</span>
+    </div>
+
+    <script>
+        // Mock Data
+        const mockInvoices = [
+            {
+                id: 1,
+                customer: "Müller & Schmidt GmbH",
+                email: "buchhaltung@mueller-schmidt.de",
+                invoiceNumber: "RE-2025-0847",
+                pdfUrl: "#",
+                amount: 12450.00,
+                invoiceDate: "2024-12-15",
+                daysOverdue: 50,
+                status: "m3"
+            },
+            {
+                id: 2,
+                customer: "TechVision Solutions AG",
+                email: "accounting@techvision.de",
+                invoiceNumber: "RE-2025-0892",
+                pdfUrl: "#",
+                amount: 8320.50,
+                invoiceDate: "2024-12-28",
+                daysOverdue: 37,
+                status: "m2"
+            },
+            {
+                id: 3,
+                customer: "Kraftwerk Industrie KG",
+                email: "finanzen@kraftwerk-ind.de",
+                invoiceNumber: "RE-2025-0901",
+                pdfUrl: "#",
+                amount: 45000.00,
+                invoiceDate: "2025-01-05",
+                daysOverdue: 29,
+                status: "m2"
+            },
+            {
+                id: 4,
+                customer: "Bergmann Logistik GmbH",
+                email: "rechnung@bergmann-log.de",
+                invoiceNumber: "RE-2025-0915",
+                pdfUrl: "#",
+                amount: 3200.00,
+                invoiceDate: "2025-01-10",
+                daysOverdue: 24,
+                status: "m1"
+            },
+            {
+                id: 5,
+                customer: "Digital Factory Hamburg",
+                email: "finance@digitalfactory.de",
+                invoiceNumber: "RE-2025-0923",
+                pdfUrl: "#",
+                amount: 18750.00,
+                invoiceDate: "2025-01-15",
+                daysOverdue: 19,
+                status: "m1"
+            },
+            {
+                id: 6,
+                customer: "Nordwind Energie GmbH",
+                email: "buchhaltung@nordwind.de",
+                invoiceNumber: "RE-2025-0934",
+                pdfUrl: "#",
+                amount: 6890.00,
+                invoiceDate: "2025-01-20",
+                daysOverdue: 14,
+                status: "offen"
+            },
+            {
+                id: 7,
+                customer: "Steinbach Automation",
+                email: "accounting@steinbach-auto.de",
+                invoiceNumber: "RE-2025-0941",
+                pdfUrl: "#",
+                amount: 25370.00,
+                invoiceDate: "2024-12-10",
+                daysOverdue: 55,
+                status: "m3"
+            },
+            {
+                id: 8,
+                customer: "Bayerische Maschinenbau AG",
+                email: "finanzen@bay-maschinen.de",
+                invoiceNumber: "RE-2025-0948",
+                pdfUrl: "#",
+                amount: 9800.00,
+                invoiceDate: "2025-01-25",
+                daysOverdue: 9,
+                status: "offen"
+            }
+        ];
+
+        const emailTemplates = {
+            m1: {
+                subject: "Zahlungserinnerung - Rechnung {invoiceNumber}",
+                body: `Sehr geehrte Damen und Herren,
+
+bei der Durchsicht unserer Buchhaltung ist uns aufgefallen, dass die folgende Rechnung noch offen ist:
+
+Rechnungsnummer: {invoiceNumber}
+Rechnungsdatum: {invoiceDate}
+Betrag: {amount}
+Fällig seit: {daysOverdue} Tagen
+
+Bitte überweisen Sie den Betrag innerhalb der nächsten 7 Tage.
+
+Falls Sie die Zahlung bereits veranlasst haben, betrachten Sie diese Erinnerung bitte als gegenstandslos.
+
+Mit freundlichen Grüßen
+36ZERO Vision GmbH`
+            },
+            m2: {
+                subject: "2. Zahlungserinnerung - Rechnung {invoiceNumber}",
+                body: `Sehr geehrte Damen und Herren,
+
+trotz unserer ersten Erinnerung ist die folgende Rechnung weiterhin unbezahlt:
+
+Rechnungsnummer: {invoiceNumber}
+Rechnungsdatum: {invoiceDate}
+Betrag: {amount}
+Fällig seit: {daysOverdue} Tagen
+
+Wir bitten Sie dringend, den ausstehenden Betrag innerhalb von 5 Werktagen zu begleichen.
+
+Mit freundlichen Grüßen
+36ZERO Vision GmbH`
+            },
+            m3: {
+                subject: "Letzte Zahlungsaufforderung - Rechnung {invoiceNumber}",
+                body: `Sehr geehrte Damen und Herren,
+
+dies ist unsere letzte Zahlungsaufforderung vor Einleitung weiterer Maßnahmen.
+
+Rechnungsnummer: {invoiceNumber}
+Rechnungsdatum: {invoiceDate}
+Betrag: {amount}
+Fällig seit: {daysOverdue} Tagen
+
+Sollte der Betrag nicht innerhalb von 3 Werktagen eingehen, sehen wir uns gezwungen, die Angelegenheit an unser Inkassounternehmen zu übergeben.
+
+Mit freundlichen Grüßen
+36ZERO Vision GmbH`
+            }
+        };
+
+        let selectedInvoice = null;
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(amount);
+        }
+
+        function formatDate(dateStr) {
+            return new Date(dateStr).toLocaleDateString('de-DE');
+        }
+
+        function getNextReminderLevel(status) {
+            if (status === 'offen') return 'm1';
+            if (status === 'm1') return 'm2';
+            if (status === 'm2') return 'm3';
+            return 'm3';
+        }
+
+        function getReminderLabel(level) {
+            if (level === 'm1') return '1. Mahnung';
+            if (level === 'm2') return '2. Mahnung';
+            if (level === 'm3') return '3. Mahnung (Letzte)';
+            return '-';
+        }
+
+        function getStatusLabel(status) {
+            const labels = {
+                'offen': 'Offen',
+                'm1': '1. Mahnung',
+                'm2': '2. Mahnung',
+                'm3': '3. Mahnung',
+                'bezahlt': 'Bezahlt'
+            };
+            return labels[status] || status;
+        }
+
+        function getDaysBadgeClass(days) {
+            if (days <= 14) return 'low';
+            if (days <= 30) return 'medium';
+            return 'high';
+        }
+
+        function updatePhaseOverview() {
+            const phases = { offen: 0, m1: 0, m2: 0, m3: 0 };
+            const counts = { offen: 0, m1: 0, m2: 0, m3: 0 };
+            
+            mockInvoices.filter(i => i.status !== 'bezahlt').forEach(inv => {
+                if (phases[inv.status] !== undefined) {
+                    phases[inv.status] += inv.amount;
+                    counts[inv.status]++;
+                }
+            });
+
+            const total = Object.values(phases).reduce((a, b) => a + b, 0);
+            const totalCount = Object.values(counts).reduce((a, b) => a + b, 0);
+
+            document.getElementById('phaseOffen').textContent = formatCurrency(phases.offen);
+            document.getElementById('phaseOffenCount').textContent = `${counts.offen} Rechnung${counts.offen !== 1 ? 'en' : ''}`;
+            
+            document.getElementById('phaseM1').textContent = formatCurrency(phases.m1);
+            document.getElementById('phaseM1Count').textContent = `${counts.m1} Rechnung${counts.m1 !== 1 ? 'en' : ''}`;
+            
+            document.getElementById('phaseM2').textContent = formatCurrency(phases.m2);
+            document.getElementById('phaseM2Count').textContent = `${counts.m2} Rechnung${counts.m2 !== 1 ? 'en' : ''}`;
+            
+            document.getElementById('phaseM3').textContent = formatCurrency(phases.m3);
+            document.getElementById('phaseM3Count').textContent = `${counts.m3} Rechnung${counts.m3 !== 1 ? 'en' : ''}`;
+            
+            document.getElementById('phaseTotal').textContent = formatCurrency(total);
+            document.getElementById('phaseTotalCount').textContent = `${totalCount} Rechnung${totalCount !== 1 ? 'en' : ''}`;
+        }
+
+        function updateStats() {
+            const unpaid = mockInvoices.filter(i => i.status !== 'bezahlt');
+            const inReminder = unpaid.filter(i => ['m1', 'm2', 'm3'].includes(i.status));
+            const critical = unpaid.filter(i => i.daysOverdue > 42);
+
+            document.getElementById('openCount').textContent = unpaid.length;
+            document.getElementById('reminderCount').textContent = inReminder.length;
+            document.getElementById('criticalCount').textContent = critical.length;
+        }
+
+        function renderTable() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const sortOrder = document.getElementById('sortOrder').value;
+
+            let filtered = [...mockInvoices];
+            
+            if (statusFilter !== 'all') {
+                filtered = filtered.filter(i => i.status === statusFilter);
+            }
+
+            // Sort
+            filtered.sort((a, b) => {
+                switch(sortOrder) {
+                    case 'days-desc': return b.daysOverdue - a.daysOverdue;
+                    case 'days-asc': return a.daysOverdue - b.daysOverdue;
+                    case 'amount-desc': return b.amount - a.amount;
+                    case 'amount-asc': return a.amount - b.amount;
+                    default: return 0;
+                }
+            });
+
+            const tbody = document.getElementById('invoiceTable');
+            tbody.innerHTML = filtered.map(inv => `
+                <tr>
+                    <td><span class="customer-name">${inv.customer}</span></td>
+                    <td><span class="invoice-link">${inv.invoiceNumber}</span></td>
+                    <td>
+                        <a href="${inv.pdfUrl}" class="pdf-link" target="_blank">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            PDF
+                        </a>
+                    </td>
+                    <td><strong>${formatCurrency(inv.amount)}</strong></td>
+                    <td>${formatDate(inv.invoiceDate)}</td>
+                    <td><span class="days-badge ${getDaysBadgeClass(inv.daysOverdue)}">${inv.daysOverdue} Tage</span></td>
+                    <td><span class="status-badge ${inv.status}">${getStatusLabel(inv.status)}</span></td>
+                    <td>
+                        ${inv.status !== 'bezahlt' ? `<button class="btn btn-primary btn-sm" onclick="openModal(${inv.id})">Mahnung senden</button>` : '-'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openModal(invoiceId) {
+            selectedInvoice = mockInvoices.find(i => i.id === invoiceId);
+            if (!selectedInvoice) return;
+
+            const nextLevel = getNextReminderLevel(selectedInvoice.status);
+            const template = emailTemplates[nextLevel];
+
+            document.getElementById('modalCustomer').textContent = selectedInvoice.customer;
+            document.getElementById('modalInvoice').textContent = selectedInvoice.invoiceNumber;
+            document.getElementById('modalAmount').textContent = formatCurrency(selectedInvoice.amount);
+            document.getElementById('modalMahnstufe').textContent = getReminderLabel(nextLevel);
+            document.getElementById('modalMahnstufeDot').className = `mahnstufe-dot ${nextLevel}`;
+            document.getElementById('modalEmailTo').textContent = selectedInvoice.email;
+
+            const subject = template.subject.replace('{invoiceNumber}', selectedInvoice.invoiceNumber);
+            const body = template.body
+                .replace('{invoiceNumber}', selectedInvoice.invoiceNumber)
+                .replace('{invoiceDate}', formatDate(selectedInvoice.invoiceDate))
+                .replace('{amount}', formatCurrency(selectedInvoice.amount))
+                .replace('{daysOverdue}', selectedInvoice.daysOverdue);
+
+            document.getElementById('modalEmailSubject').textContent = subject;
+            document.getElementById('modalEmailBody').textContent = body;
+
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+            selectedInvoice = null;
+        }
+
+        function sendReminder() {
+            if (!selectedInvoice) return;
+
+            // Update status (mock)
+            const nextLevel = getNextReminderLevel(selectedInvoice.status);
+            selectedInvoice.status = nextLevel;
+
+            closeModal();
+            renderTable();
+            updateStats();
+            updatePhaseOverview();
+
+            // Show toast
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = `Mahnung an ${selectedInvoice.customer} gesendet!`;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Event listeners
+        document.getElementById('statusFilter').addEventListener('change', renderTable);
+        document.getElementById('sortOrder').addEventListener('change', renderTable);
+
+        // Close modal on overlay click
+        document.getElementById('modalOverlay').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeModal();
+        });
+
+        // Initialize
+        updateStats();
+        updatePhaseOverview();
+        renderTable();
+    </script>
+</body>
+</html>

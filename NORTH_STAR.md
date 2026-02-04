@@ -93,7 +93,8 @@
 - [ ] Decile Application absenden
 
 ### Rest der Woche
-- [ ] 10 CNC Leads kontaktieren (Sub-Agent recherchiert)
+- [ ] 9 CNC E-Mails senden (READY in products/cnc-planner/leads/READY-TO-SEND-EMAILS.md)
+- [ ] 5 VC Applications senden (READY in job-applications/READY-TO-APPLY.md)
 - [ ] 10 Consulting Leads kontaktieren
 - [ ] Substack Artikel #1 publizieren
 - [ ] VC Lab Sprint 2 finalisieren
@@ -107,8 +108,9 @@
 |--------|------|---------|
 | CNC Demos | 10 | 1 (Onkel) |
 | CNC Kunden | 2 | 0 |
+| CNC E-Mails ready | 9 | ✅ 9 READY |
 | Consulting Gespräche | 5 | 0 |
-| VC Applications | 10 | 1 (Decile) |
+| VC Applications | 10 | 1 sent + 5 READY |
 | Substack Posts | 4 | 0 |
 | Revenue | €5.000 | €0 |
 

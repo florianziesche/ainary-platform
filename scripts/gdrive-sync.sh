@@ -3,7 +3,7 @@
 # Syncs heavy files (images, PDFs, etc.) from local to Google Drive
 # Run via cron at 23:00 CET or manually
 
-set -e
+# No set -e: we handle errors per-file and want the sync to continue on partial failures
 
 # Configuration
 ACCOUNT="florian@ainaryventures.com"
@@ -47,14 +47,14 @@ upload_if_new() {
     if [ -z "$existing" ]; then
         echo "Uploading: $filename" | tee -a "$LOG_FILE"
         if gog drive upload "$file" --parent "$parent_id" --account "$ACCOUNT" 2>&1 | tee -a "$LOG_FILE"; then
-            ((UPLOADED++))
+            UPLOADED=$((UPLOADED + 1))
         else
             echo "ERROR uploading: $filename" | tee -a "$LOG_FILE"
-            ((ERRORS++))
+            ERRORS=$((ERRORS + 1))
         fi
     else
         echo "Skipping (exists): $filename" | tee -a "$LOG_FILE"
-        ((SKIPPED++))
+        SKIPPED=$((SKIPPED + 1))
     fi
 }
 

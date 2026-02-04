@@ -110,6 +110,57 @@
 
 ---
 
+## 🟡 Neue Warm Leads (Feb 4 Recherche)
+
+### 13. Maschinentechnik Pretzschendorf GmbH
+- **Website:** maschinentechnik.de
+- **Ort:** Klingenberg/Pretzschendorf (Erzgebirge — 30 min von Schlottwitz!)
+- **Leistungen:** CNC-Zeichnungsteile, Normteile, Verbindungselemente
+- **Maschinen:** Okuma CNC-Bearbeitungszentren (inkl. MF 46)
+- **Zertifizierung:** ISO 9001, ISO 14001
+- **Vertrieb:** Uwe Emmrich
+- **Telefon:** +49 35058 469-0
+- **E-Mail:** info@maschinentechnik.de
+- **Branchen:** Automobil, Automobilzulieferer, Elektroindustrie, Medizintechnik
+- **Status:** ⬜ Zu kontaktieren
+- **Notizen:** 🔥 SEHR NAH an Schlottwitz! Perfekt für persönliche Demo. Beliefert Automobil- und Medizinbranche — hoher Kalkulationsbedarf.
+
+### 14. KWD Kupplungswerk Dresden AG
+- **Website:** kupplungswerk-dresden.de
+- **Ort:** Dresden (Löbtauer Str. 45)
+- **Leistungen:** Kupplungen, CNC-Lohnfertigung
+- **Geschäftsführung:** Rico Brückner, Marcus Francke
+- **Telefon:** +49 351 4999-0
+- **E-Mail:** kwd@kupplungswerk-dresden.de
+- **Status:** ⬜ Zu kontaktieren
+- **Notizen:** Aktiengesellschaft, groß genug für Business-Plan. Lohnfertigung als Nebengeschäft = pain bei Kalkulation.
+
+### 15. Laro NC-Technik
+- **Website:** laro-nc.de
+- **Ort:** Bei Dresden
+- **Leistungen:** CNC-Fräsen, Einzelteile, Prototypen, Kleinserien, 5-Achs
+- **Zertifizierung:** ISO 9001, EN 9100 (Luftfahrt!)
+- **Materialien:** Stahl, Alu, Titan, Invar, CFK, GFK
+- **Status:** ⬜ Zu kontaktieren
+- **Notizen:** Klimatisierte Fertigung, virtuelle Maschinensimulation. Luftfahrt-zertifiziert = hoher Dokumentationsbedarf. Starker Lead!
+
+### 16. Werkzeugbau GmbH Glauchau
+- **Website:** werkzeugbau-glauchau.de
+- **Ort:** Glauchau (Sachsen, Nähe Zwickau)
+- **Leistungen:** CNC-Drahterodieren, CNC-Drehen, CNC-Fräsen, 3D-Fräsen, Sonderwerkzeuge
+- **Historie:** 25+ Jahre
+- **Status:** ⬜ Zu kontaktieren
+- **Notizen:** Breites Spektrum, Lohnfertigung = Kalkulationsbedarf. Medizintechnik & Halbleiter.
+
+### 17. IBEX Lohnfertigung (Erweiterter Kontakt)
+- **Website:** ibex-lohnfertigung.de
+- **Ort:** Dresden
+- **Leistungen:** Blech, Rohr, CNC-Zerspanung, Pulverbeschichtung, Baugruppenfertigung
+- **Status:** ⬜ Zu kontaktieren
+- **Notizen:** Bereits in Lead #5, aber Detailrecherche zeigt: breites Spektrum + eigene Beschichtung = komplexere Kalkulation = mehr Pain = besserer Fit.
+
+---
+
 ## ⬜ Cold Leads (Zu recherchieren)
 
 ### Aus wlw.de Dresden (32 Anbieter)
@@ -182,11 +233,14 @@ CNC Planner Pro
 
 | Status | Count | Value (Est.) |
 |--------|-------|--------------|
-| 🟢 Meeting | 1 | €750/Mo |
-| 🟡 Qualified | 10 | €7,500/Mo |
-| 🔵 Researched | 12 | TBD |
-| ⬜ To Research | 20+ | TBD |
+| 🟢 Meeting gehabt | 1 | €750/Mo |
+| 🟡 Qualified + E-Mail ready | 14 | €10,500/Mo |
+| 🔵 Researched | 17 | TBD |
+| ⬜ To Research | 30+ | TBD |
 
+**Total Leads:** 17 (up from 12)
+**E-Mails ready:** 9 personalisierte E-Mails
+**Top Lead:** Maschinentechnik Pretzschendorf (NACHBAR — persönliche Demo möglich!)
 **Target:** 3 zahlende Kunden in 30 Tagen = €2,250 MRR
 
 ---

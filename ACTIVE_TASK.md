@@ -2,107 +2,49 @@
 
 ## 🎯 Status
 
-**Task:** Nachtschicht komplett
+**Task:** Nachtschicht 2026-02-04 komplett
 
 **Status:** DONE ✅
 
-**Zeit:** 02:25 - 04:30 CET (2 Stunden)
+**Zeit:** 02:00 - 02:45 CET
 
 ---
 
-## 🔥 GESAMTER NACHT-OUTPUT
+## Output
 
-### 💰 CNC Planner (Schnellstes Geld)
-| Asset | Status |
-|-------|--------|
-| Demo polished (Gewicht, PDF) | ✅ |
-| 12 echte Leads | ✅ |
-| 5 personalisierte E-Mails | ✅ |
-| ISO 27001 Docs | ✅ |
-| User Manual | ✅ |
-| Sales Presentation | ✅ |
-| Go-to-Market Strategy | ✅ |
+### VC Job Applications (5 neue + Cover Letters)
+| Fund | Role | Salary | Status |
+|------|------|--------|--------|
+| HOF Capital | VC Analyst (AI/SWE) | $100-175K | ✅ Cover Letter ready |
+| Betaworks | Investment Associate | $85-125K | ✅ Cover Letter ready |
+| Leonis Capital | Associate (Partner-Track) | TBD | ✅ Cover Letter ready |
+| Point72 Ventures | AI Ventures Associate | $90-130K | ✅ Cover Letter ready |
+| Conviction | Speculative Outreach | — | ✅ Email draft ready |
 
-### 💼 AI Consulting (Höchster Einzelwert)
-| Asset | Status |
-|-------|--------|
-| Case Study (<0.2% Hallucination) | ✅ |
-| One-Pager (Services + Pricing) | ✅ |
+### CNC Leads (5 neue)
+| Lead | Ort | Highlight |
+|------|-----|-----------|
+| Maschinentechnik Pretzschendorf | Klingenberg/Erzgebirge | 🔥 NACHBAR! Persönliche Demo möglich |
+| KWD Kupplungswerk Dresden | Dresden | AG, Lohnfertigung als Nebensegment |
+| Laro NC-Technik | Dresden | EN 9100 Luftfahrt, ISO 9001 |
+| Werkzeugbau GmbH Glauchau | Glauchau | 25+ Jahre, CNC-Drehen/Fräsen/3D |
+| IBEX (Erweiterung) | Dresden | Detailrecherche, breiteres Spektrum |
 
-### 📢 Content (Audience Building)
-| Asset | Status |
-|-------|--------|
-| 8 LinkedIn Posts (4 Wochen) | ✅ |
-| Twitter Thread (AI Chief of Staff) | ✅ |
-| Substack #3 Outline | ✅ |
+### CNC E-Mails (4 neue)
+- Maschinentechnik Pretzschendorf (Nachbar-Winkel)
+- Laro NC-Technik (EN 9100 Dokumentations-Winkel)
+- KWD Dresden (Lohnfertigung als Nebensegment)
+- Werkzeugbau Glauchau (Standardmail)
 
-### 🎯 VC Career
-| Asset | Status |
-|-------|--------|
-| 5 AI-focused Funds researched | ✅ |
-| Outreach templates | ✅ |
-
-### 🌐 Personal Brand
-| Asset | Status |
-|-------|--------|
-| florianziesche.com | ✅ |
-
----
-
-## 📁 Neue Dateien (18 files, 10,000+ words)
-
+### Files
 ```
-products/cnc-planner/
-├── leads/
-│   ├── LEADS-DATABASE.md (12 Leads)
-│   └── READY-TO-SEND-EMAILS.md (5 E-Mails)
-├── docs/
-│   ├── iso27001/ (3 Docs)
-│   ├── legal/ (AGB)
-│   └── user/ (Manual)
-├── sales/presentation.html
-├── deploy/ (Vercel)
-└── strategy/GO-TO-MARKET.md
-
-products/consulting/
-├── case-studies/legal-ai-hallucination.md
-└── ONE-PAGER.md
-
-content/
-├── linkedin/posts-ready-to-publish.md
-├── twitter/threads/ai-chief-of-staff-thread.md
-└── drafts/substack/2026-02-17-outline.md
-
-job-applications/
-└── VC-FUND-RESEARCH-AI.md
-
-websites/florianziesche.com/
-└── index.html
+job-applications/READY-TO-APPLY.md (NEU — 5 Cover Letters)
+products/cnc-planner/leads/LEADS-DATABASE.md (Updated — 17 Leads)
+products/cnc-planner/leads/READY-TO-SEND-EMAILS.md (Updated — 9 E-Mails)
+NORTH_STAR.md (Updated — Tracking aktualisiert)
+memory/2026-02-04-night-work.md (NEU)
 ```
 
 ---
 
-## ⏰ HEUTE (3. Feb)
-
-| Zeit | Was | Prep Status |
-|------|-----|-------------|
-| 09:00 | Demo testen | ✅ Ready |
-| 10:00 | Decile senden | ✅ Ready |
-| **12:00** | **ONKEL MEETING** | ✅ Ready |
-| 14:00 | LinkedIn Post | ✅ Ready |
-| **18:00** | **MONIQUE MEETING** | ✅ Ready |
-
----
-
-## 📊 Potential Revenue Impact
-
-| Stream | Asset | Potential |
-|--------|-------|-----------|
-| CNC Planner | Demo + Leads + E-Mails | €750/Mo (today?) |
-| Consulting | Case Study + One-Pager | €5K/Deal |
-| Content | LinkedIn + Twitter | 1000+ Followers |
-| VC | Fund Research | €100K/Year Job |
-
----
-
-*Alles ist ready. Jetzt liefern.* ♔
+*Florian muss nur noch: Review + Senden.* ♔

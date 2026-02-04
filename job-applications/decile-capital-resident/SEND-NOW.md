@@ -1,4 +1,4 @@
-# Decile Capital Application — READY TO SEND
+open ~/.openclaw/workspace/job-applications/decile-capital-resident/SEND-NOW.md# Decile Capital Application — READY TO SEND
 
 *Eine Aktion: Link öffnen, Dateien hochladen, absenden.*
 

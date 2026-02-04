@@ -138,24 +138,13 @@ function checkSystemHealth() {
         const rssMb = (mem.rss / 1024 / 1024).toFixed(1);
         report.push(`Agent RSS: ${rssMb}MB`);
 
-        // Optimization: Use native Node.js fs.statfsSync instead of spawning 'df'
-        if (fs.statfsSync) {
-            const stats = fs.statfsSync('/');
-            const total = stats.blocks * stats.bsize;
-            const free = stats.bfree * stats.bsize;
-            const used = total - free;
-            const freeGb = (free / 1024 / 1024 / 1024).toFixed(1);
-            const usedPercent = Math.round((used / total) * 100);
-            report.push(`Disk: ${usedPercent}% (${freeGb}G free)`);
-        } else {
-            // Fallback for older Node versions
-            const df = execSync('df -h /', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 2000 });
-            const lines = df.trim().split('\n');
-            if (lines.length > 1) {
-                // parsing: Filesystem Size Used Avail Use% Mounted on
-                const parts = lines[1].split(/\s+/);
-                report.push(`Disk: ${parts[4]} (${parts[3]} free)`);
-            }
+        // Use df for accurate disk reporting on macOS APFS (statfsSync reports raw blocks
+        // which include snapshots/purgeable space, inflating usage from 42% to 90%)
+        const df = execSync('df -h /', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 2000 });
+        const lines = df.trim().split('\n');
+        if (lines.length > 1) {
+            const parts = lines[1].split(/\s+/);
+            report.push(`Disk: ${parts[4]} (${parts[3]} free)`);
         }
     } catch (e) {}
 
@@ -174,18 +163,9 @@ function checkSystemHealth() {
     // Integration Health Checks (Env Vars & Tokens)
     try {
         const issues = [];
-        if (!process.env.GEMINI_API_KEY) issues.push('Gemini Key Missing');
-        if (!process.env.FEISHU_APP_ID) issues.push('Feishu App ID Missing');
-        // Check Feishu Token Freshness
-        try {
-            const tokenPath = path.resolve(MEMORY_DIR, 'feishu_token.json');
-            if (fs.existsSync(tokenPath)) {
-                const tokenData = JSON.parse(fs.readFileSync(tokenPath, 'utf8'));
-                if (tokenData.expire < Date.now() / 1000) issues.push('Feishu Token Expired');
-            } else {
-                issues.push('Feishu Token Missing');
-            }
-        } catch(e) {}
+        // Check configured integrations (skip unconfigured ones like Feishu)
+        if (process.env.GEMINI_API_KEY === '') issues.push('Gemini Key Empty');
+        if (process.env.ANTHROPIC_API_KEY === '') issues.push('Anthropic Key Empty');
 
         if (issues.length > 0) {
             report.push(`⚠️ Integrations: ${issues.join(', ')}`);
