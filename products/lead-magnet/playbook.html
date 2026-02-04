@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The AI Agent Playbook — Florian Ziesche</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  @page { size: A4; margin: 0; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #f8f9fa;
+    color: #1a1a2e;
+    line-height: 1.6;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 20px auto;
+    background: white;
+    padding: 48px 56px;
+    page-break-after: always;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+    position: relative;
+  }
+
+  @media print {
+    body { background: white; }
+    .page { margin: 0; box-shadow: none; padding: 40px 48px; }
+  }
+
+  /* Cover */
+  .cover {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 297mm;
+    padding: 80px 64px;
+    background: linear-gradient(145deg, #0a0f1e 0%, #1a1a3e 50%, #0d1b3e 100%);
+    color: white;
+  }
+
+  .cover .label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #60a5fa;
+    margin-bottom: 32px;
+  }
+
+  .cover h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 52px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 24px;
+    max-width: 500px;
+  }
+
+  .cover .subtitle {
+    font-size: 20px;
+    color: #94a3b8;
+    line-height: 1.5;
+    max-width: 440px;
+    margin-bottom: 64px;
+  }
+
+  .cover .author {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px;
+    color: #60a5fa;
+  }
+
+  .cover .author span {
+    color: #64748b;
+    font-size: 14px;
+    display: block;
+    margin-top: 4px;
+  }
+
+  .cover .accent-line {
+    width: 60px;
+    height: 3px;
+    background: #2563eb;
+    margin-bottom: 48px;
+  }
+
+  /* Page headers */
+  .page-num {
+    position: absolute;
+    bottom: 32px;
+    right: 56px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    color: #94a3b8;
+  }
+
+  .page-label {
+    position: absolute;
+    bottom: 32px;
+    left: 56px;
+    font-size: 11px;
+    color: #cbd5e1;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* Content */
+  h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: #0a0f1e;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .section-subtitle {
+    font-size: 16px;
+    color: #64748b;
+    margin-bottom: 32px;
+  }
+
+  h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin: 28px 0 12px;
+  }
+
+  p {
+    font-size: 14px;
+    color: #374151;
+    margin-bottom: 16px;
+    line-height: 1.7;
+  }
+
+  .highlight-box {
+    background: #f0f4ff;
+    border-left: 3px solid #2563eb;
+    padding: 20px 24px;
+    margin: 24px 0;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .highlight-box p {
+    margin: 0;
+    font-size: 15px;
+    color: #1e3a5f;
+    font-weight: 500;
+  }
+
+  .stat-row {
+    display: flex;
+    gap: 24px;
+    margin: 24px 0;
+  }
+
+  .stat-card {
+    flex: 1;
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+  }
+
+  .stat-card .number {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: #2563eb;
+    display: block;
+  }
+
+  .stat-card .label {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 4px;
+    display: block;
+  }
+
+  .org-chart {
+    background: #0a0f1e;
+    color: white;
+    padding: 32px;
+    border-radius: 12px;
+    margin: 24px 0;
+  }
+
+  .org-level {
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  .org-node {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .org-ceo { background: #2563eb; }
+  .org-coo { background: #1e40af; }
+  .org-agent { background: #1e293b; border: 1px solid #334155; font-size: 12px; padding: 6px 12px; margin: 3px; }
+
+  .org-connector {
+    text-align: center;
+    color: #475569;
+    font-size: 18px;
+    margin: 8px 0;
+  }
+
+  .agents-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 12px;
+  }
+
+  .rule-item {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    align-items: flex-start;
+  }
+
+  .rule-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #2563eb;
+    min-width: 36px;
+  }
+
+  .rule-text h4 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 4px;
+  }
+
+  .rule-text p {
+    font-size: 13px;
+    color: #64748b;
+    margin: 0;
+  }
+
+  .works-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 24px 0;
+  }
+
+  .works-card {
+    padding: 20px;
+    border-radius: 8px;
+  }
+
+  .works-card.yes { background: #f0fdf4; border: 1px solid #bbf7d0; }
+  .works-card.no { background: #fef2f2; border: 1px solid #fecaca; }
+
+  .works-card h4 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .works-card.yes h4 { color: #166534; }
+  .works-card.no h4 { color: #991b1b; }
+
+  .works-card p { font-size: 12px; margin: 0; color: #4b5563; }
+
+  .template-box {
+    border: 2px dashed #cbd5e1;
+    padding: 24px;
+    border-radius: 12px;
+    margin: 24px 0;
+  }
+
+  .template-field {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 12px;
+  }
+
+  .template-field label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a1a2e;
+    min-width: 120px;
+  }
+
+  .template-field .line {
+    flex: 1;
+    border-bottom: 1px solid #e2e8f0;
+    height: 1px;
+  }
+
+  .cta-box {
+    background: linear-gradient(145deg, #0a0f1e, #1a1a3e);
+    color: white;
+    padding: 40px;
+    border-radius: 12px;
+    margin: 32px 0;
+    text-align: center;
+  }
+
+  .cta-box h3 {
+    color: white;
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+
+  .cta-box p {
+    color: #94a3b8;
+    font-size: 15px;
+  }
+
+  .cta-box a {
+    display: inline-block;
+    background: #2563eb;
+    color: white;
+    padding: 12px 32px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    margin-top: 20px;
+  }
+
+  ul { padding-left: 20px; margin-bottom: 16px; }
+  li { font-size: 14px; color: #374151; margin-bottom: 8px; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="page cover">
+  <div class="label">Free Playbook</div>
+  <div class="accent-line"></div>
+  <h1>The AI Agent Playbook</h1>
+  <p class="subtitle">How I run my business with 10 AI agents. What works, what doesn't, and how you can start.</p>
+  <div class="author">
+    Florian Ziesche
+    <span>Ex-Startup CEO (+$5M raised) · AI Systems Builder · finitematter.substack.com</span>
+  </div>
+</div>
+
+<!-- PAGE 1: The Problem -->
+<div class="page">
+  <h2>The Problem</h2>
+  <p class="section-subtitle">You've tried AI. It was... fine.</p>
+
+  <p>You've heard AI can 10x your productivity. You've used ChatGPT. Maybe you've written some emails with it, or asked it to summarize a document.</p>
+
+  <p>And it was fine. Useful, even. But not transformative.</p>
+
+  <p>Here's why: using AI as a tool and running AI as a team are completely different things.</p>
+
+  <div class="highlight-box">
+    <p>Most people use AI like a calculator. I use it like a company. Ten specialized agents, each with a role, context, and quality expectations. They work while I sleep. They cost $15/night.</p>
+  </div>
+
+  <p>This playbook shows you exactly how I set this up, what works, what fails, and how you can build your first AI agent in under an hour.</p>
+
+  <p>No hype. No theory. Just what I've learned from running this system every day since January 2026.</p>
+
+  <div class="stat-row">
+    <div class="stat-card">
+      <span class="number">10</span>
+      <span class="label">Specialized agents</span>
+    </div>
+    <div class="stat-card">
+      <span class="number">$15</span>
+      <span class="label">Cost per night</span>
+    </div>
+    <div class="stat-card">
+      <span class="number">4-6h</span>
+      <span class="label">Saved per day</span>
+    </div>
+  </div>
+
+  <span class="page-label">The AI Agent Playbook</span>
+  <span class="page-num">01</span>
+</div>
+
+<!-- PAGE 2: The Org Chart -->
+<div class="page">
+  <h2>My Setup</h2>
+  <p class="section-subtitle">This is my actual team. Not a concept. Not a demo.</p>
+
+  <div class="org-chart">
+    <div class="org-level">
+      <span class="org-node org-ceo">Florian — CEO</span>
+    </div>
+    <div class="org-connector">↓</div>
+    <div class="org-level">
+      <span class="org-node org-coo">Mia — AI COO</span>
+    </div>
+    <div class="org-connector">↓</div>
+    <div class="agents-grid">
+      <span class="org-node org-agent">RESEARCHER</span>
+      <span class="org-node org-agent">HUNTER</span>
+      <span class="org-node org-agent">WRITER</span>
+      <span class="org-node org-agent">BUILDER</span>
+      <span class="org-node org-agent">ANALYST</span>
+      <span class="org-node org-agent">STRATEGIST</span>
+      <span class="org-node org-agent">ENGINEER</span>
+      <span class="org-node org-agent">DESIGNER</span>
+      <span class="org-node org-agent">OUTREACH</span>
+      <span class="org-node org-agent">SCRIBE</span>
+    </div>
+  </div>
+
+  <p>Mia is my AI Chief of Staff. She delegates tasks to specialized agents, reviews their output, and flags what needs my attention. I talk to Mia. She manages the rest.</p>
+
+  <p>Each agent has three things:</p>
+  <ul>
+    <li><strong>A role</strong> — what they're responsible for</li>
+    <li><strong>Context</strong> — what they know about my business, goals, and preferences</li>
+    <li><strong>Quality gates</strong> — what "done" looks like, and what's not acceptable</li>
+  </ul>
+
+  <p>Think of it like managing a team of juniors who are incredibly fast, never tired, and surprisingly capable — but need clear direction.</p>
+
+  <span class="page-label">The AI Agent Playbook</span>
+  <span class="page-num">02</span>
+</div>
+
+<!-- PAGE 3: 5 Rules -->
+<div class="page">
+  <h2>5 Rules of Agent Management</h2>
+  <p class="section-subtitle">What I learned from running AI agents every day.</p>
+
+  <div class="rule-item">
+    <span class="rule-num">01</span>
+    <div class="rule-text">
+      <h4>Define "done" before they start</h4>
+      <p>"Write me an email" produces garbage. "Write a 5-sentence email to a CNC manufacturer in Saxony, referencing their Heidenhain machines, offering a 15-minute demo" produces something I can send.</p>
+    </div>
+  </div>
+
+  <div class="rule-item">
+    <span class="rule-num">02</span>
+    <div class="rule-text">
+      <h4>Give context, not just instructions</h4>
+      <p>My agents know my business goals, target audience, writing style, and current priorities. Without context, they're just a fancy autocomplete.</p>
+    </div>
+  </div>
+
+  <div class="rule-item">
+    <span class="rule-num">03</span>
+    <div class="rule-text">
+      <h4>Review like a manager, not a user</h4>
+      <p>Don't accept the first output. Check for accuracy, tone, and completeness. AI writes fast but doesn't know when it's wrong. That's your job.</p>
+    </div>
+  </div>
+
+  <div class="rule-item">
+    <span class="rule-num">04</span>
+    <div class="rule-text">
+      <h4>Build systems, not prompts</h4>
+      <p>A prompt is a one-time instruction. A system is: role + context + quality gates + feedback loops. Systems improve. Prompts don't.</p>
+    </div>
+  </div>
+
+  <div class="rule-item">
+    <span class="rule-num">05</span>
+    <div class="rule-text">
+      <h4>Measure outcomes, not output</h4>
+      <p>I tracked "emails written" and felt productive. Then I tracked "emails sent" and felt sick. The metric that matters is always the one that reaches another human.</p>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <p>The biggest mistake: thinking more agents = more results. It doesn't. One well-configured agent beats ten poorly managed ones.</p>
+  </div>
+
+  <span class="page-label">The AI Agent Playbook</span>
+  <span class="page-num">03</span>
+</div>
+
+<!-- PAGE 4: What Works / Doesn't -->
+<div class="page">
+  <h2>What Works. What Doesn't.</h2>
+  <p class="section-subtitle">Honest numbers from my first month.</p>
+
+  <div class="works-grid">
+    <div class="works-card yes">
+      <h4>Research</h4>
+      <p>2 days of manual work → 15 minutes. Fund analysis, competitor research, lead enrichment. This is the killer app.</p>
+    </div>
+    <div class="works-card yes">
+      <h4>Drafting at Scale</h4>
+      <p>20 personalized outreach emails overnight. Not mail-merge — genuinely personalized. $2 in API calls.</p>
+    </div>
+    <div class="works-card yes">
+      <h4>Content Repurposing</h4>
+      <p>1 Substack article → LinkedIn post + Twitter thread + 3 Notes + WhatsApp message. 30 minutes.</p>
+    </div>
+    <div class="works-card yes">
+      <h4>Analysis</h4>
+      <p>Read 40+ files, identified gaps, found forgotten drafts, suggested priorities. Pattern recognition at scale.</p>
+    </div>
+    <div class="works-card no">
+      <h4>Judgment Calls</h4>
+      <p>Which email to send first? When to follow up? What price to charge? Still 100% human.</p>
+    </div>
+    <div class="works-card no">
+      <h4>Quality Without Constraints</h4>
+      <p>Unconstrained AI produces "technically complete" work no human would use. Quality gates are mandatory.</p>
+    </div>
+    <div class="works-card no">
+      <h4>Relationship Building</h4>
+      <p>AI can research a person. It cannot read body language, build trust, or know when to shut up and listen.</p>
+    </div>
+    <div class="works-card no">
+      <h4>Pressing Send</h4>
+      <p>50 deliverables prepared. 2 sent. AI doesn't fix procrastination. It exposes it.</p>
+    </div>
+  </div>
+
+  <span class="page-label">The AI Agent Playbook</span>
+  <span class="page-num">04</span>
+</div>
+
+<!-- PAGE 5: How To Start -->
+<div class="page">
+  <h2>Start Here</h2>
+  <p class="section-subtitle">Your first AI agent in under an hour.</p>
+
+  <div class="rule-item">
+    <span class="rule-num">01</span>
+    <div class="rule-text">
+      <h4>Pick ONE recurring task</h4>
+      <p>Not "run my business." Something specific: research prospects before meetings, draft follow-up emails, summarize industry news. Start small.</p>
+    </div>
+  </div>
+
+  <div class="rule-item">
+    <span class="rule-num">02</span>
+    <div class="rule-text">
+      <h4>Write a clear brief</h4>
+      <p>Who is this agent? What do they do? What context do they need? What does "done" look like? Be specific. The more precise your brief, the better the output.</p>
+    </div>
+  </div>
+
+  <div class="rule-item">
+    <span class="rule-num">03</span>
+    <div class="rule-text">
+      <h4>Run it 5 times. Review every output.</h4>
+      <p>The first output will be mediocre. That's normal. Review it like you'd review a junior employee's work. Note what's wrong. Adjust the brief.</p>
+    </div>
+  </div>
+
+  <div class="rule-item">
+    <span class="rule-num">04</span>
+    <div class="rule-text">
+      <h4>Refine the brief. Repeat.</h4>
+      <p>After 5 iterations, your brief should be tight enough that the agent produces usable output 80% of the time. That's your baseline.</p>
+    </div>
+  </div>
+
+  <div class="rule-item">
+    <span class="rule-num">05</span>
+    <div class="rule-text">
+      <h4>Add a second agent only when the first delivers consistently.</h4>
+      <p>Don't build 10 agents on day one. Nail one first. The skills transfer.</p>
+    </div>
+  </div>
+
+  <h3>Your First Agent Template</h3>
+
+  <div class="template-box">
+    <div class="template-field"><label>Agent Name</label><div class="line"></div></div>
+    <div class="template-field"><label>Role</label><div class="line"></div></div>
+    <div class="template-field"><label>Context</label><div class="line"></div></div>
+    <div class="template-field"><label>Input</label><div class="line"></div></div>
+    <div class="template-field"><label>Expected Output</label><div class="line"></div></div>
+    <div class="template-field"><label>Quality Gate</label><div class="line"></div></div>
+    <div class="template-field"><label>Done =</label><div class="line"></div></div>
+  </div>
+
+  <span class="page-label">The AI Agent Playbook</span>
+  <span class="page-num">05</span>
+</div>
+
+<!-- PAGE 6: CTA -->
+<div class="page">
+  <h2>What's Next</h2>
+  <p class="section-subtitle">Three ways to go deeper.</p>
+
+  <div class="cta-box">
+    <h3>Subscribe to Finite Matter</h3>
+    <p>Weekly insights from an operator actually running AI agents. No hype. No theory. Just what works.</p>
+    <a href="https://finitematter.substack.com">finitematter.substack.com</a>
+  </div>
+
+  <h3>Want this built for your company?</h3>
+  <p>I help businesses design and implement AI agent systems tailored to their workflows. From a 2-hour Discovery Workshop to full prototype builds.</p>
+  <ul>
+    <li><strong>Discovery Workshop</strong> — We map your workflows, identify AI opportunities, and build your first agent together. Half a day, remote or on-site.</li>
+    <li><strong>Prototype Build</strong> — I design and build an AI agent system for your specific use case. 4-8 weeks, working product.</li>
+    <li><strong>Advisory</strong> — Monthly check-ins to help your team improve their AI systems. For teams already using AI who want to get better.</li>
+  </ul>
+  <p>Email me: <strong>fz@florianziesche.com</strong></p>
+
+  <h3 style="margin-top: 40px;">Connect</h3>
+  <ul>
+    <li>LinkedIn: <strong>linkedin.com/in/fziesche</strong></li>
+    <li>Substack: <strong>finitematter.substack.com</strong></li>
+    <li>Website: <strong>florianziesche.com</strong></li>
+  </ul>
+
+  <div style="margin-top: 64px; padding-top: 24px; border-top: 1px solid #e2e8f0;">
+    <p style="font-size: 12px; color: #94a3b8;">© 2026 Florian Ziesche. This playbook is free to share. If it helped you, tell someone about it.</p>
+  </div>
+
+  <span class="page-label">The AI Agent Playbook</span>
+  <span class="page-num">06</span>
+</div>
+
+</body>
+</html>
