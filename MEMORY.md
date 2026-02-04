@@ -175,6 +175,15 @@ Wenn nein → nicht fertig. Weiter iterieren.
 
 ---
 
+## Lessons: Pricing & Positioning (2026-02-04)
+
+- **"Was nichts kostet ist nichts wert"** — Florian lehnt 0€ Positionierung ab. Produkt braucht Preis.
+- **Sonderkonditionen mündlich, nicht auf Website** — €500 Einrichtung geschenkt = Verhandlungsmasse im Gespräch
+- **Pricing-Features = Kundenwert, nicht Technik-Checkliste** — "Für Einzelfertiger" > "Bis zu 50 Kalkulationen"
+- **Weniger ist mehr bei Pricing** — 4 Punkte pro Tier reichen. Jeder Punkt muss Nachfrage/Wert zeigen.
+- **CTA-Buttons aus Pricing Cards entfernen** wenn kein Self-Service-Signup existiert
+- **Demo > Pilotphase** als Wording für CTA
+
 ## Night Shift 2026-02-03 (02:00-04:30)
 
 **Massive Output erstellt:**

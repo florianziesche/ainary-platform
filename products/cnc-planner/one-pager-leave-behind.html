@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CNC Planer Pro – Kalkulation in Minuten statt Stunden</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html, body {
+    width: 210mm;
+    height: 297mm;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #1a1a1a;
+    background: #ffffff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    padding: 28mm 24mm 20mm 24mm;
+    overflow: hidden;
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+  }
+
+  .logo-group {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .logo-icon {
+    width: 46px;
+    height: 46px;
+    background: #1e3a5f;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 0.5px;
+  }
+
+  .logo-text {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1e3a5f;
+    letter-spacing: -0.3px;
+  }
+
+  .header-url {
+    font-size: 13px;
+    color: #5a6a7a;
+    font-weight: 500;
+  }
+
+  /* ── Divider ── */
+  .divider {
+    height: 3px;
+    background: linear-gradient(90deg, #1e3a5f 0%, #2d5a8e 100%);
+    border-radius: 2px;
+    margin-bottom: 32px;
+  }
+
+  /* ── Headline ── */
+  .headline {
+    font-size: 30px;
+    font-weight: 700;
+    color: #1e3a5f;
+    letter-spacing: -0.5px;
+    margin-bottom: 12px;
+    line-height: 1.15;
+  }
+
+  .subline {
+    font-size: 15px;
+    color: #3a4a5a;
+    line-height: 1.55;
+    max-width: 520px;
+    margin-bottom: 30px;
+  }
+
+  /* ── Stats Row ── */
+  .stats-row {
+    display: flex;
+    gap: 0;
+    margin-bottom: 34px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .stat {
+    flex: 1;
+    text-align: center;
+    padding: 20px 16px;
+    background: #f7f9fc;
+  }
+
+  .stat + .stat {
+    border-left: 1.5px solid #e2e8f0;
+  }
+
+  .stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1e3a5f;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: #5a6a7a;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Two Columns ── */
+  .columns {
+    display: flex;
+    gap: 36px;
+    margin-bottom: 34px;
+  }
+
+  .col-left {
+    flex: 1.15;
+  }
+
+  .col-right {
+    flex: 1;
+  }
+
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e3a5f;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 14px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  .feature-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .feature-list li {
+    font-size: 14px;
+    color: #2a3a4a;
+    line-height: 1.45;
+    padding-left: 18px;
+    position: relative;
+  }
+
+  .feature-list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 7px;
+    width: 8px;
+    height: 8px;
+    background: #1e3a5f;
+    border-radius: 2px;
+  }
+
+  .steuerungen {
+    margin-top: 22px;
+  }
+
+  .steuerungen-label {
+    font-size: 12px;
+    color: #5a6a7a;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+  }
+
+  .steuerungen-tags {
+    display: flex;
+    gap: 8px;
+  }
+
+  .tag {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e3a5f;
+    background: #edf2f7;
+    padding: 6px 14px;
+    border-radius: 6px;
+    letter-spacing: 0.2px;
+  }
+
+  /* ── Pricing ── */
+  .pricing-row {
+    display: flex;
+    gap: 0;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .price-card {
+    flex: 1;
+    text-align: center;
+    padding: 18px 14px;
+    background: #ffffff;
+  }
+
+  .price-card + .price-card {
+    border-left: 1.5px solid #e2e8f0;
+  }
+
+  .price-card.featured {
+    background: #1e3a5f;
+    color: #ffffff;
+  }
+
+  .price-tier {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 6px;
+    color: #5a6a7a;
+  }
+
+  .price-card.featured .price-tier {
+    color: #a8c4e0;
+  }
+
+  .price-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1e3a5f;
+  }
+
+  .price-card.featured .price-value {
+    color: #ffffff;
+  }
+
+  .price-unit {
+    font-size: 13px;
+    font-weight: 400;
+    color: #7a8a9a;
+  }
+
+  .price-card.featured .price-unit {
+    color: #a8c4e0;
+  }
+
+  /* ── Spacer ── */
+  .spacer {
+    flex: 1;
+  }
+
+  /* ── Contact & Footer ── */
+  .contact-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 22px;
+    background: #f7f9fc;
+    border-radius: 10px;
+    border: 1.5px solid #e2e8f0;
+    margin-bottom: 16px;
+  }
+
+  .contact-left {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .contact-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e3a5f;
+  }
+
+  .contact-details {
+    font-size: 13px;
+    color: #5a6a7a;
+    line-height: 1.5;
+  }
+
+  .contact-cta {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    background: #1e3a5f;
+    padding: 10px 22px;
+    border-radius: 8px;
+    text-decoration: none;
+    letter-spacing: 0.1px;
+  }
+
+  .footer {
+    text-align: center;
+    font-size: 11px;
+    color: #8a9aaa;
+    letter-spacing: 0.2px;
+  }
+
+  @media print {
+    html, body {
+      width: 210mm;
+      height: 297mm;
+    }
+    body {
+      padding: 28mm 24mm 20mm 24mm;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-group">
+      <div class="logo-icon">CP</div>
+      <div class="logo-text">CNC Planer Pro</div>
+    </div>
+    <div class="header-url">www.cnc-planer.de</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Headline -->
+  <h1 class="headline">Kalkulation in Minuten statt Stunden</h1>
+  <p class="subline">
+    CNC Planer Pro digitalisiert Ihre Angebotskalkulation von der technischen Zeichnung bis zum fertigen Angebot. 
+    Weniger Aufwand, exakte Preise, schnellere Auftragsgewinnung.
+  </p>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat">
+      <div class="stat-value">~85%</div>
+      <div class="stat-label">Zeitersparnis</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">~10 min</div>
+      <div class="stat-label">pro Angebot</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value">5x</div>
+      <div class="stat-label">ROI im ersten Jahr</div>
+    </div>
+  </div>
+
+  <!-- Two Columns -->
+  <div class="columns">
+    <div class="col-left">
+      <div class="section-title">Funktionen</div>
+      <ul class="feature-list">
+        <li>Automatische Kalkulation auf Basis von Geometrie, Material und Maschine</li>
+        <li>Professionelle Angebotserstellung in Minuten</li>
+        <li>Fertigungsanweisungen direkt aus der Kalkulation</li>
+        <li>NC-Code-Generierung für Ihre Steuerung</li>
+      </ul>
+
+      <div class="steuerungen">
+        <div class="steuerungen-label">Unterstützte Steuerungen</div>
+        <div class="steuerungen-tags">
+          <span class="tag">Heidenhain</span>
+          <span class="tag">Siemens</span>
+          <span class="tag">Fanuc</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-right">
+      <div class="section-title">Preise</div>
+      <div class="pricing-row">
+        <div class="price-card">
+          <div class="price-tier">Professional</div>
+          <div class="price-value">149 <span class="price-unit">€/Mo</span></div>
+        </div>
+        <div class="price-card featured">
+          <div class="price-tier">Business</div>
+          <div class="price-value">299 <span class="price-unit">€/Mo</span></div>
+        </div>
+        <div class="price-card">
+          <div class="price-tier">Enterprise</div>
+          <div class="price-value" style="font-size: 18px; padding-top: 4px;">Individuell</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spacer -->
+  <div class="spacer"></div>
+
+  <!-- Contact -->
+  <div class="contact-bar">
+    <div class="contact-left">
+      <div class="contact-name">Florian Ziesche</div>
+      <div class="contact-details">
+        fz@cnc-planer.de &nbsp;&middot;&nbsp; +49 151 2303 9208
+      </div>
+    </div>
+    <div class="contact-cta">Erstgespräch vereinbaren</div>
+  </div>
+
+  <div class="footer">
+    CNC Planer Pro &nbsp;&middot;&nbsp; www.cnc-planer.de &nbsp;&middot;&nbsp; Persönliches Erstgespräch vereinbaren
+  </div>
+
+</body>
+</html>
