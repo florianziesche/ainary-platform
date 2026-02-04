@@ -109,4 +109,72 @@
 
 ---
 
+## 📊 Scan 2026-02-04 — OpenClaw Goes Mainstream
+
+### Neue Showcase Patterns
+
+#### 9. Meal Planning + Shopping Lists (Notion)
+> "Built a full weekly meal planning system in Notion... Shopping lists sorted by store and aisle... Weather forecast auto-updating on the meal plan list"
+
+**Insight:** Notion-Integration für strukturierte, wiederkehrende Aufgaben. Template-Markt?
+
+#### 10. Enterprise-Scale Personal Setup (15+ Agents)
+> "15+ agents. 3 machines. 1 Discord server... Daily roll call across 10+ agents"
+
+**Pattern:** Agent orchestration at scale → Daily roll call = health check. Wir sollten ein Agent Health Dashboard haben.
+
+#### 11. Voice Model Integration
+> "Can you check this voice model I just found, install it, and use it to talk to me? → yes"
+
+**Status:** Wir haben `sag` (ElevenLabs) + `tts`. Noch nicht aktiv genutzt für Voice Briefings.
+
+#### 12. Mobile-Only Development
+> "Rebuilt my entire site via Telegram while watching Netflix in bed. Notion → Astro, 18 posts migrated, DNS moved"
+
+**Key insight:** Mobile-first ist nicht "nice to have" — es ist der Primary Mode für viele Power User.
+
+#### 13. Invoice + Cost Tracking
+> "Keep track of costs and split them after trips"
+> "Creates invoices and summarizes work beautifully"
+
+**Relevant für:** Florians Freelance-Track. Invoice-Generation als Skill.
+
+### 🔥 OpenClaw Media Explosion (Feb 2026)
+
+**Major Coverage diese Woche:**
+- **IBM Think** — "OpenClaw, Moltbot and the future of AI agents"
+- **Shelly Palmer** — "The Gap Between AI Assistant Hype and Reality"
+- **DataCamp** — Full tutorial
+- **DigitalOcean** — One-click deploy
+- **Vultr** — Deployment guide
+- **DEV Community** — Multiple guides
+- **Multiple Substacks** — "24 Hours with OpenClaw", "The OpenClaw Fiasco"
+
+**Key Takeaways:**
+1. **AgentSkills = Open Standard** — Von Anthropic zur Linux Foundation (Dez 2025). Cross-platform: Claude Code, Cursor, VS Code, Codex, Gemini CLI, GitHub Copilot
+2. **ClawHub** — 700+ Community Skills auf clawhub.com
+3. **Claude Cowork** — Anthropic's non-technical OpenClaw Alternative (Jan 2026)
+4. **Local Models möglich** — Mac Mini M4 + Ollama (Kimi K2, Qwen3) = zero cloud costs
+
+### 🎯 Content Opportunity für Florian
+
+**OpenClaw ist DAS Trending Topic in AI gerade.** 
+
+| Content-Idee | Format | Timing |
+|---|---|---|
+| "How I Built My AI Chief of Staff with OpenClaw" | Blog + LinkedIn | Diese Woche |
+| "Solo Founder Multi-Agent Setup" | Twitter Thread | Sofort |
+| "OpenClaw für VC Job Search" | Substack | Nächste Woche |
+| "AI Agent vs AI Chatbot: The Real Difference" | LinkedIn Post | Trending now |
+
+**Warum jetzt:** IBM, DataCamp, DigitalOcean — mainstream media greift es auf. Florian hat REAL experience (nicht "ich hab's installiert"). Das ist ein Differentiator.
+
+### Technische Insights
+
+- **Cross-platform message sync:** WhatsApp → Telegram Konversation nahtlos fortsetzen
+- **Background sub-agents:** sessions_spawn für parallele Research — wir nutzen das zu wenig
+- **Skills are portable:** Ein Skill für OpenClaw funktioniert in jedem AgentSkills-kompatiblen Tool
+
+---
+
 *Nächster Scan: In 24h automatisch*

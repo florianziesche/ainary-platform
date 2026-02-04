@@ -63,4 +63,77 @@ PLAN (Opus) → BUILD (Sonnet) → COMMIT (Git) → SECURITY → LEARN → CLEAR
 
 ---
 
+## 📚 Source: OpenClaw Ecosystem Scan — 2026-02-04
+
+### Architecture Insights
+
+1. **AgentSkills Spec** — Open standard (Anthropic → Linux Foundation, Dec 2025)
+   - Skills work across: Claude Code, Cursor, VS Code, OpenAI Codex, Gemini CLI, GitHub Copilot
+   - Format: SKILL.md + helper scripts in one directory
+   - **Implication:** Skills wir bauen sind PORTABEL. Investment in Skills = cross-platform value.
+
+2. **ClawHub** — clawhub.com, 700+ community skills
+   - Official skill marketplace
+   - Skills installierbar via `openclaw skills install`
+   - **Action:** Prüfen ob unsere Custom Skills dort publishable sind (CNC-related? VC Research?)
+
+3. **Multi-Machine Agent Orchestration**
+   - Power users laufen 15+ Agents auf 3+ Maschinen
+   - Daily "roll call" pattern für Agent Health Checks
+   - Discord als Agent-Koordinations-Channel
+
+4. **Local Model Support (Mac Mini Guide)**
+   - Mac Mini M4 + Ollama → Kimi K2, Qwen3 lokal
+   - Zero cloud costs, 100% privacy
+   - Relevant für: CNC Planner Kunden die "Daten bleiben bei uns" wollen
+
+### Workflow Patterns
+
+| Pattern | Beschreibung | Relevanz |
+|---------|-------------|----------|
+| **Mobile-first ops** | Telegram/WhatsApp als primäres Interface | 🔴 High |
+| **Voice conversations** | Custom voice models für Agent-Calls | 🟡 Medium |
+| **Invoice automation** | Generate invoices from work summaries | 🔴 High (Freelance) |
+| **Meal/life planning** | Structured Notion templates für Alltag | 🟢 Low |
+| **Agent impersonation** | Agent responds as user in group chats | ⚠️ Risky |
+
+### Community Patterns (Discord/Reddit)
+
+- **Quick setup tools** — Reddit user built "openclaw setup in under a minute" (Claude Code integration)
+- **exe.dev hosting** — New hosting option für Discord-connected OpenClaw instances
+- **Beeper integration** — Unified messaging (all messengers in one) + OpenClaw
+- **Homey integration** — Smart home automation
+
+### Media Landscape
+
+OpenClaw hat den **mainstream crossing point** erreicht:
+- IBM, DataCamp, DigitalOcean, Vultr = Enterprise/Dev tools
+- Shelly Palmer = mainstream tech columnists
+- Multiple Substacks = creator economy
+- DEV Community = developer adoption
+
+**Signal:** Wenn IBM darüber schreibt, ist es kein Nischen-Tool mehr. Content über OpenClaw hat jetzt Mainstream-Reach.
+
+---
+
+## 🔍 GitHub Repos to Monitor
+
+| Repo | Warum relevant |
+|------|----------------|
+| angelor888/claude-code-project | Claude Code Best Practices |
+| anthropics/claude-code | Official Claude Code |
+| openclaw/openclaw | OpenClaw Core |
+| steipete/peekaboo | macOS Automation |
+| skillsmp/clawhub | Skills Marketplace |
+
+---
+
+## 📅 Scan Schedule
+
+- **Alle 24h:** Neue Repos/Updates suchen
+- **Fokus:** OpenClaw, Claude Code, AI Agents, Automation
+- **Keywords:** "claude code", "openclaw", "ai agent workflow", "coding agent"
+
+---
+
 *Dieses File wird automatisch erweitert wenn neue Learnings gefunden werden.*

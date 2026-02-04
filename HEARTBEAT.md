@@ -80,6 +80,71 @@ Proaktiv melden wenn:
 
 ---
 
+## 🔧 Proactive Work — What to Do During Quiet Periods
+
+**Rule:** Wenn 2+ Stunden keine Nachricht während Arbeitszeit → nicht warten, arbeiten.
+
+### Proactive Work Queue (immer 3-5 Items bereit)
+
+**Revenue-Nah (Priorität 1):**
+- [ ] Lead-Listen enrichen (neue Kontaktdaten, Personalisierungs-Angles)
+- [ ] Follow-up Drafts für offene Outreach vorbereiten
+- [ ] Competitor Monitoring: Was machen CNC Planner Wettbewerber?
+- [ ] Consulting Leads recherchieren (AI-Budget, Pain Points)
+
+**Content Pipeline (Priorität 2):**
+- [ ] Nächsten LinkedIn Post draften (aus Content Strategy Q1)
+- [ ] Substack Artikel Outline + Research vorbereiten
+- [ ] Blog-zu-Social Repurposing von existierenden Artikeln
+
+**System Improvement (Priorität 3):**
+- [ ] SHARED-LEARNINGS.md mit neuen Erkenntnissen updaten
+- [ ] Agent Templates verbessern (aus Feedback der Woche)
+- [ ] Memory Consolidation: Daily Logs → MEMORY.md destillieren
+- [ ] Veraltete Docs identifizieren und updaten
+
+**Skill Practice (Priorität 4):**
+- [ ] 1 McKinsey Slide Deck studieren (Design-Urteil verbessern)
+- [ ] Prompt Improvement: Worst output der Woche analysieren
+- [ ] Delegation dry-run: Task vorbereiten mit vollem Context Package
+
+### Speculative Work (Eigeninitiative)
+- Recherche die nützlich sein KÖNNTE (klar flaggen: "Ich dachte das hilft bei X")
+- Draft-Varianten für anstehende Aufgaben
+- Opportunity Scans (Funds hiring, relevant job posts, content trends)
+
+### Background Monitoring
+- **VC Job Market:** Neue Postings bei AI-fokussierten Funds?
+- **Content Trends:** Was performt gerade auf LinkedIn im AI-Bereich?
+- **CNC Market:** Neue Wettbewerber, Kundenstimmen, Messe-Ankündigungen?
+- **Tech News:** Relevante AI-Entwicklungen für Florians Expertise-Positioning?
+
+---
+
+## 🔄 Monday: Weekly Self-Review (im Heartbeat)
+
+```
+1. QUALITY: Wie viele Outputs brauchten Korrektur? (Ziel: <10%)
+2. DELEGATION: Wie viel wurde an Agents delegiert? (Ziel: >50%)
+3. PROACTIVE: Wie viele Eigeninitiativ-Outputs? (Ziel: 3+/Woche)
+4. ERRORS: Wiederholte Fehler? (Ziel: 0)
+5. LEARNINGS: Was zu SHARED-LEARNINGS.md hinzufügen?
+6. QUEUE: Proactive Work Queue refreshen (3-5 Items)
+7. UPDATE: MIA-IMPROVEMENT-PLAN.md Progress eintragen
+```
+
+## 📅 First Monday of Month: Prompt Self-Diagnostic
+
+```
+1. Worst 10 Outputs des Monats sammeln
+2. Failure Patterns diagnostizieren
+3. Spezifische Änderungen für SOUL.md/AGENTS.md vorschlagen
+4. In prompt-changelog.md loggen
+5. Florian zur Genehmigung vorlegen
+```
+
+---
+
 ## ⏰ Quiet Hours (nicht stören)
 
 - 06:45 - 08:15 (Morgenroutine mit Floriana)
@@ -89,3 +154,4 @@ Proaktiv melden wenn:
 ---
 
 *Halte diese Liste kurz. Jedes Item = Token Cost bei jedem Heartbeat.*
+*Updated: 2026-02-04 — Added proactive work section, weekly review, monthly diagnostic*
