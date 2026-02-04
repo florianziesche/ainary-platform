@@ -1,95 +1,110 @@
 # COCKPIT.md — Daily Command Center
 
-*Letzte Aktualisierung: 2026-02-02*
+*Letzte Aktualisierung: 2026-02-04 02:45*
 
 ---
 
 ## 🎯 This Week's #1 Priority
-**Monique Meeting rocken (3. Feb) + Decile Application absenden**
+**CNC Demo bei Onkel (10:30) → erster zahlender Kunde. Danach: 20 Outreach-Emails senden.**
 
 ---
 
 ## 📊 Key Metrics
 
-| Metric | Current | Target | Gap |
-|--------|---------|--------|-----|
-| Applications sent | 0 | 10 | -10 |
-| Revenue (Feb) | €0 | €4,500 | -€4,500 |
-| Substack subs | 0 | 100 | -100 |
-| LinkedIn followers | ? | +100 | ? |
+| Metric | Current | Target (Feb) | Gap |
+|--------|---------|-------------|-----|
+| CNC Demos | 1 (morgen) | 10 | -9 |
+| CNC Kunden | 0 | 2 | -2 |
+| CNC Outreach | 0 sent | 20 | -20 |
+| AI Consulting Leads | 0 | 5 Gespräche | -5 |
+| VC Applications | 1 sent | 10 | -9 |
+| Revenue (Feb) | €0 | €5.000 | -€5.000 |
+| Substack Posts | 1 | 4 | -3 |
+| LinkedIn Posts | 1 | 12 | -11 |
 
 ---
 
-## ⏰ Next 48h
+## ⏰ HEUTE — Dienstag, 4. Feb
 
-### Montag, 3. Feb
-- [ ] **18:00 CET: Monique Barbanson Meeting** ← HIGH PRIORITY
-- [ ] Decile Application absenden (Cover Letter ready)
-- [ ] LinkedIn Post posten (14:00 CET)
-- [ ] Onkel anrufen (Maschinenbau Demo)
+### MORGENS (vor 10:30)
+- [ ] **Demo-Skript lesen** → `meetings/demo-script-2026-02-04.md`
+- [ ] **One-Pager drucken** → `products/cnc-planner/one-pager-leave-behind.html` (Chrome → Print → PDF)
+- [ ] **Demo testen** → `~/Desktop/cnc-deploy/demo.html` (API Key prüfen: "Flansch Ø200")
+- [ ] **Optional:** Cloudflare Pages deploy (5 min) → `products/cnc-planner/DEPLOY-NOW.md`
 
-### Dienstag, 4. Feb
-- [ ] **VC Lab Sprint 2 Due** — Step 5, 6, 7 finalisieren
-- [ ] Twitter Thread posten
+### 10:30 — CNC DEMO BEI ONKEL
+- Arbeitsvorbereiter ist Zielgruppe
+- Demo-Skript folgen
+- One-Pager dalassen
+- **ZIEL:** "Ja, wir probieren das" oder konkreter nächster Schritt
+
+### NACHMITTAGS
+- [ ] **VC Lab Sprint 2 abgeben** (FÄLLIG HEUTE) → `vc-lab/sprint-2-complete.md`
+- [ ] **Follow-Up Email an Onkel** → `sales/follow-up-email-template.md`
+- [ ] **Erste 5 CNC Outreach-Emails senden** → `sales/outreach-emails-ready.md`
+- [ ] **1 LinkedIn Post** posten (aus `content/linkedin/ready-to-post/`)
+
+### ABENDS
+- [ ] **5 VC Applications absenden** → `job-applications/vc-applications-ready.md`
+- [ ] Review: AI Consulting Package → `products/ai-consulting/service-packages.md`
 
 ---
 
 ## 🔥 Überfällig
 
-- [ ] ALG 1 beantragen (sollte diese Woche passieren)
-- [ ] Onkel anrufen — €750/Monat liegt auf dem Tisch
-- [ ] Sprint 2 Step 7: Decile Hub Setup (nur du kannst das)
+- [ ] ALG 1 beantragen (DIESE WOCHE!)
+- [ ] Monique Follow-Up (Meeting war gestern)
+- [ ] LinkedIn Company Page für CNC Planer Pro erstellen
 
 ---
 
-## 💡 Quick Wins (<30 min)
+## 📦 Was Mia über Nacht vorbereitet hat
 
-- [ ] LinkedIn Post copy-pasten und posten (5 min)
-- [ ] Monique auf LinkedIn connecten nach Meeting (2 min)
-- [ ] Screenshot-Backup für Demo machen (10 min)
-- [ ] Decile Cover Letter finale Review + absenden (15 min)
-
----
-
-## 🎯 90-Day Targets (bis 1. Mai 2026)
-
-- [ ] VC Associate Offer in der Hand
-- [ ] €4,500+/Monat Revenue stabil
-- [ ] 500+ Substack Subscribers
-- [ ] 10+ Job Applications gesendet
-- [ ] AI-Native Operator Reputation etabliert
+| Deliverable | Pfad | Status |
+|-------------|------|--------|
+| Demo-Skript | `meetings/demo-script-2026-02-04.md` | ✅ |
+| One-Pager (A4 Print) | `products/cnc-planner/one-pager-leave-behind.html` | ✅ |
+| Follow-Up Email | `sales/follow-up-email-template.md` | ✅ |
+| Cloudflare Deploy Guide | `products/cnc-planner/DEPLOY-NOW.md` | ✅ |
+| 20 CNC Outreach Emails | `sales/outreach-emails-ready.md` | 🔄 |
+| 15 AI Consulting Leads + Emails | `sales/ai-consulting-outreach-ready.md` | 🔄 |
+| 10 VC Applications | `job-applications/vc-applications-ready.md` | 🔄 |
+| 15 Content Pieces | `content/linkedin/ready-to-post/` | 🔄 |
+| VC Lab Sprint 2 | `vc-lab/sprint-2-complete.md` | 🔄 |
+| Deep Research: Agent Improvement | `research/agent-improvement-2026-02-04.md` | 🔄 |
 
 ---
 
-## 📈 Revenue Path
+## 🎯 Weekly Non-Negotiables Tracker
+
+| Task | Mo | Di | Mi | Do | Fr | Sa | So |
+|------|----|----|----|----|----|----|----|
+| CNC Outreach (5/day) | - | ☐ | ☐ | ☐ | ☐ | - | - |
+| Consulting Outreach | - | ☐ | ☐ | ☐ | ☐ | - | - |
+| VC Application | - | ☐ | ☐ | ☐ | ☐ | - | - |
+| LinkedIn Post | ✅ | ☐ | ☐ | ☐ | ☐ | ☐ | - |
+| Substack | ✅ | - | - | ☐ | - | - | - |
+
+---
+
+## 💰 Revenue Path to €500K
 
 ```
-ALG 1:           €2,700/Monat (pending application)
-Maschinenbau:    €750/Monat (pending Onkel call)
-Notion Bundle:   €500/Monat (not launched yet)
-Freelance:       €500+/Monat (pipeline needed)
-────────────────────────────────────────────
-Target:          €4,500/Monat
+FAST CASH (this month):
+├── CNC Planer Pro    → €149-299/mo × Kunden
+├── AI Consulting     → €3,500 Discovery Workshop  
+└── Onkel Pilotphase  → Erster zahlender Kunde
+
+MEDIUM TERM (Q1):
+├── VC Salary         → €8-12K/mo
+├── CNC Scale         → 25 Kunden = €3,750-7,500/mo
+└── Consulting        → 1 Prototyp = €15-25K
+
+COMPOUND (Q2+):
+├── Content Revenue   → Paid Substack + Courses
+└── Ainary Ventures   → Fund Launch
 ```
 
 ---
 
-## 🗓️ Upcoming Deadlines
-
-| Date | What | Status |
-|------|------|--------|
-| 3. Feb | Monique Meeting 18:00 | ✅ Prep done |
-| 4. Feb | VC Lab Sprint 2 | 90% done |
-| 7. Feb | First Substack Newsletter | Draft ready |
-| ~10. Feb | ALG 1 Application | Not started |
-
----
-
-## 💭 This Week's Focus
-
-> Land the Monique meeting. Send the Decile app. Post content. Call Onkel.
-> Everything else is secondary.
-
----
-
-*Atlas updates this file. Florian reviews mornings.*
+*Mia aktualisiert. Florian reviewed morgens.*
