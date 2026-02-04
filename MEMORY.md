@@ -71,15 +71,21 @@
 3. Content engine — blog, Notion templates, courses
 4. Systems — make everything compound
 
-## Active Threads
+## Active Threads (Updated 2026-02-04)
 
-- **VC Lab Sprint 2** — Due Feb 4, 7/8 deliverables drafted, Step 5 (Secret Sauce) needs Florian's examples
-- **Monique Barbanson meeting** — Feb 3, 6 PM CET — Full prep ready (meeting brief, demo script, day-of checklist)
-- **Decile Capital application** — Cover letter ready, submit Monday Feb 3 (after Monique meeting)
-- **LinkedIn Post** — "Founder to VC" post ready for Feb 3, 14:00 CET (strategic timing: before Monique meeting)
-- **Maschinenbau Schlottwitz** — CNC demo ready, uncle is warm lead, fastest path to revenue
-- **CNC Planner Pro** — Mehrere Versionen existieren (v2, v3, v4). v4 = Enhanced Fertigungsanweisung mit Progress Bar, Material-Warnungen, Werkzeug-Standzeitbalken, etc. Alle in `projects/cnc-planner/`
+- **CNC Demo @ Onkel's Betrieb** — Feb 5, 10:30 — Demo mit Arbeitsvorbereiter. Demo-Skript, One-Pager, Deploy-Guide ready. FASTEST PATH TO REVENUE.
+- **VC Lab Sprint 2** — Due Feb 4, alle Steps drafted. Florian muss auf fi.co einloggen und deliverables in Text-Boxen submitten. Step 7 (Decile Hub) nur Florian möglich.
+- **Substack Article #2** — Draft in Editor ("I Replaced My Back Office With AI Agents"). Florian muss Review → Publish. Images (org-chart, what-works, bottleneck) manuell einfügen.
+- **5 VC Applications ready** — HOF Capital, Betaworks, Leonis, Point72, Conviction. Cover Letters in `job-applications/READY-TO-APPLY.md`
+- **9 CNC Outreach Emails ready** — Inkl. Nachbar-Lead (Maschinentechnik Pretzschendorf!). In `products/cnc-planner/leads/READY-TO-SEND-EMAILS.md`
+- **CNC Planner Pro** — AI-Bauteilanalyse (GPT-4o Vision), dynamischer NC-Code, Feedback-Widget. Pricing: Pro €149/Business €299/Enterprise. Deploy-ready auf `~/Desktop/cnc-deploy/`
 - **Knowledge System** — 10 RSS feeds active, 144 articles captured, blogwatcher running
+
+### Completed (Feb 3-4)
+- ✅ Monique Barbanson meeting (Feb 3, 6 PM CET) — Prep was ready
+- ✅ LinkedIn "Founder to VC" post published
+- ✅ CNC Landing Page + Pricing overhaul (4 iterations)
+- ✅ ISO 27001 Docs, User Manual, Sales Presentation created
 
 ## CNC Planner Status (Quick Reference)
 
@@ -139,6 +145,9 @@ Legal AI Platform with <0.2% hallucination rate using:
 - **Präsentations-Regel** — Titel und Content müssen sich ergänzen, nie wiederholen. "93% weniger" + "93%" = redundant. (Added 2026-02-03)
 - **KORREKTUR: Whitespace ist König** — Leerer Raum ist NICHT verschenkt. Slides brauchen Luft zum Atmen. Nie Margins komprimieren um mehr reinzubekommen. v3 war besser als v4 wegen besserer Abstände. (Added 2026-02-03)
 - **Beim Rewrite: Design beibehalten** — Wenn ich Code neu schreibe, NICHT das CSS komprimieren. Original-Spacing beibehalten. Fokus auf Inhalt, nicht auf Code-Kompaktheit. (Added 2026-02-03)
+- **Browser Paste vs React Editors** — `document.execCommand` + innerHTML injection funktioniert für Substack-Text, aber Bild-Uploads werden vom React-State nicht erkannt. Bilder MÜSSEN manuell per Drag & Drop eingefügt werden. (Added 2026-02-04)
+- **Slowly typing timeout** — Browser control timeout nach 20s bei langem Text. JS-Injection ist der bessere Weg. (Added 2026-02-04)
+- **Entelechy = Angel/Solo-GP** — Nicht Fund I-III. Wichtig für VC-Kontexte (LP-Strategie, Fund Economics). (Added 2026-02-04)
 
 ## 🔴 CORE LEARNING: Die Qualitäts-Lücke (2026-02-03 04:00)
 
@@ -219,4 +228,4 @@ Wenn nein → nicht fertig. Weiter iterieren.
 
 ---
 
-*Last updated: 2026-02-03 04:30 CET*
+*Last updated: 2026-02-04 15:00 CET*

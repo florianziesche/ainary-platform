@@ -14,6 +14,8 @@
 | 2026-02-03 | Sub-Agents | Kein Output (Lead Research) | Sub-Agents haben keinen Web-Search | Research selbst machen oder Tools prüfen |
 | 2026-02-03 | Präsentation | Redundanz (Titel + Content gleich) | Nicht auf Wiederholungen geachtet | Titel und Content müssen sich ergänzen, nicht wiederholen |
 | 2026-02-03 | Präsentation | Zu viel leerer Platz | Zu wenig Elemente pro Slide | Platz sinnvoll füllen, nicht künstlich leer lassen |
+| 2026-02-04 | Browser/Substack | Bild-Upload via JS nicht erkannt | React State ignoriert programmatische Änderungen | Bilder manuell Drag&Drop, Text via JS-Injection OK |
+| 2026-02-04 | Browser Control | Slowly typing timeout bei langem Text | 20s Timeout bei character-by-character | JS innerHTML injection statt typing |
 
 ---
 

@@ -311,24 +311,13 @@ async function run() {
     // 2. Detect Workspace State (Enhanced Skill Map)
     let fileList = '';
     const skillsDir = path.resolve(__dirname, '../../skills');
-    const hasFeishuCard = fs.existsSync(path.join(skillsDir, 'feishu-card'));
+    // Removed dead feishu-card reference (not in this workspace)
     
     let reportingDirective = `3.  **📝 REPORT**:
     - Use \`message\` tool.
     - **Title**: 🧬 Evolution ${cycleId}
     - **Status**: [SUCCESS]
     - **Changes**: Detail exactly what was improved.`;
-
-    if (process.env.EVOLVE_REPORT_TOOL === 'feishu-card' || hasFeishuCard) {
-        reportingDirective = `3.  **📝 REPORT (MANDATORY)**:
-    - You **MUST** use the \`feishu-card\` skill (NOT the generic \`message\` tool) if possible.
-    - **Frequency**: The Master requested "more sync". You MUST report EVERY cycle.
-    - **Command**:
-      \`\`\`bash
-      node skills/feishu-card/send.js --title "🧬 Evolution ${cycleId} Log" --color blue --text "Status: [RUNNING]\\nAction: ... (What did you check? What did you fix? Even if nothing, report 'Stability Scan OK')"
-      \`\`\`
-    - **Target**: Auto-detects context.`;
-    }
 
     const SKILLS_CACHE_FILE = path.join(MEMORY_DIR, 'skills_list_cache.json');
     
