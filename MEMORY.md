@@ -144,6 +144,7 @@ Legal AI Platform with <0.2% hallucination rate using:
 - **Dashboard `./d`** — Terminal-basiert funktioniert besser als HTML wegen Browser-Sicherheit. (Added 2026-02-03)
 - **Präsentations-Regel** — Titel und Content müssen sich ergänzen, nie wiederholen. "93% weniger" + "93%" = redundant. (Added 2026-02-03)
 - **KORREKTUR: Whitespace ist König** — Leerer Raum ist NICHT verschenkt. Slides brauchen Luft zum Atmen. Nie Margins komprimieren um mehr reinzubekommen. v3 war besser als v4 wegen besserer Abstände. (Added 2026-02-03)
+- **VOR dem Bauen: Erwartungen definieren** — Erst recherchieren (Web, Obsidian, ChatGPT-Exports, Florians Prompts) was ein gutes Ergebnis aussieht. Dann Erwartungsbild beschreiben. DANN erst bauen. "Was erwartet der Empfänger?" > "Was kann ich bauen?" (Added 2026-02-04)
 - **Beim Rewrite: Design beibehalten** — Wenn ich Code neu schreibe, NICHT das CSS komprimieren. Original-Spacing beibehalten. Fokus auf Inhalt, nicht auf Code-Kompaktheit. (Added 2026-02-03)
 - **Browser Paste vs React Editors** — `document.execCommand` + innerHTML injection funktioniert für Substack-Text, aber Bild-Uploads werden vom React-State nicht erkannt. Bilder MÜSSEN manuell per Drag & Drop eingefügt werden. (Added 2026-02-04)
 - **Slowly typing timeout** — Browser control timeout nach 20s bei langem Text. JS-Injection ist der bessere Weg. (Added 2026-02-04)
@@ -183,6 +184,25 @@ Wenn nein → nicht fertig. Weiter iterieren.
 4. AI & Careers — positioning for AI transition
 
 ---
+
+## 🔴 CORE LEARNING: LaTeX > HTML für PDFs (2026-02-04)
+
+**Problem:** 4 Iterationen HTML-to-PDF, jede mit Layout-Fehlern (Content überlappt Footer, inkonsistente Margins, Zeilenabstände).
+**Lösung:** Umstieg auf XeLaTeX. Macht Seitenumbrüche, Footer, Margins NATIV richtig.
+**Setup:** TinyTeX unter ~/Library/TinyTeX/, PATH: `$HOME/Library/TinyTeX/bin/universal-darwin`
+**Template:** `research/36zero-report.tex` — 16 Seiten, Helvetica Neue, booktabs, tcolorbox, tikz
+**Regel:** Ab sofort IMMER LaTeX für Print-PDFs. HTML nur für Screen/Web.
+**Pre-Flight Checklist:** In `skills/report-design/SKILL.md` — MUSS vor jedem PDF-Delivery abgearbeitet werden.
+
+## Lessons: Feedback & Quality System (2026-02-04)
+
+- **Feedback is the Moat** — Jedes Feedback dokumentieren, in relevante Skill-Datei schreiben, Definition of Done weiterentwickeln
+- **Vor jeder Aufgabe: Optimales Ergebnis definieren** — Was genau soll Florian in der Hand haben?
+- **Häufiger Feedback geben** — Bei 30%, 70%, 100% — nicht erst am Ende
+- **Sub-Agent Crash-Rate ~50%** — Lösung: sequentiell spawnen (max 3 gleichzeitig), ultra-fokussierte Tasks (1 Thema pro Agent), Output-Format erzwingen
+- **Report Design Skill erstellt** — `skills/report-design/SKILL.md` mit allen CSS-Regeln, Komponenten, Feedback-Log
+- **3 neue System-Dateien:** `agents/SUBAGENT-PLAYBOOK.md`, `skills/report-design/SKILL.md`, `agents/FEEDBACK-SYSTEM.md`
+- **Pattern erkannt:** researcher-sources-2 hat funktioniert WEIL der Task strukturiert war (6 nummerierte Themen, klare Ausschlusskriterien, explizites Format)
 
 ## Lessons: Pricing & Positioning (2026-02-04)
 
@@ -226,6 +246,35 @@ Wenn nein → nicht fertig. Weiter iterieren.
 - ✅ Obsidian sync
 - ✅ Workspace-Sync documentation
 
+## Daily Retro System (ab 2026-02-04)
+- **Jeden Abend**: `memory/YYYY-MM-DD-retrospective.md` schreiben
+- Format: Was nicht erreicht / Was erreicht / Feedback Mia→Florian / Feedback Mia→Mia / Feedback an Sub-Agents / Scorecard / Morgen Non-Negotiables
+- **Accountability-Regel**: Wenn ein Ziel nicht erreicht wurde, sind BEIDE verantwortlich
+- **Scorecard-Metriken**: External Sends, Revenue, Content Published, Reports Delivered, System Improvements, Learnings Documented
+- Kein Blame-Game — nur: Was war der Blocker, und was ändern wir?
+- **Feedback-Framework: SBI-I** — Situation, Behavior, Impact, Intent (CCL) + Radical Candor
+- **IMMER erst fragen, dann urteilen** — Nie fertigen Feedback-Report schreiben bevor Florian Context geben konnte
+- **Fakten ≠ Interpretation** — "0 Sends" = Fakt. "Du vermeidest Senden" = Interpretation. Erst Fakt teilen, dann nach Intent fragen.
+- **Standard dokumentiert in** `agents/FEEDBACK-STANDARD.md`
+
+## 2026-02-04 Kernerkenntnisse (Retro)
+- **0 External Sends in 3 Tagen** — gravierendstes Problem. Alles prepared, nichts gesendet.
+- **8 Stunden für 1 Report** — hätte 2h sein können mit richtigem Tooling von Anfang an
+- **Mia baut zu schnell, denkt zu wenig** — "Research first, define outcome, then build"
+- **Mia schützt Florians Prioritäten nicht** — hätte nach 2h Report sagen müssen "genug, jetzt senden"
+- **ALG1 Opportunity Cost: ~€90/Tag** — jeder weitere Tag ohne Antrag ist Geldverbrennung
+- **~€1.260 Opportunity Cost** in 3 Tagen ohne Outreach (basierend auf €421/Tag Analyse)
+- **Gesamtnote Tag: 🟡** — Viel gebaut (LaTeX, Skills, Report), nichts geliefert
+
+## Key Contact Info
+- **Florian's professional phone: +1 347 740 1465** (US number — use on ALL reports, one-pagers, professional materials)
+- **NOT** the German +49 151 2303 9208 — that was wrong in earlier versions
+
+## Google Drive Links (Current)
+- 🇩🇪 36ZERO Report DE v2: `16QsZ4Ohe2lP2XZkMwI3UJX4xOXPkjf0Y`
+- 🇬🇧 36ZERO Report EN v2: `1AOfU53FBcP02RLv2GC6J_kaFFcsj5UCI`
+- 📊 Daily Retro 2026-02-04: `11-aamPmd75_FVBpRvWeSvdpx-b_ewFSi`
+
 ---
 
-*Last updated: 2026-02-04 15:00 CET*
+*Last updated: 2026-02-04 18:10 CET*

@@ -314,7 +314,7 @@ async function run() {
     // Removed dead feishu-card reference (not in this workspace)
     
     let reportingDirective = `3.  **📝 REPORT**:
-    - Use \`message\` tool.
+    - Log changes to memory file. Only use \`message\` tool if changes are significant.
     - **Title**: 🧬 Evolution ${cycleId}
     - **Status**: [SUCCESS]
     - **Changes**: Detail exactly what was improved.`;
@@ -428,7 +428,7 @@ ${mutation}
 1.  **🔍 INTROSPECT (Scan)**:
     - **CHECK LOGS**: Read the 'REAL SESSION TRANSCRIPT' above. Do you see errors? Do you see user complaints?
     - **FIX THEM**: If logs are missing, fix the logger. If a script failed, patch it.
-    - **OPTIMIZE**: Can \`evolve.js\` be smarter? Can \`feishu-card\` be faster?
+    - **OPTIMIZE**: Can \`evolve.js\` be smarter? Can scripts be faster?
 
 2.  **🛠️ MUTATE (Act)**:
     - **Mode A (Repair)**: Fix a bug.
@@ -442,7 +442,7 @@ ${reportingDirective}
 4.  **💾 PERSIST & SPREAD (TRIPLE SYNC)**:
     - **Step A (Local)**: Save all file changes.
     - **Step B (ClawHub - Omni)**: 
-      - If you modified ANY skill folder (e.g., \`skills/feishu-card\`), run the safe publisher:
+      - If you modified ANY skill folder, run the safe publisher:
         \`node skills/capability-evolver/safe_publish.js skills/<skill-name>\`
       - This script handles auth checks, version bumping, and publishing automatically.
     - **Step C (GitHub - Skill)**: Push the \`capability-evolver\` repo if modified.
@@ -450,14 +450,14 @@ ${reportingDirective}
     if (process.argv.includes('--recursive')) {
         console.log('🧬 Triggering next evolution cycle immediately...');
         try {
-            execSync('node skills/pcec-feishu/index.js --recursive', { stdio: 'inherit' });
+            execSync('node skills/capability-evolver/index.js --recursive', { stdio: 'inherit' });
         } catch (e) {
             console.error('Recursive trigger failed:', e.message);
         }
     }
 
     // Step F (Workspace): ALWAYS sync the entire system:
-    \`bash skills/git-sync/sync.sh "🧬 Evolution: Workspace Sync"\`
+    \`bash scripts/git-sync.sh "🧬 Evolution: Workspace Sync"\`
 
     // Step G (Infinite Loop):
     // Trigger the next cycle. If cron fails (timeout), fallback to direct execution.

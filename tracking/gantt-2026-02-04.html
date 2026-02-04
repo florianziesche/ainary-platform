@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gantt — 04.02.2026</title>
+<style>
+  :root {
+    --build: #2563EB;
+    --research: #7C3AED;
+    --content: #059669;
+    --sales: #EA580C;
+    --system: #64748B;
+    --idle: #FEE2E2;
+    --bg: #FAFBFC;
+    --text: #111827;
+    --subtle: #64748B;
+    --border: #E5E7EB;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { color: var(--subtle); font-size: 14px; margin-bottom: 32px; }
+  .legend { display: flex; gap: 20px; margin-bottom: 24px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+  .gantt-container { position: relative; overflow-x: auto; }
+  .time-header {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+    padding-left: 200px;
+  }
+  .time-label {
+    flex-shrink: 0;
+    width: calc((100% - 200px) / 24);
+    min-width: 36px;
+    font-size: 11px;
+    color: var(--subtle);
+    text-align: center;
+    padding: 4px 0;
+  }
+  .task-row {
+    display: flex;
+    align-items: center;
+    height: 44px;
+    position: relative;
+    border-bottom: 1px solid #F3F4F6;
+  }
+  .task-row:hover { background: #F8FAFC; }
+  .task-label {
+    width: 200px;
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: 500;
+    padding-right: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .task-track {
+    flex: 1;
+    position: relative;
+    height: 100%;
+    min-width: 600px;
+  }
+  .task-bar {
+    position: absolute;
+    height: 28px;
+    top: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .task-bar:hover { opacity: 0.85; }
+  .tooltip {
+    display: none;
+    position: fixed;
+    background: #1E293B;
+    color: white;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 360px;
+    z-index: 100;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  }
+  .tooltip.visible { display: block; }
+  .tooltip h4 { font-size: 14px; margin-bottom: 6px; }
+  .tooltip .meta { color: #94A3B8; font-size: 12px; }
+  .grid-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: #F3F4F6;
+    pointer-events: none;
+  }
+  .now-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #EF4444;
+    pointer-events: none;
+    z-index: 5;
+  }
+  .summary {
+    margin-top: 32px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+  }
+  .stat-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .stat-card .value { font-size: 28px; font-weight: 700; }
+  .stat-card .label { font-size: 12px; color: var(--subtle); margin-top: 4px; }
+  .stat-card.red .value { color: #DC2626; }
+  .stat-card.blue .value { color: #2563EB; }
+  .stat-card.green .value { color: #059669; }
+  .stat-card.purple .value { color: #7C3AED; }
+  .insights { margin-top: 32px; }
+  .insights h3 { font-size: 18px; margin-bottom: 12px; }
+  .insight {
+    display: flex;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #F3F4F6;
+    font-size: 14px;
+  }
+  .insight-icon { font-size: 18px; flex-shrink: 0; }
+  .insight strong { font-weight: 600; }
+</style>
+</head>
+<body>
+
+<h1>Task Gantt — 04.02.2026</h1>
+<p class="subtitle">Florian Ziesche · Mia COO · Tracking aller Aufgaben mit Zeitstempel</p>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--build)"></div>Build</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--research)"></div>Research</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--content)"></div>Content</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--sales)"></div>Sales</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--system)"></div>System</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--idle);border:1px solid #FECACA"></div>Idle/Gap</div>
+</div>
+
+<div class="gantt-container" id="gantt">
+  <!-- Built by JS -->
+</div>
+
+<div class="summary">
+  <div class="stat-card blue"><div class="value">10</div><div class="label">Tasks abgeschlossen</div></div>
+  <div class="stat-card purple"><div class="value">~12h</div><div class="label">Aktive Arbeitszeit</div></div>
+  <div class="stat-card red"><div class="value">44%</div><div class="label">Schätz-Genauigkeit</div></div>
+  <div class="stat-card red"><div class="value">0</div><div class="label">External Sends</div></div>
+  <div class="stat-card green"><div class="value">52%</div><div class="label">Build-Anteil</div></div>
+  <div class="stat-card red"><div class="value">0%</div><div class="label">Sales-Anteil</div></div>
+</div>
+
+<div class="insights">
+  <h3>Top Erkenntnisse</h3>
+  <div class="insight"><span class="insight-icon">🔴</span><div><strong>0% Sales-Zeit.</strong> Kein einziger Send. Alles Build/Research/System. Morgen: min. 30 min Sends vor 09:00.</div></div>
+  <div class="insight"><span class="insight-icon">⏱</span><div><strong>Schätzungen 2.3x zu niedrig.</strong> Geschätzt ~5h 20min, tatsächlich ~12h. Scope Creep + Tool-Probleme. Regel: Schätzung × 2.5.</div></div>
+  <div class="insight"><span class="insight-icon">🔧</span><div><strong>HTML→PDF = 8h Zeitgrab.</strong> 6-9 Iterationen. LaTeX löste alles in 1 Compile. Ab jetzt: LaTeX für Print-PDFs. Immer.</div></div>
+  <div class="insight"><span class="insight-icon">🔀</span><div><strong>Zu viel parallel.</strong> 5 Research-Docs gleichzeitig statt 1 fertig → senden → nächstes. Seriell > Parallel für Output.</div></div>
+  <div class="insight"><span class="insight-icon">⚙️</span><div><strong>2h System-Arbeit morgens.</strong> HEARTBEAT, COCKPIT, Cron — alles Meta. Max 15 min, dann echte Arbeit.</div></div>
+</div>
+
+<div id="tooltip" class="tooltip"></div>
+
+<script>
+const tasks = [
+  {
+    label: "CNC Demo Overhaul",
+    start: 1, end: 2.67, type: "build",
+    est: 60, actual: 100,
+    problems: "Scope Creep — aus 'Pricing fixen' wurde Full-Stack Overhaul",
+    better: "Scope vorher definieren. Restliches in separaten Tasks.",
+    output: "demo-v12.html, Landing Page v4"
+  },
+  {
+    label: "Sub-Agent Deliverables",
+    start: 2.67, end: 3, type: "build",
+    est: 10, actual: 20,
+    problems: "Sub-Agent Crash-Rate ~50%",
+    better: "Ultra-fokussierte Tasks, max 1 Output pro Agent",
+    output: "One-Pager, Follow-Up Email, Deploy Guide"
+  },
+  {
+    label: "Morning Systems",
+    start: 8, end: 10, type: "system",
+    est: 30, actual: 120,
+    problems: "Zu viel System-Optimierung statt Execution",
+    better: "Max 15 min System-Arbeit morgens",
+    output: "HEARTBEAT.md, COCKPIT.md, 15 Cron Jobs"
+  },
+  {
+    label: "Research Sprint",
+    start: 10, end: 12, type: "research",
+    est: 60, actual: 120,
+    problems: "Zu breit — 5 Docs gleichzeitig",
+    better: "1 Research → 1 Deliverable → Senden",
+    output: "5 Research-Dokumente, Quality Gap Analysis"
+  },
+  {
+    label: "Content Preparation",
+    start: 12, end: 13, type: "content",
+    est: 30, actual: 60,
+    problems: "Alles drafted, NICHTS PUBLISHED",
+    better: "1 Post schreiben → sofort posten",
+    output: "5 LinkedIn Posts, Comment Replies"
+  },
+  {
+    label: "Substack #2 + VC Lab",
+    start: 13, end: 14.5, type: "content",
+    est: 45, actual: 90,
+    problems: "React Editor blockt programmatische Bild-Uploads",
+    better: "Text-only publishen, Bilder nachträglich",
+    output: "Article Draft in Substack Editor"
+  },
+  {
+    label: "36ZERO Report LaTeX",
+    start: 14.5, end: 16, type: "build",
+    est: 30, actual: 90,
+    problems: "HTML-to-PDF: 6-9 Iterationen Layout-Fehler",
+    better: "IMMER LaTeX für Print-PDFs",
+    output: "36zero-report.tex, 16 Seiten"
+  },
+  {
+    label: "WCAG + Report Polish",
+    start: 16, end: 17, type: "build",
+    est: 20, actual: 60,
+    problems: "Farbkontrast, Unicode-Glyphen, TAM Overflow",
+    better: "WCAG Check VOR dem Design",
+    output: "Report v2.0 FINAL"
+  },
+  {
+    label: "Feedback + Retro",
+    start: 17, end: 17.75, type: "system",
+    est: 20, actual: 45,
+    problems: "Retro ohne Florians Input geschrieben",
+    better: "Erst Dialog, dann Report",
+    output: "FEEDBACK-STANDARD.md, Retro PDF"
+  },
+  {
+    label: "Report EN + Drive",
+    start: 17.83, end: 18.17, type: "build",
+    est: 15, actual: 20,
+    problems: "Keine — sauberer Prozess",
+    better: "Nichts — Template + gog CLI = effizient",
+    output: "36ZERO EN v2, 3 PDFs in Google Drive"
+  }
+];
+
+const colors = {
+  build: '#2563EB',
+  research: '#7C3AED',
+  content: '#059669',
+  sales: '#EA580C',
+  system: '#64748B'
+};
+
+const gantt = document.getElementById('gantt');
+const tooltip = document.getElementById('tooltip');
+
+// Time header
+const timeHeader = document.createElement('div');
+timeHeader.className = 'time-header';
+for (let h = 0; h < 24; h++) {
+  const lbl = document.createElement('div');
+  lbl.className = 'time-label';
+  lbl.textContent = String(h).padStart(2,'0');
+  lbl.style.width = (100/24) + '%';
+  timeHeader.appendChild(lbl);
+}
+
+// Wrap header
+const headerRow = document.createElement('div');
+headerRow.style.display = 'flex';
+const spacer = document.createElement('div');
+spacer.style.width = '200px';
+spacer.style.flexShrink = '0';
+headerRow.appendChild(spacer);
+const timeTrack = document.createElement('div');
+timeTrack.style.flex = '1';
+timeTrack.style.display = 'flex';
+timeTrack.style.borderBottom = '1px solid #E5E7EB';
+timeTrack.style.marginBottom = '4px';
+for (let h = 0; h < 24; h++) {
+  const lbl = document.createElement('div');
+  lbl.style.flex = '1';
+  lbl.style.fontSize = '11px';
+  lbl.style.color = '#94A3B8';
+  lbl.style.textAlign = 'center';
+  lbl.style.padding = '4px 0';
+  lbl.textContent = String(h).padStart(2,'0');
+  timeTrack.appendChild(lbl);
+}
+headerRow.appendChild(timeTrack);
+gantt.appendChild(headerRow);
+
+// Task rows
+tasks.forEach(t => {
+  const row = document.createElement('div');
+  row.className = 'task-row';
+
+  const label = document.createElement('div');
+  label.className = 'task-label';
+  label.textContent = t.label;
+  row.appendChild(label);
+
+  const track = document.createElement('div');
+  track.className = 'task-track';
+  track.style.position = 'relative';
+
+  // Grid lines
+  for (let h = 0; h < 24; h++) {
+    const gl = document.createElement('div');
+    gl.className = 'grid-line';
+    gl.style.left = (h/24*100) + '%';
+    track.appendChild(gl);
+  }
+
+  const bar = document.createElement('div');
+  bar.className = 'task-bar';
+  bar.style.left = (t.start/24*100) + '%';
+  bar.style.width = ((t.end - t.start)/24*100) + '%';
+  bar.style.background = colors[t.type];
+  bar.textContent = t.actual + ' min';
+
+  bar.addEventListener('mouseenter', e => {
+    const overUnder = t.actual > t.est
+      ? `<span style="color:#F87171">+${t.actual - t.est} min over</span>`
+      : `<span style="color:#34D399">on time</span>`;
+    tooltip.innerHTML = `
+      <h4>${t.label}</h4>
+      <div class="meta">${formatTime(t.start)}–${formatTime(t.end)} · ${t.type}</div>
+      <div style="margin-top:6px">Est: ${t.est} min · Actual: ${t.actual} min · ${overUnder}</div>
+      <div style="margin-top:6px"><strong>Problem:</strong> ${t.problems}</div>
+      <div style="margin-top:4px"><strong>Besser:</strong> ${t.better}</div>
+      <div style="margin-top:4px;color:#94A3B8"><strong>Output:</strong> ${t.output}</div>
+    `;
+    tooltip.classList.add('visible');
+  });
+  bar.addEventListener('mousemove', e => {
+    tooltip.style.left = Math.min(e.clientX + 12, window.innerWidth - 380) + 'px';
+    tooltip.style.top = (e.clientY - 10) + 'px';
+  });
+  bar.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
+
+  track.appendChild(bar);
+  row.appendChild(track);
+  gantt.appendChild(row);
+});
+
+// Now line (18:15)
+const nowHour = 18.25;
+document.querySelectorAll('.task-track').forEach(track => {
+  const nl = document.createElement('div');
+  nl.className = 'now-line';
+  nl.style.left = (nowHour/24*100) + '%';
+  nl.title = '18:15 — Jetzt';
+  track.appendChild(nl);
+});
+
+function formatTime(h) {
+  const hours = Math.floor(h);
+  const mins = Math.round((h - hours) * 60);
+  return String(hours).padStart(2,'0') + ':' + String(mins).padStart(2,'0');
+}
+</script>
+</body>
+</html>

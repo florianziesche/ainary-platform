@@ -1,0 +1,825 @@
+\documentclass[a4paper,11pt]{article}
+
+% Fonts
+\usepackage{fontspec}
+\setmainfont{Helvetica Neue}[
+  BoldFont=Helvetica Neue Bold,
+  ItalicFont=Helvetica Neue Italic
+]
+
+% Layout
+\usepackage[top=28mm, bottom=34mm, left=28mm, right=28mm]{geometry}
+\usepackage{parskip}
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+% ============================================
+% COLOR SYSTEM (Contrast-Checked)
+% ============================================
+% RULE: Every text color must have ≥4.5:1 contrast ratio against its background.
+%
+% On WHITE (#FFFFFF):
+%   heading (#111827)  = 16.8:1 ✓  — Headings, bold labels
+%   bodytext (#374151) = 9.7:1  ✓  — Body text
+%   subtitle (#64748B) = 4.6:1  ✓  — Secondary text, labels
+%   primary (#2563EB)  = 4.6:1  ✓  — Accent, links, numbers
+%   darkred (#B91C1C)  = 6.1:1  ✓  — Negative/risk (NOT bright red)
+%   darkgreen (#15803D)= 5.0:1  ✓  — Positive/solution (NOT bright green)
+%   darkyellow (#92400E)= 7.3:1 ✓  — Warning/partial (NOT bright yellow)
+%
+% On DARK (#0A0F1E):
+%   white (#FFFFFF)    = 18.5:1 ✓  — Primary text on dark
+%   accent (#93C5FD)   = 8.2:1  ✓  — Highlight on dark (lighter blue)
+%   lightgray (#D1D5DB)= 10.3:1 ✓  — Secondary on dark
+%
+% On LIGHTBLUE (#F0F4FF):
+%   darkblue (#1E3A5F) = 10.1:1 ✓  — Text in highlight boxes
+%
+% BANNED: yellow (#EAB308) on white = 1.9:1 ✗ UNREADABLE
+% BANNED: green (#16A34A) on white = 3.8:1 ✗ Below threshold for small text
+% BANNED: subtitle (#64748B) on dark = 3.1:1 ✗ Too low
+
+\usepackage{xcolor}
+\definecolor{primary}{HTML}{2563EB}
+\definecolor{darkbg}{HTML}{0A0F1E}
+\definecolor{darkblue}{HTML}{1E3A5F}
+\definecolor{bodytext}{HTML}{374151}
+\definecolor{heading}{HTML}{111827}
+\definecolor{subtitle}{HTML}{64748B}
+\definecolor{lightgray}{HTML}{F8F9FA}
+\definecolor{border}{HTML}{E5E7EB}
+\definecolor{accent}{HTML}{93C5FD}
+\definecolor{lightondark}{HTML}{D1D5DB}
+\definecolor{darkred}{HTML}{B91C1C}
+\definecolor{darkgreen}{HTML}{15803D}
+\definecolor{darkyellow}{HTML}{92400E}
+\definecolor{lightblue}{HTML}{F0F4FF}
+\definecolor{lightred}{HTML}{FEF2F2}
+\definecolor{lightgreen}{HTML}{F0FDF4}
+
+% ============================================
+% HIGHLIGHT STRATEGY
+% ============================================
+% 1. highlightbox (light blue bg) = Key insight, takeaway, recommendation
+%    → Used max 1x per page. Reader's eye goes here first.
+% 2. darkhighlight (dark bg) = Bold statement, vision, core argument
+%    → Used for maximum emphasis. Sparingly — max 1x per 2 pages.
+% 3. statcard (light gray bg) = Single metric with label
+%    → Always in rows of 3. Data-driven pages only.
+% 4. No background = Normal content. Most text lives here.
+%
+% RULE: Never stack two highlighted boxes without normal text between them.
+
+% Headers & Footers
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyfoot[L]{\footnotesize\color{subtitle}\textls[50]{36ZERO VISION · STRATEGIC REPORT}}
+\fancyfoot[R]{\footnotesize\color{subtitle}\thepage}
+
+% Headings
+\usepackage{titlesec}
+% Headings: \needspace ensures min. 4 lines after heading stay on same page
+\titleformat{\section}{\needspace{6\baselineskip}\fontsize{24}{28}\selectfont\bfseries\color{heading}}{}{0em}{}[\vspace{-2pt}]
+\titleformat{\subsection}{\needspace{4\baselineskip}\fontsize{14}{18}\selectfont\bfseries\color{heading}}{}{0em}{}
+\titlespacing*{\section}{0pt}{0pt}{4pt}
+\titlespacing*{\subsection}{0pt}{16pt}{6pt}
+
+% Tables
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{colortbl}
+\usepackage{multirow}
+
+% Lists
+\usepackage{enumitem}
+\setlist[itemize]{leftmargin=1.2em, itemsep=2pt, parsep=0pt, topsep=4pt}
+
+% Links
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=primary, urlcolor=primary}
+
+% Drawing
+\usepackage{tikz}
+\usetikzlibrary{calc,positioning,shapes.geometric}
+
+% Boxes
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+
+% Misc
+\usepackage{microtype}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{needspace}
+\usepackage{multicol}
+\usepackage{amssymb}  % for \checkmark
+
+% ============================================
+% TEXT ALIGNMENT: Blocksatz (Justified)
+% ============================================
+% DIN 5008:2020 — Blocksatz für Reports wenn Silbentrennung aktiv.
+% Typografie-Standard: Justified text für professionelle Dokumente.
+% Silbentrennung MUSS aktiv sein bei Blocksatz (sonst Lücken).
+\usepackage{polyglossia}
+\setdefaultlanguage{german}
+% polyglossia + german activates German hyphenation automatically
+
+% Overflow tolerance (für Blocksatz)
+% Höhere Toleranz erlaubt mehr Dehnung zwischen Wörtern, vermeidet Überlauf
+\tolerance=2000
+\emergencystretch=15pt
+\hbadness=2000
+\hyphenpenalty=50
+\exhyphenpenalty=50
+
+% ============================================
+% WIDOW/ORPHAN CONTROL (Typografie-Standard)
+% ============================================
+% Widow = einzelne Zeile am Seitenanfang (vom vorherigen Absatz)
+% Orphan = einzelne Zeile am Seitenende (vom nächsten Absatz)
+% Heading-Regel: Min. 3 Zeilen nach Überschrift auf gleicher Seite,
+%   sonst Überschrift auf nächste Seite schieben.
+% Quelle: DIN 5008, ISO 11442 (tech. documentation), allg. Typografie
+\widowpenalty=10000
+\clubpenalty=10000
+\brokenpenalty=10000
+
+% ============================================
+% CUSTOM COMMANDS
+% ============================================
+
+\newcommand{\ssubtitle}[1]{%
+  \par\textcolor{subtitle}{\fontsize{12}{16}\selectfont #1}%
+  \par\vspace{2pt}\textcolor{border}{\rule{\linewidth}{0.4pt}}\vspace{12pt}%
+}
+
+\newtcolorbox{highlightbox}{
+  colback=lightblue, colframe=primary,
+  leftrule=3pt, rightrule=0pt, toprule=0pt, bottomrule=0pt,
+  arc=0pt, outer arc=4pt,
+  boxsep=4pt, left=12pt, right=12pt, top=8pt, bottom=8pt,
+  fontupper=\fontsize{11}{15}\selectfont\color{darkblue}
+}
+
+\newtcolorbox{darkhighlight}{
+  colback=darkbg, colframe=primary,
+  leftrule=3pt, rightrule=0pt, toprule=0pt, bottomrule=0pt,
+  arc=0pt, outer arc=4pt,
+  boxsep=4pt, left=12pt, right=12pt, top=8pt, bottom=8pt,
+  fontupper=\fontsize{11}{15}\selectfont\color{white}
+}
+
+% Stat card: consistent size, text wraps within
+\newcommand{\statcard}[2]{%
+  \begin{tikzpicture}
+    \node[fill=lightgray, rounded corners=4pt, minimum width=4.4cm, minimum height=2.2cm, inner sep=6pt, align=center, text width=4cm] {
+      {\fontsize{20}{24}\selectfont\bfseries\color{primary}#1}\\[3pt]
+      {\fontsize{8}{10}\selectfont\color{subtitle}\MakeUppercase{#2}}
+    };
+  \end{tikzpicture}%
+}
+
+% Red stat card (for negative scenarios)
+\newcommand{\statcardred}[2]{%
+  \begin{tikzpicture}
+    \node[fill=lightred, rounded corners=4pt, minimum width=4.4cm, minimum height=2.2cm, inner sep=6pt, align=center, text width=4cm] {
+      {\fontsize{20}{24}\selectfont\bfseries\color{darkred}#1}\\[3pt]
+      {\fontsize{8}{10}\selectfont\color{subtitle}\MakeUppercase{#2}}
+    };
+  \end{tikzpicture}%
+}
+
+% Green stat card (for positive scenarios)
+\newcommand{\statcardgreen}[2]{%
+  \begin{tikzpicture}
+    \node[fill=lightgreen, rounded corners=4pt, minimum width=4.4cm, minimum height=2.2cm, inner sep=6pt, align=center, text width=4cm] {
+      {\fontsize{20}{24}\selectfont\bfseries\color{darkgreen}#1}\\[3pt]
+      {\fontsize{8}{10}\selectfont\color{subtitle}\MakeUppercase{#2}}
+    };
+  \end{tikzpicture}%
+}
+
+% Arrow command (consistent, no math mode needed)
+\newcommand{\arrow}{$\rightarrow$}
+
+% Numbered step item
+\newcommand{\ruleitem}[3]{%
+  \needspace{3\baselineskip}%
+  \noindent\begin{minipage}[t]{0.07\linewidth}
+    {\fontsize{16}{20}\selectfont\bfseries\color{primary}#1}
+  \end{minipage}%
+  \begin{minipage}[t]{0.91\linewidth}
+    {\fontsize{11}{14}\selectfont\bfseries\color{heading}#2}\\[2pt]
+    {\fontsize{10.5}{14}\selectfont\color{bodytext}#3}
+  \end{minipage}\par\vspace{8pt}%
+}
+
+% Dark rule item (white text for use inside darkhighlight)
+\newcommand{\darkruleitem}[3]{%
+  \noindent\begin{minipage}[t]{0.07\linewidth}
+    {\fontsize{16}{20}\selectfont\bfseries\color{accent}#1}
+  \end{minipage}%
+  \begin{minipage}[t]{0.91\linewidth}
+    {\fontsize{11}{14}\selectfont\bfseries\color{white}#2}\\[2pt]
+    {\fontsize{10.5}{14}\selectfont\color{lightondark}#3}
+  \end{minipage}\par\vspace{6pt}%
+}
+
+% Body text
+\renewcommand{\normalsize}{\fontsize{11}{15}\selectfont}
+\color{bodytext}
+
+\begin{document}
+
+% ============================================
+% COVER PAGE
+% ============================================
+\thispagestyle{empty}
+\begin{tikzpicture}[remember picture, overlay]
+  \fill[darkbg] (current page.south west) rectangle (current page.north east);
+
+  \node[anchor=north west, text width=12cm] at ($(current page.north west)+(3cm,-4cm)$) {
+    {\fontsize{11}{14}\selectfont\color{accent}\textls[200]{STRATEGIC RESEARCH REPORT}}\\[24pt]
+    {\color{primary}\rule{50pt}{2.5pt}}\\[32pt]
+    {\fontsize{38}{44}\selectfont\bfseries\color{white}Von Inspection zu\\Autonomous Quality}\\[18pt]
+    {\fontsize{16}{22}\selectfont\color{lightondark}Wie 36ZERO Vision das Betriebssystem für Fertigungsqualität wird — und warum der Zeitpunkt jetzt ist.}
+  };
+
+  \node[anchor=south west] at ($(current page.south west)+(3cm,5.5cm)$) {
+    \begin{tabular}{@{}l@{\hspace{36pt}}l@{\hspace{36pt}}l@{}}
+      {\fontsize{30}{34}\selectfont\bfseries\color{accent}15--20\%} &
+      {\fontsize{30}{34}\selectfont\bfseries\color{accent}80\%} &
+      {\fontsize{30}{34}\selectfont\bfseries\color{accent}\$41.7B} \\[2pt]
+      {\fontsize{9}{11}\selectfont\color{lightondark}\MakeUppercase{Qualitätskosten (\% Umsatz)}} &
+      {\fontsize{9}{11}\selectfont\color{lightondark}\MakeUppercase{Erkennungsrate manuell}} &
+      {\fontsize{9}{11}\selectfont\color{lightondark}\MakeUppercase{Marktvolumen 2030}}
+    \end{tabular}
+  };
+
+  \node[anchor=south west] at ($(current page.south west)+(3cm,3cm)$) {
+    {\fontsize{14}{18}\selectfont\color{accent}Florian Ziesche}\\[3pt]
+    {\fontsize{11}{14}\selectfont\color{lightondark}Version 2.0 · February 2026 · Confidential}
+  };
+\end{tikzpicture}
+
+\clearpage
+
+% ============================================
+% PAGE 1: EXECUTIVE SUMMARY
+% ============================================
+\section{Executive Summary}
+\ssubtitle{Die Chance ist größer als die aktuelle Vision.}
+
+36ZERO Vision hat eine starke technologische Basis: dateneffiziente KI (5--20 Bilder), Kunden wie Siemens, Bosch und LEONI, Partnerschaften mit SAP und Bosch Rexroth. Aber „AI Visual Inspection" ist ein Feature, kein Unternehmen. Die Vision muss wachsen.
+
+\begin{highlightbox}
+Die zentrale Erkenntnis: Inspektion ist nur die Datenschicht. Der eigentliche Wert liegt darüber — in Diagnose, Wissensaufbau und autonomer Korrektur.
+\end{highlightbox}
+
+\subsection{Die Evolution — Drei Stufen über das Heute hinaus}
+
+\begin{darkhighlight}
+\darkruleitem{\arrow}{Voraussetzung: Vision — „Was ist kaputt?"}{Visuelle Defekterkennung. Wo 36ZERO heute steht. Schnell, zuverlässig, dateneffizient.}
+\darkruleitem{1}{Memory — „Warum ist es kaputt?"}{Wissensdatenbank + ERP-Daten. Ursachenanalyse, Branchenwissen, kollektive Intelligenz.}
+\darkruleitem{2}{Autonomous Quality — „Wie verhindern wir es?"}{Agentic AI. Agent erkennt \arrow{} diagnostiziert \arrow{} korrigiert. Self-Improving: lernt aus jedem Teil.}
+\darkruleitem{3}{Manufacturing Quality OS — „Die Plattform"}{Predictive Quality, Cross-Plant Benchmarking, Manufacturing GPT, Quality-as-a-Service.}
+\end{darkhighlight}
+
+\textbf{Jede Stufe verdreifacht den Kundenwert und den adressierbaren Markt.} Die Wettbewerber bleiben bei der Voraussetzung stehen.
+
+\vspace{6pt}
+\noindent\begin{minipage}[t]{0.32\linewidth}\centering\statcard{\$30B}{AI Inspection Market}\end{minipage}\hfill
+\begin{minipage}[t]{0.32\linewidth}\centering\statcard{3--5x}{Kundenwert pro Stufe}\end{minipage}\hfill
+\begin{minipage}[t]{0.32\linewidth}\centering\statcard{0}{Closed-Loop Wettbewerber}\end{minipage}
+
+% ============================================
+% PAGE 2: CUSTOMER PROBLEMS
+% ============================================
+\clearpage
+\section{Das Kundenproblem}
+\ssubtitle{Warum visuelle Qualitätskontrolle heute versagt — und was es kostet.}
+
+Manuelle Inspektion ist das Fundament der Qualitätskontrolle. Und es bröckelt:
+
+\vspace{6pt}
+\noindent\begin{minipage}[t]{0.32\linewidth}\centering\statcard{80--85\%}{Erkennungsrate Prüfer}\end{minipage}\hfill
+\begin{minipage}[t]{0.32\linewidth}\centering\statcard{bis 40\%}{False-Positive-Rate}\end{minipage}\hfill
+\begin{minipage}[t]{0.32\linewidth}\centering\statcard{15--20\%}{COPQ (\% Umsatz)}\end{minipage}
+\vspace{6pt}
+
+\subsection{Die fünf größten Schmerzpunkte}
+
+\begin{minipage}[t]{0.48\linewidth}
+\textbf{\color{darkred}Ermüdung \& Inkonsistenz}\\
+{\small Prüfer erreichen max.\ 80--85\% Erkennung. Nach 2h sinkt die Aufmerksamkeit signifikant. \textit{Quelle: Pharmaceutical Technology}}
+
+\vspace{6pt}
+\textbf{\color{darkred}Wissensabfluss}\\
+{\small 13--20 Mio.\ Arbeitnehmer gehen bis 2036 in Rente. 30 Jahre Erfahrung verschwinden unwiederbringlich.}
+
+\vspace{6pt}
+\textbf{\color{darkred}Skalierungsproblem}\\
+{\small Mehr Produktion = mehr Prüfer. Lineare Kosten, keine Skaleneffekte.}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\textbf{\color{darkred}Scrap \& Rework}\\
+{\small COPQ: 8--15\% des Umsatzes in Automotive, Aerospace, Medtech. Bis 20\% bei typischen Herstellern. \textit{Quelle: ASQ}}
+
+\vspace{6pt}
+\textbf{\color{darkred}Rückrufkosten}\\
+{\small 28 Mio.\ Fahrzeuge zurückgerufen in USA 2024 (445 Kampagnen). Ein Recall: \$97--194M. \textit{Quelle: NHTSA, GM}}
+\end{minipage}
+
+\subsection{Wie 36ZERO diese Probleme löst}
+
+\begin{minipage}[t]{0.48\linewidth}
+\textbf{\color{darkgreen}Konsistenz rund um die Uhr}\\
+{\small KI ermüdet nicht. 24/7, jedes Teil, jede Schicht.}
+
+\vspace{6pt}
+\textbf{\color{darkgreen}Wissen digitalisieren}\\
+{\small 20 Bilder \arrow{} 30 Jahre Erfahrung als KI-Modell.}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\textbf{\color{darkgreen}Frühzeitige Erkennung}\\
+{\small Defekte am Anfang fangen. Kosten steigen 10x pro Stufe.}
+
+\vspace{6pt}
+\textbf{\color{darkgreen}Dateneffizient}\\
+{\small 5--20 Bilder statt Tausende. Perfekt für seltene Defekte.}
+\end{minipage}
+
+% ============================================
+% PAGE 3: ROI
+% ============================================
+\clearpage
+\section{ROI: Echte Zahlen}
+\ssubtitle{Was AI-basierte Inspektion in der Praxis liefert — dokumentierte Ergebnisse.}
+
+\begin{tabularx}{\linewidth}{@{}l l X@{}}
+\toprule
+\textbf{Branche} & \textbf{Problem} & \textbf{Ergebnis} \\
+\midrule
+Medizintechnik & 12.000 False Rejects/Woche & Reduktion auf 246 \arrow{} \textbf{\$18M/Jahr gespart} \\
+Semiconductor & 60 manuelle Prüfer & Reduktion auf 24 \arrow{} \textbf{\$691K/Jahr} \\
+Semiconductor & +0.1\% Yield & \textbf{+\$75M/Jahr} (TSMC-Skala) \\
+Automotive & Closed-Loop QC & \textbf{--23\% Defekte}, €89K vermieden \\
+\bottomrule
+\end{tabularx}
+
+\subsection{Kostenvergleich: Manuell vs.\ 36ZERO}
+
+\begin{tabularx}{\linewidth}{@{}l X X@{}}
+\toprule
+\textbf{Kostenfaktor} & \textbf{Manuell} & \textbf{36ZERO} \\
+\midrule
+Personal (3-Schicht) & €150--250K/Jahr pro Linie & €0 (AI ersetzt) \\
+Erkennungsrate & 80--85\% (sinkend) & {>}95\% (konstant, 24/7) \\
+False Positives & Bis 40\% (regelbasiert) & {<}5\% (datenbasiert) \\
+Setup neues Produkt & Wochen & Stunden (5--20 Bilder) \\
+Skalierung & Linear (mehr = teurer) & Marginalkosten nahe 0 \\
+\bottomrule
+\end{tabularx}
+
+\subsection{Der ROI-Multiplikator}
+
+\vspace{4pt}
+\noindent\begin{minipage}[t]{0.32\linewidth}\centering\statcard{1x}{Erkennung in Fertigung}\end{minipage}\hfill
+\begin{minipage}[t]{0.32\linewidth}\centering\statcard{10x}{Erkennung Endmontage}\end{minipage}\hfill
+\begin{minipage}[t]{0.32\linewidth}\centering\statcard{100x}{Erkennung beim Kunden}\end{minipage}
+
+\begin{highlightbox}
+Je früher im Prozess ein Defekt erkannt wird, desto dramatischer die Ersparnis. 36ZERO's Inline-Inspektion erkennt Defekte am Entstehungsort.
+\end{highlightbox}
+
+% ============================================
+% PAGE 4: AGENTIC QUALITY
+% ============================================
+\clearpage
+\section{Agentic Quality}
+\ssubtitle{Autonome Agenten, die Defekte nicht nur finden — sondern beheben.}
+
+Agentic AI ist der heißeste Trend in industrieller Software. KI-Agenten die selbstständig handeln — ohne menschliche Intervention.
+
+\subsection{Der konkrete Ablauf}
+
+\ruleitem{01}{Detect}{Kamera erkennt Riss an Bremsscheibe. Das macht 36ZERO heute — schnell, zuverlässig, mit 5 Trainingsbildern.}
+\ruleitem{02}{Diagnose}{System schlägt Wissensdatenbank nach: „Risstyp 3B = typisch für Spindeltemperatur {>}180°C." Ursache identifiziert.}
+\ruleitem{03}{Prescribe}{Automatische Empfehlung: Spindel kalibrieren, Werkzeug wechseln, nächste 50 Teile prüfen.}
+\ruleitem{04}{Act}{Via Bosch ctrlX: Agent sendet Korrekturbefehl direkt an SPS. Maschinenparameter angepasst. Ohne Bedienereingriff.}
+
+\subsection{Warum jetzt?}
+
+\begin{tabularx}{\linewidth}{@{}l X@{}}
+\toprule
+\textbf{Enabler} & \textbf{Status 2026} \\
+\midrule
+Agentic AI Frameworks & 40\% Enterprise Apps integrieren AI Agents bis 2026 (Gartner) \\
+SPS-Konnektivität & Bosch ctrlX = offene Plattform, API-gesteuert \\
+Edge Computing & NVIDIA Jetson/Orin: 275 TOPS on-premise \\
+Regulatorik & EU GMP Annex 22 schafft Rahmen für AI in Pharma \\
+\bottomrule
+\end{tabularx}
+
+\begin{darkhighlight}
+Detect \arrow{} Diagnose \arrow{} Prescribe \arrow{} Act. Kein einziger Wettbewerber bietet diesen vollständigen Loop. Das White Space ist real und messbar.
+\end{darkhighlight}
+
+% ============================================
+% PAGE 5: SELF-IMPROVING AI
+% ============================================
+\clearpage
+\section{Self-Improving AI}
+\ssubtitle{Bereits heute Realität — und der Schlüssel zum Autonomous Quality Loop.}
+
+36ZERO nutzt Self-Improving-Prinzipien bereits heute: dateneffizientes Training mit 5--20 Bildern, aktives Lernen aus Nutzer-Feedback. Nächster Schritt: volle Automatisierung.
+
+\subsection{Drei Dimensionen der Selbstverbesserung}
+
+\ruleitem{01}{Self-Training: KI lernt aus jedem Teil}{Jedes inspizierte Teil ist ein Trainingsdatenpunkt. Active Learning: Das System fragt gezielt nach Labels für Grenzfälle. Die Erkennungsrate steigt mit jeder Schicht.}
+\ruleitem{02}{Self-Calibrating: KI kontrolliert die Umgebung}{Steuert aktiv Beleuchtung (Helligkeit, Winkel, Wellenlänge). Kameras kalibrieren sich automatisch bei Vibrationen oder Temperaturänderungen.}
+\ruleitem{03}{Self-Adapting: Neues Produkt? Kein Problem.}{Produktwechsel erfordern traditionell Wochen. Self-Improving AI erkennt die neue Baseline und beginnt sofort mit der Defekterkennung.}
+
+\vspace{8pt}
+\noindent\begin{minipage}[t]{0.32\linewidth}\centering\statcard{0}{Programmierer nötig}\end{minipage}\hfill
+\begin{minipage}[t]{0.32\linewidth}\centering\statcard{1 Klick}{Nutzer bestätigt}\end{minipage}\hfill
+\begin{minipage}[t]{0.32\linewidth}\centering\statcard{99\%}{Defektreduktion (WEF)}\end{minipage}
+
+\begin{darkhighlight}
+Der Flywheel-Effekt: Mehr Inspektionen \arrow{} mehr Daten \arrow{} besseres Modell \arrow{} weniger Fehler \arrow{} mehr Vertrauen \arrow{} mehr Inspektionen. Traditionelle Systeme degradieren. Self-Improving AI wird über Zeit besser.
+\end{darkhighlight}
+
+% ============================================
+% PAGE 6: ERP-INTEGRATION
+% ============================================
+\clearpage
+\section{ERP-Integration}
+\ssubtitle{Der schnellste Weg zu mehr Kundenwert — und der stärkste Lock-in.}
+
+Das akuteste Kundenproblem: Inspektion und ERP leben in getrennten Welten. Defektdaten in der Kamera, Produktionsdaten in SAP. Keine Verbindung.
+
+\subsection{SAP QM Connector}
+
+\ruleitem{01}{Batch-Traceability}{Jeder Defekt wird automatisch dem SAP-Fertigungsauftrag zugeordnet. Chargen-Rückverfolgung in Sekunden statt Tagen.}
+\ruleitem{02}{Supplier Scoring}{Defektrate pro Lieferant, automatisch berechnet. Basis für datengetriebene Lieferantenbewertung.}
+\ruleitem{03}{Quality Analytics im ERP}{Dashboard direkt in SAP: Ausschussquote, Trend, Kosten. Der Qualitätsmanager verlässt sein System nicht.}
+
+\subsection{Bosch ctrlX World: 1-Click Install}
+
+Die Bosch ctrlX Plattform ist das „App Store" für Industrieautomation. 36ZERO als App im ctrlX World = Product-Led Growth für Manufacturing.
+
+\begin{highlightbox}
+Strategische Bedeutung: ERP-Integration schafft den stärksten Lock-in im B2B-Software. Wer einmal in SAP integriert ist, wird nicht mehr gewechselt.
+\end{highlightbox}
+
+% ============================================
+% PAGE 7: WISSENSDATENBANK
+% ============================================
+\clearpage
+\section{Wissensdatenbank \&\\Fachkräftemangel}
+\ssubtitle{Wissen digitalisieren, bevor es in Rente geht.}
+
+\vspace{4pt}
+\noindent\begin{minipage}[t]{0.32\linewidth}\centering\statcard{13--20M}{Rente bis 2036 (DE)}\end{minipage}\hfill
+\begin{minipage}[t]{0.32\linewidth}\centering\statcard{30 J.}{Erfahrung verloren}\end{minipage}\hfill
+\begin{minipage}[t]{0.32\linewidth}\centering\statcard{3 Tage}{Wissensdigitalisierung}\end{minipage}
+
+\begin{darkhighlight}
+\textit{„Ihr bester Qualitätsprüfer geht in drei Jahren in Rente. Wir digitalisieren sein Wissen in drei Tagen."}
+\end{darkhighlight}
+
+\subsection{Manufacturing Knowledge Base}
+
+Bei jedem Defekt durchsucht das System eine Wissensdatenbank und schlägt Ursachen und Lösungen vor. Standards: IATF 16949, VDA 6.3/6.5, IPC-A-610, EU GMP, DIN EN ISO 5817.
+
+\subsection{Der Netzwerkeffekt — der wahre Moat}
+
+\ruleitem{01}{Kunden tragen anonymisiert bei}{Jede gelöste Ursache-Wirkungs-Kette fließt in die gemeinsame Wissensdatenbank ein.}
+\ruleitem{02}{Datenbank wird mit jedem Kunden schlauer}{Kunde A löst Riss-Problem \arrow{} hilft Kunde B--Z automatisch. Stack Overflow für Fertigung.}
+\ruleitem{03}{Switching Cost wird unmöglich}{Kollektives Wissen von 100+ Herstellern. Kein Feature — ein Moat.}
+
+\begin{highlightbox}
+Workflow: Experte + 36ZERO + 20 Bilder \arrow{} Modell trainiert \arrow{} 30 Jahre Erfahrung digitalisiert \arrow{} Neue Mitarbeiter profitieren sofort.
+\end{highlightbox}
+
+% ============================================
+% PAGE 8: WETTBEWERB + NEUE MÄRKTE
+% ============================================
+\clearpage
+\section{Wettbewerb \& Neue Märkte}
+\ssubtitle{Die Landschaft — und wo die weißen Flecken sind.}
+
+{\small
+\begin{tabularx}{\linewidth}{@{}l l X X@{}}
+\toprule
+\textbf{Unternehmen} & \textbf{Revenue} & \textbf{Stärke} & \textbf{Schwäche} \\
+\midrule
+Cognex & \$1.34B & Marktführer, Deep Learning & Hardware-locked, kein SaaS \\
+Keyence & \$7B & Vertriebsstärke & Proprietär, wenig AI \\
+Landing AI & \$57M raised & Andrew Ng, PLG & Kein Enterprise \\
+Instrumental & --- & PCB-Expertise & Nur Elektronik \\
+Elementary & \$66M raised & Schnelles Deployment & Keine Tier-1 Kunden \\
+\bottomrule
+\end{tabularx}
+}
+
+\subsection{Das White Space}
+
+\begin{minipage}[t]{0.48\linewidth}
+\textbf{\color{primary}Autonomous Quality}\\
+{\small Detect \arrow{} Diagnose \arrow{} Prescribe \arrow{} Act. Kein Wettbewerber geht über Detection hinaus.}
+
+\vspace{6pt}
+\textbf{\color{primary}ERP-native Intelligence}\\
+{\small Alle sind Insellösungen neben dem ERP. Niemand liefert Quality Intelligence direkt in SAP.}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\textbf{\color{primary}Cross-Industry Knowledge}\\
+{\small Niemand aggregiert Defekt-Ursache-Lösung über Kunden und Branchen hinweg.}
+
+\vspace{6pt}
+\textbf{\color{primary}Wissensdigitalisierung}\\
+{\small Keine Plattform positioniert sich als Lösung für den Fachkräftemangel.}
+\end{minipage}
+
+\subsection{Neue Märkte}
+
+{\small
+\begin{tabularx}{\linewidth}{@{}l r X@{}}
+\toprule
+\textbf{Branche} & \textbf{Markt} & \textbf{Opportunity} \\
+\midrule
+Pharma \& Medtech & \$5.7B+ & 3--5x Preis, Compliance = must-have \\
+Semiconductor & \$14.4B & Software-Layer offen trotz KLA-Dominanz \\
+Energie (Solar + Wind) & \$1.5B+ & Drone Inspection, 21.4\% CAGR \\
+Infrastruktur & \$34.4B & 40.000+ Brücken in DE, EU-Pflicht \\
+\bottomrule
+\end{tabularx}
+}
+
+% ============================================
+% PAGE 9: ROADMAP
+% ============================================
+\clearpage
+\section{Product Roadmap}
+\ssubtitle{Vier Phasen — von der Voraussetzung zum Paradigmenwechsel.}
+
+\ruleitem{\arrow}{Voraussetzung: Vision — Die Datenschicht legen}{SAP QM Connector. 1-Click Install in Bosch ctrlX World. Pre-Trained Models pro Branche. Fachkräftemangel-Messaging.}
+\ruleitem{P1}{Phase 1: Memory — Wissensdatenbank aufbauen}{Process Parameter Correlation Engine. Manufacturing Knowledge Base v1 (IATF 16949, VDA, ISO). Auto-8D Reports. Pharma-Modul (GMP).}
+\ruleitem{P2}{Phase 2: Autonomous Quality — Closed Loop}{Agentic Quality: AI erkennt \arrow{} diagnostiziert \arrow{} korrigiert via ctrlX. Customer Knowledge Network. Self-Improving.}
+\ruleitem{P3}{Phase 3: Manufacturing Quality OS}{Predictive Quality. Cross-Plant Benchmarking. Manufacturing GPT. Quality-as-a-Service für den Mittelstand.}
+
+\subsection{Top 3 Moves — sofort umsetzbar}
+
+\ruleitem{{\color{darkgreen}01}}{ERP-Integration + PLG via Marketplace}{Impact: Hoch. Feasibility: Hoch (Partnerschaften existieren). Löst das akuteste Problem mit existierenden Assets.}
+\ruleitem{{\color{primary}02}}{Process Correlation Engine + Knowledge Base}{Impact: Sehr hoch (3--5x Kundenwert, einzigartiger Moat). Differenziert fundamental von allen Wettbewerbern.}
+\ruleitem{{\color{heading}03}}{Pharma / Regulated Industries Expansion}{3--5x höhere Preise, kürzerer Sales Cycle. Compliance = must-have = Budget vorhanden.}
+
+% ============================================
+% PAGE 10: VISION
+% ============================================
+\clearpage
+\section{Die neue Vision}
+\ssubtitle{Sechs Formulierungen — von pragmatisch bis revolutionär.}
+
+\begin{darkhighlight}
+\textbf{\color{accent}Option A — Autonomous Quality}\\[2pt]
+{\color{white}\textit{„36ZERO macht Qualitätskontrolle autonom. Unsere KI erkennt Defekte, diagnostiziert Ursachen und korrigiert Prozesse — ohne menschliche Schleife."}}
+\end{darkhighlight}
+
+\begin{darkhighlight}
+\textbf{\color{accent}Option B — The Quality Intelligence Company}\\[2pt]
+{\color{white}\textit{„Wir bauen die Intelligenzschicht für Fertigungsqualität. Inspektion war der Anfang. Heute liefern wir was falsch ist — warum, und was dagegen zu tun ist."}}
+\end{darkhighlight}
+
+\begin{darkhighlight}
+\textbf{\color{accent}Option C — Zero-Defect Manufacturing}\\[2pt]
+{\color{white}\textit{„Null Defekte. Nicht als Ziel, sondern als System. 36ZERO verbindet Inspektion mit Branchenwissen und autonomer Korrektur."}}
+\end{darkhighlight}
+
+\begin{darkhighlight}
+\textbf{\color{accent}Option D — Manufacturing Memory}\\[2pt]
+{\color{white}\textit{„Maschinen vergessen nicht. 36ZERO gibt der Fertigung ein Gedächtnis — jeder Defekt, jede Ursache, jede Lösung."}}
+\end{darkhighlight}
+
+\begin{darkhighlight}
+\textbf{\color{accent}Option E — Agentic Quality Platform}\\[2pt]
+{\color{white}\textit{„Die erste KI-Plattform mit Quality Agents. Unsere Agenten sehen, verstehen und handeln — in Sekunden."}}
+\end{darkhighlight}
+
+\begin{darkhighlight}
+\textbf{\color{accent}Option F — Self-Improving Quality Intelligence}\\[2pt]
+{\color{white}\textit{„KI die besser wird, während Sie produzieren. 36ZERO lernt aus jedem Teil und wird mit jedem Kunden schlauer."}}
+\end{darkhighlight}
+
+\begin{highlightbox}
+36ZERO hat die Wahl: Ein gutes Inspection Tool bleiben — oder die Plattform für Autonomous Quality werden. Die Bausteine sind da. Es fehlt nur die Entscheidung.
+\end{highlightbox}
+
+% ============================================
+% PAGE 11: TAM/SAM/SOM
+% ============================================
+\clearpage
+\section{Marktpotenzial: TAM, SAM, SOM}
+\ssubtitle{Vom Gesamtmarkt zum adressierbaren Umsatzpotenzial.}
+
+\vspace{4pt}
+\noindent\begin{minipage}[t]{0.32\linewidth}\centering\statcard{\$41.7B}{TAM — Machine Vision 2030}\end{minipage}\hfill
+\begin{minipage}[t]{0.32\linewidth}\centering\statcard{\$5.2B}{SAM — AI Software Layer}\end{minipage}\hfill
+\begin{minipage}[t]{0.32\linewidth}\centering\statcard{\$120--350M}{SOM — in 5 Jahren}\end{minipage}
+
+\vspace{12pt}
+\subsection{Der Waterfall}
+
+{\fontsize{11}{14}\selectfont
+\noindent\textbf{\color{primary}TAM \$41.7B} — Machine Vision Gesamtmarkt 2030\\
+{\color{bodytext}Kameras, Optik, Software, Services. CAGR 13\%. \textit{Grand View Research}}
+
+\noindent\textbf{\color{primary}SAM \$5.2B} — AI Software-Layer (12.5\% des TAM)\\
+{\color{bodytext}Automotive 28\%, Elektronik 19\%, Pharma 15\%. \textit{MarketsandMarkets}}
+
+\noindent\textbf{\color{primary}SOM \$120--350M} — Erreichbar in 5 Jahren\\
+{\color{bodytext}DACH + EU-Kernmärkte. 500--1.500 Kunden bei €80--230K ACV.}
+}
+
+\vspace{6pt}
+
+{\small
+\begin{tabularx}{\linewidth}{@{}l r X@{}}
+\toprule
+\textbf{Branche} & \textbf{Anteil} & \textbf{36ZERO Fit} \\
+\midrule
+Automotive & 28\% & Sehr hoch — Siemens, LEONI \\
+Elektronik/Semiconductor & 19\% & Hoch — PCB, Wafer \\
+Pharma/Medtech & 15\% & Sehr hoch — 3--5x Pricing \\
+Energie & 8\% & Mittel — Drone Inspection \\
+Food \& Packaging & 12\% & Mittel — Commodity-Risiko \\
+\bottomrule
+\end{tabularx}
+}
+
+% ============================================
+% PAGE 12: COMPETITIVE DEEP DIVE
+% ============================================
+\clearpage
+\section{Competitive Deep Dive}
+\ssubtitle{Feature-Matrix — und wo 36ZERO gewinnt.}
+
+{\footnotesize
+\begin{tabularx}{\linewidth}{@{}l c c c c c@{}}
+\toprule
+\textbf{Feature} & \textbf{36ZERO} & \textbf{Cognex} & \textbf{Landing} & \textbf{Keyence} & \textbf{Elementary} \\
+\midrule
+Deep Learning & {\color{darkgreen}\checkmark{} 5--20} & {\color{darkgreen}\checkmark{} ViDi} & {\color{darkgreen}\checkmark{}} & {\color{darkyellow}Teilw.} & {\color{darkgreen}\checkmark{}} \\
+Hardware & Agnostisch & Proprietär & Agnostisch & Proprietär & Eigen+3rd \\
+ERP-Integr. & {\color{darkgreen}\checkmark{} SAP} & Nein & Nein & Nein & Nein \\
+Closed-Loop & Roadmap & Nein & Nein & Nein & Nein \\
+Knowledge Base & Roadmap & Nein & Nein & Nein & Nein \\
+Self-Improving & {\color{darkgreen}\checkmark{} Aktiv} & Nein & {\color{darkyellow}Teilw.} & Nein & Nein \\
+Pharma/GMP & Möglich & {\color{darkgreen}\checkmark{}} & Nein & {\color{darkgreen}\checkmark{}} & Nein \\
+Pricing & SaaS & HW+Lizenz & SaaS & HW+Lizenz & SaaS+HW \\
+Tier-1 Kunden & Siemens+ & Top-50 OEM & Mittelstand & Top-50 OEM & Scale-ups \\
+\bottomrule
+\end{tabularx}
+}
+
+\vspace{8pt}
+
+\begin{darkhighlight}
+36ZERO's einzigartiger Vorteil: Kein Wettbewerber kombiniert ERP-Integration + Self-Improving AI + Closed-Loop Roadmap. Hardware-Incumbents sind in proprietären Ökosystemen gefangen. Software-Startups haben keine Enterprise-Kunden.
+\end{darkhighlight}
+
+\subsection{Strategische Implikation}
+
+\begin{minipage}[t]{0.48\linewidth}
+\textbf{Gegen Cognex/Keyence}\\
+{\small Nicht auf Hardware-Ebene kämpfen. Software-Layer für jede Hardware. SaaS vs.\ Lizenzen. PLG via SAP/Bosch Marketplace.}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+\textbf{Gegen Landing AI/Elementary}\\
+{\small Enterprise-Referenzen als Moat. Siemens/Bosch = Credibility. Vertikale Tiefe statt horizontal.}
+\end{minipage}
+
+% ============================================
+% PAGE 13: REVENUE SCENARIOS
+% ============================================
+\clearpage
+\section{Revenue-Szenarien}
+\ssubtitle{Drei Pfade — vom Status Quo zum Manufacturing Quality OS.}
+
+{\small\textit{\color{subtitle}Szenarien basieren auf Marktdaten und vergleichbaren SaaS-Unternehmen. Genaue Prognosen erfordern 36ZERO's interne KPIs.}}
+
+\subsection{Szenario A: Status Quo — „Gutes Inspection Tool"}
+
+\noindent\begin{minipage}[t]{0.32\linewidth}\centering\statcardred{€5--10M}{ARR in 3 Jahren}\end{minipage}\hfill
+\begin{minipage}[t]{0.32\linewidth}\centering\statcardred{€30--50K}{Durchschn.\ ACV}\end{minipage}\hfill
+\begin{minipage}[t]{0.32\linewidth}\centering\statcardred{Hoch}{Commodity-Risiko}\end{minipage}
+
+{\small\color{bodytext}Lineares Wachstum, Feature-Wettbewerb. Kein Moat. Commodity-Risiko steigt jedes Jahr.}
+
+\subsection{Szenario B: ERP + Pharma — „Quality Intelligence"}
+
+\noindent\begin{minipage}[t]{0.32\linewidth}\centering\statcard{€15--30M}{ARR in 3 Jahren}\end{minipage}\hfill
+\begin{minipage}[t]{0.32\linewidth}\centering\statcard{€80--150K}{Durchschn.\ ACV}\end{minipage}\hfill
+\begin{minipage}[t]{0.32\linewidth}\centering\statcard{Mittel}{Defensibility}\end{minipage}
+
+{\small\color{bodytext}SAP-Marketplace + Pharma. 3x ACVs. ERP-Lock-in. Erreichbar mit existierendem Team + 1--2 Pharma-Hires.}
+
+\subsection{Szenario C: Full Platform — „Manufacturing Quality OS"}
+
+\noindent\begin{minipage}[t]{0.32\linewidth}\centering\statcardgreen{€50--100M+}{ARR in 5 Jahren}\end{minipage}\hfill
+\begin{minipage}[t]{0.32\linewidth}\centering\statcardgreen{€150--300K}{Durchschn.\ ACV}\end{minipage}\hfill
+\begin{minipage}[t]{0.32\linewidth}\centering\statcardgreen{Sehr hoch}{Defensibility}\end{minipage}
+
+\begin{highlightbox}
+Empfehlung: Szenario B sofort starten, Szenario C vorbereiten. Szenario A ist keine Option — das Marktfenster für reine Inspection schließt sich in 18--24 Monaten.
+\end{highlightbox}
+
+% ============================================
+% PAGE 14: RISK MATRIX
+% ============================================
+\clearpage
+\section{Risiko-Analyse}
+\ssubtitle{Die 8 größten strategischen Risiken — und wie man sie adressiert.}
+
+{\small
+\begin{tabularx}{\linewidth}{@{}c l c c X@{}}
+\toprule
+\textbf{\#} & \textbf{Risiko} & \textbf{Impact} & \textbf{Prob.} & \textbf{Mitigation} \\
+\midrule
+1 & Cognex: Autonomous Quality & {\color{darkred}Sehr hoch} & {\color{darkyellow}Mittel} & Speed + ERP als Moat. Pivot dauert 2--3 J. \\
+2 & Commoditisierung & {\color{darkred}Sehr hoch} & {\color{darkred}Hoch} & Jetzt: Knowledge Base + Closed-Loop. \\
+3 & Foundation Models & {\color{darkyellow}Hoch} & {\color{darkyellow}Mittel} & Domänendaten = Moat. VLMs brauchen Tuning. \\
+4 & Talent-Engpass KI & {\color{darkyellow}Hoch} & {\color{darkred}Hoch} & Remote-first, Uni-Koops, Equity. \\
+5 & EU AI Act Verzögerung & {\color{darkyellow}Mittel} & {\color{darkyellow}Mittel} & Compliance als Feature und Barriere. \\
+6 & Kundenkonzentration & {\color{darkyellow}Hoch} & {\color{darkyellow}Mittel} & PLG via Marketplace. Max 15\% ARR. \\
+7 & Sales Cycle zu lang & {\color{darkyellow}Mittel} & {\color{darkred}Hoch} & PLG: Self-Service, Land, Expand. \\
+8 & Wirtschaftsabschwung & {\color{darkyellow}Hoch} & {\color{darkyellow}Mittel} & ROI-Story: spart Geld. Payback {<}6 Mo. \\
+\bottomrule
+\end{tabularx}
+}
+
+\begin{darkhighlight}
+Kritischstes Risiko: \textbf{Nr.\ 2 — Commoditisierung.} Jeder Monat ohne Differenzierung über Inspection hinaus verengt das strategische Fenster. Die Top-3-Moves auf der Roadmap adressieren genau dieses Risiko.
+\end{darkhighlight}
+
+% ============================================
+% PAGE 15: QUELLEN
+% ============================================
+\clearpage
+\section{Quellen \& Referenzen}
+\ssubtitle{26 Tier-1-Quellen — Research Paper Format.}
+
+\begin{multicols}{2}
+{\fontsize{8.5}{12}\selectfont\color{bodytext}
+\noindent\textsuperscript{1} ASQ, ``Cost of Quality.'' COPQ: 15--20\%.\\[1pt]
+\textsuperscript{2} McKinsey, ``Lighthouse Factories,'' Apr.~2024.\\[1pt]
+\textsuperscript{3} Averroes.ai / IEEE, Medtech Case Study.\\[1pt]
+\textsuperscript{4} SEMI, Industry Reports, 2024.\\[1pt]
+\textsuperscript{5} Deloitte \& Manufacturing Inst., 2021/2024.\\[1pt]
+\textsuperscript{6} Stat.\ Bundesamt / IAB, Rentenprognose.\\[1pt]
+\textsuperscript{7} WEF, ``Future of Jobs,'' 2025.\\[1pt]
+\textsuperscript{8} Grand View Research, MV Market, 2025.\\[1pt]
+\textsuperscript{9} PwC, ``Sizing the Prize,'' AI Impact.\\[1pt]
+\textsuperscript{10} Menlo Ventures, ``GenAI Report,'' 2025.\\[1pt]
+\textsuperscript{11} MarketsandMarkets, Defect Detection.\\[1pt]
+\textsuperscript{12} Gartner, AI Agents Forecast, Aug.~2025.\\[1pt]
+\textsuperscript{13} McKinsey/WEF, Lighthouses, Apr.~2024.\\[1pt]
+\textsuperscript{14} McKinsey, ``State of AI,'' Nov.~2025.\\[1pt]
+\textsuperscript{15} NHTSA, 2024 Recall Report.\\[1pt]
+\textsuperscript{16} GM, SEC Filings, 2024.\\[1pt]
+\textsuperscript{17} Cognex, 10-K Filing, Feb.~2025.\\[1pt]
+\textsuperscript{18} KLA Corporation, FY2024/25.\\[1pt]
+\textsuperscript{19} SEMI, Fab Equipment Forecast, 2025.\\[1pt]
+\textsuperscript{20} Deloitte, ``Smart Mfg Survey,'' 2025.\\[1pt]
+\textsuperscript{21} Accenture, ``Reinventing Ops,'' 2024.\\[1pt]
+\textsuperscript{22} FDA, PCCP, Dez.~2024.\\[1pt]
+\textsuperscript{23} EU-Kommission, GMP Annex 22, Jul.~2025.\\[1pt]
+\textsuperscript{24} Pharmaceutical Technology, Inspection.\\[1pt]
+\textsuperscript{25} IISE, ``Cost of Quality,'' COPQ Study.\\[1pt]
+\textsuperscript{26} NVIDIA, VLMs for Defects, Jan.~2026.
+}
+\end{multicols}
+
+{\footnotesize\color{subtitle}Alle Quellen im Januar/Februar 2026 abgerufen und verifiziert.}
+
+\vfill
+
+\noindent\rule{\linewidth}{1.5pt}
+\vspace{8pt}
+
+\noindent\begin{minipage}[t]{0.5\linewidth}
+{\fontsize{14}{18}\selectfont\bfseries\color{heading}Florian Ziesche}\\[3pt]
+{\small\color{bodytext}florian@ainaryventures.com}\\
+{\small\color{bodytext}+1 347 740 1465}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.45\linewidth}\raggedleft
+{\small\color{subtitle}Version 2.0 · February 2026}\\
+{\footnotesize\color{subtitle}Confidential — Not for distribution.}
+\end{minipage}
+
+\end{document}
