@@ -1,5 +1,5 @@
 # 🎯 CNC Planer Pro — Demo Script
-## Meeting: 04.02.2026, 10:30 Uhr | Maschinenbau Schlottwitz
+## Meeting: 05.02.2026, 10:30 Uhr | Maschinenbau Schlottwitz
 
 **Teilnehmer:** Florian + Onkel (Geschäftsführer) + Arbeitsvorbereiter (AV)
 **Ziel:** Arbeitsvorbereiter soll sagen "Das will ich haben" oder konkreten nächsten Schritt vereinbaren
