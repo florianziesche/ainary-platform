@@ -36,7 +36,8 @@
 | Mo 3. | "One-Person Company" | LinkedIn ✅ | 🟢 |
 | Mo 3. | "Year of One-Person Company" | Substack ✅ | 🟢 |
 | Di 4. | - | - | ☐ |
-| **Gesamt** | **2 published** | | 🟡 |
+| Mi 5. | "Judgment as Leverage" (Sarah Guo repost) | LinkedIn ✅ | 🟢 |
+| **Gesamt** | **3 published** | | 🟢 |
 
 ### Meetings/Demos
 | Datum | Mit wem | Ergebnis |
