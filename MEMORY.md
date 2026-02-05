@@ -74,7 +74,7 @@
 ## Active Threads (Updated 2026-02-04)
 
 - **CNC Demo @ Onkel's Betrieb** — Feb 5, 10:30 — Demo mit Arbeitsvorbereiter. Demo-Skript, One-Pager, Deploy-Guide ready. FASTEST PATH TO REVENUE.
-- **VC Lab Sprint 2** — Due Feb 4, alle Steps drafted. Florian muss auf fi.co einloggen und deliverables in Text-Boxen submitten. Step 7 (Decile Hub) nur Florian möglich.
+- **VC Lab Sprint 2** — Steps 2,4,5 done + iterated. Thesis finalized. Steps 6,7,8 need morning finalization. Florian muss auf fi.co submitten.
 - **Substack Article #2** — Draft in Editor ("I Replaced My Back Office With AI Agents"). Florian muss Review → Publish. Images (org-chart, what-works, bottleneck) manuell einfügen.
 - **5 VC Applications ready** — HOF Capital, Betaworks, Leonis, Point72, Conviction. Cover Letters in `job-applications/READY-TO-APPLY.md`
 - **9 CNC Outreach Emails ready** — Inkl. Nachbar-Lead (Maschinentechnik Pretzschendorf!). In `products/cnc-planner/leads/READY-TO-SEND-EMAILS.md`
@@ -149,6 +149,8 @@ Legal AI Platform with <0.2% hallucination rate using:
 - **Browser Paste vs React Editors** — `document.execCommand` + innerHTML injection funktioniert für Substack-Text, aber Bild-Uploads werden vom React-State nicht erkannt. Bilder MÜSSEN manuell per Drag & Drop eingefügt werden. (Added 2026-02-04)
 - **Slowly typing timeout** — Browser control timeout nach 20s bei langem Text. JS-Injection ist der bessere Weg. (Added 2026-02-04)
 - **Entelechy = Angel/Solo-GP** — Nicht Fund I-III. Wichtig für VC-Kontexte (LP-Strategie, Fund Economics). (Added 2026-02-04)
+- **Amplify > Replace** — Florians eigene Texte (z.B. "Where I Fit", Investment Thesis) sind BESSER als meine Drafts. Meine Rolle: strukturieren, prompten, Grammar fixen, Rahmen geben — NICHT komplett neu schreiben. (Added 2026-02-05)
+- **Thesis confirmed, not changed** — VC Lab Exercise bestätigte Ainary Thesis. Florians Formulierung: "$5M seed fund backing European founders building AI-first and deep-tech in the U.S." (Added 2026-02-05)
 
 ## 🔴 CORE LEARNING: Die Qualitäts-Lücke (2026-02-03 04:00)
 
