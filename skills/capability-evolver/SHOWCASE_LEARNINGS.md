@@ -177,4 +177,66 @@
 
 ---
 
+## 📊 Scan 2026-02-05 — "Chief of Staff" Pattern & Consulting Triage
+
+### Neue Showcase Patterns
+
+#### 14. Consulting Request Triage (SparkryAI)
+> "Processed 15 consulting requests and categorized them by fit... Matched it against my expertise profile... Sent me a Telegram message with the opportunity summary"
+
+**Pattern:** Email cron → match against expertise profile → notify with summary → one-tap approve → draft + send response.
+**Relevanz für Florian:** 🔴 HIGH — Genau das was er für AI Consulting Leads braucht. Aktuell manuell.
+**Action:** Wenn Gmail connected → automatisches Lead-Matching gegen Florians Profil.
+
+#### 15. Cross-App Calendar Blocking
+> "Found my wife's text about a dental appointment, blocked my calendar, and texted her back"
+
+**Pattern:** Monitor messages → extract time-relevant info → auto-block calendar → confirm to sender.
+**Insight:** Agent als "Life Traffic Controller" — nicht nur Business, auch Personal.
+
+#### 16. Watchdog / Self-Monitoring
+> "Created a watchdog system so it can alert Amy if it goes down while I'm traveling"
+
+**Pattern:** Self-health-check → notify designated contact if agent goes offline.
+**Status:** Wir haben kein Watchdog-System. Wäre relevant wenn Florian unterwegs ist.
+
+#### 17. Airport/Travel Workflow
+> "I was in a Lyft heading to the airport when a consulting request came in... All done via Telegram in 2 minutes"
+> "Writing this from an Alaska flight with nothing but free texting"
+
+**Key insight:** Die beste Agent-Nutzung passiert in Dead-Time (Lyft, Flughafen, Wartezeiten). Agent MUSS mobile-first sein.
+
+### 🧠 "AI Threshold Effect" (Leonis Newsletter Analysis)
+
+**Framing:** OpenClaw ist ein "threshold artifact" — erscheint wenn Modelle eine kritische Fähigkeitsschwelle überschreiten.
+- AutoGPT (2023) = GPT-4 threshold → hype → crash
+- OpenClaw (2026) = Opus 4.5 threshold → dauerhafter weil Modell zuverlässiger
+
+**Kernfrage für Florian's Content:** "Where does durable value accrue in the agent wave?"
+- NOT in the orchestration layer (commodity)
+- IN the skills/workflows (domain expertise)
+- IN the human-agent relationship (trust, memory, personalization)
+
+**Content-Angle:** Florian kann "Threshold Artifact" Framing nutzen für VC-Thesis Positionierung. "I've been through the AutoGPT hype AND the OpenClaw wave. Here's what's actually different."
+
+### 🔧 OpenClaw v2026.2.3 — Neue Features
+
+| Feature | Beschreibung | Relevant? |
+|---------|-------------|-----------|
+| **Cron announce delivery** | Isolated jobs can announce results to main session | ✅ Wir nutzen das |
+| **One-shot auto-delete** | Cron jobs die einmal laufen werden danach gelöscht | ✅ Cleaner reminders |
+| **Per-channel responsePrefix** | Verschiedene Prefixes pro Channel/Account | 🟡 Nützlich für Multi-Channel |
+| **Cloudflare AI Gateway** | Neuer Provider-Setup in Onboarding | 🟡 Alternative Hosting |
+| **Security: sandboxed media** | Media-Pfade gesichert | ✅ Bereits aktiv |
+| **Security: whatsapp_login gated** | Nur Owner kann WA-Login triggern | ✅ Sicherheit |
+
+### 📈 OpenClaw Growth Metrics (Feb 2026)
+- **146K+ GitHub Stars** (Feb 2)
+- **700+ Community Skills** auf ClawHub
+- **Wikipedia-Eintrag** existiert
+- **Mainstream Coverage:** IBM Think, DataCamp, DigitalOcean, Vultr, DEV Community
+- **Community:** Thousands auf Discord, "impossible to keep up"
+
+---
+
 *Nächster Scan: In 24h automatisch*

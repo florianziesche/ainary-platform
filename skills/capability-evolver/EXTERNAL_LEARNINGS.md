@@ -136,4 +136,112 @@ OpenClaw hat den **mainstream crossing point** erreicht:
 
 ---
 
+## 📚 Source: SparkryAI — "24 Hours with OpenClaw" (2026-02-03)
+
+### Chief of Staff Pattern
+
+**Core Workflow:**
+```
+Email arrives → Cron detects → Match against profile → Notify user → User approves → Agent drafts + sends
+```
+
+**Key Design Decisions:**
+1. **Trust is earned** — Start read-only, expand as confidence builds
+2. **Sandbox for dev, full access for exec assistant** — Different risk profiles
+3. **Dead-time is prime-time** — Best agent usage in Lyfts, airports, flights
+4. **Hourly email cron** — Sweet spot between responsive and cost-efficient
+
+### Setup Notes
+- Mac Mini M2/M4 recommended for 24/7
+- Cloudflare Moltworker = $5/month hosted alternative (limited capabilities)
+- Claude Max subscription works natively (but Anthropic may cancel heavy users)
+
+### Consulting Triage Pattern (Most Relevant for Florian)
+```
+1. Cron checks email hourly
+2. Match against expertise profile (stored in USER.md/SOUL.md)
+3. Categorize by fit (high/medium/low)
+4. Send Telegram notification with summary
+5. User says "yes" → draft response
+6. User says "send" → send email
+```
+**Total user time: ~2 minutes.** Most consulting requests don't convert, but cost to process is near-zero.
+
+---
+
+## 📚 Source: Leonis Newsletter — "AI Threshold Effect" (2026-02-04)
+
+### Thesis: OpenClaw as "Threshold Artifact"
+
+**Pattern repeats:**
+| Wave | Model Threshold | Artifact | Outcome |
+|------|----------------|----------|---------|
+| 2023 | GPT-4 reasoning | AutoGPT | Hype → crash (unreliable) |
+| 2026 | Opus 4.5 execution | OpenClaw | Sustainable? (models reliable enough) |
+
+**Key difference this time:** Claude Opus 4.5 can chain tools AND recover from errors. AutoGPT's GPT-4 could chain but not recover.
+
+**Where durable value accrues (VC-relevant):**
+1. NOT orchestration layers (commodity, open-source)
+2. YES domain-specific skills (expertise moats)
+3. YES trust/memory systems (personalization moats)
+4. YES enterprise guardrails (compliance, security)
+
+**Anthropic's response to OpenClaw:** Sprint-built "Cowork" (Jan 2026) — non-technical Claude Code for file/folder delegation. This validates the category but threatens the hobbyist layer.
+
+**Content opportunity for Florian:**
+- "I've lived through AutoGPT AND OpenClaw. Here's what VCs should know about the agent wave."
+- Frame: Threshold artifacts vs durable platforms
+- Unique angle: Founder-operator + VC candidate who actually USES the tools
+
+---
+
+## 📚 Source: OpenClaw v2026.2.3 Release Notes (2026-02-05)
+
+### Cron System Overhaul
+- **Announce delivery mode** for isolated jobs (results post to main session)
+- **One-shot auto-delete** — cron jobs that run once are cleaned up automatically
+- **ISO 8601 support** in schedule.at inputs
+- Hard migration: all isolated jobs now use announce/none delivery
+
+### Security Hardening (3 fixes)
+- Sandboxed media paths for message attachments
+- WhatsApp login gated to owner-only
+- Gateway URL credential leakage prevention
+
+### New Provider: Cloudflare AI Gateway
+- Available in onboarding wizard
+- Alternative to direct Anthropic API
+
+### Per-Channel Response Prefix
+- Different prefixes per channel/account
+- Useful for multi-channel setups (different tone for different contexts)
+
+### Implications for Us
+- Our cron jobs should use announce delivery (already do for some)
+- One-shot auto-delete means cleaner reminder management
+- Security fixes already active in our version
+
+---
+
+## 🔍 GitHub Repos to Monitor
+
+| Repo | Warum relevant |
+|------|----------------|
+| angelor888/claude-code-project | Claude Code Best Practices |
+| anthropics/claude-code | Official Claude Code |
+| openclaw/openclaw | OpenClaw Core |
+| steipete/peekaboo | macOS Automation |
+| skillsmp/clawhub | Skills Marketplace |
+
+---
+
+## 📅 Scan Schedule
+
+- **Alle 24h:** Neue Repos/Updates suchen
+- **Fokus:** OpenClaw, Claude Code, AI Agents, Automation
+- **Keywords:** "claude code", "openclaw", "ai agent workflow", "coding agent"
+
+---
+
 *Dieses File wird automatisch erweitert wenn neue Learnings gefunden werden.*
