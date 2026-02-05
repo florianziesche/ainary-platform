@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CNC Planner Pro — Kalkulation</title>
+    <style>
+        /* ================================================================
+           CSS VARIABLES
+           ================================================================ */
+        :root {
+            --color-primary: #1E3A5F;
+            --color-primary-light: #2D4A6F;
+            --color-bg: #F8FAFC;
+            --color-bg-alt: #F1F5F9;
+            --color-text: #1E293B;
+            --color-text-secondary: #475569;
+            --color-text-muted: #94A3B8;
+            --color-border: #E2E8F0;
+            --color-border-light: #F1F5F9;
+            --color-success: #059669;
+            --color-success-light: #D1FAE5;
+            --color-warning: #D97706;
+            --color-warning-light: #FEF3C7;
+            --color-error: #DC2626;
+            --color-error-light: #FEE2E2;
+            --color-info: #0284C7;
+            --color-info-light: #E0F2FE;
+            
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-mono: 'SF Mono', 'Fira Code', monospace;
+            
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 24px;
+            --space-6: 32px;
+            
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+        }
+        
+        /* ================================================================
+           BASE
+           ================================================================ */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: var(--font-sans);
+            background: var(--color-bg);
+            color: var(--color-text);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .app { display: flex; min-height: 100vh; }
+        
+        /* ================================================================
+           SIDEBAR
+           ================================================================ */
+        .sidebar {
+            width: 220px;
+            background: var(--color-primary);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+        }
+        
+        .sidebar-header {
+            padding: var(--space-5);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .logo {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        
+        .logo-badge {
+            background: var(--color-warning);
+            color: white;
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+        }
+        
+        .sidebar-nav { flex: 1; padding: var(--space-3); }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3) var(--space-4);
+            border-radius: var(--radius-md);
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+            transition: all 0.15s;
+        }
+        
+        .nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
+        .nav-item.active { background: white; color: var(--color-primary); }
+        .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+        
+        .sidebar-footer {
+            padding: var(--space-3);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        /* ================================================================
+           MAIN
+           ================================================================ */
+        .main {
+            flex: 1;
+            margin-left: 220px;
+            min-height: 100vh;
+        }
+        
+        .main-header {
+            background: white;
+            padding: var(--space-4) var(--space-6);
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .main-title { font-size: 20px; font-weight: 600; }
+        
+        .main-content { padding: var(--space-6); }
+        
+        .section { display: none; }
+        .section.active { display: block; }
+        
+        /* ================================================================
+           COMPONENTS
+           ================================================================ */
+        .card {
+            background: white;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+        
+        .card-header {
+            padding: var(--space-4) var(--space-5);
+            border-bottom: 1px solid var(--color-border-light);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-header-primary { background: var(--color-primary); color: white; }
+        .card-header-info { background: var(--color-info-light); color: var(--color-info); }
+        .card-header-success { background: var(--color-success-light); color: var(--color-success); }
+        .card-header-warning { background: var(--color-warning-light); color: var(--color-warning); }
+        .card-header-error { background: var(--color-error-light); color: var(--color-error); }
+        
+        .card-body { padding: var(--space-5); }
+        
+        .btn {
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.15s;
+        }
+        
+        .btn-primary { background: var(--color-primary); color: white; }
+        .btn-primary:hover { background: var(--color-primary-light); }
+        .btn-secondary { background: white; color: var(--color-text); border-color: var(--color-border); }
+        .btn-secondary:hover { background: var(--color-bg); }
+        .btn-sm { padding: var(--space-1) var(--space-3); font-size: 13px; }
+        
+        .input {
+            padding: var(--space-2) var(--space-3);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            width: 100%;
+        }
+        
+        .input:focus { outline: none; border-color: var(--color-primary); }
+        .input-sm { padding: var(--space-1) var(--space-2); font-size: 13px; }
+        .input-mono { font-family: var(--font-mono); }
+        
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--color-text-muted);
+            margin-bottom: var(--space-1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .form-group { margin-bottom: var(--space-4); }
+        
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-5); }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-5); }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4); }
+        
+        .table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .table th, .table td { padding: var(--space-3); text-align: left; border-bottom: 1px solid var(--color-border-light); }
+        .table th { background: var(--color-bg); font-weight: 600; font-size: 11px; text-transform: uppercase; color: var(--color-text-muted); }
+        .table .right { text-align: right; }
+        .table .mono { font-family: var(--font-mono); }
+        
+        .mono { font-family: var(--font-mono); }
+        
+        /* ================================================================
+           PART CARDS
+           ================================================================ */
+        .part-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-4); }
+        
+        .part-card {
+            background: white;
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .part-card:hover { border-color: var(--color-primary); transform: translateY(-2px); }
+        .part-card.selected { border-color: var(--color-primary); background: var(--color-info-light); }
+        
+        .part-card-img {
+            width: 100%;
+            height: 120px;
+            background: var(--color-bg);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+        
+        .part-card-title { font-weight: 600; margin-bottom: var(--space-1); }
+        .part-card-meta { font-size: 12px; color: var(--color-text-muted); }
+        
+        /* ================================================================
+           DRAWING VIEWER
+           ================================================================ */
+        .drawing-viewer {
+            background: white;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+        
+        .drawing-header {
+            padding: var(--space-3) var(--space-4);
+            background: var(--color-bg);
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .drawing-content {
+            padding: var(--space-4);
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .drawing-content img {
+            max-width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+        }
+        
+        /* ================================================================
+           PRICE HERO
+           ================================================================ */
+        .price-hero {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+            color: white;
+            padding: var(--space-6);
+            border-radius: var(--radius-lg);
+            text-align: center;
+            margin-bottom: var(--space-5);
+        }
+        
+        .price-label { font-size: 14px; opacity: 0.8; margin-bottom: var(--space-2); }
+        .price-value { font-size: 48px; font-weight: 700; font-family: var(--font-mono); }
+        .price-detail { font-size: 13px; opacity: 0.7; margin-top: var(--space-2); }
+        
+        .confidence-badge {
+            display: inline-block;
+            margin-top: var(--space-3);
+            padding: var(--space-2) var(--space-4);
+            background: rgba(255,255,255,0.2);
+            border-radius: var(--radius-md);
+            font-size: 13px;
+        }
+        
+        /* ================================================================
+           COST BREAKDOWN
+           ================================================================ */
+        .cost-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-3) 0;
+            border-bottom: 1px solid var(--color-border-light);
+        }
+        
+        .cost-row:last-child { border-bottom: none; }
+        .cost-row.subtotal { background: var(--color-bg); margin: 0 calc(-1 * var(--space-5)); padding: var(--space-3) var(--space-5); }
+        .cost-row.total { background: var(--color-primary); color: white; margin: 0 calc(-1 * var(--space-5)) calc(-1 * var(--space-5)); padding: var(--space-4) var(--space-5); font-weight: 600; font-size: 16px; }
+        
+        .cost-label { font-size: 14px; }
+        .cost-formula { font-size: 11px; color: var(--color-text-muted); font-family: var(--font-mono); }
+        .cost-value { font-family: var(--font-mono); font-weight: 600; }
+        
+        /* ================================================================
+           COLLAPSIBLE SECTIONS
+           ================================================================ */
+        .collapse-header {
+            padding: var(--space-4);
+            background: var(--color-bg);
+            border-bottom: 1px solid var(--color-border-light);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+        
+        .collapse-header:hover { background: var(--color-bg-alt); }
+        
+        .collapse-content {
+            display: none;
+            padding: var(--space-4);
+            border-bottom: 1px solid var(--color-border-light);
+        }
+        
+        .collapse-content.open { display: block; }
+        
+        .chevron { transition: transform 0.2s; }
+        .chevron.open { transform: rotate(90deg); }
+        
+        /* ================================================================
+           OP TABLE
+           ================================================================ */
+        .op-row { cursor: pointer; }
+        .op-row:hover { background: var(--color-bg); }
+        .op-row.critical { background: rgba(254,226,226,0.3); }
+        .op-row.critical:hover { background: rgba(254,226,226,0.5); }
+        
+        .op-detail {
+            display: none;
+            background: var(--color-bg);
+            padding: var(--space-4);
+        }
+        
+        .op-detail.open { display: block; }
+        
+        /* ================================================================
+           UTILITIES
+           ================================================================ */
+        .mb-4 { margin-bottom: var(--space-4); }
+        .mb-5 { margin-bottom: var(--space-5); }
+        .text-muted { color: var(--color-text-muted); }
+        .text-error { color: var(--color-error); }
+        .text-success { color: var(--color-success); }
+        
+        /* ================================================================
+           PRINT
+           ================================================================ */
+        @media print {
+            .sidebar, .main-header { display: none; }
+            .main { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    CNC Planner Pro
+                    <span class="logo-badge">BETA</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <button class="nav-item active" onclick="showSection('teil', this)">
+                    <span class="nav-icon">📐</span>
+                    <span>Teil</span>
+                </button>
+                <button class="nav-item" onclick="showSection('kalkulation', this)">
+                    <span class="nav-icon">💰</span>
+                    <span>Kalkulation</span>
+                </button>
+                <button class="nav-item" onclick="showSection('angebot', this)">
+                    <span class="nav-icon">📄</span>
+                    <span>Angebot</span>
+                </button>
+                <button class="nav-item" onclick="showSection('nccode', this)">
+                    <span class="nav-icon">💻</span>
+                    <span>NC-Code</span>
+                </button>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="nav-item" onclick="showSection('feedback', this)">
+                    <span class="nav-icon">📝</span>
+                    <span>Feedback</span>
+                </button>
+                <button class="nav-item" onclick="showSection('settings', this)">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Einstellungen</span>
+                </button>
+            </div>
+        </aside>
+        
+        <!-- MAIN -->
+        <main class="main">
+            <header class="main-header">
+                <h1 class="main-title" id="mainTitle">Teil auswählen</h1>
+                <div>
+                    <button class="btn btn-secondary btn-sm" onclick="exportCSV()">CSV</button>
+                    <button class="btn btn-primary btn-sm" onclick="window.print()">PDF</button>
+                </div>
+            </header>
+            
+            <div class="main-content">
+                
+                <!-- ========================================
+                     SECTION: TEIL
+                     ======================================== -->
+                <div class="section active" id="section-teil">
+                    
+                    <!-- Part Selection -->
+                    <div class="card mb-5">
+                        <div class="card-header"><span>📁 Bauteil auswählen</span></div>
+                        <div class="card-body">
+                            <div class="part-grid">
+                                <div class="part-card selected" onclick="selectPart('verbindungsplatte')">
+                                    <div class="part-card-img">🔩</div>
+                                    <div class="part-card-title">Verbindungsplatte</div>
+                                    <div class="part-card-meta">130×130×50 mm • S235JR • h5/H7</div>
+                                </div>
+                                <div class="part-card" onclick="selectPart('flansch')">
+                                    <div class="part-card-img">⚙️</div>
+                                    <div class="part-card-title">Flansch DN50</div>
+                                    <div class="part-card-meta">Ø160×25 mm • 1.4301 • 4× M10</div>
+                                </div>
+                                <div class="part-card" onclick="selectPart('halter')">
+                                    <div class="part-card-img">📦</div>
+                                    <div class="part-card-title">Halterung</div>
+                                    <div class="part-card-meta">80×60×40 mm • AlMg3</div>
+                                </div>
+                                <div class="part-card" onclick="uploadPart()">
+                                    <div class="part-card-img" style="background: var(--color-info-light);">➕</div>
+                                    <div class="part-card-title">Zeichnung hochladen</div>
+                                    <div class="part-card-meta">PDF oder Bild</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Drawing Viewer -->
+                    <div class="drawing-viewer mb-5" id="drawingViewer">
+                        <div class="drawing-header">
+                            <div>
+                                <strong>Zeichnung:</strong> <span id="drawingTitle">2500473.01.11.02.00.001</span>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-secondary" onclick="zoomDrawing()">🔍 Vergrößern</button>
+                            </div>
+                        </div>
+                        <div class="drawing-content" id="drawingContent">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400' viewBox='0 0 600 400'%3E%3Crect fill='%23f8fafc' width='600' height='400'/%3E%3Crect x='50' y='50' width='300' height='200' fill='%23e2e8f0' stroke='%2364748b' stroke-width='2'/%3E%3Ccircle cx='200' cy='150' r='60' fill='none' stroke='%231e3a5f' stroke-width='2'/%3E%3Ctext x='200' y='155' text-anchor='middle' font-family='monospace' font-size='14' fill='%231e3a5f'%3EØ120 h5%3C/text%3E%3Ccircle cx='120' cy='100' r='13' fill='none' stroke='%23dc2626' stroke-width='1.5'/%3E%3Ctext x='120' y='75' text-anchor='middle' font-size='10' fill='%23dc2626'%3EØ26 H7%3C/text%3E%3Ccircle cx='280' cy='100' r='13' fill='none' stroke='%23dc2626' stroke-width='1.5'/%3E%3Ccircle cx='120' cy='200' r='13' fill='none' stroke='%23dc2626' stroke-width='1.5'/%3E%3Crect x='400' y='50' width='150' height='300' fill='white' stroke='%2364748b'/%3E%3Ctext x='475' y='80' text-anchor='middle' font-size='12' font-weight='bold'%3ESchriftfeld%3C/text%3E%3Ctext x='410' y='110' font-size='10'%3EMaterial: S235JR%3C/text%3E%3Ctext x='410' y='130' font-size='10'%3EMaße: 130×130×50%3C/text%3E%3Ctext x='410' y='150' font-size='10'%3EGewicht: 2,2 kg%3C/text%3E%3Ctext x='410' y='180' font-size='10' fill='%23dc2626'%3EToleranz: h5, H7%3C/text%3E%3Cline x1='50' y1='280' x2='350' y2='280' stroke='%2364748b' stroke-width='1'/%3E%3Ctext x='200' y='300' text-anchor='middle' font-size='11'%3E130%3C/text%3E%3C/svg%3E" alt="Technische Zeichnung">
+                        </div>
+                    </div>
+                    
+                    <!-- Input Parameters -->
+                    <div class="grid-2">
+                        <div class="card">
+                            <div class="card-header"><span>📐 Werkstück</span></div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label class="form-label">Material</label>
+                                    <select class="input" id="materialSelect" onchange="calculate()">
+                                        <option value="S235JR">S235JR (Baustahl)</option>
+                                        <option value="S355J2">S355J2</option>
+                                        <option value="C45">C45</option>
+                                        <option value="42CrMo4">42CrMo4</option>
+                                        <option value="1.4301">1.4301 (V2A)</option>
+                                        <option value="1.4404">1.4404 (V4A)</option>
+                                        <option value="AlMg3">AlMg3</option>
+                                    </select>
+                                </div>
+                                <div class="grid-3" style="gap: var(--space-3);">
+                                    <div class="form-group">
+                                        <label class="form-label">Länge (mm)</label>
+                                        <input type="number" class="input input-mono" id="dimX" value="130" onchange="calculate()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Breite (mm)</label>
+                                        <input type="number" class="input input-mono" id="dimY" value="130" onchange="calculate()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Höhe (mm)</label>
+                                        <input type="number" class="input input-mono" id="dimZ" value="50" onchange="calculate()">
+                                    </div>
+                                </div>
+                                <div class="grid-2" style="gap: var(--space-3); margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--color-border-light);">
+                                    <div>
+                                        <span class="text-muted" style="font-size: 12px;">Gewicht:</span>
+                                        <span class="mono" id="weightDisplay">2,20 kg</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-muted" style="font-size: 12px;">Materialkosten:</span>
+                                        <span class="mono" id="materialCostDisplay">€14,93</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header"><span>⚙️ Fertigung</span></div>
+                            <div class="card-body">
+                                <div class="grid-2" style="gap: var(--space-3);">
+                                    <div class="form-group">
+                                        <label class="form-label">Stückzahl</label>
+                                        <input type="number" class="input input-mono" id="quantity" value="1" min="1" onchange="calculate()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Aufspannungen</label>
+                                        <input type="number" class="input input-mono" id="setupCount" value="2" min="1" onchange="calculate()">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Spannmittel</label>
+                                    <select class="input" id="clampingSelect" onchange="calculate()">
+                                        <option value="schraubstock">Schraubstock</option>
+                                        <option value="parallel" selected>Parallelspanner</option>
+                                        <option value="nullpunkt">Nullpunkt-Spannsystem</option>
+                                        <option value="vakuum">Vakuumspannung</option>
+                                    </select>
+                                </div>
+                                <div style="margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--color-border-light);">
+                                    <div class="form-label">Zusatzoperationen</div>
+                                    <div style="display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-2);">
+                                        <label style="display: flex; align-items: center; gap: var(--space-2); cursor: pointer; font-size: 13px;">
+                                            <input type="checkbox" id="opEntgraten" checked onchange="calculate()"> Entgraten
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: var(--space-2); cursor: pointer; font-size: 13px;">
+                                            <input type="checkbox" id="opPruefung" onchange="calculate()"> Prüfung
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: var(--space-2); cursor: pointer; font-size: 13px;">
+                                            <input type="checkbox" id="opSaegen" onchange="calculate()"> Sägen
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Result -->
+                    <div style="margin-top: var(--space-5); padding: var(--space-5); background: var(--color-primary); color: white; border-radius: var(--radius-lg); display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-size: 13px; opacity: 0.8;">Kalkulierter Stückpreis</div>
+                            <div style="font-size: 36px; font-weight: 700; font-family: var(--font-mono);" id="quickPrice">€64,89</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 13px; opacity: 0.8;">Bearbeitungszeit</div>
+                            <div style="font-size: 24px; font-weight: 600; font-family: var(--font-mono);" id="quickTime">42 min</div>
+                        </div>
+                        <button class="btn" style="background: white; color: var(--color-primary);" onclick="showSection('kalkulation', document.querySelectorAll('.nav-item')[1])">Details anzeigen →</button>
+                    </div>
+                    
+                </div>
+                
+                <!-- ========================================
+                     SECTION: KALKULATION
+                     ======================================== -->
+                <div class="section" id="section-kalkulation">
+                    
+                    <!-- Price Hero -->
+                    <div class="price-hero">
+                        <div class="price-label">Stückpreis (netto)</div>
+                        <div class="price-value" id="priceDisplay">€64,89</div>
+                        <div class="price-detail">Material + Fertigung + Zuschläge + Gewinn</div>
+                        <div class="confidence-badge" id="confidenceBadge">🟡 ±15% Genauigkeit</div>
+                    </div>
+                    
+                    <div class="grid-2 mb-5">
+                        <!-- Kostenaufschlüsselung -->
+                        <div class="card">
+                            <div class="card-header"><span>📊 Kostenaufschlüsselung</span></div>
+                            <div class="card-body">
+                                <div class="cost-row">
+                                    <div>
+                                        <div class="cost-label">Material + MGK</div>
+                                        <div class="cost-formula" id="matFormula">2,2 kg × €6,79 + 10%</div>
+                                    </div>
+                                    <div class="cost-value" id="matCost">€16,42</div>
+                                </div>
+                                <div class="cost-row">
+                                    <div>
+                                        <div class="cost-label">Fertigung + AV</div>
+                                        <div class="cost-formula" id="machFormula">12,5 min × €91/h + 8%</div>
+                                    </div>
+                                    <div class="cost-value" id="machCost">€20,51</div>
+                                </div>
+                                <div class="cost-row">
+                                    <div>
+                                        <div class="cost-label">Einrichtung</div>
+                                        <div class="cost-formula" id="setupFormula">25 min × €91/h ÷ 1</div>
+                                    </div>
+                                    <div class="cost-value" id="setupCost">€37,92</div>
+                                </div>
+                                <div class="cost-row">
+                                    <div>
+                                        <div class="cost-label">Werkzeugverschleiß</div>
+                                        <div class="cost-formula">pauschal</div>
+                                    </div>
+                                    <div class="cost-value" id="toolCost">€20,74</div>
+                                </div>
+                                <div class="cost-row subtotal">
+                                    <div class="cost-label">Selbstkosten</div>
+                                    <div class="cost-value" id="totalCost">€58,09</div>
+                                </div>
+                                <div class="cost-row">
+                                    <div class="cost-label">+ Gewinn (10%)</div>
+                                    <div class="cost-value" id="profitAmount">€5,81</div>
+                                </div>
+                                <div class="cost-row total">
+                                    <div class="cost-label">Angebotspreis</div>
+                                    <div class="cost-value" id="sellPrice">€64,89</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Mengenstaffel -->
+                        <div class="card">
+                            <div class="card-header"><span>📈 Mengenstaffel</span></div>
+                            <div class="card-body" style="padding: 0;">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Stück</th>
+                                            <th class="right">Pro Stück</th>
+                                            <th class="right">Gesamt</th>
+                                            <th class="right">Ersparnis</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="quantityTable">
+                                        <tr>
+                                            <td class="mono">1</td>
+                                            <td class="mono right">€64,89</td>
+                                            <td class="mono right">€64,89</td>
+                                            <td class="mono right text-muted">—</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="mono">5</td>
+                                            <td class="mono right">€52,30</td>
+                                            <td class="mono right">€261,50</td>
+                                            <td class="mono right text-success">-19%</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="mono">10</td>
+                                            <td class="mono right">€46,15</td>
+                                            <td class="mono right">€461,50</td>
+                                            <td class="mono right text-success">-29%</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="mono">25</td>
+                                            <td class="mono right">€41,20</td>
+                                            <td class="mono right">€1.030,00</td>
+                                            <td class="mono right text-success">-36%</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Collapsible: Operationen -->
+                    <div class="card mb-5">
+                        <div class="collapse-header" onclick="toggleCollapse('ops')">
+                            <span>🔩 Operationen & Bearbeitungszeiten</span>
+                            <span class="chevron" id="chevron-ops">▶</span>
+                        </div>
+                        <div class="collapse-content" id="collapse-ops">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 80px;">OP</th>
+                                        <th>Beschreibung</th>
+                                        <th>Werkzeug</th>
+                                        <th class="right">t<sub>h</sub></th>
+                                        <th class="right">t<sub>n</sub></th>
+                                        <th class="right">Gesamt</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="op-row" onclick="toggleOpDetail('op10')">
+                                        <td class="mono">OP10</td>
+                                        <td>Planfräsen Oberseite</td>
+                                        <td>T1 Ø63 Planfräser</td>
+                                        <td class="mono right">1,9 min</td>
+                                        <td class="mono right">0,8 min</td>
+                                        <td class="mono right">2,7 min</td>
+                                    </tr>
+                                    <tr class="op-detail" id="detail-op10">
+                                        <td colspan="6">
+                                            <div class="grid-3" style="gap: var(--space-4);">
+                                                <div style="background: white; padding: var(--space-3); border-radius: var(--radius-md); text-align: center;">
+                                                    <svg width="140" height="100" viewBox="0 0 140 100">
+                                                        <rect x="10" y="30" width="100" height="50" fill="#E2E8F0" stroke="#64748B"/>
+                                                        <circle cx="40" cy="20" r="15" fill="#1E3A5F" opacity="0.8"/>
+                                                        <line x1="20" y1="45" x2="100" y2="45" stroke="#059669" stroke-width="2" stroke-dasharray="4"/>
+                                                        <line x1="100" y1="55" x2="20" y2="55" stroke="#059669" stroke-width="2" stroke-dasharray="4"/>
+                                                        <line x1="20" y1="65" x2="100" y2="65" stroke="#059669" stroke-width="2" stroke-dasharray="4"/>
+                                                    </svg>
+                                                    <div style="font-size: 10px; color: var(--color-text-muted);">Bahnstrategie: Zeilenweise</div>
+                                                </div>
+                                                <div style="font-size: 12px; font-family: var(--font-mono); line-height: 1.8;">
+                                                    <strong>Hauptzeit:</strong><br>
+                                                    Fläche: 130 × 130 mm<br>
+                                                    Bahnen: 3 × 130 mm<br>
+                                                    v<sub>f</sub> = 485 mm/min<br>
+                                                    t<sub>h</sub> = 390 / 485 × 2 = 1,6 min<br>
+                                                    + 20% Sicherheit = <strong>1,9 min</strong>
+                                                </div>
+                                                <div style="font-size: 12px; font-family: var(--font-mono); line-height: 1.8;">
+                                                    <strong>Nebenzeit:</strong><br>
+                                                    Werkzeugwechsel: 0,3 min<br>
+                                                    Anfahren: 0,2 min<br>
+                                                    Positionieren: 0,2 min<br>
+                                                    Spindel: 0,1 min<br>
+                                                    = <strong>0,8 min</strong>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="op-row" onclick="toggleOpDetail('op20')">
+                                        <td class="mono">OP20</td>
+                                        <td>Kontur schruppen Ø120</td>
+                                        <td>T2 Ø20 Schaftfräser</td>
+                                        <td class="mono right">6,2 min</td>
+                                        <td class="mono right">1,8 min</td>
+                                        <td class="mono right">8,0 min</td>
+                                    </tr>
+                                    <tr class="op-detail" id="detail-op20">
+                                        <td colspan="6" style="padding: var(--space-4);">
+                                            <em>Klicken für Berechnungsdetails...</em>
+                                        </td>
+                                    </tr>
+                                    <tr class="op-row critical" onclick="toggleOpDetail('op50')">
+                                        <td class="mono text-error">OP50</td>
+                                        <td>Schlichten Ø120 <span class="text-error">⚠️ h5</span></td>
+                                        <td>T3 Ø16 Schlichtfräser</td>
+                                        <td class="mono right">4,2 min</td>
+                                        <td class="mono right">0,9 min</td>
+                                        <td class="mono right">5,1 min</td>
+                                    </tr>
+                                    <tr class="op-detail" id="detail-op50">
+                                        <td colspan="6">
+                                            <div style="background: var(--color-error-light); padding: var(--space-3); border-radius: var(--radius-md); margin-bottom: var(--space-3);">
+                                                <strong style="color: var(--color-error);">⚠️ Kritische Toleranz: h5 = 0/-0,018 mm</strong><br>
+                                                <span style="font-size: 12px;">Vorschub reduziert, Zwischenmessung erforderlich, Messzeit eingeplant.</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="op-row critical" onclick="toggleOpDetail('op60')">
+                                        <td class="mono text-error">OP60</td>
+                                        <td>Feinbohren 3× Ø26 <span class="text-error">⚠️ H7</span></td>
+                                        <td>T11 Feinbohrkopf</td>
+                                        <td class="mono right">3,3 min</td>
+                                        <td class="mono right">0,8 min</td>
+                                        <td class="mono right">4,1 min</td>
+                                    </tr>
+                                    <tr class="op-detail" id="detail-op60">
+                                        <td colspan="6">
+                                            <div style="background: var(--color-error-light); padding: var(--space-3); border-radius: var(--radius-md);">
+                                                <strong style="color: var(--color-error);">⚠️ Toleranz H7 = +0,021/0 mm</strong><br>
+                                                <span style="font-size: 12px;">Feinbohrkopf-Einstellung dokumentieren!</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot style="background: var(--color-bg);">
+                                    <tr>
+                                        <td colspan="3"><strong>Summe Bearbeitung</strong></td>
+                                        <td class="mono right"><strong>15,6 min</strong></td>
+                                        <td class="mono right"><strong>4,3 min</strong></td>
+                                        <td class="mono right"><strong>19,9 min</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="5"><strong>+ Einrichtung (2 Aufspannungen)</strong></td>
+                                        <td class="mono right"><strong>25 min</strong></td>
+                                    </tr>
+                                    <tr style="background: var(--color-primary); color: white;">
+                                        <td colspan="5"><strong>GESAMTZEIT</strong></td>
+                                        <td class="mono right"><strong>42 min</strong></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Collapsible: Werkzeuge -->
+                    <div class="card mb-5">
+                        <div class="collapse-header" onclick="toggleCollapse('tools')">
+                            <span>🔧 Werkzeuge & Schnittdaten</span>
+                            <span class="chevron" id="chevron-tools">▶</span>
+                        </div>
+                        <div class="collapse-content" id="collapse-tools">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>T#</th>
+                                        <th>Werkzeug</th>
+                                        <th class="right">v<sub>c</sub> (m/min)</th>
+                                        <th class="right">f<sub>z</sub> (mm)</th>
+                                        <th class="right">a<sub>p</sub> (mm)</th>
+                                        <th class="right">Kosten</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="mono">T1</td>
+                                        <td>Planfräser Ø63, 5 Schneiden</td>
+                                        <td class="mono right">180</td>
+                                        <td class="mono right">0,15</td>
+                                        <td class="mono right">2,0</td>
+                                        <td class="mono right">€4,20</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="mono">T2</td>
+                                        <td>Schaftfräser Ø20, 4 Schneiden</td>
+                                        <td class="mono right">150</td>
+                                        <td class="mono right">0,12</td>
+                                        <td class="mono right">8,0</td>
+                                        <td class="mono right">€8,50</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="mono">T3</td>
+                                        <td>Schlichtfräser Ø16, 6 Schneiden</td>
+                                        <td class="mono right">200</td>
+                                        <td class="mono right">0,08</td>
+                                        <td class="mono right">0,3</td>
+                                        <td class="mono right">€5,80</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="mono">T11</td>
+                                        <td>Feinbohrkopf Ø26 H7</td>
+                                        <td class="mono right">80</td>
+                                        <td class="mono right">0,05</td>
+                                        <td class="mono right">—</td>
+                                        <td class="mono right">€2,24</td>
+                                    </tr>
+                                </tbody>
+                                <tfoot style="background: var(--color-bg);">
+                                    <tr>
+                                        <td colspan="5"><strong>Werkzeugkosten gesamt</strong></td>
+                                        <td class="mono right"><strong>€20,74</strong></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Collapsible: Methodik -->
+                    <div class="card">
+                        <div class="collapse-header" onclick="toggleCollapse('method')">
+                            <span>📖 Berechnungsmethodik & Normen</span>
+                            <span class="chevron" id="chevron-method">▶</span>
+                        </div>
+                        <div class="collapse-content" id="collapse-method">
+                            <div class="grid-2" style="gap: var(--space-5);">
+                                <div>
+                                    <h4 style="margin-bottom: var(--space-3);">Angewandte Normen</h4>
+                                    <ul style="font-size: 13px; line-height: 1.8; padding-left: var(--space-5);">
+                                        <li><strong>REFA</strong> — Zeitgliederung (t<sub>h</sub>, t<sub>n</sub>, t<sub>r</sub>)</li>
+                                        <li><strong>VDI 3321</strong> — Schnittdaten Fräsen</li>
+                                        <li><strong>DIN 8580</strong> — Fertigungsverfahren</li>
+                                        <li><strong>DIN EN 10027</strong> — Werkstoffbezeichnung</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4 style="margin-bottom: var(--space-3);">Genauigkeit</h4>
+                                    <p style="font-size: 13px; color: var(--color-text-secondary);">
+                                        Diese Kalkulation basiert auf parametrischen Formeln und Erfahrungswerten. 
+                                        Die tatsächliche Fertigungszeit kann je nach Maschine, Werkzeugzustand und 
+                                        Bediener variieren.
+                                    </p>
+                                    <p style="font-size: 13px; color: var(--color-text-secondary); margin-top: var(--space-2);">
+                                        <strong>Typische Abweichung:</strong> ±15% bei Standardteilen, ±25% bei engen Toleranzen.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- ========================================
+                     SECTION: ANGEBOT
+                     ======================================== -->
+                <div class="section" id="section-angebot">
+                    <div class="card">
+                        <div class="card-header">
+                            <span>📄 Angebot ANG-2026-0042</span>
+                            <div>
+                                <button class="btn btn-sm btn-secondary">✉️ E-Mail</button>
+                                <button class="btn btn-sm btn-primary" onclick="window.print()">📥 PDF</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <p style="margin-bottom: var(--space-5); color: var(--color-text-secondary);">
+                                Angebot wird aus den Kalkulationsdaten generiert. Firmendaten können in den Einstellungen hinterlegt werden.
+                            </p>
+                            
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Pos.</th>
+                                        <th>Beschreibung</th>
+                                        <th class="right">Menge</th>
+                                        <th class="right">EP (€)</th>
+                                        <th class="right">GP (€)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>
+                                            <strong>Verbindungsplatte</strong><br>
+                                            <span style="font-size: 12px; color: var(--color-text-muted);">
+                                                Material: S235JR, Maße: 130×130×50 mm<br>
+                                                Toleranzen: Ø120 h5, 3× Ø26 H7
+                                            </span>
+                                        </td>
+                                        <td class="mono right">1</td>
+                                        <td class="mono right">64,89</td>
+                                        <td class="mono right">64,89</td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="4" class="right">Zwischensumme</td>
+                                        <td class="mono right">€64,89</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" class="right">MwSt. 19%</td>
+                                        <td class="mono right">€12,33</td>
+                                    </tr>
+                                    <tr style="background: var(--color-primary); color: white;">
+                                        <td colspan="4" class="right"><strong>Gesamtbetrag</strong></td>
+                                        <td class="mono right"><strong>€77,22</strong></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                            
+                            <div style="margin-top: var(--space-5); padding: var(--space-4); background: var(--color-bg); border-radius: var(--radius-md); font-size: 13px;">
+                                <strong>Lieferzeit:</strong> 3-4 Wochen ab Auftragseingang<br>
+                                <strong>Zahlungsziel:</strong> 14 Tage netto<br>
+                                <strong>Gültigkeit:</strong> 30 Tage
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ========================================
+                     SECTION: NC-CODE
+                     ======================================== -->
+                <div class="section" id="section-nccode">
+                    <div class="card">
+                        <div class="card-header">
+                            <span>💻 NC-Code Generator</span>
+                            <div style="display: flex; gap: var(--space-2);">
+                                <button class="btn btn-sm btn-primary" id="btnHeidenhain">Heidenhain</button>
+                                <button class="btn btn-sm btn-secondary" id="btnSiemens">Siemens</button>
+                                <button class="btn btn-sm btn-secondary" id="btnFanuc">Fanuc</button>
+                            </div>
+                        </div>
+                        <div class="card-body" style="padding: 0;">
+                            <pre style="background: #1E293B; color: #E2E8F0; padding: var(--space-5); margin: 0; font-family: var(--font-mono); font-size: 12px; line-height: 1.6; overflow-x: auto;">
+<span style="color: #94A3B8;">; =============================================</span>
+<span style="color: #94A3B8;">; CNC Planner Pro - NC-Programm</span>
+<span style="color: #94A3B8;">; Teil: Verbindungsplatte</span>
+<span style="color: #94A3B8;">; Datum: 05.02.2026</span>
+<span style="color: #94A3B8;">; =============================================</span>
+
+<span style="color: #F59E0B;">BEGIN PGM</span> VERBINDUNGSPLATTE <span style="color: #F59E0B;">MM</span>
+
+<span style="color: #94A3B8;">; OP10 - Planfräsen</span>
+<span style="color: #F59E0B;">TOOL CALL</span> 1 Z S909 F485
+<span style="color: #60A5FA;">L</span> X+0 Y+0 Z+100 <span style="color: #F59E0B;">FMAX</span>
+<span style="color: #60A5FA;">L</span> Z+2 <span style="color: #F59E0B;">FMAX</span>
+<span style="color: #60A5FA;">L</span> Z-2 F485
+<span style="color: #60A5FA;">L</span> X+130 F485
+<span style="color: #60A5FA;">L</span> Y+45
+<span style="color: #60A5FA;">L</span> X+0
+<span style="color: #60A5FA;">L</span> Y+90
+<span style="color: #60A5FA;">L</span> X+130
+<span style="color: #60A5FA;">L</span> Z+100 <span style="color: #F59E0B;">FMAX</span>
+
+<span style="color: #94A3B8;">; OP20 - Kontur schruppen</span>
+<span style="color: #F59E0B;">TOOL CALL</span> 2 Z S2387 F611
+<span style="color: #94A3B8;">; ... weitere Operationen</span>
+
+<span style="color: #F59E0B;">END PGM</span> VERBINDUNGSPLATTE <span style="color: #F59E0B;">MM</span></pre>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: var(--space-4); padding: var(--space-4); background: var(--color-warning-light); border-radius: var(--radius-md); font-size: 13px;">
+                        <strong>⚠️ Hinweis:</strong> NC-Code vor Einsatz an der Maschine prüfen. Dieser Code ist ein Ausgangspunkt und muss ggf. an die spezifische Maschinensteuerung angepasst werden.
+                    </div>
+                </div>
+                
+                <!-- ========================================
+                     SECTION: FEEDBACK
+                     ======================================== -->
+                <div class="section" id="section-feedback">
+                    
+                    <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-5);">
+                        <button class="btn btn-sm btn-primary" id="tabFeedbackInput" onclick="showFeedbackTab('input')">📝 Erfassen</button>
+                        <button class="btn btn-sm btn-secondary" id="tabFeedbackLearnings" onclick="showFeedbackTab('learnings')">🧠 Cross-Learnings</button>
+                        <button class="btn btn-sm btn-secondary" id="tabFeedbackHistory" onclick="showFeedbackTab('history')">📋 Historie</button>
+                    </div>
+                    
+                    <!-- Feedback Input -->
+                    <div id="feedback-input">
+                        <div class="card">
+                            <div class="card-header card-header-info"><span>📝 Fertigungs-Feedback</span></div>
+                            <div class="card-body">
+                                <div class="grid-3 mb-5" style="gap: var(--space-4);">
+                                    <div class="form-group" style="margin: 0;">
+                                        <label class="form-label">Projekt-Nr.</label>
+                                        <input type="text" class="input input-mono" value="2500473.01" readonly style="background: var(--color-bg);">
+                                    </div>
+                                    <div class="form-group" style="margin: 0;">
+                                        <label class="form-label">Datum</label>
+                                        <input type="date" class="input" value="2026-02-05">
+                                    </div>
+                                    <div class="form-group" style="margin: 0;">
+                                        <label class="form-label">Erfasser</label>
+                                        <input type="text" class="input" placeholder="Name">
+                                    </div>
+                                </div>
+                                
+                                <div class="grid-2 mb-5" style="gap: var(--space-4);">
+                                    <div class="form-group" style="margin: 0;">
+                                        <label class="form-label">Gesamtzeit Kalkulation</label>
+                                        <input type="text" class="input input-mono" value="42 min" readonly style="background: var(--color-bg);">
+                                    </div>
+                                    <div class="form-group" style="margin: 0;">
+                                        <label class="form-label">Gesamtzeit Ist</label>
+                                        <input type="number" class="input input-mono" placeholder="z.B. 48" id="fbGesamtIst">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Hauptgrund für Abweichung</label>
+                                    <select class="input" id="fbGrund">
+                                        <option value="">— Kein Problem / wie kalkuliert —</option>
+                                        <option value="einrichtung">Einrichtung (Fräskanten, Ausrichten, Nullpunkt)</option>
+                                        <option value="toleranz">Toleranz (Nacharbeit, Messung)</option>
+                                        <option value="werkzeug">Werkzeug (Verschleiß, Bruch)</option>
+                                        <option value="material">Material (Lunker, Übermaß)</option>
+                                        <option value="nc">NC-Programm (Anpassung nötig)</option>
+                                        <option value="sonstiges">Sonstiges</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Notiz / Details</label>
+                                    <textarea class="input" rows="3" placeholder="z.B. Fräskanten für Parallelspanner nötig, +15 min"></textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Ergebnis</label>
+                                    <div style="display: flex; gap: var(--space-4); flex-wrap: wrap;">
+                                        <label style="display: flex; align-items: center; gap: var(--space-2); cursor: pointer;">
+                                            <input type="radio" name="fbErgebnis" value="io" checked> ✅ Teil i.O.
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: var(--space-2); cursor: pointer;">
+                                            <input type="radio" name="fbErgebnis" value="nacharbeit"> ⚠️ Nacharbeit
+                                        </label>
+                                        <label style="display: flex; align-items: center; gap: var(--space-2); cursor: pointer;">
+                                            <input type="radio" name="fbErgebnis" value="ausschuss"> ❌ Ausschuss
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div style="margin-top: var(--space-5);">
+                                    <button class="btn btn-primary" onclick="saveFeedback()">💾 Feedback speichern</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Cross-Learnings -->
+                    <div id="feedback-learnings" style="display: none;">
+                        <div class="card mb-5">
+                            <div class="card-header card-header-primary"><span>📈 Kalkulations-Genauigkeit</span></div>
+                            <div class="card-body">
+                                <div class="grid-3" style="text-align: center;">
+                                    <div>
+                                        <div style="font-size: 36px; font-weight: 700; color: var(--color-warning);">+18%</div>
+                                        <div class="text-muted">Ø Abweichung</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 36px; font-weight: 700; color: var(--color-primary);">12</div>
+                                        <div class="text-muted">Feedbacks</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 36px; font-weight: 700; color: var(--color-success);">3</div>
+                                        <div class="text-muted">Muster erkannt</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header card-header-warning"><span>🔄 Erkannte Muster</span></div>
+                            <div class="card-body" style="padding: 0;">
+                                <div style="padding: var(--space-4); border-bottom: 1px solid var(--color-border-light);">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-2);">
+                                        <strong>Einrichtzeit bei Parallelspanner</strong>
+                                        <span style="background: var(--color-error-light); color: var(--color-error); padding: 2px 8px; border-radius: var(--radius-sm); font-size: 11px;">8/12 = 67%</span>
+                                    </div>
+                                    <p style="font-size: 13px; color: var(--color-text-secondary); margin-bottom: var(--space-3);">Ø +12 min Mehraufwand durch fehlende Fräskanten.</p>
+                                    <div style="display: flex; gap: var(--space-2);">
+                                        <button class="btn btn-sm btn-primary">+15 min anwenden</button>
+                                        <button class="btn btn-sm btn-secondary">Ignorieren</button>
+                                    </div>
+                                </div>
+                                <div style="padding: var(--space-4); border-bottom: 1px solid var(--color-border-light);">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-2);">
+                                        <strong>Toleranz h5/H7 unterschätzt</strong>
+                                        <span style="background: var(--color-warning-light); color: var(--color-warning); padding: 2px 8px; border-radius: var(--radius-sm); font-size: 11px;">5/7 = 71%</span>
+                                    </div>
+                                    <p style="font-size: 13px; color: var(--color-text-secondary); margin-bottom: var(--space-3);">Ø +4 min pro Passung durch Messzeit.</p>
+                                    <div style="display: flex; gap: var(--space-2);">
+                                        <button class="btn btn-sm btn-primary">Faktor 1.3× anwenden</button>
+                                        <button class="btn btn-sm btn-secondary">Ignorieren</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- History -->
+                    <div id="feedback-history" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <span>📋 Feedback-Historie</span>
+                                <button class="btn btn-sm btn-secondary">📤 Export</button>
+                            </div>
+                            <div class="card-body" style="padding: 0;">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Datum</th>
+                                            <th>Projekt</th>
+                                            <th class="right">Kalk.</th>
+                                            <th class="right">Ist</th>
+                                            <th class="right">Delta</th>
+                                            <th>Grund</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="mono">05.02.</td>
+                                            <td class="mono">2500473.01</td>
+                                            <td class="mono right">42 min</td>
+                                            <td class="mono right">48 min</td>
+                                            <td class="mono right text-error">+14%</td>
+                                            <td>Einrichtung</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="mono">04.02.</td>
+                                            <td class="mono">2500112.03</td>
+                                            <td class="mono right">28 min</td>
+                                            <td class="mono right">26 min</td>
+                                            <td class="mono right text-success">-7%</td>
+                                            <td>—</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="mono">03.02.</td>
+                                            <td class="mono">2500098.01</td>
+                                            <td class="mono right">35 min</td>
+                                            <td class="mono right">43 min</td>
+                                            <td class="mono right text-error">+23%</td>
+                                            <td>Toleranz</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- ========================================
+                     SECTION: EINSTELLUNGEN
+                     ======================================== -->
+                <div class="section" id="section-settings">
+                    
+                    <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-5);">
+                        <button class="btn btn-sm btn-primary" id="tabRates" onclick="showSettingsTab('rates')">Stundensätze</button>
+                        <button class="btn btn-sm btn-secondary" id="tabMaterial" onclick="showSettingsTab('material')">Materialpreise</button>
+                        <button class="btn btn-sm btn-secondary" id="tabZuschlag" onclick="showSettingsTab('zuschlag')">Zuschläge</button>
+                        <button class="btn btn-sm btn-secondary" id="tabFirma" onclick="showSettingsTab('firma')">Firmendaten</button>
+                    </div>
+                    
+                    <!-- Stundensätze -->
+                    <div id="settings-rates">
+                        <div class="card">
+                            <div class="card-header card-header-info"><span>⏱️ Maschinenstundensätze</span></div>
+                            <div class="card-body" style="padding: 0;">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Bereich</th>
+                                            <th class="right">Lohn (€/h)</th>
+                                            <th class="right">Maschine (€/h)</th>
+                                            <th class="right">Gesamt (€/h)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>CNC-Fräsen 3-Achs</td>
+                                            <td><input type="number" class="input input-sm input-mono right" value="49" style="width: 80px;"></td>
+                                            <td><input type="number" class="input input-sm input-mono right" value="42" style="width: 80px;"></td>
+                                            <td class="mono right">€91</td>
+                                        </tr>
+                                        <tr>
+                                            <td>CNC-Fräsen 5-Achs</td>
+                                            <td><input type="number" class="input input-sm input-mono right" value="55" style="width: 80px;"></td>
+                                            <td><input type="number" class="input input-sm input-mono right" value="65" style="width: 80px;"></td>
+                                            <td class="mono right">€120</td>
+                                        </tr>
+                                        <tr>
+                                            <td>CNC-Drehen</td>
+                                            <td><input type="number" class="input input-sm input-mono right" value="45" style="width: 80px;"></td>
+                                            <td><input type="number" class="input input-sm input-mono right" value="38" style="width: 80px;"></td>
+                                            <td class="mono right">€83</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Entgraten / Schlossern</td>
+                                            <td><input type="number" class="input input-sm input-mono right" value="42" style="width: 80px;"></td>
+                                            <td><input type="number" class="input input-sm input-mono right" value="5" style="width: 80px;"></td>
+                                            <td class="mono right">€47</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Materialpreise -->
+                    <div id="settings-material" style="display: none;">
+                        <div class="card">
+                            <div class="card-header card-header-success"><span>📦 Materialpreise (€/kg)</span></div>
+                            <div class="card-body">
+                                <div class="grid-3" style="gap: var(--space-4);">
+                                    <div class="form-group">
+                                        <label class="form-label">S235JR</label>
+                                        <input type="number" class="input input-mono" value="6.79" step="0.01">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">S355J2</label>
+                                        <input type="number" class="input input-mono" value="7.50" step="0.01">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">C45</label>
+                                        <input type="number" class="input input-mono" value="3.50" step="0.01">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">1.4301 (V2A)</label>
+                                        <input type="number" class="input input-mono" value="8.50" step="0.01">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">1.4404 (V4A)</label>
+                                        <input type="number" class="input input-mono" value="12.00" step="0.01">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">AlMg3</label>
+                                        <input type="number" class="input input-mono" value="6.50" step="0.01">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Zuschläge -->
+                    <div id="settings-zuschlag" style="display: none;">
+                        <div class="card">
+                            <div class="card-header card-header-warning"><span>📊 Zuschlagskalkulation</span></div>
+                            <div class="card-body">
+                                <div class="grid-3" style="gap: var(--space-4);">
+                                    <div class="form-group">
+                                        <label class="form-label">MGK (Materialgemeinkosten)</label>
+                                        <div style="display: flex; align-items: center; gap: var(--space-2);">
+                                            <input type="number" class="input input-mono" value="10" style="width: 80px;">
+                                            <span>%</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">AV-Aufschlag</label>
+                                        <div style="display: flex; align-items: center; gap: var(--space-2);">
+                                            <input type="number" class="input input-mono" value="8" style="width: 80px;">
+                                            <span>%</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">VwGK (Verwaltung)</label>
+                                        <div style="display: flex; align-items: center; gap: var(--space-2);">
+                                            <input type="number" class="input input-mono" value="12" style="width: 80px;">
+                                            <span>%</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">VtGK (Vertrieb)</label>
+                                        <div style="display: flex; align-items: center; gap: var(--space-2);">
+                                            <input type="number" class="input input-mono" value="5" style="width: 80px;">
+                                            <span>%</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Gewinn</label>
+                                        <div style="display: flex; align-items: center; gap: var(--space-2);">
+                                            <input type="number" class="input input-mono" value="10" style="width: 80px;">
+                                            <span>%</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Skonto</label>
+                                        <div style="display: flex; align-items: center; gap: var(--space-2);">
+                                            <input type="number" class="input input-mono" value="2" style="width: 80px;">
+                                            <span>%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Firmendaten -->
+                    <div id="settings-firma" style="display: none;">
+                        <div class="card">
+                            <div class="card-header"><span>🏢 Firmendaten</span></div>
+                            <div class="card-body">
+                                <div class="grid-2" style="gap: var(--space-4);">
+                                    <div class="form-group">
+                                        <label class="form-label">Firmenname</label>
+                                        <input type="text" class="input" value="Muster CNC GmbH">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Ansprechpartner</label>
+                                        <input type="text" class="input" value="Max Mustermann">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Straße</label>
+                                        <input type="text" class="input" value="Industriestraße 42">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">PLZ / Ort</label>
+                                        <input type="text" class="input" value="01234 Musterstadt">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Telefon</label>
+                                        <input type="text" class="input" value="+49 123 456789">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">E-Mail</label>
+                                        <input type="email" class="input" value="info@muster-cnc.de">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: var(--space-5);">
+                        <button class="btn btn-primary">💾 Einstellungen speichern</button>
+                        <button class="btn btn-secondary">↺ Zurücksetzen</button>
+                    </div>
+                    
+                </div>
+                
+            </div>
+        </main>
+    </div>
+    
+    <!-- ================================================================
+         JAVASCRIPT
+         ================================================================ -->
+    <script>
+        // Navigation
+        function showSection(id, btn) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('section-' + id).classList.add('active');
+            if (btn) btn.classList.add('active');
+            
+            const titles = {
+                'teil': 'Teil auswählen',
+                'kalkulation': 'Kalkulation',
+                'angebot': 'Angebot',
+                'nccode': 'NC-Code',
+                'feedback': 'Feedback',
+                'settings': 'Einstellungen'
+            };
+            document.getElementById('mainTitle').textContent = titles[id] || id;
+        }
+        
+        // Part selection
+        function selectPart(id) {
+            document.querySelectorAll('.part-card').forEach(c => c.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            calculate();
+        }
+        
+        function uploadPart() {
+            alert('Zeichnungs-Upload wird in der nächsten Version verfügbar sein.');
+        }
+        
+        function zoomDrawing() {
+            // Open drawing in fullscreen or new window
+            window.open(document.querySelector('.drawing-content img').src, '_blank');
+        }
+        
+        // Collapsible sections
+        function toggleCollapse(id) {
+            const content = document.getElementById('collapse-' + id);
+            const chevron = document.getElementById('chevron-' + id);
+            content.classList.toggle('open');
+            chevron.classList.toggle('open');
+        }
+        
+        // OP details
+        function toggleOpDetail(id) {
+            const detail = document.getElementById('detail-' + id);
+            detail.classList.toggle('open');
+        }
+        
+        // Feedback tabs
+        function showFeedbackTab(tab) {
+            document.getElementById('feedback-input').style.display = 'none';
+            document.getElementById('feedback-learnings').style.display = 'none';
+            document.getElementById('feedback-history').style.display = 'none';
+            document.getElementById('tabFeedbackInput').className = 'btn btn-sm btn-secondary';
+            document.getElementById('tabFeedbackLearnings').className = 'btn btn-sm btn-secondary';
+            document.getElementById('tabFeedbackHistory').className = 'btn btn-sm btn-secondary';
+            
+            document.getElementById('feedback-' + tab).style.display = 'block';
+            document.getElementById('tabFeedback' + tab.charAt(0).toUpperCase() + tab.slice(1)).className = 'btn btn-sm btn-primary';
+        }
+        
+        // Settings tabs
+        function showSettingsTab(tab) {
+            document.getElementById('settings-rates').style.display = 'none';
+            document.getElementById('settings-material').style.display = 'none';
+            document.getElementById('settings-zuschlag').style.display = 'none';
+            document.getElementById('settings-firma').style.display = 'none';
+            document.getElementById('tabRates').className = 'btn btn-sm btn-secondary';
+            document.getElementById('tabMaterial').className = 'btn btn-sm btn-secondary';
+            document.getElementById('tabZuschlag').className = 'btn btn-sm btn-secondary';
+            document.getElementById('tabFirma').className = 'btn btn-sm btn-secondary';
+            
+            document.getElementById('settings-' + tab).style.display = 'block';
+            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).className = 'btn btn-sm btn-primary';
+        }
+        
+        // Calculation
+        function calculate() {
+            // Simplified calculation for v17
+            const qty = parseInt(document.getElementById('quantity').value) || 1;
+            const basePrice = 64.89;
+            const setupSavings = qty > 1 ? (37.92 / qty) - 37.92 : 0;
+            const price = basePrice + setupSavings / qty;
+            
+            document.getElementById('quickPrice').textContent = '€' + price.toFixed(2).replace('.', ',');
+            document.getElementById('priceDisplay').textContent = '€' + price.toFixed(2).replace('.', ',');
+        }
+        
+        function saveFeedback() {
+            alert('✅ Feedback gespeichert!\n\nDanke — das System lernt mit jedem Feedback.');
+        }
+        
+        function exportCSV() {
+            alert('CSV Export wird generiert...');
+        }
+        
+        // Init
+        calculate();
+    </script>
+</body>
+</html>

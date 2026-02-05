@@ -282,3 +282,19 @@ Wenn nein → nicht fertig. Weiter iterieren.
 ---
 
 *Last updated: 2026-02-04 18:10 CET*
+
+## CNC Planner v16 Final State (2026-02-05 20:53)
+
+**Hauptdatei:** `projects/cnc-planner/demo-v16-complete.html`
+**Status:** Production-ready mit 6-Tab Navigation
+
+### Key Features:
+- Zuschlagskalkulation (MGK, AV, VwGK, VtGK, Gewinn)
+- SVG-Skizzen bei aufklappbaren OPs
+- Feedback-System mit Cross-Learnings
+- Design Standard mit CSS-Klassen
+
+### Lesson: v16 > v17
+- Florian: "v16 schaut besser und professioneller aus"
+- Kompletter Neubau (v17) war weniger professionell
+- Besser: v16 iterativ verbessern, nur Navigation vereinfachen

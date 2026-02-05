@@ -1,0 +1,2070 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CNC Planner Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ================================================================
+           CNC PLANNER PRO v15 COMPLETE — GOLDEN STANDARD DESIGN
+           All features from v14 + new trust/confidence features
+           ================================================================ */
+        
+        :root {
+            /* Colors - Primary */
+            --color-primary: #1E3A5F;
+            --color-primary-hover: #152A45;
+            --color-primary-light: #2D5A8A;
+            
+            /* Colors - Semantic */
+            --color-success: #059669;
+            --color-success-light: #D1FAE5;
+            --color-warning: #D97706;
+            --color-warning-light: #FEF3C7;
+            --color-error: #DC2626;
+            --color-error-light: #FEE2E2;
+            --color-info: #2563EB;
+            --color-info-light: #DBEAFE;
+            
+            /* Colors - Neutrals */
+            --color-bg: #F8FAFC;
+            --color-surface: #FFFFFF;
+            --color-border: #E2E8F0;
+            --color-border-light: #F1F5F9;
+            
+            /* Colors - Text */
+            --color-text: #1E293B;
+            --color-text-secondary: #64748B;
+            --color-text-muted: #94A3B8;
+            
+            /* Typography */
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+            
+            /* Spacing */
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+            --space-8: 32px;
+            --space-10: 40px;
+            
+            /* Sizes */
+            --sidebar-width: 260px;
+            --header-height: 56px;
+            --input-height: 40px;
+            --btn-height: 36px;
+            
+            /* Radius */
+            --radius-sm: 4px;
+            --radius-md: 6px;
+            --radius-lg: 8px;
+            --radius-xl: 12px;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            
+            /* Transitions */
+            --transition-fast: 150ms ease;
+            --transition-normal: 200ms ease;
+        }
+        
+        /* Reset */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        
+        body {
+            font-family: var(--font-sans);
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--color-text);
+            background: var(--color-bg);
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* ================================================================
+           LAYOUT
+           ================================================================ */
+        
+        .app { display: flex; min-height: 100vh; }
+        
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background: var(--color-surface);
+            border-right: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            height: var(--header-height);
+            padding: 0 var(--space-4);
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+        
+        .sidebar-logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 12px;
+        }
+        
+        .sidebar-logo-text {
+            font-size: 15px;
+            font-weight: 600;
+        }
+        
+        .sidebar-logo-text span {
+            font-weight: 400;
+            color: var(--color-text-secondary);
+        }
+        
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--space-2);
+        }
+        
+        .nav-section { margin-bottom: var(--space-6); }
+        
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--color-text-muted);
+            padding: var(--space-2) var(--space-3);
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-3);
+            margin: 2px 0;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+        
+        .nav-item:hover { background: var(--color-bg); color: var(--color-text); }
+        .nav-item.active { background: var(--color-primary); color: white; }
+        
+        .nav-item-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        
+        .sidebar-footer {
+            padding: var(--space-2);
+            border-top: 1px solid var(--color-border);
+        }
+        
+        /* Main */
+        .main {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-header {
+            height: var(--header-height);
+            padding: 0 var(--space-6);
+            background: var(--color-surface);
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        
+        .main-title { font-size: 16px; font-weight: 600; }
+        .main-actions { display: flex; gap: var(--space-2); }
+        
+        .main-content {
+            flex: 1;
+            padding: var(--space-6);
+            max-width: 1200px;
+        }
+        
+        .section { display: none; }
+        .section.active { display: block; }
+        
+        /* ================================================================
+           COMPONENTS
+           ================================================================ */
+        
+        /* Buttons */
+        .btn {
+            height: var(--btn-height);
+            padding: 0 var(--space-4);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            font-size: 13px;
+            font-weight: 500;
+            font-family: inherit;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            border: none;
+            white-space: nowrap;
+        }
+        
+        .btn-primary { background: var(--color-primary); color: white; }
+        .btn-primary:hover { background: var(--color-primary-hover); }
+        .btn-secondary { background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border); }
+        .btn-secondary:hover { background: var(--color-bg); }
+        .btn-sm { height: 32px; padding: 0 var(--space-3); font-size: 12px; }
+        
+        /* Form Elements */
+        .form-group { margin-bottom: var(--space-4); }
+        
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-1);
+        }
+        
+        .form-label-caps {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--color-text-muted);
+        }
+        
+        .input {
+            height: var(--input-height);
+            width: 100%;
+            padding: 0 var(--space-3);
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--color-text);
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            transition: all var(--transition-fast);
+        }
+        
+        .input:hover { border-color: var(--color-text-muted); }
+        .input:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1); }
+        .input-mono { font-family: var(--font-mono); text-align: right; }
+        .input-sm { height: 32px; font-size: 13px; }
+        
+        .select {
+            height: var(--input-height);
+            width: 100%;
+            padding: 0 var(--space-8) 0 var(--space-3);
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--color-text);
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+        }
+        
+        .input-with-unit { position: relative; display: inline-flex; width: 100%; }
+        .input-with-unit .input { padding-right: var(--space-10); }
+        .input-unit {
+            position: absolute;
+            right: var(--space-3);
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 13px;
+            color: var(--color-text-muted);
+            pointer-events: none;
+        }
+        
+        .checkbox-group { display: flex; align-items: center; gap: var(--space-2); }
+        .checkbox { width: 18px; height: 18px; accent-color: var(--color-primary); cursor: pointer; }
+        .checkbox-label { font-size: 14px; cursor: pointer; }
+        
+        /* Cards */
+        .card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+        
+        .card-header {
+            padding: var(--space-4) var(--space-5);
+            border-bottom: 1px solid var(--color-border-light);
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .card-body { padding: var(--space-5); }
+        
+        /* Price Hero */
+        .price-hero {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+            color: white;
+            padding: var(--space-8);
+            border-radius: var(--radius-xl);
+            text-align: center;
+            margin-bottom: var(--space-6);
+            position: relative;
+        }
+        
+        .price-label { font-size: 14px; font-weight: 500; opacity: 0.85; margin-bottom: var(--space-1); }
+        .price-value { font-size: 48px; font-weight: 700; font-family: var(--font-mono); letter-spacing: -0.02em; line-height: 1.1; }
+        .price-detail { font-size: 13px; opacity: 0.7; margin-top: var(--space-2); }
+        
+        /* Confidence Badge */
+        .confidence-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: var(--space-3);
+        }
+        
+        .confidence-high { background: rgba(5, 150, 105, 0.2); color: #D1FAE5; }
+        .confidence-medium { background: rgba(217, 119, 6, 0.2); color: #FEF3C7; }
+        .confidence-low { background: rgba(220, 38, 38, 0.2); color: #FEE2E2; }
+        
+        /* Cost Breakdown */
+        .cost-breakdown {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+        
+        .cost-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: var(--space-3) var(--space-4);
+            border-bottom: 1px solid var(--color-border-light);
+        }
+        
+        .cost-row:last-child { border-bottom: none; }
+        .cost-label { font-size: 14px; color: var(--color-text-secondary); }
+        
+        .cost-formula {
+            font-size: 12px;
+            color: var(--color-text-muted);
+            font-family: var(--font-mono);
+            margin-top: 2px;
+            cursor: help;
+        }
+        
+        .cost-value {
+            font-size: 14px;
+            font-weight: 500;
+            font-family: var(--font-mono);
+            text-align: right;
+        }
+        
+        .cost-row.subtotal { background: var(--color-bg); }
+        .cost-row.subtotal .cost-label, .cost-row.subtotal .cost-value { font-weight: 600; }
+        .cost-row.total { background: var(--color-primary); }
+        .cost-row.total .cost-label, .cost-row.total .cost-value { color: white; font-weight: 600; }
+        
+        /* Part Cards */
+        .part-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-4);
+            margin-bottom: var(--space-6);
+        }
+        
+        .part-card {
+            display: flex;
+            gap: var(--space-4);
+            padding: var(--space-4);
+            background: var(--color-surface);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .part-card:hover { border-color: var(--color-primary-light); }
+        .part-card.selected { border-color: var(--color-primary); background: linear-gradient(135deg, rgba(30, 58, 95, 0.02), rgba(45, 90, 138, 0.02)); }
+        
+        .part-thumb {
+            width: 80px;
+            height: 80px;
+            flex-shrink: 0;
+            background: var(--color-bg);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--color-border);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .part-thumb img { width: 100%; height: 100%; object-fit: contain; }
+        .part-info { flex: 1; min-width: 0; }
+        .part-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+        .part-number { font-size: 12px; font-family: var(--font-mono); color: var(--color-text-muted); margin-bottom: var(--space-2); }
+        .part-meta { display: flex; gap: var(--space-3); font-size: 13px; color: var(--color-text-secondary); }
+        .part-price { font-weight: 600; color: var(--color-primary); }
+        
+        /* Info Box */
+        .info-box {
+            background: var(--color-bg);
+            border-left: 3px solid var(--color-primary);
+            padding: var(--space-4);
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+        }
+        
+        .info-box strong { color: var(--color-text); }
+        
+        .warning-box {
+            background: var(--color-warning-light);
+            border-left: 3px solid var(--color-warning);
+            padding: var(--space-4);
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            font-size: 13px;
+        }
+        
+        .warning-box strong { color: var(--color-warning); }
+        
+        /* Trust Badges */
+        .trust-badges {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-8);
+            margin-bottom: var(--space-6);
+            flex-wrap: wrap;
+        }
+        
+        .trust-badge {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            color: var(--color-text-secondary);
+            font-size: 13px;
+        }
+        
+        .trust-badge svg { width: 18px; height: 18px; stroke: var(--color-text-muted); }
+        
+        /* Scope Notice */
+        .scope-notice {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-6);
+            overflow: hidden;
+        }
+        
+        .scope-header {
+            padding: var(--space-4) var(--space-5);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .scope-header:hover { background: var(--color-bg); }
+        
+        .scope-content {
+            display: none;
+            padding: var(--space-5);
+            border-top: 1px solid var(--color-border);
+            background: var(--color-bg);
+        }
+        
+        .scope-content.expanded { display: block; }
+        
+        /* Grid Layouts */
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-5); }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4); }
+        
+        .dimension-group { display: flex; align-items: flex-end; gap: var(--space-2); }
+        .dimension-group .form-group { flex: 1; margin-bottom: 0; }
+        .dimension-separator { padding-bottom: 10px; color: var(--color-text-muted); font-size: 16px; }
+        
+        /* Tables */
+        .table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        
+        .table th {
+            padding: var(--space-3) var(--space-4);
+            text-align: left;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--color-text-muted);
+            background: var(--color-bg);
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .table td {
+            padding: var(--space-3) var(--space-4);
+            border-bottom: 1px solid var(--color-border-light);
+            vertical-align: middle;
+        }
+        
+        .table tr:last-child td { border-bottom: none; }
+        .table .mono { font-family: var(--font-mono); }
+        .table .right { text-align: right; }
+        
+        /* Live Results */
+        .live-results {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-4);
+            padding: var(--space-5);
+            background: var(--color-bg);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-border);
+            margin-bottom: var(--space-5);
+        }
+        
+        .live-result-item { text-align: center; }
+        .live-result-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); margin-bottom: var(--space-1); }
+        .live-result-value { font-size: 20px; font-weight: 700; font-family: var(--font-mono); color: var(--color-primary); }
+        
+        /* Code Block */
+        .code-block {
+            background: #0F172A;
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .code-block pre {
+            margin: 0;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            line-height: 1.6;
+            color: #E2E8F0;
+            white-space: pre-wrap;
+        }
+        
+        .code-comment { color: #64748B; }
+        .code-keyword { color: #F59E0B; }
+        .code-number { color: #10B981; }
+        
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: 500;
+            border-radius: var(--radius-sm);
+        }
+        
+        .badge-success { background: var(--color-success-light); color: var(--color-success); }
+        .badge-warning { background: var(--color-warning-light); color: var(--color-warning); }
+        .badge-error { background: var(--color-error-light); color: var(--color-error); }
+        .badge-info { background: var(--color-info-light); color: var(--color-info); }
+        
+        /* Instruction Sections */
+        .instruction-section {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-4);
+            overflow: hidden;
+        }
+        
+        .instruction-section.critical { border-color: var(--color-error); }
+        
+        .instruction-header {
+            background: var(--color-bg);
+            padding: var(--space-4) var(--space-5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--color-border);
+        }
+        
+        .instruction-header.critical { background: var(--color-error-light); }
+        
+        .instruction-header h4 {
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        
+        .op-badge {
+            background: var(--color-primary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .op-badge.critical { background: var(--color-error); }
+        
+        .instruction-content { padding: var(--space-5); }
+        
+        .params-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-3);
+            margin-bottom: var(--space-4);
+        }
+        
+        .param-item {
+            background: var(--color-bg);
+            padding: var(--space-3);
+            border-radius: var(--radius-md);
+            text-align: center;
+            border: 1px solid var(--color-border);
+        }
+        
+        .param-item.critical { border-color: var(--color-error); }
+        .param-label { font-size: 11px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        .param-value { font-size: 14px; font-weight: 600; font-family: var(--font-mono); }
+        .param-value.critical { color: var(--color-error); }
+        
+        .tips-list { list-style: none; }
+        
+        .tips-list li {
+            padding: var(--space-2) 0;
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-2);
+            border-bottom: 1px solid var(--color-border-light);
+        }
+        
+        .tips-list li:last-child { border-bottom: none; }
+        
+        .tip-icon {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            background: var(--color-bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+        }
+        
+        .tip-icon.success { background: var(--color-success-light); color: var(--color-success); }
+        .tip-icon.warning { background: var(--color-warning-light); color: var(--color-warning); }
+        .tip-icon.danger { background: var(--color-error-light); color: var(--color-error); }
+        
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            cursor: help;
+        }
+        
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 12px;
+            background: var(--color-text);
+            color: white;
+            font-size: 12px;
+            border-radius: var(--radius-md);
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-fast);
+            z-index: 100;
+        }
+        
+        .tooltip:hover::after { opacity: 1; visibility: visible; }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; }
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            .part-grid { grid-template-columns: 1fr; }
+            .live-results { grid-template-columns: repeat(2, 1fr); }
+            .params-grid { grid-template-columns: repeat(2, 1fr); }
+            .price-value { font-size: 36px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">CP</div>
+                    <div class="sidebar-logo-text">CNC Planner <span>Pro</span></div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Kalkulation</div>
+                    <button class="nav-item active" onclick="showSection('part', this)">
+                        <span class="nav-item-icon">◻</span>
+                        <span>Teil auswählen</span>
+                    </button>
+                    <button class="nav-item" onclick="showSection('params', this)">
+                        <span class="nav-item-icon">⚙</span>
+                        <span>Parameter</span>
+                    </button>
+                    <button class="nav-item" onclick="showSection('result', this)">
+                        <span class="nav-item-icon">€</span>
+                        <span>Ergebnis</span>
+                    </button>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Ausgabe</div>
+                    <button class="nav-item" onclick="showSection('quote', this)">
+                        <span class="nav-item-icon">📄</span>
+                        <span>Angebot</span>
+                    </button>
+                    <button class="nav-item" onclick="showSection('instructions', this)">
+                        <span class="nav-item-icon">📋</span>
+                        <span>Fertigungsanweisung</span>
+                    </button>
+                    <button class="nav-item" onclick="showSection('code', this)">
+                        <span class="nav-item-icon">&lt;/&gt;</span>
+                        <span>NC-Code</span>
+                    </button>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="nav-item" onclick="showSection('settings', this)">
+                    <span class="nav-item-icon">⚙</span>
+                    <span>Einstellungen</span>
+                </button>
+            </div>
+        </aside>
+        
+        <!-- MAIN CONTENT -->
+        <main class="main">
+            <header class="main-header">
+                <h1 class="main-title" id="mainTitle">Teil auswählen</h1>
+                <div class="main-actions">
+                    <button class="btn btn-secondary btn-sm" onclick="exportCSV()">CSV</button>
+                    <button class="btn btn-primary btn-sm" onclick="window.print()">PDF Export</button>
+                </div>
+            </header>
+            
+            <div class="main-content">
+                <!-- ========================================
+                     SECTION: TEIL AUSWÄHLEN
+                     ======================================== -->
+                <div class="section active" id="section-part">
+                    <!-- Trust Badges -->
+                    <div class="trust-badges">
+                        <div class="trust-badge">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9,12 12,15 16,10"/></svg>
+                            Basierend auf echten Betriebsdaten
+                        </div>
+                        <div class="trust-badge">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                            Kalkulation in &lt;30 Sekunden
+                        </div>
+                        <div class="trust-badge">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+                            NC-Code inklusive
+                        </div>
+                    </div>
+                    
+                    <!-- Scope Notice -->
+                    <div class="scope-notice">
+                        <div class="scope-header" onclick="toggleScope()">
+                            <div>
+                                <div style="font-weight: 600; color: var(--color-text);">Funktionsprinzip und Anwendungsbereich</div>
+                                <div style="font-size: 12px; color: var(--color-text-muted);">Klicken für Details zu Grenzen und Anpassungsmöglichkeiten</div>
+                            </div>
+                            <svg id="scopeChevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" stroke-width="2" style="transition: transform 0.2s;"><polyline points="6 9 12 15 18 9"/></svg>
+                        </div>
+                        <div class="scope-content" id="scopeContent">
+                            <div class="grid-2" style="margin-bottom: var(--space-4);">
+                                <div>
+                                    <div style="font-weight: 600; margin-bottom: var(--space-2);">Geeignet für</div>
+                                    <ul style="font-size: 13px; color: var(--color-text-secondary); padding-left: var(--space-4);">
+                                        <li>Prismatische Teile (Platten, Blöcke)</li>
+                                        <li>Standardbohrungen, Senkungen</li>
+                                        <li>Einfache Taschen und Konturen</li>
+                                        <li>3-Achs-Bearbeitung</li>
+                                        <li>Stahl, Edelstahl, Aluminium, Kunststoff</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; margin-bottom: var(--space-2);">Nicht geeignet für</div>
+                                    <ul style="font-size: 13px; color: var(--color-text-secondary); padding-left: var(--space-4);">
+                                        <li>Komplexe 3D-Freiformflächen</li>
+                                        <li>5-Achs-Simultanbearbeitung</li>
+                                        <li>Sonderwerkstoffe (Titan, Inconel)</li>
+                                        <li>Toleranzen besser als IT8</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="info-box">
+                                <strong>Berechnungsprinzip:</strong> Die Kalkulation basiert auf einer Referenzmaschine (3-Achs Hermle) mit validierten Stundensätzen aus echten Fertigungsaufträgen.<br>
+                                <strong>Erwartete Genauigkeit:</strong> ±15% für Standardteile
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Part Selection -->
+                    <div style="font-weight: 600; margin-bottom: var(--space-3);">Bauteile aus Ihrem Betrieb</div>
+                    <div class="part-grid" id="partGrid">
+                        <!-- Filled by JS -->
+                    </div>
+                    
+                    <!-- File Upload -->
+                    <div class="card" style="margin-bottom: var(--space-6);">
+                        <div class="card-body" style="text-align: center; padding: var(--space-8);">
+                            <div style="font-size: 32px; margin-bottom: var(--space-3); color: var(--color-text-muted);">📁</div>
+                            <div style="font-weight: 600; margin-bottom: var(--space-2);">Eigenes Bauteil analysieren</div>
+                            <div style="font-size: 13px; color: var(--color-text-muted); margin-bottom: var(--space-4);">STEP-Datei hochladen oder hier ablegen • .step, .stp, .pdf</div>
+                            <input type="file" id="fileInput" accept=".step,.stp,.pdf" style="display: none;">
+                            <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">Datei auswählen</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ========================================
+                     SECTION: PARAMETER
+                     ======================================== -->
+                <div class="section" id="section-params">
+                    <div class="grid-2" style="margin-bottom: var(--space-6);">
+                        <!-- Werkstück -->
+                        <div class="card">
+                            <div class="card-header">Werkstück</div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label class="form-label">Werkstoff</label>
+                                    <select class="select" id="materialSelect" onchange="calculate()">
+                                        <optgroup label="Edelstahl">
+                                            <option value="1.4301">1.4301 (V2A)</option>
+                                            <option value="1.4404">1.4404 (V4A)</option>
+                                            <option value="1.4571">1.4571</option>
+                                        </optgroup>
+                                        <optgroup label="Baustahl">
+                                            <option value="S235JR" selected>S235JR</option>
+                                            <option value="S355J2">S355J2</option>
+                                            <option value="C45">C45</option>
+                                        </optgroup>
+                                        <optgroup label="Vergütungsstahl">
+                                            <option value="42CrMo4">42CrMo4</option>
+                                            <option value="34CrNiMo6">34CrNiMo6</option>
+                                        </optgroup>
+                                        <optgroup label="Aluminium">
+                                            <option value="AlMg3">AlMg3</option>
+                                            <option value="AlMgSi1">AlMgSi1 (6082)</option>
+                                            <option value="Al7075">Al7075-T6</option>
+                                        </optgroup>
+                                        <optgroup label="Buntmetalle">
+                                            <option value="CuZn39Pb3">Messing CuZn39Pb3</option>
+                                            <option value="CuSn8">Bronze CuSn8</option>
+                                        </optgroup>
+                                        <optgroup label="Kunststoff">
+                                            <option value="POM">POM</option>
+                                            <option value="PA6">PA6 (Nylon)</option>
+                                            <option value="PEEK">PEEK</option>
+                                        </optgroup>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Rohmaße</label>
+                                    <div class="dimension-group">
+                                        <div class="form-group">
+                                            <div class="input-with-unit">
+                                                <input type="number" class="input input-mono" id="dimX" value="440" oninput="calculate()">
+                                                <span class="input-unit">mm</span>
+                                            </div>
+                                        </div>
+                                        <span class="dimension-separator">×</span>
+                                        <div class="form-group">
+                                            <div class="input-with-unit">
+                                                <input type="number" class="input input-mono" id="dimY" value="50" oninput="calculate()">
+                                                <span class="input-unit">mm</span>
+                                            </div>
+                                        </div>
+                                        <span class="dimension-separator">×</span>
+                                        <div class="form-group">
+                                            <div class="input-with-unit">
+                                                <input type="number" class="input input-mono" id="dimZ" value="20" oninput="calculate()">
+                                                <span class="input-unit">mm</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Stückzahl</label>
+                                    <div class="input-with-unit" style="width: 120px;">
+                                        <input type="number" class="input input-mono" id="quantity" value="1" min="1" oninput="calculate()">
+                                        <span class="input-unit">Stk</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Fertigung -->
+                        <div class="card">
+                            <div class="card-header">Fertigung</div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label class="form-label">Spannung</label>
+                                    <select class="select" id="clampingSelect" onchange="calculate()">
+                                        <option value="schraubstock">Schraubstock (15 min)</option>
+                                        <option value="schraubstock2">2× Schraubstock (25 min)</option>
+                                        <option value="tischspannung">Tischspannung (35 min)</option>
+                                        <option value="nullpunkt">Nullpunktspannsystem (5 min)</option>
+                                        <option value="spezial">Sondervorrichtung (45 min)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Aufspannungen</label>
+                                    <select class="select" id="setupCount" onchange="calculate()">
+                                        <option value="1">1 Aufspannung</option>
+                                        <option value="2" selected>2 Aufspannungen</option>
+                                        <option value="3">3 Aufspannungen</option>
+                                        <option value="4">4+ Aufspannungen</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Einrichtzeit Info -->
+                                <div class="info-box" style="margin-bottom: var(--space-4);">
+                                    <strong>Einrichtzeit:</strong> <span id="setupTimeDisplay">25 min</span> = <span id="setupCostDisplay">€37,92</span><br>
+                                    <span id="clampingDescription" style="font-size: 12px;">Schraubstock: Teil spannen, Parallelität prüfen, Nullpunkt antasten.</span>
+                                </div>
+                                
+                                <label class="form-label form-label-caps">Zusätzliche Arbeitsgänge</label>
+                                <div style="display: flex; flex-direction: column; gap: var(--space-3); margin-top: var(--space-2);">
+                                    <div class="checkbox-group">
+                                        <input type="checkbox" class="checkbox" id="opEntgraten" checked onchange="calculate()">
+                                        <label class="checkbox-label" for="opEntgraten">Entgraten</label>
+                                        <div class="input-with-unit" style="width: 80px; margin-left: auto;">
+                                            <input type="number" class="input input-sm input-mono" id="opEntgratenTime" value="5" onchange="calculate()">
+                                            <span class="input-unit">min</span>
+                                        </div>
+                                    </div>
+                                    <div class="checkbox-group">
+                                        <input type="checkbox" class="checkbox" id="opSaegen" onchange="calculate()">
+                                        <label class="checkbox-label" for="opSaegen">Sägen</label>
+                                        <div class="input-with-unit" style="width: 80px; margin-left: auto;">
+                                            <input type="number" class="input input-sm input-mono" id="opSaegenTime" value="3" onchange="calculate()">
+                                            <span class="input-unit">min</span>
+                                        </div>
+                                    </div>
+                                    <div class="checkbox-group">
+                                        <input type="checkbox" class="checkbox" id="opPruefung" checked onchange="calculate()">
+                                        <label class="checkbox-label" for="opPruefung">Prüfung</label>
+                                        <div class="input-with-unit" style="width: 80px; margin-left: auto;">
+                                            <input type="number" class="input input-sm input-mono" id="opPruefungTime" value="5" onchange="calculate()">
+                                            <span class="input-unit">min</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Live Results -->
+                    <div class="live-results">
+                        <div class="live-result-item">
+                            <div class="live-result-label">Gewicht</div>
+                            <div class="live-result-value" id="liveWeight">2,2 kg</div>
+                        </div>
+                        <div class="live-result-item">
+                            <div class="live-result-label">Material</div>
+                            <div class="live-result-value" id="liveMaterial">€14,93</div>
+                        </div>
+                        <div class="live-result-item">
+                            <div class="live-result-label">Zeit</div>
+                            <div class="live-result-value" id="liveTime">12,5 min</div>
+                        </div>
+                        <div class="live-result-item">
+                            <div class="live-result-label">Maschine</div>
+                            <div class="live-result-value" id="liveMachine">€18,96</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Plausibility Warnings -->
+                    <div id="warningsContainer"></div>
+                    
+                    <button class="btn btn-primary" onclick="showSection('result', document.querySelector('.nav-item:nth-child(3)'))">Kalkulation anzeigen →</button>
+                </div>
+                
+                <!-- ========================================
+                     SECTION: ERGEBNIS
+                     ======================================== -->
+                <div class="section" id="section-result">
+                    <!-- Price Hero with Confidence -->
+                    <div class="price-hero">
+                        <div class="price-label">Stückpreis</div>
+                        <div class="price-value" id="priceDisplay">€64,89</div>
+                        <div class="price-detail">inkl. Material, Bearbeitung, Einrichtung</div>
+                        <div class="confidence-badge confidence-medium" id="confidenceBadge">
+                            <span>🟡</span> ±15% Genauigkeit — Standardteil
+                        </div>
+                    </div>
+                    
+                    <div class="grid-2">
+                        <!-- Kostenaufschlüsselung -->
+                        <div class="card">
+                            <div class="card-header">Kostenaufschlüsselung</div>
+                            <div class="cost-breakdown" style="border: none; border-radius: 0;">
+                                <div class="cost-row">
+                                    <div>
+                                        <div class="cost-label">Material</div>
+                                        <div class="cost-formula tooltip" id="matFormula" data-tooltip="Gewicht × Preis/kg × Verschnitt">2,2 kg × €6,79/kg × 1,1</div>
+                                    </div>
+                                    <div class="cost-value" id="matCost">€16,42</div>
+                                </div>
+                                <div class="cost-row">
+                                    <div>
+                                        <div class="cost-label">Bearbeitung</div>
+                                        <div class="cost-formula tooltip" id="machFormula" data-tooltip="Bearbeitungszeit × Stundensatz">12,5 min × €91/h</div>
+                                    </div>
+                                    <div class="cost-value" id="machCost">€18,96</div>
+                                </div>
+                                <div class="cost-row">
+                                    <div>
+                                        <div class="cost-label">Einrichtung</div>
+                                        <div class="cost-formula tooltip" id="setupFormula" data-tooltip="Einrichtzeit × Stundensatz ÷ Stückzahl">25 min × €91/h ÷ 1</div>
+                                    </div>
+                                    <div class="cost-value" id="setupCost">€37,92</div>
+                                </div>
+                                <div class="cost-row">
+                                    <div>
+                                        <div class="cost-label">Werkzeugverschleiß</div>
+                                        <div class="cost-formula">pauschal, werkstoffabhängig</div>
+                                    </div>
+                                    <div class="cost-value" id="toolCost">€20,74</div>
+                                </div>
+                                <div class="cost-row">
+                                    <div>
+                                        <div class="cost-label">Nebenzeiten</div>
+                                        <div class="cost-formula" id="additionalFormula">Entgraten + Prüfung</div>
+                                    </div>
+                                    <div class="cost-value" id="additionalCost">€15,17</div>
+                                </div>
+                                <div class="cost-row subtotal">
+                                    <div class="cost-label">Herstellkosten</div>
+                                    <div class="cost-value" id="totalCost">€109,21</div>
+                                </div>
+                                <div class="cost-row">
+                                    <div class="cost-label">+ Marge (<span id="marginDisplay">10</span>%)</div>
+                                    <div class="cost-value" id="marginCost">€10,92</div>
+                                </div>
+                                <div class="cost-row total">
+                                    <div class="cost-label">Verkaufspreis</div>
+                                    <div class="cost-value" id="sellPrice">€120,13</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Mengenstaffel -->
+                        <div class="card">
+                            <div class="card-header">Mengenstaffel</div>
+                            <div class="card-body">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Stückzahl</th>
+                                            <th class="right">Pro Stück</th>
+                                            <th class="right">Gesamt</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="quantityTable"></tbody>
+                                </table>
+                                
+                                <div class="info-box" style="margin-top: var(--space-4);">
+                                    Bei größeren Mengen sinkt der Stückpreis, da Einricht- und Prüfkosten verteilt werden.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Marge anpassen -->
+                    <div class="card" style="margin-top: var(--space-5);">
+                        <div class="card-body" style="display: flex; align-items: center; gap: var(--space-4);">
+                            <span style="color: var(--color-text-secondary);">Marge anpassen:</span>
+                            <div class="input-with-unit" style="width: 100px;">
+                                <input type="number" class="input input-mono" id="marginInput" value="10" min="0" max="100" oninput="calculate()">
+                                <span class="input-unit">%</span>
+                            </div>
+                            <span style="margin-left: auto; color: var(--color-text-secondary);">Gesamtauftragswert:</span>
+                            <strong style="font-size: 18px; font-family: var(--font-mono);" id="orderTotal">€120,13</strong>
+                        </div>
+                    </div>
+                    
+                    <!-- Kalkulationsgrundlage -->
+                    <div class="card" style="margin-top: var(--space-5);">
+                        <div class="card-header">Kalkulationsgrundlage</div>
+                        <div class="card-body">
+                            <div class="grid-2" style="font-size: 13px;">
+                                <div>
+                                    <div style="color: var(--color-text-muted); margin-bottom: 4px;">Datenquelle</div>
+                                    <div>Echte Betriebsdaten (validiert)</div>
+                                </div>
+                                <div>
+                                    <div style="color: var(--color-text-muted); margin-bottom: 4px;">Stundensätze</div>
+                                    <div>Aus Nachkalkulation verifiziert</div>
+                                </div>
+                                <div>
+                                    <div style="color: var(--color-text-muted); margin-bottom: 4px;">Zeitberechnung</div>
+                                    <div>Formelbasiert (±15% Genauigkeit)</div>
+                                </div>
+                                <div>
+                                    <div style="color: var(--color-text-muted); margin-bottom: 4px;">Materialpreise</div>
+                                    <div>Aktueller Einkaufspreis + Handling</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ========================================
+                     SECTION: ANGEBOT
+                     ======================================== -->
+                <div class="section" id="section-quote">
+                    <div class="card">
+                        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>Angebot ANG-2026-0042</span>
+                            <div style="display: flex; gap: var(--space-2);">
+                                <button class="btn btn-secondary btn-sm">E-Mail</button>
+                                <button class="btn btn-primary btn-sm" onclick="window.print()">PDF</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-6); padding-bottom: var(--space-4); border-bottom: 2px solid var(--color-primary);">
+                                <div>
+                                    <div style="font-size: 20px; font-weight: 700; color: var(--color-primary);">ANGEBOT</div>
+                                    <div style="font-size: 13px; color: var(--color-text-muted);">ANG-2026-0042</div>
+                                </div>
+                                <div style="text-align: right; font-size: 13px; color: var(--color-text-secondary);">
+                                    <div><strong>Ihre Firma GmbH</strong></div>
+                                    <div>Datum: <span id="quoteDate">05.02.2026</span></div>
+                                    <div>Gültig bis: <span id="quoteValidUntil">05.03.2026</span></div>
+                                </div>
+                            </div>
+                            
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Pos.</th>
+                                        <th>Beschreibung</th>
+                                        <th class="right">Menge</th>
+                                        <th class="right">EP (€)</th>
+                                        <th class="right">GP (€)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td id="quoteDesc">Verbindungsplatte 2500473...</td>
+                                        <td class="right mono" id="quoteQty">1</td>
+                                        <td class="right mono" id="quoteEP">120,13</td>
+                                        <td class="right mono" id="quoteGP">120,13</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <div style="margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px solid var(--color-border);">
+                                <div style="display: flex; justify-content: flex-end;">
+                                    <div style="text-align: right; width: 250px;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-2);">
+                                            <span style="color: var(--color-text-secondary);">Zwischensumme:</span>
+                                            <span class="mono" id="quoteSubtotal">€120,13</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-2);">
+                                            <span style="color: var(--color-text-secondary);">+ MwSt. 19%:</span>
+                                            <span class="mono" id="quoteMwst">€22,82</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 600; padding-top: var(--space-2); border-top: 2px solid var(--color-primary);">
+                                            <span>GESAMT:</span>
+                                            <span class="mono" style="color: var(--color-primary);" id="quoteTotal">€142,95</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: var(--space-6); font-size: 12px; color: var(--color-text-muted);">
+                                <strong>Zahlungsbedingungen:</strong> 14 Tage netto ab Rechnungsdatum<br>
+                                <strong>Lieferzeit:</strong> ca. 3-4 Wochen nach Auftragseingang
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ========================================
+                     SECTION: FERTIGUNGSANWEISUNG
+                     ======================================== -->
+                <div class="section" id="section-instructions">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-5);">
+                        <div style="display: flex; gap: var(--space-2);">
+                            <button class="btn btn-primary btn-sm" onclick="window.print()">PDF drucken</button>
+                            <button class="btn btn-secondary btn-sm">E-Mail</button>
+                        </div>
+                        <span class="badge badge-info">KI-generierte Anweisungen</span>
+                    </div>
+                    
+                    <!-- Document Header -->
+                    <div class="card" style="margin-bottom: var(--space-5);">
+                        <div class="card-body">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-5); padding-bottom: var(--space-4); border-bottom: 3px solid var(--color-primary);">
+                                <div>
+                                    <h3 style="color: var(--color-primary); font-size: 18px; font-weight: 700;">FERTIGUNGSANWEISUNG</h3>
+                                    <p id="faPartName" style="color: var(--color-text-muted); font-size: 13px;">Verbindungsplatte — 2500473.01.11.02.00.001</p>
+                                </div>
+                                <div style="text-align: right; font-size: 13px; color: var(--color-text-muted);">
+                                    <div>Freigabe: 05.02.2026</div>
+                                    <div>Version: 1.0</div>
+                                </div>
+                            </div>
+                            
+                            <div class="grid-3" style="margin-bottom: var(--space-4);">
+                                <div>
+                                    <div style="font-weight: 600; margin-bottom: var(--space-2);">Werkstück</div>
+                                    <table style="font-size: 13px; width: 100%;">
+                                        <tr><td style="color: var(--color-text-muted); padding: 2px 0;">Werkstoff:</td><td id="faMaterial" style="padding: 2px 0;"><strong>S235JR</strong></td></tr>
+                                        <tr><td style="color: var(--color-text-muted); padding: 2px 0;">Rohteil:</td><td id="faRawDims" style="padding: 2px 0;">440 × 50 × 20 mm</td></tr>
+                                        <tr><td style="color: var(--color-text-muted); padding: 2px 0;">Gewicht:</td><td id="faWeight" style="padding: 2px 0;">2,2 kg</td></tr>
+                                    </table>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; margin-bottom: var(--space-2);">Maschine</div>
+                                    <table style="font-size: 13px; width: 100%;">
+                                        <tr><td style="color: var(--color-text-muted); padding: 2px 0;">Maschine:</td><td style="padding: 2px 0;"><strong>FEHLMANN VERSA 943</strong></td></tr>
+                                        <tr><td style="color: var(--color-text-muted); padding: 2px 0;">Steuerung:</td><td style="padding: 2px 0;">Heidenhain TNC 640</td></tr>
+                                        <tr><td style="color: var(--color-text-muted); padding: 2px 0;">Zeit:</td><td id="faMachiningTime" style="padding: 2px 0;"><strong>12,5 min</strong></td></tr>
+                                    </table>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; margin-bottom: var(--space-2);">Zeichnung</div>
+                                    <div id="drawingPreview" style="background: var(--color-bg); border: 2px dashed var(--color-border); border-radius: var(--radius-md); height: 100px; display: flex; align-items: center; justify-content: center; cursor: pointer;" onclick="document.getElementById('drawingInput').click()">
+                                        <input type="file" id="drawingInput" accept=".pdf,.png,.jpg" style="display: none;">
+                                        <span style="font-size: 12px; color: var(--color-text-muted);">Zeichnung ablegen</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="info-box">
+                                <strong>Toleranzen:</strong> Allgemein DIN ISO 2768-mK • Oberfläche Rz 25
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Operations -->
+                    <div style="font-weight: 600; margin-bottom: var(--space-3);">Arbeitsschritte</div>
+                    
+                    <!-- OP10 -->
+                    <div class="instruction-section">
+                        <div class="instruction-header">
+                            <h4><span class="op-badge">OP10</span> Planfräsen Oberseite</h4>
+                            <span style="color: var(--color-text-muted); font-size: 13px;">2,7 min</span>
+                        </div>
+                        <div class="instruction-content">
+                            <div class="params-grid">
+                                <div class="param-item">
+                                    <div class="param-label">Werkzeug</div>
+                                    <div class="param-value">T1 Ø63</div>
+                                </div>
+                                <div class="param-item">
+                                    <div class="param-label">Drehzahl</div>
+                                    <div class="param-value">800</div>
+                                </div>
+                                <div class="param-item">
+                                    <div class="param-label">Vorschub</div>
+                                    <div class="param-value">300</div>
+                                </div>
+                                <div class="param-item">
+                                    <div class="param-label">Zustellung</div>
+                                    <div class="param-value">2 mm</div>
+                                </div>
+                            </div>
+                            <ul class="tips-list">
+                                <li><span class="tip-icon success">✓</span> Rohteil plan spannen, Parallelität prüfen</li>
+                                <li><span class="tip-icon">i</span> Fräsen im Gegenlauf für bessere Oberfläche</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- OP20 -->
+                    <div class="instruction-section">
+                        <div class="instruction-header">
+                            <h4><span class="op-badge">OP20</span> Kontur fräsen</h4>
+                            <span style="color: var(--color-text-muted); font-size: 13px;">5,8 min</span>
+                        </div>
+                        <div class="instruction-content">
+                            <div class="params-grid">
+                                <div class="param-item">
+                                    <div class="param-label">Werkzeug</div>
+                                    <div class="param-value">T2 Ø20</div>
+                                </div>
+                                <div class="param-item">
+                                    <div class="param-label">Drehzahl</div>
+                                    <div class="param-value">2500</div>
+                                </div>
+                                <div class="param-item">
+                                    <div class="param-label">Vorschub</div>
+                                    <div class="param-value">400</div>
+                                </div>
+                                <div class="param-item">
+                                    <div class="param-label">Aufmaß</div>
+                                    <div class="param-value">0,3 mm</div>
+                                </div>
+                            </div>
+                            <ul class="tips-list">
+                                <li><span class="tip-icon warning">!</span> Kühlmittel-Druck mind. 20 bar</li>
+                                <li><span class="tip-icon">i</span> Aufmaß 0,3 mm für Schlichtgang</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Critical OP -->
+                    <div class="instruction-section critical">
+                        <div class="instruction-header critical">
+                            <h4>
+                                <span class="op-badge critical">OP30</span>
+                                Passbohrung Ø26 H7
+                                <span class="badge badge-error">KRITISCH</span>
+                            </h4>
+                            <span style="color: var(--color-text-muted); font-size: 13px;">4,0 min</span>
+                        </div>
+                        <div class="instruction-content">
+                            <div class="params-grid">
+                                <div class="param-item">
+                                    <div class="param-label">Werkzeug</div>
+                                    <div class="param-value">T11</div>
+                                </div>
+                                <div class="param-item">
+                                    <div class="param-label">Drehzahl</div>
+                                    <div class="param-value">1200</div>
+                                </div>
+                                <div class="param-item">
+                                    <div class="param-label">Vorschub</div>
+                                    <div class="param-value">100</div>
+                                </div>
+                                <div class="param-item critical">
+                                    <div class="param-label">Toleranz</div>
+                                    <div class="param-value critical">H7</div>
+                                </div>
+                            </div>
+                            <div class="warning-box" style="margin-bottom: var(--space-3);">
+                                <strong>Toleranz H7 = +0,021 / 0 mm — Nur 21 µm Spielraum!</strong>
+                            </div>
+                            <ul class="tips-list">
+                                <li><span class="tip-icon danger">!</span> <strong>Werkzeug vor Bearbeitung auf Verschleiß prüfen</strong></li>
+                                <li><span class="tip-icon danger">!</span> Werkstück-Temperatur beachten: Ausdehnung ~2 µm bei 20°C Abweichung</li>
+                                <li><span class="tip-icon warning">!</span> Nach Bearbeitung sofort messen</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Quality Check -->
+                    <div class="instruction-section">
+                        <div class="instruction-header">
+                            <h4>Qualitätsprüfung</h4>
+                            <span class="badge badge-info">QS</span>
+                        </div>
+                        <div class="instruction-content">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Prüfmerkmal</th>
+                                        <th>Soll</th>
+                                        <th>Prüfmittel</th>
+                                        <th class="right">Zeit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Ø26 H7</td>
+                                        <td class="mono">26,000 / 26,021</td>
+                                        <td>Innenmessschraube</td>
+                                        <td class="right mono">0,8 min</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Höhe</td>
+                                        <td class="mono">20,0 ±0,1</td>
+                                        <td>Messschieber</td>
+                                        <td class="right mono">0,3 min</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Oberfläche</td>
+                                        <td class="mono">Rz ≤ 25</td>
+                                        <td>Vergleichsmuster</td>
+                                        <td class="right mono">0,5 min</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ========================================
+                     SECTION: NC-CODE
+                     ======================================== -->
+                <div class="section" id="section-code">
+                    <div class="card">
+                        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; gap: var(--space-2);">
+                                <button class="btn btn-primary btn-sm" id="btnHeidenhain" onclick="setCodeFormat('heidenhain')">Heidenhain</button>
+                                <button class="btn btn-secondary btn-sm" id="btnSiemens" onclick="setCodeFormat('siemens')">Siemens</button>
+                                <button class="btn btn-secondary btn-sm" id="btnFanuc" onclick="setCodeFormat('fanuc')">Fanuc</button>
+                            </div>
+                            <div style="display: flex; gap: var(--space-2);">
+                                <button class="btn btn-secondary btn-sm" onclick="copyCode()">Kopieren</button>
+                                <button class="btn btn-primary btn-sm" onclick="downloadCode()">Download</button>
+                            </div>
+                        </div>
+                        <div class="card-body" style="padding: 0;">
+                            <div class="code-block" id="codeBlock">
+<pre><span class="code-comment">; ========================================</span>
+<span class="code-comment">; CNC PLANNER PRO — Automatisch generiert</span>
+<span class="code-comment">; ========================================</span>
+<span class="code-comment">; Werkstück:  Verbindungsplatte</span>
+<span class="code-comment">; Werkstoff:  S235JR</span>
+<span class="code-comment">; Maschine:   FEHLMANN VERSA 943</span>
+<span class="code-comment">; Steuerung:  Heidenhain TNC 640</span>
+<span class="code-comment">; ========================================</span>
+
+<span class="code-keyword">BEGIN PGM</span> VERBINDUNGSPLATTE <span class="code-keyword">MM</span>
+
+<span class="code-comment">; --- WERKZEUGLISTE ---</span>
+<span class="code-keyword">TOOL DEF</span> <span class="code-number">1</span> L+<span class="code-number">0</span> R+<span class="code-number">31.5</span>  <span class="code-comment">; Planfräser Ø63</span>
+<span class="code-keyword">TOOL DEF</span> <span class="code-number">2</span> L+<span class="code-number">0</span> R+<span class="code-number">10</span>    <span class="code-comment">; VHM-Fräser Ø20</span>
+<span class="code-keyword">TOOL DEF</span> <span class="code-number">11</span> L+<span class="code-number">0</span> R+<span class="code-number">13</span>   <span class="code-comment">; Feinbohrkopf Ø26</span>
+
+<span class="code-comment">; OP10: PLANFRÄSEN</span>
+<span class="code-keyword">TOOL CALL</span> <span class="code-number">1</span> Z S<span class="code-number">800</span>
+L Z+<span class="code-number">100</span> R0 FMAX M3
+L X+<span class="code-number">0</span> Y+<span class="code-number">0</span> FMAX
+
+<span class="code-keyword">CYCL DEF</span> <span class="code-number">230</span> <span class="code-keyword">FACE MILLING</span>
+  Q<span class="code-number">225</span>=+<span class="code-number">0</span>
+  Q<span class="code-number">218</span>=<span class="code-number">450</span>
+  Q<span class="code-number">219</span>=<span class="code-number">60</span>
+  Q<span class="code-number">202</span>=<span class="code-number">2</span>
+  Q<span class="code-number">207</span>=<span class="code-number">300</span>
+
+<span class="code-keyword">CYCL CALL</span>
+L Z+<span class="code-number">100</span> FMAX
+M5
+
+<span class="code-comment">; OP20: KONTUR</span>
+<span class="code-keyword">TOOL CALL</span> <span class="code-number">2</span> Z S<span class="code-number">2500</span>
+M3
+<span class="code-comment">; ... weitere Bearbeitung</span>
+
+<span class="code-comment">; OP30: FEINBOHREN Ø26 H7</span>
+<span class="code-keyword">TOOL CALL</span> <span class="code-number">11</span> Z S<span class="code-number">1200</span>
+M3
+L X+<span class="code-number">220</span> Y+<span class="code-number">25</span> FMAX
+
+<span class="code-keyword">CYCL DEF</span> <span class="code-number">201</span> <span class="code-keyword">BORING</span>
+  Q<span class="code-number">200</span>=<span class="code-number">2</span>
+  Q<span class="code-number">201</span>=-<span class="code-number">25</span>
+  Q<span class="code-number">206</span>=<span class="code-number">100</span>
+
+<span class="code-keyword">CYCL CALL</span>
+L Z+<span class="code-number">100</span> FMAX
+M5
+M30
+
+<span class="code-keyword">END PGM</span> VERBINDUNGSPLATTE <span class="code-keyword">MM</span></pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-box" style="margin-top: var(--space-4);">
+                        <strong>Programm-Info:</strong> 85 Zeilen | Geschätzte Laufzeit: 12,5 min | Maschine: FEHLMANN VERSA 943<br>
+                        <strong style="color: var(--color-warning);">Hinweis:</strong> Code vor Einsatz prüfen.
+                    </div>
+                </div>
+                
+                <!-- ========================================
+                     SECTION: EINSTELLUNGEN
+                     ======================================== -->
+                <div class="section" id="section-settings">
+                    <div class="grid-2">
+                        <!-- Stundensätze -->
+                        <div class="card">
+                            <div class="card-header">Stundensätze</div>
+                            <div class="card-body">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Arbeitsgang</th>
+                                            <th class="right">Lohn</th>
+                                            <th class="right">Maschine</th>
+                                            <th class="right">Gesamt</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>CNC-Bearbeitung</td>
+                                            <td class="right"><input type="number" class="input input-sm input-mono" value="49" id="rateCncLabor" style="width: 70px;" onchange="updateRates()"></td>
+                                            <td class="right"><input type="number" class="input input-sm input-mono" value="42" id="rateCncMachine" style="width: 70px;" onchange="updateRates()"></td>
+                                            <td class="right mono" id="rateCncTotal">€91</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Sägen</td>
+                                            <td class="right"><input type="number" class="input input-sm input-mono" value="43" id="rateSaegenLabor" style="width: 70px;" onchange="updateRates()"></td>
+                                            <td class="right"><input type="number" class="input input-sm input-mono" value="12" id="rateSaegenMachine" style="width: 70px;" onchange="updateRates()"></td>
+                                            <td class="right mono" id="rateSaegenTotal">€55</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Entgraten</td>
+                                            <td class="right"><input type="number" class="input input-sm input-mono" value="32" id="rateEntgratenLabor" style="width: 70px;" onchange="updateRates()"></td>
+                                            <td class="right"><input type="number" class="input input-sm input-mono" value="4" id="rateEntgratenMachine" style="width: 70px;" onchange="updateRates()"></td>
+                                            <td class="right mono" id="rateEntgratenTotal">€36</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Materialpreise -->
+                        <div class="card">
+                            <div class="card-header">Materialpreise (€/kg)</div>
+                            <div class="card-body">
+                                <div class="grid-2" style="gap: var(--space-3);">
+                                    <div class="form-group">
+                                        <label class="form-label">S235JR</label>
+                                        <input type="number" class="input input-mono" value="6.79" step="0.01" id="matS235JR" onchange="updateMaterials()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">1.4571</label>
+                                        <input type="number" class="input input-mono" value="14.00" step="0.01" id="mat14571" onchange="updateMaterials()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">AlMg3</label>
+                                        <input type="number" class="input input-mono" value="6.50" step="0.01" id="matAlMg3" onchange="updateMaterials()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">42CrMo4</label>
+                                        <input type="number" class="input input-mono" value="4.20" step="0.01" id="mat42CrMo4" onchange="updateMaterials()">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sonstige -->
+                    <div class="card" style="margin-top: var(--space-5);">
+                        <div class="card-header">Sonstige Einstellungen</div>
+                        <div class="card-body">
+                            <div class="grid-3">
+                                <div class="form-group">
+                                    <label class="form-label">Werkzeugverschleiß (€)</label>
+                                    <input type="number" class="input input-mono" value="20.74" step="0.01" id="settingToolWear" onchange="calculate()">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Materialverschnitt (%)</label>
+                                    <input type="number" class="input input-mono" value="10" id="settingScrap" onchange="calculate()">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">MwSt. (%)</label>
+                                    <input type="number" class="input input-mono" value="19" id="settingVat" onchange="calculate()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: var(--space-5); display: flex; gap: var(--space-3);">
+                        <button class="btn btn-primary" onclick="saveSettings()">Einstellungen speichern</button>
+                        <button class="btn btn-secondary" onclick="resetSettings()">Zurücksetzen</button>
+                    </div>
+                    
+                    <p style="margin-top: var(--space-4); font-size: 12px; color: var(--color-text-muted);">
+                        Einstellungen werden lokal im Browser gespeichert (localStorage).
+                    </p>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- ================================================================
+         JAVASCRIPT
+         ================================================================ -->
+    <script>
+        // ================================================================
+        // DATA
+        // ================================================================
+        
+        const MATERIALS = {
+            // Edelstahl
+            '1.4301': { name: '1.4301 (V2A)', price: 8.50, density: 7.90, timeFactor: 1.25 },
+            '1.4404': { name: '1.4404 (V4A)', price: 12.00, density: 7.95, timeFactor: 1.30 },
+            '1.4571': { name: '1.4571', price: 14.00, density: 8.00, timeFactor: 1.35 },
+            // Baustahl
+            'S235JR': { name: 'S235JR', price: 6.79, density: 7.85, timeFactor: 1.00 },
+            'S355J2': { name: 'S355J2', price: 7.50, density: 7.85, timeFactor: 1.02 },
+            'C45': { name: 'C45', price: 3.50, density: 7.85, timeFactor: 1.05 },
+            // Vergütungsstahl
+            '42CrMo4': { name: '42CrMo4', price: 4.20, density: 7.85, timeFactor: 1.15 },
+            '34CrNiMo6': { name: '34CrNiMo6', price: 5.50, density: 7.85, timeFactor: 1.20 },
+            // Aluminium
+            'AlMg3': { name: 'AlMg3', price: 6.50, density: 2.66, timeFactor: 0.65 },
+            'AlMgSi1': { name: 'AlMgSi1', price: 7.00, density: 2.70, timeFactor: 0.68 },
+            'Al7075': { name: 'Al7075-T6', price: 12.00, density: 2.81, timeFactor: 0.75 },
+            // Buntmetalle
+            'CuZn39Pb3': { name: 'Messing', price: 8.50, density: 8.47, timeFactor: 0.70 },
+            'CuSn8': { name: 'Bronze', price: 15.00, density: 8.80, timeFactor: 0.75 },
+            // Kunststoff
+            'POM': { name: 'POM', price: 4.50, density: 1.41, timeFactor: 0.45 },
+            'PA6': { name: 'PA6 (Nylon)', price: 5.00, density: 1.14, timeFactor: 0.50 },
+            'PEEK': { name: 'PEEK', price: 85.00, density: 1.32, timeFactor: 0.55 }
+        };
+        
+        const CLAMPING = {
+            'schraubstock': { time: 15, desc: 'Teil in Maschinenschraubstock spannen, Parallelität prüfen, Nullpunkt antasten.' },
+            'schraubstock2': { time: 25, desc: 'Zwei Schraubstöcke für Langteile. Beide auf gleiche Höhe ausrichten.' },
+            'tischspannung': { time: 35, desc: 'Tischspannung mit Pratzen. Für große oder unregelmäßige Werkstücke.' },
+            'nullpunkt': { time: 5, desc: 'Nullpunktspannsystem. Schnellstes Wechseln, höchste Wiederholgenauigkeit.' },
+            'spezial': { time: 45, desc: 'Sondervorrichtung. Aufwändiger Aufbau, für Serienteile rentabel.' }
+        };
+        
+        const PROJECTS = {
+            verbindungsplatte: {
+                id: 'verbindungsplatte',
+                name: 'Verbindungsplatte',
+                partNumber: '2500473.01.11.02.00.001',
+                material: 'S235JR',
+                dims: { x: 440, y: 50, z: 20 },
+                baseTime: 12.5,
+                unitPrice: 28.40,
+                thumbnail: 'demo-parts/2500473.01.11.02.00.001.pdf.png'
+            },
+            adapterplatte: {
+                id: 'adapterplatte',
+                name: 'Adapterplatte',
+                partNumber: '2500473.01.01.02.01.001',
+                material: 'AlMg3',
+                dims: { x: 85, y: 70, z: 55 },
+                baseTime: 24.8,
+                unitPrice: 52.15,
+                thumbnail: 'demo-parts/2500473.01.01.02.01.001.pdf.png'
+            }
+        };
+        
+        let RATES = {
+            cnc: { labor: 49, machine: 42 },
+            saegen: { labor: 43, machine: 12 },
+            entgraten: { labor: 32, machine: 4 }
+        };
+        
+        let currentProject = null;
+        
+        // ================================================================
+        // NAVIGATION
+        // ================================================================
+        
+        const SECTION_TITLES = {
+            'part': 'Teil auswählen',
+            'params': 'Parameter',
+            'result': 'Ergebnis',
+            'quote': 'Angebot',
+            'instructions': 'Fertigungsanweisung',
+            'code': 'NC-Code',
+            'settings': 'Einstellungen'
+        };
+        
+        function showSection(name, btn) {
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            
+            document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+            document.getElementById('section-' + name).classList.add('active');
+            
+            document.getElementById('mainTitle').textContent = SECTION_TITLES[name] || name;
+        }
+        
+        function toggleScope() {
+            const content = document.getElementById('scopeContent');
+            const chevron = document.getElementById('scopeChevron');
+            content.classList.toggle('expanded');
+            chevron.style.transform = content.classList.contains('expanded') ? 'rotate(180deg)' : 'rotate(0)';
+        }
+        
+        // ================================================================
+        // PART SELECTION
+        // ================================================================
+        
+        function renderPartGrid() {
+            const grid = document.getElementById('partGrid');
+            grid.innerHTML = Object.values(PROJECTS).map(p => `
+                <div class="part-card ${currentProject?.id === p.id ? 'selected' : ''}" onclick="selectProject('${p.id}')">
+                    <div class="part-thumb">
+                        <img src="${p.thumbnail}" alt="${p.name}" onerror="this.parentElement.innerHTML='<span style=\\'color:var(--color-text-muted);font-size:11px;\\'>Keine Vorschau</span>'">
+                    </div>
+                    <div class="part-info">
+                        <div class="part-name">${p.name}</div>
+                        <div class="part-number">${p.partNumber}</div>
+                        <div class="part-meta">
+                            <span>${p.baseTime} min</span>
+                            <span>${p.material}</span>
+                            <span class="part-price">€${p.unitPrice.toFixed(2).replace('.', ',')}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function selectProject(id) {
+            currentProject = PROJECTS[id];
+            
+            document.getElementById('materialSelect').value = currentProject.material;
+            document.getElementById('dimX').value = currentProject.dims.x;
+            document.getElementById('dimY').value = currentProject.dims.y;
+            document.getElementById('dimZ').value = currentProject.dims.z;
+            
+            renderPartGrid();
+            calculate();
+            
+            // Update instruction header
+            document.getElementById('faPartName').textContent = `${currentProject.name} — ${currentProject.partNumber}`;
+            document.getElementById('quoteDesc').textContent = `${currentProject.name} ${currentProject.partNumber}`;
+            
+            showSection('params', document.querySelector('.nav-item:nth-child(2)'));
+        }
+        
+        // ================================================================
+        // CALCULATION
+        // ================================================================
+        
+        function calculate() {
+            const mat = MATERIALS[document.getElementById('materialSelect').value];
+            const x = parseFloat(document.getElementById('dimX').value) || 100;
+            const y = parseFloat(document.getElementById('dimY').value) || 100;
+            const z = parseFloat(document.getElementById('dimZ').value) || 20;
+            const qty = parseInt(document.getElementById('quantity').value) || 1;
+            const margin = parseFloat(document.getElementById('marginInput').value) || 10;
+            const scrap = parseFloat(document.getElementById('settingScrap')?.value) || 10;
+            const toolWear = parseFloat(document.getElementById('settingToolWear')?.value) || 20.74;
+            const vat = parseFloat(document.getElementById('settingVat')?.value) || 19;
+            
+            // Clamping
+            const clampingType = document.getElementById('clampingSelect').value;
+            const clampingData = CLAMPING[clampingType];
+            const setupCount = parseInt(document.getElementById('setupCount').value) || 1;
+            const totalSetupTime = clampingData.time + (setupCount - 1) * (clampingData.time * 0.6);
+            
+            // Update clamping description
+            document.getElementById('clampingDescription').textContent = clampingData.desc;
+            
+            // Rates
+            const cncRate = RATES.cnc.labor + RATES.cnc.machine;
+            const entgratenRate = RATES.entgraten.labor + RATES.entgraten.machine;
+            const saegenRate = RATES.saegen.labor + RATES.saegen.machine;
+            
+            // Setup cost
+            const setupCost = (totalSetupTime / 60) * cncRate;
+            const setupCostPerPiece = setupCost / qty;
+            
+            // Volume & Weight
+            const volumeMm3 = x * y * z;
+            const volumeCm3 = volumeMm3 / 1000;
+            const weightKg = (volumeCm3 * mat.density) / 1000;
+            
+            // Material cost
+            const materialCost = weightKg * mat.price * (1 + scrap / 100);
+            
+            // Machining time
+            const refVolume = currentProject ? (currentProject.dims.x * currentProject.dims.y * currentProject.dims.z) / 1000 : 440;
+            const baseTime = currentProject ? currentProject.baseTime : 12.5;
+            const sizeFactor = volumeCm3 / refVolume;
+            const machiningTime = baseTime * Math.pow(sizeFactor, 0.7) * mat.timeFactor;
+            
+            // Machine cost
+            const machineCost = (machiningTime / 60) * cncRate;
+            
+            // Additional operations
+            let additionalCost = 0;
+            let additionalDesc = [];
+            
+            if (document.getElementById('opEntgraten').checked) {
+                const t = parseFloat(document.getElementById('opEntgratenTime').value) || 5;
+                additionalCost += (t / 60) * entgratenRate;
+                additionalDesc.push('Entgraten ' + t + ' min');
+            }
+            if (document.getElementById('opSaegen').checked) {
+                const t = parseFloat(document.getElementById('opSaegenTime').value) || 3;
+                additionalCost += (t / 60) * saegenRate;
+                additionalDesc.push('Sägen ' + t + ' min');
+            }
+            if (document.getElementById('opPruefung').checked) {
+                const t = parseFloat(document.getElementById('opPruefungTime').value) || 5;
+                additionalCost += (t / 60) * cncRate;
+                additionalDesc.push('Prüfung ' + t + ' min');
+            }
+            
+            // Tool cost
+            const toolCost = toolWear * mat.timeFactor;
+            
+            // Totals
+            const totalCost = materialCost + machineCost + setupCostPerPiece + toolCost + additionalCost;
+            const marginAmount = totalCost * (margin / 100);
+            const sellPrice = totalCost + marginAmount;
+            const orderTotal = sellPrice * qty;
+            const mwstAmount = orderTotal * (vat / 100);
+            const totalWithVat = orderTotal + mwstAmount;
+            
+            // Confidence
+            let confidenceClass = 'confidence-medium';
+            let confidenceText = '🟡 ±15% — Standardteil';
+            if (mat.timeFactor > 1.2) {
+                confidenceClass = 'confidence-low';
+                confidenceText = '🔴 ±25% — Schwerzerspanbarer Werkstoff';
+            } else if (currentProject && Math.abs(volumeCm3 - refVolume) < refVolume * 0.2) {
+                confidenceClass = 'confidence-high';
+                confidenceText = '🟢 ±10% — Ähnlich wie Referenzteil';
+            }
+            
+            // Update UI
+            document.getElementById('setupTimeDisplay').textContent = Math.round(totalSetupTime) + ' min';
+            document.getElementById('setupCostDisplay').textContent = '€' + setupCost.toFixed(2).replace('.', ',');
+            
+            document.getElementById('liveWeight').textContent = weightKg.toFixed(2).replace('.', ',') + ' kg';
+            document.getElementById('liveMaterial').textContent = '€' + materialCost.toFixed(2).replace('.', ',');
+            document.getElementById('liveTime').textContent = machiningTime.toFixed(1).replace('.', ',') + ' min';
+            document.getElementById('liveMachine').textContent = '€' + machineCost.toFixed(2).replace('.', ',');
+            
+            document.getElementById('priceDisplay').textContent = '€' + sellPrice.toFixed(2).replace('.', ',');
+            document.getElementById('confidenceBadge').className = 'confidence-badge ' + confidenceClass;
+            document.getElementById('confidenceBadge').innerHTML = '<span>' + confidenceText.split(' ')[0] + '</span> ' + confidenceText.split(' ').slice(1).join(' ');
+            
+            document.getElementById('matCost').textContent = '€' + materialCost.toFixed(2).replace('.', ',');
+            document.getElementById('matFormula').textContent = weightKg.toFixed(2).replace('.', ',') + ' kg × €' + mat.price.toFixed(2).replace('.', ',') + '/kg × 1,' + scrap;
+            document.getElementById('machCost').textContent = '€' + machineCost.toFixed(2).replace('.', ',');
+            document.getElementById('machFormula').textContent = machiningTime.toFixed(1).replace('.', ',') + ' min × €' + cncRate + '/h';
+            document.getElementById('setupCost').textContent = '€' + setupCostPerPiece.toFixed(2).replace('.', ',');
+            document.getElementById('setupFormula').textContent = Math.round(totalSetupTime) + ' min × €' + cncRate + '/h ÷ ' + qty;
+            document.getElementById('toolCost').textContent = '€' + toolCost.toFixed(2).replace('.', ',');
+            document.getElementById('additionalCost').textContent = '€' + additionalCost.toFixed(2).replace('.', ',');
+            document.getElementById('additionalFormula').textContent = additionalDesc.join(' + ') || '—';
+            document.getElementById('totalCost').textContent = '€' + totalCost.toFixed(2).replace('.', ',');
+            document.getElementById('marginDisplay').textContent = margin;
+            document.getElementById('marginCost').textContent = '€' + marginAmount.toFixed(2).replace('.', ',');
+            document.getElementById('sellPrice').textContent = '€' + sellPrice.toFixed(2).replace('.', ',');
+            document.getElementById('orderTotal').textContent = '€' + orderTotal.toFixed(2).replace('.', ',');
+            
+            // Quantity table
+            const qtys = [1, 5, 10, 25, 50];
+            document.getElementById('quantityTable').innerHTML = qtys.map(q => {
+                const setupPerPiece = setupCost / q;
+                const unitCost = materialCost + machineCost + setupPerPiece + toolCost + additionalCost;
+                const unitSell = unitCost * (1 + margin / 100);
+                const totalSell = unitSell * q;
+                return `<tr>
+                    <td class="mono">${q}</td>
+                    <td class="right mono">€${unitSell.toFixed(2).replace('.', ',')}</td>
+                    <td class="right mono">€${totalSell.toFixed(2).replace('.', ',')}</td>
+                </tr>`;
+            }).join('');
+            
+            // Quote
+            document.getElementById('quoteQty').textContent = qty;
+            document.getElementById('quoteEP').textContent = sellPrice.toFixed(2).replace('.', ',');
+            document.getElementById('quoteGP').textContent = orderTotal.toFixed(2).replace('.', ',');
+            document.getElementById('quoteSubtotal').textContent = '€' + orderTotal.toFixed(2).replace('.', ',');
+            document.getElementById('quoteMwst').textContent = '€' + mwstAmount.toFixed(2).replace('.', ',');
+            document.getElementById('quoteTotal').textContent = '€' + totalWithVat.toFixed(2).replace('.', ',');
+            
+            // Instructions
+            document.getElementById('faMaterial').innerHTML = '<strong>' + mat.name + '</strong>';
+            document.getElementById('faRawDims').textContent = x + ' × ' + y + ' × ' + z + ' mm';
+            document.getElementById('faWeight').textContent = weightKg.toFixed(2).replace('.', ',') + ' kg';
+            document.getElementById('faMachiningTime').innerHTML = '<strong>' + machiningTime.toFixed(1).replace('.', ',') + ' min</strong>';
+            
+            // Plausibility warnings
+            checkPlausibility(x, y, z, mat, clampingType);
+        }
+        
+        function checkPlausibility(x, y, z, mat, clamping) {
+            const warnings = [];
+            
+            if (x > 400 && clamping === 'schraubstock') {
+                warnings.push({ type: 'warning', text: `Länge ${x}mm: Prüfen ob Schraubstock-Kapazität ausreicht. 2× Schraubstock empfohlen.` });
+            }
+            if (z > 100) {
+                warnings.push({ type: 'warning', text: `Höhe ${z}mm: Werkzeugüberhang beachten. Vibrationsgefahr bei tiefen Taschen.` });
+            }
+            if (mat.timeFactor > 1.3) {
+                warnings.push({ type: 'info', text: `Schwerzerspanbarer Werkstoff (${mat.name}): Kühlmittel und Werkzeugverschleiß beachten.` });
+            }
+            
+            const container = document.getElementById('warningsContainer');
+            if (warnings.length > 0) {
+                container.innerHTML = warnings.map(w => `
+                    <div class="${w.type === 'warning' ? 'warning-box' : 'info-box'}" style="margin-bottom: var(--space-3);">
+                        <strong>⚠️ ${w.type === 'warning' ? 'Warnung' : 'Hinweis'}:</strong> ${w.text}
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = '';
+            }
+        }
+        
+        // ================================================================
+        // SETTINGS
+        // ================================================================
+        
+        function updateRates() {
+            RATES.cnc.labor = parseFloat(document.getElementById('rateCncLabor').value) || 49;
+            RATES.cnc.machine = parseFloat(document.getElementById('rateCncMachine').value) || 42;
+            RATES.saegen.labor = parseFloat(document.getElementById('rateSaegenLabor').value) || 43;
+            RATES.saegen.machine = parseFloat(document.getElementById('rateSaegenMachine').value) || 12;
+            RATES.entgraten.labor = parseFloat(document.getElementById('rateEntgratenLabor').value) || 32;
+            RATES.entgraten.machine = parseFloat(document.getElementById('rateEntgratenMachine').value) || 4;
+            
+            document.getElementById('rateCncTotal').textContent = '€' + (RATES.cnc.labor + RATES.cnc.machine);
+            document.getElementById('rateSaegenTotal').textContent = '€' + (RATES.saegen.labor + RATES.saegen.machine);
+            document.getElementById('rateEntgratenTotal').textContent = '€' + (RATES.entgraten.labor + RATES.entgraten.machine);
+            
+            calculate();
+        }
+        
+        function updateMaterials() {
+            MATERIALS['S235JR'].price = parseFloat(document.getElementById('matS235JR').value) || 6.79;
+            MATERIALS['1.4571'].price = parseFloat(document.getElementById('mat14571').value) || 14.00;
+            MATERIALS['AlMg3'].price = parseFloat(document.getElementById('matAlMg3').value) || 6.50;
+            MATERIALS['42CrMo4'].price = parseFloat(document.getElementById('mat42CrMo4').value) || 4.20;
+            calculate();
+        }
+        
+        function saveSettings() {
+            const settings = { RATES, MATERIALS };
+            localStorage.setItem('cncplanner_settings_v15', JSON.stringify(settings));
+            alert('Einstellungen gespeichert.');
+        }
+        
+        function loadSettings() {
+            const saved = localStorage.getItem('cncplanner_settings_v15');
+            if (saved) {
+                const settings = JSON.parse(saved);
+                Object.assign(RATES, settings.RATES);
+                Object.assign(MATERIALS, settings.MATERIALS);
+            }
+        }
+        
+        function resetSettings() {
+            localStorage.removeItem('cncplanner_settings_v15');
+            location.reload();
+        }
+        
+        // ================================================================
+        // EXPORT
+        // ================================================================
+        
+        function exportCSV() {
+            alert('CSV Export — Coming soon');
+        }
+        
+        function copyCode() {
+            const code = document.querySelector('#codeBlock pre').textContent;
+            navigator.clipboard.writeText(code);
+            alert('Code kopiert!');
+        }
+        
+        function downloadCode() {
+            const code = document.querySelector('#codeBlock pre').textContent;
+            const blob = new Blob([code], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'programm.h';
+            a.click();
+        }
+        
+        function setCodeFormat(format) {
+            document.querySelectorAll('[id^="btn"]').forEach(btn => {
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-secondary');
+            });
+            document.getElementById('btn' + format.charAt(0).toUpperCase() + format.slice(1)).classList.remove('btn-secondary');
+            document.getElementById('btn' + format.charAt(0).toUpperCase() + format.slice(1)).classList.add('btn-primary');
+            // TODO: Switch code templates
+        }
+        
+        // ================================================================
+        // INIT
+        // ================================================================
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSettings();
+            renderPartGrid();
+            calculate();
+            
+            // Set today's date
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('de-DE');
+            document.getElementById('quoteDate').textContent = dateStr;
+            const validUntil = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+            document.getElementById('quoteValidUntil').textContent = validUntil.toLocaleDateString('de-DE');
+        });
+    </script>
+</body>
+</html>
