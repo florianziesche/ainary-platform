@@ -1,0 +1,4051 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CNC Planner Pro — Vollständige Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* === LANDING PAGE DESIGN SYSTEM === */
+        :root {
+            --primary: #1e3a5f;
+            --primary-dark: #152a45;
+            --primary-light: #2d5a8a;
+            --accent: #2563eb;
+            --accent-dark: #1d4ed8;
+            --steel: #64748b;
+            --steel-light: #94a3b8;
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --radius: 6px;
+            --radius-lg: 12px;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-800);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--gray-900);
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .logo-text {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .logo-text span { color: var(--primary); }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-400);
+        }
+
+        .btn-accent {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-accent:hover {
+            background: var(--accent-dark);
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.8rem;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        /* Section Header */
+        .section-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .section-badge {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 12px;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--gray-500);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* App Demo */
+        .app-demo {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+
+        .app-tabs {
+            display: flex;
+            background: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .app-tab {
+            padding: 14px 24px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--gray-500);
+            cursor: pointer;
+            border: none;
+            background: none;
+            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
+        }
+
+        .app-tab:hover { color: var(--gray-700); }
+        
+        .app-tab.active {
+            color: var(--primary);
+            background: white;
+            border-bottom-color: var(--primary);
+        }
+
+        .app-content {
+            padding: 24px;
+            min-height: 600px;
+            position: relative;
+        }
+
+        .app-content.hidden {
+            display: none;
+        }
+
+        /* Loading / Placeholder */
+        .app-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            color: var(--gray-500);
+            text-align: center;
+            padding: 40px;
+        }
+
+        .app-placeholder-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .app-loading {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .app-loading.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--gray-200);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-steps {
+            margin-top: 24px;
+            text-align: left;
+        }
+
+        .loading-step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+            color: var(--gray-400);
+            font-size: 0.9rem;
+        }
+
+        .loading-step.done {
+            color: var(--success);
+        }
+
+        .loading-step.active {
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* Quote Preview */
+        .quote-preview {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            padding: 32px;
+        }
+
+        .quote-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .quote-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .quote-meta {
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--gray-600);
+        }
+
+        .quote-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+        }
+
+        .quote-table th {
+            background: var(--gray-100);
+            text-align: left;
+            padding: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .quote-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .quote-table .price {
+            text-align: right;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .quote-total {
+            background: var(--gray-50);
+            padding: 20px;
+            border-radius: var(--radius);
+        }
+
+        .quote-total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 0.9rem;
+        }
+
+        .quote-total-row.grand {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            border-top: 2px solid var(--primary);
+            margin-top: 12px;
+            padding-top: 16px;
+        }
+
+        /* Calculation Section */
+        .calc-section {
+            background: var(--gray-50);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .calc-section h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .calc-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .calc-table th {
+            background: var(--gray-200);
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .calc-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--gray-200);
+            background: white;
+        }
+
+        .calc-table .formula {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--primary);
+            background: var(--gray-100);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .calc-table .result {
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .calc-note {
+            background: #eff6ff;
+            border-left: 3px solid var(--primary);
+            padding: 16px;
+            font-size: 0.85rem;
+            color: var(--gray-700);
+            margin-top: 16px;
+            border-radius: 0 var(--radius) var(--radius) 0;
+        }
+
+        .tool-total {
+            background: var(--accent);
+            color: white;
+            padding: 16px 20px;
+            border-radius: var(--radius);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+        }
+
+        .tool-total-label { font-weight: 500; }
+        .tool-total-value { font-size: 1.4rem; font-weight: 700; }
+
+        /* Cost Summary Grid */
+        .cost-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .cost-card {
+            background: rgba(255,255,255,0.15);
+            padding: 20px;
+            border-radius: var(--radius);
+            text-align: center;
+        }
+
+        .cost-card-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .cost-card-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 4px 0;
+        }
+
+        .cost-card-detail {
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+
+        .cost-card.total {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .cost-card.total .cost-card-value {
+            font-size: 1.8rem;
+        }
+
+        /* Code Block */
+        .code-block {
+            background: var(--gray-900);
+            border-radius: var(--radius);
+            padding: 24px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: #e2e8f0;
+            overflow-x: auto;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .code-block pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+
+        .code-comment { color: #718096; }
+        .code-keyword { color: #f6ad55; }
+        .code-number { color: #68d391; }
+        .code-gcode { color: #90cdf4; }
+        .code-mcode { color: #fc8181; }
+
+        /* Instruction Section */
+        .instruction-section {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .instruction-section.critical {
+            border-color: var(--danger);
+        }
+
+        .instruction-header {
+            background: var(--gray-50);
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .instruction-header.critical {
+            background: #fef2f2;
+        }
+
+        .instruction-header h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .op-badge {
+            background: var(--primary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .op-badge.critical {
+            background: var(--danger);
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .badge-critical {
+            background: #fef2f2;
+            color: var(--danger);
+        }
+
+        .badge-info {
+            background: #eff6ff;
+            color: var(--accent);
+        }
+
+        .instruction-content {
+            padding: 20px;
+        }
+
+        .params-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .param-item {
+            background: var(--gray-50);
+            padding: 12px;
+            border-radius: var(--radius);
+            text-align: center;
+            border: 1px solid var(--gray-200);
+        }
+
+        .param-item.critical {
+            border-color: var(--danger);
+        }
+
+        .param-label {
+            font-size: 0.7rem;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .param-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .param-value.critical {
+            color: var(--danger);
+        }
+
+        .tips-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .tips-list li {
+            padding: 10px 0;
+            font-size: 0.85rem;
+            color: var(--gray-600);
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .tips-list li:last-child {
+            border-bottom: none;
+        }
+
+        .tip-icon {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            background: var(--gray-200);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: var(--gray-600);
+        }
+
+        .tip-icon.warning {
+            background: #fef3c7;
+            color: var(--warning);
+        }
+
+        .tip-icon.danger {
+            background: #fef2f2;
+            color: var(--danger);
+        }
+
+        .tip-icon.success {
+            background: #ecfdf5;
+            color: var(--success);
+        }
+
+        /* Warning Box */
+        .warning-box {
+            background: #fef9e6;
+            border-left: 4px solid var(--warning);
+            padding: 16px 20px;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            margin-bottom: 24px;
+        }
+
+        .warning-box strong {
+            color: #92400e;
+        }
+
+        .warning-box span {
+            color: #78350f;
+        }
+
+        .danger-box {
+            background: #fef2f2;
+            border-left: 4px solid var(--danger);
+            padding: 16px 20px;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            margin-bottom: 16px;
+        }
+
+        .danger-box strong {
+            color: var(--danger);
+            font-size: 0.85rem;
+        }
+
+        /* Info Grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .info-table {
+            font-size: 0.85rem;
+            width: 100%;
+        }
+
+        .info-table td {
+            padding: 6px 0;
+        }
+
+        .info-table td:first-child {
+            color: var(--gray-500);
+            width: 40%;
+        }
+
+        .info-table strong {
+            color: var(--gray-800);
+        }
+
+        /* ROI Calculator */
+        .roi-section {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            margin-bottom: 40px;
+        }
+
+        .roi-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .roi-inputs h3,
+        .roi-results h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 24px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: 6px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+        }
+
+        .input-group .hint {
+            font-size: 0.75rem;
+            color: var(--gray-400);
+            margin-top: 4px;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .result-label {
+            color: var(--gray-600);
+        }
+
+        .result-value {
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .result-value.positive {
+            color: var(--success);
+        }
+
+        .result-value.negative {
+            color: var(--gray-500);
+        }
+
+        .roi-highlight {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            padding: 24px;
+            border-radius: var(--radius);
+            margin-top: 24px;
+            text-align: center;
+        }
+
+        .roi-highlight-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .roi-highlight-value {
+            font-size: 3rem;
+            font-weight: 700;
+        }
+
+        .roi-highlight-value span {
+            font-size: 1.5rem;
+            opacity: 0.8;
+        }
+
+        /* Quality Check Table */
+        .quality-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .quality-table th {
+            background: var(--gray-100);
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .quality-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .quality-table .check {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        /* AI Badge */
+        .ai-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        /* Collapsible Sections */
+        .collapsible-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .collapsible-header:hover {
+            opacity: 0.8;
+        }
+
+        .collapse-icon {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            transition: transform 0.2s;
+        }
+
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .collapsible-content.expanded {
+            max-height: 2000px;
+        }
+
+        .calc-detail-row {
+            display: none;
+            background: var(--gray-50);
+        }
+
+        .calc-detail-row.visible {
+            display: table-row;
+        }
+
+        .calc-detail-cell {
+            padding: 12px 16px;
+            font-size: 0.8rem;
+            border-left: 3px solid var(--accent);
+        }
+
+        .calc-breakdown {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .calc-breakdown-item {
+            background: white;
+            padding: 10px;
+            border-radius: var(--radius);
+            border: 1px solid var(--gray-200);
+        }
+
+        .calc-breakdown-label {
+            font-size: 0.7rem;
+            color: var(--gray-500);
+            text-transform: uppercase;
+        }
+
+        .calc-breakdown-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .expand-row {
+            cursor: pointer;
+        }
+
+        .expand-row:hover {
+            background: var(--gray-50);
+        }
+
+        .expand-icon {
+            display: inline-block;
+            width: 16px;
+            text-align: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Project Cards */
+        .projects-section {
+            margin-bottom: 32px;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .project-card {
+            background: white;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .project-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .project-card.active {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(30, 58, 95, 0.03), rgba(37, 99, 235, 0.03));
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .project-name {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .project-date {
+            font-size: 0.75rem;
+            color: var(--gray-400);
+        }
+
+        .project-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 0.85rem;
+            color: var(--gray-600);
+            margin-bottom: 12px;
+        }
+
+        .project-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .project-tag {
+            background: var(--gray-100);
+            color: var(--gray-600);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .project-tag.success {
+            background: #ecfdf5;
+            color: var(--success);
+        }
+
+        /* === NEW FEATURES === */
+
+        /* Rohmaß Editor */
+        .dimension-editor {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .dimension-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .dim-input {
+            text-align: center;
+        }
+
+        .dim-input label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .dim-input input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .dim-input input:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+
+        .dim-input .unit {
+            font-size: 0.7rem;
+            color: var(--gray-400);
+            margin-top: 2px;
+        }
+
+        .live-result {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, var(--gray-50), var(--gray-100));
+            padding: 16px 20px;
+            border-radius: var(--radius);
+            border: 1px solid var(--gray-200);
+        }
+
+        .live-result-item {
+            text-align: center;
+        }
+
+        .live-result-label {
+            font-size: 0.7rem;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .live-result-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--primary);
+        }
+
+        .live-result-value.updating {
+            color: var(--accent);
+            animation: pulse 0.3s;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Serienkalkulation */
+        .series-calc {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .series-inputs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .series-results {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .series-result-card {
+            background: var(--gray-50);
+            padding: 16px;
+            border-radius: var(--radius);
+            text-align: center;
+            border: 1px solid var(--gray-200);
+        }
+
+        .series-result-card.highlight {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            border: none;
+        }
+
+        .series-result-card .label {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            margin-bottom: 4px;
+        }
+
+        .series-result-card .value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .breakeven-chart {
+            height: 200px;
+            background: var(--gray-50);
+            border-radius: var(--radius);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+        }
+
+        .breakeven-bar {
+            position: absolute;
+            bottom: 40px;
+            height: 20px;
+            border-radius: 3px;
+            transition: all 0.3s;
+        }
+
+        .breakeven-bar.setup {
+            background: var(--warning);
+            left: 20px;
+        }
+
+        .breakeven-bar.runtime {
+            background: var(--accent);
+        }
+
+        .breakeven-labels {
+            position: absolute;
+            bottom: 10px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: var(--gray-500);
+        }
+
+        .breakeven-marker {
+            position: absolute;
+            top: 10px;
+            transform: translateX(-50%);
+            background: var(--success);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .breakeven-marker::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 20px;
+            background: var(--success);
+        }
+
+        /* Ist/Soll Vergleich */
+        .comparison-section {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th {
+            background: var(--gray-100);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .comparison-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--gray-100);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .comparison-table .op-name {
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+        }
+
+        .diff-positive {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .diff-negative {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .diff-neutral {
+            color: var(--gray-400);
+        }
+
+        .diff-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: var(--gray-200);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .diff-bar-fill {
+            position: absolute;
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .diff-bar-fill.over {
+            background: var(--danger);
+            right: 50%;
+        }
+
+        .diff-bar-fill.under {
+            background: var(--success);
+            left: 50%;
+        }
+
+        .diff-bar-center {
+            position: absolute;
+            left: 50%;
+            top: -2px;
+            bottom: -2px;
+            width: 2px;
+            background: var(--gray-400);
+        }
+
+        .learning-indicator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            padding: 16px;
+            border-radius: var(--radius);
+            margin-top: 16px;
+        }
+
+        .learning-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .learning-text {
+            flex: 1;
+        }
+
+        .learning-text strong {
+            display: block;
+            color: var(--gray-900);
+        }
+
+        .learning-text span {
+            font-size: 0.85rem;
+            color: var(--gray-600);
+        }
+
+        .actual-input {
+            width: 70px;
+            padding: 6px 8px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        .actual-input:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+
+        /* Print Styles */
+        @media print {
+            body { background: white; }
+            .header, .app-tabs, .btn { display: none; }
+            .app-content { padding: 0; }
+            .app-demo { box-shadow: none; border: none; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .roi-grid,
+            .info-grid,
+            .params-grid,
+            .cost-summary-grid {
+                grid-template-columns: 1fr;
+            }
+            .app-tabs { overflow-x: auto; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+    <div class="header-inner">
+        <a href="#" class="logo">
+            <div class="logo-icon">CP</div>
+            <div class="logo-text">CNC <span>Planner</span> Pro</div>
+        </a>
+        <div style="display: flex; gap: 12px;">
+            <button class="btn btn-secondary" onclick="exportCSV()">CSV Export</button>
+            <button class="btn btn-primary" onclick="generatePDF()">PDF</button>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <!-- Section Header -->
+    <div class="section-header">
+        <span class="section-badge">Live-Demo</span>
+        <h2 class="section-title">Fertigungskalkulation in Sekunden</h2>
+        <p class="section-subtitle">STEP hochladen → Zeiten & Kosten berechnen → NC-Code generieren</p>
+    </div>
+
+    <!-- Trust Badges -->
+    <div style="display: flex; justify-content: center; gap: 32px; margin-bottom: 32px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 8px; color: var(--gray-500); font-size: 0.85rem;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9,12 12,15 16,10"/></svg>
+            DSGVO-konform
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; color: var(--gray-500); font-size: 0.85rem;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            Kalkulation in &lt;30 Sekunden
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; color: var(--gray-500); font-size: 0.85rem;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            NC-Code inklusive
+        </div>
+    </div>
+
+    <!-- Upload Area (simplified, no email) -->
+    <div style="background: white; border: 1px solid var(--gray-200); border-radius: 12px; padding: 32px; max-width: 500px; margin: 0 auto 40px;">
+        <div style="text-align: center; margin-bottom: 16px;">
+            <h3 style="font-size: 1rem; font-weight: 600; color: var(--gray-800); margin-bottom: 4px;">Eigenes Bauteil analysieren</h3>
+            <p style="font-size: 0.85rem; color: var(--gray-500);">Laden Sie Ihre CAD-Datei hoch für eine individuelle Kalkulation</p>
+        </div>
+        <div id="dropZone" style="border: 2px dashed var(--gray-300); border-radius: 8px; padding: 32px; text-align: center; cursor: pointer; transition: all 0.2s;" onclick="document.getElementById('fileInput').click()">
+            <input type="file" id="fileInput" accept=".step,.stp,.pdf" style="display: none;" onchange="handleFileSelect(this)">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.5" style="margin-bottom: 12px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <div id="fileLabel" style="color: var(--gray-700); font-size: 1rem; font-weight: 500;">STEP-Datei hochladen</div>
+            <div style="color: var(--gray-400); font-size: 0.8rem; margin-top: 4px;">oder hier ablegen • .step, .stp, .pdf</div>
+        </div>
+    </div>
+
+    <!-- Project Selection -->
+    <div class="projects-section">
+        <h3 style="font-size: 1rem; font-weight: 600; color: var(--gray-700); margin-bottom: 16px;">Beispielprojekte</h3>
+        <div class="projects-grid">
+            <div class="project-card" onclick="loadProject('grundplatte')">
+                <div class="project-header">
+                    <div class="project-name">Grundplatte WCAD-15-02-2020</div>
+                    <div class="project-date">Heute</div>
+                </div>
+                <div class="project-meta">
+                    <span>41,8 min</span>
+                    <span>1.4571</span>
+                    <span>€122,07</span>
+                </div>
+                <div class="project-tags">
+                    <span class="project-tag" id="status-grundplatte">Entwurf</span>
+                </div>
+            </div>
+            <div class="project-card" onclick="loadProject('lagerbock')">
+                <div class="project-header">
+                    <div class="project-name">Lagerbock WZ-2024-118</div>
+                    <div class="project-date">Gestern</div>
+                </div>
+                <div class="project-meta">
+                    <span>28,5 min</span>
+                    <span>42CrMo4</span>
+                    <span>€85,20</span>
+                </div>
+                <div class="project-tags">
+                    <span class="project-tag" id="status-lagerbock">Entwurf</span>
+                </div>
+            </div>
+            <div class="project-card" onclick="loadProject('flansch')">
+                <div class="project-header">
+                    <div class="project-name">Flansch FL-889</div>
+                    <div class="project-date">vor 3 Tagen</div>
+                </div>
+                <div class="project-meta">
+                    <span>18,2 min</span>
+                    <span>S355</span>
+                    <span>€48,50</span>
+                </div>
+                <div class="project-tags">
+                    <span class="project-tag" id="status-flansch">Entwurf</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ ROHMASZE & WERKSTOFF ============ -->
+    <div class="dimension-editor">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+                <h3 style="font-size: 1.1rem; font-weight: 600; color: var(--gray-800); margin-bottom: 4px;">Werkstück-Parameter</h3>
+                <p style="font-size: 0.85rem; color: var(--gray-500);">Rohmaße und Werkstoff anpassen — Kosten berechnen sich automatisch</p>
+            </div>
+            <span class="badge badge-info">Live-Kalkulation</span>
+        </div>
+        
+        <!-- Werkstoff Auswahl -->
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; font-size: 0.75rem; color: var(--gray-500); margin-bottom: 6px; text-transform: uppercase;">Werkstoff</label>
+            <select id="materialSelect" onchange="recalculateAll()" style="width: 100%; padding: 12px 16px; border: 2px solid var(--gray-200); border-radius: var(--radius); font-size: 1rem; background: white; cursor: pointer;">
+                <optgroup label="Edelstahl">
+                    <option value="1.4301">1.4301 (V2A)</option>
+                    <option value="1.4404">1.4404 (V4A)</option>
+                    <option value="1.4571" selected>1.4571</option>
+                </optgroup>
+                <optgroup label="Baustahl">
+                    <option value="S235JR">S235JR</option>
+                    <option value="S355J2">S355J2</option>
+                    <option value="C45">C45</option>
+                </optgroup>
+                <optgroup label="Vergütungsstahl">
+                    <option value="42CrMo4">42CrMo4</option>
+                    <option value="34CrNiMo6">34CrNiMo6</option>
+                </optgroup>
+                <optgroup label="Aluminium">
+                    <option value="AlMg3">AlMg3</option>
+                    <option value="AlMgSi1">AlMgSi1 (6082)</option>
+                    <option value="Al7075">Al7075-T6</option>
+                </optgroup>
+                <optgroup label="Buntmetalle">
+                    <option value="CuZn39Pb3">Messing CuZn39Pb3</option>
+                    <option value="CuSn8">Bronze CuSn8</option>
+                </optgroup>
+                <optgroup label="Kunststoff">
+                    <option value="POM">POM</option>
+                    <option value="PA6">PA6 (Nylon)</option>
+                    <option value="PEEK">PEEK</option>
+                </optgroup>
+            </select>
+        </div>
+
+        <!-- Spannung & Einrichtung -->
+        <div style="margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div>
+                <label style="display: block; font-size: 0.75rem; color: var(--gray-500); margin-bottom: 6px; text-transform: uppercase;">Spannung</label>
+                <select id="clampingSelect" onchange="recalculateAll()" style="width: 100%; padding: 12px 16px; border: 2px solid var(--gray-200); border-radius: var(--radius); font-size: 1rem; background: white; cursor: pointer;">
+                    <option value="schraubstock">Schraubstock (Standard)</option>
+                    <option value="schraubstock2">2× Schraubstock (lang)</option>
+                    <option value="tischspannung">Tischspannung (Pratzen)</option>
+                    <option value="nullpunkt">Nullpunktspannsystem</option>
+                    <option value="spezial">Sondervorrichtung</option>
+                </select>
+            </div>
+            <div>
+                <label style="display: block; font-size: 0.75rem; color: var(--gray-500); margin-bottom: 6px; text-transform: uppercase;">Aufspannungen</label>
+                <select id="setupCount" onchange="recalculateAll()" style="width: 100%; padding: 12px 16px; border: 2px solid var(--gray-200); border-radius: var(--radius); font-size: 1rem; background: white; cursor: pointer;">
+                    <option value="1">1 Aufspannung</option>
+                    <option value="2" selected>2 Aufspannungen</option>
+                    <option value="3">3 Aufspannungen</option>
+                    <option value="4">4+ Aufspannungen</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Einrichtzeit-Anzeige mit Beschreibung -->
+        <div id="setupTimeInfo" style="background: #fef3c7; border: 1px solid #fcd34d; border-radius: var(--radius); padding: 16px; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div>
+                    <span style="font-weight: 600; color: #92400e;">⚙️ Geschätzte Einrichtzeit:</span>
+                    <span id="setupTimeDisplay" style="font-weight: 700; color: #78350f; margin-left: 8px;">25 min</span>
+                </div>
+                <div style="font-size: 0.85rem; color: #92400e;">
+                    <span id="setupCostDisplay">€ 35,42</span> bei €85/h
+                </div>
+            </div>
+            <div id="clampingDescription" style="font-size: 0.85rem; color: #78350f; background: rgba(255,255,255,0.5); padding: 8px 12px; border-radius: 4px;">
+                <strong>Schraubstock:</strong> Teil in Maschinenschraubstock spannen, Parallelität mit Messuhr prüfen. Nullpunkt an Werkstück-Ecke antasten.
+            </div>
+        </div>
+
+        <!-- Rohmaße -->
+        <div class="dimension-grid" style="grid-template-columns: repeat(4, 1fr);">
+            <div class="dim-input">
+                <label id="labelDimX">Länge (X)</label>
+                <input type="number" id="dimX" value="130" min="10" max="1000" oninput="recalculateAll()">
+                <div class="unit">mm</div>
+            </div>
+            <div class="dim-input">
+                <label id="labelDimY">Breite (Y)</label>
+                <input type="number" id="dimY" value="130" min="10" max="1000" oninput="recalculateAll()">
+                <div class="unit">mm</div>
+            </div>
+            <div class="dim-input">
+                <label>Höhe (Z)</label>
+                <input type="number" id="dimZ" value="47" min="5" max="500" oninput="recalculateAll()">
+                <div class="unit">mm</div>
+            </div>
+            <div class="dim-input">
+                <label>Aufmaß</label>
+                <input type="number" id="dimAllowance" value="5" min="1" max="20" oninput="recalculateAll()">
+                <div class="unit">mm pro Seite</div>
+            </div>
+        </div>
+
+        <!-- Ergebnisse -->
+        <div class="live-result" style="margin-top: 20px;">
+            <div class="live-result-item">
+                <div class="live-result-label">Rohteil-Gewicht</div>
+                <div class="live-result-value" id="liveWeight">4,87 kg</div>
+            </div>
+            <div class="live-result-item">
+                <div class="live-result-label">Materialkosten</div>
+                <div class="live-result-value" id="liveMaterialCost">€ 34,09</div>
+            </div>
+            <div class="live-result-item">
+                <div class="live-result-label">Bearbeitungszeit</div>
+                <div class="live-result-value" id="liveTime">41,8 min</div>
+            </div>
+            <div class="live-result-item">
+                <div class="live-result-label">Maschinenkosten</div>
+                <div class="live-result-value" id="liveMachineCost">€ 59,22</div>
+            </div>
+        </div>
+
+        <!-- Gesamtkosten -->
+        <div style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; padding: 20px; border-radius: var(--radius); margin-top: 16px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <div style="font-size: 0.85rem; opacity: 0.9;">Gesamtkosten pro Teil</div>
+                <div style="font-size: 0.75rem; opacity: 0.7;">Material + Bearbeitung + Werkzeugverschleiß</div>
+            </div>
+            <div style="font-size: 2rem; font-weight: 700; font-family: 'JetBrains Mono', monospace;" id="liveTotalCost">€ 122,07</div>
+        </div>
+    </div>
+
+    <!-- App Demo with Tabs -->
+    <div class="app-demo">
+        <div class="app-tabs">
+            <button class="app-tab active" onclick="showTab('quote')">Angebot</button>
+            <button class="app-tab" onclick="showTab('calculation')">Kalkulation</button>
+            <button class="app-tab" onclick="showTab('tools')">Werkzeuge</button>
+            <button class="app-tab" onclick="showTab('code')">Maschinencode</button>
+            <button class="app-tab" onclick="showTab('instructions')">Fertigungsanweisung</button>
+        </div>
+
+        <!-- Placeholder: Kein Projekt ausgewählt -->
+        <div class="app-placeholder" id="appPlaceholder">
+            <div class="app-placeholder-icon">📋</div>
+            <h3 style="color: var(--gray-700); margin-bottom: 8px;">Projekt auswählen</h3>
+            <p>Klicken Sie auf eines der Beispielprojekte oben, um die Kalkulation zu starten.</p>
+        </div>
+
+        <!-- Loading Animation -->
+        <div class="app-loading" id="appLoading">
+            <div class="loading-spinner"></div>
+            <h3 style="color: var(--gray-700); margin-bottom: 8px;">Generiere Unterlagen...</h3>
+            <div class="loading-steps">
+                <div class="loading-step" id="loadStep1">
+                    <span class="step-icon">○</span>
+                    <span>Geometrie analysieren</span>
+                </div>
+                <div class="loading-step" id="loadStep2">
+                    <span class="step-icon">○</span>
+                    <span>Bearbeitungszeiten berechnen</span>
+                </div>
+                <div class="loading-step" id="loadStep3">
+                    <span class="step-icon">○</span>
+                    <span>Werkzeugkosten kalkulieren</span>
+                </div>
+                <div class="loading-step" id="loadStep4">
+                    <span class="step-icon">○</span>
+                    <span>Maschinencode generieren</span>
+                </div>
+                <div class="loading-step" id="loadStep5">
+                    <span class="step-icon">○</span>
+                    <span>Fertigungsanweisung erstellen</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="app-content hidden" id="appContent">
+            <!-- ================ TAB: ANGEBOT ================ -->
+            <div class="tab-panel active" id="panel-quote">
+                <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+                    <button class="btn btn-primary btn-sm" onclick="generatePDF()">PDF drucken</button>
+                    <button class="btn btn-secondary btn-sm">Per E-Mail senden</button>
+                    <button class="btn btn-secondary btn-sm">Kopieren</button>
+                </div>
+
+                <div class="quote-preview">
+                    <div class="quote-header-row">
+                        <div>
+                            <div class="quote-title">ANGEBOT</div>
+                            <div style="color: var(--gray-500); font-size: 0.85rem;">ANG-2026-0042</div>
+                        </div>
+                        <div class="quote-meta">
+                            <div><strong>Ihre Firma GmbH</strong></div>
+                            <div>Datum: 02.02.2026</div>
+                            <div>Gültig bis: 04.03.2026</div>
+                        </div>
+                    </div>
+
+                    <table class="quote-table">
+                        <thead>
+                            <tr>
+                                <th>Pos.</th>
+                                <th>Beschreibung</th>
+                                <th>Menge</th>
+                                <th class="price">EP (€)</th>
+                                <th class="price">GP (€)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td id="quoteDescription">
+                                    <strong>Grundplatte WCAD-15-02-2020</strong><br>
+                                    <span style="color: var(--gray-500); font-size: 0.8rem;">Zahnradpumpen-Gehäuse, Werkstoff V4A Edelstahl</span>
+                                </td>
+                                <td>10</td>
+                                <td class="price" id="quoteUnitPrice">122,07</td>
+                                <td class="price" id="quoteTotalPrice">1.220,70</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="quote-total">
+                        <div class="quote-total-row">
+                            <span>Zwischensumme:</span>
+                            <span id="quoteSubtotal">1.220,70 €</span>
+                        </div>
+                        <div class="quote-total-row">
+                            <span>zzgl. MwSt. 19%:</span>
+                            <span id="quoteMwst">231,93 €</span>
+                        </div>
+                        <div class="quote-total-row grand">
+                            <span>GESAMTBETRAG:</span>
+                            <span id="quoteGrandTotal">1.452,63 €</span>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--gray-200); font-size: 0.8rem; color: var(--gray-500);">
+                        <strong>Zahlungsbedingungen:</strong> 14 Tage netto ab Rechnungsdatum<br>
+                        <strong>Lieferzeit:</strong> ca. 3-4 Wochen nach Auftragseingang
+                    </div>
+
+                    <!-- Feedback -->
+                    <div style="text-align: center; padding: 16px; margin-top: 20px; background: var(--gray-50); border-radius: var(--radius);">
+                        <span style="color: var(--gray-500); font-size: 0.85rem;">Feedback oder Fragen?</span>
+                        <a href="mailto:feedback@cncplanner.de" style="color: var(--primary); margin-left: 8px; font-size: 0.85rem;">feedback@cncplanner.de</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================ TAB: KALKULATION ================ -->
+            <div class="tab-panel" id="panel-calculation">
+                <!-- 1. Operationen und Bearbeitungszeiten -->
+                <div class="calc-section">
+                    <h4>Operationen und Bearbeitungszeiten</h4>
+                    <p style="font-size: 0.8rem; color: var(--gray-500); margin-bottom: 16px;">Zeiten passen sich automatisch an Werkstoff und Bauteilgröße an</p>
+                    <table class="calc-table" id="timeTable">
+                        <thead>
+                            <tr>
+                                <th>OP</th>
+                                <th>Beschreibung</th>
+                                <th style="text-align: center;">Zeit (min)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="timeTableBody">
+                            <!-- Wird dynamisch gefüllt -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 2. Maschinenzeitkalkulation -->
+                <div class="calc-section" style="background: linear-gradient(135deg, #eff6ff, #dbeafe); border-left: 4px solid var(--primary);">
+                    <h4>Maschinenzeitkalkulation</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                        <div>
+                            <table class="calc-table" style="margin-bottom: 0;">
+                                <tbody>
+                                    <tr>
+                                        <td style="width: 60%;">Hauptzeit (th)</td>
+                                        <td style="text-align: right; font-family: 'JetBrains Mono', monospace;" id="calcTh">30,0 min</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Nebenzeit (tn)</td>
+                                        <td style="text-align: right; font-family: 'JetBrains Mono', monospace;" id="calcTn">11,8 min</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Gesamtzeit</strong></td>
+                                        <td style="text-align: right; font-family: 'JetBrains Mono', monospace;"><strong id="calcTimeTotal">41,8 min</strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div>
+                            <table class="calc-table" style="margin-bottom: 0;">
+                                <tbody>
+                                    <tr>
+                                        <td style="width: 60%;">Stundensatz</td>
+                                        <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">€85,00/h</td>
+                                    </tr>
+                                    <tr style="background: #bfdbfe;">
+                                        <td><strong>Maschinenkosten</strong></td>
+                                        <td style="text-align: right; font-family: 'JetBrains Mono', monospace;"><strong id="calcMachineTotal">€59,22</strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Materialkalkulation -->
+                <div class="calc-section" style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-left: 4px solid var(--success);">
+                    <h4>Materialkalkulation</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                        <div>
+                            <table class="calc-table" style="margin-bottom: 0;">
+                                <tbody>
+                                    <tr>
+                                        <td style="width: 60%;">Rohmaße</td>
+                                        <td style="text-align: right; font-family: 'JetBrains Mono', monospace;" id="calcRawDims">135 × 135 × 50 mm</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Volumen</td>
+                                        <td style="text-align: right; font-family: 'JetBrains Mono', monospace;" id="calcVolume">911.250 mm³</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Werkstoff / Dichte</td>
+                                        <td style="text-align: right; font-family: 'JetBrains Mono', monospace;" id="calcDensity">1.4571 / 7,98 g/cm³</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Gewicht</strong></td>
+                                        <td style="text-align: right; font-family: 'JetBrains Mono', monospace;"><strong id="calcWeight">7,27 kg</strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div>
+                            <table class="calc-table" style="margin-bottom: 0;">
+                                <tbody>
+                                    <tr>
+                                        <td style="width: 60%;">Materialpreis</td>
+                                        <td style="text-align: right; font-family: 'JetBrains Mono', monospace;" id="calcMatPrice">€7,00/kg</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Verschnitt</td>
+                                        <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">+10%</td>
+                                    </tr>
+                                    <tr style="background: #bbf7d0;">
+                                        <td><strong>Materialkosten</strong></td>
+                                        <td style="text-align: right; font-family: 'JetBrains Mono', monospace;"><strong id="calcMatTotal">€55,98</strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Werkzeugkosten -->
+                <div class="calc-section" style="background: #fef9e6; border-left: 4px solid var(--warning);">
+                    <h4>Werkzeugkosten</h4>
+                    <table class="calc-table">
+                        <thead>
+                            <tr>
+                                <th>Werkzeug</th>
+                                <th style="text-align: right;">Preis</th>
+                                <th style="text-align: right;">Standzeit</th>
+                                <th style="text-align: right;">Einsatz</th>
+                                <th style="text-align: right;">Kosten</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>T1 Planfräser Ø63</td><td style="text-align: right;">€45</td><td style="text-align: right;">60 min</td><td style="text-align: right;">1,9 min</td><td style="text-align: right;"><strong>€1,43</strong></td></tr>
+                            <tr><td>T2 VHM-Fräser Ø20</td><td style="text-align: right;">€120</td><td style="text-align: right;">180 min</td><td style="text-align: right;">11,2 min</td><td style="text-align: right;"><strong>€7,47</strong></td></tr>
+                            <tr><td>T3 Schlichtfräser Ø16</td><td style="text-align: right;">€95</td><td style="text-align: right;">120 min</td><td style="text-align: right;">7,4 min</td><td style="text-align: right;"><strong>€5,86</strong></td></tr>
+                            <tr><td>T11 Feinbohrkopf Ø26</td><td style="text-align: right;">€350</td><td style="text-align: right;">500 min</td><td style="text-align: right;">3,3 min</td><td style="text-align: right;"><strong>€2,31</strong></td></tr>
+                            <tr><td>T12 Feinbohrkopf Ø44</td><td style="text-align: right;">€380</td><td style="text-align: right;">500 min</td><td style="text-align: right;">3,8 min</td><td style="text-align: right;"><strong>€2,89</strong></td></tr>
+                            <tr><td>T13 Gewindefräser M8</td><td style="text-align: right;">€65</td><td style="text-align: right;">200 min</td><td style="text-align: right;">2,4 min</td><td style="text-align: right;"><strong>€0,78</strong></td></tr>
+                            <tr style="background: var(--gray-100);"><td colspan="4" style="text-align: right;"><strong>Summe:</strong></td><td style="text-align: right;"><strong>€20,74</strong></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 5. Einrichtkosten -->
+                <div class="calc-section" style="background: linear-gradient(135deg, #fef3c7, #fef9e6); border-left: 4px solid #d97706;">
+                    <h4>Einrichtkosten (Rüstzeit)</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                        <div>
+                            <table class="calc-table" style="margin-bottom: 0;">
+                                <tbody>
+                                    <tr>
+                                        <td style="width: 60%;">Spannmethode</td>
+                                        <td style="text-align: right; font-family: 'JetBrains Mono', monospace;" id="calcClampingMethod">Schraubstock</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Basis-Einrichtzeit</td>
+                                        <td style="text-align: right; font-family: 'JetBrains Mono', monospace;" id="calcBaseSetup">15 min</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Aufspannungen</td>
+                                        <td style="text-align: right; font-family: 'JetBrains Mono', monospace;" id="calcSetupCount">2×</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Gesamt-Einrichtzeit</strong></td>
+                                        <td style="text-align: right; font-family: 'JetBrains Mono', monospace;"><strong id="calcSetupTimeTotal">24 min</strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div>
+                            <table class="calc-table" style="margin-bottom: 0;">
+                                <tbody>
+                                    <tr>
+                                        <td style="width: 60%;">Stundensatz</td>
+                                        <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">€85,00/h</td>
+                                    </tr>
+                                    <tr style="background: #fcd34d;">
+                                        <td><strong>Einrichtkosten</strong></td>
+                                        <td style="text-align: right; font-family: 'JetBrains Mono', monospace;"><strong id="calcSetupCost">€34,00</strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p style="font-size: 0.75rem; color: #92400e; margin-top: 8px;">
+                                💡 Hinweis: Einrichtkosten werden bei Serienproduktion auf Stückzahl verteilt.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Gesamtkalkulation -->
+                <div class="calc-section" style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white;">
+                    <h4 style="color: white;">Gesamtkalkulation pro Teil</h4>
+                    <div class="cost-summary-grid" style="grid-template-columns: repeat(5, 1fr);">
+                        <div class="cost-card">
+                            <div class="cost-card-label">Maschinenzeit</div>
+                            <div class="cost-card-value" id="calcMachineCost">€59,22</div>
+                            <div class="cost-card-detail" id="calcMachineDetail">41,8 min × €85/h</div>
+                        </div>
+                        <div class="cost-card">
+                            <div class="cost-card-label">Material</div>
+                            <div class="cost-card-value" id="calcMaterialCost">€34,09</div>
+                            <div class="cost-card-detail" id="calcMaterialDetail">4,87 kg × €7,00/kg</div>
+                        </div>
+                        <div class="cost-card">
+                            <div class="cost-card-label">Werkzeuge</div>
+                            <div class="cost-card-value" id="calcToolCost">€28,76</div>
+                            <div class="cost-card-detail">Verschleiß</div>
+                        </div>
+                        <div class="cost-card">
+                            <div class="cost-card-label">Einrichtung</div>
+                            <div class="cost-card-value" id="calcSetupCostSummary">€34,00</div>
+                            <div class="cost-card-detail" id="calcSetupDetail">24 min</div>
+                        </div>
+                        <div class="cost-card total">
+                            <div class="cost-card-label">GESAMT</div>
+                            <div class="cost-card-value" id="calcTotalCost">€156,07</div>
+                            <div class="cost-card-detail">Selbstkosten</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.2);">
+                        <span style="opacity: 0.8;">Verkaufspreis mit</span>
+                        <input type="number" id="marginInput" value="10" min="0" max="100" step="1" 
+                               style="width: 60px; padding: 4px 8px; border: none; border-radius: 4px; text-align: center; font-weight: 600;"
+                               oninput="updateMargin()">
+                        <span style="opacity: 0.8;">% Marge:</span>
+                        <strong style="font-size: 1.3rem;" id="calcSellPrice">€134,28</strong>
+                    </div>
+                </div>
+
+                <!-- Feedback -->
+                <div style="text-align: center; padding: 16px; margin-top: 20px; background: var(--gray-50); border-radius: var(--radius);">
+                    <span style="color: var(--gray-500); font-size: 0.85rem;">Feedback oder Fragen?</span>
+                    <a href="mailto:feedback@cncplanner.de" style="color: var(--primary); margin-left: 8px; font-size: 0.85rem;">feedback@cncplanner.de</a>
+                </div>
+            </div>
+
+            <!-- ================ TAB: WERKZEUGE ================ -->
+            <div class="tab-panel" id="panel-tools">
+                <!-- Schnittparameter -->
+                <div class="calc-section" style="background: linear-gradient(135deg, #fef3c7, #fef9e6); border-left: 4px solid var(--warning);">
+                    <h4>Schnittparameter</h4>
+                    <p style="font-size: 0.8rem; color: var(--gray-600); margin-bottom: 16px;">Optimierte Parameter für den gewählten Werkstoff. Werte passen sich automatisch an.</p>
+                    <div style="overflow-x: auto;">
+                        <table class="calc-table" id="cuttingParamsTable">
+                            <thead>
+                                <tr>
+                                    <th>Werkzeug</th>
+                                    <th>Operation</th>
+                                    <th style="text-align: right;">Vc [m/min]</th>
+                                    <th style="text-align: right;">n [U/min]</th>
+                                    <th style="text-align: right;">fz [mm/Z]</th>
+                                    <th style="text-align: right;">vf [mm/min]</th>
+                                    <th style="text-align: right;">ap [mm]</th>
+                                    <th style="text-align: right;">ae [mm]</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cuttingParamsBody">
+                                <tr>
+                                    <td><strong>T1</strong> Planfräser Ø63</td>
+                                    <td>Planfräsen</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">160</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">808</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">0,15</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">485</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">2,0</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">45</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>T2</strong> VHM-Fräser Ø20</td>
+                                    <td>Schruppen</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">120</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">1910</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">0,08</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">611</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">8,0</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">10</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>T3</strong> VHM-Schlichtfräser Ø16</td>
+                                    <td>Schlichten</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">140</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">2785</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">0,05</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">557</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">0,3</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">8</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>T11</strong> Feinbohrkopf Ø26</td>
+                                    <td>Feinbohren</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">100</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">1225</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">0,08</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">98</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">0,15</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">—</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>T12</strong> Feinbohrkopf Ø44</td>
+                                    <td>Feinbohren</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">100</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">723</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">0,08</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">58</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">0,15</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">—</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>T13</strong> Gewindefräser M8</td>
+                                    <td>Gewinde</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">80</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">3183</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">—</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">1,25</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">1,25</td>
+                                    <td style="text-align: right; font-family: 'JetBrains Mono', monospace;">—</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="calc-note" style="margin-top: 16px; padding: 10px 14px; font-size: 0.75rem; background: white;">
+                        <strong>Legende:</strong> Vc = Schnittgeschwindigkeit | n = Drehzahl | fz = Vorschub pro Zahn | vf = Vorschubgeschwindigkeit | ap = Schnitttiefe | ae = Zustellung
+                    </div>
+                </div>
+
+                <div style="background: #fef9e6; border-left: 4px solid #fbbf24; padding: 16px; border-radius: 0 6px 6px 0;">
+                    <strong style="color: #92400e;">Hinweis:</strong> Bei hartem Werkstoff (1.4571) können Werkzeugkosten 15-20% der Gesamtkosten ausmachen. Standzeiten sind werkstoffabhängig.
+                </div>
+
+                <!-- Feedback -->
+                <div style="text-align: center; padding: 16px; margin-top: 20px; background: var(--gray-50); border-radius: var(--radius);">
+                    <span style="color: var(--gray-500); font-size: 0.85rem;">Feedback oder Fragen?</span>
+                    <a href="mailto:feedback@cncplanner.de" style="color: var(--primary); margin-left: 8px; font-size: 0.85rem;">feedback@cncplanner.de</a>
+                </div>
+            </div>
+
+            <!-- ================ TAB: MASCHINENCODE ================ -->
+            <div class="tab-panel" id="panel-code">
+                <!-- Beta Hinweis -->
+                <div style="background: #fef3c7; border: 1px solid #fbbf24; padding: 12px 16px; border-radius: var(--radius); margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+                    <span style="color: #92400e; font-size: 0.85rem;">Code vor Einsatz prüfen.</span>
+                </div>
+
+                <!-- Bauteil-Bild -->
+                <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+                    <div style="flex: 0 0 200px; height: 150px; background: var(--gray-100); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; border: 1px dashed var(--gray-300);">
+                        <div style="text-align: center; color: var(--gray-400);">
+                            <div style="font-size: 2rem; margin-bottom: 4px;">&#9633;</div>
+                            <div style="font-size: 0.75rem;" id="partImageLabel">Bauteil-Vorschau</div>
+                        </div>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <div class="code-format-tabs" style="display: flex; gap: 4px; background: var(--gray-100); padding: 4px; border-radius: var(--radius);">
+                                <button class="btn btn-sm" id="btn-heidenhain" onclick="setCodeFormat('heidenhain')" style="background: var(--primary); color: white;">Heidenhain TNC</button>
+                                <button class="btn btn-sm" id="btn-siemens" onclick="setCodeFormat('siemens')" style="background: transparent; color: var(--gray-600);">Siemens 840D</button>
+                                <button class="btn btn-sm" id="btn-fanuc" onclick="setCodeFormat('fanuc')" style="background: transparent; color: var(--gray-600);">Fanuc</button>
+                            </div>
+                            <button class="btn btn-secondary btn-sm" style="margin-left: auto;" onclick="copyCode()">Kopieren</button>
+                            <button class="btn btn-primary btn-sm" onclick="downloadCode()">Export</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="code-block" id="codeBlock">
+<pre><span class="code-comment">; ============================================</span>
+<span class="code-comment">; CNC PLANNER PRO — Automatisch generiert</span>
+<span class="code-comment">; ============================================</span>
+<span class="code-comment">; Werkstück:  Grundplatte WCAD-15-02-2020</span>
+<span class="code-comment">; Werkstoff:  1.4571 (X6CrNiMoTi17-12-2)</span>
+<span class="code-comment">; Maschine:   FEHLMANN VERSA 943</span>
+<span class="code-comment">; Steuerung:  Heidenhain TNC 640</span>
+<span class="code-comment">; Erstellt:   02.02.2026 12:00</span>
+<span class="code-comment">; ============================================</span>
+
+<span class="code-keyword">BEGIN PGM</span> GRUNDPLATTE <span class="code-keyword">MM</span>
+
+<span class="code-comment">; --- WERKZEUGLISTE ---</span>
+<span class="code-comment">; T1  = Planfräser Ø63 (WSP)</span>
+<span class="code-comment">; T2  = VHM-Fräser Ø20</span>
+<span class="code-comment">; T3  = VHM-Schlichtfräser Ø16</span>
+<span class="code-comment">; T11 = Feinbohrkopf Ø26</span>
+<span class="code-comment">; T12 = Feinbohrkopf Ø44</span>
+<span class="code-comment">; T13 = Gewindefräser M8</span>
+
+<span class="code-comment">; ============================================</span>
+<span class="code-comment">; OP10: PLANFRÄSEN OBERSEITE</span>
+<span class="code-comment">; Berechnet: t_h = 1,9 min | t_n = 0,8 min</span>
+<span class="code-comment">; ============================================</span>
+
+<span class="code-keyword">TOOL CALL</span> <span class="code-number">1</span> Z S<span class="code-number">800</span>
+<span class="code-mcode">M3</span>
+<span class="code-gcode">L</span> X+<span class="code-number">0</span> Y+<span class="code-number">0</span> Z+<span class="code-number">100</span> <span class="code-keyword">FMAX</span>
+<span class="code-gcode">L</span> Z+<span class="code-number">2</span> F<span class="code-number">500</span>
+
+<span class="code-keyword">CYCL DEF</span> <span class="code-number">230</span> <span class="code-keyword">FACE MILLING</span>
+  Q<span class="code-number">225</span>=+<span class="code-number">0</span>      <span class="code-comment">;START POINT 1ST AXIS</span>
+  Q<span class="code-number">226</span>=+<span class="code-number">0</span>      <span class="code-comment">;START POINT 2ND AXIS</span>
+  Q<span class="code-number">227</span>=+<span class="code-number">0</span>      <span class="code-comment">;MILLING DEPTH</span>
+  Q<span class="code-number">218</span>=<span class="code-number">150</span>     <span class="code-comment">;FIRST SIDE LENGTH</span>
+  Q<span class="code-number">219</span>=<span class="code-number">150</span>     <span class="code-comment">;SECOND SIDE LENGTH</span>
+  Q<span class="code-number">202</span>=<span class="code-number">2</span>       <span class="code-comment">;INFEED DEPTH</span>
+  Q<span class="code-number">207</span>=<span class="code-number">300</span>     <span class="code-comment">;MILLING FEED RATE</span>
+
+<span class="code-keyword">CYCL CALL</span>
+<span class="code-gcode">L</span> Z+<span class="code-number">100</span> <span class="code-keyword">FMAX</span>
+<span class="code-mcode">M5</span>
+
+<span class="code-comment">; ============================================</span>
+<span class="code-comment">; OP20: SCHRUPPEN AUSSENKONTUR Ø120</span>
+<span class="code-comment">; Berechnet: t_h = 7,2 min | t_n = 0,8 min</span>
+<span class="code-comment">; ACHTUNG: Aufmaß 0,3mm für Schlichtgang!</span>
+<span class="code-comment">; ============================================</span>
+
+<span class="code-keyword">TOOL CALL</span> <span class="code-number">2</span> Z S<span class="code-number">2500</span>
+<span class="code-mcode">M3</span>
+<span class="code-gcode">L</span> X+<span class="code-number">0</span> Y+<span class="code-number">0</span> Z+<span class="code-number">100</span> <span class="code-keyword">FMAX</span>
+
+<span class="code-keyword">CYCL DEF</span> <span class="code-number">25</span> <span class="code-keyword">KONTUR</span>
+  Q<span class="code-number">1</span>=+<span class="code-number">120.3</span>   <span class="code-comment">;DURCHMESSER (inkl. Aufmaß)</span>
+  Q<span class="code-number">2</span>=+<span class="code-number">42</span>      <span class="code-comment">;TIEFE</span>
+  Q<span class="code-number">3</span>=+<span class="code-number">3</span>       <span class="code-comment">;ZUSTELLUNG</span>
+  Q<span class="code-number">6</span>=<span class="code-number">400</span>      <span class="code-comment">;VORSCHUB</span>
+
+<span class="code-keyword">CYCL CALL</span>
+<span class="code-gcode">L</span> Z+<span class="code-number">100</span> <span class="code-keyword">FMAX</span>
+
+<span class="code-comment">; ============================================</span>
+<span class="code-comment">; OP50: SCHLICHTEN Ø120 h5 — KRITISCH!</span>
+<span class="code-comment">; Toleranz: 0 / -0,018 mm (nur 18 µm!)</span>
+<span class="code-comment">; Berechnet: t_h = 4,3 min | t_n = 0,8 min</span>
+<span class="code-comment">; ============================================</span>
+
+<span class="code-keyword">TOOL CALL</span> <span class="code-number">3</span> Z S<span class="code-number">3000</span>
+<span class="code-mcode">M3</span>
+
+<span class="code-comment">; WERKZEUG VOR BEARBEITUNG AUF VERSCHLEISS PRÜFEN!</span>
+<span class="code-mcode">M0</span> <span class="code-comment">;HALT - Werkzeugkontrolle</span>
+
+<span class="code-keyword">CYCL DEF</span> <span class="code-number">25</span> <span class="code-keyword">KONTUR SCHLICHTEN</span>
+  Q<span class="code-number">1</span>=+<span class="code-number">120</span>     <span class="code-comment">;DURCHMESSER FERTIGMASS</span>
+  Q<span class="code-number">2</span>=+<span class="code-number">42</span>      <span class="code-comment">;TIEFE</span>
+  Q<span class="code-number">3</span>=+<span class="code-number">0.15</span>    <span class="code-comment">;ZUSTELLUNG (Schlichten)</span>
+  Q<span class="code-number">6</span>=<span class="code-number">250</span>      <span class="code-comment">;VORSCHUB</span>
+
+<span class="code-keyword">CYCL CALL</span>
+<span class="code-gcode">L</span> Z+<span class="code-number">100</span> <span class="code-keyword">FMAX</span>
+
+<span class="code-comment">; ============================================</span>
+<span class="code-comment">; OP60: FEINBOHREN Ø26 H7 — KRITISCH!</span>
+<span class="code-comment">; Toleranz: +0,021 / 0 mm</span>
+<span class="code-comment">; ============================================</span>
+
+<span class="code-keyword">TOOL CALL</span> <span class="code-number">11</span> Z S<span class="code-number">1200</span>
+<span class="code-mcode">M3</span>
+<span class="code-gcode">L</span> X+<span class="code-number">0</span> Y+<span class="code-number">0</span> Z+<span class="code-number">10</span> <span class="code-keyword">FMAX</span>
+
+<span class="code-keyword">CYCL DEF</span> <span class="code-number">201</span> <span class="code-keyword">BORING</span>
+  Q<span class="code-number">200</span>=<span class="code-number">2</span>       <span class="code-comment">;SICHERHEITSABSTAND</span>
+  Q<span class="code-number">201</span>=-<span class="code-number">35</span>     <span class="code-comment">;TIEFE</span>
+  Q<span class="code-number">206</span>=<span class="code-number">100</span>     <span class="code-comment">;VORSCHUB TIEFENZUSTELLUNG</span>
+  Q<span class="code-number">211</span>=<span class="code-number">50</span>      <span class="code-comment">;VERWEILZEIT UNTEN</span>
+
+<span class="code-keyword">CYCL CALL</span>
+<span class="code-gcode">L</span> Z+<span class="code-number">100</span> <span class="code-keyword">FMAX</span>
+
+<span class="code-comment">; ============================================</span>
+<span class="code-comment">; OP80+90: BOHREN UND GEWINDE 6×M8</span>
+<span class="code-comment">; ============================================</span>
+
+<span class="code-keyword">TOOL CALL</span> <span class="code-number">13</span> Z S<span class="code-number">800</span>
+<span class="code-mcode">M3</span>
+
+<span class="code-keyword">CYCL DEF</span> <span class="code-number">262</span> <span class="code-keyword">THREAD MILLING</span>
+  Q<span class="code-number">335</span>=<span class="code-number">26</span>      <span class="code-comment">;NOMINAL DIAMETER</span>
+  Q<span class="code-number">239</span>=<span class="code-number">1.25</span>    <span class="code-comment">;PITCH</span>
+  Q<span class="code-number">201</span>=-<span class="code-number">20</span>     <span class="code-comment">;THREAD DEPTH</span>
+
+<span class="code-comment">; Bohrkreis Ø75</span>
+<span class="code-gcode">L</span> X+<span class="code-number">37.5</span> Y+<span class="code-number">0</span> <span class="code-keyword">FMAX</span>
+<span class="code-keyword">CYCL CALL</span>
+<span class="code-gcode">L</span> X+<span class="code-number">18.75</span> Y+<span class="code-number">32.48</span> <span class="code-keyword">FMAX</span>
+<span class="code-keyword">CYCL CALL</span>
+<span class="code-gcode">L</span> X-<span class="code-number">18.75</span> Y+<span class="code-number">32.48</span> <span class="code-keyword">FMAX</span>
+<span class="code-keyword">CYCL CALL</span>
+<span class="code-gcode">L</span> X-<span class="code-number">37.5</span> Y+<span class="code-number">0</span> <span class="code-keyword">FMAX</span>
+<span class="code-keyword">CYCL CALL</span>
+<span class="code-gcode">L</span> X-<span class="code-number">18.75</span> Y-<span class="code-number">32.48</span> <span class="code-keyword">FMAX</span>
+<span class="code-keyword">CYCL CALL</span>
+<span class="code-gcode">L</span> X+<span class="code-number">18.75</span> Y-<span class="code-number">32.48</span> <span class="code-keyword">FMAX</span>
+<span class="code-keyword">CYCL CALL</span>
+
+<span class="code-gcode">L</span> Z+<span class="code-number">100</span> <span class="code-keyword">FMAX</span>
+<span class="code-mcode">M5</span>
+<span class="code-mcode">M30</span>
+<span class="code-keyword">END PGM</span> GRUNDPLATTE <span class="code-keyword">MM</span></pre>
+                </div>
+
+                <div style="margin-top: 20px; padding: 16px; background: var(--gray-50); border-radius: var(--radius); font-size: 0.85rem;">
+                    <strong>Programm-Info:</strong> 127 Zeilen | Geschätzte Laufzeit: 41,8 min | Maschine: FEHLMANN VERSA 943
+                </div>
+
+                <!-- Feedback -->
+                <div style="text-align: center; padding: 16px; margin-top: 20px; background: var(--gray-50); border-radius: var(--radius);">
+                    <span style="color: var(--gray-500); font-size: 0.85rem;">Feedback oder Fragen?</span>
+                    <a href="mailto:feedback@cncplanner.de" style="color: var(--primary); margin-left: 8px; font-size: 0.85rem;">feedback@cncplanner.de</a>
+                </div>
+            </div>
+
+            <!-- ================ TAB: FERTIGUNGSANWEISUNG ================ -->
+            <div class="tab-panel" id="panel-instructions">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-primary btn-sm" onclick="generatePDF()">PDF drucken</button>
+                        <button class="btn btn-secondary btn-sm">Per E-Mail senden</button>
+                    </div>
+                    <span class="ai-badge">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                        KI-generierte Anweisungen
+                    </span>
+                </div>
+
+                <!-- Document Header -->
+                <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 24px; margin-bottom: 24px;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 3px solid var(--primary);">
+                        <div>
+                            <h3 style="color: var(--primary); font-size: 1.4rem; font-weight: 700;">FERTIGUNGSANWEISUNG</h3>
+                            <p style="color: var(--gray-500);">Grundplatte — WCAD-15-02-2020</p>
+                        </div>
+                        <div style="text-align: right; font-size: 0.85rem; color: var(--gray-500);">
+                            <div>Freigabe: 02.02.2026</div>
+                            <div>Version: 1.0</div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px;">
+                        <div>
+                            <h4 style="color: var(--gray-700); font-size: 0.9rem; margin-bottom: 12px;">Werkstück</h4>
+                            <table class="info-table">
+                                <tr><td>Werkstoff:</td><td><strong>1.4571</strong> (X6CrNiMoTi17-12-2)</td></tr>
+                                <tr><td>Rohteil:</td><td>Ø135 × 50 mm</td></tr>
+                                <tr><td>Fertigmaß:</td><td>Ø120 × 42 mm</td></tr>
+                                <tr><td>Gewicht:</td><td>1,903 kg</td></tr>
+                            </table>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--gray-700); font-size: 0.9rem; margin-bottom: 12px;">Maschine</h4>
+                            <table class="info-table">
+                                <tr><td>Maschine:</td><td><strong>FEHLMANN VERSA 943</strong></td></tr>
+                                <tr><td>Steuerung:</td><td>Heidenhain TNC 640</td></tr>
+                                <tr><td>Programm:</td><td>GRUNDPLATTE.H</td></tr>
+                                <tr><td>Bearbeitungszeit:</td><td><strong>41,8 min</strong></td></tr>
+                            </table>
+                        </div>
+                        <!-- Zeichnungs-Vorschau -->
+                        <div>
+                            <h4 style="color: var(--gray-700); font-size: 0.9rem; margin-bottom: 12px;">Zeichnung</h4>
+                            <div id="drawingPreview" style="background: white; border: 2px dashed var(--gray-300); border-radius: var(--radius); height: 160px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;" onclick="document.getElementById('drawingInput').click()">
+                                <input type="file" id="drawingInput" accept=".pdf,.png,.jpg,.jpeg" style="display: none;" onchange="handleDrawingUpload(this)">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="1.5">
+                                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                    <path d="M9 9h6v6H9z"/>
+                                    <path d="M9 3v6M15 3v6M9 15v6M15 15v6M3 9h6M3 15h6M15 9h6M15 15h6"/>
+                                </svg>
+                                <span style="font-size: 0.8rem; color: var(--gray-400); margin-top: 8px;">Zeichnung hier ablegen</span>
+                                <span style="font-size: 0.7rem; color: var(--gray-400);">oder klicken zum Auswählen</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="warning-box">
+                        <strong>Kritische Toleranzen:</strong>
+                        <span>Ø120 h5 (0/-0,018mm) • Ø26 H7 (+0,021/0) • Ø44 H7 (+0,025/0)</span>
+                    </div>
+                </div>
+
+                <!-- Operations -->
+                <h4 style="color: var(--gray-700); font-size: 1rem; margin-bottom: 16px;">Arbeitsschritte mit Hinweisen</h4>
+
+                <!-- OP10 -->
+                <div class="instruction-section">
+                    <div class="instruction-header">
+                        <h4><span class="op-badge">OP10</span> Planfräsen Oberseite</h4>
+                        <span style="color: var(--gray-500); font-size: 0.85rem;">2,7 min</span>
+                    </div>
+                    <div class="instruction-content">
+                        <div class="params-grid">
+                            <div class="param-item">
+                                <div class="param-label">Werkzeug</div>
+                                <div class="param-value">T1 Ø63</div>
+                            </div>
+                            <div class="param-item">
+                                <div class="param-label">Drehzahl</div>
+                                <div class="param-value">800</div>
+                            </div>
+                            <div class="param-item">
+                                <div class="param-label">Vorschub</div>
+                                <div class="param-value">300</div>
+                            </div>
+                            <div class="param-item">
+                                <div class="param-label">Zustellung</div>
+                                <div class="param-value">2 mm</div>
+                            </div>
+                        </div>
+                        <ul class="tips-list">
+                            <li><span class="tip-icon success">✓</span> Rohteil plan auf Maschinentisch spannen, Parallelität prüfen</li>
+                            <li><span class="tip-icon">i</span> Fräsen im Gegenlauf für bessere Oberfläche bei 1.4571</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- OP20 -->
+                <div class="instruction-section">
+                    <div class="instruction-header">
+                        <h4><span class="op-badge">OP20</span> Schruppen Außenkontur Ø120</h4>
+                        <span style="color: var(--gray-500); font-size: 0.85rem;">8,0 min</span>
+                    </div>
+                    <div class="instruction-content">
+                        <div class="params-grid">
+                            <div class="param-item">
+                                <div class="param-label">Werkzeug</div>
+                                <div class="param-value">T2 Ø20</div>
+                            </div>
+                            <div class="param-item">
+                                <div class="param-label">Drehzahl</div>
+                                <div class="param-value">2500</div>
+                            </div>
+                            <div class="param-item">
+                                <div class="param-label">Vorschub</div>
+                                <div class="param-value">400</div>
+                            </div>
+                            <div class="param-item">
+                                <div class="param-label">Aufmaß</div>
+                                <div class="param-value">0,3 mm</div>
+                            </div>
+                        </div>
+                        <ul class="tips-list">
+                            <li><span class="tip-icon">i</span> Gleichlauffräsen bei austenitischem Stahl vermeiden — Kaltverfestigung!</li>
+                            <li><span class="tip-icon warning">!</span> Kühlmittel-Druck mind. 20 bar, Späne kontinuierlich entfernen</li>
+                            <li><span class="tip-icon">i</span> Aufmaß 0,3 mm für Schlichtgang belassen</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- OP50 - Kritisch -->
+                <div class="instruction-section critical">
+                    <div class="instruction-header critical">
+                        <h4>
+                            <span class="op-badge critical">OP50</span>
+                            Schlichten Ø120 h5
+                            <span class="badge badge-critical">KRITISCH</span>
+                        </h4>
+                        <span style="color: var(--gray-500); font-size: 0.85rem;">5,1 min</span>
+                    </div>
+                    <div class="instruction-content">
+                        <div class="params-grid">
+                            <div class="param-item">
+                                <div class="param-label">Werkzeug</div>
+                                <div class="param-value">T3 Ø16</div>
+                            </div>
+                            <div class="param-item">
+                                <div class="param-label">Drehzahl</div>
+                                <div class="param-value">3000</div>
+                            </div>
+                            <div class="param-item">
+                                <div class="param-label">Vorschub</div>
+                                <div class="param-value">250</div>
+                            </div>
+                            <div class="param-item critical">
+                                <div class="param-label">Toleranz</div>
+                                <div class="param-value critical">h5</div>
+                            </div>
+                        </div>
+                        <div class="danger-box">
+                            <strong>Toleranz h5 = 0 / -0,018 mm — Nur 18 µm Spielraum!</strong>
+                        </div>
+                        <ul class="tips-list">
+                            <li><span class="tip-icon danger">!</span> <strong>Werkzeug vor Bearbeitung auf Verschleiß prüfen</strong> — Standzeit bei 1.4571 reduziert</li>
+                            <li><span class="tip-icon danger">!</span> Werkstück-Temperatur beachten: Ausdehnung bei 20°C Abweichung = ~2 µm</li>
+                            <li><span class="tip-icon warning">!</span> Nach Schlichtgang sofort messen — nicht auskühlen lassen</li>
+                            <li><span class="tip-icon">i</span> Bei Erstmuster: Zwischenmessung nach 50% der Kontur empfohlen</li>
+                            <li><span class="tip-icon success">✓</span> Ziel-Rauheit: Ra 1,6 — erreichbar mit diesen Parametern</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- OP60 - Kritisch -->
+                <div class="instruction-section critical">
+                    <div class="instruction-header critical">
+                        <h4>
+                            <span class="op-badge critical">OP60</span>
+                            Feinbohren Ø26 H7
+                            <span class="badge badge-critical">KRITISCH</span>
+                        </h4>
+                        <span style="color: var(--gray-500); font-size: 0.85rem;">4,1 min</span>
+                    </div>
+                    <div class="instruction-content">
+                        <div class="params-grid">
+                            <div class="param-item">
+                                <div class="param-label">Werkzeug</div>
+                                <div class="param-value">T11</div>
+                            </div>
+                            <div class="param-item">
+                                <div class="param-label">Drehzahl</div>
+                                <div class="param-value">1200</div>
+                            </div>
+                            <div class="param-item">
+                                <div class="param-label">Vorschub</div>
+                                <div class="param-value">100</div>
+                            </div>
+                            <div class="param-item critical">
+                                <div class="param-label">Toleranz</div>
+                                <div class="param-value critical">H7</div>
+                            </div>
+                        </div>
+                        <ul class="tips-list">
+                            <li><span class="tip-icon danger">!</span> <strong>Feinbohrkopf-Einstellung dokumentieren</strong> — reproduzierbar für Serie</li>
+                            <li><span class="tip-icon warning">!</span> Bohrung vor Feinbohren auf Rundheit prüfen (max. 0,01 mm)</li>
+                            <li><span class="tip-icon">i</span> Ausfahren mit reduziertem Vorschub (50 mm/min) für saubere Oberfläche</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Quality Check - Editable -->
+                <div class="instruction-section">
+                    <div class="instruction-header">
+                        <h4>Qualitätsprüfung nach Bearbeitung</h4>
+                        <span class="badge badge-info">QS</span>
+                        <button onclick="addQualityCheck()" style="margin-left: auto; padding: 4px 12px; border: 1px solid var(--gray-300); border-radius: 4px; background: white; cursor: pointer; font-size: 0.8rem;">+ Prüfung hinzufügen</button>
+                    </div>
+                    <div class="instruction-content">
+                        <p style="font-size: 0.8rem; color: var(--gray-500); margin-bottom: 12px;">💡 Klicken Sie auf ein Feld um es zu bearbeiten. Vorgeschlagene Prüfungen basieren auf der Bauteilanalyse.</p>
+                        <table class="quality-table" id="qualityCheckTable">
+                            <thead>
+                                <tr>
+                                    <th>Prüfmerkmal</th>
+                                    <th>Soll</th>
+                                    <th>Prüfmittel</th>
+                                    <th>Prüfung</th>
+                                    <th style="width: 40px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="qualityCheckBody">
+                                <tr>
+                                    <td><input type="text" value="Ø120 h5 (Außendurchmesser)" class="quality-input" style="width: 100%; border: 1px solid transparent; padding: 4px; border-radius: 4px;"></td>
+                                    <td><input type="text" value="120,000 / 119,982" class="quality-input" style="width: 100%; border: 1px solid transparent; padding: 4px; border-radius: 4px;"></td>
+                                    <td>
+                                        <select class="quality-select" style="width: 100%; border: 1px solid transparent; padding: 4px; border-radius: 4px; background: transparent;">
+                                            <option value="mikrometer" selected>Mikrometer</option>
+                                            <option value="messschieber">Messschieber</option>
+                                            <option value="innenmessschraube">Innenmessschraube</option>
+                                            <option value="messuhr">Messuhr</option>
+                                            <option value="3d-messgerät">3D-Messgerät (CMM)</option>
+                                            <option value="rauheitsmessgerät">Rauheitsmessgerät</option>
+                                            <option value="gewindelehrdorn">Gewindelehrdorn</option>
+                                        </select>
+                                    </td>
+                                    <td class="check"><input type="checkbox"></td>
+                                    <td><button onclick="removeQualityRow(this)" style="border: none; background: #fee2e2; color: #dc2626; padding: 4px 8px; border-radius: 4px; cursor: pointer;">×</button></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="text" value="Ø26 H7 (Feinbohrung)" class="quality-input" style="width: 100%; border: 1px solid transparent; padding: 4px; border-radius: 4px;"></td>
+                                    <td><input type="text" value="26,000 / 26,021" class="quality-input" style="width: 100%; border: 1px solid transparent; padding: 4px; border-radius: 4px;"></td>
+                                    <td>
+                                        <select class="quality-select" style="width: 100%; border: 1px solid transparent; padding: 4px; border-radius: 4px; background: transparent;">
+                                            <option value="mikrometer">Mikrometer</option>
+                                            <option value="messschieber">Messschieber</option>
+                                            <option value="innenmessschraube" selected>Innenmessschraube</option>
+                                            <option value="messuhr">Messuhr</option>
+                                            <option value="3d-messgerät">3D-Messgerät (CMM)</option>
+                                            <option value="rauheitsmessgerät">Rauheitsmessgerät</option>
+                                            <option value="gewindelehrdorn">Gewindelehrdorn</option>
+                                        </select>
+                                    </td>
+                                    <td class="check"><input type="checkbox"></td>
+                                    <td><button onclick="removeQualityRow(this)" style="border: none; background: #fee2e2; color: #dc2626; padding: 4px 8px; border-radius: 4px; cursor: pointer;">×</button></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="text" value="Ø44 H7 (Feinbohrung)" class="quality-input" style="width: 100%; border: 1px solid transparent; padding: 4px; border-radius: 4px;"></td>
+                                    <td><input type="text" value="44,000 / 44,025" class="quality-input" style="width: 100%; border: 1px solid transparent; padding: 4px; border-radius: 4px;"></td>
+                                    <td>
+                                        <select class="quality-select" style="width: 100%; border: 1px solid transparent; padding: 4px; border-radius: 4px; background: transparent;">
+                                            <option value="mikrometer">Mikrometer</option>
+                                            <option value="messschieber">Messschieber</option>
+                                            <option value="innenmessschraube" selected>Innenmessschraube</option>
+                                            <option value="messuhr">Messuhr</option>
+                                            <option value="3d-messgerät">3D-Messgerät (CMM)</option>
+                                            <option value="rauheitsmessgerät">Rauheitsmessgerät</option>
+                                            <option value="gewindelehrdorn">Gewindelehrdorn</option>
+                                        </select>
+                                    </td>
+                                    <td class="check"><input type="checkbox"></td>
+                                    <td><button onclick="removeQualityRow(this)" style="border: none; background: #fee2e2; color: #dc2626; padding: 4px 8px; border-radius: 4px; cursor: pointer;">×</button></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="text" value="Höhe 42 mm" class="quality-input" style="width: 100%; border: 1px solid transparent; padding: 4px; border-radius: 4px;"></td>
+                                    <td><input type="text" value="42,0 ±0,1" class="quality-input" style="width: 100%; border: 1px solid transparent; padding: 4px; border-radius: 4px;"></td>
+                                    <td>
+                                        <select class="quality-select" style="width: 100%; border: 1px solid transparent; padding: 4px; border-radius: 4px; background: transparent;">
+                                            <option value="mikrometer">Mikrometer</option>
+                                            <option value="messschieber" selected>Messschieber</option>
+                                            <option value="innenmessschraube">Innenmessschraube</option>
+                                            <option value="messuhr">Messuhr</option>
+                                            <option value="3d-messgerät">3D-Messgerät (CMM)</option>
+                                            <option value="rauheitsmessgerät">Rauheitsmessgerät</option>
+                                            <option value="gewindelehrdorn">Gewindelehrdorn</option>
+                                        </select>
+                                    </td>
+                                    <td class="check"><input type="checkbox"></td>
+                                    <td><button onclick="removeQualityRow(this)" style="border: none; background: #fee2e2; color: #dc2626; padding: 4px 8px; border-radius: 4px; cursor: pointer;">×</button></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="text" value="Ra Oberfläche (Dichtflächen)" class="quality-input" style="width: 100%; border: 1px solid transparent; padding: 4px; border-radius: 4px;"></td>
+                                    <td><input type="text" value="≤ 1,6 µm" class="quality-input" style="width: 100%; border: 1px solid transparent; padding: 4px; border-radius: 4px;"></td>
+                                    <td>
+                                        <select class="quality-select" style="width: 100%; border: 1px solid transparent; padding: 4px; border-radius: 4px; background: transparent;">
+                                            <option value="mikrometer">Mikrometer</option>
+                                            <option value="messschieber">Messschieber</option>
+                                            <option value="innenmessschraube">Innenmessschraube</option>
+                                            <option value="messuhr">Messuhr</option>
+                                            <option value="3d-messgerät">3D-Messgerät (CMM)</option>
+                                            <option value="rauheitsmessgerät" selected>Rauheitsmessgerät</option>
+                                            <option value="gewindelehrdorn">Gewindelehrdorn</option>
+                                        </select>
+                                    </td>
+                                    <td class="check"><input type="checkbox"></td>
+                                    <td><button onclick="removeQualityRow(this)" style="border: none; background: #fee2e2; color: #dc2626; padding: 4px 8px; border-radius: 4px; cursor: pointer;">×</button></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="text" value="Gewinde M8 (alle 8 Stk.)" class="quality-input" style="width: 100%; border: 1px solid transparent; padding: 4px; border-radius: 4px;"></td>
+                                    <td><input type="text" value="6H" class="quality-input" style="width: 100%; border: 1px solid transparent; padding: 4px; border-radius: 4px;"></td>
+                                    <td>
+                                        <select class="quality-select" style="width: 100%; border: 1px solid transparent; padding: 4px; border-radius: 4px; background: transparent;">
+                                            <option value="mikrometer">Mikrometer</option>
+                                            <option value="messschieber">Messschieber</option>
+                                            <option value="innenmessschraube">Innenmessschraube</option>
+                                            <option value="messuhr">Messuhr</option>
+                                            <option value="3d-messgerät">3D-Messgerät (CMM)</option>
+                                            <option value="rauheitsmessgerät">Rauheitsmessgerät</option>
+                                            <option value="gewindelehrdorn" selected>Gewindelehrdorn</option>
+                                        </select>
+                                    </td>
+                                    <td class="check"><input type="checkbox"></td>
+                                    <td><button onclick="removeQualityRow(this)" style="border: none; background: #fee2e2; color: #dc2626; padding: 4px 8px; border-radius: 4px; cursor: pointer;">×</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Troubleshooting -->
+                <div class="instruction-section">
+                    <div class="instruction-header">
+                        <h4>Problemlösung</h4>
+                        <span class="badge badge-info">Hilfe</span>
+                    </div>
+                    <div class="instruction-content">
+                        <table class="quality-table">
+                            <thead>
+                                <tr>
+                                    <th>Problem</th>
+                                    <th>Mögliche Ursache</th>
+                                    <th>Maßnahme</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Ø120 zu klein</td>
+                                    <td>Werkzeugverschleiß</td>
+                                    <td>Korrektur erhöhen oder Werkzeug wechseln</td>
+                                </tr>
+                                <tr>
+                                    <td>Oberfläche rau</td>
+                                    <td>Vorschub zu hoch</td>
+                                    <td>Vorschub auf 200 reduzieren</td>
+                                </tr>
+                                <tr>
+                                    <td>Bohrung unrund</td>
+                                    <td>Feinbohrkopf-Exzentrizität</td>
+                                    <td>Kopf neu einstellen, Rundlauf prüfen</td>
+                                </tr>
+                                <tr>
+                                    <td>Gratbildung</td>
+                                    <td>Stumpfes Werkzeug</td>
+                                    <td>Werkzeug wechseln, Entgratschritt hinzufügen</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Feedback -->
+                <div style="text-align: center; padding: 16px; margin-top: 20px; background: var(--gray-50); border-radius: var(--radius);">
+                    <span style="color: var(--gray-500); font-size: 0.85rem;">Feedback oder Fragen?</span>
+                    <a href="mailto:feedback@cncplanner.de" style="color: var(--primary); margin-left: 8px; font-size: 0.85rem;">feedback@cncplanner.de</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ================================================================================
+    // CNC PLANNER PRO - VOLLSTÄNDIGES DATENMODELL
+    // ================================================================================
+
+    const MACHINE_HOUR_RATE = 85;
+    const TOOL_WEAR_BASE = 20.74; // Summe aus Werkzeugkosten-Tabelle
+
+    // Werkstoff-Datenbank
+    const MATERIALS = {
+        // Edelstahl
+        '1.4301': { name: '1.4301 (V2A)', price: 8.50, density: 7.90, timeFactor: 1.25, vcFactor: 0.6 },
+        '1.4404': { name: '1.4404 (V4A)', price: 12.00, density: 7.90, timeFactor: 1.30, vcFactor: 0.55 },
+        '1.4571': { name: '1.4571', price: 14.00, density: 8.00, timeFactor: 1.35, vcFactor: 0.5 },
+        // Baustahl
+        'S235JR': { name: 'S235JR', price: 1.80, density: 7.85, timeFactor: 1.00, vcFactor: 1.0 },
+        'S355J2': { name: 'S355J2', price: 2.20, density: 7.85, timeFactor: 1.02, vcFactor: 0.95 },
+        'C45': { name: 'C45', price: 2.80, density: 7.85, timeFactor: 1.08, vcFactor: 0.85 },
+        // Vergütungsstahl
+        '42CrMo4': { name: '42CrMo4', price: 4.50, density: 7.85, timeFactor: 1.15, vcFactor: 0.7 },
+        '34CrNiMo6': { name: '34CrNiMo6', price: 6.00, density: 7.85, timeFactor: 1.20, vcFactor: 0.65 },
+        // Aluminium
+        'AlMg3': { name: 'AlMg3', price: 6.50, density: 2.66, timeFactor: 0.65, vcFactor: 2.0 },
+        'AlMgSi1': { name: 'AlMgSi1 (6082)', price: 7.00, density: 2.70, timeFactor: 0.68, vcFactor: 1.8 },
+        'Al7075': { name: 'Al7075-T6', price: 12.00, density: 2.81, timeFactor: 0.72, vcFactor: 1.5 },
+        // Buntmetalle
+        'CuZn39Pb3': { name: 'Messing CuZn39Pb3', price: 8.50, density: 8.47, timeFactor: 0.75, vcFactor: 1.3 },
+        'CuSn8': { name: 'Bronze CuSn8', price: 12.00, density: 8.80, timeFactor: 0.80, vcFactor: 1.2 },
+        // Kunststoff
+        'POM': { name: 'POM', price: 4.00, density: 1.41, timeFactor: 0.50, vcFactor: 3.0 },
+        'PA6': { name: 'PA6 (Nylon)', price: 5.00, density: 1.14, timeFactor: 0.55, vcFactor: 2.8 },
+        'PEEK': { name: 'PEEK', price: 85.00, density: 1.30, timeFactor: 0.60, vcFactor: 2.5 }
+    };
+
+    // ================================================================================
+    // PROJEKTDATEN - 3 vollständige Beispiele
+    // ================================================================================
+    const PROJECTS = {
+        grundplatte: {
+            id: 'grundplatte',
+            name: 'Grundplatte WCAD-15-02-2020',
+            description: 'Zahnradpumpen-Gehäuse',
+            material: '1.4571',
+            isRound: true,
+            dims: { x: 130, y: 130, z: 47, allowance: 5 },
+            finishDims: { diameter: 120, height: 42 },
+            features: { bore1: 26, bore2: 44, threads: 6 },
+            baseTime: 41.8,
+            unitPrice: 122.07,
+            operations: [
+                { op: 'OP10', name: 'Planfräsen', time: 2.7, tool: 'T1 Planfräser Ø63', critical: false },
+                { op: 'OP20', name: 'Schruppen Außen', time: 8.0, tool: 'T2 VHM-Fräser Ø20', critical: false },
+                { op: 'OP30', name: 'Schruppen Innen', time: 4.8, tool: 'T3 VHM-Fräser Ø16', critical: false },
+                { op: 'OP40', name: 'Schlichten Innen', time: 4.2, tool: 'T4 Schlichtfräser Ø12', critical: false },
+                { op: 'OP50', name: 'Schlichten Ø120 h5', time: 5.1, tool: 'T3 Schlichtfräser Ø16', critical: true, tolerance: 'h5' },
+                { op: 'OP60', name: 'Feinbohren Ø26 H7', time: 4.1, tool: 'T11 Feinbohrkopf', critical: true, tolerance: 'H7' },
+                { op: 'OP70', name: 'Feinbohren Ø44 H7', time: 4.6, tool: 'T12 Feinbohrkopf', critical: false },
+                { op: 'OP80', name: 'Bohren 6×M8', time: 3.6, tool: 'T5 Spiralbohrer Ø6,8', critical: false },
+                { op: 'OP90', name: 'Gewinde 6×M8', time: 3.1, tool: 'T6 Gewindebohrer M8', critical: false },
+                { op: 'OP100', name: 'Entgraten', time: 1.6, tool: 'T7 Entgratfräser', critical: false }
+            ],
+            ncTemplate: `; ========================================
+; GRUNDPLATTE WCAD-15-02-2020
+; Werkstoff: {material}
+; Rohmaße: Ø{rawDia} × {rawH} mm
+; Fertigmaß: Ø{finDia} × {finH} mm
+; Gesamtzeit: {totalTime} min
+; ========================================
+BEGIN PGM GRUNDPLATTE MM
+
+; Werkzeugdefinition
+TOOL DEF 1 L+0 R+31.5    ; Planfräser Ø63
+TOOL DEF 2 L+0 R+10      ; VHM-Fräser Ø20
+TOOL DEF 3 L+0 R+8       ; Schlichtfräser Ø16
+TOOL DEF 11 L+0 R+13     ; Feinbohrkopf Ø26
+
+; OP10: Planfräsen Oberseite
+TOOL CALL 1 Z S800 F300
+L Z+100 R0 FMAX M3
+L X+0 Y-50 FMAX
+L Z+2 FMAX
+L Z+0 F200
+L X+{rawDia} F300
+L Z+100 FMAX
+
+; OP20: Schruppen Außenkontur Ø{finDia}
+TOOL CALL 2 Z S2500 F400
+L Z+100 R0 FMAX
+CYCL DEF 14.0 KONTUR
+CYCL DEF 14.1 KONTURLABEL 1
+L X+0 Y+0 FMAX M99
+L Z+5 FMAX
+CYCL CALL
+L Z+100 FMAX
+
+; OP50: Schlichten Ø{finDia} h5 — KRITISCH!
+; Toleranz: 0 / -0,018 mm (nur 18 µm!)
+; WERKZEUG VOR BEARBEITUNG AUF VERSCHLEISS PRÜFEN!
+TOOL CALL 3 Z S3000 F250
+L Z+100 R0 FMAX
+L X+{finDiaHalf} Y+0 FMAX
+L Z+2 FMAX
+CC X+0 Y+0
+LP PR+{finDiaHalf} PA+0 F250
+CP IPA+360 DR+
+L Z+100 FMAX
+
+; OP60: Feinbohren Ø26 H7 — KRITISCH!
+TOOL CALL 11 Z S1200 F100
+L Z+100 R0 FMAX
+L X+0 Y+0 FMAX
+L Z+5 FMAX
+L Z-35 F100
+L Z+100 FMAX F50
+
+END PGM GRUNDPLATTE MM`
+        },
+
+        lagerbock: {
+            id: 'lagerbock',
+            name: 'Lagerbock WZ-2024-118',
+            description: 'Lageraufnahme für Welle Ø25',
+            material: '42CrMo4',
+            isRound: false,
+            dims: { x: 120, y: 80, z: 55, allowance: 3 },
+            finishDims: { length: 115, width: 75, height: 50 },
+            features: { bore1: 25, threads: 4 },
+            baseTime: 28.5,
+            unitPrice: 85.20,
+            operations: [
+                { op: 'OP10', name: 'Planfräsen', time: 2.1, tool: 'T1 Planfräser Ø63', critical: false },
+                { op: 'OP20', name: 'Schruppen Kontur', time: 6.5, tool: 'T2 VHM-Fräser Ø16', critical: false },
+                { op: 'OP30', name: 'Schlichten Kontur', time: 4.2, tool: 'T3 Schlichtfräser Ø10', critical: false },
+                { op: 'OP40', name: 'Bohren Ø25 H7', time: 3.8, tool: 'T4 Spiralbohrer Ø24', critical: true, tolerance: 'H7' },
+                { op: 'OP50', name: 'Reiben Ø25 H7', time: 2.5, tool: 'T5 Reibahle Ø25 H7', critical: true, tolerance: 'H7' },
+                { op: 'OP60', name: 'Bohren 4×M6', time: 2.8, tool: 'T6 Spiralbohrer Ø5', critical: false },
+                { op: 'OP70', name: 'Gewinde 4×M6', time: 2.4, tool: 'T7 Gewindebohrer M6', critical: false },
+                { op: 'OP80', name: 'Entgraten', time: 1.2, tool: 'T8 Entgratfräser', critical: false }
+            ],
+            ncTemplate: `; ========================================
+; LAGERBOCK WZ-2024-118
+; Werkstoff: {material}
+; Rohmaße: {rawX} × {rawY} × {rawZ} mm
+; Fertigmaße: {finX} × {finY} × {finZ} mm
+; Gesamtzeit: {totalTime} min
+; ========================================
+BEGIN PGM LAGERBOCK MM
+
+TOOL DEF 1 L+0 R+31.5    ; Planfräser Ø63
+TOOL DEF 4 L+0 R+12      ; Spiralbohrer Ø24
+TOOL DEF 5 L+0 R+12.5    ; Reibahle Ø25 H7
+
+; OP10: Planfräsen
+TOOL CALL 1 Z S900 F350
+L Z+100 R0 FMAX M3
+L X-40 Y+0 FMAX
+L Z+0 F200
+L X+{rawX}+40 F350
+L Z+100 FMAX
+
+; OP40: Bohren Ø25 H7
+TOOL CALL 4 Z S1500 F180
+L Z+100 R0 FMAX
+L X+{centerX} Y+{centerY} FMAX
+CYCL DEF 200 BOHREN
+  Q200=2    ; Sicherheitsabstand
+  Q201=-{finZ} ; Bohrtiefe
+  Q206=180  ; Vorschub
+  Q202=10   ; Zustelltiefe
+  Q210=0    ; Verweilzeit
+L Z+5 FMAX M99
+
+; OP50: Reiben Ø25 H7 — KRITISCH!
+TOOL CALL 5 Z S400 F80
+L Z+100 R0 FMAX
+L X+{centerX} Y+{centerY} FMAX
+L Z+2 FMAX
+L Z-{finZ} F80
+L Z+100 FMAX
+
+END PGM LAGERBOCK MM`
+        },
+
+        flansch: {
+            id: 'flansch',
+            name: 'Flansch FL-889',
+            description: 'Anschlussflansch DN50 PN16',
+            material: 'S355',
+            isRound: true,
+            dims: { x: 145, y: 145, z: 22, allowance: 3 },
+            finishDims: { diameter: 140, height: 18 },
+            features: { bore1: 60, threads: 4 },
+            baseTime: 18.2,
+            unitPrice: 48.50,
+            operations: [
+                { op: 'OP10', name: 'Planfräsen beidseitig', time: 3.2, tool: 'T1 Planfräser Ø63', critical: false },
+                { op: 'OP20', name: 'Außenkontur Ø140', time: 4.5, tool: 'T2 VHM-Fräser Ø20', critical: false },
+                { op: 'OP30', name: 'Bohrung Ø60', time: 3.8, tool: 'T3 Bohrfräser Ø25', critical: false },
+                { op: 'OP40', name: 'Lochkreis 4×Ø14', time: 2.4, tool: 'T4 Spiralbohrer Ø14', critical: false },
+                { op: 'OP50', name: 'Dichtfläche planschleifen', time: 2.1, tool: 'T5 Schlichtfräser Ø40', critical: true },
+                { op: 'OP60', name: 'Entgraten', time: 1.2, tool: 'T6 Entgratfräser', critical: false }
+            ],
+            ncTemplate: `; ========================================
+; FLANSCH FL-889
+; Werkstoff: {material}
+; Rohmaße: Ø{rawDia} × {rawH} mm
+; Fertigmaß: Ø{finDia} × {finH} mm
+; Gesamtzeit: {totalTime} min
+; ========================================
+BEGIN PGM FLANSCH MM
+
+TOOL DEF 1 L+0 R+31.5    ; Planfräser Ø63
+TOOL DEF 2 L+0 R+10      ; VHM-Fräser Ø20
+TOOL DEF 4 L+0 R+7       ; Spiralbohrer Ø14
+
+; OP10: Planfräsen
+TOOL CALL 1 Z S1000 F400
+L Z+100 R0 FMAX M3
+L X+0 Y-40 FMAX
+L Z+0 F200
+L X+{rawDia} F400
+L Z+100 FMAX
+
+; OP20: Außenkontur Ø{finDia}
+TOOL CALL 2 Z S3000 F500
+L Z+100 R0 FMAX
+L X+{finDiaHalf} Y+0 FMAX
+L Z+2 FMAX
+CC X+0 Y+0
+CP IPA+360 DR+ F500
+L Z+100 FMAX
+
+; OP40: Lochkreis 4×Ø14
+TOOL CALL 4 Z S2000 F250
+CYCL DEF 220 MUSTER KREIS
+  Q216=50   ; Radius
+  Q217=0    ; Startwinkel
+  Q218=4    ; Anzahl
+CYCL DEF 200 BOHREN
+  Q200=2
+  Q201=-{finH}
+  Q206=250
+  Q202=8
+L X+50 Y+0 Z+5 FMAX M99
+
+END PGM FLANSCH MM`
+        }
+    };
+
+    // Aktuelles Projekt
+    let currentProject = PROJECTS.grundplatte;
+
+    // ================================================================================
+    // HAUPTFUNKTIONEN
+    // ================================================================================
+
+    function loadProject(projectId) {
+        currentProject = PROJECTS[projectId];
+        
+        // UI: Projektkarten aktualisieren
+        document.querySelectorAll('.project-card').forEach(c => c.classList.remove('active'));
+        document.querySelector(`[onclick="loadProject('${projectId}')"]`).classList.add('active');
+
+        // Placeholder verstecken, Loading zeigen
+        document.getElementById('appPlaceholder').style.display = 'none';
+        document.getElementById('appContent').classList.add('hidden');
+        document.getElementById('appLoading').classList.add('active');
+
+        // Loading Steps zurücksetzen
+        for (let i = 1; i <= 5; i++) {
+            const step = document.getElementById('loadStep' + i);
+            step.classList.remove('done', 'active');
+            step.querySelector('.step-icon').textContent = '○';
+        }
+
+        // Animierte Loading Steps
+        const steps = [
+            { id: 'loadStep1', delay: 300 },
+            { id: 'loadStep2', delay: 600 },
+            { id: 'loadStep3', delay: 400 },
+            { id: 'loadStep4', delay: 500 },
+            { id: 'loadStep5', delay: 400 }
+        ];
+
+        let totalDelay = 0;
+        steps.forEach((step, index) => {
+            // Step aktiv setzen
+            setTimeout(() => {
+                document.getElementById(step.id).classList.add('active');
+                document.getElementById(step.id).querySelector('.step-icon').textContent = '◉';
+            }, totalDelay);
+
+            totalDelay += step.delay;
+
+            // Step als done markieren
+            setTimeout(() => {
+                const el = document.getElementById(step.id);
+                el.classList.remove('active');
+                el.classList.add('done');
+                el.querySelector('.step-icon').textContent = '✓';
+            }, totalDelay);
+        });
+
+        // Nach allen Steps: Content zeigen
+        setTimeout(() => {
+            document.getElementById('appLoading').classList.remove('active');
+            document.getElementById('appContent').classList.remove('hidden');
+
+            // Werkstoff setzen
+            document.getElementById('materialSelect').value = currentProject.material;
+
+            // Maße setzen
+            document.getElementById('dimX').value = currentProject.dims.x;
+            document.getElementById('dimY').value = currentProject.dims.y;
+            document.getElementById('dimZ').value = currentProject.dims.z;
+            document.getElementById('dimAllowance').value = currentProject.dims.allowance;
+
+            // Labels anpassen (Rundteil vs. Quader)
+            if (currentProject.isRound) {
+                document.getElementById('labelDimX').textContent = 'Durchmesser';
+                document.getElementById('labelDimY').textContent = '(= Durchmesser)';
+                document.getElementById('dimY').value = currentProject.dims.x;
+                document.getElementById('dimY').disabled = true;
+            } else {
+                document.getElementById('labelDimX').textContent = 'Länge (X)';
+                document.getElementById('labelDimY').textContent = 'Breite (Y)';
+                document.getElementById('dimY').disabled = false;
+            }
+
+            // Alles neu berechnen
+            recalculateAll();
+
+            // Status auf "Vollständig" setzen
+            const statusEl = document.getElementById('status-' + projectId);
+            if (statusEl) {
+                statusEl.textContent = 'Vollständig';
+                statusEl.classList.add('success');
+            }
+        }, totalDelay + 300);
+    }
+
+    function recalculateAll() {
+        const mat = MATERIALS[document.getElementById('materialSelect').value];
+        const x = parseFloat(document.getElementById('dimX').value) || 100;
+        const y = parseFloat(document.getElementById('dimY').value) || 100;
+        const z = parseFloat(document.getElementById('dimZ').value) || 50;
+        const allowance = parseFloat(document.getElementById('dimAllowance').value) || 5;
+
+        // === EINRICHTZEIT-BERECHNUNG ===
+        const clampingType = document.getElementById('clampingSelect')?.value || 'schraubstock';
+        const setupCount = parseInt(document.getElementById('setupCount')?.value) || 1;
+        
+        // Basis-Einrichtzeiten in Minuten
+        const CLAMPING_TIMES = {
+            'schraubstock': 15,      // Standard-Schraubstock
+            'schraubstock2': 25,     // 2× Schraubstock
+            'tischspannung': 35,     // Spannpratzen auf Tisch
+            'nullpunkt': 5,          // Nullpunktspannsystem
+            'spezial': 45            // Sondervorrichtung
+        };
+        
+        // Beschreibungen für Spannmethoden
+        const CLAMPING_DESCRIPTIONS = {
+            'schraubstock': '<strong>Schraubstock:</strong> Teil in Maschinenschraubstock spannen, Parallelität mit Messuhr prüfen. Nullpunkt an Werkstück-Ecke antasten.',
+            'schraubstock2': '<strong>2× Schraubstock:</strong> Langes Teil in zwei Schraubstöcken spannen. Beide Schraubstöcke auf gleiche Höhe ausrichten, Parallelität prüfen.',
+            'tischspannung': '<strong>Tischspannung:</strong> Teil mit Spannpratzen direkt auf Maschinentisch befestigen. Unterlagen verwenden, Nullpunkt manuell antasten.',
+            'nullpunkt': '<strong>Nullpunktspannsystem:</strong> Teil auf Palette vorspannen (hauptzeitparallel). Palette einsetzen, Nullpunkt automatisch referenziert.',
+            'spezial': '<strong>Sondervorrichtung:</strong> Kundenspezifische oder komplexe Spannvorrichtung. Aufbau und Ausrichtung nach Arbeitsanweisung.'
+        };
+        
+        const baseSetupTime = CLAMPING_TIMES[clampingType] || 20;
+        // Jede weitere Aufspannung: +60% der Basis (Werkstück wenden, neu ausrichten)
+        const totalSetupTime = baseSetupTime + (setupCount - 1) * (baseSetupTime * 0.6);
+        const setupCost = (totalSetupTime / 60) * MACHINE_HOUR_RATE;
+        
+        // Spannmethoden-Namen für Anzeige
+        const CLAMPING_NAMES = {
+            'schraubstock': 'Schraubstock',
+            'schraubstock2': '2× Schraubstock',
+            'tischspannung': 'Tischspannung',
+            'nullpunkt': 'Nullpunktspannsystem',
+            'spezial': 'Sondervorrichtung'
+        };
+        
+        // UI aktualisieren - Hauptanzeige
+        const setupTimeDisplay = document.getElementById('setupTimeDisplay');
+        const setupCostDisplay = document.getElementById('setupCostDisplay');
+        const clampingDescription = document.getElementById('clampingDescription');
+        if (setupTimeDisplay) setupTimeDisplay.textContent = Math.round(totalSetupTime) + ' min';
+        if (setupCostDisplay) setupCostDisplay.textContent = '€ ' + setupCost.toFixed(2).replace('.', ',');
+        if (clampingDescription) clampingDescription.innerHTML = CLAMPING_DESCRIPTIONS[clampingType] || '';
+        
+        // UI aktualisieren - Detailrechnung Einrichtkosten
+        const calcClampingMethod = document.getElementById('calcClampingMethod');
+        const calcBaseSetup = document.getElementById('calcBaseSetup');
+        const calcSetupCount = document.getElementById('calcSetupCount');
+        const calcSetupTimeTotal = document.getElementById('calcSetupTimeTotal');
+        const calcSetupCostEl = document.getElementById('calcSetupCost');
+        const calcSetupCostSummary = document.getElementById('calcSetupCostSummary');
+        const calcSetupDetail = document.getElementById('calcSetupDetail');
+        
+        if (calcClampingMethod) calcClampingMethod.textContent = CLAMPING_NAMES[clampingType] || clampingType;
+        if (calcBaseSetup) calcBaseSetup.textContent = baseSetupTime + ' min';
+        if (calcSetupCount) calcSetupCount.textContent = setupCount + '×';
+        if (calcSetupTimeTotal) calcSetupTimeTotal.textContent = Math.round(totalSetupTime) + ' min';
+        if (calcSetupCostEl) calcSetupCostEl.textContent = '€' + setupCost.toFixed(2).replace('.', ',');
+        if (calcSetupCostSummary) calcSetupCostSummary.textContent = '€' + setupCost.toFixed(2).replace('.', ',');
+        if (calcSetupDetail) calcSetupDetail.textContent = Math.round(totalSetupTime) + ' min';
+
+        // Bei Rundteil Y = X setzen
+        if (currentProject.isRound) {
+            document.getElementById('dimY').value = x;
+        }
+
+        // Volumen berechnen (Quader oder Zylinder)
+        let volumeCm3;
+        if (currentProject.isRound) {
+            volumeCm3 = Math.PI * Math.pow(x / 20, 2) * (z / 10);
+        } else {
+            volumeCm3 = (x * y * z) / 1000;
+        }
+
+        // Gewicht
+        const weightKg = (volumeCm3 * mat.density) / 1000;
+
+        // Materialkosten
+        const materialCost = weightKg * mat.price;
+
+        // Größenfaktor für Zeit
+        const refVolume = currentProject.isRound 
+            ? Math.PI * Math.pow(currentProject.dims.x / 20, 2) * (currentProject.dims.z / 10)
+            : (currentProject.dims.x * currentProject.dims.y * currentProject.dims.z) / 1000;
+        const sizeFactor = volumeCm3 / refVolume;
+
+        // Zeitberechnung mit Werkstoff-Faktor
+        const baseMatFactor = MATERIALS[currentProject.material].timeFactor;
+        const newMatFactor = mat.timeFactor;
+        const machiningTime = currentProject.baseTime * Math.pow(sizeFactor, 0.7) * (newMatFactor / baseMatFactor);
+
+        // Kosten
+        const machineCost = (machiningTime / 60) * MACHINE_HOUR_RATE;
+        const toolCost = TOOL_WEAR_BASE * (newMatFactor / baseMatFactor);
+        const totalCost = materialCost + machineCost + toolCost + setupCost;
+
+        // Aktuelles Projekt updaten (für andere Funktionen)
+        currentProject._calculated = {
+            weight: weightKg,
+            materialCost: materialCost,
+            time: machiningTime,
+            machineCost: machineCost,
+            toolCost: toolCost,
+            setupTime: totalSetupTime,
+            setupCost: setupCost,
+            totalCost: totalCost,
+            dims: { x, y, z, allowance }
+        };
+
+        // Konsistente Werte berechnen (Material inkl. Verschnitt)
+        const materialWithScrapLive = materialCost * 1.1;
+        const finalTotalCostLive = materialWithScrapLive + machineCost + toolCost + setupCost;
+
+        // Display updaten - Live-Kalkulation
+        document.getElementById('liveWeight').textContent = weightKg.toFixed(2).replace('.', ',') + ' kg';
+        document.getElementById('liveMaterialCost').textContent = '€ ' + materialWithScrapLive.toFixed(2).replace('.', ',');
+        document.getElementById('liveTime').textContent = machiningTime.toFixed(1).replace('.', ',') + ' min';
+        document.getElementById('liveMachineCost').textContent = '€ ' + machineCost.toFixed(2).replace('.', ',');
+        document.getElementById('liveTotalCost').textContent = '€ ' + finalTotalCostLive.toFixed(2).replace('.', ',');
+
+        // Gesamtkalkulation synchronisieren (gleiche Werte!)
+        const calcMachineCost = document.getElementById('calcMachineCost');
+        const calcMaterialCost = document.getElementById('calcMaterialCost');
+        const calcToolCost = document.getElementById('calcToolCost');
+        const calcTotalCost = document.getElementById('calcTotalCost');
+        const calcSellPrice = document.getElementById('calcSellPrice');
+        const calcMachineDetail = document.getElementById('calcMachineDetail');
+        const calcMaterialDetail = document.getElementById('calcMaterialDetail');
+
+        // Detaillierte Kalkulation aktualisieren
+        const volumeMm3 = currentProject.isRound 
+            ? Math.PI * Math.pow(x / 2, 2) * z 
+            : x * y * z;
+        const hauptzeit = machiningTime * 0.72; // ca. 72% Hauptzeit
+        const nebenzeit = machiningTime * 0.28; // ca. 28% Nebenzeit
+        const materialWithScrap = materialCost * 1.1; // +10% Verschnitt
+        
+        // Gesamtkosten mit konsistenten Werten berechnen (inkl. Einrichtung)
+        const finalTotalCost = materialWithScrap + machineCost + toolCost + setupCost;
+
+        // Gesamtkalkulation synchronisieren (GLEICHE Werte wie oben!)
+        if (calcMachineCost) calcMachineCost.textContent = '€' + machineCost.toFixed(2).replace('.', ',');
+        if (calcMaterialCost) calcMaterialCost.textContent = '€' + materialWithScrap.toFixed(2).replace('.', ',');
+        if (calcToolCost) calcToolCost.textContent = '€' + toolCost.toFixed(2).replace('.', ',');
+        if (calcTotalCost) calcTotalCost.textContent = '€' + finalTotalCost.toFixed(2).replace('.', ',');
+        // Einrichtkosten separat anzeigen
+        const calcSetupCost = document.getElementById('calcSetupCost');
+        if (calcSetupCost) calcSetupCost.textContent = '€' + setupCost.toFixed(2).replace('.', ',');
+        const margin = parseFloat(document.getElementById('marginInput')?.value) || 10;
+        if (calcSellPrice) calcSellPrice.textContent = '€' + (finalTotalCost * (1 + margin / 100)).toFixed(2).replace('.', ',');
+        if (calcMachineDetail) calcMachineDetail.textContent = machiningTime.toFixed(1).replace('.', ',') + ' min × €85/h';
+        if (calcMaterialDetail) calcMaterialDetail.textContent = weightKg.toFixed(2).replace('.', ',') + ' kg × €' + mat.price.toFixed(2).replace('.', ',') + '/kg + 10%';
+
+        // Material-Detail-Felder
+        const calcRawDims = document.getElementById('calcRawDims');
+        const calcVolume = document.getElementById('calcVolume');
+        const calcDensity = document.getElementById('calcDensity');
+        const calcWeight = document.getElementById('calcWeight');
+        const calcMatPrice = document.getElementById('calcMatPrice');
+        const calcMatTotal = document.getElementById('calcMatTotal');
+
+        if (calcRawDims) {
+            calcRawDims.textContent = currentProject.isRound 
+                ? `Ø${x} × ${z} mm` 
+                : `${x} × ${y} × ${z} mm`;
+        }
+        if (calcVolume) calcVolume.textContent = Math.round(volumeMm3).toLocaleString('de-DE') + ' mm³';
+        if (calcDensity) calcDensity.textContent = mat.name + ' / ' + mat.density.toFixed(2).replace('.', ',') + ' g/cm³';
+        if (calcWeight) calcWeight.textContent = weightKg.toFixed(2).replace('.', ',') + ' kg';
+        if (calcMatPrice) calcMatPrice.textContent = '€' + mat.price.toFixed(2).replace('.', ',') + '/kg';
+        if (calcMatTotal) calcMatTotal.textContent = '€' + materialWithScrap.toFixed(2).replace('.', ',');
+
+        // Maschinenzeit-Detail-Felder
+        const calcTh = document.getElementById('calcTh');
+        const calcTn = document.getElementById('calcTn');
+        const calcTimeTotal = document.getElementById('calcTimeTotal');
+        const calcMachineTotal = document.getElementById('calcMachineTotal');
+
+        if (calcTh) calcTh.textContent = hauptzeit.toFixed(1).replace('.', ',') + ' min';
+        if (calcTn) calcTn.textContent = nebenzeit.toFixed(1).replace('.', ',') + ' min';
+        if (calcTimeTotal) calcTimeTotal.textContent = machiningTime.toFixed(1).replace('.', ',') + ' min';
+        if (calcMachineTotal) calcMachineTotal.textContent = '€' + machineCost.toFixed(2).replace('.', ',');
+
+        // Animation
+        document.querySelectorAll('.live-result-value').forEach(el => {
+            el.classList.add('updating');
+            setTimeout(() => el.classList.remove('updating'), 300);
+        });
+
+        // Abhängige Bereiche aktualisieren
+        updateQuote();
+        updateCalculation();
+        updateNCCode();
+    }
+
+    function updateQuote() {
+        const calc = currentProject._calculated || {};
+        const total = calc.totalCost || currentProject.unitPrice;
+        const mat = MATERIALS[document.getElementById('materialSelect').value];
+
+        // Angebot-Tabelle aktualisieren
+        const quoteDesc = document.getElementById('quoteDescription');
+        const quoteUnitPrice = document.getElementById('quoteUnitPrice');
+        const quoteTotalPrice = document.getElementById('quoteTotalPrice');
+        const quoteSubtotal = document.getElementById('quoteSubtotal');
+        const quoteGrandTotal = document.getElementById('quoteGrandTotal');
+
+        if (quoteDesc) {
+            quoteDesc.innerHTML = `<strong>${currentProject.name}</strong><br>
+                <span style="color: var(--gray-500); font-size: 0.8rem;">${currentProject.description}, Werkstoff ${mat.name}</span>`;
+        }
+        const subtotal = total * 10;
+        const mwst = subtotal * 0.19;
+        const grandTotal = subtotal + mwst;
+        
+        if (quoteUnitPrice) quoteUnitPrice.textContent = total.toFixed(2).replace('.', ',');
+        if (quoteTotalPrice) quoteTotalPrice.textContent = subtotal.toFixed(2).replace('.', ',');
+        if (quoteSubtotal) quoteSubtotal.textContent = subtotal.toFixed(2).replace('.', ',') + ' €';
+        
+        const quoteMwst = document.getElementById('quoteMwst');
+        if (quoteMwst) quoteMwst.textContent = mwst.toFixed(2).replace('.', ',') + ' €';
+        if (quoteGrandTotal) quoteGrandTotal.textContent = grandTotal.toFixed(2).replace('.', ',') + ' €';
+    }
+
+    function updateCalculation() {
+        // Zeit-Tabelle mit Operationen des aktuellen Projekts aktualisieren
+        const tbody = document.getElementById('timeTableBody');
+        if (!tbody) return;
+
+        const mat = MATERIALS[document.getElementById('materialSelect').value];
+        const timeFactor = mat.timeFactor / MATERIALS[currentProject.material].timeFactor;
+        let totalTime = 0;
+
+        let html = '';
+        currentProject.operations.forEach((op, i) => {
+            const adjustedTime = (op.time * timeFactor).toFixed(1);
+            totalTime += parseFloat(adjustedTime);
+            const rowClass = op.critical ? 'style="background: #fef3c7;"' : '';
+            html += `<tr ${rowClass}>
+                <td><strong>${op.op}</strong></td>
+                <td>${op.name}${op.critical ? ' <span class="badge badge-warning">KRITISCH</span>' : ''}</td>
+                <td style="text-align:center;">${adjustedTime}</td>
+            </tr>`;
+        });
+        html += `<tr style="background: var(--gray-100); font-weight: 600;">
+            <td colspan="2" style="text-align: right;">Gesamtzeit:</td>
+            <td style="text-align:center;"><strong>${totalTime.toFixed(1)} min</strong></td>
+        </tr>`;
+        tbody.innerHTML = html;
+    }
+
+    function updateNCCode() {
+        const codeBlock = document.getElementById('codeBlock');
+        if (!codeBlock) return;
+
+        const calc = currentProject._calculated || {};
+        const dims = calc.dims || currentProject.dims;
+        const mat = MATERIALS[document.getElementById('materialSelect').value];
+
+        // Template mit Werten füllen
+        let code = currentProject.ncTemplate
+            .replace(/{material}/g, mat.name)
+            .replace(/{rawDia}/g, dims.x)
+            .replace(/{rawX}/g, dims.x)
+            .replace(/{rawY}/g, dims.y)
+            .replace(/{rawH}/g, dims.z)
+            .replace(/{rawZ}/g, dims.z)
+            .replace(/{finDia}/g, currentProject.finishDims.diameter || (dims.x - dims.allowance * 2))
+            .replace(/{finDiaHalf}/g, ((currentProject.finishDims.diameter || (dims.x - dims.allowance * 2)) / 2).toFixed(1))
+            .replace(/{finH}/g, currentProject.finishDims.height || (dims.z - dims.allowance * 2))
+            .replace(/{finX}/g, currentProject.finishDims.length || (dims.x - dims.allowance * 2))
+            .replace(/{finY}/g, currentProject.finishDims.width || (dims.y - dims.allowance * 2))
+            .replace(/{finZ}/g, currentProject.finishDims.height || (dims.z - dims.allowance * 2))
+            .replace(/{centerX}/g, (dims.x / 2).toFixed(1))
+            .replace(/{centerY}/g, (dims.y / 2).toFixed(1))
+            .replace(/{totalTime}/g, (calc.time || currentProject.baseTime).toFixed(1));
+
+        // Syntax Highlighting (einfach)
+        code = code.replace(/^;.*$/gm, '<span class="code-comment">$&</span>');
+        code = code.replace(/KRITISCH|ACHTUNG|PRÜFEN/g, '<span style="color: var(--danger); font-weight: bold;">$&</span>');
+
+        codeBlock.innerHTML = code;
+    }
+
+    // ================================================================================
+    // UI FUNKTIONEN
+    // ================================================================================
+
+    function showTab(tabName) {
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.app-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('panel-' + tabName).classList.add('active');
+        event.target.classList.add('active');
+        
+        // Bei Tab-Wechsel Inhalte aktualisieren
+        if (tabName === 'calculation') updateCalculation();
+        if (tabName === 'code') updateNCCode();
+    }
+
+    function updateMargin() {
+        const margin = parseFloat(document.getElementById('marginInput').value) || 10;
+        const calc = currentProject._calculated || {};
+        // Materialkosten inkl. Verschnitt verwenden
+        const materialWithScrap = (calc.materialCost || 50) * 1.1;
+        const finalTotalCost = materialWithScrap + (calc.machineCost || 59) + (calc.toolCost || 20.74);
+        const sellPrice = finalTotalCost * (1 + margin / 100);
+        document.getElementById('calcSellPrice').textContent = '€' + sellPrice.toFixed(2).replace('.', ',');
+    }
+
+    function copyCode() {
+        const codeText = document.getElementById('codeBlock').innerText;
+        navigator.clipboard.writeText(codeText).then(() => alert('Code kopiert!'));
+    }
+
+    function downloadCode() {
+        const codeText = document.getElementById('codeBlock').innerText;
+        const blob = new Blob([codeText], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = currentProject.name.replace(/\s+/g, '_') + '.H';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function toggleDetail(opId) {
+        const row = document.getElementById('detail-' + opId);
+        const icon = document.getElementById('icon-' + opId);
+        if (row) {
+            row.classList.toggle('visible');
+            icon.textContent = row.classList.contains('visible') ? '−' : '+';
+        }
+    }
+
+    function exportCSV() {
+        showLicenseModal();
+    }
+
+    function showLicenseModal() {
+        document.getElementById('licenseModal').style.display = 'flex';
+    }
+
+    function hideLicenseModal() {
+        document.getElementById('licenseModal').style.display = 'none';
+    }
+
+    function generatePDF() {
+        if (!currentProject) {
+            alert('Bitte wählen Sie zuerst ein Projekt aus.');
+            return;
+        }
+
+        const calc = currentProject._calculated || {};
+        const mat = MATERIALS[document.getElementById('materialSelect').value];
+        const today = new Date().toLocaleDateString('de-DE');
+        const quoteNum = 'ANG-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random() * 9000) + 1000);
+        const validUntil = new Date(Date.now() + 30*24*60*60*1000).toLocaleDateString('de-DE');
+        
+        const totalCost = calc.totalCost || currentProject.unitPrice;
+        const margin = parseFloat(document.getElementById('marginInput')?.value) || 10;
+        const sellPrice = totalCost * (1 + margin/100);
+        
+        const pdfContent = `
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Angebot ${quoteNum}</title>
+    <style>
+        @page { 
+            size: A4; 
+            margin: 15mm 20mm 20mm 20mm;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            font-size: 10pt; 
+            color: #1e293b;
+            line-height: 1.5;
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #1e3a5f;
+            margin-bottom: 25px;
+        }
+        .logo-section { display: flex; align-items: center; gap: 12px; }
+        .logo-box {
+            width: 45px; height: 45px;
+            background: linear-gradient(135deg, #1e3a5f, #2d5a8a);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 700; font-size: 14pt;
+        }
+        .company-name { font-size: 16pt; font-weight: 700; color: #1e3a5f; }
+        .company-name span { color: #1e3a5f; }
+        .company-tagline { font-size: 8pt; color: #64748b; margin-top: 2px; }
+        .doc-info { text-align: right; font-size: 9pt; }
+        .doc-title { font-size: 18pt; font-weight: 700; color: #1e3a5f; margin-bottom: 5px; }
+        .doc-number { color: #64748b; }
+        
+        /* Addresses */
+        .addresses { display: flex; gap: 40px; margin-bottom: 25px; }
+        .address-block { flex: 1; }
+        .address-label { font-size: 8pt; color: #64748b; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 0.5px; }
+        .address-content { font-size: 10pt; }
+        .address-company { font-weight: 600; }
+        
+        /* Project Info */
+        .project-info {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .project-title { font-size: 12pt; font-weight: 600; color: #1e3a5f; margin-bottom: 10px; }
+        .project-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .project-item label { font-size: 8pt; color: #64748b; display: block; margin-bottom: 2px; }
+        .project-item value { font-size: 10pt; font-weight: 500; }
+        
+        /* Table */
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th { 
+            background: #1e3a5f; 
+            color: white; 
+            padding: 10px 12px; 
+            text-align: left; 
+            font-size: 9pt;
+            font-weight: 600;
+        }
+        th:last-child, th:nth-last-child(2) { text-align: right; }
+        td { 
+            padding: 10px 12px; 
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 9pt;
+        }
+        td:last-child, td:nth-last-child(2) { text-align: right; font-family: 'Consolas', monospace; }
+        tr:nth-child(even) { background: #f8fafc; }
+        .item-desc { font-size: 8pt; color: #64748b; margin-top: 3px; }
+        
+        /* Totals */
+        .totals { margin-left: auto; width: 280px; margin-bottom: 25px; }
+        .total-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e2e8f0; }
+        .total-row.grand { 
+            background: #1e3a5f; 
+            color: white; 
+            padding: 12px; 
+            margin: 10px -12px 0;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 12pt;
+        }
+        .total-label { color: #64748b; }
+        .total-value { font-weight: 600; font-family: 'Consolas', monospace; }
+        .total-row.grand .total-label { color: rgba(255,255,255,0.8); }
+        .total-row.grand .total-value { color: white; }
+        
+        /* Terms */
+        .terms { 
+            background: #f8fafc; 
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .terms-title { font-weight: 600; margin-bottom: 8px; color: #1e3a5f; }
+        .terms-content { font-size: 9pt; color: #475569; }
+        .terms-content li { margin-bottom: 4px; }
+        
+        /* Footer */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 15px 20mm;
+            border-top: 1px solid #e2e8f0;
+            font-size: 8pt;
+            color: #64748b;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-note { font-style: italic; }
+        
+        /* Custom Badge */
+        .custom-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #dbeafe, #eff6ff);
+            border: 1px dashed #2563eb;
+            color: #1e40af;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 8pt;
+            margin-top: 15px;
+        }
+        
+        @media print {
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-section">
+            <div class="logo-box">CP</div>
+            <div>
+                <div class="company-name">CNC <span>Planner</span> Pro</div>
+            </div>
+        </div>
+        <div class="doc-info">
+            <div class="doc-title">ANGEBOT</div>
+            <div class="doc-number">${quoteNum}</div>
+            <div style="margin-top: 8px;">
+                <div>Datum: ${today}</div>
+                <div>Gültig bis: ${validUntil}</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="addresses">
+        <div class="address-block">
+            <div class="address-label">Absender</div>
+            <div class="address-content">
+                <div class="address-company">[Ihr Firmenname]</div>
+                <div>[Straße Nr.]</div>
+                <div>[PLZ Ort]</div>
+                <div>Tel: [Ihre Telefonnummer]</div>
+                <div>E-Mail: [ihre@email.de]</div>
+            </div>
+        </div>
+        <div class="address-block">
+            <div class="address-label">Empfänger</div>
+            <div class="address-content">
+                <div class="address-company">[Kundenname]</div>
+                <div>[Kundenstraße]</div>
+                <div>[Kunden-PLZ Ort]</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="project-info">
+        <div class="project-title">Projektdetails: ${currentProject.name}</div>
+        <div class="project-grid">
+            <div class="project-item">
+                <label>Werkstoff</label>
+                <value>${mat.name}</value>
+            </div>
+            <div class="project-item">
+                <label>Rohmaße</label>
+                <value>${calc.dims?.x || currentProject.dims.x} × ${calc.dims?.y || currentProject.dims.y} × ${calc.dims?.z || currentProject.dims.z} mm</value>
+            </div>
+            <div class="project-item">
+                <label>Gewicht</label>
+                <value>${(calc.weight || 0).toFixed(2)} kg</value>
+            </div>
+            <div class="project-item">
+                <label>Bearbeitungszeit</label>
+                <value>${(calc.time || currentProject.baseTime).toFixed(1)} min</value>
+            </div>
+        </div>
+    </div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 60px;">Pos.</th>
+                <th>Beschreibung</th>
+                <th style="width: 80px;">Menge</th>
+                <th style="width: 100px;">EP (€)</th>
+                <th style="width: 100px;">GP (€)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>
+                    <strong>${currentProject.name}</strong>
+                    <div class="item-desc">Werkstoff: ${mat.name} | Toleranzen lt. Zeichnung</div>
+                </td>
+                <td>10</td>
+                <td>${sellPrice.toFixed(2)}</td>
+                <td>${(sellPrice * 10).toFixed(2)}</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>
+                    <strong>Einrichtung / Rüstkosten</strong>
+                    <div class="item-desc">Ersteinrichtung Maschine, Werkzeuge, Nullpunkt</div>
+                </td>
+                <td>1</td>
+                <td>85,00</td>
+                <td>85,00</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <div class="totals">
+        <div class="total-row">
+            <span class="total-label">Zwischensumme:</span>
+            <span class="total-value">${(sellPrice * 10 + 85).toFixed(2)} €</span>
+        </div>
+        <div class="total-row">
+            <span class="total-label">zzgl. MwSt. 19%:</span>
+            <span class="total-value">${((sellPrice * 10 + 85) * 0.19).toFixed(2)} €</span>
+        </div>
+        <div class="total-row grand">
+            <span class="total-label">GESAMTBETRAG:</span>
+            <span class="total-value">${((sellPrice * 10 + 85) * 1.19).toFixed(2)} €</span>
+        </div>
+    </div>
+    
+    <div class="terms">
+        <div class="terms-title">Konditionen</div>
+        <div class="terms-content">
+            <ul style="margin-left: 20px;">
+                <li><strong>Lieferzeit:</strong> ca. 10-15 Werktage nach Auftragsbestätigung</li>
+                <li><strong>Zahlungsbedingungen:</strong> 30 Tage netto, 2% Skonto bei Zahlung innerhalb 10 Tagen</li>
+                <li><strong>Lieferung:</strong> ab Werk, Verpackung inklusive</li>
+                <li><strong>Qualitätsprüfung:</strong> Maßprotokoll auf Anfrage</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="custom-badge">
+        ✎ Dieses Dokument ist kundenspezifisch anpassbar — Firmenlogo, Kontaktdaten und Layout können individuell konfiguriert werden.
+    </div>
+    
+    <div class="footer">
+        <div>Generiert mit CNC Planner Pro | www.cnc-planner.de</div>
+        <div class="footer-note">Seite 1 von 1</div>
+    </div>
+</body>
+</html>`;
+        
+        const pdfWindow = window.open('', '_blank');
+        pdfWindow.document.write(pdfContent);
+        pdfWindow.document.close();
+        
+        // Auto-print nach kurzer Verzögerung
+        setTimeout(() => {
+            pdfWindow.print();
+        }, 500);
+    }
+
+    // ================================================================================
+    // FILE UPLOAD HANDLING
+    // ================================================================================
+
+    function handleFileSelect(input) {
+        const file = input.files[0];
+        if (file) {
+            document.getElementById('fileLabel').textContent = file.name;
+            document.getElementById('dropZone').style.borderColor = 'var(--success)';
+            document.getElementById('dropZone').style.background = '#ecfdf5';
+        }
+    }
+
+    function submitDemoRequest(event) {
+        event.preventDefault();
+        alert('Demo-Modus: In der Vollversion wird Ihre Anfrage verarbeitet und Sie erhalten die Analyse per E-Mail.');
+    }
+
+    // ================================================================================
+    // CODE FORMAT SWITCHING
+    // ================================================================================
+
+    let currentCodeFormat = 'heidenhain';
+
+    const CODE_TEMPLATES = {
+        heidenhain: `; ============================================
+; CNC PLANNER PRO — Automatisch generiert
+; ============================================
+; Werkstück:  {name}
+; Werkstoff:  {material}
+; Maschine:   FEHLMANN VERSA 943
+; Steuerung:  Heidenhain TNC 640
+; Erstellt:   {date}
+; ============================================
+
+BEGIN PGM {progName} MM
+
+; --- WERKZEUGLISTE ---
+; T1  = Planfräser Ø63 (WSP)
+; T2  = VHM-Fräser Ø20
+; T3  = VHM-Schlichtfräser Ø16
+; T11 = Feinbohrkopf
+
+; ============================================
+; OP10: PLANFRÄSEN OBERSEITE
+; ============================================
+TOOL CALL 1 Z S800
+L Z+100 R0 FMAX M3
+; Anfahrt: Außerhalb Werkstück positionieren
+L X-40 Y-40 FMAX
+L Z+5 FMAX
+; Eintauchen auf Arbeitstiefe
+L Z+0 F200
+; Planfräsen in Bahnen
+L X+{dimX}+40 F300
+L Y+0
+L X-40
+L Y+40
+L X+{dimX}+40
+L Y+80
+L X-40
+; Rückzug
+L Z+100 FMAX
+
+; ============================================
+; OP20: SCHRUPPEN AUSSENKONTUR
+; ============================================
+TOOL CALL 2 Z S2500
+L Z+100 R0 FMAX M3
+; Anfahrt: Sicherheitsabstand zum Rohteil
+L X+{dimX}+20 Y+0 FMAX
+L Z+5 FMAX
+; Konturparallel anfahren
+CYCL DEF 14.0 KONTUR
+CYCL DEF 14.1 KONTURLABEL 1
+L X+{dimX}+10 Y+0 FMAX M99
+CYCL CALL
+L Z+100 FMAX
+
+; ============================================
+; OP50: SCHLICHTEN — KRITISCH!
+; Toleranz: {tolerance}
+; ============================================
+TOOL CALL 3 Z S3000
+L Z+100 R0 FMAX M3
+; WERKZEUG VOR BEARBEITUNG PRÜFEN!
+M0
+; Anfahrt: Außerhalb Fertigkontur positionieren
+L X+{finishRadius}+10 Y+0 FMAX
+L Z+2 FMAX
+; Auf Arbeitstiefe absenken
+L Z-{dimZ}+5 F150
+; Tangentiale Anfahrt zur Kontur
+L X+{finishRadius}+2 F100
+; Kreisförmiges Schlichten
+CC X+0 Y+0
+CP IPA+360 DR+ F250
+; Tangentiales Abfahren
+L X+{finishRadius}+10 F100
+; Rückzug
+L Z+100 FMAX
+
+M30
+END PGM {progName} MM`,
+
+        siemens: `; ============================================
+; CNC PLANNER PRO — Automatisch generiert
+; ============================================
+; Werkstück:  {name}
+; Werkstoff:  {material}
+; Steuerung:  Siemens SINUMERIK 840D
+; Erstellt:   {date}
+; ============================================
+
+%_N_{progName}_MPF
+;$PATH=/_N_WKS_DIR/_N_TEILE_WPD
+
+; --- WERKZEUGAUFRUF ---
+N10 G90 G54 G17
+N20 T1 D1 M6              ; Planfräser Ø63
+N30 S800 M3
+
+; OP10: PLANFRÄSEN
+; Anfahrt außerhalb Werkstück
+N40 G0 X-40 Y-40 Z100
+N50 G0 Z5
+N60 G1 Z0 F200
+; Planfräsen in Bahnen
+N70 G1 X{dimX}+40 F300
+N80 Y0
+N90 X-40
+N100 Y40
+N110 X{dimX}+40
+N120 G0 Z100
+
+; OP20: SCHRUPPEN AUSSENKONTUR
+N130 T2 D1 M6             ; VHM-Fräser Ø20
+N140 S2500 M3
+; Anfahrt mit Sicherheitsabstand
+N150 G0 X{dimX}+20 Y0 Z100
+N160 G0 Z5
+N170 CYCLE72("KONTUR",1,0,0,0,2,0.5,0.1,1,41,1,1,0)
+N180 G0 Z100
+
+; OP50: SCHLICHTEN — KRITISCH!
+N190 T3 D1 M6             ; Schlichtfräser Ø16
+N200 S3000 M3
+; ACHTUNG: Toleranz {tolerance}!
+N210 M0                   ; Halt - Werkzeugkontrolle
+; Anfahrt außerhalb Fertigkontur
+N220 G0 X{finishRadius}+10 Y0 Z5
+N230 G1 Z-{dimZ}+5 F150
+; Tangentiale Anfahrt
+N240 G1 X{finishRadius}+2 F100
+; Kreisförmiges Schlichten
+N250 G3 X{finishRadius} Y2 CR=2
+N260 G3 X{finishRadius} Y0 I-{finishRadius} J0 F250
+; Tangentiales Abfahren
+N270 G1 X{finishRadius}+10 F100
+N280 G0 Z100
+
+N290 M30`,
+
+        fanuc: `( ============================================ )
+( CNC PLANNER PRO — Automatisch generiert )
+( ============================================ )
+( Werkstück:  {name} )
+( Werkstoff:  {material} )
+( Steuerung:  Fanuc 0i-MF )
+( Erstellt:   {date} )
+( ============================================ )
+
+O0001 ({progName})
+
+( WERKZEUGWECHSEL T1 - PLANFRÄSER )
+N10 G90 G54 G17 G21
+N20 T1 M6
+N30 S800 M3
+N40 G43 H1 Z100.
+
+( OP10: PLANFRÄSEN )
+( Anfahrt außerhalb Werkstück )
+N50 G0 X-40. Y-40.
+N60 G0 Z5.
+N70 G1 Z0. F200
+( Planfräsen in Bahnen )
+N80 G1 X{dimX}+40. F300
+N90 Y0.
+N100 X-40.
+N110 Y40.
+N120 X{dimX}+40.
+N130 G0 Z100.
+
+( WERKZEUGWECHSEL T2 - SCHRUPPFRÄSER )
+N140 T2 M6
+N150 S2500 M3
+N160 G43 H2 Z100.
+
+( OP20: SCHRUPPEN AUSSENKONTUR )
+( Anfahrt mit Sicherheitsabstand )
+N170 G0 X{dimX}+20. Y0.
+N180 G0 Z5.
+N190 G12 I{finishRadius}. K0. D2 F400
+N200 G0 Z100.
+
+( WERKZEUGWECHSEL T3 - SCHLICHTFRÄSER )
+( ACHTUNG: KRITISCHE OPERATION! )
+( Toleranz: {tolerance} )
+N210 T3 M6
+N220 S3000 M3
+N230 G43 H3 Z100.
+N240 M0                   ( Halt - Werkzeugkontrolle )
+
+( OP50: SCHLICHTEN )
+( Anfahrt außerhalb Fertigkontur )
+N250 G0 X{finishRadius}+10. Y0.
+N260 G0 Z5.
+N270 G1 Z-{dimZ}+5. F150
+( Tangentiale Anfahrt )
+N280 G1 X{finishRadius}+2. F100
+( Kreisförmiges Schlichten )
+N290 G3 X{finishRadius}. Y2. R2.
+N300 G3 X{finishRadius}. Y0. I-{finishRadius}. J0. F250
+( Tangentiales Abfahren )
+N310 G1 X{finishRadius}+10. F100
+N320 G0 Z100.
+
+N330 M30
+%`
+    };
+
+    function setCodeFormat(format) {
+        currentCodeFormat = format;
+        
+        // Update button styles
+        ['heidenhain', 'siemens', 'fanuc'].forEach(f => {
+            const btn = document.getElementById('btn-' + f);
+            if (f === format) {
+                btn.style.background = 'var(--primary)';
+                btn.style.color = 'white';
+            } else {
+                btn.style.background = 'transparent';
+                btn.style.color = 'var(--gray-600)';
+            }
+        });
+
+        updateNCCode();
+    }
+
+    // Override updateNCCode to use format templates
+    function updateNCCode() {
+        const codeBlock = document.getElementById('codeBlock');
+        if (!codeBlock) return;
+
+        const calc = currentProject._calculated || {};
+        const dims = calc.dims || currentProject.dims;
+        const mat = MATERIALS[document.getElementById('materialSelect').value];
+        const today = new Date().toLocaleDateString('de-DE');
+
+        const template = CODE_TEMPLATES[currentCodeFormat];
+        
+        let code = template
+            .replace(/{name}/g, currentProject.name)
+            .replace(/{progName}/g, currentProject.name.split(' ')[0].toUpperCase())
+            .replace(/{material}/g, mat.name)
+            .replace(/{date}/g, today)
+            .replace(/{dimX}/g, dims.x)
+            .replace(/{dimY}/g, dims.y)
+            .replace(/{dimZ}/g, dims.z)
+            .replace(/{finishRadius}/g, ((currentProject.finishDims?.diameter || dims.x - dims.allowance * 2) / 2).toFixed(1))
+            .replace(/{tolerance}/g, currentProject.operations?.find(op => op.critical)?.tolerance || 'Standard');
+
+        // Syntax highlighting
+        code = code.replace(/^;.*$/gm, '<span class="code-comment">$&</span>');
+        code = code.replace(/^\(.*\)$/gm, '<span class="code-comment">$&</span>');
+        code = code.replace(/KRITISCH|ACHTUNG|PRÜFEN/g, '<span style="color: var(--danger); font-weight: bold;">$&</span>');
+        code = code.replace(/\b(BEGIN PGM|END PGM|TOOL CALL|CYCL DEF|CYCL CALL|FMAX|MM)\b/g, '<span class="code-keyword">$&</span>');
+        code = code.replace(/\b(G[0-9]+|M[0-9]+|T[0-9]+|S[0-9]+|F[0-9]+|N[0-9]+)\b/g, '<span class="code-gcode">$&</span>');
+
+        codeBlock.innerHTML = '<pre>' + code + '</pre>';
+    }
+
+    // ================================================================================
+    // ZEICHNUNGS-UPLOAD
+    // ================================================================================
+
+    function handleDrawingUpload(input) {
+        const file = input.files[0];
+        if (!file) return;
+        
+        const preview = document.getElementById('drawingPreview');
+        
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = `
+                    <img src="${e.target.result}" style="max-width: 100%; max-height: 150px; border-radius: 4px;">
+                    <button onclick="clearDrawing(event)" style="position: absolute; top: 4px; right: 4px; background: #fee2e2; color: #dc2626; border: none; border-radius: 4px; padding: 2px 6px; cursor: pointer; font-size: 0.7rem;">×</button>
+                `;
+                preview.style.border = '2px solid var(--success)';
+                preview.style.position = 'relative';
+            };
+            reader.readAsDataURL(file);
+        } else if (file.type === 'application/pdf') {
+            preview.innerHTML = `
+                <div style="text-align: center;">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="1.5">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14,2 14,8 20,8"/>
+                        <path d="M12 18v-6M9 15l3 3 3-3"/>
+                    </svg>
+                    <div style="font-size: 0.8rem; color: var(--gray-600); margin-top: 4px;">${file.name}</div>
+                    <div style="font-size: 0.7rem; color: var(--gray-400);">PDF angehängt</div>
+                </div>
+                <button onclick="clearDrawing(event)" style="position: absolute; top: 4px; right: 4px; background: #fee2e2; color: #dc2626; border: none; border-radius: 4px; padding: 2px 6px; cursor: pointer; font-size: 0.7rem;">×</button>
+            `;
+            preview.style.border = '2px solid var(--success)';
+            preview.style.position = 'relative';
+        }
+    }
+
+    function clearDrawing(event) {
+        event.stopPropagation();
+        const preview = document.getElementById('drawingPreview');
+        preview.innerHTML = `
+            <input type="file" id="drawingInput" accept=".pdf,.png,.jpg,.jpeg" style="display: none;" onchange="handleDrawingUpload(this)">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="1.5">
+                <rect x="3" y="3" width="18" height="18" rx="2"/>
+                <path d="M9 9h6v6H9z"/>
+                <path d="M9 3v6M15 3v6M9 15v6M15 15v6M3 9h6M3 15h6M15 9h6M15 15h6"/>
+            </svg>
+            <span style="font-size: 0.8rem; color: var(--gray-400); margin-top: 8px;">Zeichnung hier ablegen</span>
+            <span style="font-size: 0.7rem; color: var(--gray-400);">oder klicken zum Auswählen</span>
+        `;
+        preview.style.border = '2px dashed var(--gray-300)';
+    }
+
+    // ================================================================================
+    // QUALITÄTSPRÜFUNG - Editierbare Tabelle
+    // ================================================================================
+
+    function addQualityCheck() {
+        const tbody = document.getElementById('qualityCheckBody');
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td><input type="text" value="" placeholder="Prüfmerkmal eingeben..." class="quality-input" style="width: 100%; border: 1px solid var(--gray-300); padding: 4px; border-radius: 4px;"></td>
+            <td><input type="text" value="" placeholder="Soll-Wert" class="quality-input" style="width: 100%; border: 1px solid var(--gray-300); padding: 4px; border-radius: 4px;"></td>
+            <td>
+                <select class="quality-select" style="width: 100%; border: 1px solid var(--gray-300); padding: 4px; border-radius: 4px; background: white;">
+                    <option value="mikrometer">Mikrometer</option>
+                    <option value="messschieber" selected>Messschieber</option>
+                    <option value="innenmessschraube">Innenmessschraube</option>
+                    <option value="messuhr">Messuhr</option>
+                    <option value="3d-messgerät">3D-Messgerät (CMM)</option>
+                    <option value="rauheitsmessgerät">Rauheitsmessgerät</option>
+                    <option value="gewindelehrdorn">Gewindelehrdorn</option>
+                    <option value="endmassatz">Endmaßsatz</option>
+                    <option value="grenzlehrdorn">Grenzlehrdorn</option>
+                    <option value="sichtprüfung">Sichtprüfung</option>
+                </select>
+            </td>
+            <td class="check"><input type="checkbox"></td>
+            <td><button onclick="removeQualityRow(this)" style="border: none; background: #fee2e2; color: #dc2626; padding: 4px 8px; border-radius: 4px; cursor: pointer;">×</button></td>
+        `;
+        tbody.appendChild(newRow);
+        // Focus auf erstes Input
+        newRow.querySelector('input').focus();
+    }
+
+    function removeQualityRow(btn) {
+        const row = btn.closest('tr');
+        if (row) row.remove();
+    }
+
+    // ================================================================================
+    // INITIALISIERUNG
+    // ================================================================================
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Placeholder anzeigen bis ein Projekt gewählt wird
+        
+        // Style für editierbare Inputs
+        const style = document.createElement('style');
+        style.textContent = `
+            .quality-input:hover, .quality-select:hover {
+                border-color: var(--gray-300) !important;
+            }
+            .quality-input:focus, .quality-select:focus {
+                border-color: var(--primary) !important;
+                outline: none;
+                box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+            }
+        `;
+        document.head.appendChild(style);
+    });
+</script>
+
+<!-- Lizenz-Modal -->
+<div id="licenseModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 12px; padding: 32px; width: 100%; max-width: 450px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center;">
+        <div style="width: 64px; height: 64px; background: linear-gradient(135deg, #fef3c7, #fef9e6); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h3 style="color: var(--gray-900); margin-bottom: 12px; font-size: 1.3rem;">Lizenz erforderlich</h3>
+        <p style="color: var(--gray-600); margin-bottom: 24px; line-height: 1.6;">
+            Der CSV-Export ist in der Vollversion verfügbar.<br>
+            Starten Sie jetzt Ihre kostenlose Testphase.
+        </p>
+        <div style="display: flex; gap: 12px; justify-content: center;">
+            <button onclick="hideLicenseModal()" class="btn btn-secondary">Abbrechen</button>
+            <a href="../../products/cnc-planner/landing-page.html#pricing" class="btn btn-primary">Preise ansehen</a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

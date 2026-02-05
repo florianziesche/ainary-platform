@@ -13,6 +13,10 @@
 
 **Die Frage ist nicht "Was können wir vorbereiten?" sondern "Was wurde GESENDET?"**
 
+**Quick Execution Check:** `./scripts/send-enforcer.sh`
+**With shame mode:** `./scripts/send-enforcer.sh --shame`
+**Execution metrics:** `agents/EXECUTION-METRICS.md`
+
 ---
 
 ## 🌅 Morning Check (wenn Florian online kommt)

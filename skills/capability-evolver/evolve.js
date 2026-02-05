@@ -125,8 +125,41 @@ function readRecentLog(filePath, size = 10000) {
     }
 }
 
+function checkExecutionHealth() {
+    // NEW: Track prepared vs. sent ratio (The core execution problem)
+    const TRACKER = path.resolve(__dirname, '../../agents/EXECUTION-TRACKER.md');
+    try {
+        if (!fs.existsSync(TRACKER)) return { ratio: null, redDays: 0, greenDays: 0 };
+        const content = fs.readFileSync(TRACKER, 'utf8');
+        const redCount = (content.match(/🔴/g) || []).length;
+        const greenCount = (content.match(/🟢/g) || []).length;
+        const zeroSendDays = (content.match(/\| 0 \|/g) || []).length;
+        const total = redCount + greenCount;
+        const ratio = total > 0 ? ((greenCount / total) * 100).toFixed(0) : 0;
+        return { 
+            ratio: `${ratio}%`, 
+            redDays: redCount, 
+            greenDays: greenCount,
+            zeroSendDays,
+            opportunityCost: zeroSendDays * 421 // €/day from MEMORY.md
+        };
+    } catch (e) {
+        return { ratio: null, error: e.message };
+    }
+}
+
 function checkSystemHealth() {
     let report = [];
+    
+    // NEW: Execution Health (most important metric!)
+    const execHealth = checkExecutionHealth();
+    if (execHealth.ratio !== null) {
+        report.push(`📤 Execution: ${execHealth.ratio}`);
+        if (execHealth.zeroSendDays > 0) {
+            report.push(`⚠️ ${execHealth.zeroSendDays} zero-send days (€${execHealth.opportunityCost} lost)`);
+        }
+    }
+    
     try {
         // Uptime & Node Version
         const uptime = (os.uptime() / 3600).toFixed(1);
