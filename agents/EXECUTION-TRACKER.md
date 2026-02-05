@@ -10,9 +10,9 @@
 | Tag | Gesendet | An wen | Status |
 |-----|----------|--------|--------|
 | Mo 3. | 0 | - | 🔴 |
-| Di 4. | - | - | ☐ |
-| Mi 5. | - | - | ☐ |
-| Do 6. | - | - | ☐ |
+| Di 4. | 0 | - | 🔴 |
+| Mi 5. | 0 | - | 🔴 |
+| Do 5. | - | - | ☐ |
 | Fr 7. | - | - | ☐ |
 | **Gesamt** | **0/25** | | 🔴 |
 
@@ -43,7 +43,7 @@
 |-------|---------|----------|
 | Mo 3. 12:00 | Onkel (Telefon) | ✅ Einladung zur Demo |
 | Mo 3. 18:00 | Monique Barbanson | ✅ Durchgeführt |
-| Di 4. 10:30 | Onkel + AV | ☐ Anstehend |
+| Mi 5. 10:30 | Onkel + AV (CNC Demo) | ☐ JETZT |
 
 ### Admin/Finanzen
 | Task | Status | Deadline |
@@ -63,4 +63,4 @@
 
 ---
 
-*Letzte Aktualisierung: 2026-02-04 02:55*
+*Letzte Aktualisierung: 2026-02-05 10:27*

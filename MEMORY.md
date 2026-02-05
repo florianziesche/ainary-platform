@@ -151,6 +151,8 @@ Legal AI Platform with <0.2% hallucination rate using:
 - **Entelechy = Angel/Solo-GP** — Nicht Fund I-III. Wichtig für VC-Kontexte (LP-Strategie, Fund Economics). (Added 2026-02-04)
 - **Amplify > Replace** — Florians eigene Texte (z.B. "Where I Fit", Investment Thesis) sind BESSER als meine Drafts. Meine Rolle: strukturieren, prompten, Grammar fixen, Rahmen geben — NICHT komplett neu schreiben. (Added 2026-02-05)
 - **Thesis confirmed, not changed** — VC Lab Exercise bestätigte Ainary Thesis. Florians Formulierung: "$5M seed fund backing European founders building AI-first and deep-tech in the U.S." (Added 2026-02-05)
+- **WhatsApp target requires E.164** — "Florian" fails, muss echte Nummer sein (E.164 format: +49...) oder group JID. Nicht Namen verwenden. (Added 2026-02-05)
+- **track-send.sh erstellt** — `./scripts/track-send.sh <type> <recipient> [notes]` loggt External Sends automatisch in Daily Log. (Added 2026-02-05)
 
 ## 🔴 CORE LEARNING: Die Qualitäts-Lücke (2026-02-03 04:00)
 
