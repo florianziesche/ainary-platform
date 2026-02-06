@@ -1,5 +1,43 @@
 # Evolution Log
 
+## Cycle #0024 — 2026-02-06 13:22 CET
+
+**Status**: ✅ SUCCESS
+**Mode**: Optimize + Repair
+
+**Analysis (from session transcript):**
+- EXECUTION-TRACKER.md was stale: wrong dates (Do 5. → Do 6.), ALG1 still "NICHT GESTARTET" (done since Feb 5), Andreas email at 11:39 not logged
+- Two overlapping send-tracking scripts (`track-send.sh` + `log-send.sh`) creating confusion
+- No single-command "what should I send next?" tool
+
+**Changes:**
+
+1. **`scripts/send.sh`** (NEW, 3.9KB) — Unified send tracker
+   - Replaces both `track-send.sh` and `log-send.sh` 
+   - Single command: `./scripts/send.sh cnc "Company" "notes"`
+   - Auto-updates daily memory file AND references execution tracker
+   - Supports all types: cnc, consulting, vc, content, admin, email
+
+2. **`scripts/next-send.sh`** (NEW, 3.2KB) — Zero-friction next action
+   - Shows exactly ONE item to send (eliminates choice paralysis)
+   - Includes copy-paste commands for sending + logging
+   - Shows today's send count for accountability
+   - Filterable by type: `./scripts/next-send.sh cnc`
+
+3. **`agents/EXECUTION-TRACKER.md`** (REPAIRED)
+   - Fixed: Do 5. → Do 6. (correct date)
+   - Added: Andreas email sent 11:39 (1 CNC send logged)
+   - Updated: ALG1 from "🔴 NICHT GESTARTET" → "✅ Registriert 05.02. 23:10"
+   - Added: Demo verschoben Mo/Di row
+   - Updated: Gesamt 0/25 → 1/25
+
+**Impact:**
+- Tracker now reflects reality (was 3 days behind)
+- Single `send.sh` command reduces friction from "which script?" to "just run it"
+- `next-send.sh` eliminates decision fatigue — show one thing, do it
+
+---
+
 ## Cycle #0023 — 2026-02-06 09:19 CET
 
 **Status**: ✅ SUCCESS

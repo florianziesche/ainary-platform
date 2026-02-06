@@ -12,9 +12,9 @@
 | Mo 3. | 0 | - | 🔴 |
 | Di 4. | 0 | - | 🔴 |
 | Mi 5. | 0 | - | 🔴 |
-| Do 5. | - | - | ☐ |
+| Do 6. | 1 | Andreas (MBS) — Demo-Ergebnisse + 3 PDFs | 🟡 |
 | Fr 7. | - | - | ☐ |
-| **Gesamt** | **0/25** | | 🔴 |
+| **Gesamt** | **1/25** | | 🔴 |
 
 ### AI Consulting Outreach (Ziel: 2/Tag Mo-Fr)
 | Tag | Gesendet | An wen | Status |
@@ -44,14 +44,15 @@
 |-------|---------|----------|
 | Mo 3. 12:00 | Onkel (Telefon) | ✅ Einladung zur Demo |
 | Mo 3. 18:00 | Monique Barbanson | ✅ Durchgeführt |
-| Mi 5. 10:30 | Onkel + AV (CNC Demo) | ☐ JETZT |
+| Mi 5. 10:30 | Onkel + AV (CNC Demo) | ⏸️ Verschoben → Mo/Di nächste Woche |
+| Do 6. 11:39 | Email an Andreas (MBS) | ✅ 3 PDFs gesendet, Demo Mo/Di |
 
 ### Admin/Finanzen
 | Task | Status | Deadline |
 |------|--------|----------|
-| ALG1 beantragen | 🔴 NICHT GESTARTET | Diese Woche |
+| ALG1 beantragen | ✅ Registriert 05.02. 23:10 | Erledigt |
 | Formspree einrichten | 🔴 NICHT GESTARTET | Diese Woche |
-| Cloudflare Deploy | 🔴 NICHT GESTARTET | Morgen |
+| Cloudflare Deploy | 🔴 NICHT GESTARTET | Diese Woche |
 
 ---
 

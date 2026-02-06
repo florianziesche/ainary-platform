@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Florian Ziesche — Sales & Demo Dashboard</title>
+<style>
+:root {
+  --bg: #0A0F1E;
+  --card: #131A23;
+  --card-hover: #1A2332;
+  --border: #1E293B;
+  --border-active: #2563EB;
+  --text: #F1F5F9;
+  --text-muted: #94A3B8;
+  --text-dim: #64748B;
+  --blue: #2563EB;
+  --blue-light: #60A5FA;
+  --green: #4ADE80;
+  --amber: #FBBF24;
+  --red: #F87171;
+  --purple: #A78BFA;
+  --orange: #FB923C;
+  --font: -apple-system, 'Helvetica Neue', Arial, sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* ---- Header ---- */
+.header {
+  padding: 36px 48px 24px;
+  border-bottom: 1px solid var(--border);
+}
+.header-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.3px; }
+.header .subtitle { color: var(--text-dim); font-size: 13px; margin-top: 4px; }
+.header .meta { text-align: right; }
+.meta-line { font-size: 11px; color: var(--text-dim); }
+.meta-line strong { color: var(--text-muted); }
+
+/* ---- Stats Bar ---- */
+.stats-bar { display: flex; border-bottom: 1px solid var(--border); }
+.stat { flex: 1; padding: 20px 24px; border-right: 1px solid var(--border); text-align: center; }
+.stat:last-child { border-right: none; }
+.stat-num { font-size: 32px; font-weight: 800; color: var(--blue-light); line-height: 1; }
+.stat-label { font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 6px; }
+
+/* ---- Tabs ---- */
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  padding: 0 48px;
+  background: rgba(19, 26, 35, 0.5);
+}
+.tab {
+  padding: 14px 24px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dim);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  user-select: none;
+}
+.tab:hover { color: var(--text-muted); }
+.tab.active { color: var(--blue-light); border-bottom-color: var(--blue); }
+.tab .tab-count {
+  font-size: 10px;
+  background: var(--border);
+  color: var(--text-dim);
+  padding: 1px 7px;
+  border-radius: 8px;
+  margin-left: 6px;
+}
+.tab.active .tab-count { background: rgba(37,99,235,0.25); color: var(--blue-light); }
+
+/* ---- Content ---- */
+.content { padding: 32px 48px 60px; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ---- Section ---- */
+.section { margin-bottom: 36px; }
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.section-title { font-size: 16px; font-weight: 700; }
+.section-desc { font-size: 12px; color: var(--text-dim); }
+
+/* ---- Grid ---- */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.grid-wide { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+
+/* ---- Card ---- */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 22px;
+  transition: all 0.2s;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+}
+.card:hover {
+  border-color: var(--border-active);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(37,99,235,0.12);
+  background: var(--card-hover);
+}
+
+.card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+
+/* CSS-only icons */
+.card-icon {
+  width: 42px; height: 42px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+}
+.icon-app { background: rgba(37,99,235,0.12); }
+.icon-app::after { content: ''; width: 18px; height: 18px; border: 2.5px solid var(--blue-light); border-radius: 4px; display: block; }
+.icon-demo { background: rgba(21,128,61,0.12); }
+.icon-demo::after { content: ''; width: 0; height: 0; border-left: 14px solid var(--green); border-top: 9px solid transparent; border-bottom: 9px solid transparent; margin-left: 3px; display: block; }
+.icon-pdf { background: rgba(185,28,28,0.12); }
+.icon-pdf::after { content: 'PDF'; font-size: 10px; font-weight: 800; color: var(--red); letter-spacing: 0.5px; }
+.icon-pptx { background: rgba(234,88,12,0.12); }
+.icon-pptx::after { content: 'PPT'; font-size: 10px; font-weight: 800; color: var(--orange); letter-spacing: 0.5px; }
+.icon-sprint { background: rgba(124,58,237,0.12); }
+.icon-sprint::after { content: ''; width: 16px; height: 16px; border: 3px solid var(--purple); border-top-color: transparent; border-radius: 50%; display: block; }
+
+.card-badge {
+  font-size: 9px; font-weight: 700;
+  padding: 3px 10px; border-radius: 8px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.badge-live { background: rgba(74,222,128,0.15); color: var(--green); }
+.badge-pdf { background: rgba(248,113,113,0.15); color: var(--red); }
+.badge-pptx { background: rgba(251,146,39,0.15); color: var(--orange); }
+.badge-new { background: rgba(96,165,250,0.15); color: var(--blue-light); }
+
+.card h3 { font-size: 15px; font-weight: 600; line-height: 1.3; }
+.card p { font-size: 11.5px; color: var(--text-muted); line-height: 1.5; flex-grow: 1; }
+
+.card-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-top: 10px; border-top: 1px solid var(--border);
+  margin-top: auto;
+}
+.card-detail { font-size: 10px; color: var(--text-dim); }
+.card-highlight { font-size: 20px; font-weight: 800; color: var(--blue-light); }
+.card-highlight-sm { font-size: 14px; font-weight: 700; color: var(--blue-light); }
+.card-highlight-label { font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* Star */
+.star-card { border-color: var(--blue); box-shadow: 0 0 0 1px rgba(37,99,235,0.3); }
+
+/* Footer */
+.dash-footer {
+  text-align: center;
+  padding: 24px 48px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.dash-footer a { color: var(--blue-light); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div>
+      <h1>Sales & Demo Dashboard</h1>
+      <div class="subtitle">Alle Assets. Alles verlinkt. Alles live.</div>
+    </div>
+    <div class="meta">
+      <div class="meta-line"><strong>Florian Ziesche</strong></div>
+      <div class="meta-line">florian@ziesche.co · +1 347 740 1465</div>
+      <div class="meta-line" style="margin-top:4px;">Sprint: 12h · 6. Feb 2026</div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat">
+    <div class="stat-num">27</div>
+    <div class="stat-label">Assets Total</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">6</div>
+    <div class="stat-label">Live Demos</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">10</div>
+    <div class="stat-label">PDF Reports</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">2</div>
+    <div class="stat-label">Slide Decks</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">85+</div>
+    <div class="stat-label">Seiten</div>
+  </div>
+  <div class="stat">
+    <div class="stat-num">12h</div>
+    <div class="stat-label">Buildzeit</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="showTab('all')">Alle<span class="tab-count">27</span></div>
+  <div class="tab" onclick="showTab('demos')">Live Demos<span class="tab-count">7</span></div>
+  <div class="tab" onclick="showTab('reports')">Reports<span class="tab-count">10</span></div>
+  <div class="tab" onclick="showTab('decks')">Präsentationen<span class="tab-count">2</span></div>
+  <div class="tab" onclick="showTab('sprint')">Sprint-KPIs<span class="tab-count">1</span></div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- ============ ALL ============ -->
+  <div class="tab-panel active" id="panel-all">
+
+    <!-- HERO: CNC Planer Pro -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Hauptprodukt</div>
+      </div>
+      <div class="grid">
+        <a class="card star-card" href="cnc-planner/cnc-v18-demo.html" style="grid-column: span 2;">
+          <div class="card-top">
+            <div class="card-icon icon-app"></div>
+            <span class="card-badge badge-live">LIVE DEMO</span>
+          </div>
+          <h3>CNC Planer Pro v18</h3>
+          <p>Vollständige Kalkulationssoftware. Zuschlagskalkulation nach REFA, 10 Tabs, 3 Demo-Bauteile, Fertigungsanweisung, Nachkalkulation, Angebotserstellung. 6.117 Zeilen, 1 Woche Entwicklung.</p>
+          <div class="card-footer">
+            <div><div class="card-highlight">6.117</div><div class="card-highlight-label">Lines of Code</div></div>
+            <div style="text-align:right;"><div class="card-highlight-sm">Ø +9,8%</div><div class="card-highlight-label">vs. MBS ERP</div></div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- KI DEMOS -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">KI Use-Case Demos</div>
+        <div class="section-desc">Interaktiv · Echte Daten · ROI-Berechnung</div>
+      </div>
+      <div class="grid">
+        <a class="card" href="ki-mittelstand/demos/email-triage.html">
+          <div class="card-top"><div class="card-icon icon-demo"></div><span class="card-badge badge-live">LIVE</span></div>
+          <h3>E-Mail-Triage</h3>
+          <p>47 E-Mails automatisch priorisiert, kategorisiert und mit Antwort-Entwürfen. 3 rotierbare Mail-Sets.</p>
+          <div class="card-footer">
+            <div><div class="card-highlight">2h15→12min</div><div class="card-highlight-label">pro Tag</div></div>
+            <div class="card-detail">EUR 1.845/Mo</div>
+          </div>
+        </a>
+
+        <a class="card" href="ki-mittelstand/demos/research-briefing.html">
+          <div class="card-top"><div class="card-icon icon-demo"></div><span class="card-badge badge-live">LIVE</span></div>
+          <h3>Branchen-Briefing</h3>
+          <p>Materialpreise, Wettbewerber, Normen, Ausschreibungen — jeden Morgen. Live-Aktualisierung mit Sparklines.</p>
+          <div class="card-footer">
+            <div><div class="card-highlight">90→5,5min</div><div class="card-highlight-label">pro Tag</div></div>
+            <div class="card-detail">EUR 1.540/Mo</div>
+          </div>
+        </a>
+
+        <a class="card" href="ki-mittelstand/demos/wissenstransfer.html">
+          <div class="card-top"><div class="card-icon icon-demo"></div><span class="card-badge badge-live">LIVE</span></div>
+          <h3>Meisterwissen Digital</h3>
+          <p>30 Jahre Zerspanungserfahrung als Chat-Interface. 3 CNC-Szenarien, Typing-Animation, Autocomplete.</p>
+          <div class="card-footer">
+            <div><div class="card-highlight">12→3 Mo</div><div class="card-highlight-label">Einarbeitung</div></div>
+            <div class="card-detail">EUR 40.000+/a</div>
+          </div>
+        </a>
+
+        <a class="card" href="ki-mittelstand/demos/qualitaetsprotokoll.html">
+          <div class="card-top"><div class="card-icon icon-demo"></div><span class="card-badge badge-live">LIVE</span></div>
+          <h3>Qualitätsprotokoll</h3>
+          <p>Messwerte eingeben → Prüfprotokoll mit Soll-Ist, Toleranzprüfung, KI-Analyse und Handlungsempfehlung.</p>
+          <div class="card-footer">
+            <div><div class="card-highlight">45→15min</div><div class="card-highlight-label">pro Protokoll</div></div>
+            <div class="card-detail">EUR 608/Mo</div>
+          </div>
+        </a>
+
+        <a class="card" href="ki-mittelstand/demos/meeting-protokoll.html">
+          <div class="card-top"><div class="card-icon icon-demo"></div><span class="card-badge badge-live">LIVE</span></div>
+          <h3>Meeting-Protokoll</h3>
+          <p>Aufnahme → Transkription → Beschlüsse → To-Dos. Audio-Waveform, 4-Step Processing, abhakbare Items.</p>
+          <div class="card-footer">
+            <div><div class="card-highlight">45→5,5min</div><div class="card-highlight-label">pro Meeting</div></div>
+            <div class="card-detail">EUR 535/Mo</div>
+          </div>
+        </a>
+
+        <a class="card" href="ki-mittelstand/demos/INDEX.html">
+          <div class="card-top"><div class="card-icon icon-demo"></div><span class="card-badge badge-new">INDEX</span></div>
+          <h3>Demo-Übersicht (Index)</h3>
+          <p>Übersichtsseite aller 6 KI-Demos. Für Kundenpräsentationen — jede Demo direkt anklickbar.</p>
+          <div class="card-footer">
+            <div class="card-detail">6 Demos · EUR ~4.500/Mo Gesamtpotenzial</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Reports & Analysen</div>
+        <div class="section-desc">LaTeX · Helvetica Neue · 0 Warnings</div>
+      </div>
+      <div class="grid grid-wide">
+
+        <a class="card" href="cnc-planner/research/cnc-planer-ausgabe-3bauteile.pdf">
+          <div class="card-top"><div class="card-icon icon-pdf"></div><span class="card-badge badge-pdf">PDF</span></div>
+          <h3>Kalkulationsausgabe 3 Bauteile</h3>
+          <p>Vollständige Zuschlagskalkulation mit Zeichnungen, Kommentaren, 6 Mitigationen, Prognose und Ausblick.</p>
+          <div class="card-footer"><div class="card-detail">14 Seiten · mit MBS-Vergleich</div><div class="card-badge badge-new">NEU</div></div>
+        </a>
+
+        <a class="card" href="cnc-planner/research/vergleich-report-v2.pdf">
+          <div class="card-top"><div class="card-icon icon-pdf"></div><span class="card-badge badge-pdf">PDF</span></div>
+          <h3>Kalkulations-Vergleich v2</h3>
+          <p>3 Bauteile mit Zeichnungen + alle 6 MBS-Positionen. Ø +5,9% (Demo) / Ø +9,8% (gesamt).</p>
+          <div class="card-footer"><div class="card-detail">14 Seiten · mit Zeichnungen</div></div>
+        </a>
+
+        <a class="card" href="cnc-planner/research/strategie-report-v2.pdf">
+          <div class="card-top"><div class="card-icon icon-pdf"></div><span class="card-badge badge-pdf">PDF</span></div>
+          <h3>Strategische Einschätzung v2</h3>
+          <p>USP, Positionierung, Go-to-Market. Belegt mit echten Kalkulationsdaten.</p>
+          <div class="card-footer"><div class="card-detail">10 Seiten</div></div>
+        </a>
+
+        <a class="card" href="cnc-planner/research/hk-vergleich-6pos.pdf">
+          <div class="card-top"><div class="card-icon icon-pdf"></div><span class="card-badge badge-pdf">PDF</span></div>
+          <h3>HK-Vergleich alle 6 Positionen</h3>
+          <p>Herstellkosten-Vergleich MBS vs CNC Planer Pro. Alle Zeichnungen eingebettet.</p>
+          <div class="card-footer"><div class="card-detail">11 Seiten · mit Zeichnungen</div></div>
+        </a>
+
+        <a class="card" href="cnc-planner/research/mbs-vs-cncplaner-report.pdf">
+          <div class="card-top"><div class="card-icon icon-pdf"></div><span class="card-badge badge-pdf">PDF</span></div>
+          <h3>MBS vs CNC Planer Pro</h3>
+          <p>Direktvergleich beider Systeme. Abweichungsursachen, Zuschlagsanalyse.</p>
+          <div class="card-footer"><div class="card-detail">10 Seiten</div></div>
+        </a>
+
+        <a class="card" href="cnc-planner/research/strategie-report-usp.pdf">
+          <div class="card-top"><div class="card-icon icon-pdf"></div><span class="card-badge badge-pdf">PDF</span></div>
+          <h3>Strategie-Report USP v1</h3>
+          <p>Wettbewerbsanalyse (goCAD, Spanflug, up2parts), Positionierung, Zielgruppe.</p>
+          <div class="card-footer"><div class="card-detail">11 Seiten</div></div>
+        </a>
+
+        <a class="card" href="cnc-planner/research/kalkulations-vergleich-6pos.pdf">
+          <div class="card-top"><div class="card-icon icon-pdf"></div><span class="card-badge badge-pdf">PDF</span></div>
+          <h3>Vergleich 6 Positionen</h3>
+          <p>Alle 6 MBS-Angebotspositionen einzeln kalkuliert und verglichen.</p>
+          <div class="card-footer"><div class="card-detail">8 Seiten</div></div>
+        </a>
+
+        <a class="card" href="cnc-planner/research/kalkulations-vergleich-3pos.pdf">
+          <div class="card-top"><div class="card-icon icon-pdf"></div><span class="card-badge badge-pdf">PDF</span></div>
+          <h3>Vergleich 3 Demo-Bauteile</h3>
+          <p>Fokus auf die 3 Haupt-Demo-Bauteile mit detaillierter Aufschlüsselung.</p>
+          <div class="card-footer"><div class="card-detail">7 Seiten</div></div>
+        </a>
+
+        <a class="card" href="cnc-planner/research/CNC-MARKET-RESEARCH-2026.pdf">
+          <div class="card-top"><div class="card-icon icon-pdf"></div><span class="card-badge badge-pdf">PDF</span></div>
+          <h3>CNC-Marktforschung 2026</h3>
+          <p>Wettbewerber, Marktgrößen, Trends. Basis für Positionierung.</p>
+          <div class="card-footer"><div class="card-detail">Marktanalyse</div></div>
+        </a>
+
+        <a class="card" href="ki-mittelstand/praesentation.pdf">
+          <div class="card-top"><div class="card-icon icon-pdf"></div><span class="card-badge badge-pdf">PDF</span></div>
+          <h3>KI-Mittelstand Report</h3>
+          <p>Proposal/Nachlese für KI-Beratungsgespräche. Anwendungsfälle, ROI, Förderung.</p>
+          <div class="card-footer"><div class="card-detail">8 Seiten</div></div>
+        </a>
+      </div>
+    </div>
+
+    <!-- PRÄSENTATIONEN -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Präsentationen</div>
+        <div class="section-desc">PowerPoint · 16:9</div>
+      </div>
+      <div class="grid">
+        <a class="card" href="ki-mittelstand/KI-Umsetzung-Mittelstand-Sales-Deck.pptx">
+          <div class="card-top"><div class="card-icon icon-pptx"></div><span class="card-badge badge-pptx">PPTX</span></div>
+          <h3>KI Sales Deck</h3>
+          <p>9 Slides für Erstgespräche. Problem → Lösung → ROI → Förderung → Nächste Schritte.</p>
+          <div class="card-footer"><div class="card-detail">9 Slides · 16:9</div></div>
+        </a>
+
+        <a class="card" href="ki-mittelstand/KI-Schulung-Mittelstand-Komplett.pptx">
+          <div class="card-top"><div class="card-icon icon-pptx"></div><span class="card-badge badge-pptx">PPTX</span></div>
+          <h3>KI-Schulungsdeck</h3>
+          <p>40 Slides, 5 Module. Vom Überblick bis zur Umsetzung. Für Workshops und Schulungen.</p>
+          <div class="card-footer"><div class="card-detail">40 Slides · 5 Module</div></div>
+        </a>
+      </div>
+    </div>
+
+    <!-- SPRINT -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Sprint-Report</div>
+      </div>
+      <div class="grid">
+        <a class="card" href="cnc-planner/research/12h-zusammenfassung.pdf">
+          <div class="card-top"><div class="card-icon icon-sprint"></div><span class="card-badge badge-new">NEU</span></div>
+          <h3>12h Sprint KPIs</h3>
+          <p>70 Commits, 24 Deliverables, Faktor 15-20× vs. konventionell. Für Kunden-Demos.</p>
+          <div class="card-footer">
+            <div><div class="card-highlight">15-20×</div><div class="card-highlight-label">Produktivitätsfaktor</div></div>
+            <div class="card-detail">6 Seiten</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============ DEMOS TAB ============ -->
+  <div class="tab-panel" id="panel-demos"></div>
+
+  <!-- ============ REPORTS TAB ============ -->
+  <div class="tab-panel" id="panel-reports"></div>
+
+  <!-- ============ DECKS TAB ============ -->
+  <div class="tab-panel" id="panel-decks"></div>
+
+  <!-- ============ SPRINT TAB ============ -->
+  <div class="tab-panel" id="panel-sprint"></div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="dash-footer">
+  Florian Ziesche · KI-Umsetzung im Mittelstand · <a href="mailto:florian@ziesche.co">florian@ziesche.co</a> · +1 347 740 1465<br>
+  <span style="font-size:10px; color:#475569;">CNC Planer Pro v0.18.0-beta · 27 Assets · Stand 6. Februar 2026</span>
+</div>
+
+<script>
+function showTab(name) {
+  // Update tab styles
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.closest('.tab').classList.add('active');
+
+  // If "all" — show main panel
+  if (name === 'all') {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-all').classList.add('active');
+    return;
+  }
+
+  // Clone relevant sections into the specific tab panel
+  const panel = document.getElementById('panel-' + name);
+  const allPanel = document.getElementById('panel-all');
+  const sections = allPanel.querySelectorAll('.section');
+
+  const mapping = {
+    demos: ['Hauptprodukt', 'KI Use-Case Demos'],
+    reports: ['Reports & Analysen'],
+    decks: ['Präsentationen'],
+    sprint: ['Sprint-Report']
+  };
+
+  let html = '';
+  sections.forEach(s => {
+    const title = s.querySelector('.section-title')?.textContent;
+    if (mapping[name]?.includes(title)) {
+      html += s.outerHTML;
+    }
+  });
+  panel.innerHTML = html;
+
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  panel.classList.add('active');
+}
+</script>
+
+</body>
+</html>
