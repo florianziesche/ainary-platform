@@ -951,7 +951,8 @@
  font-size: 13px;
  }
  
- .scope-content.open {
+ .scope-content.open,
+ .scope-content.expanded {
  display: block;
  }
  
@@ -1112,7 +1113,7 @@
 <span>Teil</span>
 </button>
 <button class="nav-item" data-section="params" onclick="showSection('params', this)">
-<span>Parameter</span>
+<span>Preise &amp; Sätze</span>
 </button>
 </div>
  
@@ -1238,7 +1239,7 @@
 <div class="card-body">
 <div class="form-group">
 <label class="form-label">Werkstoff</label>
-<select class="select" id="materialSelect" onchange="calculate()">
+<select class="select" id="materialSelect">
 <optgroup label="Edelstahl">
 <option value="1.4301">1.4301 (V2A)</option>
 <option value="1.4404">1.4404 (V4A)</option>
@@ -1275,21 +1276,21 @@
 <div class="dimension-group">
 <div class="form-group">
 <div class="input-with-unit">
-<input type="number" class="input input-mono" id="dimX" value="440" oninput="calculate()">
+<input type="number" class="input input-mono" id="dimX" value="440">
 <span class="input-unit">mm</span>
 </div>
 </div>
 <span class="dimension-separator">×</span>
 <div class="form-group">
 <div class="input-with-unit">
-<input type="number" class="input input-mono" id="dimY" value="50" oninput="calculate()">
+<input type="number" class="input input-mono" id="dimY" value="50">
 <span class="input-unit">mm</span>
 </div>
 </div>
 <span class="dimension-separator">×</span>
 <div class="form-group">
 <div class="input-with-unit">
-<input type="number" class="input input-mono" id="dimZ" value="20" oninput="calculate()">
+<input type="number" class="input input-mono" id="dimZ" value="20">
 <span class="input-unit">mm</span>
 </div>
 </div>
@@ -1299,22 +1300,78 @@
 <div class="form-group">
 <label class="form-label">Stückzahl</label>
 <div class="input-with-unit" style="width: 120px;">
-<input type="number" class="input input-mono" id="quantity" value="1" min="1" oninput="calculate()">
+<input type="number" class="input input-mono" id="quantity" value="1" min="1">
 <span class="input-unit">Stk</span>
 </div>
 </div>
  
-<!-- Action Buttons -->
-<div style="display: flex; gap: var(--space-3); margin-top: var(--space-5); padding-top: var(--space-4); border-top: 1px solid var(--color-border);">
-<button class="btn btn-secondary" onclick="calculate()" style="flex: 1;">
- Analysieren
+<!-- Spannungen — editierbare Liste -->
+<div class="card" id="werkstuckConfig" style="margin-top: var(--space-4);">
+<div class="card-header">
+<span>Aufspannungen</span>
+<button class="btn btn-sm" onclick="addClamping()" style="font-size:11px;">+ Hinzufügen</button>
+</div>
+<div class="card-body" style="padding:0;">
+<table class="table" id="clampingTable">
+<thead>
+<tr>
+<th style="width:40px;">Nr.</th>
+<th>Spannmittel</th>
+<th class="right" style="width:100px;">Rüstzeit</th>
+<th style="width:40px;"></th>
+</tr>
+</thead>
+<tbody id="clampingRows">
+<tr>
+<td class="mono">1</td>
+<td>
+<select class="select" style="height:28px;font-size:12px;" onchange="updateClampingTotal()">
+<option value="schraubstock" selected>Schraubstock</option>
+<option value="schraubstock2">2× Schraubstock (Langteil)</option>
+<option value="tischspannung">Tischspannung / Pratzen</option>
+<option value="nullpunkt">Nullpunktspannsystem</option>
+<option value="spezial">Sondervorrichtung</option>
+</select>
+</td>
+<td class="right"><input type="number" class="input input-sm input-mono" value="15" style="width:70px;text-align:right;" onchange="updateClampingTotal()"> min</td>
+<td></td>
+</tr>
+<tr>
+<td class="mono">2</td>
+<td>
+<select class="select" style="height:28px;font-size:12px;" onchange="updateClampingTotal()">
+<option value="schraubstock" selected>Schraubstock</option>
+<option value="schraubstock2">2× Schraubstock (Langteil)</option>
+<option value="tischspannung">Tischspannung / Pratzen</option>
+<option value="nullpunkt">Nullpunktspannsystem</option>
+<option value="spezial">Sondervorrichtung</option>
+</select>
+</td>
+<td class="right"><input type="number" class="input input-sm input-mono" value="10" style="width:70px;text-align:right;" onchange="updateClampingTotal()"> min</td>
+<td style="text-align:center;"><button class="btn btn-sm" onclick="removeClamping(this)" style="padding:0 4px;color:var(--color-error);border:none;">×</button></td>
+</tr>
+</tbody>
+<tfoot>
+<tr style="font-weight:600;background:var(--color-bg-subtle);">
+<td colspan="2">Gesamte Rüstzeit</td>
+<td class="right mono" id="totalSetupTimeDisplay">25 min</td>
+<td></td>
+</tr>
+</tfoot>
+</table>
+</div>
+</div>
+
+</div>
+</div>
+
+<!-- BERECHNEN Button -->
+<div style="margin-top: var(--space-4);">
+<button class="btn btn-primary" onclick="runCalculation()" style="width:100%; height:44px; font-size:15px; font-weight:600;">
+Berechnen →
 </button>
-<button class="btn btn-primary" onclick="confirmAndGoToParams()" style="flex: 1;">
- Weiter zu Parameter
-</button>
 </div>
-</div>
-</div>
+
 </div>
  
 <!-- ========================================
@@ -1322,46 +1379,19 @@
  ======================================== -->
 <div class="section" id="section-params">
 <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-5); border-bottom: 1px solid var(--color-border); padding-bottom: var(--space-3);">
-<button class="btn btn-sm btn-primary" id="tabParamFertigung" onclick="showParamTab('fertigung')">Fertigung</button>
-<button class="btn btn-sm btn-secondary" id="tabParamPreis" onclick="showParamTab('preis')">Preisangaben</button>
-<button class="btn btn-sm btn-secondary" id="tabParamMaschine" onclick="showParamTab('maschine')">Maschine</button>
+<button class="btn btn-sm btn-primary" id="tabParamPreis" onclick="showParamTab('preis')">Stundensätze</button>
+<button class="btn btn-sm btn-secondary" id="tabParamMaterial" onclick="showParamTab('material')">Materialpreise</button>
+<button class="btn btn-sm btn-secondary" id="tabParamZuschlag" onclick="showParamTab('zuschlag')">Zuschläge</button>
 </div>
  
-<div id="param-fertigung">
-<div class="card" style="margin-bottom: var(--space-6);">
-<div class="card-header"><span>Fertigung</span></div>
-<div class="card-body">
-<div class="form-group">
-<label class="form-label">Spannung</label>
-<select class="select" id="clampingSelect" onchange="calculate()">
-<option value="schraubstock">Schraubstock (15 min)</option>
-<option value="schraubstock2">2× Schraubstock (25 min)</option>
-<option value="tischspannung">Tischspannung (35 min)</option>
-<option value="nullpunkt">Nullpunktspannsystem (5 min)</option>
-<option value="spezial">Sondervorrichtung (45 min)</option>
-</select>
-</div>
+<!-- Hidden elements for backward compatibility -->
+<span id="setupTimeDisplay" style="display:none;">25 min</span>
+<span id="setupCostDisplay" style="display:none;">EUR 37,92</span>
+<span id="clampingDescription" style="display:none;"></span>
+<select id="clampingSelect" style="display:none;"><option value="schraubstock" selected></option></select>
+<select id="setupCount" style="display:none;"><option value="2" selected></option></select>
  
-<div class="form-group">
-<label class="form-label">Aufspannungen</label>
-<select class="select" id="setupCount" onchange="calculate()">
-<option value="1">1 Aufspannung</option>
-<option value="2" selected>2 Aufspannungen</option>
-<option value="3">3 Aufspannungen</option>
-<option value="4">4+ Aufspannungen</option>
-</select>
-</div>
- 
-<!-- Einrichtzeit Info -->
-<div class="info-box" style="margin-bottom: var(--space-4);">
-<strong>Einrichtzeit:</strong> <span id="setupTimeDisplay">25 min</span> = <span id="setupCostDisplay">EUR 37,92</span><br>
-<span id="clampingDescription" style="font-size: 12px;">Schraubstock: Teil spannen, Parallelität prüfen, Nullpunkt antasten.</span>
-</div>
-</div>
-</div>
-</div>
- 
-<div id="param-preis" style="display: none;">
+<div id="param-preis" style="display: block;">
 <div class="card" style="margin-bottom: var(--space-5);">
 <div class="card-header card-header-info"><span>Maschinenstundensätze (€/h)</span></div>
 <div class="card-body" style="padding: 0; overflow-x: auto;">
@@ -1419,9 +1449,12 @@
 <div class="info-box" style="margin-bottom: var(--space-5);">
 <strong>Hinweis:</strong> Maschinenstundensatz = Lohnkosten + Maschinenkosten (Abschreibung, Energie, Wartung, Raumkosten). Branchenüblich: EUR 65-95/h für 3-Achs, EUR 90-140/h für 5-Achs.
 </div>
+</div>
  
+<!-- TAB: Materialpreise -->
+<div id="param-material" style="display: none;">
 <div class="card" style="margin-bottom: var(--space-5);">
-<div class="card-header card-header-success"><span>Materialpreise (€/kg)</span></div>
+<div class="card-header"><span>Materialpreise (EUR/kg)</span></div>
 <div class="card-body">
 <div style="font-size: 12px; color: var(--color-text-muted); margin-bottom: var(--space-4);">
  Tagesaktuelle Preise vom Stahlhandel übernehmen. Verschnitt wird separat berechnet.
@@ -1517,9 +1550,12 @@
 </div>
 </div>
 </div>
+</div>
  
+<!-- TAB: Zuschläge -->
+<div id="param-zuschlag" style="display: none;">
 <div class="card" style="margin-bottom: var(--space-5);">
-<div class="card-header card-header-warning"><span>Zuschlagskalkulation (Industriestandard)</span></div>
+<div class="card-header"><span>Zuschlagskalkulation (Industriestandard)</span></div>
 <div class="card-body">
 <div style="font-size: 12px; color: var(--color-text-muted); margin-bottom: var(--space-4);">
  Zuschlagssätze nach betriebswirtschaftlicher Kalkulationsmethode. Basis: Herstellkosten.
@@ -1540,7 +1576,7 @@
 <strong>Materialgemeinkosten (MGK)</strong><br>
 <span style="font-size: 11px; color: var(--color-text-muted);">Einkauf, Lager, Handling</span>
 </td>
-<td><input type="number" class="input input-sm input-mono" value="10" id="zuschlagMGK" style="width: 80px;" onchange="calculate()"></td>
+<td><input type="number" class="input input-sm input-mono" value="10" id="zuschlagMGK" style="width: 80px;"></td>
 <td class="mono" style="font-size: 12px;">auf Materialkosten</td>
 <td style="font-size: 12px; color: var(--color-text-muted);">5-15%</td>
 </tr>
@@ -1549,7 +1585,7 @@
 <strong>Fertigungsgemeinkosten (FGK)</strong><br>
 <span style="font-size: 11px; color: var(--color-text-muted);">Meister, Instandhaltung, Energie</span>
 </td>
-<td><input type="number" class="input input-sm input-mono" value="0" id="zuschlagFGK" style="width: 80px;" onchange="calculate()"></td>
+<td><input type="number" class="input input-sm input-mono" value="0" id="zuschlagFGK" style="width: 80px;"></td>
 <td class="mono" style="font-size: 12px;">auf Fertigungskosten</td>
 <td style="font-size: 12px; color: var(--color-text-muted);">100-200% (oft in MSS)</td>
 </tr>
@@ -1558,7 +1594,7 @@
 <strong>AV-Aufschlag</strong><br>
 <span style="font-size: 11px; color: var(--color-text-muted);">Arbeitsvorbereitung, Programmierung, CAM</span>
 </td>
-<td><input type="number" class="input input-sm input-mono" value="8" id="zuschlagAV" style="width: 80px;" onchange="calculate()"></td>
+<td><input type="number" class="input input-sm input-mono" value="8" id="zuschlagAV" style="width: 80px;"></td>
 <td class="mono" style="font-size: 12px;">auf Fertigungskosten</td>
 <td style="font-size: 12px; color: var(--color-text-muted);">5-15%</td>
 </tr>
@@ -1570,7 +1606,7 @@
 <strong>Verwaltungsgemeinkosten (VwGK)</strong><br>
 <span style="font-size: 11px; color: var(--color-text-muted);">Buchhaltung, IT, Geschäftsführung</span>
 </td>
-<td><input type="number" class="input input-sm input-mono" value="12" id="zuschlagVwGK" style="width: 80px;" onchange="calculate()"></td>
+<td><input type="number" class="input input-sm input-mono" value="12" id="zuschlagVwGK" style="width: 80px;"></td>
 <td class="mono" style="font-size: 12px;">auf Herstellkosten</td>
 <td style="font-size: 12px; color: var(--color-text-muted);">8-15%</td>
 </tr>
@@ -1579,7 +1615,7 @@
 <strong>Vertriebsgemeinkosten (VtGK)</strong><br>
 <span style="font-size: 11px; color: var(--color-text-muted);">Angebote, Kundenbetreuung, Versand</span>
 </td>
-<td><input type="number" class="input input-sm input-mono" value="5" id="zuschlagVtGK" style="width: 80px;" onchange="calculate()"></td>
+<td><input type="number" class="input input-sm input-mono" value="5" id="zuschlagVtGK" style="width: 80px;"></td>
 <td class="mono" style="font-size: 12px;">auf Herstellkosten</td>
 <td style="font-size: 12px; color: var(--color-text-muted);">3-8%</td>
 </tr>
@@ -1591,7 +1627,7 @@
 <strong>Gewinnzuschlag / Marge</strong><br>
 <span style="font-size: 11px; color: var(--color-text-muted);">Unternehmensgewinn</span>
 </td>
-<td><input type="number" class="input input-sm input-mono" value="10" id="zuschlagGewinn" style="width: 80px;" onchange="calculate()"></td>
+<td><input type="number" class="input input-sm input-mono" value="10" id="zuschlagGewinn" style="width: 80px;"></td>
 <td class="mono" style="font-size: 12px;">auf Selbstkosten</td>
 <td style="font-size: 12px; color: var(--color-text-muted);">5-15%</td>
 </tr>
@@ -1602,7 +1638,7 @@
 </table>
 </div>
 </div>
-</div>
+</div><!-- /param-zuschlag -->
  
 <div id="param-maschine" style="display: none;">
 <div class="card" style="margin-bottom: var(--space-6);">
@@ -1622,7 +1658,7 @@
 <!-- Plausibility Warnings -->
 <div id="warningsContainer"></div>
  
-<button class="btn btn-primary" onclick="calculate(); showSection('result', document.querySelector('.nav-item[data-section=&quot;result&quot;]'))">Berechnen und Kalkulation anzeigen →</button>
+<button class="btn btn-primary" onclick="runCalculation()" style="width:100%;">Berechnen und Kalkulation anzeigen →</button>
 </div>
  
 <!-- ========================================
@@ -1791,7 +1827,7 @@
 <div class="card-body" style="display: flex; align-items: center; gap: var(--space-4);">
 <span style="color: var(--color-text-secondary);">Marge anpassen:</span>
 <div class="input-with-unit" style="width: 100px;">
-<input type="number" class="input input-mono" id="marginInput" value="10" min="0" max="100" oninput="calculate()">
+<input type="number" class="input input-mono" id="marginInput" value="10" min="0" max="100">
 <span class="input-unit">%</span>
 </div>
 <span style="margin-left: auto; color: var(--color-text-secondary);">Gesamtauftragswert:</span>
@@ -3841,22 +3877,21 @@ M30
  }
  
  function showParamTab(tab) {
- document.getElementById('param-fertigung').style.display = 'none';
- document.getElementById('param-preis').style.display = 'none';
- document.getElementById('param-maschine').style.display = 'none';
- 
- document.getElementById('tabParamFertigung').className = 'btn btn-sm btn-secondary';
- document.getElementById('tabParamPreis').className = 'btn btn-sm btn-secondary';
- document.getElementById('tabParamMaschine').className = 'btn btn-sm btn-secondary';
- 
- document.getElementById('param-' + tab).style.display = 'block';
- if (tab === 'fertigung') {
- document.getElementById('tabParamFertigung').className = 'btn btn-sm btn-primary';
- } else if (tab === 'preis') {
- document.getElementById('tabParamPreis').className = 'btn btn-sm btn-primary';
- } else if (tab === 'maschine') {
- document.getElementById('tabParamMaschine').className = 'btn btn-sm btn-primary';
- }
+ // Hide all param tabs
+ ['preis', 'material', 'zuschlag', 'maschine'].forEach(t => {
+ const el = document.getElementById('param-' + t);
+ if (el) el.style.display = 'none';
+ });
+ // Reset all tab buttons
+ ['tabParamPreis', 'tabParamMaterial', 'tabParamZuschlag', 'tabParamMaschine'].forEach(id => {
+ const el = document.getElementById(id);
+ if (el) el.className = 'btn btn-sm btn-secondary';
+ });
+ // Show selected
+ const panel = document.getElementById('param-' + tab);
+ if (panel) panel.style.display = 'block';
+ const btn = document.getElementById('tabParam' + tab.charAt(0).toUpperCase() + tab.slice(1));
+ if (btn) btn.className = 'btn btn-sm btn-primary';
  }
  
  function toggleScope() {
@@ -3899,6 +3934,62 @@ M30
  }
  }
  
+ // === CLAMPING LIST (editable) ===
+ function addClamping() {
+ const tbody = document.getElementById('clampingRows');
+ const count = tbody.rows.length + 1;
+ const tr = document.createElement('tr');
+ tr.innerHTML = `
+ <td class="mono">${count}</td>
+ <td>
+ <select class="select" style="height:28px;font-size:12px;" onchange="updateClampingTotal()">
+ <option value="schraubstock">Schraubstock</option>
+ <option value="schraubstock2">2× Schraubstock (Langteil)</option>
+ <option value="tischspannung">Tischspannung / Pratzen</option>
+ <option value="nullpunkt">Nullpunktspannsystem</option>
+ <option value="spezial">Sondervorrichtung</option>
+ </select>
+ </td>
+ <td class="right"><input type="number" class="input input-sm input-mono" value="10" style="width:70px;text-align:right;" onchange="updateClampingTotal()"> min</td>
+ <td style="text-align:center;"><button class="btn btn-sm" onclick="removeClamping(this)" style="padding:0 4px;color:var(--color-error);border:none;">×</button></td>
+ `;
+ tbody.appendChild(tr);
+ updateClampingTotal();
+ }
+ 
+ function removeClamping(btn) {
+ const tbody = document.getElementById('clampingRows');
+ if (tbody.rows.length <= 1) return; // keep at least 1
+ btn.closest('tr').remove();
+ // Renumber
+ Array.from(tbody.rows).forEach((r, i) => { r.cells[0].textContent = i + 1; });
+ updateClampingTotal();
+ }
+ 
+ function updateClampingTotal() {
+ const tbody = document.getElementById('clampingRows');
+ let total = 0;
+ Array.from(tbody.rows).forEach(r => {
+ const input = r.querySelector('input[type="number"]');
+ if (input) total += parseFloat(input.value) || 0;
+ });
+ document.getElementById('totalSetupTimeDisplay').textContent = total + ' min';
+ // Update hidden legacy fields
+ { const _e = document.getElementById('setupTimeDisplay'); if(_e) _e.textContent = total + ' min'; }
+ { const _e = document.getElementById('setupCount'); if(_e) _e.value = tbody.rows.length; }
+ }
+ 
+ function getClampingTotalTime() {
+ const tbody = document.getElementById('clampingRows');
+ if (!tbody) return 25;
+ let total = 0;
+ Array.from(tbody.rows).forEach(r => {
+ const input = r.querySelector('input[type="number"]');
+ if (input) total += parseFloat(input.value) || 0;
+ });
+ return total;
+ }
+ 
  // ================================================================
  // PART SELECTION
  // ================================================================
@@ -3926,26 +4017,35 @@ M30
  function selectProject(id) {
  currentProject = PROJECTS[id];
  
- // Show loading animation
- showLoading();
- 
+ // Fill form fields — NO auto-calculate, NO loading animation
  document.getElementById('materialSelect').value = currentProject.material;
  document.getElementById('dimX').value = currentProject.dims.x;
  document.getElementById('dimY').value = currentProject.dims.y;
  document.getElementById('dimZ').value = currentProject.dims.z;
  
  renderPartGrid();
+ 
+ // Scroll to config section below
+ const configCard = document.getElementById('werkstuckConfig');
+ if (configCard) configCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+ }
+ 
+ function runCalculation() {
+ // Triggered by explicit "Berechnen" button
+ showLoading();
+ 
  calculate();
  
  // Update instruction header
+ if (currentProject) {
  document.getElementById('faPartName').textContent = `${currentProject.name} — ${currentProject.partNumber}`;
  const descEl = document.getElementById('quoteDesc');
  if (descEl) descEl.textContent = `Angebot — CNC-Fertigung ${currentProject.name}`;
+ }
  
- // Show params section after loading completes
- setTimeout(() =>{
+ setTimeout(() => {
  hideLoading();
- showSection('params', document.querySelector('.nav-item[data-section="params"]'));
+ showSection('result', document.querySelector('.nav-item[data-section="result"]'));
  }, 2500);
  }
  
@@ -3964,14 +4064,11 @@ M30
  const toolWear = parseFloat(document.getElementById('settingToolWear')?.value) || 20.74;
  const vat = parseFloat(document.getElementById('settingVat')?.value) || 19;
  
- // Clamping
- const clampingType = document.getElementById('clampingSelect').value;
- const clampingData = CLAMPING[clampingType];
- const setupCount = parseInt(document.getElementById('setupCount').value) || 1;
- const totalSetupTime = clampingData.time + (setupCount - 1) * (clampingData.time * 0.6);
- 
- // Update clamping description
- document.getElementById('clampingDescription').textContent = clampingData.desc;
+ // Clamping — from editable table
+ const totalSetupTime = getClampingTotalTime();
+ const clampingType = document.getElementById('clampingSelect')?.value || 'schraubstock';
+ const clampingData = CLAMPING[clampingType] || CLAMPING.schraubstock;
+ const setupCount = document.getElementById('clampingRows')?.rows.length || 2;
  
  // Rates
  const cncRate = RATES.cnc.labor + RATES.cnc.machine;
