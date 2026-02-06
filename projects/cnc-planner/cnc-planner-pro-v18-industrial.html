@@ -2322,8 +2322,13 @@ Berechnen →
  
 <!-- Operationen-Tabelle mit Berechnungsdetails -->
 <div class="card" style="margin-bottom: var(--space-5);">
-<div class="card-header"><span>Operationen und Bearbeitungszeiten</span>
-<span style="font-size: 11px; font-weight: 400; color: var(--color-text-muted);">n [U/min] · vf [mm/min] · ap [mm]</span></div>
+<div class="card-header">
+<span>Operationen und Bearbeitungszeiten</span>
+<div style="display:flex;align-items:center;gap:var(--space-2);">
+<span style="font-size: 11px; font-weight: 400; color: var(--color-text-muted);">n [U/min] · vf [mm/min] · ap [mm]</span>
+<button class="btn btn-secondary btn-sm" onclick="exportFertigungsCSV()" style="margin-left:var(--space-3);">CSV</button>
+</div>
+</div>
 <div class="card-body" style="padding: 0;">
  
 <!-- OP10 -->
@@ -2786,49 +2791,70 @@ Freigabe / Dokumentation
 </div>
  
 <!-- SUMME -->
-<div style="display: flex; align-items: center; padding: var(--space-3) var(--space-4); background: var(--color-primary); color: white; font-weight: 600;">
+<div id="opSumRow" style="display: flex; align-items: center; padding: var(--space-3) var(--space-4); background: var(--color-primary); color: white; font-weight: 600;">
 <span style="flex: 1;">SUMME</span>
-<span class="mono" style="margin-right: var(--space-4);">t<sub>h</sub>=31,2 | t<sub>n</sub>=8,0</span>
-<span class="mono" style="width: 80px; text-align: right;">44,2 min</span>
+<span class="mono" id="opSumDetail" style="margin-right: var(--space-4);">t<sub>h</sub>=31,2 | t<sub>n</sub>=8,0</span>
+<span class="mono" id="opSumTotal" style="width: 80px; text-align: right;">44,2 min</span>
 </div>
 </div>
+
+<!-- Arbeitsgang hinzufügen -->
+<div style="display:flex;gap:var(--space-3);margin-bottom:var(--space-5);">
+<button class="btn btn-secondary btn-sm" onclick="addCustomOP()">+ Arbeitsgang hinzufügen</button>
+</div>
+
+<!-- Container für manuell hinzugefügte OPs -->
+<div id="customOpsContainer"></div>
+
 <!-- Qualitätsprüfung -->
 <div class="instruction-section">
 <div class="instruction-header">
 <h4>Qualitätsprüfung</h4>
+<div style="display:flex;align-items:center;gap:var(--space-2);">
 <span class="badge badge-info">QS</span>
+<button class="btn btn-secondary btn-sm" onclick="exportPruefCSV()">CSV</button>
+</div>
 </div>
 <div class="instruction-content">
-<table class="table">
+<table class="table" id="pruefTable">
 <thead>
 <tr>
+<th style="width:30px;"></th>
 <th>Prüfmerkmal</th>
 <th>Soll</th>
 <th>Prüfmittel</th>
 <th class="right">Zeit</th>
+<th style="width:30px;"></th>
 </tr>
 </thead>
-<tbody>
+<tbody id="pruefBody">
 <tr>
+<td><input type="checkbox" checked onchange="togglePruefRow(this)"></td>
 <td>Ø26 H7</td>
 <td class="mono">26,000 / 26,021</td>
 <td>Innenmessschraube</td>
 <td class="right mono">0,8 min</td>
+<td><button class="btn btn-sm" onclick="removePruefRow(this)" style="padding:0 4px;color:var(--color-text-muted);border:none;" title="Entfernen">×</button></td>
 </tr>
 <tr>
+<td><input type="checkbox" checked onchange="togglePruefRow(this)"></td>
 <td>Höhe</td>
 <td class="mono">20,0 ±0,1</td>
 <td>Messschieber</td>
 <td class="right mono">0,3 min</td>
+<td><button class="btn btn-sm" onclick="removePruefRow(this)" style="padding:0 4px;color:var(--color-text-muted);border:none;" title="Entfernen">×</button></td>
 </tr>
 <tr>
+<td><input type="checkbox" checked onchange="togglePruefRow(this)"></td>
 <td>Oberfläche</td>
 <td class="mono">Rz ≤ 25</td>
 <td>Vergleichsmuster</td>
 <td class="right mono">0,5 min</td>
+<td><button class="btn btn-sm" onclick="removePruefRow(this)" style="padding:0 4px;color:var(--color-text-muted);border:none;" title="Entfernen">×</button></td>
 </tr>
 </tbody>
 </table>
+<button class="btn btn-secondary btn-sm" onclick="addPruefRow()" style="margin-top:var(--space-3);">+ Prüfmerkmal hinzufügen</button>
 </div>
 </div>
 </div>
@@ -4567,6 +4593,160 @@ Alle Daten verbleiben lokal in Ihrem Browser (localStorage). Es werden keine Dat
  }
  }
  
+ // ================================================================
+ // FERTIGUNGSANWEISUNG: OP Management
+ // ================================================================
+ 
+ let customOpCounter = 110;
+ 
+ function initOpControls() {
+ // Add checkbox + disable toggle to each existing OP row
+ document.querySelectorAll('#section-instructions .card-body > div[style*="border-bottom"]').forEach(opDiv => {
+ const header = opDiv.querySelector('[onclick*="toggleOpDetail"]');
+ if (!header) return;
+ 
+ // Insert checkbox before op-badge
+ const badge = header.querySelector('.op-badge');
+ if (badge && !header.querySelector('input[type="checkbox"]')) {
+ const cb = document.createElement('input');
+ cb.type = 'checkbox';
+ cb.checked = true;
+ cb.style.cssText = 'margin-right:var(--space-2);cursor:pointer;';
+ cb.onchange = function() {
+ const row = this.closest('div[style*="border-bottom"]');
+ if (row) {
+ row.style.opacity = this.checked ? '1' : '0.35';
+ const detail = row.querySelector('[id$="-detail"]');
+ if (detail && !this.checked) detail.style.display = 'none';
+ }
+ updateOpSum();
+ };
+ header.insertBefore(cb, badge);
+ }
+ });
+ }
+ 
+ function updateOpSum() {
+ let total = 0;
+ document.querySelectorAll('#section-instructions .card-body > div[style*="border-bottom"]').forEach(opDiv => {
+ const cb = opDiv.querySelector('input[type="checkbox"]');
+ if (cb && !cb.checked) return;
+ const timeSpan = opDiv.querySelector('.mono[style*="text-align: right"] strong, .mono[style*="text-align: right"]');
+ if (timeSpan) {
+ const t = parseFloat(timeSpan.textContent.replace(',','.').replace(' min','')) || 0;
+ total += t;
+ }
+ });
+ // Custom OPs
+ document.querySelectorAll('#customOpsContainer .custom-op-row').forEach(row => {
+ const cb = row.querySelector('input[type="checkbox"]');
+ if (cb && !cb.checked) return;
+ const timeInput = row.querySelector('.custom-op-time');
+ total += parseFloat(timeInput?.value) || 0;
+ });
+ const el = document.getElementById('opSumTotal');
+ if (el) el.textContent = total.toFixed(1).replace('.',',') + ' min';
+ }
+ 
+ function addCustomOP() {
+ const container = document.getElementById('customOpsContainer');
+ if (!container) return;
+ const opNum = customOpCounter;
+ customOpCounter += 10;
+ 
+ const div = document.createElement('div');
+ div.className = 'custom-op-row card';
+ div.style.marginBottom = 'var(--space-3)';
+ div.innerHTML = `
+ <div class="card-body" style="padding:var(--space-3) var(--space-4);">
+ <div style="display:flex;align-items:center;gap:var(--space-3);">
+ <input type="checkbox" checked onchange="updateOpSum()" style="cursor:pointer;">
+ <span class="op-badge">${opNum}</span>
+ <input type="text" class="input input-sm" placeholder="Beschreibung (z.B. Wärmebehandlung)" style="flex:1;">
+ <input type="text" class="input input-sm" placeholder="Werkzeug" style="width:80px;">
+ <input type="number" class="input input-sm input-mono custom-op-time" placeholder="min" style="width:70px;" step="0.1" onchange="updateOpSum()">
+ <input type="text" class="input input-sm" placeholder="Anmerkung" style="width:150px;">
+ <button class="btn btn-sm" onclick="this.closest('.custom-op-row').remove();updateOpSum();" style="padding:0 6px;color:var(--color-text-muted);border:none;" title="Entfernen">×</button>
+ </div>
+ </div>`;
+ container.appendChild(div);
+ }
+ 
+ function exportFertigungsCSV() {
+ let csv = 'OP;Beschreibung;Werkzeug;Zeit [min];Status\\n';
+ document.querySelectorAll('#section-instructions .card-body > div[style*="border-bottom"]').forEach(opDiv => {
+ const cb = opDiv.querySelector('input[type="checkbox"]');
+ const badge = opDiv.querySelector('.op-badge');
+ const header = opDiv.querySelector('[onclick*="toggleOpDetail"]');
+ if (!header || !badge) return;
+ const strong = header.querySelector('strong');
+ const desc = strong ? strong.textContent.trim() : '';
+ const tool = header.querySelector('.mono')?.textContent.trim() || '';
+ const timeEl = header.querySelectorAll('.mono');
+ const time = timeEl.length >= 2 ? timeEl[timeEl.length-1].textContent.trim().replace(' min','') : '';
+ const status = (cb && !cb.checked) ? 'Abgewählt' : 'Aktiv';
+ csv += `${badge.textContent};${desc};${tool};${time};${status}\\n`;
+ });
+ // Custom OPs
+ document.querySelectorAll('#customOpsContainer .custom-op-row').forEach(row => {
+ const inputs = row.querySelectorAll('input');
+ const cb = inputs[0];
+ const badge = row.querySelector('.op-badge');
+ csv += `${badge?.textContent || ''};${inputs[1]?.value || ''};${inputs[2]?.value || ''};${inputs[3]?.value || ''};${cb.checked ? 'Aktiv' : 'Abgewählt'}\\n`;
+ });
+ 
+ const blob = new Blob([csv.replace(/\\\\n/g, '\\n')], { type: 'text/csv;charset=utf-8;' });
+ const a = document.createElement('a');
+ a.href = URL.createObjectURL(blob);
+ a.download = 'fertigungsanweisung.csv';
+ a.click();
+ }
+ 
+ // Prüfmerkmale
+ function togglePruefRow(cb) {
+ const row = cb.closest('tr');
+ if (row) row.style.opacity = cb.checked ? '1' : '0.35';
+ }
+ 
+ function removePruefRow(btn) {
+ const row = btn.closest('tr');
+ if (row && confirm('Prüfmerkmal entfernen?')) row.remove();
+ }
+ 
+ function addPruefRow() {
+ const tbody = document.getElementById('pruefBody');
+ if (!tbody) return;
+ const tr = document.createElement('tr');
+ tr.innerHTML = `
+ <td><input type="checkbox" checked onchange="togglePruefRow(this)"></td>
+ <td><input type="text" class="input input-sm" placeholder="Merkmal" style="width:120px;"></td>
+ <td><input type="text" class="input input-sm input-mono" placeholder="Soll-Wert" style="width:140px;"></td>
+ <td><input type="text" class="input input-sm" placeholder="Prüfmittel" style="width:130px;"></td>
+ <td class="right"><input type="text" class="input input-sm input-mono" placeholder="min" style="width:60px;"></td>
+ <td><button class="btn btn-sm" onclick="removePruefRow(this)" style="padding:0 4px;color:var(--color-text-muted);border:none;" title="Entfernen">×</button></td>`;
+ tbody.appendChild(tr);
+ }
+ 
+ function exportPruefCSV() {
+ let csv = 'Prüfmerkmal;Soll;Prüfmittel;Zeit [min];Status\\n';
+ document.querySelectorAll('#pruefBody tr').forEach(tr => {
+ const cb = tr.querySelector('input[type="checkbox"]');
+ const cells = tr.querySelectorAll('td');
+ if (cells.length < 5) return;
+ const merkmal = cells[1].querySelector('input')?.value || cells[1].textContent.trim();
+ const soll = cells[2].querySelector('input')?.value || cells[2].textContent.trim();
+ const mittel = cells[3].querySelector('input')?.value || cells[3].textContent.trim();
+ const zeit = cells[4].querySelector('input')?.value || cells[4].textContent.trim().replace(' min','');
+ const status = (cb && !cb.checked) ? 'Abgewählt' : 'Aktiv';
+ csv += `${merkmal};${soll};${mittel};${zeit};${status}\\n`;
+ });
+ const blob = new Blob([csv.replace(/\\\\n/g, '\\n')], { type: 'text/csv;charset=utf-8;' });
+ const a = document.createElement('a');
+ a.href = URL.createObjectURL(blob);
+ a.download = 'pruefplan.csv';
+ a.click();
+ }
+ 
  function toggleOpDetail(opId) {
  const detail = document.getElementById(opId + '-detail');
  if (detail) {
@@ -5713,6 +5893,7 @@ Alle Daten verbleiben lokal in Ihrem Browser (localStorage). Es werden keine Dat
  loadSettings();
  renderPartGrid();
  calculate();
+ initOpControls();
  
  // Initialize quote section
  calculateValidity();
