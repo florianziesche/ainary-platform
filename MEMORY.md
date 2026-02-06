@@ -153,6 +153,7 @@ Legal AI Platform with <0.2% hallucination rate using:
 - **Thesis confirmed, not changed** — VC Lab Exercise bestätigte Ainary Thesis. Florians Formulierung: "$5M seed fund backing European founders building AI-first and deep-tech in the U.S." (Added 2026-02-05)
 - **WhatsApp target requires E.164** — "Florian" fails, muss echte Nummer sein (E.164 format: +49...) oder group JID. Nicht Namen verwenden. (Added 2026-02-05)
 - **track-send.sh erstellt** — `./scripts/track-send.sh <type> <recipient> [notes]` loggt External Sends automatisch in Daily Log. (Added 2026-02-05)
+- **Build Blocker System deployed** — Automatic enforcement: cannot build >2 features with 0 sends. Prevents €421/day opportunity cost. `./scripts/pre-build-check.sh` before any build, `./scripts/log-send.sh` after any send. See `agents/BUILD-BLOCKER.md`. (Added 2026-02-06, Evolution Cycle #0021)
 
 ## 🔴 CORE LEARNING: Die Qualitäts-Lücke (2026-02-03 04:00)
 
