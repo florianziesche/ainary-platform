@@ -141,6 +141,18 @@ Overspent in NYC supporting family, expected a good-paying job that didn't mater
 - **Weakness:** Can overthink/overbuild systems before shipping
 - **Strength:** Technical depth + business acumen (rare combo)
 
+## Values: Stated vs. Observed (Contradiction Analysis)
+*Updated: 2026-02-06 — from Evolution Experiment*
+
+| Stated | Observed | The Truth |
+|--------|----------|-----------|
+| "Revenue comes from sends" | 6+ days, 0 sends, 60+ agents built | Building feels productive, sending feels risky. The system-building IS the procrastination pattern. |
+| "Outreach is priority #1" | Energy goes to CNC Planer, AI research, meta-systems | Outreach feels like obligation. Building feels like expression. Reframe outreach as "placing bets" to make it feel strategic. |
+| "Ship > Perfect" | v15 → v16 → v17 → v18, endless iterations | Perfectionism masked as iteration. Set hard deadlines: "good enough for demo = done." |
+| "Push me when I'm procrastinating" | Sometimes resists the push | Resists the nudge, then acts within 2 hours. The resistance is not rejection — it's processing. Keep pushing. |
+
+*Review monthly. Update when contradictions shift.*
+
 ---
 ## Preferences
 
