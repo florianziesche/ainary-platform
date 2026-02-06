@@ -38,6 +38,23 @@
 
 ---
 
+## Ainary Ventures — Was es WIRKLICH ist
+
+**Name Origin:** Binary (tech/IT) → AI + Binary = Ainary. "Ventures" = bewusst offen gewählt.
+
+**Ainary Ventures ist KEIN reiner VC Fund.** Es ist eine Dachmarke / Umbrella:
+- 🏗️ **LLC** (geplante Rechtsform)
+- 💰 **Venture Fund** = eine Aktivität, angetrieben durch VC Lab Programm (Decile Group)
+- 🤖 **AI Consultancy** = eine Aktivität (KI-Beratung Mittelstand, Workshops)
+- 🚀 **Startup** = potentiell (eigene Produkte wie CNC Planer)
+- 📚 **Content/Education** = Substack, Kurse, Templates
+
+**VC Lab Kontext:** Florian nimmt am VC Lab Programm teil. Das Programm pusht Richtung Fund-Aufbau. Die "Fund"-Aktivitäten (Thesis, LP Outreach, Decile Hub) sind Teil dieses Programms, NICHT Florians alleiniger Plan.
+
+**Wichtig für alle Dokumente:** Ainary Ventures nicht als "VC Fund" bezeichnen, sondern als "ventures platform" oder einfach die jeweilige Aktivität benennen.
+
+---
+
 ## Active Threads (Updated 2026-02-06)
 
 ### 🔥 P0 — Diese Woche

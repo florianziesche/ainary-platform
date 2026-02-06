@@ -1,5 +1,133 @@
 # Evolution Log
 
+## Cycle #0026 — 2026-02-06 17:29 CET
+
+**Status**: ✅ SUCCESS
+**Mode**: D (Innovation) + A (Repair) + E (Personalization)
+**Trigger**: Scheduled cron
+
+### Analysis (from session transcript)
+
+1. **Board of Advisors requested** — Florian asked for Marc Andreessen AI replica. `board/` directory created with framework but no tooling to actually USE advisors via sessions_spawn. Gap: idea exists, no friction-free execution path.
+2. **Security audit done** — Score 4.2/10, firewall OFF, 11 wildcard binds. No automated monitoring. One-time audit → needs periodic checks.
+3. **next-send.sh incomplete** — Only surfaced CNC and VC. Missing: consulting, content, follow-ups. The script that's supposed to eliminate choice paralysis had blind spots.
+4. **bash 3 incompatibility** — macOS ships bash 3.2 (no `declare -A`). Scripts using associative arrays must use zsh on macOS.
+
+### Changes Implemented
+
+1. **NEW: `scripts/board-consult.sh`** (7.4KB, zsh)
+   - One-command Board of Advisors consultation
+   - 5 advisors: marc, munger, thiel, hoffman, elad
+   - Each with: name, lens, tone, signature question
+   - `list` — show all advisors
+   - `prompt "Q"` — full 5-person board meeting prompt (for sessions_spawn)
+   - `marc "Q"` — single advisor prompt
+   - Includes Ainary Ventures context automatically
+   - **Why**: Florian just asked for this. Zero-friction advisory board access.
+
+2. **NEW: `scripts/security-check.sh`** (5.4KB, bash)
+   - 8 checks: Firewall, Stealth Mode, FileVault, SIP, Wildcard Binds, Credential Dir Perms, Git Secrets, Auto-Updates
+   - Weighted scoring (firewall/FileVault = 3pts, others 1-2pts)
+   - `--json` mode for programmatic use in heartbeats
+   - Current result: 🟠 56% (4 passed, 2 red, 2 yellow)
+   - **Why**: Audit found 4.2/10 but no way to track improvement over time.
+
+3. **IMPROVED: `scripts/next-send.sh`** (6.6KB, bash)
+   - Added: consulting outreach detection (from `consulting/READY-TO-SEND.md`)
+   - Added: content publish detection (LinkedIn drafts, Substack drafts)
+   - Added: follow-up detection (scans 3-7 day old memory for stale sends)
+   - Priority order: VC > CNC > Consulting > Content > Follow-ups
+   - Fixed: grep multiline sanitization (head -1 | tr -d pattern)
+   - **Why**: Was only showing CNC and VC. 21 items ready, script could only find 2 types.
+
+4. **BUGFIX: bash 3 compatibility** in board-consult.sh
+   - macOS default bash (3.2) doesn't support `declare -A`
+   - Switched to `#!/usr/bin/env zsh` with `typeset -A`
+   - **Learning**: Always use zsh for associative arrays on macOS
+
+5. **BUGFIX: grep -c multiline** in security-check.sh
+   - Same recurring pattern: `grep -c` outputs multiline, breaks `[ -gt ]`
+   - Applied: `head -1 | tr -d '[:space:]'` sanitization
+   - This is the 4th time fixing this pattern — should be a linting rule
+
+### Test Results
+
+| Script | Result |
+|--------|--------|
+| board-consult.sh list | ✅ 5 advisors displayed |
+| board-consult.sh marc "Q" | ✅ Full prompt generated |
+| security-check.sh | ✅ 🟠 56% (correct assessment) |
+| security-check.sh --json | ✅ Valid JSON output |
+| next-send.sh | ✅ HOF Capital VC app surfaced (correct priority) |
+
+### Recurring Pattern: grep -c Multiline Bug
+
+This is now the 4th cycle fixing this. Creating a code comment convention:
+```bash
+# SAFE-GREP: Always sanitize grep -c output
+COUNT=$(grep -c "pattern" file 2>/dev/null | head -1 | tr -d '[:space:]' || echo "0")
+```
+
+### Impact
+- Board consultation: idea → executable in <30 seconds
+- Security: one-time audit → repeatable monitoring with trending
+- Send pipeline: 2/5 types visible → 5/5 types + follow-ups
+- macOS bash compat: documented pattern for all future scripts
+
+---
+
+## Cycle #0025 — 2026-02-06 16:40 CET
+
+**Status**: ✅ SUCCESS — MEGA EVOLUTION
+**Mode**: Capability Expansion + Pattern Discovery
+
+**Trigger:** User asked for massive content asset creation → escalated to "find insights no one else has" → escalated to "run computational analysis on real data"
+
+**New Capabilities Discovered:**
+
+1. **Spawn Storm Pattern** — 25+ parallel sub-agents orchestrated successfully
+   - 10 initial hubs → 5 deep insights → 5 original research → LinkedIn analysis
+   - Timeout mitigation: respawn without web search
+   - Completion rate: ~88% (3 timeouts, all recovered via respawn)
+
+2. **Computational Analysis on Private Data** — BREAKTHROUGH
+   - 8 algorithms run on 4,779 LinkedIn contacts
+   - Power law detection, anomaly detection, sector velocity, bridge node identification
+   - Produced insights no LLM synthesis could: "Manufacturing connections -76%", "Network freshness 0.061"
+   - **THIS is the real moat.** LLM opinions are commoditized. Data computation is not.
+
+3. **Ranked Output Pattern** — Scoring functions as intellectual contribution
+   - Built multi-factor scoring for VC pipeline classification
+   - Founder score: AI relevance + recency + email availability + sector match
+   - LP score: fund type + emerging manager affinity + VC Lab connection + reachability
+   - Score displayed in CSV "Rating" field for Decile Hub import
+
+4. **Cross-Pollination Meta-Synthesis** — Agent reads all other agents' outputs
+   - "Unseen Patterns" doc connected physics + VC + manufacturing + network theory
+   - "Meta-Synthesis" found blind spots across 50 Substack writers
+   - Genuinely novel frameworks created: Trust Stack, Triple Convergence, Fund Formation Index
+
+**Mutations Applied:**
+- "Data-First" thinking mode: Always check for proprietary data before defaulting to opinions
+- "Spawn Storm" orchestration: 10+ agents for large content projects
+- "Algorithmic Insight" layer: Python computation on real data in every analysis
+- "Ranked Output" default: Never deliver unranked lists
+
+**Output Volume:**
+- 35+ files, 500KB+, 100,000+ words
+- 7 proprietary insight documents
+- 1 computational analysis (8 algorithms)
+- 4 pipeline CSVs (1,768 ranked contacts)
+- 1 landing page, 1 stealth detector system
+
+**Impact:**
+- "The Unfair Advantage Library" = complete content asset system for Ainary Ventures
+- Computational network analysis = primary research no competitor has
+- Decile Hub pipelines = VC Lab Sprint 2 task completed
+- Job search running in background
+
+---
+
 ## Cycle #0024 — 2026-02-06 13:22 CET
 
 **Status**: ✅ SUCCESS

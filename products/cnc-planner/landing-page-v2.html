@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CNC Planer Pro — Strukturierte Fertigungskalkulation</title>
+    <meta name="description" content="Zuschlagskalkulation nach REFA in 2 Minuten. Fertigungsanweisung, Angebotsvorschlag, Nachkalkulation. Validiert an echten Aufträgen.">
+    <meta property="og:title" content="CNC Planer Pro — Strukturierte Fertigungskalkulation">
+    <meta property="og:description" content="Vom Taschenrechner zur strukturierten Vorkalkulation. Validiert: Ø +9,8% Abweichung vs. realer Betriebskalkulation.">
+    <link rel="canonical" href="https://cncplaner.de">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e3a5f;
+            --primary-dark: #152a45;
+            --primary-light: #2d5a8a;
+            --accent: #2563eb;
+            --accent-dark: #1d4ed8;
+            --green: #059669;
+            --green-light: #d1fae5;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --radius: 6px;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-800);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+        /* Header */
+        header {
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--gray-900);
+        }
+        .logo-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 700; font-size: 13px;
+        }
+        .logo-text { font-weight: 700; font-size: 1.1rem; }
+        .logo-text span { color: var(--primary); }
+
+        nav { display: flex; gap: 28px; align-items: center; }
+        nav a {
+            color: var(--gray-600); text-decoration: none;
+            font-size: 0.9rem; font-weight: 500;
+            transition: color 0.2s;
+        }
+        nav a:hover { color: var(--primary); }
+
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 22px; border-radius: var(--radius);
+            font-weight: 600; font-size: 0.9rem;
+            text-decoration: none; transition: all 0.2s;
+            border: none; cursor: pointer;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-accent { background: var(--accent); color: white; }
+        .btn-accent:hover { background: var(--accent-dark); }
+        .btn-outline {
+            background: white; color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+        }
+        .btn-outline:hover { border-color: var(--gray-400); }
+        .btn-lg { padding: 14px 28px; font-size: 1rem; }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%);
+            color: white;
+            padding: 80px 0;
+        }
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+        .hero h1 {
+            font-size: 2.6rem; font-weight: 700;
+            line-height: 1.2; margin-bottom: 20px;
+        }
+        .hero p {
+            font-size: 1.1rem; opacity: 0.9;
+            margin-bottom: 32px; line-height: 1.7;
+        }
+        .hero-cta { display: flex; gap: 16px; flex-wrap: wrap; }
+        .hero-stats {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 20px; margin-top: 48px;
+        }
+        .hero-stat {
+            text-align: center; padding: 16px;
+            background: rgba(255,255,255,0.1); border-radius: var(--radius);
+        }
+        .hero-stat-value { font-size: 1.8rem; font-weight: 700; }
+        .hero-stat-label { font-size: 0.8rem; opacity: 0.8; }
+        .hero-visual {
+            background: white; border-radius: 12px;
+            padding: 32px; box-shadow: var(--shadow-lg);
+            color: var(--gray-800);
+        }
+        .hero-calc-header {
+            font-size: 0.75rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            color: var(--gray-400); margin-bottom: 20px;
+        }
+        .hero-calc-row {
+            display: flex; justify-content: space-between;
+            padding: 10px 0; font-size: 0.95rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        .hero-calc-row:last-child { border-bottom: none; }
+        .hero-calc-row.total {
+            font-weight: 700; font-size: 1.1rem;
+            border-top: 2px solid var(--gray-800);
+            border-bottom: none; padding-top: 14px; margin-top: 4px;
+        }
+        .hero-calc-row.total .green { color: var(--green); }
+
+        /* Section */
+        section { padding: 80px 0; }
+        .section-badge {
+            display: inline-block;
+            font-size: 0.75rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 2px;
+            color: var(--accent); margin-bottom: 12px;
+        }
+        .section-title {
+            font-size: 2rem; font-weight: 700;
+            color: var(--gray-900); margin-bottom: 12px;
+        }
+        .section-subtitle {
+            font-size: 1.05rem; color: var(--gray-500);
+            max-width: 600px; margin-bottom: 48px;
+        }
+        .text-center { text-align: center; }
+        .mx-auto { margin-left: auto; margin-right: auto; }
+
+        /* Feature Grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 28px;
+        }
+        .feature-card {
+            background: white; padding: 32px;
+            border-radius: var(--radius);
+            border: 1px solid var(--gray-200);
+            transition: box-shadow 0.2s;
+        }
+        .feature-card:hover { box-shadow: var(--shadow-md); }
+        .feature-icon {
+            width: 44px; height: 44px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; margin-bottom: 16px;
+        }
+        .feature-card h3 {
+            font-size: 1rem; font-weight: 600;
+            color: var(--gray-900); margin-bottom: 8px;
+        }
+        .feature-card p {
+            font-size: 0.9rem; color: var(--gray-500);
+            line-height: 1.6;
+        }
+
+        /* Validation */
+        .validation-bg { background: white; }
+        .validation-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 28px; margin-bottom: 40px;
+        }
+        .validation-card {
+            text-align: center; padding: 28px;
+            background: var(--gray-50); border-radius: var(--radius);
+        }
+        .validation-number {
+            font-size: 2.5rem; font-weight: 700;
+            line-height: 1; margin-bottom: 8px;
+        }
+        .validation-label { font-size: 0.85rem; color: var(--gray-500); }
+
+        .validation-table {
+            width: 100%; border-collapse: collapse;
+            background: white; border-radius: var(--radius);
+            overflow: hidden; box-shadow: var(--shadow);
+        }
+        .validation-table th, .validation-table td {
+            padding: 14px 18px; text-align: left;
+            font-size: 0.9rem;
+        }
+        .validation-table th {
+            background: var(--gray-50);
+            font-size: 0.75rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 1px;
+            color: var(--gray-400);
+        }
+        .validation-table td { border-bottom: 1px solid var(--gray-100); }
+        .validation-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+        .validation-table .green { color: var(--green); font-weight: 600; }
+
+        /* Process */
+        .process-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+        .process-step { text-align: center; }
+        .process-num {
+            width: 48px; height: 48px;
+            background: var(--primary); color: white;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 1.1rem;
+            margin: 0 auto 16px;
+        }
+        .process-step h3 { font-size: 1rem; margin-bottom: 4px; }
+        .process-step p { font-size: 0.85rem; color: var(--gray-500); }
+
+        /* ROI Calculator */
+        .roi-bg { background: white; }
+        .roi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+        .roi-input-group { margin-bottom: 20px; }
+        .roi-label {
+            font-size: 0.85rem; font-weight: 500;
+            color: var(--gray-700); margin-bottom: 6px; display: block;
+        }
+        .roi-input {
+            width: 100%; padding: 12px 14px;
+            border: 1px solid var(--gray-300); border-radius: var(--radius);
+            font-size: 1rem; font-family: inherit;
+        }
+        .roi-input:focus { outline: none; border-color: var(--accent); }
+        .roi-result-card {
+            background: var(--gray-50); border-radius: var(--radius);
+            padding: 28px;
+        }
+        .roi-result-row {
+            display: flex; justify-content: space-between;
+            padding: 10px 0; font-size: 0.95rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .roi-result-row:last-child { border-bottom: none; }
+        .roi-big {
+            text-align: center; margin-top: 24px;
+            padding: 24px; background: var(--primary);
+            border-radius: var(--radius); color: white;
+        }
+        .roi-big-number { font-size: 2.5rem; font-weight: 700; }
+        .roi-big-label { font-size: 0.85rem; opacity: 0.8; }
+
+        /* Wissenstransfer */
+        .wt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+        .wt-text h3 { font-size: 1.4rem; font-weight: 600; margin-bottom: 12px; color: var(--gray-900); }
+        .wt-text p { color: var(--gray-600); margin-bottom: 16px; }
+        .wt-cards { display: flex; flex-direction: column; gap: 16px; }
+        .wt-card {
+            padding: 20px; background: white;
+            border-radius: var(--radius); border-left: 3px solid var(--accent);
+            box-shadow: var(--shadow);
+        }
+        .wt-card h4 { font-size: 0.95rem; margin-bottom: 4px; }
+        .wt-card p { font-size: 0.85rem; color: var(--gray-500); margin: 0; }
+
+        /* Pricing */
+        .pricing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; max-width: 800px; margin: 0 auto; }
+        .price-card {
+            background: white; border: 2px solid var(--gray-200);
+            border-radius: var(--radius); padding: 36px;
+        }
+        .price-card.featured { border-color: var(--primary); }
+        .price-tier {
+            font-size: 0.75rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 1px;
+            color: var(--gray-400); margin-bottom: 8px;
+        }
+        .price-card.featured .price-tier { color: var(--primary); }
+        .price-amount { font-size: 2.5rem; font-weight: 700; }
+        .price-period { font-size: 0.9rem; color: var(--gray-500); margin-bottom: 24px; }
+        .price-features { list-style: none; }
+        .price-features li {
+            font-size: 0.9rem; color: var(--gray-600);
+            padding: 8px 0 8px 24px; position: relative;
+        }
+        .price-features li::before {
+            content: "✓"; position: absolute; left: 0;
+            color: var(--green); font-weight: 700;
+        }
+        .price-note {
+            text-align: center; margin-top: 24px;
+            font-size: 0.85rem; color: var(--gray-500);
+        }
+
+        /* Transparency */
+        .transparency-box {
+            background: white; border: 1px solid var(--gray-200);
+            border-radius: var(--radius); padding: 32px;
+            max-width: 800px; margin: 0 auto;
+        }
+        .transparency-box h3 { font-size: 1.1rem; margin-bottom: 16px; }
+        .transparency-list {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px;
+            list-style: none;
+        }
+        .transparency-list li {
+            font-size: 0.9rem; color: var(--gray-600);
+            padding: 6px 0 6px 20px; position: relative;
+        }
+        .transparency-list li::before {
+            content: "→"; position: absolute; left: 0;
+            color: var(--gray-400);
+        }
+
+        /* CTA */
+        .cta-section {
+            background: var(--primary); color: white;
+            padding: 80px 0; text-align: center;
+        }
+        .cta-section h2 { font-size: 2rem; margin-bottom: 12px; }
+        .cta-section p {
+            font-size: 1.1rem; opacity: 0.8;
+            margin-bottom: 32px; max-width: 500px; margin-left: auto; margin-right: auto;
+        }
+
+        /* FAQ */
+        .faq-list { max-width: 720px; margin: 0 auto; }
+        .faq-item {
+            border-bottom: 1px solid var(--gray-200);
+            padding: 20px 0;
+        }
+        .faq-q {
+            font-weight: 600; font-size: 1rem;
+            color: var(--gray-900); cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .faq-a {
+            font-size: 0.9rem; color: var(--gray-600);
+            margin-top: 12px; line-height: 1.7;
+            display: none;
+        }
+        .faq-item.open .faq-a { display: block; }
+        .faq-toggle { font-size: 1.2rem; color: var(--gray-400); }
+        .faq-item.open .faq-toggle::after { content: "−"; }
+        .faq-toggle::after { content: "+"; }
+
+        /* Footer */
+        footer {
+            background: var(--gray-900); color: var(--gray-400);
+            padding: 48px 0 32px;
+        }
+        .footer-grid {
+            display: grid; grid-template-columns: 2fr 1fr 1fr;
+            gap: 48px; margin-bottom: 40px;
+        }
+        .footer-grid h4 {
+            color: white; font-size: 0.85rem;
+            text-transform: uppercase; letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+        .footer-grid p, .footer-grid a {
+            font-size: 0.85rem; color: var(--gray-400);
+            text-decoration: none; display: block; margin-bottom: 8px;
+        }
+        .footer-grid a:hover { color: white; }
+        .footer-bottom {
+            border-top: 1px solid var(--gray-700);
+            padding-top: 24px; text-align: center;
+            font-size: 0.8rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-grid, .feature-grid, .process-grid, .roi-grid,
+            .validation-grid, .wt-grid, .pricing-grid, .footer-grid,
+            .transparency-list { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 2rem; }
+            .hero-stats { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+            .hero-visual { display: none; }
+            .feature-grid { grid-template-columns: 1fr; }
+            .process-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+    <div class="container header-inner">
+        <a href="#" class="logo">
+            <div class="logo-icon">CP</div>
+            <div class="logo-text">CNC <span>Planer</span> Pro</div>
+        </a>
+        <nav>
+            <a href="#features">Funktionen</a>
+            <a href="#validation">Validierung</a>
+            <a href="#roi">ROI-Rechner</a>
+            <a href="#pricing">Preise</a>
+            <a href="#contact" class="btn btn-primary">Demo anfragen</a>
+        </nav>
+    </div>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+    <div class="container hero-grid">
+        <div>
+            <h1>Strukturierte Fertigungskalkulation in 2 Minuten</h1>
+            <p>CNC Planer Pro berechnet Ihre Zuschlagskalkulation nach REFA, erstellt Fertigungsanweisungen und druckfertige Angebotsvorschläge — transparent und nachvollziehbar.</p>
+            <div class="hero-cta">
+                <a href="#contact" class="btn btn-accent btn-lg">Kostenlose Demo →</a>
+                <a href="#roi" class="btn btn-outline btn-lg" style="border-color: rgba(255,255,255,0.3); color: white;">ROI berechnen</a>
+            </div>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="hero-stat-value">2 min</div>
+                    <div class="hero-stat-label">pro Kalkulation</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value">+9,8%</div>
+                    <div class="hero-stat-label">Ø Abweichung (validiert)</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value">100%</div>
+                    <div class="hero-stat-label">offline, keine Cloud</div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="hero-calc-header">Zuschlagskalkulation — Verbindungsplatte 1.4571 (29 Stk)</div>
+            <div class="hero-calc-row"><span>Materialeinzelkosten (MEK)</span><span>€ 3,27</span></div>
+            <div class="hero-calc-row"><span>+ Materialgemeinkosten (5%)</span><span>€ 0,16</span></div>
+            <div class="hero-calc-row"><span>Fertigungseinzelkosten (FEK)</span><span>€ 14,82</span></div>
+            <div class="hero-calc-row"><span>+ Rüstkosten (anteilig)</span><span>€ 2,41</span></div>
+            <div class="hero-calc-row"><span>+ Arbeitsvorbereitung (12%)</span><span>€ 1,78</span></div>
+            <div class="hero-calc-row"><span style="font-weight:600">= Herstellkosten (HK)</span><span style="font-weight:600">€ 22,67</span></div>
+            <div class="hero-calc-row"><span>+ VwGK (10%) + VtGK (5%)</span><span>€ 3,40</span></div>
+            <div class="hero-calc-row"><span>+ Gewinn (8%)</span><span>€ 2,09</span></div>
+            <div class="hero-calc-row total"><span>Angebotspreis / Stück</span><span class="green">€ 28,16</span></div>
+        </div>
+    </div>
+</section>
+
+<!-- Features -->
+<section id="features">
+    <div class="container">
+        <span class="section-badge">Funktionen</span>
+        <h2 class="section-title">Von der Anfrage bis zum Angebot — in einem Durchgang</h2>
+        <p class="section-subtitle">Alles was Ihre Arbeitsvorbereitung braucht, in einer Oberfläche.</p>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon" style="background: #EFF6FF;">📊</div>
+                <h3>Zuschlagskalkulation</h3>
+                <p>5-stufig nach REFA: MEK → MGK → FEK → HK → SK → Angebotspreis. Jede Zeile mit vollständiger Berechnungsformel.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background: #F0FDF4;">⚙️</div>
+                <h3>Fertigungsanweisung</h3>
+                <p>Operationsfolge mit Schnittdaten (n, vf, ap), Werkzeugen und geschätzten Zeiten. Direkt an die Werkstatt weitergebbar.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background: #FEF3C7;">📄</div>
+                <h3>Angebotsvorschlag</h3>
+                <p>Professionelles Angebot mit Firmenkopf, Positionstabelle, Summe inkl. MwSt — druckfertig als PDF.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background: #FDF2F8;">🔄</div>
+                <h3>Nachkalkulation</h3>
+                <p>Soll-Ist-Vergleich nach der Fertigung. Jedes Teil macht die nächste Vorkalkulation genauer.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background: #F5F3FF;">💰</div>
+                <h3>Deckungsbeitragsrechnung</h3>
+                <p>DB I und DB II pro Stück und pro Auftrag. Sofort sehen, ob sich ein Auftrag lohnt.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon" style="background: #ECFDF5;">🔧</div>
+                <h3>Konfigurierbare Sätze</h3>
+                <p>Ihre Stundensätze, Zuschläge und Materialpreise. Einmal einstellen, überall wirksam.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Validation -->
+<section id="validation" class="validation-bg">
+    <div class="container">
+        <span class="section-badge">Validiert</span>
+        <h2 class="section-title">Getestet an echten Fertigungsaufträgen</h2>
+        <p class="section-subtitle">Verglichen mit der Vorkalkulation eines CNC-Betriebs — auf Herstellkosten-Ebene.</p>
+
+        <div class="validation-grid">
+            <div class="validation-card">
+                <div class="validation-number" style="color: var(--green);">+9,8%</div>
+                <div class="validation-label">Ø Abweichung HK (gewichtet)</div>
+            </div>
+            <div class="validation-card">
+                <div class="validation-number" style="color: var(--primary);">6</div>
+                <div class="validation-label">Positionen verglichen</div>
+            </div>
+            <div class="validation-card">
+                <div class="validation-number" style="color: var(--primary);">73</div>
+                <div class="validation-label">Einzelteile kalkuliert</div>
+            </div>
+        </div>
+
+        <table class="validation-table">
+            <thead>
+                <tr>
+                    <th>Bauteil</th>
+                    <th>Werkstoff</th>
+                    <th class="num">Stk</th>
+                    <th class="num">Referenz HK/Stk</th>
+                    <th class="num">CNC Planer HK/Stk</th>
+                    <th class="num">Abweichung</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Verbindungsplatte</td>
+                    <td>1.4571</td>
+                    <td class="num">29</td>
+                    <td class="num">€ 21,51</td>
+                    <td class="num">€ 22,67</td>
+                    <td class="num green">+5,4 %</td>
+                </tr>
+                <tr>
+                    <td>Adapterplatte</td>
+                    <td>AlMg3</td>
+                    <td class="num">10</td>
+                    <td class="num">€ 74,31</td>
+                    <td class="num">€ 79,06</td>
+                    <td class="num green">+6,4 %</td>
+                </tr>
+                <tr>
+                    <td>Block / Drehteil</td>
+                    <td>AlMg3</td>
+                    <td class="num">5</td>
+                    <td class="num">€ 66,15</td>
+                    <td class="num">€ 72,11</td>
+                    <td class="num green">+9,0 %</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="text-align: center; margin-top: 20px; font-size: 0.85rem; color: var(--gray-500);">
+            Konservative Tendenz = kein Verlustrisiko. Nachkalkulation empfohlen.
+        </div>
+    </div>
+</section>
+
+<!-- Process -->
+<section>
+    <div class="container">
+        <div class="text-center">
+            <span class="section-badge">Workflow</span>
+            <h2 class="section-title mx-auto" style="max-width: 600px;">Vier Schritte zum fertigen Angebot</h2>
+        </div>
+        <div style="height: 48px;"></div>
+        <div class="process-grid">
+            <div class="process-step">
+                <div class="process-num">1</div>
+                <h3>Eingabe</h3>
+                <p>Maße, Werkstoff,<br>Stückzahl, Aufspannungen</p>
+            </div>
+            <div class="process-step">
+                <div class="process-num">2</div>
+                <h3>Kalkulation</h3>
+                <p>Zuschlagskalkulation<br>automatisch nach REFA</p>
+            </div>
+            <div class="process-step">
+                <div class="process-num">3</div>
+                <h3>Prüfung</h3>
+                <p>Ergebnis + Formeln<br>einsehen und anpassen</p>
+            </div>
+            <div class="process-step">
+                <div class="process-num">4</div>
+                <h3>Angebot</h3>
+                <p>PDF exportieren<br>oder direkt drucken</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Wissenstransfer -->
+<section style="background: white;">
+    <div class="container">
+        <div class="wt-grid">
+            <div class="wt-text">
+                <span class="section-badge">Kernwert</span>
+                <h3>Das Tool ersetzt nicht 30 Jahre Erfahrung — es macht sie zugänglich</h3>
+                <p>Kalkulationswissen steckt heute in den Köpfen einzelner Mitarbeiter. Geht der Meister in Rente, geht das Wissen mit.</p>
+                <p>CNC Planer Pro strukturiert dieses Wissen. Neue Mitarbeiter kalkulieren ab Tag 1 nachvollziehbar — mit derselben Methodik wie der erfahrenste Kollege.</p>
+            </div>
+            <div class="wt-cards">
+                <div class="wt-card">
+                    <h4>Nachkalkulation</h4>
+                    <p>Soll-Ist-Vergleich nach der Fertigung. Jedes Teil macht die Vorkalkulation genauer.</p>
+                </div>
+                <div class="wt-card">
+                    <h4>Deckungsbeitragsrechnung</h4>
+                    <p>DB I + DB II pro Stück und Auftrag. Lohnt sich dieser Auftrag?</p>
+                </div>
+                <div class="wt-card">
+                    <h4>Fertigungsanweisung</h4>
+                    <p>Operationsfolge mit Schnittdaten — strukturiert an die Werkstatt, nicht mündlich.</p>
+                </div>
+                <div class="wt-card">
+                    <h4>Transparente Formeln</h4>
+                    <p>Jede Kalkulation zeigt die vollständige Berechnung. Keine Black Box.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ROI Calculator -->
+<section id="roi" class="roi-bg">
+    <div class="container">
+        <span class="section-badge">ROI-Rechner</span>
+        <h2 class="section-title">Was sparen Sie konkret?</h2>
+        <p class="section-subtitle">Geben Sie Ihre aktuellen Werte ein.</p>
+
+        <div class="roi-grid">
+            <div>
+                <div class="roi-input-group">
+                    <label class="roi-label">Kalkulationen pro Monat</label>
+                    <input type="number" class="roi-input" id="roiCalcs" value="86" oninput="calcROI()">
+                </div>
+                <div class="roi-input-group">
+                    <label class="roi-label">Minuten pro Kalkulation (heute)</label>
+                    <input type="number" class="roi-input" id="roiMins" value="31" oninput="calcROI()">
+                </div>
+                <div class="roi-input-group">
+                    <label class="roi-label">Stundensatz AV (Vollkosten, €)</label>
+                    <input type="number" class="roi-input" id="roiRate" value="55" oninput="calcROI()">
+                </div>
+                <div class="roi-input-group">
+                    <label class="roi-label">CNC Planer Pro Lizenz (€/Monat)</label>
+                    <input type="number" class="roi-input" id="roiLicense" value="149" oninput="calcROI()">
+                </div>
+            </div>
+            <div>
+                <div class="roi-result-card">
+                    <div class="roi-result-row"><span>Zeitaufwand heute</span><span id="roiTimeOld">44,4 h/Mo</span></div>
+                    <div class="roi-result-row"><span>Zeitaufwand mit CNC Planer</span><span id="roiTimeNew">2,9 h/Mo</span></div>
+                    <div class="roi-result-row"><span>Eingesparte Zeit</span><span id="roiTimeSaved" style="color: var(--green); font-weight: 600;">41,5 h/Mo</span></div>
+                    <div class="roi-result-row"><span>Kostenersparnis</span><span id="roiCostSaved" style="color: var(--green); font-weight: 600;">€ 2.283/Mo</span></div>
+                    <div class="roi-result-row"><span>./. Lizenzkosten</span><span id="roiLicenseCost">€ 149/Mo</span></div>
+                    <div class="roi-result-row" style="border-top: 2px solid var(--gray-800); font-weight: 700; font-size: 1.05rem;">
+                        <span>Netto-Ersparnis</span><span id="roiNet" style="color: var(--green);">€ 2.134/Mo</span>
+                    </div>
+                </div>
+                <div class="roi-big">
+                    <div class="roi-big-number" id="roiROI">14,3×</div>
+                    <div class="roi-big-label">Return on Investment</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Transparency -->
+<section>
+    <div class="container text-center">
+        <span class="section-badge">Ehrlichkeit</span>
+        <h2 class="section-title mx-auto">Was CNC Planer Pro (noch) nicht kann</h2>
+        <p class="section-subtitle mx-auto">Transparenz schafft Vertrauen. Diese Grenzen kennen wir — und arbeiten daran.</p>
+
+        <div class="transparency-box">
+            <ul class="transparency-list">
+                <li>Bearbeitungszeiten sind Richtwerte (nicht geometriebasiert)</li>
+                <li>Keine CAD-Integration (Abmessungen manuell)</li>
+                <li>Materialkosten aus Volumen × kg-Preis</li>
+                <li>6 Werkstoffe (S235, AlMg3, 1.4571, 1.4301, 42CrMo4, C45)</li>
+                <li>Keine Oberflächenbehandlung (Härten, Beschichten)</li>
+                <li>Nachkalkulation empfohlen für genaue Ergebnisse</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing -->
+<section id="pricing" style="background: white;">
+    <div class="container text-center">
+        <span class="section-badge">Preise</span>
+        <h2 class="section-title">Einfache, faire Preisgestaltung</h2>
+        <p class="section-subtitle mx-auto">Monatlich kündbar. Keine versteckten Kosten.</p>
+
+        <div class="pricing-grid">
+            <div class="price-card featured">
+                <div class="price-tier">Starter</div>
+                <div class="price-amount">€ 149</div>
+                <div class="price-period">pro Monat</div>
+                <ul class="price-features">
+                    <li>Unbegrenzte Kalkulationen</li>
+                    <li>Zuschlagskalkulation nach REFA</li>
+                    <li>Fertigungsanweisung</li>
+                    <li>PDF-Angebotsvorschlag</li>
+                    <li>Nachkalkulation (Soll-Ist)</li>
+                    <li>Deckungsbeitragsrechnung</li>
+                    <li>E-Mail Support</li>
+                </ul>
+            </div>
+            <div class="price-card">
+                <div class="price-tier">Professional</div>
+                <div class="price-amount">€ 299</div>
+                <div class="price-period">pro Monat + € 500 Einrichtung</div>
+                <ul class="price-features">
+                    <li>Alles aus Starter</li>
+                    <li>Kalibrierung auf Ihre Stundensätze</li>
+                    <li>Bis zu 3 Benutzer</li>
+                    <li>Persönliches Onboarding (2h)</li>
+                    <li>Telefon-Support</li>
+                    <li>Quartals-Review</li>
+                </ul>
+            </div>
+        </div>
+        <p class="price-note">Förderfähig über Sachsen EFRE — bis zu 60 % Zuschuss für Kleinstunternehmen</p>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="contact">
+    <div class="container">
+        <h2>Testen Sie es mit Ihrem eigenen Werkstück</h2>
+        <p>Kostenlose Vor-Ort Demo — wir kalkulieren Ihr Bauteil live. Kein Risiko, keine Verpflichtung.</p>
+        <a href="mailto:florian@ziesche.co?subject=CNC%20Planer%20Pro%20Demo" class="btn btn-accent btn-lg">Demo anfragen →</a>
+        <div style="margin-top: 20px; font-size: 0.9rem; opacity: 0.7;">
+            Oder direkt: +1 347 740 1465
+        </div>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" style="background: var(--gray-50);">
+    <div class="container">
+        <div class="text-center">
+            <span class="section-badge">FAQ</span>
+            <h2 class="section-title">Häufige Fragen</h2>
+        </div>
+        <div style="height: 40px;"></div>
+        <div class="faq-list">
+            <div class="faq-item" onclick="this.classList.toggle('open')">
+                <div class="faq-q">Wie genau ist die Kalkulation?<span class="faq-toggle"></span></div>
+                <div class="faq-a">Im Vergleich mit einer realen Betriebskalkulation (6 Positionen, 73 Teile) liegt die Abweichung bei durchschnittlich +9,8 % auf Herstellkosten-Ebene. Die konservative Tendenz schützt Ihre Marge. Mit der integrierten Nachkalkulation verbessert sich die Genauigkeit über die Zeit.</div>
+            </div>
+            <div class="faq-item" onclick="this.classList.toggle('open')">
+                <div class="faq-q">Brauche ich CAD-Dateien?<span class="faq-toggle"></span></div>
+                <div class="faq-a">Nein. Sie geben Maße, Werkstoff und Stückzahl manuell ein. Eine CAD-Integration (STEP-Import) ist für eine spätere Version geplant.</div>
+            </div>
+            <div class="faq-item" onclick="this.classList.toggle('open')">
+                <div class="faq-q">Ist das ein ERP-Ersatz?<span class="faq-toggle"></span></div>
+                <div class="faq-a">Nein. CNC Planer Pro ist ein Kalkulationstool — wie ein intelligenter Taschenrechner für die Arbeitsvorbereitung. Keine Materialwirtschaft, keine Auftragsverfolgung. Es ergänzt bestehende Systeme.</div>
+            </div>
+            <div class="faq-item" onclick="this.classList.toggle('open')">
+                <div class="faq-q">Wo sind meine Daten?<span class="faq-toggle"></span></div>
+                <div class="faq-a">100 % lokal auf Ihrem Rechner. CNC Planer Pro ist eine einzelne HTML-Datei ohne Internetverbindung. Keine Cloud, keine Datenübertragung, kein Account.</div>
+            </div>
+            <div class="faq-item" onclick="this.classList.toggle('open')">
+                <div class="faq-q">Gibt es eine Testphase?<span class="faq-toggle"></span></div>
+                <div class="faq-a">Ja. Wir machen eine kostenlose Vor-Ort Demo mit Ihrem eigenen Werkstück, gefolgt von einer 4-wöchigen Pilotphase. Die Entscheidung treffen Sie erst danach, auf Basis echter Daten.</div>
+            </div>
+            <div class="faq-item" onclick="this.classList.toggle('open')">
+                <div class="faq-q">Welche Förderung gibt es?<span class="faq-toggle"></span></div>
+                <div class="faq-a">In Sachsen können Kleinstunternehmen über das EFRE-Programm bis zu 60 % der Kosten gefördert bekommen. Wir helfen Ihnen gern bei der Antragstellung.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="footer-grid">
+            <div>
+                <h4>CNC Planer Pro</h4>
+                <p>Strukturierte Fertigungskalkulation für CNC-Betriebe. Validiert an echten Aufträgen. Made in Germany.</p>
+                <p style="margin-top: 16px;">Version 0.18.0-beta</p>
+            </div>
+            <div>
+                <h4>Produkt</h4>
+                <a href="#features">Funktionen</a>
+                <a href="#validation">Validierung</a>
+                <a href="#roi">ROI-Rechner</a>
+                <a href="#pricing">Preise</a>
+                <a href="#faq">FAQ</a>
+            </div>
+            <div>
+                <h4>Kontakt</h4>
+                <a href="mailto:florian@ziesche.co">florian@ziesche.co</a>
+                <a href="tel:+13477401465">+1 347 740 1465</a>
+                <p style="margin-top: 16px;">Florian Ziesche</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 CNC Planer Pro · Florian Ziesche · Alle Rechte vorbehalten</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+function calcROI() {
+    const calcs = parseFloat(document.getElementById('roiCalcs').value) || 0;
+    const mins = parseFloat(document.getElementById('roiMins').value) || 0;
+    const rate = parseFloat(document.getElementById('roiRate').value) || 0;
+    const license = parseFloat(document.getElementById('roiLicense').value) || 0;
+
+    const hoursOld = (calcs * mins) / 60;
+    const hoursNew = (calcs * 2) / 60;
+    const hoursSaved = hoursOld - hoursNew;
+    const costSaved = hoursSaved * rate;
+    const net = costSaved - license;
+    const roi = license > 0 ? costSaved / license : 0;
+
+    document.getElementById('roiTimeOld').textContent = hoursOld.toFixed(1) + ' h/Mo';
+    document.getElementById('roiTimeNew').textContent = hoursNew.toFixed(1) + ' h/Mo';
+    document.getElementById('roiTimeSaved').textContent = hoursSaved.toFixed(1) + ' h/Mo';
+    document.getElementById('roiCostSaved').textContent = '€ ' + Math.round(costSaved).toLocaleString('de-DE') + '/Mo';
+    document.getElementById('roiLicenseCost').textContent = '€ ' + license + '/Mo';
+    document.getElementById('roiNet').textContent = '€ ' + Math.round(net).toLocaleString('de-DE') + '/Mo';
+    document.getElementById('roiROI').textContent = roi.toFixed(1) + '×';
+}
+</script>
+
+</body>
+</html>
