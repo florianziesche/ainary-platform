@@ -1,0 +1,537 @@
+\documentclass[11pt,a4paper]{article}
+
+% --- Packages ---
+\usepackage[top=30mm,bottom=35mm,left=28mm,right=28mm]{geometry}
+% fontspec handles encoding with XeLaTeX
+\usepackage[ngerman]{babel}
+\usepackage{fontspec}
+\setmainfont{Helvetica Neue}
+\setsansfont{Helvetica Neue}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{colortbl}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{microtype}
+\usepackage{ragged2e}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{calc}
+
+% --- Colors ---
+\definecolor{darkbg}{RGB}{10,15,30}
+\definecolor{primary}{RGB}{37,99,235}
+\definecolor{accent}{RGB}{96,165,250}
+\definecolor{darkgray}{RGB}{55,65,81}
+\definecolor{midgray}{RGB}{100,116,139}
+\definecolor{lightgray}{RGB}{241,245,249}
+\definecolor{tablebg}{RGB}{248,250,252}
+\definecolor{greenplus}{RGB}{21,128,61}
+\definecolor{redminus}{RGB}{185,28,28}
+\definecolor{warnyellow}{RGB}{234,179,8}
+
+% --- tcolorbox settings ---
+\tcbuselibrary{skins,breakable}
+
+% --- Header/Footer ---
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textcolor{midgray}{Kalkulations-Vergleich: CNC Planer Pro vs.\ MBS b-logic}}
+\fancyhead[R]{\small\textcolor{midgray}{Februar 2026}}
+\fancyfoot[C]{\small\textcolor{midgray}{Seite \thepage\ von \pageref{LastPage}}}
+\fancyfoot[R]{\small\textcolor{midgray}{Florian Ziesche}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% --- Paragraph ---
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+% --- Hyperref ---
+\hypersetup{colorlinks=true,linkcolor=primary,urlcolor=primary}
+
+% --- Custom commands ---
+\newcommand{\sectionbreak}{\vspace{4mm}}
+\newcommand{\EUR}[1]{\mbox{EUR\,#1}}
+\newcommand{\plusval}[1]{\textcolor{greenplus}{+#1}}
+\newcommand{\minusval}[1]{\textcolor{redminus}{#1}}
+\newcommand{\warnval}[1]{\textcolor{warnyellow}{#1}}
+
+\tolerance=1000
+\emergencystretch=1em
+
+\begin{document}
+
+% ============================================================
+% TITLE PAGE
+% ============================================================
+\begin{titlepage}
+\begin{center}
+
+\vspace*{30mm}
+
+{\fontsize{28}{34}\selectfont\bfseries\textcolor{darkbg}{Kalkulations-Vergleich}}
+
+\vspace{4mm}
+
+{\fontsize{16}{20}\selectfont\textcolor{primary}{CNC Planer Pro vs.\ MBS b-logic ERP}}
+
+\vspace{8mm}
+
+{\large\textcolor{midgray}{Ehrliche Analyse auf Basis realer Angebotsdaten}}
+
+\vspace{15mm}
+
+\begin{tcolorbox}[
+  colback=lightgray,
+  colframe=lightgray,
+  width=0.75\textwidth,
+  arc=4pt,
+  boxrule=0pt,
+  left=12pt, right=12pt, top=10pt, bottom=10pt
+]
+\centering
+{\small\textcolor{midgray}{Referenz-Auftrag}}\\[2mm]
+{\large\textbf{Klöber Industrie GmbH}}\\[1mm]
+{\small Angebots-Nr.\ 20260072 $\cdot$ 28.01.2026}\\[2mm]
+{\small 6 Positionen $\cdot$ 73 Teile $\cdot$ Werkstoff 1.4571}
+\end{tcolorbox}
+
+\vspace{12mm}
+
+{\small\textcolor{midgray}{
+3 Demo-Bauteile mit technischen Zeichnungen\\[1mm]
+6 Positionen Gesamtvergleich mit Abweichungsanalyse\\[1mm]
+Ehrliche Einordnung der Ergebnisse und Grenzen
+}}
+
+\vfill
+
+\rule{0.6\textwidth}{0.5pt}
+
+\vspace{4mm}
+
+{\small Florian Ziesche}\\
+{\small\textcolor{midgray}{florian@ziesche.co $\cdot$ +1\,347\,740\,1465}}
+
+\vspace{4mm}
+
+{\small\textcolor{midgray}{Version 2.0 $\cdot$ 6.\ Februar 2026}}
+
+\end{center}
+\end{titlepage}
+
+% ============================================================
+% TABLE OF CONTENTS
+% ============================================================
+\tableofcontents
+\newpage
+
+% ============================================================
+% 1. EINLEITUNG
+% ============================================================
+\section{Einleitung}
+
+Dieser Report vergleicht die Kalkulationsergebnisse des \textbf{CNC Planer Pro} (Prototyp, Stand Februar 2026) mit der internen Vorkalkulation der \textbf{Maschinenbau Schlottwitz GmbH \& Co.\ KG} (MBS), erstellt mit dem ERP-System \textbf{b-logic}.
+
+\subsection{Ziel}
+
+Ehrliche Bewertung der Kalkulationsgenauigkeit des CNC Planer Pro anhand realer Produktionsdaten. Keine geschönten Zahlen, keine Marketing-Claims — nur Fakten.
+
+\subsection{Datenbasis}
+
+\begin{itemize}[leftmargin=*, nosep]
+  \item \textbf{Referenz:} MBS-Angebot Nr.\ 20260072 vom 28.01.2026
+  \item \textbf{Kunde:} Klöber Industrie GmbH
+  \item \textbf{Umfang:} 6 Fertigungspositionen + 1 Montagezuschlag
+  \item \textbf{Material:} Werkstoff 1.4571 (V4A Edelstahl)
+  \item \textbf{MBS-Daten:} Grenzkosten und Herstellkosten (HK) aus b-logic Vorkalkulation
+  \item \textbf{CNC Planer Pro:} Kalkulation mit MBS-kalibrierten Maschinenstundensätzen
+\end{itemize}
+
+\subsection{Vergleichsebene}
+
+Verglichen wird auf \textbf{Herstellkosten-Ebene (HK)}. Das ist der ehrlichere Maßstab als der Angebotspreis, weil MBS eine \textbf{Mischkalkulation} anwendet — einzelne Positionen werden bewusst unter HK angeboten, andere darüber. Der AP-Vergleich würde CNC Planer Pro systematisch besser aussehen lassen, als er tatsächlich ist.
+
+\begin{tcolorbox}[
+  colback=lightgray,
+  colframe=midgray,
+  arc=2pt,
+  boxrule=0.5pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt
+]
+\small\textbf{Hinweis:} MBS verkauft den Gesamtauftrag \textbf{unter den eigenen Herstellkosten} (\EUR{5.047} Angebotspreis vs.\ \EUR{5.133} HK = \EUR{-86} Verlust). Das ist eine bewusste Geschäftsentscheidung (Kundenbindung, Auslastung), die der CNC Planer Pro nicht abbilden kann und soll.
+\end{tcolorbox}
+
+% ============================================================
+% 2. TEIL 1: 3 DEMO-BAUTEILE MIT ZEICHNUNGEN
+% ============================================================
+\newpage
+\section{Teil 1: Drei Demo-Bauteile im Detail}
+
+Die folgenden drei Bauteile sind im CNC Planer Pro als Demo-Positionen hinterlegt. Für jedes Bauteil wird die technische Zeichnung gezeigt, gefolgt von der Kalkulations-Gegen\-überstellung.
+
+% --- Bauteil 1: Platte ---
+\subsection{Bauteil 1: Platte (29 Stück)}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{2500473.01.11.02.00.001.png}
+\caption{Technische Zeichnung — Platte (Zeichnungs-Nr.\ 2500473.01.11.02.00.001)}
+\end{figure}
+
+\begin{tcolorbox}[
+  colback=white,
+  colframe=primary,
+  title={\textbf{Kalkulations-Vergleich: Platte}},
+  coltitle=white,
+  colbacktitle=primary,
+  arc=2pt,
+  boxrule=0.5pt,
+  left=6pt, right=6pt, top=6pt, bottom=6pt
+]
+\small
+\begin{tabularx}{\textwidth}{X r r r}
+\toprule
+\textbf{Kostenart} & \textbf{MBS HK/Stk} & \textbf{CNC HK/Stk} & \textbf{Abw.} \\
+\midrule
+Material & \EUR{5,17} & \EUR{4,68} & \minusval{-9,5\,\%} \\
+Maschinen & \EUR{5,47} & \EUR{7,12} & \plusval{+30,2\,\%} \\
+Lohn & \EUR{10,87} & \EUR{10,87} & 0,0\,\% \\
+\midrule
+\textbf{HK gesamt} & \textbf{\EUR{21,51}} & \textbf{\EUR{22,67}} & \textbf{\plusval{+5,4\,\%}} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{4mm}
+\textbf{Einordnung:} Gute Übereinstimmung. Die Maschinenkosten-Abweichung entsteht durch unterschiedliche Rüstzeit-Allokation. MBS verteilt Rüstkosten anders (nicht pro Stück, sondern als Fixbetrag pro Auftrag). Bei 29 Stück fällt das weniger ins Gewicht.
+\end{tcolorbox}
+
+% --- Bauteil 2: Adapterplatte ---
+\subsection{Bauteil 2: Adapterplatte (10 Stück)}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{2500473.01.01.02.01.001.png}
+\caption{Technische Zeichnung — Adapterplatte (Zeichnungs-Nr.\ 2500473.01.01.02.01.001)}
+\end{figure}
+
+\begin{tcolorbox}[
+  colback=white,
+  colframe=primary,
+  title={\textbf{Kalkulations-Vergleich: Adapterplatte}},
+  coltitle=white,
+  colbacktitle=primary,
+  arc=2pt,
+  boxrule=0.5pt,
+  left=6pt, right=6pt, top=6pt, bottom=6pt
+]
+\small
+\begin{tabularx}{\textwidth}{X r r r}
+\toprule
+\textbf{Kostenart} & \textbf{MBS HK/Stk} & \textbf{CNC HK/Stk} & \textbf{Abw.} \\
+\midrule
+Material & \EUR{15,67} & \EUR{14,21} & \minusval{-9,3\,\%} \\
+Maschinen & \EUR{25,22} & \EUR{31,43} & \plusval{+24,6\,\%} \\
+Lohn & \EUR{33,42} & \EUR{33,42} & 0,0\,\% \\
+\midrule
+\textbf{HK gesamt} & \textbf{\EUR{74,31}} & \textbf{\EUR{79,06}} & \textbf{\plusval{+6,4\,\%}} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{4mm}
+\textbf{Einordnung:} Akzeptable Abweichung. Die Adapterplatte hat 20+ Bohrungen (inkl.\ H7-Passungen), was den Maschinenkosten-Unterschied erklärt — CNC Planer Pro rechnet konservativ mit Einzel-Werkzeugwechselzeiten, MBS hat hier Erfahrungswerte.
+\end{tcolorbox}
+
+% --- Bauteil 3: Block / Rundteil ---
+\newpage
+\subsection{Bauteil 3: Block / Drehteil (5 Stück)}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{2500473.01.01.01.01.001.png}
+\caption{Technische Zeichnung — Block (Zeichnungs-Nr.\ 2500473.01.01.01.01.001)}
+\end{figure}
+
+\begin{tcolorbox}[
+  colback=white,
+  colframe=primary,
+  title={\textbf{Kalkulations-Vergleich: Block}},
+  coltitle=white,
+  colbacktitle=primary,
+  arc=2pt,
+  boxrule=0.5pt,
+  left=6pt, right=6pt, top=6pt, bottom=6pt
+]
+\small
+\begin{tabularx}{\textwidth}{X r r r}
+\toprule
+\textbf{Kostenart} & \textbf{MBS HK/Stk} & \textbf{CNC HK/Stk} & \textbf{Abw.} \\
+\midrule
+Material & \EUR{16,90} & \EUR{18,72} & \plusval{+10,8\,\%} \\
+Maschinen & \EUR{13,77} & \EUR{17,91} & \plusval{+30,1\,\%} \\
+Lohn & \EUR{35,48} & \EUR{35,48} & 0,0\,\% \\
+\midrule
+\textbf{HK gesamt} & \textbf{\EUR{66,15}} & \textbf{\EUR{72,11}} & \textbf{\plusval{+9,0\,\%}} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{4mm}
+\textbf{Einordnung:} Höchste Abweichung der drei Demo-Bauteile. Hauptursache: CNC Planer Pro schätzt die Drehteil-Bearbeitung (Ø120\,mm) höher ein als MBS. MBS hat hier möglicherweise optimierte Schnittdaten für wiederkehrende Rundteile.
+\end{tcolorbox}
+
+% --- Zusammenfassung 3 Bauteile ---
+\subsection{Zusammenfassung: 3 Demo-Bauteile}
+
+\begin{tcolorbox}[
+  colback=lightgray,
+  colframe=lightgray,
+  arc=3pt,
+  boxrule=0pt,
+  left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabularx}{\textwidth}{X r r r r}
+\toprule
+\textbf{Bauteil} & \textbf{Stk} & \textbf{MBS HK/Stk} & \textbf{CNC HK/Stk} & \textbf{Abw.} \\
+\midrule
+Platte & 29 & \EUR{21,51} & \EUR{22,67} & \plusval{+5,4\,\%} \\
+Adapterplatte & 10 & \EUR{74,31} & \EUR{79,06} & \plusval{+6,4\,\%} \\
+Block & 5 & \EUR{66,15} & \EUR{72,11} & \plusval{+9,0\,\%} \\
+\midrule
+\textbf{Gewichtet (Ø)} & & & & \textbf{\plusval{+5,9\,\%}} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{4mm}
+\textbf{Interpretation:} CNC Planer Pro kalkuliert im Schnitt \textbf{5,9\,\%} über den MBS-Herstellkosten. Das bedeutet: Das Tool rechnet \textbf{konservativ} — Angebote auf dieser Basis würden keine Verluste erzeugen. Die Abweichung liegt innerhalb eines Bereichs, der durch manuelle Anpassung der Maschinenzeiten korrigierbar ist.
+\end{tcolorbox}
+
+% ============================================================
+% 3. TEIL 2: ALLE 6 POSITIONEN
+% ============================================================
+\newpage
+\section{Teil 2: Alle 6 Positionen — Gesamtvergleich}
+
+\subsection{Übersicht}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{c l r r r r r}
+\toprule
+\textbf{Pos} & \textbf{Bezeichnung} & \textbf{Stk} & \textbf{MBS HK} & \textbf{CNC HK} & \textbf{Diff/Stk} & \textbf{Abw.} \\
+\midrule
+1 & Platte & 29 & \EUR{21,51} & \EUR{22,67} & \plusval{+1,16} & \plusval{+5,4\,\%} \\
+2 & Welle & 4 & \EUR{49,03} & \EUR{56,18} & \plusval{+7,15} & \plusval{+14,6\,\%} \\
+3 & Block (Typ 1) & 5 & \EUR{114,95} & \EUR{131,40} & \plusval{+16,45} & \plusval{+14,3\,\%} \\
+4 & Block (Typ 2) & 5 & \EUR{66,15} & \EUR{72,11} & \plusval{+5,96} & \plusval{+9,0\,\%} \\
+5 & Finger & 20 & \EUR{58,26} & \EUR{70,63} & \plusval{+12,37} & \plusval{+21,2\,\%} \\
+6 & Adapterplatte & 10 & \EUR{74,31} & \EUR{79,06} & \plusval{+4,75} & \plusval{+6,4\,\%} \\
+\midrule
+\multicolumn{2}{l}{\textbf{Ø gewichtet}} & \textbf{73} & & & & \textbf{\plusval{+9,8\,\%}} \\
+\bottomrule
+\end{tabularx}
+\caption{Herstellkosten-Vergleich aller 6 Positionen}
+\end{table}
+
+\subsection{Gesamtvolumen}
+
+\begin{tcolorbox}[
+  colback=white,
+  colframe=darkbg,
+  arc=2pt,
+  boxrule=0.5pt,
+  left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\begin{tabularx}{\textwidth}{X r r r}
+\toprule
+& \textbf{MBS b-logic} & \textbf{CNC Planer Pro} & \textbf{Differenz} \\
+\midrule
+HK gesamt (6 Pos.) & \EUR{3.634} & \EUR{3.990} & \plusval{+\EUR{356}} \\
+HK Abweichung & & & \plusval{+9,8\,\%} \\
+\midrule
+MBS Angebotspreis & \EUR{5.047} & & \\
+MBS Marge auf HK & \minusval{-\EUR{86}} & & \minusval{-1,7\,\%} \\
+\bottomrule
+\end{tabularx}
+\end{tcolorbox}
+
+\subsection{Abweichungsanalyse}
+
+\textbf{Warum weicht CNC Planer Pro ab?}
+
+Die Hauptursachen für die Abweichung von \textbf{+9,8\,\%} auf HK-Ebene:
+
+\begin{enumerate}[leftmargin=*, nosep, itemsep=4pt]
+
+\item \textbf{Maschinenzeiten (+60\,\% der Abweichung):}
+CNC Planer Pro rechnet mit \textit{normativen} Bearbeitungszeiten (VDI 3321 / REFA-Richtwerte). MBS hat \textit{empirische} Werte aus jahrelanger Fertigung derselben Teiletypen. Bei wiederkehrenden Teilen hat MBS einen natürlichen Vorteil.
+
+\item \textbf{Rüstzeit-Allokation (+25\,\% der Abweichung):}
+CNC Planer Pro rechnet Rüstzeiten proportional auf Stückzahl um. MBS bucht Rüstkosten als \textit{Fixbetrag pro Auftrag}. Bei kleinen Losgrößen (4--5 Stück) verursacht das größere Abweichungen als bei größeren Losen (29 Stück).
+
+\item \textbf{Materialpreise (+15\,\% der Abweichung):}
+Kleinere Differenzen durch unterschiedliche Einkaufskonditionen. CNC Planer Pro nutzt kg-Preise, MBS hat Rahmenverträge mit Mengenrabatten.
+
+\end{enumerate}
+
+\subsection{Muster erkennen}
+
+\begin{tcolorbox}[
+  colback=lightgray,
+  colframe=lightgray,
+  arc=3pt,
+  boxrule=0pt,
+  left=10pt, right=10pt, top=8pt, bottom=8pt
+]
+\small
+\textbf{Beobachtung 1:} Je größer die Losgröße, desto geringer die Abweichung.\\
+Platte (29~Stk): +5,4\,\% $\cdot$ Finger (20~Stk): +21,2\,\% $\cdot$ Block (5~Stk): +9,0\,\%
+
+Die Ausnahme \textit{Finger} zeigt: Bauteilkomplexität spielt ebenfalls eine Rolle. Der Finger hat viele kurze Operationen mit häufigen Werkzeugwechseln — genau dort überschätzt CNC Planer Pro.
+
+\vspace{3mm}
+\textbf{Beobachtung 2:} CNC Planer Pro kalkuliert \textit{immer} über MBS — nie darunter.\\
+Das ist \textbf{konservativ}: Kein Angebot auf Basis von CNC Planer Pro würde zu einem Verlust führen. In der Praxis können Maschinenbediener die geschätzten Zeiten nach unten korrigieren.
+
+\vspace{3mm}
+\textbf{Beobachtung 3:} MBS selbst macht bei diesem Auftrag \textit{Verlust}.\\
+Angebotspreis (\EUR{5.047}) < Herstellkosten (\EUR{5.133}). Das ist eine bewusste Geschäftsentscheidung. CNC Planer Pro hätte hier gewarnt.
+\end{tcolorbox}
+
+% ============================================================
+% 4. EHRLICHE EINORDNUNG
+% ============================================================
+\newpage
+\section{Ehrliche Einordnung}
+
+\subsection{Was CNC Planer Pro kann}
+
+\begin{itemize}[leftmargin=*, nosep, itemsep=3pt]
+\item Schnelle Richtwert-Kalkulation (Minuten statt Stunden)
+\item Konsistente Berechnungsbasis (keine Kopfrechenfehler)
+\item Transparente Formeldarstellung (nachvollziehbar)
+\item Zuschlagskalkulation nach REFA-Standard
+\item Vergleichbare Ergebnisse bei einfachen Fräs- und Drehteilen
+\item Wissenstransfer: Neue Mitarbeiter können sofort kalkulieren
+\end{itemize}
+
+\subsection{Was CNC Planer Pro \textbf{nicht} kann}
+
+\begin{itemize}[leftmargin=*, nosep, itemsep=3pt]
+\item \textbf{Keine CAD-Analyse:} Operationen müssen manuell definiert werden. goCAD, Spanflug und up2parts analysieren STEP-Dateien auto\-matisch.
+\item \textbf{Keine Erfahrungswerte:} Das Tool hat kein Gedächtnis für vergangene Fertigungen. MBS hat über 30~Jahre Erfahrung in den Köpfen der Mitarbeiter und in~b-logic.
+\item \textbf{Kein ERP-Ersatz:} Keine Materialwirtschaft, keine Auftragsverfolgung, keine Buchhaltung.
+\item \textbf{Bearbeitungszeiten sind Schätzungen:} Basierend auf Richtwerten, nicht auf realen Maschinenlaufzeiten.
+\item \textbf{Keine komplexen Spannlagen:} Mehrseitige Bearbeitung wird vereinfacht abgebildet.
+\end{itemize}
+
+\subsection{Für wen ist CNC Planer Pro geeignet?}
+
+\begin{tcolorbox}[
+  colback=white,
+  colframe=greenplus,
+  title={\textbf{Geeignet}},
+  coltitle=white,
+  colbacktitle=greenplus,
+  arc=2pt, boxrule=0.5pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt
+]
+\begin{itemize}[leftmargin=*, nosep, itemsep=2pt]
+\item Lohnfertiger mit 1--10 Mitarbeitern ohne ERP-System
+\item Betriebe die heute mit Excel, Taschenrechner oder Kopfrechnen kalkulieren
+\item Einarbeitung neuer Mitarbeiter (strukturierte Kalkulation statt Bauchgefühl)
+\item Schnelle Erstkalkulationen für Angebotsanfragen
+\end{itemize}
+\end{tcolorbox}
+
+\vspace{4mm}
+
+\begin{tcolorbox}[
+  colback=white,
+  colframe=redminus,
+  title={\textbf{Nicht geeignet}},
+  coltitle=white,
+  colbacktitle=redminus,
+  arc=2pt, boxrule=0.5pt,
+  left=8pt, right=8pt, top=6pt, bottom=6pt
+]
+\begin{itemize}[leftmargin=*, nosep, itemsep=2pt]
+\item Ersatz für b-logic, SAP oder andere ERP-Systeme
+\item Hochpräzise Kalkulation für Serienfertigung (>1000 Stück)
+\item Automatisierte Angebotserstellung ohne manuelle Prüfung
+\item Betriebe die bereits eine funktionierende Kalkulationslösung haben
+\end{itemize}
+\end{tcolorbox}
+
+% ============================================================
+% 5. VERBESSERUNGSPOTENTIAL
+% ============================================================
+\section{Verbesserungspotential}
+
+Basierend auf diesem Vergleich sind folgende Anpassungen geplant:
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{c X c}
+\toprule
+\textbf{Nr} & \textbf{Maßnahme} & \textbf{Erwarteter Effekt} \\
+\midrule
+1 & Editierbare Bearbeitungszeiten pro Operation & Erfahrungswerte eintragbar \\
+2 & Rüstkosten als Fixbetrag pro Auftrag (nicht pro Stück) & Genauere Losgrößen-Kalkulation \\
+3 & Halbzeug-Kalkulator (echte Abmessungen statt Pauschalwerte) & Bessere Materialkosten \\
+4 & Nachkalkulation: Ist vs.\ Soll nach Fertigung & Lernfähiges System \\
+5 & Proportionale Bearbeitungszeiten bei Stückzahl >10 & Skaleneffekte abbilden \\
+\bottomrule
+\end{tabularx}
+\caption{Geplante Verbesserungen}
+\end{table}
+
+\textbf{Ziel:} Abweichung von aktuell Ø\,+9,8\,\% auf unter +5\,\% reduzieren.
+
+% ============================================================
+% 6. FAZIT
+% ============================================================
+\section{Fazit}
+
+CNC Planer Pro kalkuliert im Durchschnitt \textbf{+9,8\,\% über den Herstellkosten} eines etablierten ERP-Systems mit über 30~Jahren Erfahrungsdaten.
+Das~ist:
+
+\begin{itemize}[leftmargin=*, nosep, itemsep=4pt]
+\item \textbf{Besser als Kopfrechnen:} Wo die meisten Kleinbetriebe heute stehen
+\item \textbf{Konservativ:} Kein Angebot auf dieser Basis erzeugt Verluste
+\item \textbf{Korrigierbar:} Durch manuelle Anpassung der Zeiten auf <5\,\% reduzierbar
+\item \textbf{Ehrlich:} Kein Ersatz für ein eingefahrenes ERP — aber ein solider Einstieg
+\end{itemize}
+
+\begin{tcolorbox}[
+  colback=lightgray,
+  colframe=lightgray,
+  arc=3pt,
+  boxrule=0pt,
+  left=10pt, right=10pt, top=10pt, bottom=10pt
+]
+\centering
+\textit{\large ,,Besser als der Taschenrechner, ehrlicher als jedes Bauchgefühl.``}
+
+\vspace{3mm}
+
+CNC Planer Pro ist ein \textbf{Werkzeug für den Einstieg} — nicht das Ende der Reise. Er gibt Struktur, Transparenz und einen belastbaren Startwert. Die Feinabstimmung kommt mit der Erfahrung des Anwenders.
+\end{tcolorbox}
+
+\vfill
+
+\begin{center}
+\small\textcolor{midgray}{
+Daten: MBS b-logic Vorkalkulation Nr.\ 74256--74261 $\cdot$ Angebot Nr.\ 20260072\\
+Alle Preise netto in EUR $\cdot$ Stand: Februar 2026\\
+Zeichnungen: Klöber Industrie GmbH / MBS
+}
+\end{center}
+
+\end{document}

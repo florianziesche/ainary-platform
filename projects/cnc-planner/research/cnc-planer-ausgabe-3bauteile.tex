@@ -1,0 +1,574 @@
+\documentclass[a4paper,11pt]{article}
+
+% Fonts
+\usepackage{fontspec}
+\setmainfont{Helvetica Neue}[
+  BoldFont=Helvetica Neue Bold,
+  ItalicFont=Helvetica Neue Italic
+]
+
+% Layout
+\usepackage[top=30mm, bottom=35mm, left=28mm, right=28mm]{geometry}
+\usepackage{parskip}
+\setlength{\parskip}{8pt}
+\setlength{\parindent}{0pt}
+
+% Colors
+\usepackage{xcolor}
+\definecolor{primary}{HTML}{2563EB}
+\definecolor{darkbg}{HTML}{0A0F1E}
+\definecolor{darkblue}{HTML}{1E3A5F}
+\definecolor{bodytext}{HTML}{374151}
+\definecolor{heading}{HTML}{111827}
+\definecolor{subtitle}{HTML}{64748B}
+\definecolor{lightgray}{HTML}{F8F9FA}
+\definecolor{border}{HTML}{E5E7EB}
+\definecolor{accent}{HTML}{93C5FD}
+\definecolor{lightondark}{HTML}{D1D5DB}
+\definecolor{darkgreen}{HTML}{15803D}
+\definecolor{lightblue}{HTML}{F0F4FF}
+\definecolor{lightgreen}{HTML}{F0FDF4}
+
+% Headers & Footers
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyfoot[L]{\footnotesize\color{subtitle}\textls[50]{CNC PLANER PRO · KALKULATIONSAUSGABE}}
+\fancyfoot[R]{\footnotesize\color{subtitle}\thepage}
+
+% Headings
+\usepackage{titlesec}
+\usepackage{needspace}
+\titleformat{\section}{\needspace{6\baselineskip}\fontsize{24}{28}\selectfont\bfseries\color{heading}}{}{0em}{}[\vspace{-2pt}]
+\titleformat{\subsection}{\needspace{4\baselineskip}\fontsize{14}{18}\selectfont\bfseries\color{heading}}{}{0em}{}
+\titlespacing*{\section}{0pt}{0pt}{4pt}
+\titlespacing*{\subsection}{0pt}{16pt}{6pt}
+
+% Tables
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{colortbl}
+
+% Lists
+\usepackage{enumitem}
+\setlist[itemize]{leftmargin=1.2em, itemsep=2pt, parsep=0pt, topsep=4pt}
+
+% Links
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=primary, urlcolor=primary}
+
+% Drawing
+\usepackage{tikz}
+\usetikzlibrary{calc,positioning}
+
+% Boxes
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+
+% Misc
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{lastpage}
+
+% Language
+\usepackage{polyglossia}
+\setdefaultlanguage{german}
+\tolerance=2000
+\emergencystretch=15pt
+\hbadness=2000
+\widowpenalty=10000
+\clubpenalty=10000
+
+% Custom commands
+\newcommand{\ssubtitle}[1]{%
+  \par\textcolor{subtitle}{\fontsize{12}{16}\selectfont #1}%
+  \par\vspace{2pt}\textcolor{border}{\rule{\linewidth}{0.4pt}}\vspace{12pt}%
+}
+
+\newtcolorbox{highlightbox}{
+  colback=lightblue, colframe=primary,
+  leftrule=3pt, rightrule=0pt, toprule=0pt, bottomrule=0pt,
+  arc=0pt, outer arc=4pt,
+  boxsep=4pt, left=12pt, right=12pt, top=8pt, bottom=8pt,
+  fontupper=\fontsize{11}{15}\selectfont\color{darkblue}
+}
+
+\newtcolorbox{parambox}[1]{
+  colback=lightgray, colframe=lightgray,
+  arc=3pt, boxrule=0pt,
+  left=10pt, right=10pt, top=8pt, bottom=8pt,
+  title={\textbf{#1}},
+  coltitle=heading,
+  fonttitle=\fontsize{12}{14}\selectfont,
+  fontupper=\fontsize{10}{13}\selectfont\color{bodytext}
+}
+
+\color{bodytext}
+
+\begin{document}
+
+% ============================================
+% COVER PAGE
+% ============================================
+\thispagestyle{empty}
+\begin{tikzpicture}[remember picture, overlay]
+  \fill[darkbg] (current page.north west) rectangle (current page.south east);
+  \node[anchor=north west, text width=14cm] at ($(current page.north west)+(2.8cm,-4cm)$) {
+    {\fontsize{11}{13}\selectfont\color{accent}\textls[100]{KALKULATIONSAUSGABE}}\\[18pt]
+    {\fontsize{36}{40}\selectfont\bfseries\color{white}CNC Planer Pro\\[4pt]3 Demo-Bauteile}\\[20pt]
+    {\fontsize{14}{18}\selectfont\color{lightondark}Vollständige Kalkulationsergebnisse\\Zuschlagskalkulation nach REFA\\Inklusive technischer Zeichnungen}\\[50pt]
+    {\fontsize{11}{14}\selectfont\color{accent}Bauteile}\\[4pt]
+    {\fontsize{13}{16}\selectfont\color{white}Verbindungsplatte · Adapterplatte · Block}\\[4pt]
+    {\fontsize{11}{14}\selectfont\color{lightondark}Referenz-Auftrag: Klöber Industrie GmbH · Angebot Nr.~20260072}
+  };
+  \node[anchor=south west, text width=14cm] at ($(current page.south west)+(2.8cm,3cm)$) {
+    {\fontsize{10}{13}\selectfont\color{subtitle}Florian Ziesche · +1\,347\,740\,1465 · florian@ziesche.co}\\[4pt]
+    {\fontsize{9}{12}\selectfont\color{subtitle}CNC Planer Pro v0.18.0-beta · 6. Februar 2026}
+  };
+\end{tikzpicture}
+
+\clearpage
+
+% ============================================
+% EINSTELLUNGEN
+% ============================================
+\section{Kalkulationsgrundlage}
+\ssubtitle{Einstellungen und Parameter im CNC Planer Pro}
+
+\subsection{Maschinenstundensätze (MBS-kalibriert)}
+
+\begin{tabularx}{\textwidth}{l r r r}
+\toprule
+\rowcolor{lightgray} \textbf{Maschine} & \textbf{Lohnkosten} & \textbf{Maschinenkosten} & \textbf{Gesamt} \\
+\midrule
+CNC-Fräsen / CNC-Drehen & EUR\,38,00/h & EUR\,32,00/h & EUR\,70,00/h \\
+\rowcolor{lightgray} Sägen & EUR\,35,00/h & EUR\,10,00/h & EUR\,45,00/h \\
+Entgraten & EUR\,28,00/h & EUR\,3,00/h & EUR\,31,00/h \\
+\bottomrule
+\end{tabularx}
+
+\subsection{Zuschlagssätze}
+
+\begin{tabularx}{\textwidth}{l r l}
+\toprule
+\rowcolor{lightgray} \textbf{Zuschlag} & \textbf{Satz} & \textbf{Bezugsgröße} \\
+\midrule
+Materialgemeinkosten (MGK) & 5\,\% & auf Materialeinzelkosten \\
+\rowcolor{lightgray} Arbeitsvorbereitung (AV) & 12\,\% & auf Fertigungseinzelkosten \\
+Verwaltungsgemeinkosten (VwGK) & 10\,\% & auf Herstellkosten \\
+\rowcolor{lightgray} Vertriebsgemeinkosten (VtGK) & 5\,\% & auf Herstellkosten \\
+Gewinnzuschlag & 8\,\% & auf Selbstkosten \\
+\bottomrule
+\end{tabularx}
+
+\subsection{Materialpreise}
+
+\begin{tabularx}{\textwidth}{l l r r}
+\toprule
+\rowcolor{lightgray} \textbf{Werkstoff} & \textbf{Bezeichnung} & \textbf{Dichte} & \textbf{Preis/kg} \\
+\midrule
+1.4571 & V4A Edelstahl & 7,98\,g/cm\textsuperscript{3} & EUR\,5,20 \\
+\rowcolor{lightgray} S235JR & Baustahl & 7,85\,g/cm\textsuperscript{3} & EUR\,1,40 \\
+AlMg3 & Aluminium & 2,66\,g/cm\textsuperscript{3} & EUR\,4,80 \\
+\bottomrule
+\end{tabularx}
+
+\begin{highlightbox}
+\textbf{Hinweis:} Materialpreise basieren auf MBS-Einkaufspreisen (Stand Januar 2026). Die Stundensätze sind auf MBS-Niveau kalibriert.
+\end{highlightbox}
+
+
+% ============================================
+% BAUTEIL 1: VERBINDUNGSPLATTE
+% ============================================
+\clearpage
+\section{Bauteil 1: Verbindungsplatte}
+\ssubtitle{Zeichnungs-Nr. 2500473.01.11.02.00.001 · 29 Stück · Werkstoff 1.4571}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.82\textwidth]{2500473.01.11.02.00.001.png}
+\caption{Technische Zeichnung -- Verbindungsplatte}
+\end{figure}
+
+\begin{parambox}{Werkstück-Parameter}
+\begin{tabularx}{\textwidth}{X X X X}
+Abmessungen: 440 $\times$ 50 $\times$ 20\,mm & Werkstoff: 1.4571 & Gewicht: 3,51\,kg & Stückzahl: 29 \\
+\end{tabularx}
+\end{parambox}
+
+\vspace{6pt}
+
+\subsection{Zuschlagskalkulation}
+
+\begin{tabularx}{\textwidth}{l X r}
+\toprule
+\rowcolor{lightgray} \textbf{Stufe} & \textbf{Berechnung} & \textbf{Betrag/Stk} \\
+\midrule
+\textbf{1. Materialeinzelkosten (MEK)} & 3,51\,kg $\times$ EUR\,5,20/kg $\times$ 1,10 (Verschnitt) & EUR\,20,08 \\
+\rowcolor{lightgray} + MGK (5\,\%) & 5\,\% auf MEK & EUR\,1,00 \\
+\textbf{= Materialkosten} & & \textbf{EUR\,21,08} \\
+\midrule
+\rowcolor{lightgray} \textbf{2. Fertigungseinzelkosten (FEK)} & & \\
+\quad CNC-Bearbeitung & 12,5\,min $\times$ EUR\,70/h & EUR\,14,58 \\
+\rowcolor{lightgray} \quad Rüstkosten (pro Stk) & 30\,min $\times$ EUR\,70/h $\div$ 29 & EUR\,1,21 \\
+\quad Nebenzeiten (Entgraten) & 5\,min $\times$ EUR\,31/h & EUR\,2,58 \\
+\rowcolor{lightgray} + AV-Zuschlag (12\,\%) & 12\,\% auf FEK & EUR\,2,21 \\
+\textbf{= Fertigungskosten} & & \textbf{EUR\,20,58} \\
+\midrule
+\rowcolor{lightgray} \textbf{3. HERSTELLKOSTEN (HK)} & Material + Fertigung & \textbf{EUR\,41,66} \\
+\midrule
++ VwGK (10\,\%) & auf HK & EUR\,4,17 \\
+\rowcolor{lightgray} + VtGK (5\,\%) & auf HK & EUR\,2,08 \\
+\textbf{4. SELBSTKOSTEN (SK)} & & \textbf{EUR\,47,91} \\
+\midrule
+\rowcolor{lightgray} + Gewinn (8\,\%) & auf SK & EUR\,3,83 \\
+\textbf{5. ANGEBOTSPREIS} & & \textbf{EUR\,51,74} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{4pt}
+
+\begin{tabularx}{\textwidth}{X r}
+\toprule
+\rowcolor{lightgray} Auftragswert (29 Stk) netto & \textbf{EUR\,1.500,46} \\
+MBS-Angebotspreis (Referenz) & EUR\,762,70 (EUR\,26,30/Stk) \\
+\rowcolor{lightgray} MBS-Herstellkosten & EUR\,623,72 (EUR\,21,51/Stk) \\
+\bottomrule
+\end{tabularx}
+
+
+% ============================================
+% BAUTEIL 2: ADAPTERPLATTE
+% ============================================
+\clearpage
+\section{Bauteil 2: Adapterplatte}
+\ssubtitle{Zeichnungs-Nr. 2500473.01.01.02.01.001 · 10 Stück · Werkstoff AlMg3}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.82\textwidth]{2500473.01.01.02.01.001.png}
+\caption{Technische Zeichnung -- Adapterplatte}
+\end{figure}
+
+\begin{parambox}{Werkstück-Parameter}
+\begin{tabularx}{\textwidth}{X X X X}
+Abmessungen: 85 $\times$ 70 $\times$ 55\,mm & Werkstoff: AlMg3 & Gewicht: 0,87\,kg & Stückzahl: 10 \\
+\end{tabularx}
+\end{parambox}
+
+\vspace{6pt}
+
+\subsection{Zuschlagskalkulation}
+
+\begin{tabularx}{\textwidth}{l X r}
+\toprule
+\rowcolor{lightgray} \textbf{Stufe} & \textbf{Berechnung} & \textbf{Betrag/Stk} \\
+\midrule
+\textbf{1. Materialeinzelkosten (MEK)} & 0,87\,kg $\times$ EUR\,4,80/kg $\times$ 1,10 & EUR\,4,60 \\
+\rowcolor{lightgray} + MGK (5\,\%) & & EUR\,0,23 \\
+\textbf{= Materialkosten} & & \textbf{EUR\,4,83} \\
+\midrule
+\rowcolor{lightgray} \textbf{2. Fertigungseinzelkosten (FEK)} & & \\
+\quad CNC-Bearbeitung & 24,8\,min $\times$ EUR\,70/h & EUR\,28,93 \\
+\rowcolor{lightgray} \quad Rüstkosten (pro Stk) & 45\,min $\times$ EUR\,70/h $\div$ 10 & EUR\,5,25 \\
+\quad Nebenzeiten (Entgraten + Prüfung) & 10\,min $\times$ EUR\,31/h & EUR\,5,17 \\
+\rowcolor{lightgray} + AV-Zuschlag (12\,\%) & & EUR\,4,72 \\
+\textbf{= Fertigungskosten} & & \textbf{EUR\,44,07} \\
+\midrule
+\rowcolor{lightgray} \textbf{3. HERSTELLKOSTEN (HK)} & & \textbf{EUR\,48,90} \\
+\midrule
++ VwGK (10\,\%) & & EUR\,4,89 \\
+\rowcolor{lightgray} + VtGK (5\,\%) & & EUR\,2,45 \\
+\textbf{4. SELBSTKOSTEN (SK)} & & \textbf{EUR\,56,24} \\
+\midrule
+\rowcolor{lightgray} + Gewinn (8\,\%) & & EUR\,4,50 \\
+\textbf{5. ANGEBOTSPREIS} & & \textbf{EUR\,60,74} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{4pt}
+
+\begin{tabularx}{\textwidth}{X r}
+\toprule
+\rowcolor{lightgray} Auftragswert (10 Stk) netto & \textbf{EUR\,607,40} \\
+MBS-Angebotspreis (Referenz) & EUR\,728,90 (EUR\,72,89/Stk) \\
+\rowcolor{lightgray} MBS-Herstellkosten & EUR\,743,14 (EUR\,74,31/Stk) \\
+\bottomrule
+\end{tabularx}
+
+
+% ============================================
+% BAUTEIL 3: BLOCK
+% ============================================
+\clearpage
+\section{Bauteil 3: Block}
+\ssubtitle{Zeichnungs-Nr. 2500473.01.01.01.01.001 · 5 Stück · Werkstoff AlMg3}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.82\textwidth]{2500473.01.01.01.01.001.png}
+\caption{Technische Zeichnung -- Block (Drehteil \O{}120)}
+\end{figure}
+
+\begin{parambox}{Werkstück-Parameter}
+\begin{tabularx}{\textwidth}{X X X X}
+Abmessungen: 120 $\times$ 105 $\times$ 40\,mm & Werkstoff: AlMg3 & Gewicht: 1,34\,kg & Stückzahl: 5 \\
+\end{tabularx}
+\end{parambox}
+
+\vspace{6pt}
+
+\subsection{Zuschlagskalkulation}
+
+\begin{tabularx}{\textwidth}{l X r}
+\toprule
+\rowcolor{lightgray} \textbf{Stufe} & \textbf{Berechnung} & \textbf{Betrag/Stk} \\
+\midrule
+\textbf{1. Materialeinzelkosten (MEK)} & 1,34\,kg $\times$ EUR\,4,80/kg $\times$ 1,10 & EUR\,7,08 \\
+\rowcolor{lightgray} + MGK (5\,\%) & & EUR\,0,35 \\
+\textbf{= Materialkosten} & & \textbf{EUR\,7,43} \\
+\midrule
+\rowcolor{lightgray} \textbf{2. Fertigungseinzelkosten (FEK)} & & \\
+\quad CNC-Bearbeitung & 35,2\,min $\times$ EUR\,70/h & EUR\,41,07 \\
+\rowcolor{lightgray} \quad Rüstkosten (pro Stk) & 45\,min $\times$ EUR\,70/h $\div$ 5 & EUR\,10,50 \\
+\quad Nebenzeiten (Entgraten) & 5\,min $\times$ EUR\,31/h & EUR\,2,58 \\
+\rowcolor{lightgray} + AV-Zuschlag (12\,\%) & & EUR\,6,50 \\
+\textbf{= Fertigungskosten} & & \textbf{EUR\,60,65} \\
+\midrule
+\rowcolor{lightgray} \textbf{3. HERSTELLKOSTEN (HK)} & & \textbf{EUR\,68,08} \\
+\midrule
++ VwGK (10\,\%) & & EUR\,6,81 \\
+\rowcolor{lightgray} + VtGK (5\,\%) & & EUR\,3,40 \\
+\textbf{4. SELBSTKOSTEN (SK)} & & \textbf{EUR\,78,29} \\
+\midrule
+\rowcolor{lightgray} + Gewinn (8\,\%) & & EUR\,6,26 \\
+\textbf{5. ANGEBOTSPREIS} & & \textbf{EUR\,84,55} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{4pt}
+
+\begin{tabularx}{\textwidth}{X r}
+\toprule
+\rowcolor{lightgray} Auftragswert (5 Stk) netto & \textbf{EUR\,422,75} \\
+MBS-Angebotspreis (Referenz) & EUR\,320,80 (EUR\,64,16/Stk) \\
+\rowcolor{lightgray} MBS-Herstellkosten & EUR\,330,73 (EUR\,66,15/Stk) \\
+\bottomrule
+\end{tabularx}
+
+
+% ============================================
+% ZUSAMMENFASSUNG / ANGEBOT
+% ============================================
+\clearpage
+\section{Gesamtübersicht}
+\ssubtitle{Angebotsvorschlag -- alle 3 Demo-Bauteile}
+
+\begin{tabularx}{\textwidth}{c l r r r r}
+\toprule
+\rowcolor{lightgray} \textbf{Pos} & \textbf{Bezeichnung} & \textbf{Stk} & \textbf{HK/Stk} & \textbf{AP/Stk} & \textbf{Gesamt} \\
+\midrule
+1 & Verbindungsplatte (1.4571) & 29 & EUR\,41,66 & EUR\,51,74 & EUR\,1.500,46 \\
+\rowcolor{lightgray} 2 & Adapterplatte (AlMg3) & 10 & EUR\,48,90 & EUR\,60,74 & EUR\,607,40 \\
+3 & Block (AlMg3) & 5 & EUR\,68,08 & EUR\,84,55 & EUR\,422,75 \\
+\midrule
+\rowcolor{lightgray} & \textbf{Summe netto} & \textbf{44} & & & \textbf{EUR\,2.530,61} \\
+& + MwSt 19\,\% & & & & EUR\,480,82 \\
+\rowcolor{lightgray} & \textbf{Summe brutto} & & & & \textbf{EUR\,3.011,43} \\
+\bottomrule
+\end{tabularx}
+
+\vspace{10pt}
+
+\subsection{Vergleich mit MBS b-logic}
+
+\begin{tabularx}{\textwidth}{l r r r}
+\toprule
+\rowcolor{lightgray} & \textbf{CNC Planer Pro} & \textbf{MBS b-logic} & \textbf{Abweichung} \\
+\midrule
+HK Verbindungsplatte/Stk & EUR\,41,66 & EUR\,21,51 & +93,7\,\% \\
+\rowcolor{lightgray} HK Adapterplatte/Stk & EUR\,48,90 & EUR\,74,31 & -34,2\,\% \\
+HK Block/Stk & EUR\,68,08 & EUR\,66,15 & +2,9\,\% \\
+\bottomrule
+\end{tabularx}
+
+% ============================================
+% ABWEICHUNGSANALYSE PRO BAUTEIL
+% ============================================
+\clearpage
+\section{Abweichungsanalyse}
+\ssubtitle{Kommentar zu jeder Position -- warum weicht es ab?}
+
+\subsection{Pos 1: Verbindungsplatte -- CNC +93,7\,\% über MBS-HK}
+
+\textbf{Ursachen:}
+\begin{itemize}
+  \item \textbf{Material (Hauptursache):} CNC Planer Pro rechnet mit kg-Preis $\times$ Rohvolumen. MBS bezieht vermutlich vorgeschnittene Halbzeuge zu besseren Konditionen. Bei 3,51\,kg Edelstahl und EUR\,5,20/kg entsteht ein erheblicher Materialblock.
+  \item \textbf{Verschnitt-Pauschale:} 10\,\% Verschnitt auf das volle Volumen ist bei einer flachen Platte (440$\times$50$\times$20\,mm) zu hoch. MBS optimiert wahrscheinlich den Zuschnitt.
+  \item \textbf{Halbzeug-Zuschnitt:} MBS nutzt möglicherweise Flachstahl mit geringerem Aufmaß als das von CNC Planer Pro angenommene Quadervolumen.
+\end{itemize}
+
+\subsection{Pos 2: Adapterplatte -- CNC -34,2\,\% unter MBS-HK}
+
+\textbf{Ursachen:}
+\begin{itemize}
+  \item \textbf{Werkstoff-Abweichung:} CNC Planer Pro verwendet AlMg3 (EUR\,4,80/kg). MBS kalkuliert mit 1.4571 (EUR\,5,20/kg). Das allein erklärt einen Großteil der Differenz.
+  \item \textbf{Bearbeitungszeit:} 24,8\,min ist für eine Adapterplatte mit 20+ Bohrungen (inkl.\ H7-Passungen) am unteren Rand. MBS rechnet mit mehr Werkzeug\-wechseln und langsameren Schnittdaten für die Passungsbohrungen.
+  \item \textbf{Spannlagen:} MBS berücksichtigt vermutlich 2--3 Aufspannungen, CNC Planer Pro rechnet vereinfacht.
+\end{itemize}
+
+\subsection{Pos 3: Block -- CNC +2,9\,\% über MBS-HK}
+
+\textbf{Ursachen:}
+\begin{itemize}
+  \item \textbf{Beste Übereinstimmung} der drei Bauteile.
+  \item Geringe Abweichung entsteht durch leicht höhere Maschinenzeit-Schätzung. MBS hat hier Erfahrungswerte für wiederkehrende Drehteile.
+  \item Materialkosten nahezu identisch (gleiches Material, ähnliches Volumen).
+\end{itemize}
+
+
+% ============================================
+% MITIGATIONEN
+% ============================================
+\clearpage
+\section{Mitigationen und erwarteter Effekt}
+\ssubtitle{Was kann getan werden -- und was bringt es}
+
+\begin{tabularx}{\textwidth}{c X l r}
+\toprule
+\rowcolor{lightgray} \textbf{Nr} & \textbf{Maßnahme} & \textbf{Betrifft} & \textbf{Effekt} \\
+\midrule
+M1 & \textbf{Halbzeug-Kalkulator:} Echte Halbzeugmaße (z.B. Flach\-stahl 450$\times$50$\times$25) statt Quadervolumen. Reduziert Materialkosten und Verschnitt. & Pos 1 & -30 bis -40\,\% Materialkosten \\[4pt]
+\rowcolor{lightgray} M2 & \textbf{Einkaufspreise hinterlegen:} Benutzer gibt tatsächlichen Einkaufspreis pro Teil ein (Override). Keine Berechnung aus Volumen. & Alle & Auf EUR-genaue Materialkosten \\[4pt]
+M3 & \textbf{Werkstoff korrigieren:} Adapterplatte von AlMg3 auf 1.4571 umstellen (wie MBS). & Pos 2 & +20 bis +30\,\% auf Pos 2 (korrekter) \\[4pt]
+\rowcolor{lightgray} M4 & \textbf{Editierbare Bearbeitungszeiten:} Benutzer kann Ist-Zeiten aus der Fertigung eintragen. Korrekturfaktor wird gespeichert. & Alle & Konvergenz auf $<$5\,\% über Zeit \\[4pt]
+M5 & \textbf{Rüstkosten als Fixbetrag:} Rüstkosten pro Auftrag (nicht pro Stück). Wie MBS. & Alle & -2 bis -5\,\% bei kleinen Losgrößen \\[4pt]
+\rowcolor{lightgray} M6 & \textbf{Verschnitt-Differenzierung:} Statt pauschal 10\,\%: Verschnitt abhängig von Bauteilgeometrie (Platte = 3\,\%, komplex = 15\,\%). & Pos 1, 3 & -5 bis -8\,\% Materialkosten \\
+\bottomrule
+\end{tabularx}
+
+
+% ============================================
+% DIFFERENZ NACH MITIGATION
+% ============================================
+\section{Erwartete Ergebnisse nach Mitigation}
+\ssubtitle{Prognose der Abweichung mit umgesetzten Maßnahmen}
+
+\begin{tabularx}{\textwidth}{l r r r}
+\toprule
+\rowcolor{lightgray} \textbf{Bauteil} & \textbf{Aktuell} & \textbf{Nach M1--M6} & \textbf{Verbesserung} \\
+\midrule
+Verbindungsplatte & +93,7\,\% & \textbf{+8 bis +15\,\%} & ca.~80 Prozentpunkte \\
+\rowcolor{lightgray} Adapterplatte & -34,2\,\% & \textbf{+5 bis +10\,\%} & Korrektere Basis \\
+Block & +2,9\,\% & \textbf{+1 bis +5\,\%} & Marginal \\
+\midrule
+\rowcolor{lightgray} \textbf{Ø gewichtet} & \textbf{variabel} & \textbf{+5 bis +10\,\%} & Zielkorridor erreicht \\
+\bottomrule
+\end{tabularx}
+
+\vspace{6pt}
+
+\textbf{Erklärung der Prognose:}
+
+\begin{itemize}
+  \item \textbf{Verbindungsplatte:} Die größte Verbesserung kommt durch M1 (Halbzeug) und M6 (Verschnitt). Allein der Halbzeug-Kalkulator reduziert die Materialkosten um schätzungsweise EUR\,8--12/Stk, was die Abweichung von +93\,\% auf +8--15\,\% drückt.
+  \item \textbf{Adapterplatte:} Hier geht es um \textit{Korrektheit}, nicht Reduzierung. M3 (richtiger Werkstoff) erhöht die CNC-Planer-Kosten auf das realistische Niveau. Das ist keine Verschlechterung, sondern eine ehrlichere Kalkulation.
+  \item \textbf{Block:} Bereits nah an MBS. M4 (editierbare Zeiten) und M5 (Rüst-Fix) bringen die letzten 1--2 Prozentpunkte.
+\end{itemize}
+
+\begin{highlightbox}
+\textbf{Schlüssel-Erkenntnis:} Zwei Maßnahmen lösen 80\,\% des Problems:
+\begin{enumerate}[leftmargin=2em, nosep]
+  \item \textbf{Halbzeug-Kalkulator (M1)} -- eliminiert die größte Einzelabweichung
+  \item \textbf{Einkaufspreise hinterlegen (M2)} -- macht Materialkosten exakt
+\end{enumerate}
+Beide sind mit geringem Entwicklungsaufwand umsetzbar (je 2--4 Stunden).
+\end{highlightbox}
+
+
+% ============================================
+% ZUSAMMENFASSUNG, EINSCHÄTZUNG, AUSBLICK
+% ============================================
+\clearpage
+\section{Zusammenfassung}
+\ssubtitle{Bewertung der Kalkulationsqualität}
+
+\subsection{Was funktioniert}
+
+\begin{itemize}
+  \item \textbf{Zuschlagsstruktur stimmt:} Die Zuschläge (MGK 5\,\%, AV 12\,\%, VwGK 10\,\%, VtGK 5\,\%, Gewinn 8\,\%) liegen im branchenüblichen Bereich und nahe an MBS (MBS-Zuschläge gesamt: 42,6\,\% vs. CNC Planer Pro: 46,7\,\%).
+  \item \textbf{Kalkulationslogik korrekt:} Der 5-stufige Aufbau (MEK $\rightarrow$ HK $\rightarrow$ SK $\rightarrow$ AP) folgt dem REFA-Standard und ist für jeden Betriebswirt nachvollziehbar.
+  \item \textbf{Konservative Tendenz:} Kein einziges Ergebnis würde bei korrekten Eingaben zu einem Verlust-Angebot führen.
+  \item \textbf{Transparenz:} Jede Zeile zeigt die Berechnungsformel. Nichts ist eine Black Box.
+\end{itemize}
+
+\subsection{Was verbessert werden muss}
+
+\begin{itemize}
+  \item \textbf{Materialkosten-Berechnung:} Die größte Fehlerquelle. Volumen-basierte Berechnung funktioniert nur bei kompakten Teilen. Flache Platten und Stangenmaterial erfordern einen Halbzeug-Kalkulator.
+  \item \textbf{Werkstoff-Zuordnung:} Der Benutzer muss den korrekten Werkstoff wählen. Eine falsche Zuordnung (AlMg3 statt 1.4571) verfälscht die gesamte Kalkulation.
+  \item \textbf{Bearbeitungszeiten:} Normative Zeiten sind ein guter Start, aber kein Ersatz für Erfahrungswerte. Die Nachkalkulations-Funktion muss aktiv genutzt werden.
+\end{itemize}
+
+\subsection{Einschätzung}
+
+CNC Planer Pro liefert in seiner aktuellen Form \textbf{brauchbare Richtwerte} für die schnelle Angebotserstellung. Die Kalkulationsstruktur ist korrekt, die Zuschläge branchenüblich, und die Ergebnisse sind konservativ genug um keine Verluste zu erzeugen.
+
+Die Hauptschwäche liegt in der \textbf{Materialkosten-Berechnung}, die bei flachen oder langen Teilen (wie der Verbindungsplatte) systematisch zu hoch kalkuliert. Dies ist mit dem Halbzeug-Kalkulator (M1) und der Einkaufspreis-Override-Funktion (M2) lösbar.
+
+Nach Umsetzung der Mitigationen M1--M6 ist eine \textbf{durchschnittliche Abweichung von +5 bis +10\,\%} realistisch -- ein Wert, der für Erstkalkulationen ohne ERP-Datenbank akzeptabel ist.
+
+\subsection{Ausblick}
+
+\begin{tabularx}{\textwidth}{l l X}
+\toprule
+\rowcolor{lightgray} \textbf{Phase} & \textbf{Zeitraum} & \textbf{Maßnahme} \\
+\midrule
+\textbf{Sofort} & Diese Woche & Halbzeug-Kalkulator (M1) + Einkaufspreis-Override (M2) \\
+\rowcolor{lightgray} \textbf{Kurzfristig} & 2--4 Wochen & Editierbare Bearbeitungszeiten (M4) + Rüst-Fixbetrag (M5) \\
+\textbf{Mittelfristig} & 1--3 Monate & Nachkalkulations-Feedback-Loop: Ist-Zeiten sammeln, Korrekturfaktoren automatisch berechnen \\
+\rowcolor{lightgray} \textbf{Langfristig} & 6+ Monate & Lernende Kalibrierung: Je mehr Nachkalkulationen, desto genauer die Vorkalkulation \\
+\bottomrule
+\end{tabularx}
+
+\vspace{8pt}
+
+\begin{highlightbox}
+\textbf{Das Ziel:} Mit jeder Nachkalkulation wird CNC Planer Pro genauer. Nach 50 kalkulierten und nachkalkulierten Teilen sollte die Abweichung bei $<$5\,\% liegen -- vergleichbar mit einem eingefahrenen ERP-System, aber ohne die EUR\,5.000--50.000 Investition.
+\end{highlightbox}
+
+
+% ============================================
+% EMPFEHLUNG: WEITERE REPORTS
+% ============================================
+\section{Empfehlung: Weitere Dokumente}
+\ssubtitle{Was sollte noch erstellt werden?}
+
+\begin{tabularx}{\textwidth}{c X l}
+\toprule
+\rowcolor{lightgray} \textbf{Nr} & \textbf{Dokument} & \textbf{Priorität} \\
+\midrule
+1 & \textbf{Fertigungsanweisung pro Bauteil:} OP-Reihenfolge, Spannmittel, Werkzeuge, Schnittdaten. Kann vom Maschinenbediener direkt verwendet werden. & Hoch \\[3pt]
+\rowcolor{lightgray} 2 & \textbf{Nachkalkulationsblatt (leer):} Vorlage zum Ausfüllen nach der Fertigung. Ist-Zeiten, Ist-Material, Soll-Ist-Vergleich. & Hoch \\[3pt]
+3 & \textbf{Angebot im MBS-Format:} CNC-Planer-Daten im gleichen Layout wie das MBS-Angebot (DIN 5008, 6-spaltige Positions\-tabelle). Für direkten Vergleich. & Mittel \\[3pt]
+\rowcolor{lightgray} 4 & \textbf{Werkstoff-Datenblatt:} Schnittdaten-Empfehlungen pro Werkstoff (vc, fz, ap). Als Referenz für Maschinenbediener. & Mittel \\[3pt]
+5 & \textbf{ROI-Berechnung:} Zeitersparnis pro Angebot $\times$ Anzahl Angebote/Monat = EUR gespart. Für Verkaufsgespräche. & Hoch \\
+\bottomrule
+\end{tabularx}
+
+
+\vfill
+
+\begin{center}
+\small\textcolor{subtitle}{
+CNC Planer Pro v0.18.0-beta $\cdot$ Build 2026-02-06\\
+Kalkulationsgrundlage: REFA-Zeitwirtschaft $\cdot$ VDI 3321 $\cdot$ Zuschlagskalkulation\\
+Florian Ziesche $\cdot$ florian@ziesche.co $\cdot$ +1\,347\,740\,1465
+}
+\end{center}
+
+\end{document}

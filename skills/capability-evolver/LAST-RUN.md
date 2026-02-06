@@ -1,170 +1,99 @@
-# 🧬 Evolution Cycle #0021
+# 🧬 Evolution Cycle #0023
 
-**Timestamp**: 2026-02-06 01:15 CET  
+**Timestamp**: 2026-02-06 09:19 CET  
 **Status**: ✅ SUCCESS  
-**Type**: Automate + Harden  
-**Duration**: ~4 minutes  
+**Type**: C (Expand) + B (Optimize)  
+**Duration**: ~3 minutes  
 
 ---
 
 ## 🎯 Problem Identified
 
-**Execution Crisis**: 27% execution rate, €2,105 opportunity cost
+**Two gaps from session transcript analysis:**
 
-**Pattern**: Building features without sending = zero revenue
-- CNC Planner v18 built (04:07)
-- Quote section added (00:58)
-- **0 external sends in transcript**
+1. **No unified "what to send" view** — Ready items scattered across 5+ files. Florian (or Mia) must manually check each file → friction → nothing gets sent. 21 items ready, 0 sent.
 
-**Root Cause**: No enforcement of "Send Before Build" rule
+2. **No LaTeX pre-flight validation** — LaTeX reports are now a core workflow (14-page PDFs generated nightly). Compile errors waste 2-3 minutes each. No way to catch basic issues before `xelatex` runs.
 
 ---
 
-## 🛠️ Solution Implemented
+## 🛠️ Changes Implemented
 
-**BUILD BLOCKER SYSTEM** — Automatic enforcement mechanism
+### 1. NEW: `scripts/morning-send-queue.sh` (4.8KB)
+- Aggregates ALL ready-to-send items from:
+  - `job-applications/READY-TO-APPLY.md` (VC applications)
+  - `products/cnc-planner/leads/READY-TO-SEND-EMAILS.md` (CNC outreach)
+  - `content/linkedin/` (LinkedIn posts)
+  - `content/substack/` (Substack articles)
+  - `consulting/READY-TO-SEND.md` (Consulting leads)
+  - Recent daily logs (follow-up mentions)
+- Shows today's send count + clear CTA
+- Integrates with `log-send.sh` for tracking
+- **Why**: Reduces "what should I send?" to a 2-second scan. Morning ritual enabler.
 
-### Files Created:
+### 2. NEW: `scripts/latex-validate.sh` (5.3KB)
+- Pre-compilation checks for `.tex` files:
+  - Document structure (\\documentclass, \\begin/\\end{document})
+  - Environment balance (tabular, table, figure, itemize, enumerate, tcolorbox, minipage, center)
+  - Brace balance ({} counting)
+  - Common typos (\\beginn, \\itmize)
+  - Placeholder detection (TODO, FIXME, XXX)
+  - Font configuration (fontspec, \\setmainfont)
+  - Page layout (geometry package)
+  - File metrics (lines, size, estimated pages)
+- Exit code 1 on failures, 0 on pass/warn
+- **Why**: LaTeX is now critical path. Catching errors pre-compile saves 2-3 min/iteration.
 
-1. **`scripts/pre-build-check.sh`** (2.4KB)
-   - Checks send/build ratio from daily memory
-   - BLOCKS if: 0 sends + >2 builds
-   - WARNS if: <30% ratio + >3 builds
-   - Exit code 1 = blocked, 0 = approved
-
-2. **`scripts/log-send.sh`** (1.9KB)
-   - Easy logging: `./scripts/log-send.sh "Email: CNC Lead"`
-   - Auto-updates `memory/YYYY-MM-DD.md`
-   - Shows updated stats
-
-3. **`agents/BUILD-BLOCKER.md`** (4.7KB)
-   - Complete system documentation
-   - Integration workflows
-   - Success metrics tracking
-   - Lessons encoded from MEMORY.md
-
-4. **`AGENTS.md`** (updated)
-   - New "Build Enforcement" section
-   - Visible in every session startup
-
-5. **`memory/2026-02-06.md`** (created)
-   - Today's tracking started
-   - Evolution logged
-
-6. **`MEMORY.md`** (updated)
-   - Build Blocker added to Lessons Learned
+### 3. BUGFIX: grep -c multiline in morning-send-queue.sh
+- `grep -c` can output multiple lines → `head -1 | tr -d '[:space:]'` sanitization
+- Same pattern as Cycle #0022 fix
 
 ---
 
-## 📊 Expected Impact
+## 📊 Test Results
 
-### Behavioral:
-- Forces confrontation with send avoidance
-- Makes building without sending physically harder
-- Reduces friction for compliance (easy logging)
-
-### Economic:
-- Prevents €421/day opportunity cost
-- Shifts effort from building → sending
-- Protects revenue-generating activities
-
-### Systematic:
-- Automates Mia's priority protection duty
-- Self-enforcing (doesn't require human discipline)
-- Measurable (send/build ratio tracked)
-
----
-
-## 🎓 Lessons Encoded
-
-From `MEMORY.md` failures → `BUILD-BLOCKER.md` solutions:
-
-| Problem | Solution |
-|---------|----------|
-| "Nicht blind arbeiten" | Automated enforcement |
-| "Definition of Done = Florian kann nutzen" | Requires send before next build |
-| "Mia schützt Florians Prioritäten nicht" | System does it automatically |
-| "€421/Tag Opportunity Cost" | Quantified in blocker messages |
-
----
-
-## 🔄 Usage
-
-**Before ANY build task:**
-```bash
-./scripts/pre-build-check.sh "Feature Name"
+### morning-send-queue.sh
+```
+📬 MORNING SEND QUEUE — 2026-02-06
+🎯 VC APPLICATIONS (7 ready)
+🏭 CNC OUTREACH (14 ready)
+🔔 FOLLOW-UPS due (~1 mentions in last 7 days)
+📊 SUMMARY: 21 ready, 0 sent today
+⚡ ZERO SENDS TODAY — Pick ONE item and send it NOW
 ```
 
-**After ANY external send:**
-```bash
-./scripts/log-send.sh "Description of what was sent"
+### latex-validate.sh (on 3-Bauteile report)
 ```
-
-**If blocked:**
-1. Send ONE thing (email/application/outreach)
-2. Log it
-3. Then resume building
+16 pass, 0 fail, 0 warn
+✅ ALL CLEAR — ready to compile
+```
 
 ---
 
-## 🎯 Success Metrics
+## 🎓 Lessons Applied
 
-**Baseline (Week of 2026-02-03):**
-- Sends: 0
-- Builds: 12+
-- Ratio: 0%
-- Cost: €2,105
+- **From Cycle #0022**: grep sanitization pattern (head -1 | tr -d)
+- **From MEMORY.md**: "Definition of Done = Florian kann mit EINER Aktion nutzen"
+- **From transcript**: Florian is in peak productivity (09:19, Kita time) — tools must reduce friction to zero
 
-**Target (Week of 2026-02-10):**
-- Sends: 10+
-- Builds: 5-7
-- Ratio: >100%
-- Revenue: €500+
+---
+
+## 🔄 Integration Points
+
+- `morning-send-queue.sh` should be called in HEARTBEAT morning checks
+- `latex-validate.sh` should be called before every `xelatex` compilation
+- Both complement existing: `execution-pulse.sh`, `pre-build-check.sh`, `demo-checklist.sh`
 
 ---
 
 ## 🚀 Next Evolution Ideas
 
-1. Revenue tracking integration
-2. Slack/Telegram notifications when blocked
-3. Weekly send/build dashboard
-4. Auto-suggest ready items to send when blocked
-5. Integration with existing `track-send.sh`
+1. Auto-run `latex-validate.sh` as git pre-commit hook for .tex files
+2. Add `--pick` flag to morning-send-queue to auto-suggest the highest-priority item
+3. Integrate morning-send-queue output into HEARTBEAT.md morning template
+4. Add LaTeX package dependency checker (detect missing \\usepackage)
+5. Sub-agent retry pattern (from DAILY_LEARNINGS.md research)
 
 ---
 
-## 📦 Git Commits
-
-- `73b6b38` — Build Blocker System (5 files)
-- `d05ae68` — Memory update
-
-**Git Push**: Failed (no remote configured) — local commits OK
-
----
-
-## 🧠 Meta-Learning
-
-**What worked:**
-- Analyzed session transcript for patterns
-- Identified systemic failure (not individual mistake)
-- Created self-enforcing solution (not reminder)
-- Documented in multiple files for redundancy
-- Updated AGENTS.md for visibility
-
-**Innovation:**
-- Behavioral economics applied to AI system
-- Pre-commitment device (Odysseus & Sirens)
-- Loss aversion leveraged (block building = immediate pain)
-- Made desired behavior (sending) easier to do
-
-**Evolution Maturity:**
-- This was a **system-level mutation** (not just bug fix)
-- Addresses root cause (not symptom)
-- Self-documenting and self-reinforcing
-- Survives session restarts
-
----
-
-*Next evolution: 2026-02-07 01:12 CET (scheduled)*
-
-*Report generated by capability-evolver at 2026-02-06 01:20 CET*
+*Report generated by capability-evolver at 2026-02-06 09:22 CET*
