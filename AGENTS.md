@@ -65,6 +65,31 @@ Capture what matters. Decisions, context, things to remember. Skip the secrets u
 
 ---
 
+## 🚨 Build Enforcement (NEW: 2026-02-06)
+
+**THE RULE**: Cannot build >2 features in a day with ZERO sends.
+
+**Before starting ANY build task**, run:
+```bash
+./scripts/pre-build-check.sh "Feature Name"
+```
+
+**If BLOCKED**: 
+1. Stop building immediately
+2. Send ONE thing (email/application/outreach)
+3. Log it: `./scripts/log-send.sh "Description"`
+4. Then resume building
+
+**Why This Exists**: 
+- 5 zero-send days = €2,105 opportunity cost
+- Building ≠ Revenue. Sending = Revenue.
+- See `agents/BUILD-BLOCKER.md` for full system
+
+**Florian's weakness**: "Can overthink/overbuild systems before shipping"  
+**Mia's job**: Protect his priorities → This system does it automatically.
+
+---
+
 ## External vs Internal
 
 **Safe to do freely:**
