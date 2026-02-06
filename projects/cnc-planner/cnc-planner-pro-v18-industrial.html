@@ -800,6 +800,73 @@
  .feedback-option-label { font-size: 12px; font-weight: 600; }
  .feedback-card { margin-bottom: var(--space-4); }
  
+ /* Sticky Feedback FAB */
+ .feedback-fab {
+ position: fixed;
+ bottom: 20px;
+ right: 20px;
+ width: 40px;
+ height: 40px;
+ border-radius: 50%;
+ background: var(--color-primary);
+ color: white;
+ border: none;
+ font-size: 18px;
+ font-weight: 700;
+ cursor: pointer;
+ box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+ z-index: 1000;
+ transition: transform 0.15s;
+ }
+ .feedback-fab:hover { transform: scale(1.1); }
+ 
+ .feedback-panel {
+ position: fixed;
+ bottom: 70px;
+ right: 20px;
+ width: 280px;
+ background: white;
+ border: 1px solid var(--color-border);
+ border-radius: var(--radius-lg);
+ box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+ z-index: 1001;
+ display: none;
+ overflow: hidden;
+ }
+ .feedback-panel.open { display: block; }
+ .feedback-panel-header {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ padding: 10px 14px;
+ border-bottom: 1px solid var(--color-border);
+ font-size: 13px;
+ }
+ .feedback-panel-body { padding: 12px 14px; }
+ .feedback-panel-success {
+ padding: 24px 14px;
+ text-align: center;
+ color: var(--color-success);
+ }
+ 
+ .fb-type-btn {
+ flex: 1;
+ padding: 5px 0;
+ font-size: 11px;
+ border: 1px solid var(--color-border);
+ border-radius: var(--radius-sm);
+ background: var(--color-bg);
+ cursor: pointer;
+ transition: all 0.1s;
+ }
+ .fb-type-btn.active {
+ background: var(--color-primary);
+ color: white;
+ border-color: var(--color-primary);
+ }
+ 
+ @media print { .feedback-fab, .feedback-panel { display: none !important; } }
+ 
  /* Cost detail expandables */
  .cost-detail {
  padding: 8px 12px;
@@ -3726,6 +3793,32 @@ Exportformate: CSV (Nachkalkulation), JSON (Einstellungen), PDF (Angebot/Fertigu
 </div>
 </div>
 </main>
+
+<!-- Sticky Feedback Button -->
+<button class="feedback-fab" id="feedbackFab" onclick="toggleFeedbackPanel()">?</button>
+
+<!-- Feedback Flyout -->
+<div class="feedback-panel" id="feedbackPanel">
+<div class="feedback-panel-header">
+<span style="font-weight:600;">Feedback</span>
+<button onclick="toggleFeedbackPanel()" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--color-text-muted);padding:0;line-height:1;">&times;</button>
+</div>
+<div class="feedback-panel-body">
+<div style="font-size:12px;color:var(--color-text-muted);margin-bottom:8px;">Seite: <span id="fbCurrentPage" style="font-weight:500;color:var(--color-text);">Teil</span></div>
+<div style="display:flex;gap:6px;margin-bottom:10px;">
+<button class="fb-type-btn" data-type="bug" onclick="selectFbType(this)">Fehler</button>
+<button class="fb-type-btn" data-type="idea" onclick="selectFbType(this)">Verbesserung</button>
+<button class="fb-type-btn" data-type="question" onclick="selectFbType(this)">Frage</button>
+</div>
+<textarea id="fbQuickText" class="input" rows="3" placeholder="Was ist aufgefallen?" style="font-size:13px;resize:vertical;"></textarea>
+<button class="btn btn-primary btn-sm" onclick="sendQuickFeedback()" style="width:100%;margin-top:8px;">Absenden</button>
+</div>
+<div class="feedback-panel-success" id="fbSuccess" style="display:none;">
+<div style="font-size:24px;margin-bottom:4px;">&#10003;</div>
+<div style="font-size:13px;font-weight:500;">Danke für das Feedback</div>
+<div style="font-size:12px;color:var(--color-text-muted);">Wird in der Nachkalkulation gespeichert.</div>
+</div>
+</div>
 </div>
  
 <!-- ================================================================
@@ -4060,6 +4153,65 @@ Exportformate: CSV (Nachkalkulation), JSON (Einstellungen), PDF (Angebot/Fertigu
  if (detail) {
  detail.style.display = detail.style.display === 'none' ? 'block' : 'none';
  }
+ }
+ 
+ // === STICKY FEEDBACK ===
+ let fbSelectedType = '';
+ 
+ function toggleFeedbackPanel() {
+ const panel = document.getElementById('feedbackPanel');
+ const success = document.getElementById('fbSuccess');
+ panel.classList.toggle('open');
+ if (panel.classList.contains('open')) {
+ // Detect current page
+ const active = document.querySelector('.section.active');
+ const pageNames = {
+ 'section-part': 'Teil',
+ 'section-params': 'Preise & Sätze',
+ 'section-result': 'Kalkulation',
+ 'section-instructions': 'Fertigungsanweisung',
+ 'section-quote': 'Angebot',
+ 'section-code': 'NC-Code',
+ 'section-tools': 'Werkzeuge',
+ 'section-feedback': 'Nachkalkulation',
+ 'section-settings': 'Einstellungen'
+ };
+ document.getElementById('fbCurrentPage').textContent = pageNames[active?.id] || '—';
+ success.style.display = 'none';
+ document.querySelector('.feedback-panel-body').style.display = 'block';
+ }
+ }
+ 
+ function selectFbType(btn) {
+ document.querySelectorAll('.fb-type-btn').forEach(b => b.classList.remove('active'));
+ btn.classList.add('active');
+ fbSelectedType = btn.dataset.type;
+ }
+ 
+ function sendQuickFeedback() {
+ const text = document.getElementById('fbQuickText').value.trim();
+ if (!text) { document.getElementById('fbQuickText').focus(); return; }
+ 
+ const entry = {
+ ts: new Date().toISOString(),
+ page: document.getElementById('fbCurrentPage').textContent,
+ type: fbSelectedType || 'general',
+ text: text
+ };
+ 
+ // Save to localStorage
+ const stored = JSON.parse(localStorage.getItem('cncplanner_feedback') || '[]');
+ stored.push(entry);
+ localStorage.setItem('cncplanner_feedback', JSON.stringify(stored));
+ 
+ // Show success
+ document.querySelector('.feedback-panel-body').style.display = 'none';
+ document.getElementById('fbSuccess').style.display = 'block';
+ document.getElementById('fbQuickText').value = '';
+ document.querySelectorAll('.fb-type-btn').forEach(b => b.classList.remove('active'));
+ fbSelectedType = '';
+ 
+ setTimeout(() => toggleFeedbackPanel(), 1500);
  }
  
  function toggleCostDetail(id) {
