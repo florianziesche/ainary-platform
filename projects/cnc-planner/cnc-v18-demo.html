@@ -800,6 +800,41 @@
  .feedback-option-label { font-size: 12px; font-weight: 600; }
  .feedback-card { margin-bottom: var(--space-4); }
  
+ /* Cost detail expandables */
+ .cost-detail {
+ padding: 8px 12px;
+ background: var(--color-bg-subtle);
+ border-top: 1px solid var(--color-border);
+ font-size: 12px;
+ }
+ .cost-detail-table {
+ width: 100%;
+ border-collapse: collapse;
+ }
+ .cost-detail-table td {
+ padding: 3px 0;
+ color: var(--color-text-secondary);
+ }
+ .cost-detail-table td.right {
+ text-align: right;
+ }
+ .cost-detail-table tr.subtotal td {
+ border-top: 1px solid var(--color-border);
+ padding-top: 4px;
+ font-weight: 500;
+ }
+ .cost-detail-table tr.total td {
+ border-top: 2px solid var(--color-primary);
+ padding-top: 5px;
+ color: var(--color-text);
+ }
+ .cost-detail-note {
+ margin-top: 6px;
+ font-size: 11px;
+ color: var(--color-text-hint);
+ font-style: italic;
+ }
+ 
  .part-grid {
  display: grid;
  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -1607,43 +1642,113 @@
 <div class="grid-2">
 <!-- Kostenaufschlüsselung -->
 <div class="card">
-<div class="card-header"><span>Kostenaufschlüsselung</span></div>
+<div class="card-header"><span>Kostenaufschlüsselung</span><span style="font-size:10px;font-weight:400;text-transform:none;letter-spacing:0;">Klick für Details</span></div>
 <div class="cost-breakdown" style="border: none; border-radius: 0;">
-<div class="cost-row">
-<div>
-<div class="cost-label">Material + MGK</div>
-<div class="cost-formula tooltip" id="matFormula" data-tooltip="Gewicht × Preis/kg + Materialgemeinkosten">2,2 kg × EUR 6,79/kg + 10% MGK</div>
+
+<!-- Material -->
+<div class="cost-row" style="cursor:pointer;" onclick="toggleCostDetail('mat')">
+<div style="flex:1;">
+<div class="cost-label">Material + MGK <span style="color:var(--color-text-hint);font-size:11px;">▾</span></div>
+<div class="cost-formula" id="matFormula">2,2 kg × EUR 6,79/kg + 10% MGK</div>
 </div>
 <div class="cost-value" id="matCost">EUR 16,42</div>
 </div>
-<div class="cost-row">
-<div>
-<div class="cost-label">Fertigung + AV</div>
-<div class="cost-formula tooltip" id="machFormula" data-tooltip="Fertigungskosten + AV-Aufschlag">12,5 min × EUR 91/h + 8% AV</div>
+<div id="costDetail-mat" class="cost-detail" style="display:none;">
+<table class="cost-detail-table">
+<tr><td>Rohmaße</td><td class="right mono" id="cdMatDims">440 × 50 × 20 mm</td></tr>
+<tr><td>Volumen</td><td class="right mono" id="cdMatVol">440 cm³</td></tr>
+<tr><td>Werkstoff / Dichte</td><td class="right mono" id="cdMatDensity">S235JR / 7,85 g/cm³</td></tr>
+<tr><td>Gewicht (Rohteil)</td><td class="right mono" id="cdMatWeight">2,20 kg</td></tr>
+<tr><td>Materialpreis</td><td class="right mono" id="cdMatPrice">EUR 6,79/kg</td></tr>
+<tr><td>Materialkosten (netto)</td><td class="right mono" id="cdMatNet">EUR 14,93</td></tr>
+<tr><td>+ Verschnitt/Aufmaß (10%)</td><td class="right mono" id="cdMatScrap">EUR 1,49</td></tr>
+<tr class="subtotal"><td>Materialeinzelkosten (MEK)</td><td class="right mono" id="cdMatMEK">EUR 16,42</td></tr>
+<tr><td>+ MGK (10%)</td><td class="right mono" id="cdMatMGK">EUR 1,64</td></tr>
+<tr class="total"><td><strong>Materialkosten gesamt</strong></td><td class="right mono" id="cdMatTotal"><strong>EUR 18,07</strong></td></tr>
+</table>
+<div class="cost-detail-note">MGK = Materialgemeinkosten (Lager, Beschaffung, Qualitätsprüfung Wareneingang)</div>
+</div>
+
+<!-- Fertigung -->
+<div class="cost-row" style="cursor:pointer;" onclick="toggleCostDetail('mach')">
+<div style="flex:1;">
+<div class="cost-label">Fertigung + AV <span style="color:var(--color-text-hint);font-size:11px;">▾</span></div>
+<div class="cost-formula" id="machFormula">12,5 min × EUR 91/h + 8% AV</div>
 </div>
 <div class="cost-value" id="machCost">EUR 18,96</div>
 </div>
-<div class="cost-row">
-<div>
-<div class="cost-label">Einrichtung</div>
-<div class="cost-formula tooltip" id="setupFormula" data-tooltip="Einrichtzeit × Stundensatz ÷ Stückzahl">25 min × EUR 91/h ÷ 1</div>
+<div id="costDetail-mach" class="cost-detail" style="display:none;">
+<table class="cost-detail-table">
+<tr><td>Bearbeitungszeit (t<sub>h</sub> + t<sub>n</sub>)</td><td class="right mono" id="cdMachTime">12,5 min</td></tr>
+<tr><td>Lohnkosten</td><td class="right mono" id="cdMachLabor">EUR 49/h</td></tr>
+<tr><td>Maschinenstundensatz</td><td class="right mono" id="cdMachRate">EUR 42/h</td></tr>
+<tr><td>Gesamtstundensatz</td><td class="right mono" id="cdMachTotal">EUR 91/h</td></tr>
+<tr><td>Fertigungskosten (netto)</td><td class="right mono" id="cdMachNet">EUR 18,96</td></tr>
+<tr class="subtotal"><td>Fertigungseinzelkosten (FEK)</td><td class="right mono" id="cdMachFEK">EUR 18,96</td></tr>
+<tr><td>+ AV-Aufschlag (8%)</td><td class="right mono" id="cdMachAV">EUR 1,52</td></tr>
+<tr class="total"><td><strong>Fertigungskosten gesamt</strong></td><td class="right mono" id="cdMachGesamt"><strong>EUR 20,48</strong></td></tr>
+</table>
+<div class="cost-detail-note">AV = Arbeitsvorbereitung (Programmierung, Prüfplanung, Werkzeugvoreinstellung)</div>
+</div>
+
+<!-- Einrichtung -->
+<div class="cost-row" style="cursor:pointer;" onclick="toggleCostDetail('setup')">
+<div style="flex:1;">
+<div class="cost-label">Einrichtung <span style="color:var(--color-text-hint);font-size:11px;">▾</span></div>
+<div class="cost-formula" id="setupFormula">25 min × EUR 91/h ÷ 1</div>
 </div>
 <div class="cost-value" id="setupCost">EUR 37,92</div>
 </div>
-<div class="cost-row">
-<div>
-<div class="cost-label">Werkzeugverschleiß</div>
-<div class="cost-formula">pauschal, werkstoffabhängig</div>
+<div id="costDetail-setup" class="cost-detail" style="display:none;">
+<table class="cost-detail-table">
+<tr><td>Spannmittel</td><td class="right mono" id="cdSetupClamping">Schraubstock</td></tr>
+<tr><td>Rüstzeit (Grundzeit)</td><td class="right mono" id="cdSetupBase">15 min</td></tr>
+<tr><td>Aufspannungen</td><td class="right mono" id="cdSetupCount">2</td></tr>
+<tr><td>Rüstzeit (gesamt)</td><td class="right mono" id="cdSetupTime">25,0 min</td></tr>
+<tr><td>Stundensatz</td><td class="right mono">EUR 91/h</td></tr>
+<tr><td>Rüstkosten (gesamt)</td><td class="right mono" id="cdSetupTotal">EUR 37,92</td></tr>
+<tr><td>Stückzahl</td><td class="right mono" id="cdSetupQty">1</td></tr>
+<tr class="total"><td><strong>Rüstkosten / Stück</strong></td><td class="right mono" id="cdSetupPerPiece"><strong>EUR 37,92</strong></td></tr>
+</table>
+<div class="cost-detail-note">Bei Stückzahl 10: EUR 3,79/Stück · Bei 100: EUR 0,38/Stück</div>
+</div>
+
+<!-- Werkzeugverschleiß -->
+<div class="cost-row" style="cursor:pointer;" onclick="toggleCostDetail('tool')">
+<div style="flex:1;">
+<div class="cost-label">Werkzeugverschleiß <span style="color:var(--color-text-hint);font-size:11px;">▾</span></div>
+<div class="cost-formula" id="toolFormula">pauschal, werkstoffabhängig</div>
 </div>
 <div class="cost-value" id="toolCost">EUR 20,74</div>
 </div>
-<div class="cost-row">
-<div>
-<div class="cost-label">VwGK + VtGK</div>
+<div id="costDetail-tool" class="cost-detail" style="display:none;">
+<table class="cost-detail-table">
+<tr><td>Basisbetrag (Referenz S235)</td><td class="right mono">EUR 20,74</td></tr>
+<tr><td>Werkstoff-Faktor</td><td class="right mono" id="cdToolFactor">1,0×</td></tr>
+<tr><td>Bearbeitungszeit</td><td class="right mono" id="cdToolTime">12,5 min</td></tr>
+<tr class="total"><td><strong>Werkzeugkosten</strong></td><td class="right mono" id="cdToolTotal"><strong>EUR 20,74</strong></td></tr>
+</table>
+<div class="cost-detail-note">Basiert auf durchschnittlichem Verschleiß pro Bauteil. Bei Edelstahl (1.4571) bis zu 2× höher. Detaillierte Aufstellung unter „Werkzeuge".</div>
+</div>
+
+<!-- VwGK + VtGK -->
+<div class="cost-row" style="cursor:pointer;" onclick="toggleCostDetail('overhead')">
+<div style="flex:1;">
+<div class="cost-label">VwGK + VtGK <span style="color:var(--color-text-hint);font-size:11px;">▾</span></div>
 <div class="cost-formula" id="additionalFormula">Verwaltung + Vertrieb</div>
 </div>
 <div class="cost-value" id="additionalCost">EUR 15,17</div>
 </div>
+<div id="costDetail-overhead" class="cost-detail" style="display:none;">
+<table class="cost-detail-table">
+<tr><td>Herstellkosten (HK)</td><td class="right mono" id="cdOhHK">EUR 89,38</td></tr>
+<tr><td>+ Verwaltungsgemeinkosten (12%)</td><td class="right mono" id="cdOhVwGK">EUR 10,73</td></tr>
+<tr><td>+ Vertriebsgemeinkosten (5%)</td><td class="right mono" id="cdOhVtGK">EUR 4,47</td></tr>
+<tr class="total"><td><strong>Gemeinkosten gesamt</strong></td><td class="right mono" id="cdOhTotal"><strong>EUR 15,20</strong></td></tr>
+</table>
+<div class="cost-detail-note">VwGK = Verwaltung, Buchhaltung, IT, Geschäftsführung · VtGK = Vertrieb, Angebotserstellung, Kundenpflege</div>
+</div>
+
 <div class="cost-row subtotal">
 <div class="cost-label">Selbstkosten</div>
 <div class="cost-value" id="totalCost">EUR 109,21</div>
@@ -3787,6 +3892,13 @@ M30
  }
  }
  
+ function toggleCostDetail(id) {
+ const detail = document.getElementById('costDetail-' + id);
+ if (detail) {
+ detail.style.display = detail.style.display === 'none' ? 'block' : 'none';
+ }
+ }
+ 
  // ================================================================
  // PART SELECTION
  // ================================================================
@@ -3969,10 +4081,10 @@ M30
  document.getElementById('setupTimeDisplay').textContent = DEFormatter.time(totalSetupTime);
  document.getElementById('setupCostDisplay').textContent = DEFormatter.price(setupCost);
  
- document.getElementById('liveWeight')?.textContent = DEFormatter.weight(weightKg);
- document.getElementById('liveMaterial')?.textContent = DEFormatter.price(materialCost);
- document.getElementById('liveTime')?.textContent = DEFormatter.time(machiningTime);
- document.getElementById('liveMachine')?.textContent = DEFormatter.price(machineCost);
+ { const _e = document.getElementById('liveWeight'); if(_e) _e.textContent = DEFormatter.weight(weightKg); }
+ { const _e = document.getElementById('liveMaterial'); if(_e) _e.textContent = DEFormatter.price(materialCost); }
+ { const _e = document.getElementById('liveTime'); if(_e) _e.textContent = DEFormatter.time(machiningTime); }
+ { const _e = document.getElementById('liveMachine'); if(_e) _e.textContent = DEFormatter.price(machineCost); }
  
  document.getElementById('priceDisplay').textContent = DEFormatter.price(sellPrice);
  document.getElementById('confidenceBadge').className = 'confidence-badge ' + confidenceClass;
@@ -3992,6 +4104,53 @@ M30
  document.getElementById('marginCost').textContent = DEFormatter.price(gewinnBetrag);
  document.getElementById('sellPrice').textContent = DEFormatter.price(angebotspreis);
  document.getElementById('orderTotal').textContent = DEFormatter.price(orderTotal);
+ 
+ // === COST DETAIL PANELS (transparency) ===
+ const cd = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+ const cdB = (id, val) => { const el = document.getElementById(id); if(el) el.innerHTML = '<strong>' + val + '</strong>'; };
+ 
+ // Material detail
+ cd('cdMatDims', x + ' × ' + y + ' × ' + z + ' mm');
+ cd('cdMatVol', Math.round(volumeCm3 * 1000).toLocaleString('de-DE') + ' mm³');
+ cd('cdMatDensity', mat.name + ' / ' + mat.density.toFixed(2).replace('.',',') + ' g/cm³');
+ cd('cdMatWeight', DEFormatter.weight(weightKg));
+ cd('cdMatPrice', DEFormatter.price(mat.price) + '/kg');
+ cd('cdMatNet', DEFormatter.price(weightKg * mat.price));
+ cd('cdMatScrap', DEFormatter.price(weightKg * mat.price * scrap / 100));
+ cd('cdMatMEK', DEFormatter.price(materialCost));
+ cd('cdMatMGK', DEFormatter.price(materialCost * zuschlagMGK / 100));
+ cdB('cdMatTotal', DEFormatter.price(materialMitGK));
+ 
+ // Fertigung detail
+ cd('cdMachTime', DEFormatter.time(machiningTime));
+ cd('cdMachLabor', 'EUR ' + RATES.cnc.labor + '/h');
+ cd('cdMachRate', 'EUR ' + RATES.cnc.machine + '/h');
+ cd('cdMachTotal', 'EUR ' + cncRate + '/h');
+ cd('cdMachNet', DEFormatter.price(machineCost));
+ cd('cdMachFEK', DEFormatter.price(machineCost));
+ cd('cdMachAV', DEFormatter.price(machineCost * zuschlagAV / 100));
+ cdB('cdMachGesamt', DEFormatter.price(fertigungMitAV));
+ 
+ // Setup detail
+ cd('cdSetupClamping', document.getElementById('clampingSelect')?.selectedOptions[0]?.text || 'Schraubstock');
+ cd('cdSetupBase', DEFormatter.time(CLAMPING[document.getElementById('clampingSelect')?.value || 'schraubstock'].time));
+ cd('cdSetupCount', setupCount);
+ cd('cdSetupTime', DEFormatter.time(totalSetupTime));
+ cd('cdSetupTotal', DEFormatter.price(setupCost));
+ cd('cdSetupQty', qty);
+ cdB('cdSetupPerPiece', DEFormatter.price(setupCostPerPiece));
+ 
+ // Tool detail
+ cd('cdToolFactor', mat.timeFactor.toFixed(1).replace('.',',') + '×');
+ cd('cdToolTime', DEFormatter.time(machiningTime));
+ cdB('cdToolTotal', DEFormatter.price(toolCost));
+ cd('toolFormula', mat.timeFactor > 1 ? 'EUR 20,74 × ' + mat.timeFactor.toFixed(1).replace('.',',') + ' (Werkstoff-Faktor)' : 'Pauschale, werkstoffabhängig');
+ 
+ // Overhead detail
+ cd('cdOhHK', DEFormatter.price(herstellkosten));
+ cd('cdOhVwGK', DEFormatter.price(vwGKBetrag));
+ cd('cdOhVtGK', DEFormatter.price(vtGKBetrag));
+ cdB('cdOhTotal', DEFormatter.price(vwGKBetrag + vtGKBetrag));
  
  // Quantity table with full Zuschlagskalkulation
  const qtys = [1, 5, 10, 25, 50];
@@ -4450,16 +4609,16 @@ M30
  
  function showSettingsTab(tab) {
  // Hide all tabs
- document.getElementById('settings-stunden')?.style.display = 'none';
- document.getElementById('settings-material')?.style.display = 'none';
- document.getElementById('settings-zuschlag')?.style.display = 'none';
+ { const _e = document.getElementById('settings-stunden'); if(_e) _e.style.display = 'none'; }
+ { const _e = document.getElementById('settings-material'); if(_e) _e.style.display = 'none'; }
+ { const _e = document.getElementById('settings-zuschlag'); if(_e) _e.style.display = 'none'; }
  document.getElementById('settings-firma').style.display = 'none';
  
  // Reset all buttons
- document.getElementById('tabStunden')?.className = 'btn btn-sm btn-secondary';
- document.getElementById('tabMaterial')?.className = 'btn btn-sm btn-secondary';
- document.getElementById('tabZuschlag')?.className = 'btn btn-sm btn-secondary';
- document.getElementById('tabFirma')?.className = 'btn btn-sm btn-secondary';
+ { const _e = document.getElementById('tabStunden'); if(_e) _e.className = 'btn btn-sm btn-secondary'; }
+ { const _e = document.getElementById('tabMaterial'); if(_e) _e.className = 'btn btn-sm btn-secondary'; }
+ { const _e = document.getElementById('tabZuschlag'); if(_e) _e.className = 'btn btn-sm btn-secondary'; }
+ { const _e = document.getElementById('tabFirma'); if(_e) _e.className = 'btn btn-sm btn-secondary'; }
  
  // Show selected tab
  document.getElementById('settings-' + tab).style.display = 'block';
