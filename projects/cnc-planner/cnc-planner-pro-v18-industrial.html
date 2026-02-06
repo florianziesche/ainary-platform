@@ -3497,7 +3497,9 @@ M30
 <div class="card" style="margin-bottom: var(--space-5);">
 <div class="card-header"><span>Soll-Ist-Vergleich erfassen</span></div>
 <div class="card-body">
-<div class="grid-3" style="gap: var(--space-4); margin-bottom: var(--space-5);">
+
+<!-- Auftragsstatus -->
+<div class="grid-4" style="gap: var(--space-4); margin-bottom: var(--space-5);">
 <div class="form-group" style="margin-bottom: 0;">
 <label class="form-label">Projekt-Nr.</label>
 <input type="text" class="input input-mono" id="fbProjektNr" value="2500473.01" readonly style="background: var(--color-bg);">
@@ -3508,7 +3510,40 @@ M30
 </div>
 <div class="form-group" style="margin-bottom: 0;">
 <label class="form-label">Erfasser</label>
-<input type="text" class="input" id="fbErfasser" placeholder="Name oder Kürzel">
+<input type="text" class="input" id="fbErfasser" placeholder="Kürzel">
+</div>
+<div class="form-group" style="margin-bottom: 0;">
+<label class="form-label">Auftragsstatus</label>
+<select class="select" id="fbAuftragsstatus" onchange="toggleAblehnungsgrund()">
+<option value="angenommen">Angenommen</option>
+<option value="abgelehnt">Abgelehnt</option>
+<option value="offen">Offen</option>
+</select>
+</div>
+</div>
+
+<!-- Ablehnungsgrund (nur bei abgelehnt) -->
+<div id="fbAblehnungBox" style="display:none;margin-bottom:var(--space-5);">
+<div class="grid-2" style="gap: var(--space-4);">
+<div class="form-group" style="margin-bottom:0;">
+<label class="form-label">Ablehnungsgrund</label>
+<select class="select" id="fbAblehnungsgrund">
+<option value="">—</option>
+<option value="preis">Preis zu hoch</option>
+<option value="lieferzeit">Lieferzeit zu lang</option>
+<option value="kapazitaet">Keine Kapazität</option>
+<option value="technik">Technisch nicht machbar</option>
+<option value="wettbewerb">Wettbewerber günstiger</option>
+<option value="sonstiges">Sonstiges</option>
+</select>
+</div>
+<div class="form-group" style="margin-bottom:0;">
+<label class="form-label">Wettbewerbspreis (falls bekannt)</label>
+<div class="input-with-unit">
+<input type="number" class="input input-mono" id="fbWettbewerbspreis" placeholder="—" step="0.01">
+<span class="input-unit">EUR</span>
+</div>
+</div>
 </div>
 </div>
  
@@ -3632,18 +3667,40 @@ M30
 </tfoot>
 </table>
  
+<!-- Visuelle Zusammenfassung -->
+<div class="grid-3" style="gap: var(--space-4); margin-bottom: var(--space-5);">
+<div class="card">
+<div class="card-body" style="text-align:center;padding:var(--space-3);">
+<div style="font-size:24px;font-weight:700;font-family:var(--font-mono);" id="fbSummaryDelta">—</div>
+<div style="font-size:11px;color:var(--color-text-muted);">Zeitabweichung gesamt</div>
+</div>
+</div>
+<div class="card">
+<div class="card-body" style="text-align:center;padding:var(--space-3);">
+<div style="font-size:24px;font-weight:700;font-family:var(--font-mono);" id="fbSummaryCost">—</div>
+<div style="font-size:11px;color:var(--color-text-muted);">Kostenabweichung</div>
+</div>
+</div>
+<div class="card">
+<div class="card-body" style="text-align:center;padding:var(--space-3);">
+<div style="font-size:24px;font-weight:700;font-family:var(--font-mono);" id="fbSummaryOps">0 / 4</div>
+<div style="font-size:11px;color:var(--color-text-muted);">OPs erfasst</div>
+</div>
+</div>
+</div>
+
 <div class="grid-2" style="gap: var(--space-5);">
 <div>
-<div style="font-weight: 600; margin-bottom: var(--space-3);">Ergebnis</div>
+<div style="font-weight: 600; margin-bottom: var(--space-3);">Fertigungsergebnis</div>
 <div style="display: flex; flex-direction: column; gap: var(--space-2);">
 <label style="display: flex; align-items: center; gap: var(--space-2); cursor: pointer;">
-<input type="radio" name="fbErgebnis" value="io_erst" checked>Teil i.O. (Erstfertigung)
+<input type="radio" name="fbErgebnis" value="io_erst" checked>i.O. — Erstfertigung
 </label>
 <label style="display: flex; align-items: center; gap: var(--space-2); cursor: pointer;">
-<input type="radio" name="fbErgebnis" value="io_korrektur">Teil i.O. (nach Korrektur)
+<input type="radio" name="fbErgebnis" value="io_korrektur">i.O. — nach Korrektur
 </label>
 <label style="display: flex; align-items: center; gap: var(--space-2); cursor: pointer;">
-<input type="radio" name="fbErgebnis" value="nacharbeit">Nacharbeit nötig
+<input type="radio" name="fbErgebnis" value="nacharbeit">Nacharbeit erforderlich
 </label>
 <label style="display: flex; align-items: center; gap: var(--space-2); cursor: pointer;">
 <input type="radio" name="fbErgebnis" value="ausschuss">Ausschuss
@@ -3651,8 +3708,8 @@ M30
 </div>
 </div>
 <div>
-<div style="font-weight: 600; margin-bottom: var(--space-3);">Empfehlung für nächstes Mal</div>
-<textarea class="input" id="fbEmpfehlung" rows="4" placeholder="Was sollte bei der nächsten Kalkulation anders sein? z.B. 'Vorschub bei h5 um 20% reduzieren'"></textarea>
+<div style="font-weight: 600; margin-bottom: var(--space-3);">Korrekturvorschlag</div>
+<textarea class="input" id="fbEmpfehlung" rows="4" placeholder="Was beim nächsten Mal anders machen? z.B. Vorschub -20% bei h5, Messzeit einplanen"></textarea>
 </div>
 </div>
 </div>
@@ -4069,9 +4126,49 @@ Die erwartete Abweichung zur Nachkalkulation liegt bei ±15 % für prismatische 
 </table>
 
 <div style="font-weight: 600; margin-bottom: var(--space-3);">Datenformat</div>
-<div style="color: var(--color-text-secondary);">
+<div style="color: var(--color-text-secondary); margin-bottom: var(--space-5);">
 Alle Kalkulationsdaten werden lokal im Browser verarbeitet. Es werden keine Daten an externe Server übertragen.
 Exportformate: CSV (Nachkalkulation), JSON (Einstellungen), PDF (Angebot/Fertigungsanweisung).
+</div>
+
+<div style="font-weight: 600; margin-bottom: var(--space-3);">Häufige Fragen (FAQ)</div>
+<div style="font-size:13px;color:var(--color-text-secondary);line-height:1.7;">
+
+<div style="margin-bottom:var(--space-4);">
+<div style="font-weight:500;color:var(--color-text);margin-bottom:2px;">Kann ich eigene Werkzeuge eintragen?</div>
+Die Werkzeugliste wird derzeit automatisch aus dem Operationsplan generiert. Eigene Werkzeuge (T-Nummern, Durchmesser, Schneidenanzahl) können in einer zukünftigen Version hinterlegt werden. Aktuell: Werkzeugdaten unter "Preise &amp; Sätze" → Stundensätze anpassen.
+</div>
+
+<div style="margin-bottom:var(--space-4);">
+<div style="font-weight:500;color:var(--color-text);margin-bottom:2px;">Was passiert, wenn eine Operation fehlt?</div>
+Die automatisch generierten Operationen decken Standard-Bearbeitungsschritte ab. Fehlende OPs (z.B. Wärmebehandlung, Beschichtung, Sonderprozesse) werden nicht kalkuliert. Nutzen Sie die Nachkalkulation, um Abweichungen zu dokumentieren — das System lernt aus den Daten und verbessert zukünftige Kalkulationen.
+</div>
+
+<div style="margin-bottom:var(--space-4);">
+<div style="font-weight:500;color:var(--color-text);margin-bottom:2px;">Wie genau ist die Vorkalkulation?</div>
+Für prismatische Standardteile (Platten, Adapter, Gehäuse) liegt die Abweichung zur Nachkalkulation typisch bei ±15 %. Hauptfaktoren für Abweichungen: Einrichtzeit, enge Toleranzen (h5/H7), schwerzerspanbare Werkstoffe. Die Genauigkeit verbessert sich mit jeder erfassten Nachkalkulation.
+</div>
+
+<div style="margin-bottom:var(--space-4);">
+<div style="font-weight:500;color:var(--color-text);margin-bottom:2px;">Kann ich die Zuschlagssätze ändern?</div>
+Ja. Unter "Preise &amp; Sätze" → Tab "Zuschläge" können MGK, AV, VwGK, VtGK und Gewinnzuschlag betriebsspezifisch angepasst werden. Die Änderungen wirken sich auf alle folgenden Kalkulationen aus.
+</div>
+
+<div style="margin-bottom:var(--space-4);">
+<div style="font-weight:500;color:var(--color-text);margin-bottom:2px;">Kann ich Materialpreise aktualisieren?</div>
+Ja. Unter "Preise &amp; Sätze" → Tab "Materialpreise". Empfehlung: Tagespreise vom Stahlhandel quartalsweise aktualisieren. Verschnitt wird separat berechnet.
+</div>
+
+<div style="margin-bottom:var(--space-4);">
+<div style="font-weight:500;color:var(--color-text);margin-bottom:2px;">Ist der NC-Code direkt lauffähig?</div>
+Der NC-Code dient als Ausgangsbasis. Vor dem Einsatz: Werkzeugdaten prüfen, Nullpunkt anpassen, Sicherheitsebene verifizieren, Programm im Simulator testen. Die Steuerungsformate (Heidenhain, Siemens, Fanuc) sind syntaktisch korrekt, aber maschinen- und aufspannungsabhängig.
+</div>
+
+<div>
+<div style="font-weight:500;color:var(--color-text);margin-bottom:2px;">Wo werden meine Daten gespeichert?</div>
+Alle Daten verbleiben lokal in Ihrem Browser (localStorage). Es werden keine Daten an externe Server übertragen. Nutzen Sie "Export JSON" unter Einstellungen für Backup oder Übertragung auf andere Geräte.
+</div>
+
 </div>
 </div>
 </div>
@@ -5208,6 +5305,49 @@ Exportformate: CSV (Nachkalkulation), JSON (Einstellungen), PDF (Angebot/Fertigu
  if (tab === 'historie') updateFeedbackHistory();
  }
  
+ function toggleAblehnungsgrund() {
+ const status = document.getElementById('fbAuftragsstatus')?.value;
+ const box = document.getElementById('fbAblehnungBox');
+ if (box) box.style.display = status === 'abgelehnt' ? 'block' : 'none';
+ }
+ 
+ function updateFeedbackSummary() {
+ const rows = document.querySelectorAll('#feedbackOpsTable tr');
+ let filled = 0, totalSoll = 0, totalIst = 0;
+ rows.forEach(r => {
+ const sollCell = r.cells[2];
+ const istInput = r.querySelector('input[type="number"]');
+ if (sollCell && istInput && istInput.value) {
+ filled++;
+ const soll = parseFloat(sollCell.textContent.replace(',','.')) || 0;
+ const ist = parseFloat(istInput.value) || 0;
+ totalSoll += soll;
+ totalIst += ist;
+ }
+ });
+ // Setup row
+ const setupIst = parseFloat(document.getElementById('fbSetupIst')?.value) || 0;
+ const setupSoll = 25;
+ if (setupIst > 0) { totalSoll += setupSoll; totalIst += setupIst; filled++; }
+ 
+ const totalOps = rows.length + 1; // +1 for setup
+ const el = (id, v) => { const e = document.getElementById(id); if(e) e.textContent = v; };
+ 
+ el('fbSummaryOps', filled + ' / ' + totalOps);
+ 
+ if (filled > 0 && totalSoll > 0) {
+ const deltaPct = ((totalIst - totalSoll) / totalSoll * 100);
+ const sign = deltaPct > 0 ? '+' : '';
+ const color = Math.abs(deltaPct) <= 10 ? 'var(--color-success)' : deltaPct > 20 ? 'var(--color-error)' : 'var(--color-warning)';
+ const deltaEl = document.getElementById('fbSummaryDelta');
+ if (deltaEl) { deltaEl.textContent = sign + deltaPct.toFixed(0).replace('.',',') + ' %'; deltaEl.style.color = color; }
+ 
+ const costDiff = (totalIst - totalSoll) / 60 * 91; // EUR 91/h
+ const costEl = document.getElementById('fbSummaryCost');
+ if (costEl) { costEl.textContent = (costDiff > 0 ? '+' : '') + DEFormatter.price(costDiff); costEl.style.color = color; }
+ }
+ }
+ 
  function updateFeedbackDelta(input) {
  const row = input.closest('tr');
  const kalkCell = row.cells[2].textContent;
@@ -5226,6 +5366,7 @@ Exportformate: CSV (Nachkalkulation), JSON (Einstellungen), PDF (Angebot/Fertigu
  }
  
  updateGesamtzeit();
+ updateFeedbackSummary();
  }
  
  function updateSetupDelta() {
@@ -5244,6 +5385,7 @@ Exportformate: CSV (Nachkalkulation), JSON (Einstellungen), PDF (Angebot/Fertigu
  }
  
  updateGesamtzeit();
+ updateFeedbackSummary();
  }
  
  function updateGesamtzeit() {
