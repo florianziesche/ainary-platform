@@ -353,18 +353,8 @@
  
  /* === POSITION NUMBER (10, 20, 30...) === */
  .table .position-nr {
+ font-weight: var(--font-bold);
  width: 50px;
- text-align: right;
- font-weight: normal;
- font-variant-numeric: tabular-nums;
- }
- 
- /* Drawing Number (Zeichnungsnummer) */
- .drawing-number {
- font-size: 13px;
- color: #374151;
- font-family: var(--font-mono);
- margin-top: 2px;
  }
  
  /* === MONOSPACE === */
@@ -1412,18 +1402,19 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Position 1 (klassisch) -->
+                    <!-- Position 10 -->
                     <tr>
-                        <td class="position-nr">1</td>
+                        <td class="position-nr">10</td>
                         <td class="mono">E-CNC-0001</td>
                         <td>
                             <div style="font-weight: var(--font-semibold);" id="quotePart1Name">Verbindungsplatte</div>
-                            <div class="drawing-number" style="font-size: var(--text-sm); color: var(--color-text-muted); margin-top: var(--space-1); font-family: var(--font-mono);" id="quotePart1Drawing">2500473.01.11.02.00.001</div>
-                            <div style="font-size: var(--text-sm); color: var(--color-text-muted); margin-top: var(--space-1);">Werkstoff S235JR</div>
+                            <div class="drawing-nr" style="font-size: var(--text-sm); color: var(--color-text-muted); margin-top: var(--space-1); font-family: var(--font-mono);">
+                                Zchng Nr. <span id="quotePart1Drawing">2500473.01.11.02.00.001</span>
+                            </div>
                         </td>
-                        <td class="right mono" id="quotePart1Qty">1 Stck.</td>
-                        <td class="right mono" id="quotePart1EP">EUR 170,76</td>
-                        <td class="right mono" id="quotePart1GP">EUR 170,76</td>
+                        <td class="right mono" id="quotePart1Qty">1 Stück</td>
+                        <td class="right mono" id="quotePart1EP">170,76</td>
+                        <td class="right mono" id="quotePart1GP">170,76</td>
                     </tr>
                 </tbody>
             </table>
@@ -1433,15 +1424,15 @@
                 <div style="width: 300px;">
                     <div style="display: flex; justify-content: space-between; padding: var(--space-2) 0; font-size: var(--text-base);">
                         <span style="color: var(--color-text-secondary);">Zwischensumme</span>
-                        <span class="mono" id="quoteSubtotal">EUR 170,76</span>
+                        <span class="mono" id="quoteSubtotal">170,76 €</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; padding: var(--space-2) 0; font-size: var(--text-base); border-top: 1px solid var(--color-border-light);">
                         <span style="color: var(--color-text-secondary);">+ MwSt. 19%</span>
-                        <span class="mono" id="quoteTax">EUR 32,44</span>
+                        <span class="mono" id="quoteTax">32,44 €</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; padding: var(--space-4) 0; font-size: var(--text-xl); font-weight: var(--font-bold); border-top: 2px solid var(--color-primary);">
                         <span>GESAMTBETRAG</span>
-                        <span class="mono" id="quoteTotal">EUR 203,20</span>
+                        <span class="mono" id="quoteTotal">203,20 €</span>
                     </div>
                 </div>
             </div>
@@ -3049,115 +3040,6 @@ M30
  let currentProject = null;
  
  // ================================================================
- // DEUTSCHE FORMATIERUNG LIBRARY
- // ================================================================
- 
- const DEFormatter = {
-     date(date) {
-         return date.toLocaleDateString('de-DE', {
-             day: '2-digit',
-             month: '2-digit',
-             year: 'numeric'
-         });
-     },
-     
-     price(amount) {
-         const formatted = amount.toLocaleString('de-DE', {
-             minimumFractionDigits: 2,
-             maximumFractionDigits: 2
-         });
-         return `EUR ${formatted}`;
-     },
-     
-     length(value, unit = 'mm') {
-         return `${Math.round(value)} ${unit}`;
-     },
-     
-     weight(value) {
-         return `${value.toFixed(2)} kg`;
-     },
-     
-     time(minutes) {
-         if (minutes < 60) return `${minutes.toFixed(1)} min`;
-         return `${(minutes/60).toFixed(1)} h`;
-     },
-     
-     quantity(num, unit = 'Stck.') {
-         return `${Math.round(num)} ${unit}`;
-     }
- };
- 
- // ================================================================
- // QUOTE / ANGEBOT FUNCTIONS
- // ================================================================
- 
- function calculateValidity() {
-     const today = new Date();
-     const validUntil = new Date(today);
-     validUntil.setDate(today.getDate() + 28);  // 4 Wochen
-     
-     document.getElementById('quoteDate').textContent = DEFormatter.date(today);
-     document.getElementById('quoteValidUntil').textContent = DEFormatter.date(validUntil);
- }
- 
- function generatePositions(parts) {
-     return parts.map((part, index) => ({
-         ...part,
-         position: index + 1  // 1, 2, 3... (klassisch)
-     }));
- }
- 
- function renderQuote(data) {
-     if (!data || !data.parts) {
-         console.warn('renderQuote: No data provided');
-         return;
-     }
-     
-     const parts = generatePositions(data.parts);
-     
-     let html = '';
-     parts.forEach(part => {
-         html += `
-             <tr>
-                 <td class="position-nr">${part.position}</td>
-                 <td class="mono">${part.articleNumber || 'E-CNC-' + String(part.position).padStart(4, '0')}</td>
-                 <td>
-                     <div style="font-weight: var(--font-semibold);">${part.name}</div>
-                     <div style="font-size: var(--text-sm); color: var(--color-text-muted); margin-top: var(--space-1); font-family: var(--font-mono);">
-                         ${part.drawingNumber || part.partNumber || ''}
-                     </div>
-                     ${part.material ? `<div style="font-size: var(--text-sm); color: var(--color-text-muted); margin-top: var(--space-1);">Werkstoff ${part.material}</div>` : ''}
-                 </td>
-                 <td class="right mono">${DEFormatter.quantity(part.quantity || 1)}</td>
-                 <td class="right mono">${DEFormatter.price(part.price || 0)}</td>
-                 <td class="right mono">${DEFormatter.price((part.price || 0) * (part.quantity || 1))}</td>
-             </tr>
-         `;
-     });
-     
-     const tbody = document.querySelector('#section-quote .table tbody');
-     if (tbody) {
-         tbody.innerHTML = html;
-     }
-     
-     // Summen berechnen
-     const subtotal = parts.reduce((sum, p) => sum + (p.price || 0) * (p.quantity || 1), 0);
-     const tax = subtotal * 0.19;
-     const total = subtotal + tax;
-     
-     const subtotalEl = document.getElementById('quoteSubtotal');
-     const taxEl = document.getElementById('quoteTax');
-     const totalEl = document.getElementById('quoteTotal');
-     
-     if (subtotalEl) subtotalEl.textContent = DEFormatter.price(subtotal);
-     if (taxEl) taxEl.textContent = DEFormatter.price(tax);
-     if (totalEl) totalEl.textContent = DEFormatter.price(total);
-     
-     // Gültigkeit berechnen
-     calculateValidity();
- }
- 
- // ================================================================
  // NAVIGATION
  // ================================================================
  
@@ -3498,26 +3380,6 @@ M30
  document.getElementById('faRawDims').textContent = x + ' × ' + y + ' × ' + z + ' mm';
  document.getElementById('faWeight').textContent = weightKg.toFixed(2).replace('.', ',') + ' kg';
  document.getElementById('faMachiningTime').innerHTML = '<strong>' + machiningTime.toFixed(1).replace('.', ',') + ' min</strong>';
- 
- // ================================================================
- // QUOTE SECTION UPDATE (renderQuote with calculated data)
- // ================================================================
- const partName = currentProject ? currentProject.name : document.getElementById('partName')?.value || 'Bauteil';
- const drawingNumber = currentProject ? currentProject.partNumber : document.getElementById('partNumber')?.value || '';
- const materialName = mat.name || document.getElementById('materialSelect').value;
- 
- const quoteData = {
-     parts: [{
-         name: partName,
-         drawingNumber: drawingNumber,
-         material: materialName,
-         quantity: qty,
-         price: angebotspreis,
-         articleNumber: 'E-CNC-0001'
-     }]
- };
- 
- renderQuote(quoteData);
  
  // Plausibility warnings
  checkPlausibility(x, y, z, mat, clampingType);
@@ -3958,24 +3820,12 @@ M30
  renderPartGrid();
  calculate();
  
- // Initialize quote section
- calculateValidity();
- 
- // Optional: Render quote with example data
- // Uncomment to auto-populate quote table:
- /*
- const exampleQuoteData = {
-     parts: [{
-         name: 'Verbindungsplatte',
-         drawingNumber: '2500473.01.11.02.00.001',
-         material: 'S235JR',
-         quantity: 1,
-         price: 170.76,
-         articleNumber: 'E-CNC-0001'
-     }]
- };
- renderQuote(exampleQuoteData);
- */
+ // Set today's date
+ const today = new Date();
+ const dateStr = today.toLocaleDateString('de-DE');
+ document.getElementById('quoteDate').textContent = dateStr;
+ const validUntil = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+ document.getElementById('quoteValidUntil').textContent = validUntil.toLocaleDateString('de-DE');
  });
 </script>
 </body>

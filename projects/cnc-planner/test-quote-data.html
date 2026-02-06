@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quote Data Test</title>
+</head>
+<body>
+    <h1>Test Quote Rendering</h1>
+    <button onclick="testRender()">Test renderQuote()</button>
+    <button onclick="testFormatter()">Test DEFormatter</button>
+    <div id="output"></div>
+
+    <script>
+        // DEFormatter for testing
+        const DEFormatter = {
+            date(date) {
+                return date.toLocaleDateString('de-DE', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+            },
+            
+            price(amount) {
+                const formatted = amount.toLocaleString('de-DE', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+                return `EUR ${formatted}`;
+            },
+            
+            length(value, unit = 'mm') {
+                return `${Math.round(value)} ${unit}`;
+            },
+            
+            weight(value) {
+                return `${value.toFixed(2)} kg`;
+            },
+            
+            time(minutes) {
+                if (minutes < 60) return `${minutes.toFixed(1)} min`;
+                return `${(minutes/60).toFixed(1)} h`;
+            },
+            
+            quantity(num, unit = 'Stck.') {
+                return `${Math.round(num)} ${unit}`;
+            }
+        };
+
+        function testFormatter() {
+            const output = document.getElementById('output');
+            let html = '<h2>DEFormatter Tests:</h2><ul>';
+            
+            // Test price
+            html += `<li>Price 1234.56: <strong>${DEFormatter.price(1234.56)}</strong> (expected: EUR 1.234,56)</li>`;
+            html += `<li>Price 170.76: <strong>${DEFormatter.price(170.76)}</strong> (expected: EUR 170,76)</li>`;
+            html += `<li>Price 10000.00: <strong>${DEFormatter.price(10000)}</strong> (expected: EUR 10.000,00)</li>`;
+            
+            // Test date
+            const today = new Date();
+            html += `<li>Today: <strong>${DEFormatter.date(today)}</strong> (expected: DD.MM.YYYY)</li>`;
+            
+            const futureDate = new Date();
+            futureDate.setDate(today.getDate() + 28);
+            html += `<li>+28 days: <strong>${DEFormatter.date(futureDate)}</strong></li>`;
+            
+            // Test quantity
+            html += `<li>Quantity 29: <strong>${DEFormatter.quantity(29)}</strong> (expected: 29 Stck.)</li>`;
+            html += `<li>Quantity 1: <strong>${DEFormatter.quantity(1)}</strong> (expected: 1 Stck.)</li>`;
+            
+            // Test length
+            html += `<li>Length 440: <strong>${DEFormatter.length(440)}</strong> (expected: 440 mm)</li>`;
+            
+            // Test weight
+            html += `<li>Weight 2.2: <strong>${DEFormatter.weight(2.2)}</strong> (expected: 2,20 kg)</li>`;
+            
+            // Test time
+            html += `<li>Time 45 min: <strong>${DEFormatter.time(45)}</strong> (expected: 45,0 min)</li>`;
+            html += `<li>Time 90 min: <strong>${DEFormatter.time(90)}</strong> (expected: 1,5 h)</li>`;
+            
+            html += '</ul>';
+            output.innerHTML = html;
+        }
+
+        function testRender() {
+            const output = document.getElementById('output');
+            
+            const testData = {
+                parts: [
+                    {
+                        name: 'Verbindungsplatte',
+                        drawingNumber: '2500473.01.11.02.00.001',
+                        material: 'S235JR',
+                        quantity: 1,
+                        price: 170.76,
+                        articleNumber: 'E-CNC-0001'
+                    },
+                    {
+                        name: 'Adapterplatte',
+                        drawingNumber: '2500473.01.01.02.01.001',
+                        material: 'AlMg3',
+                        quantity: 5,
+                        price: 52.15,
+                        articleNumber: 'E-CNC-0002'
+                    },
+                    {
+                        name: 'Welle',
+                        drawingNumber: '1234567.89.01.02.03.456',
+                        material: '42CrMo4',
+                        quantity: 10,
+                        price: 89.50,
+                        articleNumber: 'E-CNC-0003'
+                    }
+                ]
+            };
+            
+            let html = '<h2>Test Quote Data:</h2>';
+            html += '<table border="1" style="border-collapse: collapse; width: 100%;">';
+            html += '<thead><tr>';
+            html += '<th>Pos</th><th>Art.Nr</th><th>Bezeichnung</th><th>Menge</th><th>EP</th><th>GP</th>';
+            html += '</tr></thead><tbody>';
+            
+            testData.parts.forEach((part, index) => {
+                const position = index + 1;
+                const total = part.price * part.quantity;
+                
+                html += '<tr>';
+                html += `<td style="text-align: right;">${position}</td>`;
+                html += `<td style="font-family: monospace;">${part.articleNumber}</td>`;
+                html += `<td>`;
+                html += `<div style="font-weight: bold;">${part.name}</div>`;
+                html += `<div style="font-family: monospace; color: #666; font-size: 13px;">${part.drawingNumber}</div>`;
+                html += `<div style="color: #666; font-size: 13px;">Werkstoff ${part.material}</div>`;
+                html += `</td>`;
+                html += `<td style="text-align: right; font-family: monospace;">${DEFormatter.quantity(part.quantity)}</td>`;
+                html += `<td style="text-align: right; font-family: monospace;">${DEFormatter.price(part.price)}</td>`;
+                html += `<td style="text-align: right; font-family: monospace;">${DEFormatter.price(total)}</td>`;
+                html += '</tr>';
+            });
+            
+            // Summen
+            const subtotal = testData.parts.reduce((sum, p) => sum + p.price * p.quantity, 0);
+            const tax = subtotal * 0.19;
+            const total = subtotal + tax;
+            
+            html += '</tbody></table>';
+            html += '<div style="margin-top: 20px; text-align: right;">';
+            html += `<div>Zwischensumme: <strong>${DEFormatter.price(subtotal)}</strong></div>`;
+            html += `<div>+ MwSt. 19%: <strong>${DEFormatter.price(tax)}</strong></div>`;
+            html += `<div style="font-size: 18px; font-weight: bold; border-top: 2px solid #000; padding-top: 10px; margin-top: 10px;">`;
+            html += `GESAMTBETRAG: <strong>${DEFormatter.price(total)}</strong>`;
+            html += `</div></div>`;
+            
+            output.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
