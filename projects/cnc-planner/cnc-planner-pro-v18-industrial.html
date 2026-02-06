@@ -1196,38 +1196,46 @@
  
 <nav class="sidebar-nav">
 <div class="nav-section">
-<div class="nav-section-title">Eingabe</div>
+<div class="nav-section-title">Vorkalkulation</div>
 <button class="nav-item active" data-section="part" onclick="showSection('part', this)">
-<span>Teil</span>
+<span>Werkstück</span>
 </button>
-<button class="nav-item" data-section="params" onclick="showSection('params', this)">
-<span>Preise &amp; Sätze</span>
+<button class="nav-item" data-section="result" onclick="showSection('result', this)">
+<span>Kalkulation</span>
 </button>
 </div>
  
 <div class="nav-section">
-<div class="nav-section-title">Ergebnis</div>
-<button class="nav-item" data-section="result" onclick="showSection('result', this)">
-<span>Kalkulation</span>
-</button>
+<div class="nav-section-title">Fertigung</div>
 <button class="nav-item" data-section="instructions" onclick="showSection('instructions', this)">
 <span>Fertigungsanweisung</span>
 </button>
-<button class="nav-item" data-section="quote" onclick="showSection('quote', this)">
-<span>Angebot</span>
+<button class="nav-item" data-section="tools" onclick="showSection('tools', this)">
+<span>Werkzeuge</span>
 </button>
 <button class="nav-item" data-section="code" onclick="showSection('code', this)">
 <span>NC-Code</span>
 </button>
-<button class="nav-item" data-section="tools" onclick="showSection('tools', this)">
-<span>Werkzeuge</span>
+</div>
+ 
+<div class="nav-section">
+<div class="nav-section-title">Ausgabe</div>
+<button class="nav-item" data-section="quote" onclick="showSection('quote', this)">
+<span>Angebot</span>
+</button>
+</div>
+ 
+<div class="nav-section">
+<div class="nav-section-title">Auswertung</div>
+<button class="nav-item" data-section="feedback" onclick="showSection('feedback', this)">
+<span>Nachkalkulation</span>
 </button>
 </div>
 </nav>
  
 <div class="sidebar-footer">
-<button class="nav-item" data-section="feedback" onclick="showSection('feedback', this)">
-<span>Nachkalkulation</span>
+<button class="nav-item" data-section="params" onclick="showSection('params', this)">
+<span>Preise &amp; Sätze</span>
 </button>
 <button class="nav-item" data-section="settings" onclick="showSection('settings', this)">
 <span>Einstellungen</span>
@@ -1238,7 +1246,7 @@
 <!-- MAIN CONTENT -->
 <main class="main">
 <header class="main-header">
-<h1 class="main-title" id="mainTitle">Teil</h1>
+<h1 class="main-title" id="mainTitle">Werkstück</h1>
 <div class="main-actions" id="mainActions" style="display:none;">
 <button class="btn btn-secondary btn-sm" onclick="window.print()">Drucken / PDF</button>
 </div>
@@ -1384,11 +1392,32 @@
 </div>
 </div>
  
+<div class="grid-3" style="gap: var(--space-4);">
 <div class="form-group">
 <label class="form-label">Stückzahl</label>
-<div class="input-with-unit" style="width: 120px;">
+<div class="input-with-unit">
 <input type="number" class="input input-mono" id="quantity" value="1" min="1">
 <span class="input-unit">Stk</span>
+</div>
+</div>
+<div class="form-group">
+<label class="form-label">Toleranzklasse</label>
+<select class="select" id="toleranzKlasse">
+<option value="IT11">IT11 (Grob)</option>
+<option value="IT9" selected>IT9 (Standard)</option>
+<option value="IT8">IT8 (Genau)</option>
+<option value="IT7">IT7 (Fein)</option>
+</select>
+</div>
+<div class="form-group">
+<label class="form-label">Oberfläche (Ra)</label>
+<select class="select" id="oberflaeche">
+<option value="12.5">Ra 12,5 (Schruppen)</option>
+<option value="6.3" selected>Ra 6,3 (Standard)</option>
+<option value="3.2">Ra 3,2 (Schlichten)</option>
+<option value="1.6">Ra 1,6 (Feinschlichten)</option>
+<option value="0.8">Ra 0,8 (Poliert)</option>
+</select>
 </div>
 </div>
  
@@ -2004,6 +2033,26 @@ Berechnen →
 </div>
 <!-- Hidden for backward compat -->
 <input type="hidden" id="marginInput" value="10">
+
+<!-- Preisvergleich -->
+<div class="card" style="margin-top: var(--space-5);">
+<div class="card-header"><span>Preisvergleich</span></div>
+<div class="card-body">
+<div class="grid-3" style="gap: var(--space-4); align-items: end;">
+<div class="form-group" style="margin-bottom:0;">
+<label class="form-label">Bisheriger / Wettbewerbspreis</label>
+<div class="input-with-unit">
+<input type="number" class="input input-mono" id="comparePrice" placeholder="—" step="0.01" onchange="updatePriceCompare()">
+<span class="input-unit">EUR</span>
+</div>
+</div>
+<div id="priceCompareResult" style="font-size: 13px; padding-bottom: 8px;">
+<span style="color: var(--color-text-muted);">Vergleichspreis eingeben</span>
+</div>
+<div id="priceCompareBar" style="padding-bottom: 8px;"></div>
+</div>
+</div>
+</div>
  
 <!-- Kalkulationsgrundlage -->
 <div class="card" style="margin-top: var(--space-5);">
@@ -3219,8 +3268,8 @@ M30
 </div>
  
 <div class="info-box" style="margin-top: var(--space-4);">
-<strong>Programm-Info:</strong>85 Zeilen | Geschätzte Laufzeit: 12,5 min | Maschine: FEHLMANN VERSA 943<br>
-<strong style="color: var(--color-warning);">Hinweis:</strong> Code vor Einsatz prüfen.
+<strong>Programm-Info:</strong> 85 Zeilen | Geschätzte Laufzeit: 12,5 min | Maschine: FEHLMANN VERSA 943<br>
+<strong>Hinweis:</strong> Der generierte NC-Code dient als Ausgangsbasis und muss vor der Fertigung am Simulator oder der Maschine verifiziert werden. Werkzeugdaten, Nullpunkte und Sicherheitsebenen an die jeweilige Maschine anpassen.
 </div>
 </div>
  
@@ -3671,6 +3720,14 @@ M30
 <input type="text" class="input" value="Max Mustermann" id="firmaAnsprech">
 </div>
 <div class="form-group">
+<label class="form-label">Bearbeiter / Kürzel</label>
+<input type="text" class="input" value="" id="firmaBearbeiter" placeholder="z.B. MS, KW">
+</div>
+<div class="form-group">
+<label class="form-label">Abteilung</label>
+<input type="text" class="input" value="" id="firmaAbteilung" placeholder="z.B. Arbeitsvorbereitung">
+</div>
+<div class="form-group">
 <label class="form-label">Straße</label>
 <input type="text" class="input" value="Industriestraße 42" id="firmaStrasse">
 </div>
@@ -3699,7 +3756,7 @@ M30
 </div>
  
 <div class="card" style="margin-top: var(--space-5);">
-<div class="card-header"><span>Angebotseinstellungen</span></div>
+<div class="card-header"><span>Angebots- und Dokumenteneinstellungen</span></div>
 <div class="card-body">
 <div class="grid-3" style="gap: var(--space-4);">
 <div class="form-group" style="margin-bottom: 0;">
@@ -3719,6 +3776,47 @@ M30
 </div>
 </div>
  
+<!-- Firmenlogo -->
+<div class="card" style="margin-top: var(--space-5);">
+<div class="card-header"><span>Firmenlogo</span></div>
+<div class="card-body">
+<div style="display:flex;align-items:center;gap:var(--space-4);">
+<div id="logoPreview" style="width:120px;height:60px;border:1px dashed var(--color-border);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--color-text-muted);overflow:hidden;">
+Kein Logo
+</div>
+<div>
+<input type="file" id="logoUpload" accept="image/*" style="display:none;" onchange="previewLogo(this)">
+<button class="btn btn-secondary btn-sm" onclick="document.getElementById('logoUpload').click()">Logo hochladen</button>
+<div style="font-size:11px;color:var(--color-text-muted);margin-top:4px;">PNG oder JPG, max. 200×100 px empfohlen</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Sprache & Darstellung -->
+<div class="card" style="margin-top: var(--space-5);">
+<div class="card-header"><span>Darstellung</span></div>
+<div class="card-body">
+<div class="grid-2" style="gap: var(--space-4);">
+<div class="form-group" style="margin-bottom: 0;">
+<label class="form-label">Sprache</label>
+<select class="select" id="settingLanguage">
+<option value="de" selected>Deutsch</option>
+<option value="en" disabled>English (in Vorbereitung)</option>
+</select>
+</div>
+<div class="form-group" style="margin-bottom: 0;">
+<label class="form-label">Währung</label>
+<select class="select" id="settingCurrency">
+<option value="EUR" selected>EUR</option>
+<option value="CHF">CHF</option>
+<option value="USD" disabled>USD (in Vorbereitung)</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+
 <!-- Buttons -->
 <div style="margin-top: var(--space-5); display: flex; gap: var(--space-3); padding-top: var(--space-4); border-top: 1px solid var(--color-border);">
 <button class="btn btn-primary" onclick="saveSettings()">Einstellungen speichern</button>
@@ -3811,6 +3909,20 @@ Exportformate: CSV (Nachkalkulation), JSON (Einstellungen), PDF (Angebot/Fertigu
 </tr>
 </tbody>
 </table>
+</div>
+</div>
+</div>
+
+<!-- Gefahrenzone -->
+<div class="card" style="margin-top: var(--space-6); border-color: var(--color-error);">
+<div class="card-header" style="background:var(--color-error);color:white;"><span>Daten</span></div>
+<div class="card-body">
+<div style="display:flex;align-items:center;justify-content:space-between;">
+<div>
+<div style="font-weight:500;">Alle lokalen Daten löschen</div>
+<div style="font-size:12px;color:var(--color-text-muted);">Einstellungen, Nachkalkulationen, Feedback — kann nicht rückgängig gemacht werden.</div>
+</div>
+<button class="btn btn-sm" onclick="if(confirm('Wirklich alle Daten unwiderruflich löschen?')){localStorage.clear();location.reload();}" style="color:var(--color-error);border-color:var(--color-error);">Alle Daten löschen</button>
 </div>
 </div>
 </div>
@@ -4077,15 +4189,15 @@ Exportformate: CSV (Nachkalkulation), JSON (Einstellungen), PDF (Angebot/Fertigu
  // ================================================================
  
  const SECTION_TITLES = {
- 'part': 'Teil',
- 'params': 'Parameter',
+ 'part': 'Werkstück',
+ 'params': 'Preise & Sätze',
  'result': 'Kalkulation',
  'calculation': 'Detailkalkulation',
  'tools': 'Werkzeuge',
  'quote': 'Angebot',
  'instructions': 'Fertigungsanweisung',
  'code': 'NC-Code',
- 'feedback': 'Feedback',
+ 'feedback': 'Nachkalkulation',
  'settings': 'Einstellungen'
  };
  
@@ -5107,6 +5219,62 @@ Exportformate: CSV (Nachkalkulation), JSON (Einstellungen), PDF (Angebot/Fertigu
  // ================================================================
  // EXPORT
  // ================================================================
+ 
+ function previewLogo(input) {
+ const preview = document.getElementById('logoPreview');
+ if (input.files && input.files[0]) {
+ const reader = new FileReader();
+ reader.onload = function(e) {
+ preview.innerHTML = `<img src="${e.target.result}" style="max-width:100%;max-height:100%;object-fit:contain;">`;
+ localStorage.setItem('cncplanner_logo', e.target.result);
+ };
+ reader.readAsDataURL(input.files[0]);
+ }
+ }
+ 
+ function updatePriceCompare() {
+ const compareEl = document.getElementById('comparePrice');
+ const resultEl = document.getElementById('priceCompareResult');
+ const barEl = document.getElementById('priceCompareBar');
+ if (!compareEl || !resultEl) return;
+ 
+ const compare = parseFloat(compareEl.value);
+ const sellEl = document.getElementById('sellPrice');
+ const ownText = sellEl ? sellEl.textContent.replace(/[^0-9,.-]/g,'').replace('.','').replace(',','.') : '0';
+ const own = parseFloat(ownText) || 0;
+ 
+ if (!compare || compare <= 0 || own <= 0) {
+ resultEl.innerHTML = '<span style="color:var(--color-text-muted);">Vergleichspreis eingeben</span>';
+ barEl.innerHTML = '';
+ return;
+ }
+ 
+ const diff = own - compare;
+ const pct = ((diff / compare) * 100);
+ const isHigher = diff > 0;
+ const color = isHigher ? 'var(--color-error)' : 'var(--color-success)';
+ const sign = isHigher ? '+' : '';
+ 
+ resultEl.innerHTML = `
+ <span style="font-weight:600;color:${color};">${sign}${pct.toFixed(1).replace('.',',')} %</span>
+ <span style="color:var(--color-text-muted);"> (${sign}${DEFormatter.price(diff)})</span><br>
+ <span style="font-size:12px;color:var(--color-text-muted);">Eigene Kalkulation vs. Vergleich</span>
+ `;
+ 
+ const maxVal = Math.max(own, compare);
+ const ownW = (own / maxVal * 100);
+ const compW = (compare / maxVal * 100);
+ barEl.innerHTML = `
+ <div style="font-size:11px;color:var(--color-text-muted);margin-bottom:2px;">Eigene</div>
+ <div style="height:12px;background:var(--color-bg-subtle);border-radius:3px;overflow:hidden;margin-bottom:4px;">
+ <div style="width:${ownW}%;height:100%;background:${color};border-radius:3px;"></div>
+ </div>
+ <div style="font-size:11px;color:var(--color-text-muted);margin-bottom:2px;">Vergleich</div>
+ <div style="height:12px;background:var(--color-bg-subtle);border-radius:3px;overflow:hidden;">
+ <div style="width:${compW}%;height:100%;background:var(--color-primary);border-radius:3px;"></div>
+ </div>
+ `;
+ }
  
  function exportCSV() {
  alert('CSV Export — Coming soon');
