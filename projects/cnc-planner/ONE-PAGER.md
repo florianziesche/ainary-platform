@@ -93,12 +93,23 @@ Bei einem Meister-Stundensatz von €50–70:
 
 ---
 
-## Ehrlichkeit
+## Ehrlichkeit — was wir können und was nicht
 
-- CNC Planer Pro ist **kein ERP-Ersatz** — es ist der schnelle Weg vom Zeichnung zum Angebot
-- Voreingestellte Werte sind **Richtwerte** — belastbare Preise entstehen erst nach Kalibrierung mit Ihren betriebsspezifischen Daten
-- NC-Code ist ein **Entwurf** — Simulation vor dem Einsatz ist zwingend erforderlich
-- Die berechneten Zeiten basieren auf **REFA/VDI 3321** — nicht auf KI-Halluzinationen
+**Was CNC Planer Pro gut kann:**
+- Strukturierte Vorkalkulation statt Bauchgefühl
+- Reproduzierbare Ergebnisse statt personenabhängiger Schätzungen
+- Schnelle Angebotsvorlage mit transparenter Kostenaufschlüsselung
+- Nachkalkulation, die Ihre Schätzungen über Zeit verbessert
+
+**Was CNC Planer Pro NICHT kann:**
+- Keine CAD-Analyse — der Operationsplan basiert auf Abmessungen, nicht auf der echten Geometrie. OPs können fehlen oder überflüssig sein
+- Aufspannungen sind vereinfacht — bei mehrseitiger Bearbeitung müssen Umspannungen manuell ergänzt werden
+- Optimiert für prismatische 3-Achs-Frästeile — nicht für Freiformflächen, 5-Achs-Simultan oder Drehteile
+- Sonderprozesse (Wärmebehandlung, Beschichtung, Erodieren) sind nicht abgedeckt
+- Bearbeitungszeiten können ohne Kalibrierung ±30 % von der Realität abweichen
+- NC-Code ist ein Entwurf — Simulation vor dem Einsatz ist Pflicht
+
+**Unser Anspruch:** Lieber ehrlich über Grenzen als falsche Versprechen. Das Tool wird besser, je mehr Sie es mit Ihren realen Daten füttern.
 
 ---
 

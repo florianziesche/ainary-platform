@@ -333,6 +333,18 @@ Name, Adresse, Telefon, E-Mail, Ansprechpartner — erscheinen auf dem Angebot.
 - Absolute Zahlen sind erst nach **betriebsspezifischer Kalibrierung** (eigene Stundensätze, Materialpreise, Erfahrungswerte) belastbar
 - **Nachkalkulation empfohlen:** Vergleichen Sie regelmäßig Soll- mit Ist-Zeiten und passen Sie Ihre Parameter an
 
+### Bekannte Einschränkungen
+
+| Bereich | Einschränkung |
+|---------|--------------|
+| **Geometrie-Erkennung** | Keine CAD-Analyse. Der Operationsplan wird aus Abmessungen und Werkstoff abgeleitet — nicht aus der tatsächlichen Bauteilgeometrie. Fehlende oder überflüssige OPs sind möglich. |
+| **Aufspannungen** | Vereinfachte Darstellung (1–2 Aufspannungen). Bei mehrseitiger Bearbeitung sind zusätzliche Umspannungen wahrscheinlich und müssen manuell ergänzt werden. |
+| **Rüstzeiten** | Pauschale Schätzung. Tatsächliche Rüstzeiten hängen stark von Vorrichtungen, Erfahrung des Einrichters und Maschinenzustand ab. |
+| **Sonderprozesse** | Nicht abgedeckt: Wärmebehandlung, Beschichtung, Schleifen, Erodieren, Montage, externe Bearbeitung. |
+| **Bearbeitungszeiten** | Abweichungen von ±30 % zur Realität sind ohne betriebsspezifische Kalibrierung möglich. |
+| **NC-Code** | Entwurf — Simulation vor erstem Einsatz zwingend erforderlich. |
+| **Bauteilkomplexität** | Optimiert für prismatische Frästeile. Nicht ausgelegt für Freiformflächen, 5-Achs-Simultanbearbeitung oder Drehteile. |
+
 ### Normen und Standards
 
 | Norm | Anwendung |
