@@ -3074,12 +3074,12 @@ M30
      },
      
      weight(value) {
-         return `${value.toFixed(2)} kg`;
+         return `${value.toFixed(2).replace('.', ',')} kg`;
      },
      
      time(minutes) {
-         if (minutes < 60) return `${minutes.toFixed(1)} min`;
-         return `${(minutes/60).toFixed(1)} h`;
+         if (minutes < 60) return `${minutes.toFixed(1).replace('.', ',')} min`;
+         return `${(minutes/60).toFixed(1).replace('.', ',')} h`;
      },
      
      quantity(num, unit = 'Stck.') {
@@ -3285,7 +3285,7 @@ M30
 <div class="part-meta">
 <span>${p.baseTime} min</span>
 <span>${p.material}</span>
-<span class="part-price">€${p.unitPrice.toFixed(2).replace('.', ',')}</span>
+<span class="part-price">${DEFormatter.price(p.unitPrice)}</span>
 </div>
 </div>
 </div>
@@ -3444,33 +3444,33 @@ M30
  confidenceText = '🟢 ±10% — Ähnlich wie Referenzteil';
  }
  
- // Update UI
- document.getElementById('setupTimeDisplay').textContent = Math.round(totalSetupTime) + ' min';
- document.getElementById('setupCostDisplay').textContent = '€' + setupCost.toFixed(2).replace('.', ',');
+ // Update UI — using DEFormatter for consistent EUR formatting
+ document.getElementById('setupTimeDisplay').textContent = DEFormatter.time(totalSetupTime);
+ document.getElementById('setupCostDisplay').textContent = DEFormatter.price(setupCost);
  
- document.getElementById('liveWeight').textContent = weightKg.toFixed(2).replace('.', ',') + ' kg';
- document.getElementById('liveMaterial').textContent = '€' + materialCost.toFixed(2).replace('.', ',');
- document.getElementById('liveTime').textContent = machiningTime.toFixed(1).replace('.', ',') + ' min';
- document.getElementById('liveMachine').textContent = '€' + machineCost.toFixed(2).replace('.', ',');
+ document.getElementById('liveWeight').textContent = DEFormatter.weight(weightKg);
+ document.getElementById('liveMaterial').textContent = DEFormatter.price(materialCost);
+ document.getElementById('liveTime').textContent = DEFormatter.time(machiningTime);
+ document.getElementById('liveMachine').textContent = DEFormatter.price(machineCost);
  
- document.getElementById('priceDisplay').textContent = '€' + sellPrice.toFixed(2).replace('.', ',');
+ document.getElementById('priceDisplay').textContent = DEFormatter.price(sellPrice);
  document.getElementById('confidenceBadge').className = 'confidence-badge ' + confidenceClass;
  document.getElementById('confidenceBadge').innerHTML = '<span>' + confidenceText.split(' ')[0] + '</span>' + confidenceText.split(' ').slice(1).join(' ');
  
- document.getElementById('matCost').textContent = '€' + materialMitGK.toFixed(2).replace('.', ',');
- document.getElementById('matFormula').textContent = weightKg.toFixed(2).replace('.', ',') + ' kg × €' + mat.price.toFixed(2).replace('.', ',') + ' + ' + zuschlagMGK + '% MGK';
- document.getElementById('machCost').textContent = '€' + fertigungMitAV.toFixed(2).replace('.', ',');
- document.getElementById('machFormula').textContent = machiningTime.toFixed(1).replace('.', ',') + ' min × €' + cncRate + '/h + ' + zuschlagAV + '% AV';
- document.getElementById('setupCost').textContent = '€' + setupCostPerPiece.toFixed(2).replace('.', ',');
- document.getElementById('setupFormula').textContent = Math.round(totalSetupTime) + ' min × €' + cncRate + '/h ÷ ' + qty;
- document.getElementById('toolCost').textContent = '€' + toolCost.toFixed(2).replace('.', ',');
- document.getElementById('additionalCost').textContent = '€' + (vwGKBetrag + vtGKBetrag).toFixed(2).replace('.', ',');
+ document.getElementById('matCost').textContent = DEFormatter.price(materialMitGK);
+ document.getElementById('matFormula').textContent = DEFormatter.weight(weightKg) + ' × ' + DEFormatter.price(mat.price) + '/kg + ' + zuschlagMGK + '% MGK';
+ document.getElementById('machCost').textContent = DEFormatter.price(fertigungMitAV);
+ document.getElementById('machFormula').textContent = DEFormatter.time(machiningTime) + ' × EUR ' + cncRate + '/h + ' + zuschlagAV + '% AV';
+ document.getElementById('setupCost').textContent = DEFormatter.price(setupCostPerPiece);
+ document.getElementById('setupFormula').textContent = DEFormatter.time(totalSetupTime) + ' × EUR ' + cncRate + '/h ÷ ' + qty;
+ document.getElementById('toolCost').textContent = DEFormatter.price(toolCost);
+ document.getElementById('additionalCost').textContent = DEFormatter.price(vwGKBetrag + vtGKBetrag);
  document.getElementById('additionalFormula').textContent = zuschlagVwGK + '% VwGK + ' + zuschlagVtGK + '% VtGK';
- document.getElementById('totalCost').textContent = '€' + selbstkosten.toFixed(2).replace('.', ',');
+ document.getElementById('totalCost').textContent = DEFormatter.price(selbstkosten);
  document.getElementById('marginDisplay').textContent = zuschlagGewinn;
- document.getElementById('marginCost').textContent = '€' + gewinnBetrag.toFixed(2).replace('.', ',');
- document.getElementById('sellPrice').textContent = '€' + angebotspreis.toFixed(2).replace('.', ',');
- document.getElementById('orderTotal').textContent = '€' + orderTotal.toFixed(2).replace('.', ',');
+ document.getElementById('marginCost').textContent = DEFormatter.price(gewinnBetrag);
+ document.getElementById('sellPrice').textContent = DEFormatter.price(angebotspreis);
+ document.getElementById('orderTotal').textContent = DEFormatter.price(orderTotal);
  
  // Quantity table with full Zuschlagskalkulation
  const qtys = [1, 5, 10, 25, 50];
@@ -3484,19 +3484,39 @@ M30
  const totalSell = ap * q;
  return `<tr>
 <td class="mono">${q}</td>
-<td class="right mono">€${ap.toFixed(2).replace('.', ',')}</td>
-<td class="right mono">€${totalSell.toFixed(2).replace('.', ',')}</td>
+<td class="right mono">${DEFormatter.price(ap)}</td>
+<td class="right mono">${DEFormatter.price(totalSell)}</td>
 </tr>`;
  }).join('');
  
  // Quote — handled by renderQuote() in QUOTE SECTION UPDATE below
  // Old manual quote updates removed to prevent format conflicts with DEFormatter
  
+ // Detail Kalkulation Tab (section-calculation)
+ const calcThEl = document.getElementById('calcTh');
+ if (calcThEl) {
+     document.getElementById('calcTh').textContent = DEFormatter.time(machiningTime * 0.8);
+     document.getElementById('calcTn').textContent = DEFormatter.time(machiningTime * 0.2);
+     document.getElementById('calcTimeTotal').textContent = DEFormatter.time(machiningTime);
+     document.getElementById('calcMachCost').textContent = DEFormatter.price(machineCost);
+     document.getElementById('calcRawDims').textContent = x + ' × ' + y + ' × ' + z + ' mm';
+     document.getElementById('calcVolume').textContent = Math.round(volumeCm3 * 1000).toLocaleString('de-DE') + ' mm³';
+     document.getElementById('calcDensity').textContent = mat.name + ' / ' + mat.density.toFixed(2).replace('.', ',') + ' g/cm³';
+     document.getElementById('calcWeight').textContent = DEFormatter.weight(weightKg);
+     document.getElementById('calcMatFormula').textContent = DEFormatter.price(mat.price) + '/kg × 1,1';
+     document.getElementById('calcMatCost').textContent = DEFormatter.price(materialCost);
+     document.getElementById('calcSetupTime').textContent = DEFormatter.time(totalSetupTime);
+     document.getElementById('calcSetupCostDetail').textContent = DEFormatter.price(setupCost);
+     document.getElementById('calcSetups').textContent = (document.getElementById('secondSetup')?.checked ? '2' : '1') + '×';
+     document.getElementById('calcQtyDetail').textContent = qty;
+     document.getElementById('calcSetupPerPiece').textContent = DEFormatter.price(setupCostPerPiece);
+ }
+ 
  // Instructions
  document.getElementById('faMaterial').innerHTML = '<strong>' + mat.name + '</strong>';
  document.getElementById('faRawDims').textContent = x + ' × ' + y + ' × ' + z + ' mm';
- document.getElementById('faWeight').textContent = weightKg.toFixed(2).replace('.', ',') + ' kg';
- document.getElementById('faMachiningTime').innerHTML = '<strong>' + machiningTime.toFixed(1).replace('.', ',') + ' min</strong>';
+ document.getElementById('faWeight').textContent = DEFormatter.weight(weightKg);
+ document.getElementById('faMachiningTime').innerHTML = '<strong>' + DEFormatter.time(machiningTime) + '</strong>';
  
  // ================================================================
  // QUOTE SECTION UPDATE (renderQuote with calculated data)
