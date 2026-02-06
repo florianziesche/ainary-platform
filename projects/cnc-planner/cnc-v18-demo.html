@@ -2110,8 +2110,8 @@ Berechnen →
         <div class="card-header">
             <span>Angebot ANG-2026-0042</span>
             <div style="display: flex; gap: var(--space-2);">
-                <button class="btn btn-secondary btn-sm" onclick="sendQuoteEmail()">E-Mail versenden</button>
-                <button class="btn btn-primary btn-sm" onclick="window.print()">PDF erstellen</button>
+                <button class="btn btn-secondary btn-sm" onclick="copyQuote()">Kopieren</button>
+                <button class="btn btn-primary btn-sm" onclick="window.print()">Drucken / PDF</button>
             </div>
         </div>
         <div class="card-body" style="max-width: 800px; margin: 0 auto;">
@@ -2273,8 +2273,7 @@ Berechnen →
 <div class="section" id="section-instructions">
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-5);">
 <div style="display: flex; gap: var(--space-2);">
-<button class="btn btn-primary btn-sm" onclick="window.print()">PDF drucken</button>
-<button class="btn btn-secondary btn-sm">E-Mail</button>
+<button class="btn btn-primary btn-sm" onclick="window.print()">Drucken / PDF</button>
 </div>
 <span class="badge badge-info">KI-generierte Anweisungen</span>
 </div>
@@ -4121,19 +4120,6 @@ Exportformate: CSV (Nachkalkulation), JSON (Einstellungen), PDF (Angebot/Fertigu
 </div>
 </div>
 
-<!-- Gefahrenzone -->
-<div class="card" style="margin-top: var(--space-6); border-color: var(--color-error);">
-<div class="card-header" style="background:var(--color-error);color:white;"><span>Daten</span></div>
-<div class="card-body">
-<div style="display:flex;align-items:center;justify-content:space-between;">
-<div>
-<div style="font-weight:500;">Alle lokalen Daten löschen</div>
-<div style="font-size:12px;color:var(--color-text-muted);">Einstellungen, Nachkalkulationen, Feedback — kann nicht rückgängig gemacht werden.</div>
-</div>
-<button class="btn btn-sm" onclick="if(confirm('Wirklich alle Daten unwiderruflich löschen?')){localStorage.clear();location.reload();}" style="color:var(--color-error);border-color:var(--color-error);">Alle Daten löschen</button>
-</div>
-</div>
-</div>
 </div>
 </main>
 
@@ -4388,8 +4374,29 @@ Exportformate: CSV (Nachkalkulation), JSON (Einstellungen), PDF (Angebot/Fertigu
      calculateValidity();
  }
  
- function sendQuoteEmail() {
-     alert('E-Mail-Versand wird in einer zukünftigen Version verfügbar sein.\n\nBitte nutzen Sie "PDF erstellen" und versenden Sie das PDF manuell.');
+ function copyQuote() {
+ const quoteEl = document.querySelector('#section-quote .card-body');
+ if (!quoteEl) return;
+ 
+ // Copy as plain text
+ const text = quoteEl.innerText;
+ navigator.clipboard.writeText(text).then(() => {
+ const btn = document.querySelector('#section-quote .btn-secondary');
+ if (btn) {
+ const orig = btn.textContent;
+ btn.textContent = 'Kopiert';
+ setTimeout(() => { btn.textContent = orig; }, 1500);
+ }
+ }).catch(() => {
+ // Fallback: select + copy
+ const range = document.createRange();
+ range.selectNodeContents(quoteEl);
+ const sel = window.getSelection();
+ sel.removeAllRanges();
+ sel.addRange(range);
+ document.execCommand('copy');
+ sel.removeAllRanges();
+ });
  }
  
  // ================================================================
