@@ -1,5 +1,50 @@
 # Evolution Log
 
+## Cycle #0022 — 2026-02-06 05:16 CET
+
+**Status**: ✅ SUCCESS
+**Mode**: D (Innovation) + A (Repair)
+**Trigger**: Scheduled cron
+
+### Changes
+
+1. **NEW: `scripts/demo-checklist.sh`** — Pre-demo validation for CNC Planner
+   - Validates HTML tag balance (DIV, TABLE)
+   - Checks JavaScript syntax (extracts `<script>`, runs `new Function()`)
+   - Verifies all onclick handlers have matching function definitions
+   - Checks key CNC features (DEFormatter, Kalkulation, Angebot, Print CSS)
+   - Detects old €X format strings and TODO/FIXME markers
+   - Pass/Fail/Warn summary with exit codes
+   - **Why**: Demo at 10:30 today. This prevents shipping broken HTML.
+
+2. **NEW: `scripts/execution-pulse.sh`** — Quick execution health for heartbeats
+   - JSON output mode for programmatic use (`--json`)
+   - Human-readable mode (`--human`)
+   - Calculates: sends, zero-days, days-since-last-send, ready items, opportunity cost
+   - Execution score 0-100 with status emoji (🟢🟡🔴🚨)
+   - **Why**: The send-enforcer is verbose (for humans). This is compact (for heartbeats).
+
+3. **BUGFIX: grep -c multiline** — Fixed `0\n0` results from `grep -c` in scripts
+   - Added `head -1 | tr -d '[:space:]'` sanitization after all `grep -c` calls
+   - Affected: execution-pulse.sh, demo-checklist.sh
+
+4. **BUGFIX: onclick false positives** — Fixed demo-checklist detecting `document.getElementById` as onclick handler
+   - Now only extracts actual function calls from `onclick="fnName("` patterns
+   - Skips built-in JS objects (document, window, this, event)
+
+### Metrics
+- Scripts created: 2
+- Bugs fixed: 2  
+- Demo checklist result: ✅ DEMO-READY (12 pass, 0 fail, 1 warning)
+- Execution pulse result: 🚨 Score 10/100 (5 zero-send days, €2105 opportunity cost)
+
+### Next Ideas
+1. Auto-run demo-checklist before any `open` of CNC demo file
+2. Integrate execution-pulse into HEARTBEAT.md for morning checks
+3. Add `--fix` mode to demo-checklist (auto-fix common issues)
+
+---
+
 ## Cycle #0021 — 2026-02-06 01:15 CET
 
 **Status**: ✅ SUCCESS
