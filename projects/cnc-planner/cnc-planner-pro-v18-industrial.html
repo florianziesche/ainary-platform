@@ -1822,18 +1822,78 @@ Berechnen →
 </div>
 </div>
  
-<!-- Marge anpassen -->
+<!-- Deckungsbeitragsrechnung -->
 <div class="card" style="margin-top: var(--space-5);">
-<div class="card-body" style="display: flex; align-items: center; gap: var(--space-4);">
-<span style="color: var(--color-text-secondary);">Marge anpassen:</span>
-<div class="input-with-unit" style="width: 100px;">
-<input type="number" class="input input-mono" id="marginInput" value="10" min="0" max="100">
-<span class="input-unit">%</span>
+<div class="card-header"><span>Deckungsbeitragsrechnung</span></div>
+<div class="card-body" style="padding: 0;">
+<table class="table" id="dbTable">
+<tbody>
+<tr>
+<td>Angebotspreis (netto)</td>
+<td class="right mono" id="dbAngebotspreis">EUR 120,13</td>
+</tr>
+<tr>
+<td style="padding-left: 24px; color: var(--color-text-secondary);">– Materialeinzelkosten (MEK)</td>
+<td class="right mono" id="dbMEK">EUR 14,93</td>
+</tr>
+<tr>
+<td style="padding-left: 24px; color: var(--color-text-secondary);">– Fertigungseinzelkosten (FEK)</td>
+<td class="right mono" id="dbFEK">EUR 18,96</td>
+</tr>
+<tr>
+<td style="padding-left: 24px; color: var(--color-text-secondary);">– Sondereinzelkosten (Einrichtung)</td>
+<td class="right mono" id="dbSetup">EUR 37,92</td>
+</tr>
+<tr style="font-weight: 600; background: var(--color-bg-subtle);">
+<td>= Deckungsbeitrag I (DB I)</td>
+<td class="right mono" id="dbDB1">EUR 48,32</td>
+</tr>
+<tr>
+<td style="padding-left: 24px; color: var(--color-text-secondary);">– MGK (<span id="dbMGKpct">10</span>%)</td>
+<td class="right mono" id="dbMGK">EUR 1,49</td>
+</tr>
+<tr>
+<td style="padding-left: 24px; color: var(--color-text-secondary);">– AV (<span id="dbAVpct">8</span>%)</td>
+<td class="right mono" id="dbAV">EUR 1,52</td>
+</tr>
+<tr>
+<td style="padding-left: 24px; color: var(--color-text-secondary);">– Werkzeugverschleiß</td>
+<td class="right mono" id="dbTool">EUR 20,74</td>
+</tr>
+<tr style="font-weight: 600; background: var(--color-bg-subtle);">
+<td>= Deckungsbeitrag II (DB II)</td>
+<td class="right mono" id="dbDB2">EUR 24,57</td>
+</tr>
+<tr>
+<td style="padding-left: 24px; color: var(--color-text-secondary);">– VwGK (<span id="dbVwGKpct">12</span>%)</td>
+<td class="right mono" id="dbVwGK">EUR 10,73</td>
+</tr>
+<tr>
+<td style="padding-left: 24px; color: var(--color-text-secondary);">– VtGK (<span id="dbVtGKpct">5</span>%)</td>
+<td class="right mono" id="dbVtGK">EUR 4,47</td>
+</tr>
+<tr style="font-weight: 700; border-top: 2px solid var(--color-primary);">
+<td>= Betriebsergebnis (Gewinn)</td>
+<td class="right mono" id="dbGewinn">EUR 10,92</td>
+</tr>
+<tr>
+<td>Gewinnmarge</td>
+<td class="right mono" id="dbMarge">9,1%</td>
+</tr>
+</tbody>
+</table>
 </div>
-<span style="margin-left: auto; color: var(--color-text-secondary);">Gesamtauftragswert:</span>
+</div>
+
+<!-- Gesamtauftragswert -->
+<div class="card" style="margin-top: var(--space-5);">
+<div class="card-body" style="display: flex; align-items: center; justify-content: space-between;">
+<span style="color: var(--color-text-secondary);">Gesamtauftragswert (netto):</span>
 <strong style="font-size: 18px; font-family: var(--font-mono);" id="orderTotal">EUR 120,13</strong>
 </div>
 </div>
+<!-- Hidden for backward compat -->
+<input type="hidden" id="marginInput" value="10">
  
 <!-- Kalkulationsgrundlage -->
 <div class="card" style="margin-top: var(--space-5);">
@@ -4059,7 +4119,9 @@ M30
  const y = parseFloat(document.getElementById('dimY').value) || 100;
  const z = parseFloat(document.getElementById('dimZ').value) || 20;
  const qty = parseInt(document.getElementById('quantity').value) || 1;
- const margin = parseFloat(document.getElementById('marginInput').value) || 10;
+ // marginInput is now hidden, synced from zuschlagGewinn
+ const margin = parseFloat(document.getElementById('zuschlagGewinn')?.value) || 10;
+ { const _e = document.getElementById('marginInput'); if(_e) _e.value = margin; }
  const scrap = parseFloat(document.getElementById('settingScrap')?.value) || 10;
  const toolWear = parseFloat(document.getElementById('settingToolWear')?.value) || 20.74;
  const vat = parseFloat(document.getElementById('settingVat')?.value) || 19;
@@ -4248,6 +4310,35 @@ M30
  cd('cdOhVwGK', DEFormatter.price(vwGKBetrag));
  cd('cdOhVtGK', DEFormatter.price(vtGKBetrag));
  cdB('cdOhTotal', DEFormatter.price(vwGKBetrag + vtGKBetrag));
+ 
+ // === DECKUNGSBEITRAGSRECHNUNG ===
+ const dbMEK = materialCost; // Materialeinzelkosten (vor MGK)
+ const dbFEK = machineCost; // Fertigungseinzelkosten (vor AV)
+ const dbSetup = setupCostPerPiece;
+ const dbDB1 = angebotspreis - dbMEK - dbFEK - dbSetup;
+ const dbMGKval = materialCost * zuschlagMGK / 100;
+ const dbAVval = machineCost * zuschlagAV / 100;
+ const dbDB2 = dbDB1 - dbMGKval - dbAVval - toolCost;
+ const dbGewinn = angebotspreis - selbstkosten;
+ const dbMargePercent = angebotspreis > 0 ? (dbGewinn / angebotspreis * 100) : 0;
+ 
+ cd('dbAngebotspreis', DEFormatter.price(angebotspreis));
+ cd('dbMEK', DEFormatter.price(dbMEK));
+ cd('dbFEK', DEFormatter.price(dbFEK));
+ cd('dbSetup', DEFormatter.price(dbSetup));
+ cd('dbDB1', DEFormatter.price(dbDB1));
+ cd('dbMGKpct', zuschlagMGK);
+ cd('dbMGK', DEFormatter.price(dbMGKval));
+ cd('dbAVpct', zuschlagAV);
+ cd('dbAV', DEFormatter.price(dbAVval));
+ cd('dbTool', DEFormatter.price(toolCost));
+ cd('dbDB2', DEFormatter.price(dbDB2));
+ cd('dbVwGKpct', zuschlagVwGK);
+ cd('dbVwGK', DEFormatter.price(vwGKBetrag));
+ cd('dbVtGKpct', zuschlagVtGK);
+ cd('dbVtGK', DEFormatter.price(vtGKBetrag));
+ cd('dbGewinn', DEFormatter.price(dbGewinn));
+ cd('dbMarge', dbMargePercent.toFixed(1).replace('.',',') + '%');
  
  // Quantity table with full Zuschlagskalkulation
  const qtys = [1, 5, 10, 25, 50];
