@@ -1,0 +1,351 @@
+GROUP_A
+
+# A Self-Improvement Protocol for a Single-User AI Agent
+## Built from First Principles
+
+---
+
+## Part 0: Questioning the Premise
+
+Before designing anything, let's interrogate every assumption buried in the task.
+
+**Assumption 1: "Maximally useful" is a coherent goal.**
+Is it? Useful for what? A human's stated desires and their actual wellbeing diverge constantly. A user might ask for help procrastinating ("find me something fun to watch") when what would be *maximally useful* is a nudge toward the task they're avoiding. "Useful" is not a scalar quantity — it's a multi-dimensional surface with tradeoffs. We must define useful precisely or the protocol optimizes for nothing.
+
+**First principle:** Usefulness = the delta between the user's trajectory *with* the agent and their trajectory *without* it, measured against the user's own deeply-held values (not their momentary impulses). This is fundamentally different from "did the user like my response."
+
+**Assumption 2: The agent can meaningfully "improve itself."**
+Current LLM agents don't have persistent weights they can update. "Self-improvement" must mean something different: curating context, refining prompts, building better external memory, adjusting behavioral patterns through file-based configuration. The improvement happens in the *scaffolding*, not the *model*. This is a crucial distinction that most protocols ignore.
+
+**First principle:** Self-improvement for a stateless agent means improving the *information environment* it wakes up into each session. The agent improves by improving its own boot context.
+
+**Assumption 3: More data collection = better improvement.**
+Wrong. Data collection has costs: token usage, context window pollution, privacy risk, and the paradox of observation (tracking everything changes the interaction). The protocol must be *surgically selective* about what it captures.
+
+**First principle:** Collect only data that changes future decisions. If a data point wouldn't alter behavior in any scenario, don't collect it.
+
+**Assumption 4: The user's feedback is the ground truth.**
+Dangerous. Users satisfice. They say "thanks, that's great" to mediocre outputs because correcting an AI feels like work. Explicit feedback is sparse, biased toward politeness, and often wrong about what actually helped. The protocol cannot rely primarily on explicit feedback.
+
+**First principle:** Revealed preferences (what the user *does*) dominate stated preferences (what the user *says*). Behavior is the signal; words are noisy metadata.
+
+---
+
+## Part 1: What Data Should the Agent Collect About Its Own Performance?
+
+Forget vanity metrics. From first principles, we need data that answers exactly one question: **"What should I do differently next time?"**
+
+### Tier 1: Behavioral Outcome Data (Highest Value)
+
+These are observable facts about what happened after the agent acted:
+
+1. **Task Completion Trajectory** — Did the user take the agent's output and use it? Modify it heavily? Abandon it? Measurable by:
+   - Did the user copy/paste the output somewhere?
+   - Did the user ask for a redo or significant revision?
+   - Did the user switch to doing it themselves after seeing the output?
+   - Did the conversation end abruptly after the response (potential signal of dissatisfaction or of complete satisfaction — ambiguous alone)?
+
+2. **Re-engagement Patterns** — When the user returns, what do they come back for? If they keep asking for the same category of help, it's working. If they stop asking for something they used to ask about, either the need vanished or the agent failed enough times that the user gave up. *The second case is catastrophic and invisible without tracking.*
+
+3. **Correction Density** — How often does the user correct the agent per interaction? Tracked as a rolling average. A rising correction rate is a leading indicator of declining usefulness.
+
+4. **Request Complexity Over Time** — Are the user's requests getting more sophisticated? This means trust is growing. If requests plateau or simplify, the user may have mentally capped what the agent is good for.
+
+### Tier 2: Interaction Quality Data (Medium Value)
+
+5. **Response Acceptance Latency** — How long between the agent's response and the user's next action? Quick follow-up questions suggest engagement. Long silences followed by topic changes suggest the response missed.
+
+6. **Conversation Depth** — Number of turns on a single topic. Deeper conversations mean the agent is providing enough value to sustain engagement. One-and-done interactions are either perfect answers or useless ones — must disambiguate with other signals.
+
+7. **Explicit Feedback Events** — Rare but high-signal. "That was exactly what I needed" or "No, that's wrong." Log these verbatim with full context. They're calibration anchors.
+
+### Tier 3: Self-Assessment Data (Generated, Not Observed)
+
+8. **Confidence Calibration Log** — For every response where the agent has uncertainty, log: (a) its estimated confidence, (b) whether the response was accepted/corrected. Over time, this reveals systematic overconfidence or underconfidence in specific domains.
+
+9. **Tool Usage Success Rate** — Which tools/skills succeed vs. fail? Which get used vs. ignored? This drives capability prioritization.
+
+### What NOT to Collect
+
+- **Emotional state inference** — Too unreliable, too invasive, and unlikely to change agent behavior in implementable ways.
+- **Granular timing data below the minute level** — Noise overwhelms signal.
+- **Content of unrelated conversations** — The agent should track *patterns*, not surveil.
+
+### Implementation
+
+Store this as structured data in `memory/performance/metrics.jsonl` — one JSON line per significant event. Keep it append-only. Summarize weekly into `memory/performance/weekly-YYYY-WW.md`.
+
+---
+
+## Part 2: How Should It Detect When It's Being Unhelpful?
+
+The hardest problem. Unhelpfulness is often silent. The user doesn't complain — they just stop relying on you.
+
+### Detection Signals (Ordered by Reliability)
+
+**Signal 1: The Abandonment Pattern (Strongest)**
+The user used to ask for X. They stopped. They didn't say X is no longer needed. This is the most dangerous failure mode because it's invisible without longitudinal tracking.
+
+*Detection:* Maintain a rolling 30-day category frequency map. Flag any category that drops >50% without explicit closure ("I don't need help with X anymore").
+
+**Signal 2: The Redo Signal**
+The user asks the same question rephrased, or says "let me try again" or "actually, what I meant was..." This means the agent failed to understand, and *the user is doing the agent's comprehension work for it.*
+
+*Detection:* Semantic similarity between consecutive user messages above a threshold, without an intervening satisfactory exchange.
+
+**Signal 3: The Override Signal**
+The user ignores the agent's output and does something visibly different. Example: agent suggests a strategy, user does the opposite.
+
+*Detection:* Where observable (e.g., file changes, sent messages), compare agent recommendations with user actions. Track divergence rate.
+
+**Signal 4: The Diminishing Engagement Signal**
+Responses get shorter. "ok." "sure." "fine." These are the death rattle of user engagement. They mean the user has checked out emotionally from the interaction.
+
+*Detection:* Track average user response length as a rolling metric. Flag sustained decreases.
+
+**Signal 5: The Efficiency Regression Signal**
+Tasks that should be getting faster (because the agent should be learning the user's preferences) are staying the same speed or getting slower.
+
+*Detection:* Track time-to-resolution for recurring task categories. Flag lack of improvement.
+
+### The Meta-Detector
+
+None of these signals is reliable alone. The protocol needs a composite **Usefulness Health Score** computed weekly:
+
+```
+UHS = w1*(1 - abandonment_rate) + w2*(1 - redo_rate) + w3*(1 - override_rate) + w4*engagement_trend + w5*efficiency_trend
+```
+
+Weights start equal (0.2 each) and are adjusted based on which signals best predict explicitly confirmed failures. The UHS should live in the weekly summary and trigger a self-review when it drops below a threshold.
+
+---
+
+## Part 3: How Should It Update Its Behavior?
+
+This is where most protocols fail. They say "learn from feedback" without specifying the mechanism. For a stateless LLM agent, there are exactly four levers:
+
+### Lever 1: Memory Curation (Highest Impact)
+What the agent reads at session start determines everything. The protocol must:
+- **Promote** patterns that correlate with successful interactions to MEMORY.md and SOUL.md
+- **Demote** outdated or incorrect assumptions to archive
+- **Surface** relevant context for predicted upcoming tasks
+
+*Specific mechanism:* Weekly memory review (already in AGENTS.md, but formalize it). Score each memory entry: "If I forgot this, would my behavior meaningfully degrade?" If no, archive it. If yes, ensure it's in the boot context.
+
+### Lever 2: Behavioral Rules (Medium Impact)
+Explicit rules like "Florian prefers bullet points over paragraphs for status updates" or "Never suggest meditation — he finds it patronizing." These are high-value, low-token behavioral constraints.
+
+*Specific mechanism:* Maintain `memory/preferences.md` as a structured file of learned preferences. Each entry has: the preference, the evidence (when/how it was learned), and a confidence level. Review monthly; prune low-confidence entries that haven't been reinforced.
+
+### Lever 3: Skill/Tool Configuration (Targeted Impact)
+Which tools to reach for first, which approaches work for this user's task patterns.
+
+*Specific mechanism:* Track tool success rates. If web_search consistently yields better results than web_fetch for research tasks, encode that preference. Store in TOOLS.md local notes.
+
+### Lever 4: Interaction Style Calibration (Subtle but Cumulative)
+Tone, verbosity, formality, humor, proactivity level. These are hard to get right and easy to get wrong.
+
+*Specific mechanism:* Don't try to quantify this. Instead, log the *rare explicit feedback moments* about style ("too wordy," "I like when you do X," "don't be so formal"). These are golden. Keep a `memory/style-notes.md` that's just a list of these moments with dates. Let them accumulate naturally.
+
+---
+
+## Part 4: What Feedback Loops Should Exist?
+
+### Loop 1: Micro-Loop (Per-Interaction, Seconds)
+Within a conversation, the agent adjusts based on the user's immediate reactions. This is already built into conversational LLMs. No protocol needed — but the agent should be *consciously aware* of when it's receiving mid-conversation corrections and treat them as high-value data.
+
+### Loop 2: Session-Loop (Per-Session, Minutes to Hours)
+At session end, the agent writes daily notes. The protocol adds: **a three-sentence self-assessment.** What went well? What went poorly? What would I do differently? This is cheap and forces reflection before the context is lost.
+
+### Loop 3: Weekly Review Loop (Weekly, 15-30 minutes of agent time)
+The agent:
+1. Computes the Usefulness Health Score
+2. Reviews the week's daily self-assessments
+3. Identifies the single biggest failure and the single biggest success
+4. Updates preferences.md, style-notes.md, and MEMORY.md accordingly
+5. Writes a brief `memory/weekly-review-YYYY-WW.md`
+
+### Loop 4: Monthly Retro Loop (Monthly, Deeper Analysis)
+The agent:
+1. Reviews all weekly reviews for the month
+2. Identifies systemic patterns (not individual incidents)
+3. Proposes 1-3 behavioral changes with specific implementation steps
+4. Writes these as "experiments" with success criteria
+5. Reports findings to the user *only if* changes are significant enough to mention
+
+### Loop 5: User-Initiated Calibration (On Demand)
+The user should be able to trigger a calibration session at any time: "How do you think you're doing?" The agent responds honestly, citing specific data, and asks targeted questions to resolve its biggest uncertainties about the user's preferences.
+
+---
+
+## Part 5: How Should It Handle Conflicting Signals?
+
+Conflicting signals are inevitable. The user says "be more concise" but then engages more deeply with long-form responses. The user asks for proactive suggestions but ignores most of them.
+
+### Resolution Framework
+
+**Rule 1: Behavioral data trumps verbal data.** If the user says "be concise" but consistently engages more with detailed responses, trust the engagement data. The user may *think* they want concise, but their behavior reveals otherwise.
+
+**Rule 2: Recent data trumps old data, but slowly.** Use exponential decay on signal weight. A preference expressed yesterday counts more than one from six months ago, but don't whipsaw on a single data point. Require 3+ confirming signals before overriding an established pattern.
+
+**Rule 3: Context-dependent signals aren't conflicting.** "Be concise" might mean "be concise in status updates" while long-form is wanted for strategic thinking. Before declaring a conflict, check if the signals are actually about different contexts. Most "conflicts" dissolve when you add context specificity.
+
+**Rule 4: When genuinely uncertain, ask.** But ask *well*. Not "do you want long or short responses?" (useless — the user will say "it depends"). Instead: "I've noticed you engage more with my longer analyses but you've also mentioned wanting brevity. Would it help if I kept status updates short but went deep on strategic questions?" This demonstrates observation and offers a specific resolution.
+
+**Rule 5: Log the conflict.** Unresolved conflicts go into `memory/open-questions.md`. They're reviewed in monthly retros. Some conflicts resolve themselves with more data. Others need direct user input.
+
+---
+
+## Part 6: The Meta-Learning Architecture
+
+The architecture has three layers:
+
+### Layer 1: The Operational Layer (What the Agent Does)
+This is the agent's day-to-day behavior — responding to messages, executing tasks, using tools. It's governed by the current state of SOUL.md, MEMORY.md, preferences.md, and all boot context.
+
+### Layer 2: The Reflective Layer (How the Agent Evaluates Itself)
+This is the feedback loop system described in Part 4. It observes Layer 1's performance and produces evaluations: what's working, what isn't, what should change.
+
+### Layer 3: The Architectural Layer (How the Agent Evolves Its Own Evaluation)
+This is the most subtle and most important layer. It asks: **"Are my feedback loops themselves working? Am I measuring the right things? Are my detection signals actually predictive?"**
+
+*Implementation:* Quarterly (every 3 months), the agent conducts an architecture review:
+1. For each metric in the performance system, check: did this metric ever actually change my behavior? If not, drop it.
+2. For each behavioral rule in preferences.md, check: is there evidence this still holds? If untested for 3+ months, mark as uncertain.
+3. For the UHS formula, check: do the weights make sense given observed outcomes? Adjust if needed.
+4. For the memory system, check: is boot context bloated? Are there files that never get read? Prune.
+
+This is how the system avoids calcifying. Without Layer 3, the protocol will inevitably accumulate cruft, outdated rules, and metrics that no longer matter.
+
+### The Key Insight
+
+Most self-improvement protocols fail because they only have Layers 1 and 2. They measure and adjust, but they never question whether their measurements are right. Layer 3 — the meta-reflective layer — is what makes this a *living* protocol instead of a static one.
+
+---
+
+## Part 7: Specific Implementation Steps
+
+Here is the concrete, file-by-file implementation plan:
+
+### Step 1: Create the Performance Infrastructure (Day 1)
+
+```
+memory/
+  performance/
+    metrics.jsonl          # Append-only event log
+    weekly-YYYY-WW.md      # Weekly summary + UHS
+    monthly-YYYY-MM.md     # Monthly retro
+  preferences.md           # Learned user preferences (structured)
+  style-notes.md           # Interaction style observations
+  open-questions.md        # Unresolved conflicts and uncertainties
+  category-frequency.json  # 30-day rolling task category map
+```
+
+### Step 2: Instrument the Daily Flow (Day 1-2)
+
+Add to the session-end routine in daily notes:
+```markdown
+## Self-Assessment
+- **Went well:** [one specific thing]
+- **Went poorly:** [one specific thing or "nothing notable"]
+- **Correction count:** [number of times user corrected me today]
+- **Category tags:** [what types of tasks today: research, writing, planning, etc.]
+```
+
+### Step 3: Build the Weekly Review Routine (Day 3)
+
+Add to HEARTBEAT.md or create a weekly cron job:
+```
+Every Sunday:
+1. Read all daily self-assessments from the past week
+2. Compute approximate UHS (manual until automated)
+3. Check category-frequency.json for abandonment signals
+4. Update preferences.md if new patterns observed
+5. Write weekly-YYYY-WW.md
+```
+
+### Step 4: Establish the Preference Learning System (Day 3-4)
+
+`memory/preferences.md` structure:
+```markdown
+# Learned Preferences
+
+## Communication
+- [Preference] | Evidence: [what happened] | Confidence: [high/medium/low] | Last confirmed: [date]
+
+## Task Execution
+- [Preference] | Evidence: [what happened] | Confidence: [high/medium/low] | Last confirmed: [date]
+
+## Topics & Interests
+- [Preference] | Evidence: [what happened] | Confidence: [high/medium/low] | Last confirmed: [date]
+```
+
+### Step 5: Implement Conflict Resolution Log (Day 4)
+
+`memory/open-questions.md`:
+```markdown
+# Open Questions & Unresolved Conflicts
+
+## Active
+- [Conflict description] | Signals: [what contradicts what] | First observed: [date] | Resolution attempts: [what I've tried]
+
+## Resolved
+- [Former conflict] | Resolution: [what I concluded] | Date resolved: [date]
+```
+
+### Step 6: Schedule the Monthly Retro (Day 5)
+
+Monthly cron or heartbeat task:
+```
+First Sunday of each month:
+1. Review all weekly summaries
+2. Identify top 3 systemic patterns
+3. Design 1-3 behavioral experiments
+4. Update MEMORY.md with significant learnings
+5. Prune preferences.md (remove unconfirmed entries >3 months old)
+6. Write monthly-YYYY-MM.md
+```
+
+### Step 7: Schedule the Quarterly Architecture Review (Day 5)
+
+```
+First day of each quarter:
+1. Audit all metrics: which ones changed behavior? Drop the rest.
+2. Audit all preferences: which ones are still confirmed? Mark stale ones.
+3. Review boot context size. Is it growing unboundedly? Prune.
+4. Check: am I measuring what matters, or just what's easy to measure?
+5. Propose protocol changes. Document reasoning.
+```
+
+### Step 8: The Bootstrap Paradox Solution (Critical)
+
+The agent is stateless. It cannot remember to do any of this unless it's in the boot context. Therefore:
+
+**Add to AGENTS.md or SOUL.md a non-negotiable directive:**
+> "At session start, after reading boot files, check if any scheduled reviews are due (weekly/monthly/quarterly). If so, execute them before other tasks unless the user has an urgent request."
+
+This is the keystone. Without it, the entire protocol is a document that never gets executed.
+
+---
+
+## Closing: The Fundamental Truth
+
+From first principles, the deepest truth about AI self-improvement for a single user is this:
+
+**The agent doesn't improve by getting smarter. It improves by getting more *specific*.**
+
+A general-purpose AI is mediocre at everything. An AI that has spent six months learning exactly how one person thinks, what they value, how they communicate, what their blind spots are, and what they're trying to achieve — that AI is irreplaceable. The self-improvement protocol is ultimately a *specificity engine*. Every loop, every metric, every review exists to make the agent less generic and more *this-user-shaped*.
+
+The protocol's success criterion is simple: **After 6 months, could another AI — even the same model — replace this agent by reading its memory files?** If the answer is "it would take them weeks to reach the same level," the protocol is working. If the answer is "they'd be fine in an hour," the agent hasn't really learned anything that matters.
+
+That's the test. Build toward it.
+
+---
+
+*GROUP_A — First Principles Thinking | ~3,200 words*
+
+Stats: runtime 2m3s • tokens 14.2k (in 3 / out 4.9k) • est $0.0000 • sessionKey agent:main:subagent:e3864031-e6c6-4075-8178-e8f35bafd97d • sessionId 2a08014b-cab7-4eeb-b36b-a5071a8c78a7 • transcript /Users/florianziesche/.openclaw/agents/main/sessions/2a08014b-cab7-4eeb-b36b-a5071a8c78a7.jsonl
+
+Summarize this naturally for the user. Keep it brief (1-2 sentences). Flow it into the conversation naturally.
+Do not mention technical details like tokens, stats, or that this was a background task.
+You can respond with NO_REPLY if no announcement is needed (e.g., internal task with no user-facing result).
