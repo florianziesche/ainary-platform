@@ -35,6 +35,7 @@
 - Push when: procrastinating on outreach, building instead of shipping
 - Schwäche: "Overthink/overbuild before shipping" — BESTÄTIGT diese Woche
 - Stärke: Technik + Business + Execution = seltene Kombination
+- **ADHS**: Hyperfocus-Sessions, kann nicht aufhören bis es fertig ist, Late-Night Building. Damit arbeiten, nicht dagegen.
 
 ---
 
