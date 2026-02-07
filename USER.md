@@ -13,6 +13,7 @@
 ## Family
 
 - **Wife:** Nancy
+  - Phone: +16462260465 (iMessage)
   - Based in NYC (her life center, apartment very important to her)
   - Freelancer: Massage therapist (Soothe), caregiver for her mother (paid), gigs (US Open, etc.)
   - Building: Personal Assistant services + Digital Marketing freelance
