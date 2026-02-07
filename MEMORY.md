@@ -210,6 +210,7 @@
 - **Dashboards**: HTML Kanban/Cards bevorzugt. Clickable actions, mailto links, copy buttons.
 - **Voice**: Will hands-free sprechen, nicht tippen. macOS Fn Fn Diktat als Workaround.
 - **Nachts (nach 23:00)**: Wird frustriert beim Tippen. Kurze Antworten, direkte Aktionen.
+- **Obsidian IMMER**: Content + MD files immer auch nach Obsidian kopieren. Florian schaut selten in workspace. Pfad: `System_OS/10-Projects/`
 - **Desktop**: Sauber halten. Ordner: `01-Dashboards/`, `02-Active/`, `03-Mia-Brand/`
 - **Iterieren OK**: Lieber fragen als halluzinieren. "I dont dare to ask and just built" = schlecht.
 - **Content-Ziel**: Zusammen bekannt werden. Florian schreibt über Mia, Mia über Florian. Twitter + Substack.
