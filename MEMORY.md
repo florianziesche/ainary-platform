@@ -147,6 +147,21 @@
 
 ---
 
+## 🌟 Validated Patterns (Wiederverwenden!)
+
+### Reflektierte Konzeptentwicklung
+**Trigger:** Strategische Planung, "Plane ein Konzept", große Entscheidungen
+**Prozess:** v1 schnell → 3 Agents (Research + Positioning + Red Team) → Selbst synthesieren → v2 mit Vergleich
+**Warum:** Parallele Diversität + Primary-Agent-Synthese + Red Team = strukturell bessere Ergebnisse
+**Validiert:** Blog-Konzept (Feb 7). Florian: "sehr gutes Verhalten" ✅
+
+### Article Rewrite Pipeline
+**Trigger:** Bestehende Artikel brauchen Voice/Framing Change
+**Prozess:** 2-3 parallele Sub-Agents (je 2 Artikel), klare Regeln, Synthese prüfen
+**Validiert:** 5 Substack Artikel v1→v2 in 3 Minuten (Feb 7)
+
+---
+
 ## 🔴 Core Learnings (Distilled)
 
 ### Quality

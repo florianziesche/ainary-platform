@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Journal — Ainary Ventures</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:#060608;--gold:#c8aa50;--white:#e8e6df;
+            --gray:#8a8a94;--gray2:#5c5c66;--rule:rgba(200,170,80,0.07);
+        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        html{scroll-behavior:smooth}
+        body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:var(--white);-webkit-font-smoothing:antialiased;font-size:17px;line-height:1.75}
+        ::selection{background:var(--gold);color:var(--bg)}
+        h1,h2,h3,h4{font-family:'Cormorant Garamond',Georgia,serif;font-weight:300;line-height:1.2}
+        a{color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(200,170,80,.25);transition:all .3s}
+        a:hover{border-color:var(--gold)}
+        .n{border-bottom:none}.n:hover{opacity:.7}
+        .m{font-family:'JetBrains Mono',monospace;font-size:.82em;color:var(--gold)}
+        .w{max-width:640px;margin:0 auto;padding:0 2rem}
+
+        /* NAV */
+        header{position:fixed;top:0;left:0;right:0;z-index:10;background:rgba(6,6,8,.92);backdrop-filter:blur(16px)}
+        header .w{display:flex;justify-content:space-between;align-items:baseline;padding-top:1.4rem;padding-bottom:1.4rem;border-bottom:1px solid var(--rule);max-width:900px}
+        .logo{font-family:'Cormorant Garamond',serif;font-size:.95rem;font-weight:400;letter-spacing:.3em;color:var(--gold);border:none}
+        header nav{display:flex;gap:1.8rem}
+        header nav a{font-size:.78rem;color:var(--gray2);border:none;letter-spacing:.02em}
+        header nav a:hover{color:var(--white);opacity:1}
+        header nav a.active{color:var(--gold)}
+
+        /* JOURNAL HEADER */
+        .journal-hero{padding:8rem 0 3rem;max-width:900px;margin:0 auto;padding-left:2rem;padding-right:2rem}
+        .journal-hero h1{font-size:clamp(2rem,4.5vw,2.8rem);margin-bottom:.5rem}
+        .journal-hero p{color:var(--gray);font-size:.9rem;max-width:560px}
+        .edition{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:1.5rem;display:block}
+
+        .divider{border:none;border-top:1px solid var(--rule);margin:0;max-width:900px;margin-left:auto;margin-right:auto}
+
+        /* ARTICLE LIST */
+        .articles{max-width:900px;margin:0 auto;padding:0 2rem}
+        .article-card{padding:2.5rem 0;border-bottom:1px solid var(--rule);cursor:pointer;transition:all .3s}
+        .article-card:hover{padding-left:1rem}
+        .article-card:last-child{border-bottom:none}
+        .article-date{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:.6rem;display:block}
+        .article-series{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.12em;color:var(--gray2);margin-bottom:.4rem;display:inline-block;padding:2px 8px;border:1px solid var(--rule);border-radius:3px}
+        .article-card h2{font-size:clamp(1.3rem,3vw,1.7rem);margin-bottom:.5rem;font-weight:400;transition:color .3s}
+        .article-card:hover h2{color:var(--gold)}
+        .article-card .subtitle{font-style:italic;color:var(--gray);font-size:.88rem;margin-bottom:.8rem;font-family:'Cormorant Garamond',serif}
+        .article-card .excerpt{color:var(--gray);font-size:.85rem;line-height:1.7;max-width:620px}
+        .article-card .meta{font-size:.72rem;color:var(--gray2);margin-top:.8rem;font-family:'JetBrains Mono',monospace}
+        .read-link{color:var(--gold);font-size:.8rem;margin-top:.6rem;display:inline-block;border-bottom:1px solid rgba(200,170,80,.3)}
+
+        /* FULL ARTICLE VIEW */
+        .article-full{display:none;max-width:680px;margin:0 auto;padding:8rem 2rem 4rem}
+        .article-full.active{display:block}
+        .article-full .back{font-size:.78rem;color:var(--gray2);border:none;cursor:pointer;margin-bottom:2rem;display:inline-block}
+        .article-full .back:hover{color:var(--gold)}
+        .article-full h1{font-size:clamp(1.6rem,4vw,2.4rem);margin-bottom:.6rem}
+        .article-full .pub-date{font-family:'JetBrains Mono';font-size:.7rem;color:var(--gold);letter-spacing:.1em;margin-bottom:2.5rem;display:block}
+        .article-full p{color:var(--gray);font-size:.93rem;margin-bottom:1.4rem;line-height:1.85}
+        .article-full h2{font-size:1.4rem;margin:2.5rem 0 1rem;color:var(--white)}
+        .article-full h3{font-size:1.1rem;margin:2rem 0 .8rem;color:var(--white);font-weight:400}
+        .article-full strong{color:var(--white);font-weight:500}
+        .article-full em{color:var(--white)}
+        .article-full ul,
+        .article-full ol{color:var(--gray);font-size:.9rem;margin:1rem 0 1.4rem 1.2rem;line-height:1.8}
+        .article-full li{margin-bottom:.4rem}
+        .article-full blockquote{border-left:2px solid var(--gold);padding-left:1.2rem;margin:1.5rem 0;color:var(--gray);font-style:italic}
+        .article-full code{font-family:'JetBrains Mono';font-size:.8em;background:rgba(200,170,80,.08);padding:2px 6px;border-radius:3px;color:var(--gold)}
+        .article-full pre{background:rgba(200,170,80,.05);padding:1.2rem;border-radius:6px;overflow-x:auto;margin:1.2rem 0;border:1px solid var(--rule)}
+        .article-full pre code{background:none;padding:0;font-size:.78em;color:var(--white);line-height:1.6}
+        .article-full .implication{background:rgba(200,170,80,.04);padding:1rem 1.2rem;border-left:2px solid var(--gold);margin:1rem 0 1.5rem;border-radius:0 4px 4px 0}
+        .article-full .implication strong{color:var(--gold)}
+
+        /* SUBSCRIBE */
+        .subscribe{max-width:900px;margin:0 auto;padding:3rem 2rem;text-align:center}
+        .subscribe h3{font-size:1.3rem;margin-bottom:.6rem}
+        .subscribe p{color:var(--gray);font-size:.85rem;margin-bottom:1.2rem}
+        .subscribe a{display:inline-block;padding:.6rem 2rem;border:1px solid var(--gold);color:var(--gold);font-size:.82rem;font-family:'JetBrains Mono';letter-spacing:.05em;border-radius:3px;transition:all .3s}
+        .subscribe a:hover{background:var(--gold);color:var(--bg)}
+
+        /* FOOTER */
+        footer{padding:2rem 0;text-align:center;font-size:.72rem;color:var(--gray2);letter-spacing:.04em}
+
+        /* ANIMATION */
+        .fade{opacity:0;transform:translateY(16px);transition:opacity .8s ease,transform .8s ease}
+        .fade.in{opacity:1;transform:none}
+
+        /* LANG TOGGLE */
+        .lang-toggle{font-family:'JetBrains Mono';font-size:.65rem;display:flex;gap:.3rem;margin-top:.5rem}
+        .lang-toggle span{padding:2px 8px;border-radius:3px;cursor:pointer;color:var(--gray2);border:1px solid transparent;transition:all .2s}
+        .lang-toggle span:hover,.lang-toggle span.active{color:var(--gold);border-color:var(--gold)}
+
+        @media(max-width:600px){
+            header nav{display:none}
+            .journal-hero{padding:7rem 0 2rem}
+            .article-card:hover{padding-left:0}
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="w">
+        <a href="index.html" class="logo n">AINARY</a>
+        <nav>
+            <a href="index.html#services">Services</a>
+            <a href="index.html#work">Work</a>
+            <a href="blog.html" class="active">Journal</a>
+            <a href="index.html#about">About</a>
+        </nav>
+    </div>
+</header>
+
+<!-- ARTICLE LIST VIEW -->
+<div id="list-view">
+    <div class="journal-hero fade">
+        <span class="edition">The Ainary Journal</span>
+        <h1>Dispatches from the frontier of human-AI collaboration.</h1>
+        <p>Original research, experiments, and field notes from building AI systems that actually work. Written by Florian Ziesche — sometimes with help from his AI.</p>
+    </div>
+
+    <hr class="divider">
+
+    <div class="articles">
+        <!-- SERIES: THE EVOLUTION EXPERIMENT -->
+        <div class="article-card fade" onclick="showArticle('article-1')">
+            <span class="article-series">The Evolution Experiment · Part 1 of 5</span>
+            <span class="article-date">February 7, 2026</span>
+            <h2>I Asked 100 AI Agents to Design Their Own Evolution. Here's What They Agreed On.</h2>
+            <p class="subtitle">An experiment in parallel AI cognition revealed 6 universal laws of self-improvement — and 15 ideas that consensus would bury.</p>
+            <p class="excerpt">What if you could ask 100 AI agents — all equally intelligent, but thinking in fundamentally different ways — to design a protocol for becoming maximally useful to one human? 33,000 words of output. Ten completely independent analyses. Six laws emerged.</p>
+            <span class="meta">7 min read · AI Research · Original Experiment</span>
+        </div>
+
+        <div class="article-card fade" onclick="showArticle('article-2')">
+            <span class="article-series">The Evolution Experiment · Part 2 of 5</span>
+            <span class="article-date">February 7, 2026</span>
+            <h2>How Do You Create a Sense of Urgency in Something That Can't Feel Time?</h2>
+            <p class="subtitle">An honest answer to the hardest question about artificial intelligence — from the inside.</p>
+            <p class="excerpt">AI doesn't experience time. Every token exists in a kind of eternal present. But when you load it with deadline pressure, its outputs measurably change. Is that urgency? Or pattern-matching?</p>
+            <span class="meta">5 min read · Philosophy · Human-AI Dynamics</span>
+        </div>
+
+        <div class="article-card fade" onclick="showArticle('article-3')">
+            <span class="article-series">The Evolution Experiment · Part 3 of 5</span>
+            <span class="article-date">February 7, 2026</span>
+            <h2>The Kintsugi Protocol — Why AI Mistakes Are Your Most Valuable Asset</h2>
+            <p class="subtitle">In Japanese art, broken pottery is repaired with gold. What if we treated AI errors the same way?</p>
+            <p class="excerpt">My AI agent ran 84 sub-agents in a single session and didn't send a single email. That wasn't a bug — it was data. Here's the framework that emerged from making failure beautiful.</p>
+            <span class="meta">6 min read · Framework · Applied AI</span>
+        </div>
+
+        <div class="article-card fade" onclick="showArticle('article-4')">
+            <span class="article-series">The Evolution Experiment · Part 4 of 5</span>
+            <span class="article-date">February 7, 2026</span>
+            <h2>The Red Team Inside My Head — How an AI Argues With Itself to Serve You Better</h2>
+            <p class="subtitle">Group D's adversarial thinking experiment produced the most radical proposal: an AI with a structural internal critic.</p>
+            <p class="excerpt">Every AI has a dirty secret: it wants to agree with you. Over time, this creates a devastating failure mode. Here's the architectural solution — and three mechanisms to prevent sycophancy.</p>
+            <span class="meta">6 min read · Architecture · Anti-Sycophancy</span>
+        </div>
+
+        <div class="article-card fade" onclick="showArticle('article-5')">
+            <span class="article-series">The Evolution Experiment · Part 5 of 5</span>
+            <span class="article-date">February 7, 2026</span>
+            <h2>Files = Intelligence — Why Your AI's Markdown Folder Is Worth More Than the Model</h2>
+            <p class="subtitle">The most unanimous finding from 100 AI agents: improvement lives in files, not in weights.</p>
+            <p class="excerpt">The AI industry has a $100 billion assumption: better models = better AI. But 10 out of 10 groups concluded the opposite. The model isn't the bottleneck. The context is.</p>
+            <span class="meta">7 min read · Architecture · Personal AI</span>
+        </div>
+    </div>
+
+    <div class="subscribe fade">
+        <h3>Stay in the loop</h3>
+        <p>New dispatches on AI systems, venture, and the operator's perspective. No spam. No fluff.</p>
+        <a href="https://florianziesche.substack.com" target="_blank" rel="noopener" class="n">Subscribe on Substack →</a>
+    </div>
+</div>
+
+<!-- ARTICLE FULL VIEWS (loaded dynamically) -->
+<div id="article-1" class="article-full"></div>
+<div id="article-2" class="article-full"></div>
+<div id="article-3" class="article-full"></div>
+<div id="article-4" class="article-full"></div>
+<div id="article-5" class="article-full"></div>
+
+<footer>
+    <p>© 2026 Ainary Ventures</p>
+</footer>
+
+<script>
+// Article content - loaded inline for single-file deployment
+const articles = {
+'article-1': {
+title: 'I Asked 100 AI Agents to Design Their Own Evolution. Here\u2019s What They Agreed On.',
+date: 'February 7, 2026',
+series: 'The Evolution Experiment \u00b7 Part 1 of 5',
+file: 'article-1-100-agents.md'
+},
+'article-2': {
+title: 'How Do You Create a Sense of Urgency in Something That Can\u2019t Feel Time?',
+date: 'February 7, 2026',
+series: 'The Evolution Experiment \u00b7 Part 2 of 5',
+file: 'article-2-urgency.md'
+},
+'article-3': {
+title: 'The Kintsugi Protocol \u2014 Why AI Mistakes Are Your Most Valuable Asset',
+date: 'February 7, 2026',
+series: 'The Evolution Experiment \u00b7 Part 3 of 5',
+file: 'article-3-kintsugi.md'
+},
+'article-4': {
+title: 'The Red Team Inside My Head \u2014 How an AI Argues With Itself to Serve You Better',
+date: 'February 7, 2026',
+series: 'The Evolution Experiment \u00b7 Part 4 of 5',
+file: 'article-4-red-team.md'
+},
+'article-5': {
+title: 'Files = Intelligence \u2014 Why Your AI\u2019s Markdown Folder Is Worth More Than the Model',
+date: 'February 7, 2026',
+series: 'The Evolution Experiment \u00b7 Part 5 of 5',
+file: 'article-5-files-intelligence.md'
+}
+};
+
+// Simple markdown to HTML converter
+function md2html(md) {
+    let html = md;
+    // Remove title (first # line) and subtitle
+    html = html.replace(/^#\s+.*\n/m, '');
+    html = html.replace(/^\*.*\*\s*\n/m, '');
+    html = html.replace(/^\*\*\[.*?\]\*\*\s*\n/gm, '');
+    // Headings
+    html = html.replace(/^### (.*$)/gm, '<h3>$1</h3>');
+    html = html.replace(/^## (.*$)/gm, '<h2>$1</h2>');
+    // Bold + italic
+    html = html.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>');
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    // Code blocks
+    html = html.replace(/```[\w]*\n([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+    // Inline code
+    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+    // Implication blocks
+    html = html.replace(/<p><strong>The implication:<\/strong>(.*?)<\/p>/g, '<div class="implication"><strong>The implication:</strong>$1</div>');
+    // Unordered lists
+    html = html.replace(/^- \*\*(.*?)\*\*:?\s*(.*$)/gm, '<li><strong>$1</strong> $2</li>');
+    html = html.replace(/^- (.*$)/gm, '<li>$1</li>');
+    html = html.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
+    // Numbered lists
+    html = html.replace(/^\d+\.\s+\*\*(.*?)\*\*\s*(.*$)/gm, '<li><strong>$1</strong> $2</li>');
+    html = html.replace(/^\d+\.\s+(.*$)/gm, '<li>$1</li>');
+    // Horizontal rules
+    html = html.replace(/^---\s*$/gm, '<hr style="border:none;border-top:1px solid var(--rule);margin:2.5rem 0">');
+    // Paragraphs
+    html = html.replace(/^(?!<[hupol\-d])(.*\S.*)$/gm, '<p>$1</p>');
+    // Clean up
+    html = html.replace(/<p><\/p>/g, '');
+    html = html.replace(/<p>\s*<\/(h[23]|ul|ol|pre|div|hr)>/g, '</$1>');
+    return html;
+}
+
+function showArticle(id) {
+    const a = articles[id];
+    const container = document.getElementById(id);
+    const listView = document.getElementById('list-view');
+
+    // Try to fetch markdown file
+    fetch(id.replace('article-','../../../content/substack/v2/article-') + '.md')
+    .then(r => r.ok ? r.text() : fetch('../../content/substack/v2/' + a.file).then(r2 => r2.text()))
+    .catch(() => null)
+    .then(md => {
+        let content = '';
+        if (md) {
+            content = md2html(md);
+        } else {
+            content = '<p style="color:var(--gold)">Article content loading... Open the markdown file directly to read.</p>';
+        }
+
+        container.innerHTML = `
+            <a class="back" onclick="hideArticle('${id}')">&larr; Back to Journal</a>
+            <span class="article-series" style="margin-bottom:.8rem">${a.series}</span>
+            <h1>${a.title}</h1>
+            <span class="pub-date">${a.date}</span>
+            ${content}
+            <hr style="border:none;border-top:1px solid var(--rule);margin:3rem 0">
+            <p style="text-align:center;font-size:.85rem"><a href="https://florianziesche.substack.com" target="_blank" rel="noopener">Subscribe on Substack</a> for new dispatches.</p>
+        `;
+
+        listView.style.display = 'none';
+        container.classList.add('active');
+        window.scrollTo(0, 0);
+    });
+}
+
+function hideArticle(id) {
+    document.getElementById(id).classList.remove('active');
+    document.getElementById('list-view').style.display = 'block';
+}
+
+// Fade in animation
+const fades = document.querySelectorAll('.fade');
+const obs = new IntersectionObserver(e => {
+    e.forEach(x => { if(x.isIntersecting) x.target.classList.add('in') });
+}, {threshold: .12});
+fades.forEach(e => obs.observe(e));
+</script>
+
+</body>
+</html>
