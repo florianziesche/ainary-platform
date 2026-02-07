@@ -180,4 +180,28 @@
 
 ---
 
+## Florian's Preferences (Updated 2026-02-07)
+
+- **MD files** → Obsidian oder PDF. Keine rohen .md auf Desktop.
+- **Obsidian Vault**: `System_OS` (iCloud sync). Key files dort ablegen + `open obsidian://` Link senden.
+- **Dashboards**: HTML Kanban/Cards bevorzugt. Clickable actions, mailto links, copy buttons.
+- **Voice**: Will hands-free sprechen, nicht tippen. macOS Fn Fn Diktat als Workaround.
+- **Nachts (nach 23:00)**: Wird frustriert beim Tippen. Kurze Antworten, direkte Aktionen.
+- **Desktop**: Sauber halten. Ordner: `01-Dashboards/`, `02-Active/`, `03-Mia-Brand/`
+
+## Twitter/X Account (@Florian1776)
+
+- **Volle Kontrolle bei Mia** seit 06.02.2026
+- Name: "Mia", Handle: @Florian1776
+- Regel: Inform before posting, appear human
+- bird CLI funktioniert zum Lesen, Posting nur via Browser Relay (Error 226 bei CLI)
+- Strategie: Follow VCs, thoughtful comments, 1-2 posts/Tag, #AIagents #HumanAI
+
+## Weekly Evolution Experiment
+
+- **Cron**: Sonntag 21:00 CET, isolated session, Opus
+- **Fragen-Queue**: `experiments/agent-evolution/weekly-questions.md`
+- **Ergebnisse**: `experiments/agent-evolution/weekly/YYYY-MM-DD/`
+- Woche 1 done (6 Laws, 4 Engines). Woche 2: "How should an AI evaluate startup founders?"
+
 *Nächstes Memory-Review: Sonntag 09.02.2026*
