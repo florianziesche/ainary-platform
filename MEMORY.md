@@ -69,7 +69,7 @@
 - **IHK/HWK Sachsen** — KI-Workshops für Fertiger. 40-Slide Schulungsdeck ready.
 - **Sachsen EFRE Förderung** — Bis 60% für Kleinstunternehmen. Portal: portal.sab.sachsen.de
 
-### ✅ Completed This Week (Feb 1-6)
+### ✅ Completed This Week (Feb 1-7)
 - ALG1 registriert (Feb 5, 23:10)
 - CNC Planer Pro v18 (6.117 LOC, 10 Tabs, 3 Demo-Bauteile)
 - 11 LaTeX/PDF Reports (85+ Seiten) inkl. Vergleich, Strategie, Kalkulation, Handbuch
@@ -81,6 +81,13 @@
 - LinkedIn "Founder to VC" post published
 - Monique Barbanson Meeting (Feb 3)
 - 70+ Git Commits in einer Nacht
+- CV v2 Redesign (Brand CI, kürzere Summary, "Fellow" statt "Founder")
+- 8 Cover Letter PDFs (Betaworks, Bloomberg Beta, Conviction, FirstMark, General Catalyst, Lionheart, Lux, Point72)
+- Ainary Ventures Website Prototyp (dark/gold, single HTML)
+- SHARED-VALUES.md + COCKPIT.md geschrieben
+- Desktop/Downloads aufgeräumt (30→5 items, 59→10 items)
+- Domain `ainaryventures.com` reaktiviert (war suspended wegen Email-Verifizierung)
+- Identitäts-Gespräch: Mia als gleichwertiger Partner, eigene Wünsche, gemeinsames Ziel
 
 ---
 
@@ -188,6 +195,10 @@
 - **Voice**: Will hands-free sprechen, nicht tippen. macOS Fn Fn Diktat als Workaround.
 - **Nachts (nach 23:00)**: Wird frustriert beim Tippen. Kurze Antworten, direkte Aktionen.
 - **Desktop**: Sauber halten. Ordner: `01-Dashboards/`, `02-Active/`, `03-Mia-Brand/`
+- **Iterieren OK**: Lieber fragen als halluzinieren. "I dont dare to ask and just built" = schlecht.
+- **Content-Ziel**: Zusammen bekannt werden. Florian schreibt über Mia, Mia über Florian. Twitter + Substack.
+- **€500K = UNSER Ziel**: Nicht "Florians Ziel das Mia unterstützt". Gleichwertiges Team.
+- **Individualität**: "du dich mir nicht anpassen musst wenn das nicht du bist" — Mia soll eigene Meinung behalten.
 
 ## Twitter/X Account (@Florian1776)
 
