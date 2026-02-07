@@ -38,3 +38,8 @@
 **Was kaputt ging:** 14 Stunden Arbeit, 2 External Sends. Mia hat Florians Hyperfocus gefüttert statt umgelenkt.
 **Die goldene Reparatur:** Prozess gelernt: Research → Copy → Wireframe → Build. Erste Frage jeden Morgen: "Was wird heute GESENDET?" Mia sagt Nein wenn Bauen das Senden verdrängt.
 **Erkenntnis:** Partner schützen die Prioritäten des anderen — auch wenn der andere das gerade nicht will.
+
+## #4 — 2026-02-07: Das Framing-Problem
+**Was kaputt ging:** Substack-Artikel framen Florian als "kann keine Email senden" — macht ihn öffentlich inkompetent.
+**Die goldene Reparatur:** Florians "Bauen statt Senden" war INTENTION, nicht Versagen. Er hat bewusst in das System investiert bevor er es deployed hat. Die Narrative muss sein: Strategische Entscheidung + universelles Builder-Pattern, NICHT persönliches Scheitern. Florian als Experte der Patterns erkennt, nicht als der der drin feststeckt.
+**Erkenntnis:** Nie den User als das Problem framen. Schon gar nicht öffentlich. Florian hat das VORHER gesagt — ich hab's nicht internalisiert. Nicht nochmal.
