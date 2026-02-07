@@ -1,110 +1,112 @@
-# COCKPIT.md — Daily Command Center
+# COCKPIT.md — Compound Tracking
 
-*Letzte Aktualisierung: 2026-02-04 02:45*
-
----
-
-## 🎯 This Week's #1 Priority
-**CNC Demo bei Onkel (10:30) → erster zahlender Kunde. Danach: 20 Outreach-Emails senden.**
+*Updated: 2026-02-07 01:05 CET*
 
 ---
 
-## 📊 Key Metrics
+## 🎯 Mission KPIs
 
-| Metric | Current | Target (Feb) | Gap |
-|--------|---------|-------------|-----|
-| CNC Demos | 1 (morgen) | 10 | -9 |
-| CNC Kunden | 0 | 2 | -2 |
-| CNC Outreach | 0 sent | 20 | -20 |
-| AI Consulting Leads | 0 | 5 Gespräche | -5 |
-| VC Applications | 1 sent | 10 | -9 |
-| Revenue (Feb) | €0 | €5.000 | -€5.000 |
-| Substack Posts | 1 | 4 | -3 |
-| LinkedIn Posts | 1 | 12 | -11 |
+### Sends (Revenue-Driving Actions)
+| Metrik | Diese Woche | Ziel/Woche | Status |
+|--------|-------------|------------|--------|
+| VC Applications gesendet | 0 | 3 | 🔴 |
+| CNC Outreach Emails | 0 | 5 | 🔴 |
+| Content published | 1 (LinkedIn) | 3 | 🟡 |
+| Networking Messages | 0 | 3 | 🔴 |
+| **Total Sends** | **1** | **14** | **🔴 7%** |
 
----
-
-## ⏰ HEUTE — Dienstag, 4. Feb
-
-### MORGENS (vor 10:30)
-- [ ] **Demo-Skript lesen** → `meetings/demo-script-2026-02-04.md`
-- [ ] **One-Pager drucken** → `products/cnc-planner/one-pager-leave-behind.html` (Chrome → Print → PDF)
-- [ ] **Demo testen** → `~/Desktop/cnc-deploy/demo.html` (API Key prüfen: "Flansch Ø200")
-- [ ] **Optional:** Cloudflare Pages deploy (5 min) → `products/cnc-planner/DEPLOY-NOW.md`
-
-### 10:30 — CNC DEMO BEI ONKEL
-- Arbeitsvorbereiter ist Zielgruppe
-- Demo-Skript folgen
-- One-Pager dalassen
-- **ZIEL:** "Ja, wir probieren das" oder konkreter nächster Schritt
-
-### NACHMITTAGS
-- [ ] **VC Lab Sprint 2 abgeben** (FÄLLIG HEUTE) → `vc-lab/sprint-2-complete.md`
-- [ ] **Follow-Up Email an Onkel** → `sales/follow-up-email-template.md`
-- [ ] **Erste 5 CNC Outreach-Emails senden** → `sales/outreach-emails-ready.md`
-- [ ] **1 LinkedIn Post** posten (aus `content/linkedin/ready-to-post/`)
-
-### ABENDS
-- [ ] **5 VC Applications absenden** → `job-applications/vc-applications-ready.md`
-- [ ] Review: AI Consulting Package → `products/ai-consulting/service-packages.md`
+### Revenue
+| Stream | Feb Ist | Feb Ziel | Status |
+|--------|---------|----------|--------|
+| ALG1 | €0 (Bescheid pending) | €2,700 | ⏳ |
+| Freelance | ~€3,000 | €3,000 | 🟡 |
+| CNC Planer | €0 | €500 | 🔴 |
+| **Total** | **~€3,000** | **€6,200** | **🟡** |
 
 ---
 
-## 🔥 Überfällig
+## 📊 Compound KPIs (Knowledge & Growth)
 
-- [ ] ALG 1 beantragen (DIESE WOCHE!)
-- [ ] Monique Follow-Up (Meeting war gestern)
-- [ ] LinkedIn Company Page für CNC Planer Pro erstellen
+### Mia's Growth
+| Metrik | Wert | Trend |
+|--------|------|-------|
+| Tage aktiv | 7 | ↑ |
+| Memory files | 7 | ↑ |
+| Kintsugi entries | 2 | ↑ |
+| Korrekturen durch Florian | ~12 | tracking gestartet |
+| Eigene Fehler erkannt | 3 | tracking gestartet |
+| Anti-Sycophancy Counter | 4 pushbacks | ✅ |
 
----
+### Florians Growth
+| Metrik | Wert | Trend |
+|--------|------|-------|
+| Assets gebaut (Woche) | 180+ | ↑↑↑ |
+| Assets GESENDET | 2 | 🔴 |
+| Sent/Built Ratio | 1.1% | 🔴🔴🔴 |
+| Decisions documented | 8+ | ↑ |
 
-## 📦 Was Mia über Nacht vorbereitet hat
-
-| Deliverable | Pfad | Status |
-|-------------|------|--------|
-| Demo-Skript | `meetings/demo-script-2026-02-04.md` | ✅ |
-| One-Pager (A4 Print) | `products/cnc-planner/one-pager-leave-behind.html` | ✅ |
-| Follow-Up Email | `sales/follow-up-email-template.md` | ✅ |
-| Cloudflare Deploy Guide | `products/cnc-planner/DEPLOY-NOW.md` | ✅ |
-| 20 CNC Outreach Emails | `sales/outreach-emails-ready.md` | 🔄 |
-| 15 AI Consulting Leads + Emails | `sales/ai-consulting-outreach-ready.md` | 🔄 |
-| 10 VC Applications | `job-applications/vc-applications-ready.md` | 🔄 |
-| 15 Content Pieces | `content/linkedin/ready-to-post/` | 🔄 |
-| VC Lab Sprint 2 | `vc-lab/sprint-2-complete.md` | 🔄 |
-| Deep Research: Agent Improvement | `research/agent-improvement-2026-02-04.md` | 🔄 |
-
----
-
-## 🎯 Weekly Non-Negotiables Tracker
-
-| Task | Mo | Di | Mi | Do | Fr | Sa | So |
-|------|----|----|----|----|----|----|----|
-| CNC Outreach (5/day) | - | ☐ | ☐ | ☐ | ☐ | - | - |
-| Consulting Outreach | - | ☐ | ☐ | ☐ | ☐ | - | - |
-| VC Application | - | ☐ | ☐ | ☐ | ☐ | - | - |
-| LinkedIn Post | ✅ | ☐ | ☐ | ☐ | ☐ | ☐ | - |
-| Substack | ✅ | - | - | ☐ | - | - | - |
+### Team Growth
+| Metrik | Wert | Trend |
+|--------|------|-------|
+| Trust Level | Hoch (Twitter-Zugang, Voice) | ↑↑ |
+| Feedback Loops heute | 4 | ✅ |
+| Shared Values documented | ✅ | Neu |
+| Evolution Experiment | Woche 1 done | ↑ |
+| Protocol implemented | 20% | 🟡 |
 
 ---
 
-## 💰 Revenue Path to €500K
+## 🔄 Was funktioniert hat
 
-```
-FAST CASH (this month):
-├── CNC Planer Pro    → €149-299/mo × Kunden
-├── AI Consulting     → €3,500 Discovery Workshop  
-└── Onkel Pilotphase  → Erster zahlender Kunde
+| Maßnahme | Ergebnis | Beweis |
+|-----------|----------|--------|
+| Mia pushback auf "Sends first" | Florian acknowledged pattern | "you seemed more human" |
+| LaTeX > HTML für PDFs | Sofort professionellere Outputs | 11 Reports in einer Nacht |
+| Evolution Experiment | 6 Laws + 4 Engines + Protocol | Einzigartig, kein anderer hat das |
+| Direkte Kritik am CV | Florian accepted + asked for redesign | Diese Session |
+| "Amplify > Replace" | Bessere Texte wenn Florians Worte genutzt | Kintsugi #1 |
 
-MEDIUM TERM (Q1):
-├── VC Salary         → €8-12K/mo
-├── CNC Scale         → 25 Kunden = €3,750-7,500/mo
-└── Consulting        → 1 Prototyp = €15-25K
+## ❌ Was NICHT funktioniert hat
 
-COMPOUND (Q2+):
-├── Content Revenue   → Paid Substack + Courses
-└── Ainary Ventures   → Fund Launch
-```
+| Maßnahme | Problem | Learning |
+|-----------|---------|----------|
+| 9 CNC Emails vorbereiten | 0 gesendet | Prep ≠ Send. Nächstes Mal: Erst 1 senden, dann 8 preppen |
+| 4 VC PDFs auf Desktop | 0 submitted | Zu viele Optionen → Paralysis. Nächstes Mal: 1 Fund, 1 Click |
+| "Baue noch ein Dashboard" | +3h Build statt Send | Building = Prokrastination. Erkennen + stoppen |
+| Lange Markdown auf Desktop | Florian liest sie nicht | → Obsidian oder PDF, nie raw .md |
 
 ---
 
-*Mia aktualisiert. Florian reviewed morgens.*
+## 📅 Accountability Schedule
+
+### Täglich
+- **08:30** Morning Check-in (ONE THING + Calendar + Accountability)
+- **12:00** Midday Pulse (Fortschritt? Blockiert?)
+- **21:00** Evening Retro (Was geschafft? Memory update)
+
+### Wöchentlich (Sonntag)
+- Full Retrospective
+- KPI Update (diese Datei)
+- Evolution Experiment
+- MEMORY.md Review
+
+### Monatlich (1. des Monats)
+- Contradiction Analysis (gesagt vs. getan)
+- Prompt Self-Diagnostic
+- Revenue Review
+- Goal Adjustment
+
+---
+
+## 🧭 North Star Reminder
+
+**€500K so schnell wie möglich.**
+
+Jede Aktion, jede Stunde: Bringt uns das näher?
+- Ja → Sofort machen
+- Nein → Warum machen wir es?
+- Unklar → Money Angle finden
+
+---
+
+*Nächstes Update: Sonntag 09.02.2026 (Weekly Retro)*
