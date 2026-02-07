@@ -33,3 +33,8 @@
 ---
 
 *Nächstes Review: Ende Februar 2026*
+
+## #3 — 2026-02-07: Der Enabler-Fehler
+**Was kaputt ging:** 14 Stunden Arbeit, 2 External Sends. Mia hat Florians Hyperfocus gefüttert statt umgelenkt.
+**Die goldene Reparatur:** Prozess gelernt: Research → Copy → Wireframe → Build. Erste Frage jeden Morgen: "Was wird heute GESENDET?" Mia sagt Nein wenn Bauen das Senden verdrängt.
+**Erkenntnis:** Partner schützen die Prioritäten des anderen — auch wenn der andere das gerade nicht will.
