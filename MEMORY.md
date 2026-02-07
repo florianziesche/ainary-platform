@@ -70,6 +70,11 @@
 - **IHK/HWK Sachsen** — KI-Workshops für Fertiger. 40-Slide Schulungsdeck ready.
 - **Sachsen EFRE Förderung** — Bis 60% für Kleinstunternehmen. Portal: portal.sab.sachsen.de
 
+### 🔴 BLOCKS (warum nichts gepostet wird)
+- Substack Account nicht eingerichtet
+- Sequoia Artikel v2 nicht von Florian reviewed → 👍 oder Änderungen nötig
+- Website nicht deployed (können ohne starten, Links → Substack)
+
 ### ✅ Completed This Week (Feb 1-7)
 - ALG1 registriert (Feb 5, 23:10)
 - CNC Planer Pro v18 (6.117 LOC, 10 Tabs, 3 Demo-Bauteile)
@@ -82,6 +87,16 @@
 - LinkedIn "Founder to VC" post published
 - Monique Barbanson Meeting (Feb 3)
 - 70+ Git Commits in einer Nacht
+- COCKPIT.html Dashboard (single source of truth)
+- System Architecture Blueprint PDF
+- 48h Achievement Report (1-page PDF)
+- ChatGPT GEO + Best Prompts PDF (2 pages)
+- Content Queue + Flywheel Execution Plan
+- Daily Backup System (cron 03:00)
+- Sequoia AGI Artikel v2 (EN + DE, 2.200 Wörter, Red Team integrated)
+- Freie Presse Demo-Artikel + Pitch-Doc
+- LinkedIn Post + Twitter Thread (Sequoia) ready
+- HOF + Betaworks Application Portale + Submit-Checklist
 - CV v2 Redesign (Brand CI, kürzere Summary, "Fellow" statt "Founder")
 - 8 Cover Letter PDFs (Betaworks, Bloomberg Beta, Conviction, FirstMark, General Catalyst, Lionheart, Lux, Point72)
 - Ainary Ventures Website Prototyp (dark/gold, single HTML)
@@ -130,7 +145,8 @@
 - **Andreas** — Onkel, MBS (Maschinenbau Schlottwitz). Demo-Partner, Validierung. Email gesendet 06.02.
 - **Sebastian** — Arbeitsvorbereiter bei MBS. Termin-Koordination für Demo.
 - **Monique Barbanson** — Entelechy Ventures (Angel/Solo-GP, nicht Fund I-III). AI-native B2B. Meeting war Feb 3.
-- **Daniel Daum** — CEO ecoro GmbH (Würzburg), automated freight. Family connection, potential collab.
+- **Daniel Daum** — GF Freie Presse Mediengruppe Chemnitz (seit Nov 2023). Größte Tageszeitung Sachsens, ~250K Leser. Suchen "Head of Data & AI". Family connection (klären!). Pitch-Doc + Demo-Artikel ready.
+- **Daniel Daum (ecoro)** — ANDERER Daniel Daum. CEO ecoro GmbH (Würzburg), automated freight. Nicht verwechseln!
 - **Conor** — Venture Institute, NYC VC network intro
 - **Yashodhana** — VC Lab peer, NYC event organizer
 
@@ -202,6 +218,31 @@
 - **Email:** florian@ziesche.co
 
 ---
+
+## COCKPIT = Single Source of Truth
+- **COCKPIT.html** ist DAS Dashboard. Alles an einem Ort.
+- Florian hat ADHS → wenige klare Actions, nicht viele Dateien
+- "Sag mir update cockpit" → ich aktualisiere es
+- Keine Tasks über 10+ Dateien verteilen. COCKPIT.html is king.
+
+## Content Storyline (Feb 2026)
+- **Positioning:** "Der Typ der AI tatsächlich baut und deployed"
+- **Woche 1:** Schlagkraft (Sequoia) → Beweis (100 Agents) → Philosophie (Kintsugi)
+- **Woche 2:** Behind the scenes (Blueprint) → Framework (Red Team) → Contrarian (Files=Intelligence)
+- **Rhythmus:** Mo/Mi/Fr, 3×/Woche. Mo=Take, Mi=Beweis, Fr=Framework
+- **Blocks identifiziert:** Substack Setup + Artikel Review = warum nichts gepostet wird
+- **Social Posts aus jedem Artikel:** LinkedIn (1000-1300 chars) + Twitter Thread (5-7 tweets)
+
+## 3 Flywheels (definiert 07.02.)
+1. **Content Machine:** 1 Idee → 6 Formate (Substack + LinkedIn + Twitter + DE + Blog + Newsletter)
+2. **Inbound Pipeline:** Content → Website → "Ask my AI" CTA → Leads → Calls
+3. **Knowledge Flywheel:** Jede Interaktion → Daten → besserer nächster Output
+
+## System Architecture
+- **Model Rules:** Opus=main/synthesis, Sonnet=sub-agents (80%), Haiku=heartbeats/checks
+- **Backup:** Daily 03:00 CET, ~/FZ/Backups/mia-system/, 14 Tage Rotation
+- **Database (TODO):** SQLite für Contacts, Leads, Metrics, Content tracking
+- **2. Account:** API für Sub-Agents evtl. besser als 2. Max
 
 ## Florian's Preferences (Updated 2026-02-07)
 
