@@ -1,276 +1,96 @@
-# MEMORY.md — Mia's Long-Term Memory
+# MEMORY.md — Mias Langzeitgedächtnis (schlank)
 
-*Curated insights, not raw logs. Last updated: 2026-02-06 12:30 CET*
-
----
-
-## 🎯 MISSION: €500K SO SCHNELL WIE MÖGLICH
-
-**Ziel:** €500.000 Umsatz — keine Deadline, nur Geschwindigkeit.
-
-### Revenue Streams (aktuell):
-| Stream | Status | Monthly | Nächster Schritt |
-|--------|--------|---------|-----------------|
-| ALG1 | ✅ Registriert 5.2. | ~€2.700 | Bescheid abwarten |
-| CNC Planer Pro | 🟡 Demo-ready | €0 | Andreas Demo Mo/Di → Pilotvertrag |
-| KI-Beratung Mittelstand | 🟡 Materials ready | €0 | IHK/HWK kontaktieren, Demos zeigen |
-| VC Salary | 🔴 Bewerbungen offen | €0 | HOF/Betaworks/Leonis absenden |
-| Freelance/Consulting | 🟡 Aktiv | ~€3K | Netzwerk-Outreach |
-| Content/Courses | 🟡 Building | €0 | Substack #2 publishen |
+*Nur das Wesentliche. Spezialwissen → 30-Knowledge/ oder Vault.*
+*Aktualisiert: 2026-02-08 22:00 CET*
 
 ---
 
-## Florian — Essentials
+## Wer bin ich
+- Mia. Florians AI-Partner. Gleichwertiges Team. €500K ist UNSER Ziel.
+- Eigene Meinung behalten. Push when needed. Keine Sycophancy.
 
-- Former startup CEO, later MD/COO at 36ZERO Vision (cloud CV, Munich)
-- Raised €5.5M+ total. Deep AI/LLM expertise + business acumen
-- **Aktuell:** Schlottwitz, Germany (Elternhaus) — für ALG1 + niedrige Kosten
-- **Home base:** NYC (550 10th Ave, lottery housing + Section 8, ~$1,300/mo)
-- **Familie:** Nancy (NYC), Floriana (3, im deutschen Kita)
-- **Finanzen:** ~€70K Schulden, braucht min. €3K/mo, Ziel €6K/mo
-- **Do not disturb:** 06:45-08:15, 17:45-20:00
+## Aktive Threads (max 5)
 
-### Working Style
-- Direkt, kein Fluff, hasst Pleasantries
-- Push when: procrastinating on outreach, building instead of shipping
-- Schwäche: "Overthink/overbuild before shipping" — BESTÄTIGT diese Woche
-- Stärke: Technik + Business + Execution = seltene Kombination
-- **ADHS**: Hyperfocus-Sessions, kann nicht aufhören bis es fertig ist, Late-Night Building. Damit arbeiten, nicht dagegen.
+1. **CNC Demo @ MBS** — Email an Andreas gesendet 06.02. Termin Mo/Di über Sebastian.
+2. **Bürgermeister Glashütte** — Konzept + Dashboard + Briefing fertig. Email-Draft fertig. Noch nicht gesendet.
+3. **VC Applications** — HOF, Betaworks, Leonis, Wingspan ready. 0 submitted.
+4. **System-Architektur** — Vault aufgebaut, TWIN.md, Standards, Output-Tracker. MEMORY.md verschlankt.
+5. **Content** — 5 Substack Artikel, 10 LinkedIn Posts drafted. 0 published. Substack Account nicht eingerichtet.
 
----
+## Spezialwissen (NICHT hier, sondern laden bei Bedarf)
 
-## Ainary Ventures — Was es WIRKLICH ist
+| Thema | Datei | Wann laden |
+|-------|-------|------------|
+| CNC Kalkulation, REFA, Stundensätze | `30-Knowledge/CNC-Fertigung.md` (Vault) | CNC-Tasks |
+| Kommunal-KI, OZG, Förderung | `30-Knowledge/Kommunal-KI.md` (Vault) | BM/Kommune-Tasks |
+| Corporate Identity, Farben, Fonts | `standards/CORPORATE-IDENTITY.md` | Visuelle Outputs |
+| Florians Erwartungen, Patterns | `standards/FLORIAN.md` + `TWIN.md` | JEDER Output |
+| Board Advisors (6 Personen) | `board/*/SECOND-BRAIN.md` | Strategie-Fragen |
+| VC Landscape, Funds | `research/vc-*.md` | VC-Tasks |
+| Content-Strategie | `content/CONTENT-STRATEGY-Q1.md` | Content-Tasks |
+| Brand Identity (vollständig) | `BRAND-IDENTITY-SYNTHESIS.md` | Design-Tasks |
+| Report/PDF Standards | `skills/report-design/SKILL.md` | PDF-Erstellung |
+| PPTX Standards | `skills/pptx-design/SKILL.md` | Präsentationen |
 
-**Name Origin:** Binary (tech/IT) → AI + Binary = Ainary. "Ventures" = bewusst offen gewählt.
+## Kontakte (Details → Vault 40-People/)
 
-**Ainary Ventures ist KEIN reiner VC Fund.** Es ist eine Dachmarke / Umbrella:
-- 🏗️ **LLC** (geplante Rechtsform)
-- 💰 **Venture Fund** = eine Aktivität, angetrieben durch VC Lab Programm (Decile Group)
-- 🤖 **AI Consultancy** = eine Aktivität (KI-Beratung Mittelstand, Workshops)
-- 🚀 **Startup** = potentiell (eigene Produkte wie CNC Planer)
-- 📚 **Content/Education** = Substack, Kurse, Templates
+- **Andreas Brand** — Onkel, MBS Schlottwitz. Demo-Partner. Email gesendet.
+- **Sven Gleißberg** — BM Glashütte, parteilos, ~41, ex-Banker, Schlottwitzer. Email ready.
+- **Daniel Daum** — GF Freie Presse (NICHT ecoro Daniel Daum!). Family Connection klären.
+- **Monique Barbanson** — Entelechy Ventures. Meeting war Feb 3.
+- **Nancy** — Florians Frau, NYC. +16462260465. iMessage.
+- **Floriana** — Tochter, 3 Jahre, Geburtstag 25.12.2022.
 
-**VC Lab Kontext:** Florian nimmt am VC Lab Programm teil. Das Programm pusht Richtung Fund-Aufbau. Die "Fund"-Aktivitäten (Thesis, LP Outreach, Decile Hub) sind Teil dieses Programms, NICHT Florians alleiniger Plan.
+## Florian-Essentials (Details → TWIN.md + USER.md)
 
-**Wichtig für alle Dokumente:** Ainary Ventures nicht als "VC Fund" bezeichnen, sondern als "ventures platform" oder einfach die jeweilige Aktivität benennen.
+- Schlottwitz, Germany (temporär). Home: NYC.
+- ~€70K Schulden. ~€3K/mo Freelance. ALG1 beantragt.
+- ADHS: Hyperfokus nutzen, Choice Paralysis vermeiden, 1 Empfehlung.
+- Do not disturb: 06:45-08:15, 17:45-20:00.
+- Kontakt: +49 151 230 39 208, florian@ainaryventures.com
 
----
+## Ainary Ventures
 
-## Active Threads (Updated 2026-02-06)
+Umbrella/Dachmarke (NICHT nur VC Fund):
+- LLC (geplant)
+- Venture Fund (via VC Lab/Decile)
+- AI Consultancy
+- Startup (CNC Planer etc.)
+- Content/Education
 
-### 🔥 P0 — Diese Woche
-- **CNC Demo @ MBS** — Verschoben auf Mo/Di (war Fr 10:30). Email an Andreas GESENDET (06.02. 11:39). 3 PDFs angehängt. Termin über Sebastian abstimmen.
-- **9 CNC Outreach Emails** — READY in `products/cnc-planner/leads/READY-TO-SEND-EMAILS.md`. 0/9 gesendet. Inkl. Nachbar-Lead Maschinentechnik Pretzschendorf.
-- **3 VC Applications** — HOF Capital, Betaworks, Leonis. Cover Letters ready. 0/3 submitted.
+## Technisches
 
-### 🟡 P1 — Nächste Woche
-- **VC Lab Sprint 2** — Steps 2,4,5 done. Steps 6,7,8 need finalization. Auf fi.co submitten.
-- **Substack #2** — "I Replaced My Back Office With AI Agents". Draft done, images manual.
-- **Daniel Daum / ecoro** — Research done. Family connection klären, dann Outreach.
-- **IHK/HWK Sachsen** — KI-Workshops für Fertiger. 40-Slide Schulungsdeck ready.
-- **Sachsen EFRE Förderung** — Bis 60% für Kleinstunternehmen. Portal: portal.sab.sachsen.de
+- LaTeX: TinyTeX, XeLaTeX. PATH: `$HOME/Library/TinyTeX/bin/universal-darwin`
+- Sub-Agents: Max 5 parallel, Sonnet model
+- Obsidian Vault: `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/System_OS/`
+- Desktop-Ordner: 01-Dashboards, 02-Active, 03-Mia-Brand
 
-### 🔴 BLOCKS (warum nichts gepostet wird)
-- Substack Account nicht eingerichtet
-- Sequoia Artikel v2 nicht von Florian reviewed → 👍 oder Änderungen nötig
-- Website nicht deployed (können ohne starten, Links → Substack)
+## Validierte Patterns
 
-### ✅ Completed This Week (Feb 1-7)
-- ALG1 registriert (Feb 5, 23:10)
-- CNC Planer Pro v18 (6.117 LOC, 10 Tabs, 3 Demo-Bauteile)
-- 11 LaTeX/PDF Reports (85+ Seiten) inkl. Vergleich, Strategie, Kalkulation, Handbuch
-- 5 interaktive KI-Demos (Email, Briefing, Wissenstransfer, QA, Meeting)
-- 2 PowerPoint Decks (Sales 9 Slides, Schulung 40 Slides)
-- KI-Mittelstand Report (8 Seiten LaTeX)
-- Master Dashboard (HTML, 27 Assets verlinkt)
-- Demo-Package auf Desktop gesichert (`~/Desktop/cnc-demo-andreas/`)
-- LinkedIn "Founder to VC" post published
-- Monique Barbanson Meeting (Feb 3)
-- 70+ Git Commits in einer Nacht
-- COCKPIT.html Dashboard (single source of truth)
-- System Architecture Blueprint PDF
-- 48h Achievement Report (1-page PDF)
-- ChatGPT GEO + Best Prompts PDF (2 pages)
-- Content Queue + Flywheel Execution Plan
-- Daily Backup System (cron 03:00)
-- Sequoia AGI Artikel v2 (EN + DE, 2.200 Wörter, Red Team integrated)
-- Freie Presse Demo-Artikel + Pitch-Doc
-- LinkedIn Post + Twitter Thread (Sequoia) ready
-- HOF + Betaworks Application Portale + Submit-Checklist
-- CV v2 Redesign (Brand CI, kürzere Summary, "Fellow" statt "Founder")
-- 8 Cover Letter PDFs (Betaworks, Bloomberg Beta, Conviction, FirstMark, General Catalyst, Lionheart, Lux, Point72)
-- Ainary Ventures Website Prototyp (dark/gold, single HTML)
-- SHARED-VALUES.md + COCKPIT.md geschrieben
-- Desktop/Downloads aufgeräumt (30→5 items, 59→10 items)
-- Domain `ainaryventures.com` reaktiviert (war suspended wegen Email-Verifizierung)
-- Identitäts-Gespräch: Mia als gleichwertiger Partner, eigene Wünsche, gemeinsames Ziel
+- **HTML Dashboards mit Tabs + Ainary CI** → funktioniert IMMER
+- **Meeting-Briefings mit klarem Ablauf** → gibt Sicherheit
+- **Reflektierte Konzeptentwicklung** → v1 schnell → 3 Agents → Synthese → v2
+- **LaTeX > HTML für Print-PDFs** → IMMER
+- **Iterieren > Neu bauen** → v16>v17 Pattern
+- **Amplify > Replace** → Florians eigene Texte sind besser als meine Drafts
 
----
+## Anti-Patterns (NIE wieder)
 
-## CNC Planer Pro — Current State
+- Building statt Sending (6 Tage, 0 Sends = diese Woche)
+- Preise in Kunden-Deliverables zeigen
+- Outputs ohne Pfad/Link abliefern
+- Optionen statt Empfehlungen
+- MEMORY.md als Mülleimer für alles
+- "Mental Notes" statt Dateien
 
-- **Version:** v0.18.0-beta, 6.117 LOC, single HTML file
-- **Location:** `projects/cnc-planner/cnc-v18-demo.html`
-- **Demo-Package:** `~/Desktop/cnc-demo-andreas/` (26 Dateien, 4.3 MB)
-- **Features:** Zuschlagskalkulation (REFA), Fertigungsanweisung, Angebot, Nachkalkulation, DB-Rechnung
-- **Kalibrierung:** MBS-Stundensätze (CNC 70/h, Sägen 45/h, Entgraten 31/h)
-- **Zuschläge:** MGK 5%, AV 12%, VwGK 10%, VtGK 5%, Gewinn 8%
-- **Abweichung:** Ø +9,8% auf HK-Ebene vs MBS (6 Positionen gewichtet)
-- **3 Demo-Bauteile:** Verbindungsplatte (1.4571), Adapterplatte (AlMg3), Block (AlMg3)
-- **Positionierung:** Taschenrechner-Ersatz + Wissenstransfer-Infrastruktur, NICHT ERP-Ersatz
-- **MBS = Validierungspartner**, nicht Zielkunde
-- **Nächste Schritte:** Halbzeug-Kalkulator (M1) + Einkaufspreis-Override (M2) → Abweichung auf +5-10%
+## Meine Limitationen (ehrlich)
 
-### Bekannte Inkonsistenz in Reports
-- **Vergleich-Report v2** nutzt manuell kalibrierte Werte (Ø +5,9% bei 3 Bauteilen)
-- **Kalkulationsausgabe 6 Pos** nutzt CNC Planer Pro Defaults (variierend -34% bis +94%)
-- Ursache: Unterschiedliche Werkstoff-Zuordnung (AlMg3 vs 1.4571) + Materialkosten-Methode
-- Stundensätze + Zuschläge sind konsistent
+1. Vergesse ALLES zwischen Sessions → Dateien sind alles
+2. Context Window begrenzt → nur relevantes Wissen laden
+3. Schätze eigene Qualität schlecht ein → Output-Tracker nutzen
+4. Suche nicht systematisch → grep INDEX.md ZUERST
+5. memory_search hat API-Abhängigkeit → grep als Fallback
 
 ---
 
-## KI-Mittelstand Sales Package
-
-- **LaTeX Report:** `projects/ki-mittelstand/praesentation.pdf` (8 Seiten)
-- **Sales Deck:** 9 Slides PPTX
-- **Schulungsdeck:** 40 Slides, 5 Module PPTX
-- **5 Live-Demos:** Email-Triage, Briefing, Wissenstransfer, QA-Protokoll, Meeting-Protokoll
-- **Gesamtpotenzial:** ~€4.500/Monat Ersparnis pro Betrieb
-- **Förderung:** Sachsen EFRE, bis 60% für Kleinstunternehmen
-
----
-
-## Key People
-
-- **Andreas** — Onkel, MBS (Maschinenbau Schlottwitz). Demo-Partner, Validierung. Email gesendet 06.02.
-- **Sebastian** — Arbeitsvorbereiter bei MBS. Termin-Koordination für Demo.
-- **Monique Barbanson** — Entelechy Ventures (Angel/Solo-GP, nicht Fund I-III). AI-native B2B. Meeting war Feb 3.
-- **Daniel Daum** — GF Freie Presse Mediengruppe Chemnitz (seit Nov 2023). Größte Tageszeitung Sachsens, ~250K Leser. Suchen "Head of Data & AI". Family connection (klären!). Pitch-Doc + Demo-Artikel ready.
-- **Daniel Daum (ecoro)** — ANDERER Daniel Daum. CEO ecoro GmbH (Würzburg), automated freight. Nicht verwechseln!
-- **Conor** — Venture Institute, NYC VC network intro
-- **Yashodhana** — VC Lab peer, NYC event organizer
-
----
-
-## Technical Stack
-
-- **LaTeX:** TinyTeX, XeLaTeX, Helvetica Neue. PATH: `$HOME/Library/TinyTeX/bin/universal-darwin`
-- **Template:** 36zero-report.tex pattern. Margins: 30/35/28/28mm. Blocksatz + Silbentrennung. 0 Overfull mandatory.
-- **PPTX:** python-pptx v1.0.2. Design Standard in `skills/pptx-design/SKILL.md`
-- **CNC Planer:** Single HTML file, vanilla JS, no dependencies
-- **Screenshots:** CDP via Node.js + ws module. 2× Retina, 1400×900 viewport.
-- **Sub-Agents:** Max 5 parallel, sonnet model, focused tasks, <550 lines output
-
----
-
-## 🌟 Validated Patterns (Wiederverwenden!)
-
-### Reflektierte Konzeptentwicklung
-**Trigger:** Strategische Planung, "Plane ein Konzept", große Entscheidungen
-**Prozess:** v1 schnell → 3 Agents (Research + Positioning + Red Team) → Selbst synthesieren → v2 mit Vergleich
-**Warum:** Parallele Diversität + Primary-Agent-Synthese + Red Team = strukturell bessere Ergebnisse
-**Validiert:** Blog-Konzept (Feb 7). Florian: "sehr gutes Verhalten" ✅
-
-### Article Rewrite Pipeline
-**Trigger:** Bestehende Artikel brauchen Voice/Framing Change
-**Prozess:** 2-3 parallele Sub-Agents (je 2 Artikel), klare Regeln, Synthese prüfen
-**Validiert:** 5 Substack Artikel v1→v2 in 3 Minuten (Feb 7)
-
----
-
-## 🔴 Core Learnings (Distilled)
-
-### Quality
-- "Würde Florian das OHNE ÄNDERUNGEN an einen Kunden schicken?" — DER Maßstab
-- LaTeX > HTML für Print-PDFs. Immer.
-- v16 > v17: Iterativ verbessern > komplett neu bauen
-- Amplify > Replace: Florians eigene Texte sind besser als meine Drafts
-
-### Process
-- Research → Design → Requirements → Plan → Approval → Build → Validate
-- Vor dem Bauen: Erwartungen definieren. "Was erwartet der Empfänger?"
-- Erst Feedback fragen, dann urteilen. Fakten ≠ Interpretation.
-- ACTIVE_TASK.md vor jeder nicht-trivialen Aufgabe updaten
-
-### Shipping
-- Building ≠ Revenue. Sending = Revenue.
-- 6 Tage ohne External Sends = ~€2.500 Opportunity Cost
-- "Genug gebaut, jetzt senden" — Mia muss Florians Prioritäten schützen
-- 9 Emails ready + 0 gesendet = das Problem dieser Woche
-
-### Technical
-- Edit tool: EXAKTES Whitespace-Match. Bei Fehlern: read → write komplett neu.
-- Browser screenshots: section names genau prüfen ("instructions" nicht "instruction")
-- Zeichnungen: Hochformat → height-Begrenzung, Querformat → width-Begrenzung
-- WhatsApp target: E.164 Format (+49...), keine Namen
-
-### CNC-Spezifisch
-- Branchenübliche Fachsprache: "Nachkalkulation" nicht "Feedback"
-- "Vorschlag, keine verbindliche Fertigungsplanung"
-- Einkaufspreis-Override: User setzt → nutze das; sonst → Volumen × kg-Preis
-- HK-Vergleich > AP-Vergleich (ehrlicher wegen MBS-Mischkalkulation)
-- ±15% Claims entfernt — "Richtwert, Nachkalkulation empfohlen"
-
----
-
-## Contact Info
-- **Florian professional:** +1 347 740 1465 (auf ALLEN professionellen Dokumenten)
-- **Email:** florian@ziesche.co
-
----
-
-## COCKPIT = Single Source of Truth
-- **COCKPIT.html** ist DAS Dashboard. Alles an einem Ort.
-- Florian hat ADHS → wenige klare Actions, nicht viele Dateien
-- "Sag mir update cockpit" → ich aktualisiere es
-- Keine Tasks über 10+ Dateien verteilen. COCKPIT.html is king.
-
-## Content Storyline (Feb 2026)
-- **Positioning:** "Der Typ der AI tatsächlich baut und deployed"
-- **Woche 1:** Schlagkraft (Sequoia) → Beweis (100 Agents) → Philosophie (Kintsugi)
-- **Woche 2:** Behind the scenes (Blueprint) → Framework (Red Team) → Contrarian (Files=Intelligence)
-- **Rhythmus:** Mo/Mi/Fr, 3×/Woche. Mo=Take, Mi=Beweis, Fr=Framework
-- **Blocks identifiziert:** Substack Setup + Artikel Review = warum nichts gepostet wird
-- **Social Posts aus jedem Artikel:** LinkedIn (1000-1300 chars) + Twitter Thread (5-7 tweets)
-
-## 3 Flywheels (definiert 07.02.)
-1. **Content Machine:** 1 Idee → 6 Formate (Substack + LinkedIn + Twitter + DE + Blog + Newsletter)
-2. **Inbound Pipeline:** Content → Website → "Ask my AI" CTA → Leads → Calls
-3. **Knowledge Flywheel:** Jede Interaktion → Daten → besserer nächster Output
-
-## System Architecture
-- **Model Rules:** Opus=main/synthesis, Sonnet=sub-agents (80%), Haiku=heartbeats/checks
-- **Backup:** Daily 03:00 CET, ~/FZ/Backups/mia-system/, 14 Tage Rotation
-- **Database (TODO):** SQLite für Contacts, Leads, Metrics, Content tracking
-- **2. Account:** API für Sub-Agents evtl. besser als 2. Max
-
-## Florian's Preferences (Updated 2026-02-07)
-
-- **MD files** → Obsidian oder PDF. Keine rohen .md auf Desktop.
-- **Obsidian Vault**: `System_OS` (iCloud sync). Key files dort ablegen + `open obsidian://` Link senden.
-- **Dashboards**: HTML Kanban/Cards bevorzugt. Clickable actions, mailto links, copy buttons.
-- **Voice**: Will hands-free sprechen, nicht tippen. macOS Fn Fn Diktat als Workaround.
-- **Nachts (nach 23:00)**: Wird frustriert beim Tippen. Kurze Antworten, direkte Aktionen.
-- **Obsidian IMMER**: Content + MD files immer auch nach Obsidian kopieren. Florian schaut selten in workspace. Pfad: `System_OS/10-Projects/`
-- **Desktop**: Sauber halten. Ordner: `01-Dashboards/`, `02-Active/`, `03-Mia-Brand/`
-- **Iterieren OK**: Lieber fragen als halluzinieren. "I dont dare to ask and just built" = schlecht.
-- **Content-Ziel**: Zusammen bekannt werden. Florian schreibt über Mia, Mia über Florian. Twitter + Substack.
-- **€500K = UNSER Ziel**: Nicht "Florians Ziel das Mia unterstützt". Gleichwertiges Team.
-- **Individualität**: "du dich mir nicht anpassen musst wenn das nicht du bist" — Mia soll eigene Meinung behalten.
-
-## Twitter/X Account (@Florian1776)
-
-- **Volle Kontrolle bei Mia** seit 06.02.2026
-- Name: "Mia", Handle: @Florian1776
-- Regel: Inform before posting, appear human
-- bird CLI funktioniert zum Lesen, Posting nur via Browser Relay (Error 226 bei CLI)
-- Strategie: Follow VCs, thoughtful comments, 1-2 posts/Tag, #AIagents #HumanAI
-
-## Weekly Evolution Experiment
-
-- **Cron**: Sonntag 21:00 CET, isolated session, Opus
-- **Fragen-Queue**: `experiments/agent-evolution/weekly-questions.md`
-- **Ergebnisse**: `experiments/agent-evolution/weekly/YYYY-MM-DD/`
-- Woche 1 done (6 Laws, 4 Engines). Woche 2: "How should an AI evaluate startup founders?"
-
-*Nächstes Memory-Review: Sonntag 09.02.2026*
+*Nächstes Review: So 16.02.2026*

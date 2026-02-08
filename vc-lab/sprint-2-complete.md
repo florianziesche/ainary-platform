@@ -1,4 +1,4 @@
-# VC Lab Sprint 2 — Venture Capital Basics
+a# VC Lab Sprint 2 — Venture Capital Basics
 ## Ainary Ventures | Florian Ziesche | Cohort 10
 
 **Submitted:** February 4, 2026

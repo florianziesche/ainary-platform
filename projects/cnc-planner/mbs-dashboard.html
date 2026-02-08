@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KI-Lösungen — Maschinenbau Schlottwitz</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;background:#0a0a0a;color:#fff;line-height:1.6;padding:2rem;min-height:100vh}
+        .container{max-width:1600px;margin:0 auto;opacity:0;animation:fadeIn .8s ease-out forwards}
+        @keyframes fadeIn{to{opacity:1}}
+        @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+        header{text-align:center;margin-bottom:2.5rem;padding-bottom:2rem;border-bottom:1px solid rgba(201,168,76,.2)}
+        h1{font-size:2.2rem;color:#c9a84c;font-weight:300;letter-spacing:1px;margin-bottom:.3rem}
+        .subtitle{font-size:1rem;color:#888}
+        .datetime{font-size:.85rem;color:#555;margin-top:.5rem}
+
+        .tab-nav{display:flex;gap:0;margin-bottom:2rem;border-bottom:2px solid rgba(201,168,76,.2)}
+        .tab-btn{padding:.9rem 1.6rem;background:none;border:none;color:#666;font-size:.95rem;font-weight:500;cursor:pointer;transition:all .3s;border-bottom:3px solid transparent;margin-bottom:-2px;font-family:inherit}
+        .tab-btn:hover{color:#c9a84c}
+        .tab-btn.active{color:#c9a84c;border-bottom-color:#c9a84c}
+        .tab-content{display:none}
+        .tab-content.active{display:block}
+
+        .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem;margin-bottom:2rem}
+        .kpi-card{background:linear-gradient(135deg,#1a1a1a,#151515);border:1px solid rgba(201,168,76,.2);border-radius:12px;padding:1.5rem;transition:all .3s;animation:slideUp .6s ease-out backwards}
+        .kpi-card:hover{transform:translateY(-3px);border-color:rgba(201,168,76,.5);box-shadow:0 8px 24px rgba(201,168,76,.08)}
+        .kpi-label{font-size:.8rem;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.4rem}
+        .kpi-value{font-size:2.2rem;font-weight:700;color:#c9a84c;margin-bottom:.3rem}
+        .kpi-change{font-size:.85rem;color:#4ade80}
+        .kpi-change.neg{color:#f87171}
+
+        .panel{background:linear-gradient(135deg,#1a1a1a,#151515);border:1px solid rgba(201,168,76,.2);border-radius:12px;padding:2rem;margin-bottom:2rem;animation:slideUp .6s ease-out backwards}
+        .panel:hover{border-color:rgba(201,168,76,.35)}
+        .panel-title{font-size:1.25rem;color:#c9a84c;margin-bottom:1.2rem;font-weight:500}
+
+        .problem-card{background:rgba(248,113,113,.04);border:1px solid rgba(248,113,113,.15);border-radius:10px;padding:1.5rem;cursor:pointer;transition:all .3s}
+        .problem-card:hover{border-color:rgba(248,113,113,.4);transform:translateY(-2px)}
+        .problem-card .p-title{color:#fff;font-weight:600;font-size:1.05rem;margin-bottom:.3rem}
+        .problem-card .p-desc{color:#888;font-size:.9rem;line-height:1.6}
+        .problem-card .p-cost{color:#f87171;font-weight:600;font-size:.9rem;margin-top:.5rem}
+
+        .solution-card{background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.15);border-radius:10px;padding:1.5rem;cursor:pointer;transition:all .3s}
+        .solution-card:hover{border-color:rgba(201,168,76,.4);transform:translateY(-2px)}
+        .solution-card .s-title{color:#fff;font-weight:600;font-size:1.05rem;margin-bottom:.3rem}
+        .solution-card .s-desc{color:#888;font-size:.9rem}
+        .solution-card .s-impact{color:#4ade80;font-weight:600;font-size:.9rem;margin-top:.5rem}
+
+        .roi-row{display:flex;justify-content:space-between;align-items:center;padding:1rem 0;border-bottom:1px solid rgba(201,168,76,.08)}
+        .roi-row:last-child{border-bottom:none}
+        .roi-area{color:#ccc;font-weight:500}
+        .roi-detail{color:#666;font-size:.85rem}
+        .roi-amount{color:#4ade80;font-weight:700;font-size:1.15rem}
+        .roi-amount.cost{color:#f87171}
+
+        .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.88);z-index:1000;align-items:center;justify-content:center}
+        .modal-overlay.active{display:flex}
+        .modal{background:#1a1a1a;border:1px solid rgba(201,168,76,.4);border-radius:12px;padding:2rem;max-width:750px;width:90%;max-height:80vh;overflow-y:auto;position:relative}
+        .modal h2{color:#c9a84c;margin-bottom:1rem;font-size:1.3rem;font-weight:500}
+        .modal h3{color:#c9a84c;margin:1rem 0 .5rem;font-size:1rem}
+        .modal p,.modal li{color:#ccc;font-size:.9rem;line-height:1.7;margin-bottom:.5rem}
+        .modal ul{padding-left:1.5rem}
+        .modal table{width:100%;border-collapse:collapse;margin:1rem 0}
+        .modal th,.modal td{padding:.5rem;text-align:left;border-bottom:1px solid rgba(201,168,76,.1);font-size:.85rem}
+        .modal th{color:#c9a84c}
+        .modal td{color:#ccc}
+        .modal .close-btn{position:absolute;top:1rem;right:1rem;background:none;border:1px solid rgba(201,168,76,.3);color:#c9a84c;padding:.3rem .8rem;border-radius:6px;cursor:pointer;font-size:.9rem;transition:all .3s}
+        .modal .close-btn:hover{background:rgba(201,168,76,.2)}
+        .modal .stamp{text-align:center;color:#555;font-size:.8rem;margin-top:1.5rem;border-top:1px solid rgba(201,168,76,.1);padding-top:1rem}
+
+        footer{text-align:center;padding:2rem;border-top:1px solid rgba(201,168,76,.2);margin-top:2rem}
+        footer p{color:#888;font-size:.9rem;margin-bottom:.3rem}
+        footer a{color:#c9a84c;text-decoration:none}
+        footer a:hover{color:#fff}
+
+        @media(max-width:900px){body{padding:1rem}h1{font-size:1.6rem}.kpi-value{font-size:1.8rem}.panel{padding:1.5rem}}
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>KI-Lösungen für Maschinenbau Schlottwitz</h1>
+        <p class="subtitle">Analyse und Konzept — basierend auf Mitarbeiter-Feedback und Betriebsdaten</p>
+        <p class="datetime" id="datetime"></p>
+    </header>
+
+    <nav class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('uebersicht')">Übersicht</button>
+        <button class="tab-btn" onclick="switchTab('probleme')">Probleme und ROI</button>
+        <button class="tab-btn" onclick="switchTab('loesungen')">Lösungen</button>
+        <button class="tab-btn" onclick="switchTab('angebot')">Angebot</button>
+    </nav>
+
+    <!-- TAB 1: Übersicht -->
+    <div class="tab-content active" id="tab-uebersicht">
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">Geschätzte Rüstzeit-Verschwendung</div>
+                <div class="kpi-value">8–12h</div>
+                <div class="kpi-change neg">pro Woche, vermeidbar</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Wissensverlust-Risiko</div>
+                <div class="kpi-value" style="font-size:1.8rem;">Hoch</div>
+                <div class="kpi-change neg">Handschriftliche Notizen, keine Dokumentation</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Standort-Koordination</div>
+                <div class="kpi-value" style="font-size:1.8rem;">Keine</div>
+                <div class="kpi-change neg">Systematische Abstimmung fehlt</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Einsparpotenzial pro Jahr</div>
+                <div class="kpi-value" style="font-size:1.8rem;">50–60T</div>
+                <div class="kpi-change">konservativ geschätzt</div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">Erkenntnisse aus der Fertigung</div>
+            <p style="color:#888;font-size:.95rem;margin-bottom:1.5rem;">Vier zentrale Probleme, identifiziert aus Mitarbeiter-Feedback an beiden Standorten.</p>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;">
+                <div class="problem-card" onclick="openModal('ruest')">
+                    <div class="p-title">Rüstzeit-Verschwendung</div>
+                    <div class="p-desc">Schraubstöcke und Vorrichtungen werden abgerüstet, obwohl der nächste Auftrag dieselbe Einrichtung benötigt. Hin und Her statt intelligenter Reihenfolge.</div>
+                    <div class="p-cost">Geschätzt 35.000 Euro/Jahr</div>
+                </div>
+                <div class="problem-card" onclick="openModal('nc')">
+                    <div class="p-title">NC-Programme falsch zugewiesen</div>
+                    <div class="p-desc">NC-Programm ist auf einer Maschine eingerichtet und getestet, wird aber an eine andere Maschine vergeben — oder an einen Mitarbeiter, der das Bauteil noch nie gefertigt hat.</div>
+                    <div class="p-cost">Geschätzt 15.750 Euro/Jahr</div>
+                </div>
+                <div class="problem-card" onclick="openModal('wissen')">
+                    <div class="p-title">Handschriftliche Kommentare gehen verloren</div>
+                    <div class="p-desc">Mitarbeiter schreiben wichtige Hinweise mit Stift auf die Auftragsblätter — Materialhinweise, Toleranzen, Erfahrungswerte. Bei der nächsten Fertigung werden sie nicht einbezogen.</div>
+                    <div class="p-cost">Geschätzt 14.000 Euro/Jahr + Wissensverlust</div>
+                </div>
+                <div class="problem-card" onclick="openModal('standort')">
+                    <div class="p-title">Keine Standort-Koordination</div>
+                    <div class="p-desc">Am 2. Standort werden komplexere Bauteile geplant und gefertigt, ohne Absprache mit dem Hauptstandort. Doppelte Arbeit, keine Transparenz über Kapazitäten.</div>
+                    <div class="p-cost">Geschätzt 8.000–12.000 Euro/Jahr</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">Was KI für MBS leisten kann</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;">
+                <div class="solution-card" onclick="openModal('sol-ruest')">
+                    <div class="s-title">Rüst-Optimierer</div>
+                    <div class="s-desc">Intelligente Auftragsreihenfolge — Aufträge werden nach Vorrichtung und Spannmittel gruppiert</div>
+                    <div class="s-impact">Einsparung: 21.000–24.500 Euro/Jahr</div>
+                </div>
+                <div class="solution-card" onclick="openModal('sol-nc')">
+                    <div class="s-title">Maschinen-Programm-Manager</div>
+                    <div class="s-desc">Automatische Zuordnung von NC-Programmen zu Maschinen und Mitarbeitern</div>
+                    <div class="s-impact">Einsparung: ~12.600 Euro/Jahr</div>
+                </div>
+                <div class="solution-card" onclick="openModal('sol-wissen')">
+                    <div class="s-title">Digitales Meister-Gedächtnis</div>
+                    <div class="s-desc">Handschriftliche Kommentare und Erfahrungswerte digital erfassen und wiederverwenden</div>
+                    <div class="s-impact">Einsparung: 10.000–14.000 Euro/Jahr</div>
+                </div>
+                <div class="solution-card" onclick="openModal('sol-standort')">
+                    <div class="s-title">Standort-Brücke</div>
+                    <div class="s-desc">Zentrale Planungsübersicht und Kapazitätsabgleich zwischen beiden Standorten</div>
+                    <div class="s-impact">Einsparung: 6.000–9.000 Euro/Jahr</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 2: Probleme und ROI -->
+    <div class="tab-content" id="tab-probleme">
+        <div class="panel">
+            <div class="panel-title">Detaillierte ROI-Berechnung</div>
+            <p style="color:#888;font-size:.95rem;margin-bottom:1.5rem;">Basierend auf MBS-Stundensätzen: CNC 70 Euro/h, Sägen 45 Euro/h, Entgraten 31 Euro/h.</p>
+
+            <div style="border-left:3px solid #f87171;padding-left:1.5rem;margin-bottom:2rem;">
+                <div style="color:#fff;font-weight:600;font-size:1.1rem;margin-bottom:.5rem;">1. Rüstzeit-Verschwendung</div>
+                <div style="color:#888;font-size:.9rem;line-height:1.8;margin-bottom:1rem;">
+                    Ist-Zustand: Geschätzt 4 unnötige Rüstvorgänge pro Tag, je 30 Minuten.<br>
+                    2 Stunden pro Tag, 250 Arbeitstage = 500 Stunden pro Jahr.<br>
+                    Bei CNC-Stundensatz von 70 Euro = <strong style="color:#f87171;">35.000 Euro Verschwendung pro Jahr.</strong>
+                </div>
+                <div style="color:#ccc;font-size:.9rem;margin-bottom:.5rem;">KI-Lösung: Intelligente Auftragsreihenfolge, Rüst-Clustering nach Vorrichtung.</div>
+                <div style="color:#4ade80;font-weight:600;">Einsparungspotenzial bei 60–70%: 21.000–24.500 Euro/Jahr</div>
+            </div>
+
+            <div style="border-left:3px solid #f87171;padding-left:1.5rem;margin-bottom:2rem;">
+                <div style="color:#fff;font-weight:600;font-size:1.1rem;margin-bottom:.5rem;">2. NC-Programm-Fehlzuordnung</div>
+                <div style="color:#888;font-size:.9rem;line-height:1.8;margin-bottom:1rem;">
+                    Ist-Zustand: Geschätzt 3 Fehlzuordnungen pro Woche, je 1,5 Stunden Neueinrichtung.<br>
+                    4,5 Stunden pro Woche, 50 Wochen = 225 Stunden pro Jahr.<br>
+                    Bei 70 Euro/h = <strong style="color:#f87171;">15.750 Euro pro Jahr.</strong><br>
+                    Zusätzlich: Erhöhtes Fehler- und Ausschussrisiko.
+                </div>
+                <div style="color:#ccc;font-size:.9rem;margin-bottom:.5rem;">KI-Lösung: Automatische Maschinen-Programm-Zuordnung mit Mitarbeiter-Kompetenz-Matrix.</div>
+                <div style="color:#4ade80;font-weight:600;">Einsparungspotenzial bei 80%: ~12.600 Euro/Jahr</div>
+            </div>
+
+            <div style="border-left:3px solid #f87171;padding-left:1.5rem;margin-bottom:2rem;">
+                <div style="color:#fff;font-weight:600;font-size:1.1rem;margin-bottom:.5rem;">3. Wissenstransfer — Handschriftliche Kommentare</div>
+                <div style="color:#888;font-size:.9rem;line-height:1.8;margin-bottom:1rem;">
+                    Ist-Zustand: Geschätzt 2 Nacharbeiten pro Woche durch fehlende Hinweise, je 2 Stunden.<br>
+                    4 Stunden pro Woche, 50 Wochen = 200 Stunden pro Jahr.<br>
+                    Bei 70 Euro/h = <strong style="color:#f87171;">14.000 Euro pro Jahr.</strong><br>
+                    Unberechnet: Wenn ein erfahrener Mitarbeiter geht — monatelange Einarbeitungszeit.
+                </div>
+                <div style="color:#ccc;font-size:.9rem;margin-bottom:.5rem;">KI-Lösung: Digitale Wissensdatenbank. Kommentare werden erfasst und bei Wiederholaufträgen automatisch angezeigt.</div>
+                <div style="color:#4ade80;font-weight:600;">Einsparungspotenzial: 10.000–14.000 Euro/Jahr + Wissenssicherung</div>
+            </div>
+
+            <div style="border-left:3px solid #f87171;padding-left:1.5rem;margin-bottom:2rem;">
+                <div style="color:#fff;font-weight:600;font-size:1.1rem;margin-bottom:.5rem;">4. Standort-Koordination</div>
+                <div style="color:#888;font-size:.9rem;line-height:1.8;margin-bottom:1rem;">
+                    Ist-Zustand: Doppelte Arbeitsvorbereitung, suboptimale Maschinenauslastung, keine Transparenz über Kapazitäten am anderen Standort.<br>
+                    Geschätzt: <strong style="color:#f87171;">8.000–12.000 Euro pro Jahr</strong> durch Ineffizienz.
+                </div>
+                <div style="color:#ccc;font-size:.9rem;margin-bottom:.5rem;">KI-Lösung: Zentrale Planungsübersicht, automatischer Kapazitätsabgleich, gemeinsame Wissensbasis.</div>
+                <div style="color:#4ade80;font-weight:600;">Einsparungspotenzial: 6.000–9.000 Euro/Jahr</div>
+            </div>
+        </div>
+
+        <div style="background:rgba(74,222,128,.08);border:2px solid rgba(74,222,128,.3);border-radius:12px;padding:2rem;text-align:center;margin-bottom:2rem;">
+            <div style="color:#888;font-size:.9rem;margin-bottom:.5rem;">Gesamtes Einsparpotenzial pro Jahr</div>
+            <div style="font-size:3.5rem;font-weight:700;color:#4ade80;">49.600 – 60.100 Euro</div>
+            <div style="color:#888;margin-top:.5rem;">Basierend auf echten MBS-Stundensätzen und beobachteten Problemen</div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">Zusätzlich: CNC Planer Pro — Kalkulation</div>
+            <p style="color:#888;font-size:.95rem;margin-bottom:1rem;">Bereits kalibriert mit MBS-Stundensätzen und Zuschlägen.</p>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">
+                <div style="border-left:3px solid #4ade80;padding-left:1rem;">
+                    <div style="color:#fff;font-weight:600;">Kalkulation pro Bauteil</div>
+                    <div style="color:#888;font-size:.85rem;">Heute: 45–90 Minuten</div>
+                    <div style="color:#4ade80;font-weight:600;">Mit KI: 5–15 Minuten</div>
+                </div>
+                <div style="border-left:3px solid #4ade80;padding-left:1rem;">
+                    <div style="color:#fff;font-weight:600;">Angebotserstellung</div>
+                    <div style="color:#888;font-size:.85rem;">Heute: 2–4 Stunden</div>
+                    <div style="color:#4ade80;font-weight:600;">Mit KI: 20 Minuten</div>
+                </div>
+                <div style="border-left:3px solid #4ade80;padding-left:1rem;">
+                    <div style="color:#fff;font-weight:600;">Kalkulationsgenauigkeit</div>
+                    <div style="color:#888;font-size:.85rem;">Heute: +/- 20% (Bauchgefühl)</div>
+                    <div style="color:#4ade80;font-weight:600;">Mit KI: +/- 10% (datenbasiert)</div>
+                </div>
+                <div style="border-left:3px solid #4ade80;padding-left:1rem;">
+                    <div style="color:#fff;font-weight:600;">Nachkalkulation</div>
+                    <div style="color:#888;font-size:.85rem;">Heute: selten, manuell</div>
+                    <div style="color:#4ade80;font-weight:600;">Mit KI: automatisch, Soll/Ist</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 3: Lösungen -->
+    <div class="tab-content" id="tab-loesungen">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.5rem;margin-bottom:2rem;">
+            <div class="panel" onclick="openModal('sol-cnc')" style="cursor:pointer;">
+                <div class="panel-title">CNC Planer Pro</div>
+                <p style="color:#888;font-size:.9rem;margin-bottom:.8rem;">Automatische Zuschlagskalkulation nach REFA. Fertigungsanweisung, Angebot und Nachkalkulation aus einer Eingabe.</p>
+                <div style="color:#4ade80;font-weight:600;">Kalkulationszeit: -70%</div>
+                <div style="color:#666;font-size:.85rem;margin-top:.5rem;">Bereits kalibriert mit MBS-Daten (v0.18, Pilotphase)</div>
+            </div>
+            <div class="panel" onclick="openModal('sol-ruest')" style="cursor:pointer;">
+                <div class="panel-title">Rüst-Optimierer</div>
+                <p style="color:#888;font-size:.9rem;margin-bottom:.8rem;">Gruppiert Aufträge nach Vorrichtung und Spannmittel. Minimiert unnötige Rüstwechsel durch intelligentes Clustering.</p>
+                <div style="color:#4ade80;font-weight:600;">Rüstzeit: -60 bis 70%</div>
+                <div style="color:#666;font-size:.85rem;margin-top:.5rem;">Berücksichtigt beide Standorte</div>
+            </div>
+            <div class="panel" onclick="openModal('sol-wissen')" style="cursor:pointer;">
+                <div class="panel-title">Digitales Meister-Gedächtnis</div>
+                <p style="color:#888;font-size:.9rem;margin-bottom:.8rem;">Erfahrungswerte, Materialhinweise, Toleranzen — digital erfasst und bei jedem Wiederholauftrag automatisch verfügbar.</p>
+                <div style="color:#4ade80;font-weight:600;">Wissensverlust: 0%</div>
+                <div style="color:#666;font-size:.85rem;margin-top:.5rem;">Lokal gespeichert, kein Cloud</div>
+            </div>
+            <div class="panel" onclick="openModal('sol-nc')" style="cursor:pointer;">
+                <div class="panel-title">Maschinen-Programm-Manager</div>
+                <p style="color:#888;font-size:.9rem;margin-bottom:.8rem;">Welches NC-Programm läuft wo? Wer hat welches Bauteil schon gefertigt? Automatische Empfehlungen statt Raten.</p>
+                <div style="color:#4ade80;font-weight:600;">Fehlzuordnung: -80%</div>
+                <div style="color:#666;font-size:.85rem;margin-top:.5rem;">Mitarbeiter-Kompetenz-Matrix integriert</div>
+            </div>
+            <div class="panel" onclick="openModal('sol-standort')" style="cursor:pointer;">
+                <div class="panel-title">Standort-Brücke</div>
+                <p style="color:#888;font-size:.9rem;margin-bottom:.8rem;">Zentrale Übersicht über beide Standorte. Kapazitätsabgleich, gemeinsame Wissensbasis, koordinierte Planung.</p>
+                <div style="color:#4ade80;font-weight:600;">Transparenz: 100%</div>
+                <div style="color:#666;font-size:.85rem;margin-top:.5rem;">Echtzeit-Überblick</div>
+            </div>
+            <div class="panel" onclick="openModal('sol-qa')" style="cursor:pointer;">
+                <div class="panel-title">Qualitäts-Assistent</div>
+                <p style="color:#888;font-size:.9rem;margin-bottom:.8rem;">Automatische Soll-Ist-Vergleiche, Deckungsbeitragsrechnung pro Auftrag, Feedback-Schleife in die Kalkulation.</p>
+                <div style="color:#4ade80;font-weight:600;">Nachkalkulation: automatisch</div>
+                <div style="color:#666;font-size:.85rem;margin-top:.5rem;">Lernt aus jedem Auftrag</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 4: Angebot -->
+    <div class="tab-content" id="tab-angebot">
+        <div class="panel">
+            <div class="panel-title">Vorgehen — drei Phasen</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;margin-top:1rem;">
+                <div style="background:rgba(201,168,76,.03);border:1px solid rgba(201,168,76,.15);border-radius:10px;padding:1.5rem;">
+                    <div style="color:#888;font-size:.8rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:.5rem;">Phase 1</div>
+                    <div style="color:#c9a84c;font-size:1.2rem;font-weight:600;margin-bottom:.8rem;">Analyse und Konzept</div>
+                    <div style="color:#666;margin-bottom:1rem;">1 bis 2 Wochen</div>
+                    <ul style="color:#ccc;padding-left:1.2rem;line-height:1.8;">
+                        <li>Prozessaufnahme an beiden Standorten</li>
+                        <li>Interviews mit Mitarbeitern und Meistern</li>
+                        <li>Maschinenpark und NC-Landschaft erfassen</li>
+                        <li>ROI-Berechnung mit echten Daten validieren</li>
+                    </ul>
+                    <p style="color:#4ade80;margin-top:1rem;font-size:.9rem;">Ergebnis: Maßnahmenplan mit priorisierten Hebeln</p>
+                </div>
+                <div style="background:rgba(201,168,76,.06);border:2px solid rgba(201,168,76,.4);border-radius:10px;padding:1.5rem;">
+                    <div style="color:#c9a84c;font-size:.8rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:.5rem;">Phase 2 — empfohlen</div>
+                    <div style="color:#c9a84c;font-size:1.2rem;font-weight:600;margin-bottom:.8rem;">Pilot mit CNC Planer Pro</div>
+                    <div style="color:#666;margin-bottom:1rem;">3 bis 4 Wochen</div>
+                    <ul style="color:#ccc;padding-left:1.2rem;line-height:1.8;">
+                        <li>CNC Planer Pro mit MBS-Daten kalibrieren</li>
+                        <li>Rüst-Optimierer für Top-20-Bauteile einrichten</li>
+                        <li>Digitale Wissensdatenbank starten</li>
+                        <li>Schulung der Mitarbeiter</li>
+                        <li>4 Wochen Begleitung im Betrieb</li>
+                    </ul>
+                    <p style="color:#4ade80;margin-top:1rem;font-size:.9rem;">Ergebnis: Laufendes System, messbare Zeiteinsparung</p>
+                </div>
+                <div style="background:rgba(201,168,76,.03);border:1px solid rgba(201,168,76,.15);border-radius:10px;padding:1.5rem;">
+                    <div style="color:#888;font-size:.8rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:.5rem;">Phase 3</div>
+                    <div style="color:#c9a84c;font-size:1.2rem;font-weight:600;margin-bottom:.8rem;">Laufende Optimierung</div>
+                    <div style="color:#666;margin-bottom:1rem;">Nach Bedarf</div>
+                    <ul style="color:#ccc;padding-left:1.2rem;line-height:1.8;">
+                        <li>System-Updates und neue Funktionen</li>
+                        <li>Wissensdatenbank erweitern</li>
+                        <li>Standort-Brücke vollständig ausrollen</li>
+                        <li>Quartalsbericht mit Kennzahlen</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">Bereits im Einsatz</div>
+            <p style="color:#888;font-size:.95rem;margin-bottom:1rem;">CNC Planer Pro v0.18 ist bereits mit MBS-Stundensätzen und Zuschlägen kalibriert.</p>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">
+                <div style="background:rgba(74,222,128,.05);border:1px solid rgba(74,222,128,.2);border-radius:8px;padding:1rem;text-align:center;">
+                    <div style="color:#4ade80;font-weight:700;font-size:1.8rem;">6.117</div>
+                    <div style="color:#888;font-size:.85rem;">Zeilen Code</div>
+                </div>
+                <div style="background:rgba(74,222,128,.05);border:1px solid rgba(74,222,128,.2);border-radius:8px;padding:1rem;text-align:center;">
+                    <div style="color:#4ade80;font-weight:700;font-size:1.8rem;">10</div>
+                    <div style="color:#888;font-size:.85rem;">Funktionsbereiche</div>
+                </div>
+                <div style="background:rgba(74,222,128,.05);border:1px solid rgba(74,222,128,.2);border-radius:8px;padding:1rem;text-align:center;">
+                    <div style="color:#4ade80;font-weight:700;font-size:1.8rem;">3</div>
+                    <div style="color:#888;font-size:.85rem;">Demo-Bauteile</div>
+                </div>
+                <div style="background:rgba(74,222,128,.05);border:1px solid rgba(74,222,128,.2);border-radius:8px;padding:1rem;text-align:center;">
+                    <div style="color:#4ade80;font-weight:700;font-size:1.8rem;">MBS</div>
+                    <div style="color:#888;font-size:.85rem;">Kalibriert</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">Fördermöglichkeiten</div>
+            <p style="color:#888;font-size:.95rem;margin-bottom:1rem;">Bis zu 60% der Kosten können gefördert werden.</p>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem;">
+                <div style="background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.15);border-radius:8px;padding:1.2rem;">
+                    <div style="color:#c9a84c;font-weight:600;">Sachsen EFRE</div>
+                    <div style="color:#ccc;font-size:.9rem;">Bis 60% Zuschuss für KMU-Digitalisierung</div>
+                </div>
+                <div style="background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.15);border-radius:8px;padding:1.2rem;">
+                    <div style="color:#c9a84c;font-weight:600;">go-digital (BMWi)</div>
+                    <div style="color:#ccc;font-size:.9rem;">Beratungsförderung Digitalisierung</div>
+                </div>
+            </div>
+            <p style="color:#888;font-size:.9rem;margin-top:1rem;">Unterstützung beim Förderantrag ist im Angebot enthalten.</p>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">Warum Florian Ziesche</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;margin-top:.5rem;">
+                <div style="border-left:3px solid #c9a84c;padding-left:1.2rem;">
+                    <div style="color:#fff;font-weight:600;">Ehemaliger CEO und Geschäftsführer</div>
+                    <div style="color:#888;font-size:.9rem;">5 Jahre Führung in Tech-Unternehmen. Versteht, was ein Betrieb braucht.</div>
+                </div>
+                <div style="border-left:3px solid #c9a84c;padding-left:1.2rem;">
+                    <div style="color:#fff;font-weight:600;">Baut selbst — kein PowerPoint-Berater</div>
+                    <div style="color:#888;font-size:.9rem;">CNC Planer Pro ist selbst entwickelt. Technische Tiefe in KI, LLMs und Automatisierung.</div>
+                </div>
+                <div style="border-left:3px solid #c9a84c;padding-left:1.2rem;">
+                    <div style="color:#fff;font-weight:600;">Bereits validiert bei MBS</div>
+                    <div style="color:#888;font-size:.9rem;">Kalibriert mit echten Betriebsdaten. Kennt die Maschinen, die Stundensätze, die Zuschläge.</div>
+                </div>
+                <div style="border-left:3px solid #c9a84c;padding-left:1.2rem;">
+                    <div style="color:#fff;font-weight:600;">Lokal und DSGVO-konform</div>
+                    <div style="color:#888;font-size:.9rem;">Alle Daten bleiben im Betrieb. Keine Cloud. Keine Abhängigkeit von externen Diensten.</div>
+                </div>
+            </div>
+            <div style="text-align:center;margin-top:2rem;color:#888;">
+                <div style="font-size:1.1rem;margin-bottom:.5rem;"><strong style="color:#fff;">Florian Ziesche</strong> — KI-Beratung für Fertigung und Mittelstand</div>
+                <div>+49 151 230 39 208 — florian@ainaryventures.com — ainaryventures.com</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="modal-ruest"><div class="modal"><button class="close-btn" onclick="closeModals()">Schließen</button>
+        <h2>Rüstzeit-Verschwendung — Detailanalyse</h2>
+        <h3>Ist-Zustand</h3>
+        <p>Aufträge werden in der Reihenfolge abgearbeitet, wie sie eingehen — nicht nach Rüstähnlichkeit. Das bedeutet: Schraubstock einrichten, Bauteil fertigen, Schraubstock abrüsten. Nächster Auftrag: gleicher Schraubstock wieder einrichten.</p>
+        <h3>Typisches Beispiel</h3>
+        <p>Auftrag A: Verbindungsplatte, Maschinenschraubstock 125mm. Auftrag B: Gehäusedeckel, Backenfutter. Auftrag C: Adapterplatte, Maschinenschraubstock 125mm. Statt A dann C zu fertigen (gleiche Einrichtung), wird B dazwischengeschoben.</p>
+        <h3>Berechnung</h3>
+        <table><tr><th>Position</th><th>Wert</th></tr>
+        <tr><td>Unnötige Rüstvorgänge pro Tag</td><td>~4</td></tr>
+        <tr><td>Zeit pro Rüstvorgang</td><td>~30 Minuten</td></tr>
+        <tr><td>Verschwendung pro Tag</td><td>2 Stunden</td></tr>
+        <tr><td>Arbeitstage pro Jahr</td><td>250</td></tr>
+        <tr><td>Verschwendung pro Jahr</td><td>500 Stunden</td></tr>
+        <tr><td>CNC-Stundensatz</td><td>70 Euro</td></tr>
+        <tr><td><strong>Gesamtverschwendung</strong></td><td><strong>35.000 Euro/Jahr</strong></td></tr></table>
+        <div class="stamp">Werte sind Schätzungen basierend auf Mitarbeiter-Feedback. Exakte Messung erfolgt in Phase 1.</div>
+    </div></div>
+
+    <div class="modal-overlay" id="modal-nc"><div class="modal"><button class="close-btn" onclick="closeModals()">Schließen</button>
+        <h2>NC-Programm-Fehlzuordnung — Detailanalyse</h2>
+        <h3>Ist-Zustand</h3>
+        <p>Ein NC-Programm wird auf Maschine 3 eingerichtet und erfolgreich getestet. Der nächste Auftrag für dasselbe Bauteil wird aber an Maschine 5 vergeben — oder an einen Mitarbeiter, der dieses Bauteil noch nie gefertigt hat.</p>
+        <h3>Konsequenzen</h3>
+        <ul><li>Neueinrichtung auf anderer Maschine: 1–2 Stunden</li><li>Einarbeitung neuer Mitarbeiter: Fehlerrisiko, Ausschuss</li><li>Programmanpassungen für andere Maschine notwendig</li><li>Kein Überblick, welche Programme wo laufen</li></ul>
+        <h3>Berechnung</h3>
+        <table><tr><th>Position</th><th>Wert</th></tr>
+        <tr><td>Fehlzuordnungen pro Woche</td><td>~3</td></tr>
+        <tr><td>Zeit pro Neueinrichtung</td><td>~1,5 Stunden</td></tr>
+        <tr><td>Verschwendung pro Woche</td><td>4,5 Stunden</td></tr>
+        <tr><td>Wochen pro Jahr</td><td>50</td></tr>
+        <tr><td><strong>Gesamtverschwendung</strong></td><td><strong>15.750 Euro/Jahr</strong></td></tr></table>
+        <div class="stamp">Ohne Ausschuss- und Qualitätskosten gerechnet. Tatsächlicher Wert wahrscheinlich höher.</div>
+    </div></div>
+
+    <div class="modal-overlay" id="modal-wissen"><div class="modal"><button class="close-btn" onclick="closeModals()">Schließen</button>
+        <h2>Wissenstransfer — Handschriftliche Kommentare</h2>
+        <h3>Ist-Zustand</h3>
+        <p>Erfahrene Mitarbeiter schreiben wichtige Hinweise mit Stift auf Auftragsblätter: „Material muss vorgewärmt werden", „Toleranz hier enger als Zeichnung", „Werkzeug X hält bei diesem Material nicht". Diese Hinweise verschwinden nach der Fertigung.</p>
+        <h3>Konsequenzen</h3>
+        <ul><li>Bei Wiederholaufträgen: gleiche Fehler erneut</li><li>Neue Mitarbeiter haben keinen Zugang zu diesem Wissen</li><li>Wenn erfahrene Mitarbeiter in Rente gehen: Jahrzehnte Erfahrung verschwinden</li><li>Qualitätsprobleme und Nacharbeit</li></ul>
+        <h3>Berechnung</h3>
+        <p>Geschätzt 2 Nacharbeiten pro Woche durch fehlende Hinweise, je 2 Stunden bei 70 Euro/h = <strong>14.000 Euro pro Jahr</strong>. Der eigentliche Wert ist der Erhalt von Expertenwissen, der nicht in Euro messbar ist.</p>
+        <div class="stamp">Besonders kritisch bei MBS: Generationswechsel in der Fertigung steht bevor.</div>
+    </div></div>
+
+    <div class="modal-overlay" id="modal-standort"><div class="modal"><button class="close-btn" onclick="closeModals()">Schließen</button>
+        <h2>Standort-Koordination — Zwei Standorte, keine Abstimmung</h2>
+        <h3>Ist-Zustand</h3>
+        <p>MBS betreibt zwei Fertigungsstandorte. Am zweiten Standort werden teilweise komplexere Bauteile geplant und gefertigt, ohne dass der Hauptstandort davon weiß. Es gibt keine gemeinsame Planungsübersicht.</p>
+        <h3>Konsequenzen</h3>
+        <ul><li>Doppelte Arbeitsvorbereitung für ähnliche Bauteile</li><li>Suboptimale Maschinenauslastung: Eine Maschine steht leer, andere überlastet</li><li>Kein Wissenstransfer zwischen Standorten</li><li>Keine Möglichkeit, Aufträge zum effizienteren Standort zu verschieben</li></ul>
+        <div class="stamp">Geschätzter Verlust: 8.000–12.000 Euro/Jahr durch Ineffizienz.</div>
+    </div></div>
+
+    <div class="modal-overlay" id="modal-sol-ruest"><div class="modal"><button class="close-btn" onclick="closeModals()">Schließen</button>
+        <h2>Lösung: Rüst-Optimierer</h2>
+        <h3>Funktionsweise</h3>
+        <ul><li>KI analysiert ausstehende Aufträge nach Vorrichtung, Spannmittel und Werkzeug</li><li>Gruppiert Aufträge automatisch: Alle Teile mit Maschinenschraubstock 125mm hintereinander</li><li>Berücksichtigt Liefertermine, Prioritäten und Maschinenkapazität</li><li>Tagesplan wird optimiert: Minimale Rüstwechsel bei maximaler Termintreue</li></ul>
+        <h3>Erwarteter Nutzen</h3>
+        <table><tr><th>Kennzahl</th><th>Heute</th><th>Mit KI</th></tr>
+        <tr><td>Unnötige Rüstvorgänge</td><td>~4 pro Tag</td><td>1–2 pro Tag</td></tr>
+        <tr><td>Rüstzeit-Anteil</td><td>~20%</td><td>~8%</td></tr>
+        <tr><td>Einsparung</td><td>—</td><td>21.000–24.500 Euro/Jahr</td></tr></table>
+        <div class="stamp">Integration mit CNC Planer Pro: Optimierte Reihenfolge fließt direkt in Fertigungsanweisungen.</div>
+    </div></div>
+
+    <div class="modal-overlay" id="modal-sol-nc"><div class="modal"><button class="close-btn" onclick="closeModals()">Schließen</button>
+        <h2>Lösung: Maschinen-Programm-Manager</h2>
+        <ul><li>Zentrale Datenbank: Welches NC-Programm läuft auf welcher Maschine</li><li>Automatische Empfehlung: „Programm X ist auf Maschine 3 eingerichtet — Maschine 3 ist frei"</li><li>Mitarbeiter-Kompetenz-Matrix: Wer hat welches Bauteil schon erfolgreich gefertigt</li><li>Warnung bei Fehlzuordnung: „Achtung: Dieses Programm wurde für Maschine 3 geschrieben, nicht Maschine 5"</li></ul>
+        <div class="stamp">Einsparungspotenzial: ~12.600 Euro/Jahr. Zusätzlich: Weniger Ausschuss und Qualitätsprobleme.</div>
+    </div></div>
+
+    <div class="modal-overlay" id="modal-sol-wissen"><div class="modal"><button class="close-btn" onclick="closeModals()">Schließen</button>
+        <h2>Lösung: Digitales Meister-Gedächtnis</h2>
+        <h3>So funktioniert es</h3>
+        <ul><li>Mitarbeiter diktiert oder tippt Hinweis nach Fertigung ein (30 Sekunden)</li><li>KI verknüpft den Hinweis automatisch mit Bauteil, Material, Maschine und Werkzeug</li><li>Bei Wiederholauftrag: System zeigt alle bisherigen Hinweise automatisch an</li><li>Neuer Mitarbeiter kann fragen: „Was muss ich bei diesem Bauteil beachten?"</li><li>Lokal gespeichert (Obsidian), kein Betriebsgeheimnis verlässt das Unternehmen</li></ul>
+        <h3>Besonderer Wert</h3>
+        <p>Wenn ein erfahrener Meister in Rente geht, bleiben seine 30 Jahre Erfahrung digital erhalten. Kosten einer Fehlbesetzung oder eines Wissensverlust: 30.000–50.000 Euro. Kosten des Systems: ein Bruchteil davon.</p>
+        <div class="stamp">Einsparungspotenzial: 10.000–14.000 Euro/Jahr + Wissenssicherung für die nächste Generation.</div>
+    </div></div>
+
+    <div class="modal-overlay" id="modal-sol-standort"><div class="modal"><button class="close-btn" onclick="closeModals()">Schließen</button>
+        <h2>Lösung: Standort-Brücke</h2>
+        <ul><li>Zentrale Planungsübersicht: Was wird an welchem Standort gefertigt</li><li>Kapazitätsabgleich: Welche Maschinen sind frei, welche überlastet</li><li>Automatische Empfehlung: „Auftrag X sollte an Standort 2, Maschine Y ist frei und Programm ist dort eingerichtet"</li><li>Gemeinsame Wissensbasis: Erfahrungswerte von beiden Standorten verfügbar</li><li>Keine doppelte Arbeitsvorbereitung mehr</li></ul>
+        <div class="stamp">Einsparungspotenzial: 6.000–9.000 Euro/Jahr. Bessere Auslastung, weniger Leerlauf.</div>
+    </div></div>
+
+    <div class="modal-overlay" id="modal-sol-cnc"><div class="modal"><button class="close-btn" onclick="closeModals()">Schließen</button>
+        <h2>CNC Planer Pro — Details</h2>
+        <h3>Bereits kalibriert mit MBS-Daten</h3>
+        <table><tr><th>Parameter</th><th>MBS-Wert</th></tr>
+        <tr><td>CNC-Stundensatz</td><td>70 Euro/h</td></tr>
+        <tr><td>Sägen-Stundensatz</td><td>45 Euro/h</td></tr>
+        <tr><td>Entgraten-Stundensatz</td><td>31 Euro/h</td></tr>
+        <tr><td>Materialgemeinkosten (MGK)</td><td>5%</td></tr>
+        <tr><td>Arbeitsvorbereitung (AV)</td><td>12%</td></tr>
+        <tr><td>Verwaltungsgemeinkosten (VwGK)</td><td>10%</td></tr>
+        <tr><td>Vertriebsgemeinkosten (VtGK)</td><td>5%</td></tr>
+        <tr><td>Gewinnzuschlag</td><td>8%</td></tr></table>
+        <h3>Funktionen</h3>
+        <ul><li>Zuschlagskalkulation nach REFA</li><li>Automatische Fertigungsanweisung</li><li>Druckfertiges Angebot</li><li>Nachkalkulation mit Soll-Ist-Vergleich</li><li>Deckungsbeitragsrechnung</li></ul>
+        <div class="stamp">Version 0.18 — 6.117 Zeilen Code — 3 Demo-Bauteile — Einzelne HTML-Datei, keine Abhängigkeiten.</div>
+    </div></div>
+
+    <div class="modal-overlay" id="modal-sol-qa"><div class="modal"><button class="close-btn" onclick="closeModals()">Schließen</button>
+        <h2>Qualitäts-Assistent</h2>
+        <ul><li>Automatische Nachkalkulation: Ist-Zeiten werden mit Soll-Zeiten verglichen</li><li>Deckungsbeitragsrechnung pro Auftrag: Welche Aufträge lohnen sich, welche nicht</li><li>Reklamations-Tracking: Muster erkennen, bevor sie teuer werden</li><li>Feedback-Schleife: Erfahrungen aus der Fertigung fließen zurück in die Kalkulation</li><li>Über Zeit wird das System genauer — jeder Auftrag verbessert die Vorhersage</li></ul>
+        <div class="stamp">Besonders wertvoll in Kombination mit dem Meister-Gedächtnis und CNC Planer Pro.</div>
+    </div></div>
+
+    <footer>
+        <p style="color:#c9a84c;font-weight:500;">Konzept: Florian Ziesche — KI-Beratung für Fertigung und Mittelstand</p>
+        <p>Alle Berechnungen basieren auf Mitarbeiter-Feedback und MBS-Betriebsdaten. Exakte Validierung in Phase 1.</p>
+        <p><a href="mailto:florian@ainaryventures.com">florian@ainaryventures.com</a> | <a href="tel:+4915123039208">+49 151 230 39 208</a></p>
+    </footer>
+</div>
+
+<script>
+    document.getElementById('datetime').textContent = new Date().toLocaleDateString('de-DE',{weekday:'long',year:'numeric',month:'long',day:'numeric'}) + ' — ' + new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}) + ' Uhr';
+
+    function switchTab(name){
+        document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        document.getElementById('tab-'+name).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    function openModal(id){const m=document.getElementById('modal-'+id);if(m)m.classList.add('active');}
+    function closeModals(){document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('active'));}
+    document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',function(e){if(e.target===this)closeModals();});});
+    document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModals();});
+</script>
+</body>
+</html>

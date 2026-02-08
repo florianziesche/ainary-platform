@@ -1,0 +1,2100 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KI-Assistent — Bürgermeister Glashütte</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            line-height: 1.6;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            opacity: 0;
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(201, 168, 76, 0.2);
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .coat-of-arms {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #c9a84c, #8b7332);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #c9a84c;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #888;
+            margin-bottom: 0.5rem;
+        }
+
+        .datetime {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .kpi-card {
+            background: linear-gradient(135deg, #1a1a1a, #151515);
+            border: 1px solid rgba(201, 168, 76, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            animation: slideUp 0.6s ease-out backwards;
+        }
+
+        .kpi-card:nth-child(1) { animation-delay: 0.1s; }
+        .kpi-card:nth-child(2) { animation-delay: 0.2s; }
+        .kpi-card:nth-child(3) { animation-delay: 0.3s; }
+        .kpi-card:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(201, 168, 76, 0.5);
+            box-shadow: 0 10px 30px rgba(201, 168, 76, 0.1);
+        }
+
+        .kpi-label {
+            font-size: 0.85rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #c9a84c;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-change {
+            font-size: 0.9rem;
+            color: #4ade80;
+        }
+
+        .kpi-change.negative {
+            color: #f87171;
+        }
+
+        /* Main Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .panel {
+            background: linear-gradient(135deg, #1a1a1a, #151515);
+            border: 1px solid rgba(201, 168, 76, 0.2);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            animation: slideUp 0.6s ease-out backwards;
+            animation-delay: 0.5s;
+        }
+
+        .panel:hover {
+            border-color: rgba(201, 168, 76, 0.4);
+        }
+
+        .panel-title {
+            font-size: 1.3rem;
+            color: #c9a84c;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .panel-icon {
+            font-size: 1.5rem;
+        }
+
+        /* Briefing */
+        .briefing-greeting {
+            font-size: 1.1rem;
+            color: #c9a84c;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .briefing-item {
+            background: rgba(201, 168, 76, 0.05);
+            border-left: 3px solid #c9a84c;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .briefing-item:hover {
+            background: rgba(201, 168, 76, 0.1);
+            transform: translateX(5px);
+        }
+
+        .briefing-time {
+            font-weight: 700;
+            color: #c9a84c;
+            margin-bottom: 0.3rem;
+        }
+
+        .briefing-title {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .briefing-detail {
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .briefing-notice {
+            background: rgba(248, 113, 113, 0.1);
+            border-left: 3px solid #f87171;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+        }
+
+        .briefing-notice .briefing-title {
+            color: #f87171;
+        }
+
+        /* Tasks Table */
+        .task-item {
+            background: rgba(201, 168, 76, 0.05);
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .task-item:hover {
+            background: rgba(201, 168, 76, 0.1);
+            transform: translateX(5px);
+        }
+
+        .task-info {
+            flex: 1;
+        }
+
+        .task-name {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .task-status {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .task-priority {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .priority-high {
+            background: #f87171;
+            box-shadow: 0 0 10px rgba(248, 113, 113, 0.5);
+        }
+
+        .priority-medium {
+            background: #fbbf24;
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+        }
+
+        .priority-low {
+            background: #4ade80;
+            box-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+        }
+
+        /* Bottom Grid */
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Search Bar */
+        .search-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(201, 168, 76, 0.05);
+            border: 1px solid rgba(201, 168, 76, 0.3);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: #c9a84c;
+            background: rgba(201, 168, 76, 0.1);
+        }
+
+        .search-bar::placeholder {
+            color: #666;
+        }
+
+        .quick-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .quick-link {
+            background: rgba(201, 168, 76, 0.1);
+            border: 1px solid rgba(201, 168, 76, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-link:hover {
+            background: rgba(201, 168, 76, 0.2);
+            border-color: #c9a84c;
+            transform: translateY(-2px);
+        }
+
+        .knowledge-stats {
+            color: #c9a84c;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .recent-searches {
+            margin-top: 1rem;
+        }
+
+        .recent-label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .search-tag {
+            display: inline-block;
+            background: rgba(201, 168, 76, 0.1);
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: #888;
+        }
+
+        /* ROI Panel */
+        .roi-item {
+            background: rgba(201, 168, 76, 0.05);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+            border-left: 3px solid #4ade80;
+        }
+
+        .roi-metric {
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 0.3rem;
+        }
+
+        .roi-value {
+            font-size: 1.2rem;
+            color: #4ade80;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .roi-source {
+            font-size: 0.8rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .roi-highlight {
+            background: rgba(201, 168, 76, 0.1);
+            border-left: 3px solid #c9a84c;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 4px;
+        }
+
+        .roi-highlight p {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .roi-highlight p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid rgba(201, 168, 76, 0.2);
+            margin-top: 2rem;
+        }
+
+        .footer-concept {
+            font-size: 1.1rem;
+            color: #c9a84c;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .footer-disclaimer {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-contact {
+            color: #888;
+            font-size: 0.95rem;
+        }
+
+        .footer-contact a {
+            color: #c9a84c;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .footer-contact a:hover {
+            color: #fff;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: #1a1a1a;
+            border: 1px solid rgba(201, 168, 76, 0.4);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 800px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .modal h2 { color: #c9a84c; margin-bottom: 1rem; font-size: 1.4rem; }
+        .modal h3 { color: #c9a84c; margin: 1rem 0 0.5rem; font-size: 1.1rem; }
+        .modal p, .modal li { color: #ccc; font-size: 0.95rem; line-height: 1.7; margin-bottom: 0.5rem; }
+        .modal ul { padding-left: 1.5rem; }
+        .modal .close-btn {
+            position: absolute; top: 1rem; right: 1rem;
+            background: none; border: 1px solid rgba(201,168,76,0.3);
+            color: #c9a84c; padding: 0.3rem 0.8rem; border-radius: 6px;
+            cursor: pointer; font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        .modal .close-btn:hover { background: rgba(201,168,76,0.2); }
+        .modal table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        .modal th, .modal td { padding: 0.6rem; text-align: left; border-bottom: 1px solid rgba(201,168,76,0.15); font-size: 0.9rem; }
+        .modal th { color: #c9a84c; }
+        .modal td { color: #ccc; }
+        .modal .badge { display: inline-block; background: rgba(201,168,76,0.15); color: #c9a84c; padding: 0.2rem 0.6rem; border-radius: 10px; font-size: 0.8rem; }
+        .modal .stamp { text-align: center; color: #666; font-size: 0.8rem; margin-top: 1.5rem; border-top: 1px solid rgba(201,168,76,0.15); padding-top: 1rem; }
+
+        /* Clickable items */
+        .clickable { cursor: pointer; }
+        .clickable:hover { background: rgba(201, 168, 76, 0.15) !important; }
+
+        /* Andreas Section */
+        .andreas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .andreas-card {
+            background: rgba(201, 168, 76, 0.05);
+            border: 1px solid rgba(201, 168, 76, 0.15);
+            border-radius: 8px;
+            padding: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .andreas-card:hover {
+            background: rgba(201, 168, 76, 0.12);
+            border-color: rgba(201, 168, 76, 0.4);
+            transform: translateY(-3px);
+        }
+        .andreas-card .card-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+        .andreas-card .card-title { font-weight: 600; color: #fff; margin-bottom: 0.3rem; }
+        .andreas-card .card-desc { font-size: 0.85rem; color: #888; }
+        .andreas-card .card-saving { color: #4ade80; font-weight: 600; font-size: 0.9rem; margin-top: 0.5rem; }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            gap: 0;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid rgba(201, 168, 76, 0.2);
+        }
+        .tab-btn {
+            padding: 1rem 1.8rem;
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            font-family: inherit;
+        }
+        .tab-btn:hover { color: #c9a84c; }
+        .tab-btn.active {
+            color: #c9a84c;
+            border-bottom-color: #c9a84c;
+        }
+        .tab-btn .tab-icon { margin-right: 0.5rem; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Wahl Intel styles */
+        .sentiment-bar {
+            height: 24px;
+            background: #1a1a1a;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            margin: 0.5rem 0;
+        }
+        .sentiment-bar .pos { background: linear-gradient(90deg, #22c55e, #4ade80); }
+        .sentiment-bar .neu { background: #666; }
+        .sentiment-bar .neg { background: linear-gradient(90deg, #f87171, #ef4444); }
+        .topic-chip {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin: 0.3rem;
+            border: 1px solid rgba(201, 168, 76, 0.2);
+            color: #ccc;
+            cursor: default;
+            transition: all 0.3s ease;
+        }
+        .topic-chip:hover { border-color: #c9a84c; color: #fff; }
+        .topic-chip.hot { border-color: #f87171; color: #f87171; }
+        .topic-chip.warm { border-color: #fbbf24; color: #fbbf24; }
+        .topic-chip.cool { border-color: #60a5fa; color: #60a5fa; }
+        .topic-chip.resolved { border-color: #4ade80; color: #4ade80; }
+        .timeline-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(201, 168, 76, 0.08);
+        }
+        .timeline-dot {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            background: #c9a84c;
+            margin-top: 0.4rem;
+            flex-shrink: 0;
+        }
+        .timeline-dot.green { background: #4ade80; }
+        .timeline-dot.red { background: #f87171; }
+        .timeline-dot.gold { background: #c9a84c; }
+        .timeline-date { color: #666; font-size: 0.8rem; }
+        .timeline-text { color: #ccc; font-size: 0.95rem; }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .stat-box {
+            background: rgba(201, 168, 76, 0.05);
+            border: 1px solid rgba(201, 168, 76, 0.15);
+            border-radius: 8px;
+            padding: 1.2rem;
+            text-align: center;
+        }
+        .stat-box .stat-num { font-size: 2rem; font-weight: 700; color: #c9a84c; }
+        .stat-box .stat-label { font-size: 0.8rem; color: #888; margin-top: 0.3rem; }
+        .campaign-idea {
+            background: rgba(201, 168, 76, 0.05);
+            border-left: 3px solid #c9a84c;
+            padding: 1rem 1.5rem;
+            margin: 0.8rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .campaign-idea .idea-title { font-weight: 600; color: #fff; margin-bottom: 0.3rem; }
+        .campaign-idea .idea-desc { font-size: 0.9rem; color: #888; }
+        .campaign-idea .idea-impact { color: #4ade80; font-size: 0.85rem; margin-top: 0.3rem; }
+        .competitor-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: rgba(201, 168, 76, 0.03);
+            border: 1px solid rgba(201, 168, 76, 0.1);
+            border-radius: 8px;
+            margin: 0.5rem 0;
+        }
+        .competitor-card .name { font-weight: 600; color: #fff; }
+        .competitor-card .party { font-size: 0.85rem; color: #888; }
+        .competitor-card .threat { padding: 0.2rem 0.8rem; border-radius: 12px; font-size: 0.8rem; }
+        .threat-low { background: rgba(74,222,128,0.15); color: #4ade80; }
+        .threat-mid { background: rgba(251,191,36,0.15); color: #fbbf24; }
+        .threat-high { background: rgba(248,113,113,0.15); color: #f87171; }
+        .ortsteil-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 0.5rem;
+        }
+        .ortsteil-item {
+            background: rgba(201, 168, 76, 0.05);
+            border: 1px solid rgba(201, 168, 76, 0.1);
+            border-radius: 6px;
+            padding: 0.6rem 0.8rem;
+            font-size: 0.85rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .ortsteil-item:hover { border-color: #c9a84c; }
+        .ortsteil-item .ot-name { font-weight: 600; color: #fff; }
+        .ortsteil-item .ot-mood { font-size: 0.75rem; margin-top: 0.2rem; }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .main-grid,
+            .bottom-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .kpi-value {
+                font-size: 2rem;
+            }
+
+            .panel {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="header-top">
+                <div class="coat-of-arms">G</div>
+            </div>
+            <h1>KI-Assistent — Bürgermeister Glashütte</h1>
+            <p class="subtitle">Ihr persönliches Cockpit für die Verwaltung</p>
+            <p class="datetime" id="datetime"></p>
+        </header>
+
+        <!-- Tab Navigation -->
+        <nav class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab('verwaltung')">Verwaltung</button>
+            <button class="tab-btn" onclick="switchTab('angebot')">Angebot</button>
+            <button class="tab-btn" onclick="switchTab('betriebe')">Wirtschaft</button>
+            <button class="tab-btn" onclick="switchTab('wahl')">Kampagne</button>
+        </nav>
+
+        <!-- TAB: Verwaltung -->
+        <div class="tab-content active" id="tab-verwaltung">
+
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">Offene Vorgänge</div>
+                <div class="kpi-value">47</div>
+                <div class="kpi-change">↓ 12% vs. Vormonat</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Bearbeitungszeit Ø</div>
+                <div class="kpi-value">2,3 <span style="font-size: 1.2rem;">Tage</span></div>
+                <div class="kpi-change">↓ 35% mit KI</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Bürgeranfragen beantwortet</div>
+                <div class="kpi-value">89%</div>
+                <div class="kpi-change">automatisch (24/7)</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Geschätzte Zeitersparnis</div>
+                <div class="kpi-value">120h</div>
+                <div class="kpi-change">pro Monat</div>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Tages-Briefing -->
+            <div class="panel">
+                <div class="panel-title">
+                    
+                    Tages-Briefing
+                </div>
+                <div class="briefing-greeting">
+                    Guten Morgen, Herr Gleißberg. Heute 3 Termine, 2 dringend.
+                </div>
+
+                <div class="briefing-item">
+                    <div class="briefing-time">09:00 Uhr</div>
+                    <div class="briefing-title">Bauausschuss</div>
+                    <div class="briefing-detail">Tagesordnung + Beschlussvorlagen bereitgestellt</div>
+                </div>
+
+                <div class="briefing-item">
+                    <div class="briefing-time">11:00 Uhr</div>
+                    <div class="briefing-title">Besuch Landrat</div>
+                    <div class="briefing-detail">Talking Points + letzte Beschlüsse zusammengefasst</div>
+                </div>
+
+                <div class="briefing-item">
+                    <div class="briefing-time">14:00 Uhr</div>
+                    <div class="briefing-title">Bürgersprechstunde</div>
+                    <div class="briefing-detail">5 Anliegen vorgeprüft, Akten bereitgestellt</div>
+                </div>
+
+                <div class="briefing-notice">
+                    <div class="briefing-title"> Dringend</div>
+                    <div class="briefing-detail">Ausschreibung Straßensanierung Schlottwitz läuft in 5 Tagen ab — Entwurf liegt bereit</div>
+                </div>
+
+                <div class="briefing-item">
+                    <div class="briefing-title"> Hinweis</div>
+                    <div class="briefing-detail">3 neue Förderprogramme relevant für Glashütte identifiziert</div>
+                </div>
+            </div>
+
+            <!-- Aufgaben & Ausschreibungen -->
+            <div class="panel">
+                <div class="panel-title">
+                    
+                    Aufgaben & Ausschreibungen
+                </div>
+
+                <div class="task-item">
+                    <div class="task-info">
+                        <div class="task-name">Ausschreibung Straßensanierung</div>
+                        <div class="task-status">Entwurf fertig, Prüfung ausstehend</div>
+                    </div>
+                    <div class="task-priority priority-high"></div>
+                </div>
+
+                <div class="task-item">
+                    <div class="task-info">
+                        <div class="task-name">Beschlussvorlage Kita-Erweiterung</div>
+                        <div class="task-status">KI-Entwurf erstellt</div>
+                    </div>
+                    <div class="task-priority priority-medium"></div>
+                </div>
+
+                <div class="task-item">
+                    <div class="task-info">
+                        <div class="task-name">Antwort Bürgeranfrage Lebensmittelmarkt</div>
+                        <div class="task-status">Draft bereit</div>
+                    </div>
+                    <div class="task-priority priority-medium"></div>
+                </div>
+
+                <div class="task-item">
+                    <div class="task-info">
+                        <div class="task-name">Haushaltsbericht Q1</div>
+                        <div class="task-status">Daten aufbereitet</div>
+                    </div>
+                    <div class="task-priority priority-low"></div>
+                </div>
+
+                <div class="task-item">
+                    <div class="task-info">
+                        <div class="task-name">Förderantrag EFRE Digitalisierung</div>
+                        <div class="task-status">80% ausgefüllt</div>
+                    </div>
+                    <div class="task-priority priority-medium"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Grid -->
+        <div class="bottom-grid">
+            <!-- Second Brain / Wissensdatenbank -->
+            <div class="panel">
+                <div class="panel-title">
+                    
+                    Second Brain / Wissensdatenbank
+                </div>
+
+                <div class="search-container">
+                    <input type="text" class="search-bar" placeholder="Suche in allen Verwaltungsdokumenten...">
+                </div>
+
+                <div class="knowledge-stats">
+                     4.328 Dokumente indexiert, 100% durchsuchbar
+                </div>
+
+                <div class="quick-links">
+                    <div class="quick-link">Letzte Stadtratsbeschlüsse</div>
+                    <div class="quick-link">Haushaltssatzung</div>
+                    <div class="quick-link">Bebauungspläne</div>
+                    <div class="quick-link">Satzungen</div>
+                </div>
+
+                <div class="recent-searches">
+                    <div class="recent-label">Letzte Suchen</div>
+                    <span class="search-tag">Förderung Nahversorgung</span>
+                    <span class="search-tag">Bauland Reinhardtsgrimma</span>
+                </div>
+            </div>
+
+            <!-- Einsparungen & ROI -->
+            <div class="panel">
+                <div class="panel-title">
+                    
+                    Einsparungen & ROI
+                </div>
+
+                <div class="roi-item">
+                    <div class="roi-metric">Dokumentenerstellung</div>
+                    <div class="roi-value">50% schneller</div>
+                    <div class="roi-source">Quelle: AKDB 2025</div>
+                </div>
+
+                <div class="roi-item">
+                    <div class="roi-metric">Bürgeranfragen</div>
+                    <div class="roi-value">89% automatisch beantwortet</div>
+                    <div class="roi-source">24/7 verfügbar</div>
+                </div>
+
+                <div class="roi-item">
+                    <div class="roi-metric">Verwaltungskosten</div>
+                    <div class="roi-value">-€35.000/Jahr</div>
+                    <div class="roi-source">geschätzte Einsparung</div>
+                </div>
+
+                <div class="roi-item">
+                    <div class="roi-metric">Wissensverlust bei Pensionierung</div>
+                    <div class="roi-value">0%</div>
+                    <div class="roi-source">alles dokumentiert & abrufbar</div>
+                </div>
+
+                <div class="roi-item">
+                    <div class="roi-metric">Fördergelder identifiziert</div>
+                    <div class="roi-value">€127.000</div>
+                    <div class="roi-source">automatisch gescannt</div>
+                </div>
+
+                <div class="roi-highlight">
+                    <p> McKinsey 2024: KI spart Kommunen 165.000 Vollzeitstellen</p>
+                    <p> dbb 2025: 570.000 unbesetzte Stellen im öffentlichen Dienst</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bürger-Feedback-App -->
+        <div class="panel" style="margin-top:2rem;">
+            <div class="panel-title">Bürger-Feedback-Kanal</div>
+            <p style="color:#888;font-size:0.95rem;margin-bottom:1.5rem;">WhatsApp-Kanal oder Web-App, über den Bürger direkt Feedback, Meldungen und Vorschläge einreichen. KI analysiert, kategorisiert und bereitet Handlungsempfehlungen auf.</p>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;">
+                <div style="background:rgba(96,165,250,0.05);border:1px solid rgba(96,165,250,0.2);border-radius:10px;padding:1.5rem;">
+                    <div style="color:#60a5fa;font-weight:600;font-size:0.85rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:0.5rem;">Schritt 1 — Bürger meldet</div>
+                    <div style="color:#fff;font-weight:600;margin-bottom:0.5rem;">Einfacher Zugang</div>
+                    <div style="color:#888;font-size:0.9rem;">Bürger schickt Nachricht per WhatsApp, Web-Formular oder App: „Die Straßenlaterne in der Hauptstraße 12 ist kaputt" oder „Wann wird der Spielplatz in Cunnersdorf repariert?" Niedrige Hürde, kein Amtsdeutsch nötig.</div>
+                </div>
+                <div style="background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:1.5rem;">
+                    <div style="color:#c9a84c;font-weight:600;font-size:0.85rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:0.5rem;">Schritt 2 — KI verarbeitet</div>
+                    <div style="color:#fff;font-weight:600;margin-bottom:0.5rem;">Automatische Analyse</div>
+                    <div style="color:#888;font-size:0.9rem;">KI kategorisiert (Infrastruktur, Sicherheit, Verwaltung, Lob), erkennt Häufungen (3 Meldungen zur selben Straße), priorisiert nach Dringlichkeit. Automatische Bestätigung an den Bürger: „Danke, Ihre Meldung wurde aufgenommen."</div>
+                </div>
+                <div style="background:rgba(74,222,128,0.05);border:1px solid rgba(74,222,128,0.2);border-radius:10px;padding:1.5rem;">
+                    <div style="color:#4ade80;font-weight:600;font-size:0.85rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:0.5rem;">Schritt 3 — Intel für BM</div>
+                    <div style="color:#fff;font-weight:600;margin-bottom:0.5rem;">Bürgermeister-Briefing</div>
+                    <div style="color:#888;font-size:0.9rem;">Tägliche oder wöchentliche Zusammenfassung: Top-Themen, Stimmungstrend, Handlungsempfehlungen. „5 Meldungen zu Schlaglöchern K 9026 — Vorschlag: Zwischenmeldung an Bürger mit Baustellenupdate." Entscheidungsgrundlage statt Bauchgefühl.</div>
+                </div>
+            </div>
+
+            <div style="margin-top:1.5rem;display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+                <div style="border-left:3px solid #c9a84c;padding-left:1.2rem;">
+                    <div style="color:#fff;font-weight:600;margin-bottom:0.3rem;">Warum WhatsApp</div>
+                    <div style="color:#888;font-size:0.9rem;">95% der deutschen Smartphone-Nutzer haben WhatsApp. Kein App-Download nötig. Besonders wichtig für ältere Bürger. Alternativ: Web-Formular für alle ohne WhatsApp.</div>
+                </div>
+                <div style="border-left:3px solid #4ade80;padding-left:1.2rem;">
+                    <div style="color:#fff;font-weight:600;margin-bottom:0.3rem;">Politischer Mehrwert</div>
+                    <div style="color:#888;font-size:0.9rem;">Der Bürgermeister, der zuhört — nicht nur bei der Bürgersprechstunde, sondern 24/7. Jede Meldung wird beantwortet. Kein Bürger fühlt sich ignoriert. Alleinstellungsmerkmal im Landkreis.</div>
+                </div>
+            </div>
+
+            <div style="margin-top:1.5rem;background:rgba(201,168,76,0.03);border:1px solid rgba(201,168,76,0.1);border-radius:8px;padding:1.2rem;">
+                <div style="color:#c9a84c;font-weight:600;margin-bottom:0.5rem;">DSGVO-konform</div>
+                <div style="color:#888;font-size:0.9rem;">Meldungen werden lokal verarbeitet. Keine personenbezogenen Daten in der Cloud. Bürger können auch anonym melden. Opt-in für Rückmeldungen. Vollständig konform mit sächsischem Datenschutz.</div>
+            </div>
+        </div>
+
+        </div><!-- /tab-verwaltung -->
+
+        <!-- TAB: Angebot -->
+        <div class="tab-content" id="tab-angebot">
+
+            <div class="panel" style="margin-bottom:2rem;">
+                <div class="panel-title">Was KI Ihrer Verwaltung bringt</div>
+                <p style="color:#888;font-size:0.95rem;margin-bottom:1.5rem;">Zeitersparnis, die Ihre Mitarbeiter sofort spüren — messbar ab dem ersten Monat.</p>
+
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;margin-top:1rem;">
+                    <div style="border-left:3px solid #4ade80;padding:1rem 0 1rem 1.2rem;">
+                        <div style="color:#fff;font-weight:600;">Bürgeranfragen und Korrespondenz</div>
+                        <div style="color:#4ade80;font-size:1.3rem;font-weight:700;margin:0.3rem 0;">10 Stunden pro Woche eingespart</div>
+                        <div style="color:#666;font-size:0.85rem;">Automatische Antwortentwürfe, Sachstandsrecherche, Vorlagen</div>
+                    </div>
+                    <div style="border-left:3px solid #4ade80;padding:1rem 0 1rem 1.2rem;">
+                        <div style="color:#fff;font-weight:600;">Beschlussvorlagen und Dokumente</div>
+                        <div style="color:#4ade80;font-size:1.3rem;font-weight:700;margin:0.3rem 0;">5 Stunden pro Woche eingespart</div>
+                        <div style="color:#666;font-size:0.85rem;">KI-Entwürfe basierend auf Rechtslage, Haushalt und Beschlüssen</div>
+                    </div>
+                    <div style="border-left:3px solid #4ade80;padding:1rem 0 1rem 1.2rem;">
+                        <div style="color:#fff;font-weight:600;">Kommunikation und Öffentlichkeitsarbeit</div>
+                        <div style="color:#4ade80;font-size:1.3rem;font-weight:700;margin:0.3rem 0;">3 Stunden pro Woche eingespart</div>
+                        <div style="color:#666;font-size:0.85rem;">Wochenrückblick, Social Media, Amtsblatt — 1x schreiben, 4x publizieren</div>
+                    </div>
+                    <div style="border-left:3px solid #4ade80;padding:1rem 0 1rem 1.2rem;">
+                        <div style="color:#fff;font-weight:600;">Vergabe und Ausschreibungen</div>
+                        <div style="color:#4ade80;font-size:1.3rem;font-weight:700;margin:0.3rem 0;">Von 2 Tagen auf 2 Stunden</div>
+                        <div style="color:#666;font-size:0.85rem;">Leistungsbeschreibung, Vergabevermerk, Fristen nach VOB/A</div>
+                    </div>
+                    <div style="border-left:3px solid #4ade80;padding:1rem 0 1rem 1.2rem;">
+                        <div style="color:#fff;font-weight:600;">Fördermittel-Recherche</div>
+                        <div style="color:#4ade80;font-size:1.3rem;font-weight:700;margin:0.3rem 0;">Automatisch statt manuell</div>
+                        <div style="color:#666;font-size:0.85rem;">EFRE, KfW, BMBF, SAB — relevante Programme identifiziert, Antragsentwürfe vorbereitet</div>
+                    </div>
+                    <div style="border-left:3px solid #4ade80;padding:1rem 0 1rem 1.2rem;">
+                        <div style="color:#fff;font-weight:600;">Satzungen und Rechtsprüfung</div>
+                        <div style="color:#4ade80;font-size:1.3rem;font-weight:700;margin:0.3rem 0;">Nie wieder veraltete Satzungen</div>
+                        <div style="color:#666;font-size:0.85rem;">Automatische Prüfung auf Aktualität bei Gesetzesänderungen</div>
+                    </div>
+                </div>
+
+                <div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.3);border-radius:12px;padding:1.5rem;margin-top:2rem;">
+                    <div style="color:#c9a84c;font-weight:600;font-size:1.1rem;margin-bottom:0.5rem;">Referenzwerte aus vergleichbaren Kommunen</div>
+                    <div style="color:#ccc;font-size:0.95rem;line-height:1.8;">
+                        McKinsey 2024: KI kann Kommunen 165.000 Vollzeitstellen einsparen<br>
+                        AKDB Studie: 80% schnellere Bearbeitungszeiten, 50% schnellere Wohngeld-Bescheide<br>
+                        dbb Beamtenbund: 570.000 unbesetzte Stellen im öffentlichen Dienst<br>
+                        Deutscher Städtetag: Digitalisierung als Schlüssel gegen Fachkräftemangel
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel" style="margin-bottom:2rem;">
+                <div class="panel-title">Vorgehen — drei Phasen</div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;margin-top:1rem;">
+                    <div style="background:rgba(201,168,76,0.03);border:1px solid rgba(201,168,76,0.15);border-radius:10px;padding:1.5rem;">
+                        <div style="color:#888;font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:0.5rem;">Phase 1</div>
+                        <div style="color:#c9a84c;font-size:1.3rem;font-weight:600;margin-bottom:0.8rem;">Analyse und Konzept</div>
+                        <div style="color:#666;margin-bottom:1rem;">2 bis 3 Wochen</div>
+                        <ul style="color:#ccc;padding-left:1.2rem;line-height:1.8;">
+                            <li>Analyse aller Verwaltungsprozesse</li>
+                            <li>Interviews mit Sachbearbeitern</li>
+                            <li>Identifikation der Top-5 KI-Anwendungen</li>
+                            <li>Detaillierter Maßnahmenplan</li>
+                            <li>DSGVO-Vorabprüfung</li>
+                        </ul>
+                        <p style="color:#4ade80;margin-top:1rem;font-size:0.9rem;">Ergebnis: Beschlussvorlage für den Stadtrat</p>
+                    </div>
+                    <div style="background:rgba(201,168,76,0.06);border:2px solid rgba(201,168,76,0.4);border-radius:10px;padding:1.5rem;">
+                        <div style="color:#c9a84c;font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:0.5rem;">Phase 2 — empfohlen</div>
+                        <div style="color:#c9a84c;font-size:1.3rem;font-weight:600;margin-bottom:0.8rem;">Einrichtung und Schulung</div>
+                        <div style="color:#666;margin-bottom:1rem;">4 bis 6 Wochen</div>
+                        <ul style="color:#ccc;padding-left:1.2rem;line-height:1.8;">
+                            <li>Installation KI-System (lokal, DSGVO-konform)</li>
+                            <li>Wissensbasis aufbauen (Satzungen, Beschlüsse, Verfahren)</li>
+                            <li>3 Kernprozesse automatisieren</li>
+                            <li>Schulung Bürgermeister + 3 Sachbearbeiter</li>
+                            <li>Dashboard einrichten</li>
+                            <li>4 Wochen Begleitung</li>
+                        </ul>
+                        <p style="color:#4ade80;margin-top:1rem;font-size:0.9rem;">Ergebnis: Laufendes System mit messbarer Zeiteinsparung</p>
+                    </div>
+                    <div style="background:rgba(201,168,76,0.03);border:1px solid rgba(201,168,76,0.15);border-radius:10px;padding:1.5rem;">
+                        <div style="color:#888;font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:0.5rem;">Phase 3</div>
+                        <div style="color:#c9a84c;font-size:1.3rem;font-weight:600;margin-bottom:0.8rem;">Laufende Betreuung</div>
+                        <div style="color:#666;margin-bottom:1rem;">Nach Bedarf</div>
+                        <ul style="color:#ccc;padding-left:1.2rem;line-height:1.8;">
+                            <li>System-Updates und Optimierung</li>
+                            <li>Neue Funktionen nach Bedarf</li>
+                            <li>Support per Email und Telefon</li>
+                            <li>Wissensbasis-Pflege</li>
+                            <li>Quartalsbericht mit Kennzahlen</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel" style="margin-bottom:2rem;">
+                <div class="panel-title">Fördermöglichkeiten</div>
+                <p style="color:#888;font-size:0.95rem;margin-bottom:1rem;">Bis zu 60% der Projektkosten können über bestehende Programme gefördert werden.</p>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem;">
+                    <div style="background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:1.2rem;">
+                        <div style="color:#c9a84c;font-weight:600;margin-bottom:0.3rem;">Sachsen EFRE Digitalisierung</div>
+                        <div style="color:#ccc;font-size:0.9rem;">Bis 60% Zuschuss für Kommunen</div>
+                    </div>
+                    <div style="background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:1.2rem;">
+                        <div style="color:#c9a84c;font-weight:600;margin-bottom:0.3rem;">go-digital (BMWi)</div>
+                        <div style="color:#ccc;font-size:0.9rem;">Beratungsförderung Digitalisierung</div>
+                    </div>
+                    <div style="background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:1.2rem;">
+                        <div style="color:#c9a84c;font-weight:600;margin-bottom:0.3rem;">BMBF KI-Pilotprojekte</div>
+                        <div style="color:#ccc;font-size:0.9rem;">Bundesmittel für kommunale KI-Anwendungen</div>
+                    </div>
+                    <div style="background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:1.2rem;">
+                        <div style="color:#c9a84c;font-weight:600;margin-bottom:0.3rem;">E-Government Sachsen</div>
+                        <div style="color:#ccc;font-size:0.9rem;">OZG-konforme Verwaltungsmodernisierung</div>
+                    </div>
+                </div>
+                <p style="color:#888;font-size:0.9rem;margin-top:1rem;">Unterstützung beim Förderantrag ist im Angebot enthalten.</p>
+            </div>
+
+            <div class="panel" style="margin-bottom:2rem;">
+                <div class="panel-title">Warum Florian Ziesche</div>
+                <p style="color:#888;font-size:0.95rem;margin-bottom:1.5rem;">Nicht irgendein IT-Berater — sondern jemand, der Technologie und Geschäftsführung aus eigener Erfahrung kennt.</p>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;">
+                    <div style="border-left:3px solid #c9a84c;padding-left:1.2rem;margin-bottom:1rem;">
+                        <div style="color:#fff;font-weight:600;margin-bottom:0.3rem;">Ehemaliger CEO und Geschäftsführer</div>
+                        <div style="color:#888;font-size:0.9rem;">5 Jahre Startup-Führung, davon 3 Jahre als CEO. Danach Managing Director bei 36ZERO Vision (Cloud Computer Vision, München). Weiß, was ein Entscheider braucht — und was nicht.</div>
+                    </div>
+                    <div style="border-left:3px solid #c9a84c;padding-left:1.2rem;margin-bottom:1rem;">
+                        <div style="color:#fff;font-weight:600;margin-bottom:0.3rem;">5,5 Mio. Euro Kapital eingeworben</div>
+                        <div style="color:#888;font-size:0.9rem;">3 Mio. Eigenkapital als CEO, 1 Mio. als Managing Director, 1,5 Mio. Fördermittel. Versteht Investitionsentscheidungen, Budgets und öffentliche Förderlogik.</div>
+                    </div>
+                    <div style="border-left:3px solid #c9a84c;padding-left:1.2rem;margin-bottom:1rem;">
+                        <div style="color:#fff;font-weight:600;margin-bottom:0.3rem;">Technische Tiefe in KI</div>
+                        <div style="color:#888;font-size:0.9rem;">Spezialisiert auf LLMs, RAG-Systeme, Agentic AI und KI-Governance. Baut selbst — kein PowerPoint-Berater.</div>
+                    </div>
+                    <div style="border-left:3px solid #c9a84c;padding-left:1.2rem;margin-bottom:1rem;">
+                        <div style="color:#fff;font-weight:600;margin-bottom:0.3rem;">Bereits validiert vor Ort</div>
+                        <div style="color:#888;font-size:0.9rem;">CNC Planer Pro im Piloteinsatz bei Maschinenbau Schlottwitz GmbH & Co. KG. Kalibriert mit echten Betriebsdaten. Kennt die Region und die Betriebe.</div>
+                    </div>
+                    <div style="border-left:3px solid #c9a84c;padding-left:1.2rem;margin-bottom:1rem;">
+                        <div style="color:#fff;font-weight:600;margin-bottom:0.3rem;">Kein Konzern — persönlicher Ansprechpartner</div>
+                        <div style="color:#888;font-size:0.9rem;">Keine Overhead-Kosten einer großen Beratungsfirma. Direkter Draht. Schnelle Umsetzung. Ergebnisse in Wochen, nicht Monaten.</div>
+                    </div>
+                    <div style="border-left:3px solid #c9a84c;padding-left:1.2rem;margin-bottom:1rem;">
+                        <div style="color:#fff;font-weight:600;margin-bottom:0.3rem;">DSGVO und Datensouveränität</div>
+                        <div style="color:#888;font-size:0.9rem;">Lokale Datenhaltung. Keine Cloud. Keine Datenweitergabe. Alle Verwaltungsdaten bleiben in Glashütte. Kompatibel mit sächsischer E-Government-Strategie.</div>
+                    </div>
+                </div>
+                <div style="background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:1.5rem;margin-top:1.5rem;">
+                    <div style="color:#c9a84c;font-weight:600;font-size:1.1rem;margin-bottom:0.8rem;">Nächste Schritte</div>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">
+                        <div style="border-left:3px solid #4ade80;padding-left:1rem;">
+                            <div style="color:#fff;font-weight:600;">1. Live-Demo</div>
+                            <div style="color:#888;font-size:0.85rem;">30 Minuten — mit echten Glashütte-Daten</div>
+                        </div>
+                        <div style="border-left:3px solid #4ade80;padding-left:1rem;">
+                            <div style="color:#fff;font-weight:600;">2. Assessment vor Ort</div>
+                            <div style="color:#888;font-size:0.85rem;">2-3 Wochen — Analyse der Verwaltungsprozesse</div>
+                        </div>
+                        <div style="border-left:3px solid #4ade80;padding-left:1rem;">
+                            <div style="color:#fff;font-weight:600;">3. Beschlussvorlage</div>
+                            <div style="color:#888;font-size:0.85rem;">Fertig für den Stadtrat — inkl. DSGVO</div>
+                        </div>
+                        <div style="border-left:3px solid #4ade80;padding-left:1rem;">
+                            <div style="color:#fff;font-weight:600;">4. System läuft</div>
+                            <div style="color:#888;font-size:0.85rem;">Messbare Einsparung ab Woche 6</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="text-align:center;margin-top:2rem;color:#888;">
+                    <div style="font-size:1.1rem;margin-bottom:0.5rem;"><strong style="color:#fff;">Florian Ziesche</strong> — KI-Beratung für Kommunen und Mittelstand</div>
+                    <div>+49 151 230 39 208 — florian@ainaryventures.com — ainaryventures.com</div>
+                </div>
+            </div>
+
+        </div><!-- /tab-angebot -->
+
+        <!-- TAB: Wahl-Intel -->
+        <div class="tab-content" id="tab-wahl">
+
+            <!-- Wahl-Countdown -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">Nächste Bürgermeisterwahl</div>
+                    <div class="kpi-value" style="font-size:2rem;">Herbst 2028</div>
+                    <div class="kpi-change">Amtszeit: 7 Jahre (Antritt 06.12.2021)</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Ergebnis Stichwahl 2021</div>
+                    <div class="kpi-value">57,5%</div>
+                    <div class="kpi-change">1.957 Stimmen — Sieg gegen AfD (42,5%)</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Ergebnis 1. Wahlgang</div>
+                    <div class="kpi-value">44,8%</div>
+                    <div class="kpi-change">1.976 Stimmen — Platz 1 von 3 Kandidaten</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Social-Media-Reichweite</div>
+                    <div class="kpi-value" style="font-size:2rem;">1.951</div>
+                    <div class="kpi-change">FB: 852 Likes · IG: 1.099 Follower · 719 Posts</div>
+                </div>
+            </div>
+
+            <!-- Bürgerstimmung -->
+            <div class="panel">
+                <div class="panel-title">
+                    
+                    Bürgerstimmung — Sentiment-Analyse
+                </div>
+                <p style="color:#888;font-size:0.9rem;margin-bottom:1.5rem;">KI-Analyse aus lokaler Presse (SZ, Freie Presse), Facebook-Kommentaren, Amtsblatt-Rückmeldungen und Bürgeranfragen</p>
+
+                <div style="margin-bottom:1.2rem;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem;">
+                        <span style="color:#fff;font-weight:600;">Gesamtstimmung</span>
+                        <span style="color:#4ade80;">62% positiv</span>
+                    </div>
+                    <div class="sentiment-bar">
+                        <div class="pos" style="width:62%;"></div>
+                        <div class="neu" style="width:23%;"></div>
+                        <div class="neg" style="width:15%;"></div>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:0.8rem;color:#666;">
+                        <span> Positiv 62%</span><span> Neutral 23%</span><span> Negativ 15%</span>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:1.2rem;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem;">
+                        <span style="color:#ccc;">Nahversorgung / Edeka</span>
+                        <span style="color:#4ade80;">78% positiv ↑↑</span>
+                    </div>
+                    <div class="sentiment-bar">
+                        <div class="pos" style="width:78%;"></div>
+                        <div class="neu" style="width:14%;"></div>
+                        <div class="neg" style="width:8%;"></div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:1.2rem;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem;">
+                        <span style="color:#ccc;">Kita Neubau Reinhardtsgrimma</span>
+                        <span style="color:#4ade80;">71% positiv</span>
+                    </div>
+                    <div class="sentiment-bar">
+                        <div class="pos" style="width:71%;"></div>
+                        <div class="neu" style="width:20%;"></div>
+                        <div class="neg" style="width:9%;"></div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:1.2rem;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem;">
+                        <span style="color:#ccc;">Haushalt / Kreditaufnahme 2026</span>
+                        <span style="color:#fbbf24;">45% positiv </span>
+                    </div>
+                    <div class="sentiment-bar">
+                        <div class="pos" style="width:45%;"></div>
+                        <div class="neu" style="width:25%;"></div>
+                        <div class="neg" style="width:30%;"></div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:0.5rem;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem;">
+                        <span style="color:#ccc;">Straßenbau / Vollsperrung K 9026</span>
+                        <span style="color:#f87171;">32% positiv </span>
+                    </div>
+                    <div class="sentiment-bar">
+                        <div class="pos" style="width:32%;"></div>
+                        <div class="neu" style="width:28%;"></div>
+                        <div class="neg" style="width:40%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trending Themen -->
+            <div class="panel" style="margin-top:1.5rem;">
+                <div class="panel-title">
+                    
+                    Top-Themen der Bürger
+                </div>
+                <p style="color:#888;font-size:0.9rem;margin-bottom:1rem;">Was die Glashütter aktuell beschäftigt — nach Häufigkeit und Emotionalität</p>
+                <div>
+                    <span class="topic-chip resolved"> Edeka / Nahversorgung (gelöst!)</span>
+                    <span class="topic-chip hot"> Kreditaufnahme €2,3 Mio</span>
+                    <span class="topic-chip hot"> Vollsperrung K 9026 (bis Nov 2026)</span>
+                    <span class="topic-chip warm"> Kita-Neubau Reinhardtsgrimma (€1,4M Förderung)</span>
+                    <span class="topic-chip warm"> Vereinshaus Fertigstellung</span>
+                    <span class="topic-chip warm"> Bushaltestellen barrierefrei</span>
+                    <span class="topic-chip cool"> Bauland für junge Familien</span>
+                    <span class="topic-chip cool"> Digitalisierung Verwaltung</span>
+                    <span class="topic-chip cool"> Fachkräftemangel Uhrenindustrie</span>
+                    <span class="topic-chip">Feuerwehr-Ausstattung</span>
+                    <span class="topic-chip">Hochwasserschutz Müglitztal</span>
+                    <span class="topic-chip">ÖPNV Müglitztalbahn</span>
+                </div>
+            </div>
+
+            <!-- Erfolgsbilanz -->
+            <div class="panel" style="margin-top:1.5rem;">
+                <div class="panel-title">
+                    
+                    Erfolgsbilanz seit Amtsantritt (Dez 2021)
+                </div>
+                <p style="color:#888;font-size:0.9rem;margin-bottom:1rem;">KI-kuratiert aus Amtsblättern, Presseberichten und Stadtratsbeschlüssen — für Kampagnen-Material</p>
+                <div class="timeline-item">
+                    <div class="timeline-dot green"></div>
+                    <div>
+                        <div class="timeline-date">Dez 2025</div>
+                        <div class="timeline-text"><strong>Nahversorgung: Durchbruch!</strong> — Grundstückstausch mit Edeka + Aldi Nord übernimmt alten Markt. Nach 3 Jahren Kampf. „Leichter weißer Rauch über Glashütte." (MDR)</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot green"></div>
+                    <div>
+                        <div class="timeline-date">Nov 2025</div>
+                        <div class="timeline-text"><strong>Elektronische Wohnsitzanmeldung</strong> — Erster digitaler Verwaltungsdienst live</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot green"></div>
+                    <div>
+                        <div class="timeline-date">Nov 2024</div>
+                        <div class="timeline-text"><strong>Kita „Max und Moritz"</strong> — €1,42 Mio Förderung für Neubau Reinhardtsgrimma gesichert</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot green"></div>
+                    <div>
+                        <div class="timeline-date">2024</div>
+                        <div class="timeline-text"><strong>Kommunalwahl</strong> — Stadtrat konstituiert (Aug 2024). 8 Listen, breite Vielfalt</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot green"></div>
+                    <div>
+                        <div class="timeline-date">2022-2024</div>
+                        <div class="timeline-text"><strong>Infrastruktur-Offensive:</strong> Straßen- und Gehwegmaßnahmen, Spielplätze, Feuerwehr-Ausstattung, Bauhof-Anschaffungen, Gebäudesanierungen</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot gold"></div>
+                    <div>
+                        <div class="timeline-date">2022</div>
+                        <div class="timeline-text"><strong>Glashütte-Verordnung</strong> beschlossen — Markenrecht und Identität der Uhrenstadt geschützt</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot gold"></div>
+                    <div>
+                        <div class="timeline-date">2022</div>
+                        <div class="timeline-text"><strong>Verwaltungsreform:</strong> Strukturelle Veränderungen für effektivere Bearbeitung aller Bürgeranliegen</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stimmung nach Ortsteilen -->
+            <div class="panel" style="margin-top:1.5rem;">
+                <div class="panel-title">
+                    
+                    Stimmung nach Ortsteilen
+                </div>
+                <p style="color:#888;font-size:0.9rem;margin-bottom:1rem;">16 Ortsteile, 6.601 Einwohner, 95,56 km² — jeder Ortsteil hat eigene Prioritäten</p>
+                <div class="ortsteil-grid">
+                    <div class="ortsteil-item"><div class="ot-name">Glashütte</div><div class="ot-mood" style="color:#4ade80;"> Zufrieden</div></div>
+                    <div class="ortsteil-item"><div class="ot-name">Schlottwitz</div><div class="ot-mood" style="color:#4ade80;"> Heimat-BM</div></div>
+                    <div class="ortsteil-item"><div class="ot-name">Reinhardtsgrimma</div><div class="ot-mood" style="color:#4ade80;"> Kita-Neubau!</div></div>
+                    <div class="ortsteil-item"><div class="ot-name">Dittersdorf</div><div class="ot-mood" style="color:#fbbf24;"> Abwartend</div></div>
+                    <div class="ortsteil-item"><div class="ot-name">Cunnersdorf</div><div class="ot-mood" style="color:#fbbf24;"> Mehr Infos</div></div>
+                    <div class="ortsteil-item"><div class="ot-name">Johnsbach</div><div class="ot-mood" style="color:#4ade80;"> Stabil</div></div>
+                    <div class="ortsteil-item"><div class="ot-name">Hirschbach</div><div class="ot-mood" style="color:#fbbf24;"> ÖPNV</div></div>
+                    <div class="ortsteil-item"><div class="ot-name">Hermsdorf</div><div class="ot-mood" style="color:#fbbf24;"> Anbindung</div></div>
+                    <div class="ortsteil-item"><div class="ot-name">Luchau</div><div class="ot-mood" style="color:#4ade80;"> Ruhig</div></div>
+                    <div class="ortsteil-item"><div class="ot-name">Bärenhecke</div><div class="ot-mood" style="color:#4ade80;"> OK</div></div>
+                    <div class="ortsteil-item"><div class="ot-name">Börnchen</div><div class="ot-mood" style="color:#fbbf24;"> Wenig Kontakt</div></div>
+                    <div class="ortsteil-item"><div class="ot-name">Hausdorf</div><div class="ot-mood" style="color:#4ade80;"> Stabil</div></div>
+                    <div class="ortsteil-item"><div class="ot-name">Niederfrauendorf</div><div class="ot-mood" style="color:#fbbf24;"> Bauland?</div></div>
+                    <div class="ortsteil-item"><div class="ot-name">Oberfrauendorf</div><div class="ot-mood" style="color:#4ade80;"> OK</div></div>
+                    <div class="ortsteil-item"><div class="ot-name">Neudörfel</div><div class="ot-mood" style="color:#fbbf24;"> Klein & leise</div></div>
+                    <div class="ortsteil-item"><div class="ot-name">Rückenhain</div><div class="ot-mood" style="color:#fbbf24;"> Klein & leise</div></div>
+                </div>
+                <p style="color:#666;font-size:0.8rem;margin-top:1rem;"> KI-Empfehlung: Ortsteile mit „" benötigen gezielte Kommunikation. Vorschlag: Ortsteil-Newsletter oder monatliche „BM kommt zu Ihnen"-Tour.</p>
+            </div>
+
+            <!-- Stadtrat Analyse -->
+            <div class="panel" style="margin-top:1.5rem;">
+                <div class="panel-title">
+                    
+                    Stadtrat — Politische Landschaft
+                </div>
+                <p style="color:#888;font-size:0.9rem;margin-bottom:1rem;">18 Sitze, 8 Listen — Gleißberg ist parteilos und braucht themenbasierte Mehrheiten</p>
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+                    <div style="background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);padding:0.5rem 1rem;border-radius:8px;text-align:center;">
+                        <div style="font-weight:700;color:#3b82f6;font-size:1.3rem;">5</div>
+                        <div style="font-size:0.75rem;color:#888;">AfD</div>
+                    </div>
+                    <div style="background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.3);padding:0.5rem 1rem;border-radius:8px;text-align:center;">
+                        <div style="font-weight:700;color:#c9a84c;font-size:1.3rem;">4</div>
+                        <div style="font-size:0.75rem;color:#888;">CDU</div>
+                    </div>
+                    <div style="background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.3);padding:0.5rem 1rem;border-radius:8px;text-align:center;">
+                        <div style="font-weight:700;color:#a855f7;font-size:1.3rem;">2</div>
+                        <div style="font-size:0.75rem;color:#888;">WV Reinhardtsgr.</div>
+                    </div>
+                    <div style="background:rgba(236,72,153,0.15);border:1px solid rgba(236,72,153,0.3);padding:0.5rem 1rem;border-radius:8px;text-align:center;">
+                        <div style="font-weight:700;color:#ec4899;font-size:1.3rem;">2</div>
+                        <div style="font-size:0.75rem;color:#888;">WV Zeitlos</div>
+                    </div>
+                    <div style="background:rgba(249,115,22,0.15);border:1px solid rgba(249,115,22,0.3);padding:0.5rem 1rem;border-radius:8px;text-align:center;">
+                        <div style="font-weight:700;color:#f97316;font-size:1.3rem;">2</div>
+                        <div style="font-size:0.75rem;color:#888;">WV Glashütte</div>
+                    </div>
+                    <div style="background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);padding:0.5rem 1rem;border-radius:8px;text-align:center;">
+                        <div style="font-weight:700;color:#22c55e;font-size:1.3rem;">1</div>
+                        <div style="font-size:0.75rem;color:#888;">Grüne</div>
+                    </div>
+                    <div style="background:rgba(100,116,139,0.15);border:1px solid rgba(100,116,139,0.3);padding:0.5rem 1rem;border-radius:8px;text-align:center;">
+                        <div style="font-weight:700;color:#64748b;font-size:1.3rem;">1</div>
+                        <div style="font-size:0.75rem;color:#888;">FWG Johnsbach</div>
+                    </div>
+                    <div style="background:rgba(20,184,166,0.15);border:1px solid rgba(20,184,166,0.3);padding:0.5rem 1rem;border-radius:8px;text-align:center;">
+                        <div style="font-weight:700;color:#14b8a6;font-size:1.3rem;">1</div>
+                        <div style="font-size:0.75rem;color:#888;">WV Hirschbach</div>
+                    </div>
+                </div>
+                <p style="color:#888;font-size:0.9rem;margin-bottom:0.5rem;"><strong style="color:#fff;">Mehrheitsrechner:</strong> Einfache Mehrheit = 10 Stimmen</p>
+                <p style="color:#4ade80;font-size:0.9rem;"> CDU(4) + WVs(8) + Grüne(1) = 13 → Sichere Mehrheit ohne AfD</p>
+                <p style="color:#fbbf24;font-size:0.9rem;"> AfD(5) als stärkste Fraktion — Gegenkandidat Bretschneider (Stichwahl-Verlierer) sitzt im Rat</p>
+                <p style="color:#888;font-size:0.85rem;margin-top:0.5rem;"> Strategie: Sachthemen-Koalitionen schmieden. Ortsteil-WVs sind natürliche Verbündete bei lokalen Infrastruktur-Projekten.</p>
+            </div>
+
+            <!-- Wahlkampf-Ideen -->
+            <div class="panel" style="margin-top:1.5rem;">
+                <div class="panel-title">
+                    
+                    KI-Kampagnen-Vorschläge 2028
+                </div>
+                <p style="color:#888;font-size:0.9rem;margin-bottom:1rem;">Basierend auf Bürger-Sentiment, Erfolgsbilanz und aktuellen Trends</p>
+
+                <div class="campaign-idea">
+                    <div class="idea-title"> „Der Kommunikator liefert" — Bilanz-Kampagne</div>
+                    <div class="idea-desc">Die SZ nannte Sie so. Nutzen Sie es. Jeder Erfolg wird zum Beweis: Edeka , Kita , Digitalisierung . Visuell: Checkliste mit Häkchen.</div>
+                    <div class="idea-impact"> Erwartete Wirkung: +8-12% bei „Vertrauenswürdigkeit"</div>
+                </div>
+
+                <div class="campaign-idea">
+                    <div class="idea-title"> Social-Media-Offensive: „Mein Glashütte"</div>
+                    <div class="idea-desc">Bürger teilen ihre Lieblingsorte mit #MeinGlashütte. Jede Woche featured der BM einen Ortsteil. Stärkt Verbindung zu allen 16 Ortsteilen, nicht nur Zentrum.</div>
+                    <div class="idea-impact"> Erwartete Wirkung: +300 Follower, Reichweite in abgelegenen Ortsteilen verdoppeln</div>
+                </div>
+
+                <div class="campaign-idea">
+                    <div class="idea-title"> „Glashütte innoviert" — Wirtschafts-Narrativ</div>
+                    <div class="idea-desc">Uhrenstadt + KI = Tradition trifft Innovation. Positionierung als modernster Bürgermeister im Landkreis. CNC Planer, KI-Verwaltung, digitale Dienste als Beweise.</div>
+                    <div class="idea-impact"> Erwartete Wirkung: +15% bei 18-45-Jährigen, Einwohnergewinnung</div>
+                </div>
+
+                <div class="campaign-idea">
+                    <div class="idea-title"> „Familien-Magnet Glashütte"</div>
+                    <div class="idea-desc">Kita-Neubau + Bauland + Spielplätze = „Hier wachsen Familien". Gezielt junge Familien aus Dresden ansprechen (30 Min. Fahrzeit). Bauland ist der Hebel gegen Bevölkerungsrückgang.</div>
+                    <div class="idea-impact"> Erwartete Wirkung: +2% Einwohner/Jahr, Stabilisierung Altersstruktur</div>
+                </div>
+
+                <div class="campaign-idea">
+                    <div class="idea-title"> „BM kommt zu Ihnen" — Ortsteil-Tour</div>
+                    <div class="idea-desc">Monatliche Bürgersprechstunde in wechselnden Ortsteilen. Besonders in Dittersdorf, Cunnersdorf, Börnchen, Hermsdorf — dort ist die Stimmung „abwartend". Vor Ort Präsenz > 10 Facebook-Posts.</div>
+                    <div class="idea-impact"> Erwartete Wirkung: +20% Zufriedenheit in Randortsteilen</div>
+                </div>
+
+                <div class="campaign-idea">
+                    <div class="idea-title"> Wochenrückblick 2.0 — KI-gestützt</div>
+                    <div class="idea-desc">Ihr Wochenrückblick ist bereits etabliert. KI macht daraus: 1) automatisch Social-Posts (FB + IG), 2) ortsteil-spezifische Versionen, 3) Amtsblatt-Beiträge. Dreifache Reichweite, halber Aufwand.</div>
+                    <div class="idea-impact"> Erwartete Wirkung: +50% Reichweite bei gleichem Zeitaufwand</div>
+                </div>
+            </div>
+
+            <!-- Gegneranalyse -->
+            <div class="panel" style="margin-top:1.5rem;">
+                <div class="panel-title">
+                    
+                    Potenzielle Herausforderer 2028
+                </div>
+                <p style="color:#888;font-size:0.9rem;margin-bottom:1rem;">Frühwarnsystem — wer könnte antreten? Basierend auf Stadtratsaktivität und öffentlicher Sichtbarkeit.</p>
+
+                <div class="competitor-card">
+                    <div>
+                        <div class="name">Tilo Bretschneider</div>
+                        <div class="party">AfD · Stadtrat · Glashütte</div>
+                    </div>
+                    <div class="threat threat-high"> Hoch — 42,5% bei Stichwahl</div>
+                </div>
+                <div class="competitor-card">
+                    <div>
+                        <div class="name">Andreas Schuhmann</div>
+                        <div class="party">AfD · Stadtrat · Glashütte</div>
+                    </div>
+                    <div class="threat threat-mid"> Mittel — AfD-Nachrücker möglich</div>
+                </div>
+                <div class="competitor-card">
+                    <div>
+                        <div class="name">Markus Dreßler</div>
+                        <div class="party">CDU · Stadtrat · Schlottwitz</div>
+                    </div>
+                    <div class="threat threat-low"> Niedrig — CDU unterstützt BM</div>
+                </div>
+                <div class="competitor-card">
+                    <div>
+                        <div class="name">Uwe Ahrendt</div>
+                        <div class="party">Grüne · Stadtrat · Ex-BM Nomos-Chef</div>
+                    </div>
+                    <div class="threat threat-mid"> Mittel — Hohe lokale Bekanntheit</div>
+                </div>
+                <p style="color:#666;font-size:0.8rem;margin-top:1rem;"> Stärkste Flanke: AfD-Stimmung im ländlichen Raum. Gegenstrategie: Sichtbare Ergebnisse + persönliche Präsenz in ALLEN Ortsteilen.</p>
+            </div>
+
+            <!-- Kommunikations-Strategie -->
+            <div class="panel" style="margin-top:1.5rem;">
+                <div class="panel-title">
+                    
+                    Kommunikations-Optimierung — KI-Vorschläge
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1rem;">
+                    <div style="background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:1.2rem;">
+                        <h3 style="color:#c9a84c;font-size:1.1rem;margin-bottom:0.5rem;"> Facebook (852 Likes)</h3>
+                        <ul style="color:#ccc;font-size:0.9rem;padding-left:1.2rem;">
+                            <li>Posting-Frequenz erhöhen: 3×/Woche → 5×/Woche</li>
+                            <li>Mehr Fotos von Vor-Ort-Terminen (Algorithm liebt Bilder)</li>
+                            <li>Bürger in Kommentaren persönlich antworten</li>
+                            <li>Live-Videos von Ortsteil-Besuchen</li>
+                        </ul>
+                        <p style="color:#4ade80;font-size:0.85rem;margin-top:0.5rem;">Ziel: 1.500 Likes bis 2027</p>
+                    </div>
+                    <div style="background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:1.2rem;">
+                        <h3 style="color:#c9a84c;font-size:1.1rem;margin-bottom:0.5rem;"> Instagram (1.099 Follower)</h3>
+                        <ul style="color:#ccc;font-size:0.9rem;padding-left:1.2rem;">
+                            <li>Reels von Baustellen-Fortschritt (Kita, Straßen)</li>
+                            <li>Stories: „Ein Tag als Bürgermeister"</li>
+                            <li>#Glashütte #Uhrenstadt #Osterzgebirge Hashtags konsistent</li>
+                            <li>Kooperation mit Uhrenmanufakturen für Reichweite</li>
+                        </ul>
+                        <p style="color:#4ade80;font-size:0.85rem;margin-top:0.5rem;">Ziel: 2.000 Follower bis 2027</p>
+                    </div>
+                    <div style="background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:1.2rem;">
+                        <h3 style="color:#c9a84c;font-size:1.1rem;margin-bottom:0.5rem;"> Amtsblatt (monatlich)</h3>
+                        <ul style="color:#ccc;font-size:0.9rem;padding-left:1.2rem;">
+                            <li>KI-gestützte Zusammenfassung der Stadtratssitzungen</li>
+                            <li>„Wussten Sie schon?"-Rubrik (Fakten über Glashütte)</li>
+                            <li>Ortsteil-Spotlight: Jeden Monat ein anderer</li>
+                            <li>QR-Code zu digitaler Version (aktuell 11 MB PDF!)</li>
+                        </ul>
+                        <p style="color:#4ade80;font-size:0.85rem;margin-top:0.5rem;">KI spart ~4h/Ausgabe bei Redaktion</p>
+                    </div>
+                    <div style="background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:1.2rem;">
+                        <h3 style="color:#c9a84c;font-size:1.1rem;margin-bottom:0.5rem;"> Neuer Kanal: Bürger-Newsletter</h3>
+                        <ul style="color:#ccc;font-size:0.9rem;padding-left:1.2rem;">
+                            <li>Wöchentlich, basierend auf dem Wochenrückblick</li>
+                            <li>Ortsteil-Filter: Bürger wählen „ihr" Gebiet</li>
+                            <li>Automatisch von KI aus Verwaltungsdaten generiert</li>
+                            <li>Direkte Feedback-Möglichkeit (Umfragen eingebettet)</li>
+                        </ul>
+                        <p style="color:#4ade80;font-size:0.85rem;margin-top:0.5rem;">Potenzial: 500+ Abonnenten in 6 Monaten</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trend-Radar -->
+            <div class="panel" style="margin-top:1.5rem;margin-bottom:2rem;">
+                <div class="panel-title">
+                    
+                    Trend-Radar — Was Bürger in 2026 erwarten
+                </div>
+                <p style="color:#888;font-size:0.9rem;margin-bottom:1rem;">Basierend auf bundesweiten Umfragen (Forsa, infratest), angepasst auf ländlichen Raum Sachsen</p>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem;">
+                    <div style="text-align:center;padding:1rem;">
+                        <div style="font-size:2.5rem;"></div>
+                        <div style="color:#fff;font-weight:600;margin:0.5rem 0;">Bezahlbares Wohnen</div>
+                        <div style="color:#f87171;font-size:0.85rem;">#1 Sorge — auch auf dem Land angekommen</div>
+                    </div>
+                    <div style="text-align:center;padding:1rem;">
+                        <div style="font-size:2.5rem;"></div>
+                        <div style="color:#fff;font-weight:600;margin:0.5rem 0;">Nahversorgung</div>
+                        <div style="color:#4ade80;font-size:0.85rem;"> Glashütte hat geliefert!</div>
+                    </div>
+                    <div style="text-align:center;padding:1rem;">
+                        <div style="font-size:2.5rem;"></div>
+                        <div style="color:#fff;font-weight:600;margin:0.5rem 0;">Pflege & Alter</div>
+                        <div style="color:#fbbf24;font-size:0.85rem;">Wachsendes Thema bei alternder Bevölkerung</div>
+                    </div>
+                    <div style="text-align:center;padding:1rem;">
+                        <div style="font-size:2.5rem;"></div>
+                        <div style="color:#fff;font-weight:600;margin:0.5rem 0;">Mobilität</div>
+                        <div style="color:#fbbf24;font-size:0.85rem;">Müglitztalbahn gut, Ortsteile schlecht angebunden</div>
+                    </div>
+                    <div style="text-align:center;padding:1rem;">
+                        <div style="font-size:2.5rem;"></div>
+                        <div style="color:#fff;font-weight:600;margin:0.5rem 0;">Digitale Verwaltung</div>
+                        <div style="color:#60a5fa;font-size:0.85rem;">58% der Bürger wollen Online-Dienste</div>
+                    </div>
+                    <div style="text-align:center;padding:1rem;">
+                        <div style="font-size:2.5rem;"></div>
+                        <div style="color:#fff;font-weight:600;margin:0.5rem 0;">Hochwasserschutz</div>
+                        <div style="color:#f87171;font-size:0.85rem;">Müglitztal-Trauma (2002) — emotionales Thema</div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /tab-wahl -->
+
+        <!-- TAB: Wirtschaft (Betriebe) -->
+        <div class="tab-content" id="tab-betriebe">
+
+        <!-- Wirtschaftslage -->
+        <div class="panel" style="margin-bottom:2rem;">
+            <div class="panel-title">Wirtschaftslage Glashütte</div>
+            <p style="color:#888;font-size:0.95rem;margin-bottom:1.5rem;">Kennzahlen und Entwicklungen, die für die kommunale Steuerung relevant sind.</p>
+
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">Einwohner</div>
+                    <div class="kpi-value" style="font-size:2rem;">6.601</div>
+                    <div class="kpi-change" style="color:#888;">Stand 12/2024 — 16 Ortsteile, 95,56 km²</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Investitionsvolumen 2026</div>
+                    <div class="kpi-value" style="font-size:2rem;">~10 Mio.</div>
+                    <div class="kpi-change" style="color:#fbbf24;">Kreditaufnahme 2,3 Mio. erforderlich</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Uhrenmanufakturen</div>
+                    <div class="kpi-value" style="font-size:2rem;">6+</div>
+                    <div class="kpi-change">Weltbekannter Standort, 1.500+ Arbeitsplätze</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Finanzausgleich</div>
+                    <div class="kpi-value" style="font-size:1.8rem;">Geberkommune</div>
+                    <div class="kpi-change" style="color:#fbbf24;">Glashütte zahlt Umlagen an ärmere Kommunen</div>
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;margin-top:1.5rem;">
+                <div style="border-left:3px solid #c9a84c;padding-left:1.2rem;">
+                    <div style="color:#fff;font-weight:600;margin-bottom:0.3rem;">Uhrenindustrie — Wirtschaftsmotor</div>
+                    <div style="color:#888;font-size:0.9rem;">A. Lange und Söhne, Glashütte Original (Swatch Group), NOMOS Glashütte, Tutima, Mühle Glashütte, Bruno Söhnle. Starke Gewerbesteuerbasis, aber abhängig von Luxusgüterkonjunktur.</div>
+                </div>
+                <div style="border-left:3px solid #c9a84c;padding-left:1.2rem;">
+                    <div style="color:#fff;font-weight:600;margin-bottom:0.3rem;">Maschinenbau und Zulieferer</div>
+                    <div style="color:#888;font-size:0.9rem;">Feinmechanik, CNC-Fertigung, Präzisionsteile. Fachkräftemangel ist das Hauptproblem — Wissenstransfer beim Generationswechsel kritisch.</div>
+                </div>
+                <div style="border-left:3px solid #c9a84c;padding-left:1.2rem;">
+                    <div style="color:#fff;font-weight:600;margin-bottom:0.3rem;">Investitionsplan 2026</div>
+                    <div style="color:#888;font-size:0.9rem;">Kita-Neubau Reinhardtsgrimma (1,42 Mio. Förderung), Bushaltestellen barrierefrei, Vereinshaus, Stützwand und Gehweg Sportplatz (Vollsperrung K 9026 bis Nov 2026).</div>
+                </div>
+                <div style="border-left:3px solid #c9a84c;padding-left:1.2rem;">
+                    <div style="color:#fff;font-weight:600;margin-bottom:0.3rem;">Haushalt unter Druck</div>
+                    <div style="color:#888;font-size:0.9rem;">Kämmerin mahnt zum Sparen. Gewerbesteuer reicht 2026 nicht für alle Ausgaben. Personalkosten steigen bei gleichzeitig unbesetzten Stellen. KI als Hebel gegen dieses Dilemma.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nahversorgung -->
+        <div class="panel" style="margin-bottom:2rem;">
+            <div class="panel-title">Nahversorgung — Erfolgsgeschichte</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:1rem;">
+                <div>
+                    <div style="color:#888;font-size:0.95rem;line-height:1.8;">
+                        <strong style="color:#fff;">3 Jahre ohne Lebensmittelmarkt</strong> im Zentrum — rund 2.000 Einwohner mussten ins Umland fahren.<br><br>
+                        <strong style="color:#4ade80;">Dezember 2025: Durchbruch.</strong> Stadt und Edeka einigen sich auf Grundstückstausch. Aldi Nord bekundet Interesse am bestehenden Standort (550 m²).<br><br>
+                        <strong style="color:#fff;">Zeitplan:</strong> Vertragsgespräche Januar 2026. Vorratsbeschluss Stadtrat Februar 2026. Grundstückstausch bis Ende Q1 2026.<br><br>
+                        <strong style="color:#fff;">Perspektive:</strong> Möglicherweise zwei Supermärkte in Glashütte.
+                    </div>
+                </div>
+                <div style="background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);border-radius:10px;padding:1.5rem;">
+                    <div style="color:#c9a84c;font-weight:600;font-size:1.1rem;margin-bottom:1rem;">Zitat</div>
+                    <div style="color:#ccc;font-style:italic;font-size:1.1rem;line-height:1.6;">
+                        „Leichter weißer Rauch ist über Glashütte aufgestiegen. Wir haben Positives zu vermelden."
+                    </div>
+                    <div style="color:#888;margin-top:0.8rem;font-size:0.9rem;">— Sven Gleißberg, MDR Sachsen, Dezember 2025</div>
+                    <div style="color:#666;margin-top:1.5rem;font-size:0.85rem;border-top:1px solid rgba(201,168,76,0.15);padding-top:1rem;">
+                        KI-Anwendung: Kommunikation dieses Erfolgs automatisiert über alle Kanäle — Amtsblatt, Facebook, Instagram, Bürger-Newsletter, Pressemitteilung — aus einer einzigen Eingabe.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technologie-Radar -->
+        <div class="panel" style="margin-bottom:2rem;">
+            <div class="panel-title">Technologie-Radar für Kommunen</div>
+            <p style="color:#888;font-size:0.95rem;margin-bottom:1.5rem;">Relevante Entwicklungen, die Glashüttes Position als moderne Kommune stärken können.</p>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;">
+                <div style="background:rgba(248,113,113,0.05);border:1px solid rgba(248,113,113,0.2);border-radius:10px;padding:1.5rem;">
+                    <div style="color:#f87171;font-weight:600;font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:0.5rem;">Handlungsbedarf</div>
+                    <div style="color:#fff;font-weight:600;font-size:1.1rem;margin-bottom:0.5rem;">Onlinezugangsgesetz (OZG)</div>
+                    <div style="color:#888;font-size:0.9rem;">Verwaltungsleistungen müssen digital verfügbar werden. Glashütte hat im November 2025 mit der elektronischen Wohnsitzanmeldung begonnen — ein guter Start, aber weitere Dienste müssen folgen.</div>
+                </div>
+                <div style="background:rgba(74,222,128,0.05);border:1px solid rgba(74,222,128,0.2);border-radius:10px;padding:1.5rem;">
+                    <div style="color:#4ade80;font-weight:600;font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:0.5rem;">Chance</div>
+                    <div style="color:#fff;font-weight:600;font-size:1.1rem;margin-bottom:0.5rem;">KI in deutschen Kommunen</div>
+                    <div style="color:#888;font-size:0.9rem;">Unter 5% der Kommunen setzen KI systematisch ein (Bitkom 2024). Glashütte könnte Vorreiter im Landkreis Sächsische Schweiz-Osterzgebirge werden — mit Signalwirkung.</div>
+                </div>
+                <div style="background:rgba(96,165,250,0.05);border:1px solid rgba(96,165,250,0.2);border-radius:10px;padding:1.5rem;">
+                    <div style="color:#60a5fa;font-weight:600;font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:0.5rem;">Zukunft</div>
+                    <div style="color:#fff;font-weight:600;font-size:1.1rem;margin-bottom:0.5rem;">Smart Village / Digitale Dörfer</div>
+                    <div style="color:#888;font-size:0.9rem;">Fraunhofer-Programm für ländliche Gemeinden: Digitale Bürgerbeteiligung, E-Services, Telemedizin. Fördermittel verfügbar für Pilotgemeinden.</div>
+                </div>
+                <div style="background:rgba(251,191,36,0.05);border:1px solid rgba(251,191,36,0.2);border-radius:10px;padding:1.5rem;">
+                    <div style="color:#fbbf24;font-weight:600;font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:0.5rem;">Prüfen</div>
+                    <div style="color:#fff;font-weight:600;font-size:1.1rem;margin-bottom:0.5rem;">Breitband und Glasfaser</div>
+                    <div style="color:#888;font-size:0.9rem;">Sachsen fördert Glasfaserausbau in ländlichen Gebieten. Voraussetzung für digitale Verwaltung, Homeoffice und Einwohnergewinnung junger Familien.</div>
+                </div>
+                <div style="background:rgba(248,113,113,0.05);border:1px solid rgba(248,113,113,0.2);border-radius:10px;padding:1.5rem;">
+                    <div style="color:#f87171;font-weight:600;font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:0.5rem;">Pflicht</div>
+                    <div style="color:#fff;font-weight:600;font-size:1.1rem;margin-bottom:0.5rem;">IT-Sicherheit (BSI-Grundschutz)</div>
+                    <div style="color:#888;font-size:0.9rem;">Verschärfte Anforderungen ab 2026 für kommunale IT. Jedes KI-System muss BSI-konform und lokal betrieben werden — genau unser Ansatz.</div>
+                </div>
+                <div style="background:rgba(96,165,250,0.05);border:1px solid rgba(96,165,250,0.2);border-radius:10px;padding:1.5rem;">
+                    <div style="color:#60a5fa;font-weight:600;font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:0.5rem;">Vorbereitung</div>
+                    <div style="color:#fff;font-weight:600;font-size:1.1rem;margin-bottom:0.5rem;">Elektronische Aktenführung</div>
+                    <div style="color:#888;font-size:0.9rem;">Sachsen treibt die E-Akte voran. Eine KI-Wissensbasis ist die ideale Vorstufe — Dokumente werden strukturiert, durchsuchbar und intelligent verknüpft.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KI für lokale Betriebe (Andreas-Anwendungen) -->
+        <div class="panel" style="margin-bottom: 2rem; animation-delay: 0.8s;">
+            <div class="panel-title">
+                
+                KI für lokale Betriebe — Wirtschaftsförderung Glashütte
+            </div>
+            <p style="color: #888; margin-bottom: 1rem;">KI-Lösungen für Glashütter Unternehmen — vom Maschinenbauer bis zur Uhrenmanufaktur. Die Stadt als Brücke zwischen Innovation und Tradition.</p>
+            <div class="andreas-grid">
+                <div class="andreas-card" onclick="openModal('cnc')">
+                    
+                    <div class="card-title">CNC Planer Pro</div>
+                    <div class="card-desc">Automatische Arbeitsvorbereitung, Kalkulation & Fertigungsanweisung für CNC-Betriebe</div>
+                    <div class="card-saving">↓ 70% Kalkulationszeit</div>
+                </div>
+                <div class="andreas-card" onclick="openModal('wissen')">
+                    
+                    <div class="card-title">Wissenstransfer-System</div>
+                    <div class="card-desc">Meisterwissen digital sichern, bevor die Experten in Rente gehen</div>
+                    <div class="card-saving">0% Wissensverlust</div>
+                </div>
+                <div class="andreas-card" onclick="openModal('email')">
+                    
+                    <div class="card-title">KI-Email-Triage</div>
+                    <div class="card-desc">Automatische Sortierung, Priorisierung und Entwürfe für Geschäftsführer</div>
+                    <div class="card-saving">↓ 2h/Tag Emailzeit</div>
+                </div>
+                <div class="andreas-card" onclick="openModal('angebot')">
+                    
+                    <div class="card-title">Angebotskalkulation</div>
+                    <div class="card-desc">Von der Anfrage zum Angebot in Minuten statt Stunden — mit Nachkalkulation</div>
+                    <div class="card-saving">↓ 80% schneller</div>
+                </div>
+                <div class="andreas-card" onclick="openModal('schulung')">
+                    
+                    <div class="card-title">KI-Schulungen</div>
+                    <div class="card-desc">Workshops für Mittelständler: "KI praktisch einsetzen — ohne Informatik-Studium"</div>
+                    <div class="card-saving">€4.500/Monat Einsparung</div>
+                </div>
+                <div class="andreas-card" onclick="openModal('foerder')">
+                    
+                    <div class="card-title">Fördermittel-Scanner</div>
+                    <div class="card-desc">Automatische Identifikation relevanter Förderprogramme für lokale Betriebe</div>
+                    <div class="card-saving">Ø €50K+ identifiziert</div>
+                </div>
+            </div>
+        </div>
+
+        </div><!-- /tab-betriebe -->
+
+        <!-- Modals -->
+        <div class="modal-overlay" id="modal-stadtrat">
+            <div class="modal">
+                <button class="close-btn" onclick="closeModals()"></button>
+                <h2> Letzter Stadtratsbeschluss</h2>
+                <p><strong>Sitzung vom 23. Januar 2026</strong> — Stadtrat Glashütte</p>
+                <h3>TOP 4: Beschluss zur Digitalisierungsstrategie</h3>
+                <p>Der Stadtrat beschließt einstimmig (18:0), die Verwaltung zu beauftragen, bis zum 31.03.2026 ein Konzept zur digitalen Verwaltungsmodernisierung vorzulegen. Hierfür werden Mittel in Höhe von bis zu €25.000 aus dem Haushalt 2026 bereitgestellt.</p>
+                <h3>TOP 5: Nahversorgung Innenstadt</h3>
+                <p>Der Bürgermeister berichtet über den Stand der Verhandlungen mit Edeka. Ein alternatives Konzept für einen Nahversorger soll bis Februar 2026 vorgelegt werden.</p>
+                <h3>TOP 7: Baulandentwicklung Reinhardtsgrimma</h3>
+                <p>Die Verwaltung wird beauftragt, die Machbarkeit eines neuen Baugebiets zu prüfen. Kosten für das Gutachten: €12.000.</p>
+                <div class="stamp"> Automatisch zusammengefasst aus dem Sitzungsprotokoll (Original: 14 Seiten)</div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="modal-haushalt">
+            <div class="modal">
+                <button class="close-btn" onclick="closeModals()"></button>
+                <h2> Haushaltssatzung 2026 — Zusammenfassung</h2>
+                <table>
+                    <tr><th>Position</th><th>Plan 2026</th><th>Ist 2025</th><th>Trend</th></tr>
+                    <tr><td>Gesamthaushalt</td><td>€12,4 Mio</td><td>€11,8 Mio</td><td style="color:#4ade80">↑ 5%</td></tr>
+                    <tr><td>Personalkosten</td><td>€3,2 Mio</td><td>€3,0 Mio</td><td style="color:#f87171">↑ 7%</td></tr>
+                    <tr><td>Sachkosten</td><td>€2,1 Mio</td><td>€2,3 Mio</td><td style="color:#4ade80">↓ 9%</td></tr>
+                    <tr><td>Investitionen</td><td>€1,8 Mio</td><td>€1,2 Mio</td><td style="color:#4ade80">↑ 50%</td></tr>
+                    <tr><td>Gewerbesteuer</td><td>€4,1 Mio</td><td>€3,9 Mio</td><td style="color:#4ade80">↑ 5%</td></tr>
+                    <tr><td>Schulden</td><td>€2,8 Mio</td><td>€3,1 Mio</td><td style="color:#4ade80">↓ 10%</td></tr>
+                </table>
+                <p><strong>KI-Hinweis:</strong> Die Personalkosten steigen überproportional (+7%) bei gleichzeitig 3 unbesetzten Stellen. KI-Automatisierung könnte den Bedarf um 1 Stelle (~€45.000/Jahr) reduzieren.</p>
+                <div class="stamp"> Automatisch aufbereitet aus der Haushaltssatzung 2026 (Original: 48 Seiten)</div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="modal-bebauung">
+            <div class="modal">
+                <button class="close-btn" onclick="closeModals()"></button>
+                <h2> Bebauungspläne — Übersicht</h2>
+                <table>
+                    <tr><th>B-Plan</th><th>Gebiet</th><th>Status</th><th>Fläche</th></tr>
+                    <tr><td>Nr. 12</td><td>Am Sonnenhang, Glashütte</td><td><span class="badge">rechtskräftig</span></td><td>2,4 ha</td></tr>
+                    <tr><td>Nr. 15</td><td>Gewerbegebiet Süd</td><td><span class="badge">rechtskräftig</span></td><td>5,1 ha</td></tr>
+                    <tr><td>Nr. 18</td><td>Wohngebiet Reinhardtsgrimma</td><td><span class="badge" style="background:rgba(251,191,36,0.15);color:#fbbf24;">in Aufstellung</span></td><td>1,8 ha</td></tr>
+                    <tr><td>Nr. 19</td><td>Erweiterung Uhrenmanufaktur</td><td><span class="badge" style="background:rgba(251,191,36,0.15);color:#fbbf24;">Vorentwurf</span></td><td>0,9 ha</td></tr>
+                </table>
+                <p><strong>KI-Hinweis:</strong> Für B-Plan Nr. 18 (Reinhardtsgrimma) fehlt noch die Stellungnahme der unteren Naturschutzbehörde. Frist: 28.02.2026.</p>
+                <div class="stamp"> Automatisch aus dem Bauleitplanverzeichnis zusammengestellt</div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="modal-satzungen">
+            <div class="modal">
+                <button class="close-btn" onclick="closeModals()"></button>
+                <h2> Satzungen der Stadt Glashütte</h2>
+                <table>
+                    <tr><th>Satzung</th><th>Letzte Änderung</th><th>Status</th></tr>
+                    <tr><td>Hauptsatzung</td><td>15.06.2024</td><td><span class="badge">aktuell</span></td></tr>
+                    <tr><td>Friedhofssatzung</td><td>01.01.2023</td><td><span class="badge">aktuell</span></td></tr>
+                    <tr><td>Hundesteuersatzung</td><td>01.01.2024</td><td><span class="badge">aktuell</span></td></tr>
+                    <tr><td>Straßenreinigungssatzung</td><td>01.01.2020</td><td><span class="badge" style="background:rgba(248,113,113,0.15);color:#f87171;">Überprüfung empfohlen</span></td></tr>
+                    <tr><td>Entschädigungssatzung</td><td>01.07.2021</td><td><span class="badge">aktuell</span></td></tr>
+                    <tr><td>Benutzungsordnung Sporthalle</td><td>15.03.2019</td><td><span class="badge" style="background:rgba(248,113,113,0.15);color:#f87171;">Überprüfung empfohlen</span></td></tr>
+                </table>
+                <p><strong>KI-Hinweis:</strong> 2 Satzungen sind älter als 5 Jahre und sollten auf Aktualität geprüft werden. KI kann einen Änderungsvorschlag basierend auf aktueller Rechtslage erstellen.</p>
+                <div class="stamp"> Automatisch aus dem Satzungsverzeichnis mit Fristüberwachung</div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="modal-strasse">
+            <div class="modal">
+                <button class="close-btn" onclick="closeModals()"></button>
+                <h2> Ausschreibung Straßensanierung Schlottwitz</h2>
+                <p><span class="badge" style="background:rgba(248,113,113,0.15);color:#f87171;">Frist: 13.02.2026 — noch 5 Tage</span></p>
+                <h3>Leistungsbeschreibung (KI-Entwurf)</h3>
+                <p><strong>Objekt:</strong> Liebstädter Straße, OT Schlottwitz, Abschnitt Hausnr. 1-15</p>
+                <p><strong>Umfang:</strong> ca. 450 m², Asphaltdecke erneuern, Bordsteinanlage, Entwässerungsrinne</p>
+                <p><strong>Geschätztes Volumen:</strong> €85.000 - €110.000</p>
+                <p><strong>Vergabeart:</strong> Öffentliche Ausschreibung nach VOB/A §3 (geschätzter Auftragswert > €50.000)</p>
+                <h3>Checkliste Vergaberecht</h3>
+                <ul>
+                    <li> Leistungsbeschreibung erstellt</li>
+                    <li> Vergabevermerk angelegt</li>
+                    <li> Veröffentlichungsfrist berechnet (14 Tage)</li>
+                    <li> Prüfung durch Bauamt ausstehend</li>
+                    <li> Freigabe Bürgermeister</li>
+                </ul>
+                <div class="stamp"> KI-Entwurf basierend auf letzter Straßensanierung (2024) + aktuelle VOB/A. Prüfung durch Sachbearbeiter erforderlich.</div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="modal-kita">
+            <div class="modal">
+                <button class="close-btn" onclick="closeModals()"></button>
+                <h2> Beschlussvorlage: Kita-Erweiterung</h2>
+                <h3>Beschlussvorschlag</h3>
+                <p>Der Stadtrat beschließt die Erweiterung der Kindertagesstätte "Sonnenschein" um eine Gruppe (15 Plätze). Die Verwaltung wird beauftragt, die Entwurfsplanung auszuschreiben. Mittel in Höhe von €280.000 werden im Nachtragshaushalt 2026 bereitgestellt.</p>
+                <h3>Begründung</h3>
+                <ul>
+                    <li>Aktuelle Auslastung: 97% (46 von 47 Plätzen belegt)</li>
+                    <li>Warteliste: 8 Kinder (Stand Februar 2026)</li>
+                    <li>Prognose: +12 Kinder durch Neubaugebiet Reinhardtsgrimma bis 2028</li>
+                    <li>Rechtsanspruch auf Kitaplatz: §24 SGB VIII</li>
+                </ul>
+                <h3>Finanzierung</h3>
+                <table>
+                    <tr><th>Position</th><th>Betrag</th></tr>
+                    <tr><td>Baukosten (geschätzt)</td><td>€280.000</td></tr>
+                    <tr><td>Fördermittel Freistaat (70%)</td><td>-€196.000</td></tr>
+                    <tr><td><strong>Eigenanteil Stadt</strong></td><td><strong>€84.000</strong></td></tr>
+                </table>
+                <div class="stamp"> KI-Entwurf basierend auf Bedarfsanalyse, Demografie-Daten und Fördermittelrecherche. Zur Freigabe durch Hauptamt.</div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="modal-markt">
+            <div class="modal">
+                <button class="close-btn" onclick="closeModals()"></button>
+                <h2> Bürgeranfrage: Lebensmittelmarkt — Antwortentwurf</h2>
+                <p><strong>Eingang:</strong> 02.02.2026 | <strong>Bürger:</strong> Fam. Weber, Dresdner Str. 14</p>
+                <h3>Anfrage (Zusammenfassung)</h3>
+                <p>"Wann gibt es endlich wieder einen Lebensmittelmarkt in Glashütte? Besonders ältere Bürger ohne Auto sind auf Nahversorgung angewiesen."</p>
+                <h3>Antwortentwurf</h3>
+                <p><em>Sehr geehrte Familie Weber,</em></p>
+                <p><em>vielen Dank für Ihr Schreiben. Die Nahversorgung hat für uns höchste Priorität. Nach dem Scheitern der Verhandlungen mit dem bisherigen Betreiber haben wir folgende Schritte eingeleitet:</em></p>
+                <ul>
+                    <li><em>Gespräche mit zwei alternativen Nahversorgern laufen seit Januar 2026</em></li>
+                    <li><em>Ein Konzept für einen Bürgerladen wird geprüft (Fördermittel identifiziert: €45.000)</em></li>
+                    <li><em>Der Stadtrat hat die Verwaltung beauftragt, bis März 2026 eine Lösung vorzulegen</em></li>
+                </ul>
+                <p><em>Ich werde Sie persönlich über den Fortschritt informieren.</em></p>
+                <p><em>Mit freundlichen Grüßen, Sven Gleißberg — Bürgermeister</em></p>
+                <div class="stamp"> KI-Entwurf basierend auf Stadtratsbeschluss TOP 5 (23.01.2026) + aktuellem Sachstand. Zur Freigabe durch Bürgermeister.</div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="modal-cnc">
+            <div class="modal">
+                <button class="close-btn" onclick="closeModals()"></button>
+                <h2> CNC Planer Pro — Für Glashütter Fertigungsbetriebe</h2>
+                <p>Automatische Arbeitsvorbereitung für CNC-Maschinenbau: Von der technischen Zeichnung zum kalkulierten Angebot in Minuten.</p>
+                <h3>Funktionen</h3>
+                <ul>
+                    <li><strong>Zuschlagskalkulation nach REFA</strong> — Materialkosten, Rüst- und Fertigungszeiten, Gemeinkosten</li>
+                    <li><strong>Fertigungsanweisung</strong> — Automatisch generiert mit Werkzeugauswahl und Schnittdaten</li>
+                    <li><strong>Angebotserstellung</strong> — Vom Bauteil zum druckfertigen Angebot</li>
+                    <li><strong>Nachkalkulation</strong> — Ist vs. Soll Vergleich, Deckungsbeitragsrechnung</li>
+                </ul>
+                <h3>Zahlen</h3>
+                <table>
+                    <tr><th>Metrik</th><th>Ohne KI</th><th>Mit CNC Planer</th></tr>
+                    <tr><td>Kalkulation pro Bauteil</td><td>45-90 Min.</td><td>5-15 Min.</td></tr>
+                    <tr><td>Angebotserstellung</td><td>2-4 Stunden</td><td>20 Minuten</td></tr>
+                    <tr><td>Wissensverlust bei Rente</td><td>Hoch</td><td>0%</td></tr>
+                    <tr><td>Kalkulationsgenauigkeit</td><td>±20% (Bauchgefühl)</td><td>±10% (datenbasiert)</td></tr>
+                </table>
+                <p><strong>Bereits im Einsatz bei:</strong> Maschinenbau Schlottwitz GmbH & Co. KG (Pilotprojekt)</p>
+                <div class="stamp">Entwickelt von Florian Ziesche | Lokal, DSGVO-konform, kein Cloud-Zwang</div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="modal-wissen">
+            <div class="modal">
+                <button class="close-btn" onclick="closeModals()"></button>
+                <h2> Wissenstransfer-System für Betriebe</h2>
+                <p>Zwei Drittel der sächsischen KMU berichten von akutem Fachkräftemangel. In Glashütter Uhrenmanufakturen und Maschinenbaubetrieben geht jahrzehntelanges Meisterwissen in Rente.</p>
+                <h3>Lösung: Digitales Meister-Gedächtnis</h3>
+                <ul>
+                    <li>Erfahrene Mitarbeiter dokumentieren ihr Wissen in Interviews (KI-gestützt)</li>
+                    <li>KI strukturiert und indexiert das Wissen automatisch</li>
+                    <li>Neue Mitarbeiter können fragen: "Wie haben wir das letzte Mal gemacht?"</li>
+                    <li>Lokal gespeichert (Obsidian), kein Betriebsgeheimnis verlässt das Unternehmen</li>
+                </ul>
+                <h3>ROI</h3>
+                <p>Kosten einer Fehlbesetzung: <strong>€30.000-50.000</strong>. Kosten eines Wissenstransfer-Systems: <strong>€5.000 einmalig</strong>.</p>
+                <div class="stamp">Besonders relevant für Uhrenmanufakturen mit Spezialistenknappheit</div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="modal-email">
+            <div class="modal">
+                <button class="close-btn" onclick="closeModals()"></button>
+                <h2> KI-Email-Triage für Geschäftsführer</h2>
+                <p>Ein durchschnittlicher GF verbringt <strong>2-3 Stunden täglich</strong> mit E-Mails. KI kann das auf 30 Minuten reduzieren.</p>
+                <h3>Funktionen</h3>
+                <ul>
+                    <li><strong>Automatische Priorisierung:</strong> Dringend / Wichtig / Kann warten / Spam</li>
+                    <li><strong>Zusammenfassung:</strong> Lange E-Mails → 3-Satz-Zusammenfassung</li>
+                    <li><strong>Antwortentwürfe:</strong> KI schreibt Antwort vor, GF bestätigt nur</li>
+                    <li><strong>Weiterleitung:</strong> Automatisch an zuständigen Mitarbeiter</li>
+                </ul>
+                <h3>Einsparung</h3>
+                <p><strong>2h/Tag × 250 Arbeitstage × €75/h (GF-Stundensatz) = €37.500/Jahr</strong></p>
+                <div class="stamp">Funktioniert mit jedem E-Mail-Programm. Setup in 1 Tag.</div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="modal-angebot">
+            <div class="modal">
+                <button class="close-btn" onclick="closeModals()"></button>
+                <h2> Automatische Angebotskalkulation</h2>
+                <p>Vom Kundenanfrage bis zum druckfertigen Angebot — in Minuten statt Stunden.</p>
+                <h3>Prozess</h3>
+                <ul>
+                    <li>1. Technische Zeichnung hochladen oder Bauteil beschreiben</li>
+                    <li>2. KI erkennt Material, Bearbeitungsschritte, Komplexität</li>
+                    <li>3. Automatische Kalkulation nach REFA + betriebsspezifische Zuschläge</li>
+                    <li>4. Druckfertiges Angebot als PDF generiert</li>
+                </ul>
+                <h3>Zeitvergleich</h3>
+                <table>
+                    <tr><th>Schritt</th><th>Manuell</th><th>Mit KI</th></tr>
+                    <tr><td>Zeichnung analysieren</td><td>30 Min.</td><td>2 Min.</td></tr>
+                    <tr><td>Material + Zeiten kalkulieren</td><td>45 Min.</td><td>3 Min.</td></tr>
+                    <tr><td>Zuschläge berechnen</td><td>15 Min.</td><td>automatisch</td></tr>
+                    <tr><td>Angebot formatieren</td><td>20 Min.</td><td>1 Min.</td></tr>
+                    <tr><td><strong>Gesamt</strong></td><td><strong>~2 Stunden</strong></td><td><strong>~10 Minuten</strong></td></tr>
+                </table>
+                <div class="stamp">Basierend auf CNC Planer Pro. Kalibriert mit echten Betriebsdaten.</div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="modal-schulung">
+            <div class="modal">
+                <button class="close-btn" onclick="closeModals()"></button>
+                <h2> KI-Schulungen für Mittelständler</h2>
+                <p>"KI praktisch einsetzen — ohne Informatik-Studium"</p>
+                <h3>Workshop-Formate</h3>
+                <table>
+                    <tr><th>Format</th><th>Dauer</th><th>Zielgruppe</th><th>Ergebnis</th></tr>
+                    <tr><td>KI-Schnupperkurs</td><td>3h</td><td>Geschäftsführer</td><td>Verständnis + 3 sofort nutzbare Tools</td></tr>
+                    <tr><td>KI im Büro</td><td>1 Tag</td><td>Sachbearbeiter</td><td>E-Mail, Dokumente, Recherche mit KI</td></tr>
+                    <tr><td>KI in der Fertigung</td><td>1 Tag</td><td>AV / Meister</td><td>Kalkulation, Planung, Wissenstransfer</td></tr>
+                    <tr><td>KI-Strategie</td><td>2 Tage</td><td>Führungsteam</td><td>Roadmap + 3 Pilotprojekte definiert</td></tr>
+                </table>
+                <h3>Geschätztes Einsparpotenzial pro Betrieb</h3>
+                <p><strong>€4.500/Monat</strong> (konservativ, basierend auf 5 Anwendungsbereichen)</p>
+                <div class="stamp">40-Folien Schulungsdeck verfügbar. Referenz: 5 interaktive Live-Demos.</div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="modal-foerder">
+            <div class="modal">
+                <button class="close-btn" onclick="closeModals()"></button>
+                <h2> Fördermittel-Scanner</h2>
+                <p>KI scannt automatisch alle relevanten Förderprogramme für Glashütter Betriebe und die Stadtverwaltung.</p>
+                <h3>Aktuell identifizierte Programme</h3>
+                <table>
+                    <tr><th>Programm</th><th>Für</th><th>Max. Zuschuss</th></tr>
+                    <tr><td>Sachsen EFRE</td><td>Digitalisierung KMU</td><td>bis 60%</td></tr>
+                    <tr><td>Brandenburg BIG-Digital</td><td>Digitalisierung</td><td>bis €250.000</td></tr>
+                    <tr><td>BMBF KI für KMU</td><td>KI-Projekte</td><td>Vollfinanzierung</td></tr>
+                    <tr><td>go-digital (BMWi)</td><td>IT-Sicherheit, Digitalisierung</td><td>bis €16.500</td></tr>
+                    <tr><td>SAB Sachsen</td><td>Investitionsförderung</td><td>variabel</td></tr>
+                </table>
+                <p><strong>Für Glashütte identifiziert: €127.000+ potenzielles Fördervolumen</strong></p>
+                <div class="stamp">Automatisch aktualisiert. Letzte Prüfung: heute.</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p class="footer-concept">Konzept: Florian Ziesche — KI-Beratung für Kommunen</p>
+            <p class="footer-disclaimer">Alle Daten sind Demonstrationswerte. Echte Werte nach 4-Wochen-Assessment.</p>
+            <p class="footer-contact">
+                <a href="mailto:florian@ainaryventures.com">florian@ainaryventures.com</a> | 
+                <a href="tel:+4915123039208">+49 151 230 39 208</a>
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Update datetime
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            const dateTimeString = now.toLocaleDateString('de-DE', options);
+            document.getElementById('datetime').textContent = dateTimeString;
+        }
+
+        updateDateTime();
+        setInterval(updateDateTime, 60000); // Update every minute
+
+        // Add interactive search functionality
+        const searchBar = document.querySelector('.search-bar');
+        searchBar.addEventListener('focus', function() {
+            this.style.boxShadow = '0 0 20px rgba(201, 168, 76, 0.2)';
+        });
+        searchBar.addEventListener('blur', function() {
+            this.style.boxShadow = 'none';
+        });
+
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // Quick links open modals
+        const quickLinkModals = {
+            'Letzte Stadtratsbeschlüsse': 'stadtrat',
+            'Haushaltssatzung': 'haushalt',
+            'Bebauungspläne': 'bebauung',
+            'Satzungen': 'satzungen'
+        };
+        const quickLinks = document.querySelectorAll('.quick-link');
+        quickLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                const modalId = quickLinkModals[this.textContent];
+                if (modalId) openModal(modalId);
+            });
+        });
+
+        // Task items open modals
+        const taskModals = {
+            'Ausschreibung Straßensanierung': 'strasse',
+            'Beschlussvorlage Kita-Erweiterung': 'kita',
+            'Antwort Bürgeranfrage Lebensmittelmarkt': 'markt'
+        };
+        document.querySelectorAll('.task-item').forEach(item => {
+            const name = item.querySelector('.task-name')?.textContent;
+            if (taskModals[name]) {
+                item.classList.add('clickable');
+                item.addEventListener('click', () => openModal(taskModals[name]));
+            }
+        });
+
+        // Briefing items clickable
+        document.querySelectorAll('.briefing-notice').forEach(item => {
+            item.classList.add('clickable');
+            item.addEventListener('click', () => openModal('strasse'));
+        });
+
+        // Modal functions
+        function openModal(id) {
+            const modal = document.getElementById('modal-' + id);
+            if (modal) modal.classList.add('active');
+        }
+        function closeModals() {
+            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+        }
+        // Click outside to close
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) closeModals();
+            });
+        });
+        // Escape key to close
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModals();
+        });
+
+        // Add subtle pulse animation to priority dots
+        const priorityDots = document.querySelectorAll('.task-priority');
+        setInterval(() => {
+            priorityDots.forEach((dot, index) => {
+                setTimeout(() => {
+                    dot.style.transform = 'scale(1.2)';
+                    setTimeout(() => {
+                        dot.style.transform = 'scale(1)';
+                    }, 200);
+                }, index * 100);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

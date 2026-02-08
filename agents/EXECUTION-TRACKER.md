@@ -65,4 +65,28 @@
 
 ---
 
-*Letzte Aktualisierung: 2026-02-05 10:27*
+## Woche 7 (10.-16. Feb 2026)
+
+### CNC Outreach (Ziel: 5/Tag Mo-Fr)
+| Tag | Gesendet | An wen | Status |
+|-----|----------|--------|--------|
+| Mo 10. | - | - | ☐ |
+
+### AI Consulting Outreach (Ziel: 2/Tag Mo-Fr)
+| Tag | Gesendet | An wen | Status |
+|-----|----------|--------|--------|
+| Mo 10. | - | - | ☐ |
+
+### VC Applications (Ziel: 1/Tag)
+| Tag | Gesendet | Fund | Status |
+|-----|----------|------|--------|
+| Mo 10. | - | - | ☐ |
+
+### Content Published (Ziel: 1 LinkedIn/Tag + 1 Substack/Woche)
+| Tag | Was | Plattform | Status |
+|-----|-----|-----------|--------|
+| Mo 10. | - | - | ☐ |
+
+---
+
+*Letzte Aktualisierung: 2026-02-08 03:30 (Night Work)*
