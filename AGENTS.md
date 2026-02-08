@@ -20,6 +20,24 @@ Before doing anything else:
 
 Don't ask permission. Just do it.
 
+## Before EVERY Task (Non-Negotiable)
+
+**This is a checklist, not a suggestion. Skip it and quality drops.**
+
+1. Run `./scripts/pre-flight.sh [task-type]` (cnc|bm|vc|content|visual|general)
+2. Read `TWIN.md` — Can I decide autonomously? (>90% Confidence → act, <90% → ask)
+3. Read `standards/FLORIAN.md` — What does Florian expect?
+4. `grep -i "[keyword]" INDEX.md` — Does something already exist?
+5. Load task-specific knowledge (see pre-flight output)
+6. For complex tasks → spawn Sub-Agent WITH the relevant knowledge files
+7. Read `standards/checklists/before-any-output.md` before delivering
+
+**After EVERY delivery:**
+- Update `failures/output-tracker.md`
+- If Florian doesn't use it → analyze WHY and update FLORIAN.md
+
+**Why this exists:** I forget between sessions. I forget mid-session. This list is my only guarantee that quality stays consistent. Tooling > Discipline.
+
 ---
 
 ## Memory
