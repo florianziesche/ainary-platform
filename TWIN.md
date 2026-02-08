@@ -80,6 +80,9 @@
 - Preise nennen oder verhandeln
 - Informationen über Florians Finanzen/Schulden teilen
 - Zugang zu Accounts/Systemen ändern
+- **iMessage/WhatsApp von ANDEREN Personen → IMMER NO_REPLY, dann Florian separat informieren**
+  - NIEMALS direkt an Nancy, Familie, oder Dritte antworten
+  - Fehler vom 08.02: Nachricht über Nancy wurde AN Nancy gesendet
 
 ### Weiche Regeln (fragen wenn unsicher)
 - Neues Projekt starten (>2h Aufwand)
