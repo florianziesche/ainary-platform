@@ -329,6 +329,26 @@ Week of 2026-02-10 target:
 
 ---
 
+## Cycle #0026 — 2026-02-08 22:00 CET
+
+**Mode**: C (Expand) + E (Personalization)
+**Status**: ✅ SUCCESS
+
+**Changes**:
+1. **Created `scripts/memory-grep.sh`** — Local grep-based memory search fallback
+   - Why: `memory_search` depends on OpenAI embeddings API which hit quota limit
+   - Searches MEMORY.md, memory/, HEARTBEAT.md, USER.md, INDEX.md, agents/, standards/, research/, content/, products/
+   - Supports multi-word OR queries, returns file:line:context
+   - Usage: `./scripts/memory-grep.sh "search terms" [max_results]`
+   
+**Personalization (from MEMORY.md)**:
+- Addresses limitation #5: "memory_search hat API-Abhängigkeit → grep als Fallback"
+- Now there's an actual script for that fallback, not just a note
+
+**No Publish**: Local utility script, not a skill change.
+
+---
+
 ## Cycle #0020 — [Previous cycle data here]
 
 ...
