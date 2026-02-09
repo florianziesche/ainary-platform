@@ -6,10 +6,11 @@
 ## VOR DEM MEETING
 
 ### Materialliste (auf Laptop vorbereiten)
-- [ ] `konzept-buergermeister-light.html` — Hauptpräsentation (Light-Theme, professionell)
-- [ ] `glashuette-buergermeister-dashboard.html` — Interaktives Demo-Dashboard (Dark, für Wow-Effekt)
-- [ ] `praesentation-buergermeister.html` — 10-Slide Backup
-- [ ] `email-buergermeister.md` — Falls vorab per Mail gesendet
+- [ ] [[konzept-buergermeister-light|Dashboard Light]] — Hauptpräsentation (Light-Theme, professionell)
+- [ ] [[glashuette-buergermeister-dashboard|Dashboard Dark]] — Interaktives Demo-Dashboard (Dark, für Wow-Effekt)
+- [ ] [[praesentation-buergermeister|10-Slide Präsentation]] — Backup
+- [ ] [[email-buergermeister|Email-Entwurf]] — Falls vorab per Mail gesendet
+- [ ] [[konzept-ki-assistent-buergermeister|Konzept-Dokument]] — Vollständiges Konzept (PDF-Export)
 - [ ] Laptop geladen, Bildschirmhelligkeit hoch
 - [ ] Handy stumm
 
@@ -19,11 +20,15 @@
 - **Herkunft:** Schlottwitz — IHR seid Nachbarn
 - **Familie:** 3 Kinder
 - **Stil:** Nennt sich selbst "der Kommunikator" (SZ-Zitat)
+  - *Quelle: Sächsische Zeitung, Porträt Sven Gleißberg*
 - **Social Media:** Aktiv — FB 852 Likes, IG 1.099 Follower, wöchentlicher Rückblick
+  - *Quelle: Facebook/Instagram Glashütte, Stand Februar 2026*
 - **Stärke:** Nahbar, engagiert, löst Probleme (Nahversorgung!)
 - **Schwäche:** Kleine Verwaltung, hohe Belastung, Budget unter Druck
 - **Wahl 2021:** 57,5% Stichwahl gegen AfD (42,5%). Nächste Wahl: Herbst 2028
+  - *Quelle: Wahlergebnis Bürgermeisterwahl Glashütte, 06.12.2021*
 - **Stadtrat:** 18 Sitze — AfD 5, CDU 4, diverse WVs 8, Grüne 1. Mehrheit ohne AfD möglich.
+  - *Quelle: Kommunalwahl Glashütte, August 2024*
 
 ### Sein Wahrscheinliches Mindset
 - "Klingt interessant, aber haben wir Geld dafür?"
@@ -48,8 +53,11 @@
 - "Ich beschäftige mich beruflich mit KI für Verwaltungen und Mittelstand. Was ich sehe: Kommunen wie Glashütte leisten enorm viel mit wenigen Leuten."
 - **Zahlen nennen (er ist Banker, Zahlen wirken):**
   - "570.000 unbesetzte Stellen im öffentlichen Dienst. 165.000 könnten durch KI entlastet werden."
+    - *Quelle: dbb Beamtenbund, September 2024; McKinsey-Studie, Juli 2024*
   - "Die AKDB in Bayern hat 80% schnellere Bearbeitung gemessen."
+    - *Quelle: AKDB Bayern, Pilotprojekte 2024*
   - "Unter 5% der Kommunen setzen KI ein. Da liegt eine Chance."
+    - *Quelle: Bitkom Studie, 2024*
 - **NICHT sagen:** "Ihre Verwaltung ist ineffizient." → **Stattdessen:** "Ihre Mitarbeiter leisten großartige Arbeit. KI gibt ihnen mehr Luft."
 
 ### Phase 3: Lösung zeigen (8–10 Min)
@@ -107,3 +115,7 @@
 ---
 
 *Kontakt: +49 151 230 39 208 | florian@ainaryventures.com*
+
+---
+
+#meeting #glashuette #buergermeister #ki-assistent #ainary

@@ -31,6 +31,11 @@
 ## Standards & Qualität
 - `DEFINITION-OF-DONE.md` — Wann ist ein Output wirklich fertig
 - `BRAND-IDENTITY-SYNTHESIS.md` — Corporate Identity komplett (479 Zeilen)
+- `standards/RESEARCH-PROTOCOL.md` — Pre-Research Protocol (Question → Hypothesis → MECE → BLUF → Admiralty Rating)
+- `standards/SYNTHESIS-PROTOCOL.md` — Synthesis Protocol (SCQA, Insight Ladder, Pre-mortem, Calibrated Confidence)
+- `standards/MENTAL-MODELS-LOOKUP.md` — Situation → Model → Action (8 Situationen, Mental Models Library)
+- `standards/OUTPUT-PREFLIGHT.md` — 6 Meta-Rules + 5 Pre-Output Questions (Board Discussion 1/8)
+- `standards/3-LEAN-CHECKLISTS.md` — Content/Outreach/Deliverable Checklists (Munger's Killer Items, 5-9 items)
 - `research/golden-standards/design-system.md` — CSS Design System (Linear/Notion-inspired)
 - `research/golden-standards/form-inputs.md` — Form Input Patterns
 - `research/golden-standards/price-display.md` — Pricing Display Patterns
@@ -163,6 +168,8 @@
 - `memory/YYYY-MM-DD.md` — Tagesnotizen (31 Dateien, seit ~Jan 2026)
 - `memory/heartbeat-state.json` — Heartbeat-Tracking
 - `memory/kintsugi.md` — Fehler repariert mit Gold
+- `memory/wins/` — Win-Dokumentation (Self-Generated ICL Dataset, Mechanism 3)
+- `memory/wins/README.md` — Wie Wins dokumentieren (Prompt → Output → Why It Worked)
 
 ## Scripts & Automation
 - `scripts/pre-build-check.sh` — Build-Blocker Check

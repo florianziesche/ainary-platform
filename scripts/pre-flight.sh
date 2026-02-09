@@ -22,34 +22,38 @@ echo ""
 case $TASK in
   cnc)
     echo "🔧 CNC-TASK: Zusätzlich laden:"
-    echo "  - 30-Knowledge/CNC-Fertigung.md (Vault)"
+    echo "  - 60_Resources/Knowledge/ (Vault — CNC-Fertigung)"
     echo "  - products/cnc-planner/ (Workspace)"
-    echo "  - 40-People/Andreas-Brand.md (Vault)"
+    echo "  - 30_People/ (Vault — Andreas Brand)"
     ;;
   bm|kommune)
     echo "🏛️ BM/KOMMUNE-TASK: Zusätzlich laden:"
-    echo "  - 30-Knowledge/Kommunal-KI.md (Vault)"
-    echo "  - 30-Knowledge/Foerdermittel-Sachsen.md (Vault)"
-    echo "  - 40-People/Sven-Gleissberg.md (Vault)"
+    echo "  - 60_Resources/Knowledge/ (Vault — Kommunal-KI, Fördermittel)"
+    echo "  - 30_People/ (Vault — Sven Gleißberg)"
     echo "  - projects/glashuette-ki/ (Workspace)"
     ;;
   vc)
     echo "💼 VC-TASK: Zusätzlich laden:"
-    echo "  - 30-Knowledge/VC-Landscape.md (Vault)"
-    echo "  - 10-Projects/VC-Career/ (Vault)"
+    echo "  - 60_Resources/VC/ (Vault — VC Landscape)"
+    echo "  - 20_Areas/Venture-Capital/ (Vault — Applications, Thesis, Fund-Research)"
     echo "  - skills/vc-application/SKILL.md (Workspace)"
     ;;
   content)
     echo "✍️ CONTENT-TASK: Zusätzlich laden:"
-    echo "  - 30-Knowledge/Content-Strategy.md (Vault)"
+    echo "  - 20_Areas/Content/ (Vault — Strategy, Queue, Ideas)"
     echo "  - content/CONTENT-STRATEGY-Q1.md (Workspace)"
-    echo "  - 10-Projects/Content-Engine/ (Vault)"
     ;;
   visual|design|dashboard)
     echo "🎨 VISUAL-TASK: Zusätzlich laden:"
     echo "  - standards/CORPORATE-IDENTITY.md (Workspace)"
     echo "  - BRAND-IDENTITY-SYNTHESIS.md (Workspace)"
     echo "  - research/golden-standards/ (Workspace)"
+    ;;
+  freelance|consulting)
+    echo "💰 FREELANCE-TASK: Zusätzlich laden:"
+    echo "  - 20_Areas/Freelance/ (Vault)"
+    echo "  - sales/AI-CONSULTING-PLAYBOOK.md (Workspace)"
+    echo "  - 30_People/ (Vault — relevante Kontakte)"
     ;;
   *)
     echo "📌 GENERAL: Nur Basis-Dateien."

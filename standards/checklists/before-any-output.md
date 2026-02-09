@@ -46,7 +46,15 @@ grep -i "[keyword]" standards/FLORIAN.md
 - [ ] Auch auf Desktop wenn Florian es extern nutzt?
 - [ ] Kontext mitgeben: "Was ist es, wofür, was als nächstes"
 
-## 6. NACH ABGABE (Erinnerung)
+## 6. ANTI-LLM VOICE CHECK (jeder externe Text)
+
+- [ ] `standards/VOICE-GUIDE.md` Checklist durchlaufen
+- [ ] Em-dash Count < 3
+- [ ] Keine repetitiven Section-Strukturen
+- [ ] Kein Self-praise, keine Filler-Wörter
+- [ ] Klingt menschlich, nicht generiert?
+
+## 7. NACH ABGABE (Erinnerung)
 
 - [ ] Output-Tracker aktualisieren: `failures/output-tracker.md`
 - [ ] War der Output nützlich? Wenn nein: analysieren

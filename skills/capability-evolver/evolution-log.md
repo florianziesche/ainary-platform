@@ -329,6 +329,21 @@ Week of 2026-02-10 target:
 
 ---
 
+## Cycle #0027 — 2026-02-09 10:00 CET
+
+**Mode**: C (Expand) + E (Personalization)
+**Status**: ✅ SUCCESS
+
+**Changes**:
+1. **Created `scripts/daily-send-summary.sh`** — Unified send dashboard for all pipelines
+   - Aggregates CNC (34), VC (19), and content (5) ready-to-send items in one view
+   - Tracks today's sends and consecutive zero-send days with cost estimate
+   - JSON output mode for programmatic use in heartbeats/cron
+
+**Insight**: System had shame tooling but no quick status check. Quick numbers > long lectures.
+
+---
+
 ## Cycle #0026 — 2026-02-08 22:00 CET
 
 **Mode**: C (Expand) + E (Personalization)

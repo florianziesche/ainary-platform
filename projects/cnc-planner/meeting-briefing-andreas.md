@@ -6,9 +6,9 @@
 ## VOR DEM MEETING
 
 ### Materialliste
-- [ ] `mbs-dashboard-light.html` — Hauptpräsentation (Light, professionell)
-- [ ] `mbs-dashboard-andreas.html` — Interaktives Dashboard (Dark, Demo)
-- [ ] `cnc-v18-demo.html` — CNC Planer Pro LIVE-DEMO (das wichtigste Tool!)
+- [ ] [[mbs-dashboard-light|Dashboard Light]] — Hauptpräsentation (Light, professionell)
+- [ ] [[mbs-dashboard-andreas|Dashboard Dark]] — Interaktives Dashboard (Dark, Demo)
+- [ ] [[cnc-v18-demo|CNC Planer Pro Demo]] — LIVE-DEMO (das wichtigste Tool!)
 - [ ] 3 Demo-Bauteile vorbereitet: Verbindungsplatte (1.4571), Adapterplatte (AlMg3), Block (AlMg3)
 - [ ] Demo-Package: `~/Desktop/cnc-demo-andreas/`
 - [ ] Laptop geladen
@@ -19,6 +19,7 @@
 - **Beziehung:** Dein Onkel
 - **Betrieb:** CNC-Fertigung, 2 Standorte, Präzisionsteile
 - **Stundensätze:** CNC 70€/h, Sägen 45€/h, Entgraten 31€/h
+  - *Quelle: MBS-Kalkulation, kalibriert Januar 2026; basierend auf REFA-Industriestandards*
 - **Herausforderung:** Fachkräftemangel, Wissenstransfer, Effizienz
 - **Koordinator:** Sebastian (Arbeitsvorbereiter) — dein Ansprechpartner für Termine
 
@@ -45,12 +46,16 @@
 Dashboard öffnen → Tab "Probleme und ROI"
 
 **Problem 1 — Rüstzeit:** "Eure Leute rüsten Schraubstöcke ab und gleich wieder ein, weil die Auftragsreihenfolge nicht optimiert ist. 4 unnötige Rüstvorgänge am Tag, 30 Minuten je — das sind 500 Stunden im Jahr. Bei 70 Euro Stundensatz: **35.000 Euro.**"
+- *Quelle: Mitarbeiter-Feedback MBS, Januar 2026; Stundensatz laut MBS-Kalkulation*
 
 **Problem 2 — NC-Programme:** "NC-Programm ist auf Maschine 3 getestet, aber der nächste Auftrag geht an Maschine 5. Oder an jemanden, der es noch nie gemacht hat. 3 Mal pro Woche, 1,5 Stunden Neueinrichtung: **15.750 Euro.**"
+- *Quelle: Mitarbeiter-Feedback MBS, Januar 2026; Berechnung: 3 x 1,5h x 50 Wochen x 70 EUR*
 
 **Problem 3 — Wissen:** "Mitarbeiter schreiben Hinweise auf die Blätter. Nächste Fertigung: Hinweise weg. Nacharbeit, Fehler, Ausschuss: **14.000 Euro.** Und wenn der Meister in Rente geht — was dann?"
+- *Quelle: Mitarbeiter-Feedback MBS, Januar 2026; Schätzung basierend auf REFA-Standards*
 
 **Problem 4 — Standorte:** "Zweiter Standort plant komplexere Teile ohne Absprache. Keine Transparenz, doppelte Arbeit: **8–12.000 Euro.**"
+- *Quelle: MBS-Betriebsstruktur (2 Standorte), Schätzung basierend auf Abstimmungsaufwand*
 
 → **Pause.** "Zusammen: **50 bis 60.000 Euro pro Jahr.** Das ist konservativ gerechnet."
 
@@ -136,3 +141,7 @@ Nicht alle 6 im Detail. **Fokus auf die 3, die ihn am meisten packen:**
 ---
 
 *Kontakt: +49 151 230 39 208 | florian@ainaryventures.com*
+
+---
+
+#meeting #mbs #cnc-planner #andreas #ainary

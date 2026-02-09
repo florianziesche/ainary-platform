@@ -30,7 +30,10 @@
 | 5 | 08.02 | Meeting-Briefing BM | MD | ✅ | — | Klarer Ablauf gibt Sicherheit |
 | 6 | 08.02 | Meeting-Briefing Andreas | MD | ✅ | — | LIVE-DEMO Fokus = richtig |
 | 7 | 08.02 | Email BM Draft | MD | ? | ? | Noch nicht gesendet — Ergebnis abwarten |
-| 8 | 08.02 | Präsentation BM Dark | HTML | ❌ | Q | ROI zu niedrig, Preise sichtbar, zu wenig Nutzen → Light-Redesign angefragt |
+| 8 | 08.02 | Praesentation BM Dark | HTML | ❌ | Q | ROI zu niedrig, Preise sichtbar, zu wenig Nutzen |
+| 9 | 09.02 | Fund Thesis (Publish) | MD | ❌ | P | FALSCH: Auf "Vertical AI" reduziert statt echte Thesis aus Decile Hub. Consulting-Projekte (CNC/Legal/Municipal) mit Fund-Thesis vermischt. |
+| 10 | 09.02 | Landing Page (Publish) | MD | ❌ | P | FALSCH: Gleicher Drift. "$11T labor market" + CNC 72h + Legal 0.2% = Consulting-Showcase, nicht Investor-Positioning. |
+| 11 | 09.02 | Ainary Website v1 | HTML | ❌ | P | Thesis-Section ("Why Vertical AI") auf Kunden-Website. Zwei Audiences vermischt. |
 | | | | | | | |
 
 ---

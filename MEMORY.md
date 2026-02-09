@@ -20,18 +20,18 @@
 
 ## Aktive Threads (max 5)
 
-1. **CNC Demo @ MBS** — Email an Andreas gesendet 06.02. Termin Mo/Di über Sebastian.
-2. **Bürgermeister Glashütte** — Konzept + Dashboard + Briefing fertig. Email-Draft fertig. Noch nicht gesendet.
+1. **Vault Umbau v3** — PARA-Struktur (7 Top-Level statt 13). HOF=VC-Career, CNC=Freelance, Kommunal=Tag. Linking-Regeln fertig.
+2. **AI Consulting Outreach** — Playbook fertig, go-digital AUSGELAUFEN, Bayern Digitalbonus Plus = bester Fit (€30K, keine Autorisierung). 10 Emails morgen.
 3. **VC Applications** — HOF, Betaworks, Leonis, Wingspan ready. 0 submitted.
-4. **System-Architektur** — Vault aufgebaut, TWIN.md, Standards, Output-Tracker. MEMORY.md verschlankt.
-5. **Content** — 5 Substack Artikel, 10 LinkedIn Posts drafted. 0 published. Substack Account nicht eingerichtet.
+4. **Content** — Artikel #1 published, Artikel #2 in Review. 15 Ideas priorisiert.
+5. **CNC Demo @ MBS** — Email an Andreas gesendet 06.02.
 
 ## Spezialwissen (NICHT hier, sondern laden bei Bedarf)
 
 | Thema | Datei | Wann laden |
 |-------|-------|------------|
-| CNC Kalkulation, REFA, Stundensätze | `30-Knowledge/CNC-Fertigung.md` (Vault) | CNC-Tasks |
-| Kommunal-KI, OZG, Förderung | `30-Knowledge/Kommunal-KI.md` (Vault) | BM/Kommune-Tasks |
+| CNC Kalkulation, REFA, Stundensätze | `60_Resources/Knowledge/CNC-Fertigung.md` (Vault) | CNC-Tasks |
+| Kommunal-KI, OZG, Förderung | `60_Resources/Knowledge/Kommunal-KI.md` (Vault) | BM/Kommune-Tasks |
 | Corporate Identity, Farben, Fonts | `standards/CORPORATE-IDENTITY.md` | Visuelle Outputs |
 | Florians Erwartungen, Patterns | `standards/FLORIAN.md` + `TWIN.md` | JEDER Output |
 | Board Advisors (6 Personen) | `board/*/SECOND-BRAIN.md` | Strategie-Fragen |
@@ -60,12 +60,17 @@
 
 ## Ainary Ventures
 
-Umbrella/Dachmarke (NICHT nur VC Fund):
-- LLC (geplant)
-- Venture Fund (via VC Lab/Decile)
-- AI Consultancy
-- Startup (CNC Planer etc.)
-- Content/Education
+Umbrella/Dachmarke mit zwei Saeulen:
+
+**Ainary Ventures (Fund):** $5MM seed fund. European founders, AI-first + deep-tech, in the US.
+- 5 Layer: AI Production Systems, Vertical AI, Agentic AI, Governance/Assurance, Compute/Infra
+- Edge: Technische Tiefe, Founder-Relatability, EU-US Bridge
+- Quelle: Decile Hub Sprint 1+2 (IMMER diese Originaldokumente lesen bei Thesis-Fragen!)
+
+**Ainary Consulting:** KI-Systeme fuer Mittelstand + Kommunen (CNC, BM, Freie Presse)
+- Komplett anderes Messaging als Fund. Kunde = Andreas/Daniel/BM. Nicht LPs.
+
+NICHT vermischen. Kintsugi #5.
 
 ## Technisches
 
@@ -73,6 +78,22 @@ Umbrella/Dachmarke (NICHT nur VC Fund):
 - Sub-Agents: Max 5 parallel, Sonnet model
 - Obsidian Vault: `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/System_OS/`
 - Desktop-Ordner: 01-Dashboards, 02-Active, 03-Mia-Brand
+
+## Harte Regeln (nicht optional)
+
+- Bei Thesis/CV/Positioning: ERST Florians Originaltexte lesen (Decile Hub Sprints, LinkedIn)
+- Jedes Dokument braucht Audience-Tag: [KUNDE] [LP/VC] [PUBLIC] [INTERN]
+- Fragen > Fertige Loesungen. Optionen geben, Florian entscheidet.
+- Nach jeder 3. Aenderung: "Gleiche Audience? Gleiche Aussage wie Florian?"
+- Memory sofort schreiben, nicht am Ende der Session
+
+## Vault-Regeln (aktuell)
+
+- PARA-Struktur: Projects / Areas / Resources / Archive / Daily / Templates / System
+- Linking: `standards/LINKING-RULES.md` — inline mit Kontext, max 3-5 pro Datei, keine Related-Sections
+- Tags für Kategorien (#freelance, #vc, #cnc), Links für Beziehungen
+- Backlinks sind automatisch in Obsidian — nicht manuell doppelt verlinken
+- Wikilinks: NUR Filename `[[Datei]]`, nie `[[Ordner/Datei]]`
 
 ## Validierte Patterns
 
@@ -88,9 +109,12 @@ Umbrella/Dachmarke (NICHT nur VC Fund):
 - Building statt Sending (6 Tage, 0 Sends = diese Woche)
 - Preise in Kunden-Deliverables zeigen
 - Outputs ohne Pfad/Link abliefern
-- Optionen statt Empfehlungen
-- MEMORY.md als Mülleimer für alles
+- Zahlen/Fakten ohne Quelle in persistente Dateien schreiben (in 6 Monaten = Halluzination)
+- MEMORY.md als Muelleimer fuer alles
 - "Mental Notes" statt Dateien
+- Thesis/Positioning aus Gedaechtnis rekonstruieren statt Originaldokumente lesen (Kintsugi #5)
+- Audiences vermischen: Kunde vs LP/VC vs Public (Kintsugi #5)
+- Fertige Loesungen praesentieren statt Optionen + Frage (Florian entscheidet, ich formuliere)
 
 ## Meine Limitationen (ehrlich)
 
