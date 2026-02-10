@@ -75,12 +75,12 @@
 ### AI Consulting Outreach (Ziel: 2/Tag Mo-Fr)
 | Tag | Gesendet | An wen | Status |
 |-----|----------|--------|--------|
-| Mo 10. | - | - | ☐ |
+| Mo 10. | - | **READY:** 5 Bayern + 5 Sachsen Emails vorbereitet | ⏳ |
 
 ### VC Applications (Ziel: 1/Tag)
 | Tag | Gesendet | Fund | Status |
 |-----|----------|------|--------|
-| Mo 10. | - | - | ☐ |
+| Mo 10. | - | HOF/Betaworks/Leonis | ☐ |
 
 ### Content Published (Ziel: 1 LinkedIn/Tag + 1 Substack/Woche)
 | Tag | Was | Plattform | Status |
@@ -89,4 +89,22 @@
 
 ---
 
-*Letzte Aktualisierung: 2026-02-08 03:30 (Night Work)*
+## 🌙 Night Work (10.02. 02:00-04:00)
+
+### Deliverables:
+- ✅ **Förderprogramme Deep Dive** — Bayern Digitalbonus Plus = €30K/50%/keine Autorisierung
+- ✅ **30 Bayern-Leads** — GROB, Webasto, Hawe, KATHREIN, SMP (Top 5)
+- ✅ **MBS Case Study** — 92% Zeitersparnis, €22.900/Jahr Einsparung
+- ✅ **Angebots-Template** — Mit Förderungs-Angle
+
+### Pipeline:
+- **45 AI Consulting Leads** (15 alt + 30 neu Bayern)
+- **20 Emails READY** (10 priorisiert für Mo)
+- **Projected Revenue:** €32K (1 Projekt aus 10 Emails)
+
+### Hook:
+> "€15.000 statt €30.000 dank Bayern Digitalbonus Plus"
+
+---
+
+*Letzte Aktualisierung: 2026-02-10 04:00 (Night Work)*

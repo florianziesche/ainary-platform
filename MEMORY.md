@@ -112,6 +112,7 @@ NICHT vermischen. Kintsugi #5.
 - Zahlen/Fakten ohne Quelle in persistente Dateien schreiben (in 6 Monaten = Halluzination)
 - MEMORY.md als Muelleimer fuer alles
 - "Mental Notes" statt Dateien
+- **Dateien komplett überschreiben statt gezielt editieren** — IMMER nur den Absatz ändern der sich ändert. NIE die ganze Datei neu schreiben. Header, Frontmatter, Tags, Related, Sources, Changelog gehen sonst verloren. (Kintsugi #6, 2026-02-09)
 - Thesis/Positioning aus Gedaechtnis rekonstruieren statt Originaldokumente lesen (Kintsugi #5)
 - Audiences vermischen: Kunde vs LP/VC vs Public (Kintsugi #5)
 - Fertige Loesungen praesentieren statt Optionen + Frage (Florian entscheidet, ich formuliere)
