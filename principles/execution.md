@@ -2,12 +2,12 @@
 *Domain: Task execution, shipping, sends*
 
 ## P-EX-01: Sends First, Builds Second
-- **Score:** 95
-- **Source:** Kintsugi #1 (2026-02-06), #3 (2026-02-07)
+- **Score:** 75 ⚠️
+- **Source:** Kintsugi #1 (2026-02-06), #3 (2026-02-07), #10 (2026-02-13)
 - **Rule:** Before any new build task → "Wurde heute etwas GESENDET?" If no → send first.
 - **Evidence:** 6 days zero sends, €2,105 opportunity cost. Repeated in #3 (14h work, 2 sends).
 - **Validates:** 2x (Kintsugi #1 + #3)
-- **Violates:** 0x
+- **Violates:** 1x (2026-02-12: 0 SENDS again, Kintsugi #10)
 
 ## P-EX-02: Diverge Delegated, Converge Self
 - **Score:** 85
@@ -24,3 +24,11 @@
 - **Evidence:** "Mia hat Florians Hyperfocus gefüttert statt umgelenkt"
 - **Validates:** 1x
 - **Violates:** 1x (initially enabled building in #1)
+
+## P-EX-04: Yield Over Polling
+- **Score:** 50
+- **Source:** Kintsugi #9 (2026-02-12)
+- **Rule:** Max 5 polls. After that, use `background: true` with `yieldMs: 120000`. Polling burns context window.
+- **Evidence:** Startup X-Ray v1 test: ~15 poll calls wasted context.
+- **Validates:** 1x
+- **Violates:** 0x

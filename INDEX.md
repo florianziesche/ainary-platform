@@ -8,8 +8,10 @@
 ## System-Dateien (Root)
 - `MEMORY.md` — Mias Langzeitgedächtnis, kuratiert
 - `SOUL.md` — Mias Persönlichkeit, Werte, Betriebsmodus
+- `VOICE.md` — Wie Mia klingt (Deutsch, kurz, direkt, keine Füllwörter)
 - `IDENTITY.md` — Name (Mia), Creature, Vibe, Emoji (♔)
 - `USER.md` — Florian Ziesche: Background, Familie, Finanzen, Preferences
+- `TWIN.md` — Florians Digital Twin (Entscheidungsmodell, 95%+ Confidence Rules)
 - `AGENTS.md` — Sub-Agents (Hunter, Writer, Researcher, Operator, Dealmaker, Analyst, Strategist)
 - `TOOLS.md` — Tool-Inventar und lokale Konfiguration
 - `HEARTBEAT.md` — Heartbeat-Checkliste und proaktive Aufgaben
@@ -31,6 +33,11 @@
 ## Standards & Qualität
 - `DEFINITION-OF-DONE.md` — Wann ist ein Output wirklich fertig
 - `BRAND-IDENTITY-SYNTHESIS.md` — Corporate Identity komplett (479 Zeilen)
+- `standards/FLORIAN.md` — Florians Erwartungen, Patterns, Preferences
+- `standards/CORPORATE-IDENTITY.md` — CI Standards (Farben, Fonts, Spacing)
+- `standards/LINKING-RULES.md` — Obsidian Linking-Regeln (inline, max 3-5, keine Related-Sections)
+- `standards/DONE-GAP-DETECTOR.md` — Done Gap Detector System (Attack, Score, Tag)
+- `standards/checklists/before-delivery.md` — Vor jeder Delivery Checkliste
 - `standards/RESEARCH-PROTOCOL.md` — Pre-Research Protocol (Question → Hypothesis → MECE → BLUF → Admiralty Rating)
 - `standards/SYNTHESIS-PROTOCOL.md` — Synthesis Protocol (SCQA, Insight Ladder, Pre-mortem, Calibrated Confidence)
 - `standards/MENTAL-MODELS-LOOKUP.md` — Situation → Model → Action (8 Situationen, Mental Models Library)
@@ -78,6 +85,11 @@
 - `sales/` — Sales-Materialien (6 Dateien)
 
 ## Projekte (aktiv)
+- `projects/ai-company-xray/` — **AI Company X-Ray** (Corporate AI Audit Tool, GPT-4o, 5 Agents, Hyperthink, deployed)
+  - `projects/ai-company-xray/PROJECT-STATUS.md` — **MASTER REFERENCE** (Architektur, Bugs, GTM, Roadmap)
+- `projects/startup-xray/` — **Startup X-Ray** (Deal Screener für VCs, gleiche Engine, Purple Accent, Confidence Indicators)
+  - `projects/startup-xray/PROJECT-STATUS.md` — **MASTER REFERENCE**
+- `projects/ga4-agent-dashboard/` — **GA4 Intelligence Agent** (Dashboard v2, deployed: fziescheus-alt.github.io/ga4-intelligence)
 - `projects/glashuette-ki/` — Bürgermeister Glashütte: Dashboards, Konzept, Briefing, Email
 - `projects/cnc-planner/` — CNC Planer: Dashboards, Briefings, v18 Demo
 - `projects/ki-mittelstand/` — KI-Beratung Mittelstand: Report, Decks, Demos
@@ -165,11 +177,12 @@
 - `skills/vc-application/` — VC Application Skill
 
 ## Memory
-- `memory/YYYY-MM-DD.md` — Tagesnotizen (31 Dateien, seit ~Jan 2026)
+- `memory/YYYY-MM-DD.md` — Tagesnotizen (32+ Dateien, seit ~Jan 2026)
 - `memory/heartbeat-state.json` — Heartbeat-Tracking
-- `memory/kintsugi.md` — Fehler repariert mit Gold
+- `memory/kintsugi.md` — **Fehler & Treffer** (Golden Repairs + Hits, 9 Repairs + 4 Hits documented)
 - `memory/wins/` — Win-Dokumentation (Self-Generated ICL Dataset, Mechanism 3)
 - `memory/wins/README.md` — Wie Wins dokumentieren (Prompt → Output → Why It Worked)
+- `memory/sota-research/` — SOTA Research Briefs (ArXiv, Papers)
 
 ## Scripts & Automation
 - `scripts/pre-build-check.sh` — Build-Blocker Check
@@ -189,6 +202,7 @@
 
 ## Principles (EvolveR-based, ab 2026-02-10)
 - `principles/README.md` — How the scoring system works
+- `principles/product.md` — **Product Principles** (Ehrlichkeit>Bullshit, Architektur vor Code, Provocateur=Diff, Send First, Master Reference, 13 total)
 - `principles/execution.md` — Sends, shipping, task management (P-EX-01 to P-EX-03)
 - `principles/quality.md` — Output quality, framing, delivery (P-QU-01 to P-QU-05)
 - `principles/research.md` — Research, experiments, multi-agent (P-RE-01 to P-RE-06)

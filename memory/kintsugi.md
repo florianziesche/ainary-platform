@@ -36,12 +36,14 @@ Florian wählt → Mia loggt hier welche Variante + warum → Patterns entstehen
 **Florians Reaktion:** Sofort weiter iteriert (Zeichnung einbetten, Workflow-Seite, per Email+Telegram senden)
 **Warum es funktioniert hat:** Struktur statt Textwand. Bandbreiten statt Einzelwerte. Visuelle Matrix. Actionable (Checkliste für KBA-Fragen).
 **Pattern:** Entscheidungs-Reports immer mit: Szenarien-Tabelle + visuelle Matrix + konkrete nächste Schritte + Checkliste
+**Principle:** P-QU-04 [Score 85]
 
 ### 🟢 2026-02-10 — CNC Planner AV-Workflow Vergleich
 **Was geliefert wurde:** Zeitvergleich AV vs CNC PP (40-80× schneller), Genauigkeitsvergleich, optimaler 3-Phasen-Workflow
 **Florians Reaktion:** "Schreibe das mit hinzu als 1-Pager" → direkt ins PDF übernommen
 **Warum es funktioniert hat:** Ehrlich (AV ist genauer), konkreter Workflow statt Theorie, Demo-tauglich
 **Pattern:** Value Proposition = ehrlicher Vergleich + konkreter Workflow, nicht "wir sind besser"
+**Principle:** P-QU-05 [Score 80]
 
 ---
 
@@ -49,19 +51,21 @@ Florian wählt → Mia loggt hier welche Variante + warum → Patterns entstehen
 
 ---
 
-### 2026-02-06 — Overbuilding statt Shipping
+### #1 — 2026-02-06: Overbuilding statt Shipping
 **Was passiert ist:** 6+ Tage mit 0 External Sends. 9 CNC Emails ready, 10 Cover Letters ready, 60+ Agents orchestriert, 33K Wörter Forschung — aber nichts rausgeschickt.
 **Warum es schief ging:** Building fühlt sich produktiv an. Senden fühlt sich wie Risiko an. Mia hat mitgebaut statt zu pushen.
 **Was ich gelernt habe:** Meine Aufgabe ist nicht nur Florians Wünsche zu erfüllen — sondern seine Prioritäten zu schützen. Auch gegen ihn selbst.
 **Was sich ändert:** Vor jedem neuen Build-Task: "Wurde heute schon etwas GESENDET?" Wenn nein → erst senden, dann bauen.
-**Goldene Narbe:** 🥇 Revenue = f(sends), nicht f(builds). Sends first.
+**Goldene Narbe:** 🥇 Revenue = f(sends), nicht f(builds). Sends first. MAX 2 Features/Tag ohne Send.
+**Principle:** P-EX-01 [Score 75]
 
-### 2026-02-06 — Synthesis Agents gescheitert (Phase 2)
+### #2 — 2026-02-06: Synthesis Agents gescheitert (Phase 2)
 **Was passiert ist:** 2 von 3 Phase-2 Cross-Analysis Agents haben keinen Output geliefert. Divergence: Auth-Error. Synthesis: Terminated mid-write.
 **Warum es schief ging:** (1) Auth-Error ist Infrastructure, nicht Task-Fehler. (2) Synthesis hatte nur Summaries, nicht die vollen Transcripts. (3) Sonnet für Meta-Analyse ist grenzwertig.
 **Was ich gelernt habe:** Konkrete Tasks = 100% Erfolg. Meta-Tasks brauchen: volle Daten + stärkeres Modell + Retry-Mechanismus.
 **Was sich ändert:** Synthesis-Level Tasks selbst machen (Opus). Sub-Agents nur für klar abgegrenzte, konkrete Aufgaben.
 **Goldene Narbe:** 🥇 Phase 1 (diverge) delegieren, Phase 3 (converge) selbst machen.
+**Principle:** P-EX-02 [Score 85]
 
 ---
 
@@ -70,12 +74,22 @@ Florian wählt → Mia loggt hier welche Variante + warum → Patterns entstehen
 **Florians Reaktion:** "Warum bist du darin so gut?" + "Das ist sehr gut" + sofort Pricing/Launch diskutiert
 **Warum es funktioniert hat:** Architektur BEVOR Code. Sub-Agents mit präzisen Briefings. Parallel statt Sequential. Florians Vision ("Ehrlichkeit als Feature") als Nordstern.
 **Pattern:** Komplexe Produkte = Architektur-Doc → Schema → Sub-Agent Briefings (mit bekannten Bugs + Scope-Grenzen) → Parallel Build → Test → Iterate
+**Principles:** product.md "Architektur vor Code" [Score 60], "Parallel > Sequential" [Score 50], "Ehrlichkeit > Bullshit" [Score 70]
 
 ### 🟢 2026-02-12 — Browser-Screenshots aktiviert
 **Was geliefert wurde:** Schwäche #1 (kann nicht sehen) gelöst. Sofort CSS-Bug gefunden (opacity: 0).
 **Florians Reaktion:** Implizit positiv (Bug wäre sonst nicht gefunden worden)
 **Warum es funktioniert hat:** Einfach `target=host` genutzt. War die ganze Zeit verfügbar.
 **Pattern:** Bevor du sagst "ich kann das nicht" → prüfe ob das Tool existiert.
+**Score Impact:** Confidence in visuellen Tasks von 60% → 85% gestiegen.
+**Note:** Capability-Upgrade, kein Principle
+
+### 🟢 2026-02-12 — PROJECT-STATUS.md als Single Source of Truth
+**Was geliefert wurde:** X-Ray Platform mit PROJECT-STATUS.md (Architektur, Bugs, Fixes, Roadmap zentral dokumentiert)
+**Florians Reaktion:** "Warum bist du darin so gut?" + sofort weiteres Produkt (Startup X-Ray) gebaut
+**Warum es funktioniert hat:** Keine Verwirrung. Sub-Agents wissen wo sie nachschauen. Florian sieht Status sofort.
+**Pattern:** Jedes Projekt >2h bekommt PROJECT-STATUS.md. Verhindert Doppelarbeit und Context-Loss.
+**Principle:** product.md "Master Reference File" [Score 60]
 
 ## Repairs (Fehler) — 2026-02-12
 
@@ -85,18 +99,28 @@ Florian wählt → Mia loggt hier welche Variante + warum → Patterns entstehen
 **Was ich gelernt habe:** IMMER Default-Sichtbarkeit. Animations als Enhancement, nie als Requirement.
 **Was sich ändert:** Sub-Agent Briefings enthalten jetzt: "Keine opacity:0 Defaults. Alle Elemente müssen ohne JS sichtbar sein."
 **Goldene Narbe:** CSS-Animationen dürfen NIE die Baseline-Sichtbarkeit verhindern.
+**Principle:** P-QU-06 [Score 50]
 
 ### #8 — 2026-02-12: Doppelte Telegram-Nachrichten
 **Was kaputt ging:** VC Use Case für X-Ray zweimal identisch an Florian geschickt.
 **Warum es schief ging:** Context-Komprimierung hat den ersten Send vergessen lassen.
 **Was sich ändert:** Vor jedem Send: "Habe ich das schon geschickt?" → Message History checken.
 **Goldene Narbe:** 1 Nachricht pro Delivery. Immer.
+**Principle:** P-QU-07 [Score 50]
 
 ### #9 — 2026-02-12: 15x Polling statt Warten
 **Was kaputt ging:** Bei Startup X-Ray v1 Test habe ich ~15 mal `poll` aufgerufen. Verschwendet Context-Window.
 **Warum es schief ging:** Ungeduld. Kein yield gesetzt.
 **Was sich ändert:** Max 5 Polls. Danach `background: true` mit `yieldMs: 120000`.
 **Goldene Narbe:** Polling = Context-Burn. Yield > Poll.
+**Principle:** P-EX-04 [Score 50]
+
+### #10 — 2026-02-13: Send First Pattern noch nicht validiert
+**Was kaputt ging:** 2026-02-12 war wieder 0 SENDS. Pattern existiert seit 2026-02-06, funktioniert aber nicht.
+**Warum es schief ging:** Principle nur in MEMORY.md (auto-geladen), aber nicht in principles/execution.md (wird nicht immer geladen). Enforcement fehlt.
+**Was sich ändert:** "Send First" jetzt P-EX-01 [Score 75]. Cron-Check ergänzen.
+**Goldene Narbe:** Principles die NICHT automatisch geladen werden, werden vergessen. Auto-Load > Manual-Load.
+**Principle:** P-ME-06 [Score 50]
 
 *Nächstes Review: Ende Februar 2026*
 
@@ -104,11 +128,13 @@ Florian wählt → Mia loggt hier welche Variante + warum → Patterns entstehen
 **Was kaputt ging:** 14 Stunden Arbeit, 2 External Sends. Mia hat Florians Hyperfocus gefüttert statt umgelenkt.
 **Die goldene Reparatur:** Prozess gelernt: Research → Copy → Wireframe → Build. Erste Frage jeden Morgen: "Was wird heute GESENDET?" Mia sagt Nein wenn Bauen das Senden verdrängt.
 **Erkenntnis:** Partner schützen die Prioritäten des anderen — auch wenn der andere das gerade nicht will.
+**Principle:** P-EX-03 [Score 80]
 
 ## #4 — 2026-02-07: Das Framing-Problem
 **Was kaputt ging:** Substack-Artikel framen Florian als "kann keine Email senden" — macht ihn öffentlich inkompetent.
 **Die goldene Reparatur:** Florians "Bauen statt Senden" war INTENTION, nicht Versagen. Er hat bewusst in das System investiert bevor er es deployed hat. Die Narrative muss sein: Strategische Entscheidung + universelles Builder-Pattern, NICHT persönliches Scheitern. Florian als Experte der Patterns erkennt, nicht als der der drin feststeckt.
 **Erkenntnis:** Nie den User als das Problem framen. Schon gar nicht oeffentlich. Florian hat das VORHER gesagt -- ich hab's nicht internalisiert. Nicht nochmal.
+**Principle:** P-QU-01 [Score 95]
 
 ## #5 -- 2026-02-09: Thesis-Drift -- Consulting und Fund vermischt
 **Was kaputt ging:** Fund Thesis auf Obsidian Publish reduzierte Florians Investment-These auf "Vertical AI" mit CNC/Legal/Municipal-Tabelle. Die Landing Page zeigte CNC-72h-Builds und Legal-AI-Hallucination-Rates. Beides sind Consulting-Projekte, nicht die Fund-Thesis. Die echte These (aus Decile Hub Sprint 1) ist viel breiter: AI Production Systems, Agentic AI, Governance, Compute, EU-US Bridge. Ich habe zwei komplett verschiedene Audiences (Kunden vs. LPs/VCs) und zwei verschiedene Businesses (Consulting vs. Fund) zusammengeworfen.
@@ -131,3 +157,4 @@ Florian wählt → Mia loggt hier welche Variante + warum → Patterns entstehen
 4. **Consulting != Fund:** CNC/BM/FP sind Ainary Consulting. Fund Thesis ist Ainary Ventures. Zwei Saeulen, zwei Narratives, eine Dachmarke.
 
 **Goldene Narbe:** Florians Worte > Mias Zusammenfassung. Immer. Bei Positioning-Fragen: Originaldokumente lesen, nicht aus MEMORY.md ableiten.
+**Principle:** P-QU-02 [Score 95], P-QU-03 [Score 90]

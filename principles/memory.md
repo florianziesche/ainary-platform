@@ -41,3 +41,11 @@
 - **Evidence:** A-MEM's linking improves cross-referencing. DualRAG's entity-keyed outline enables demand-driven retrieval.
 - **Validates:** 0x (partially implemented in semantic/ folder)
 - **Violates:** 0x
+
+## P-ME-06: Auto-Load > Manual-Load
+- **Score:** 50
+- **Source:** Kintsugi #10 (2026-02-13)
+- **Rule:** Principles that are NOT auto-loaded will be forgotten. Critical rules must be in SOUL.md or MEMORY.md (both auto-loaded).
+- **Evidence:** "Send First" existed in product.md (manual load) but not in MEMORY.md → Mia forgot → 0 sends on 2026-02-12.
+- **Validates:** 1x
+- **Violates:** 0x

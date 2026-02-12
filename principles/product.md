@@ -1,5 +1,16 @@
 # Product Principles — Validated Patterns
 *Score: Starts at 50. +10 when validated. -20 when violated. Delete under 20.*
+*Last reviewed: 2026-02-13 04:42*
+
+---
+
+## Master Reference File [Score: 60]
+**Pattern:** Komplexe Projekte brauchen eine PROJECT-STATUS.md als Single Source of Truth.
+**Herkunft:** X-Ray Platform (2026-02-12). Nach 3h Build hatte ich vergessen welche Bugs gefixt waren.
+**Warum es funktioniert:** Verhindert Doppelarbeit. Sub-Agents wissen wo sie nachschauen. Florian sieht sofort den Status.
+**Anwendung:** Jedes Projekt >2h Aufwand bekommt PROJECT-STATUS.md (Architektur, Tech Stack, Bugs, Fixes, Roadmap).
+**Was reingehört:** Dateistruktur, bekannte Bugs, Design-Entscheidungen, Florians Feedback, nächste Steps.
+**Validated:** 2026-02-12 (X-Ray Platform läuft damit seit 12h, keine Verwirrung)
 
 ---
 

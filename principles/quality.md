@@ -40,3 +40,19 @@
 - **Evidence:** "Schreibe das mit hinzu als 1-Pager" — immediately adopted.
 - **Validates:** 1x
 - **Violates:** 0x
+
+## P-QU-06: CSS Baseline Visibility
+- **Score:** 50
+- **Source:** Kintsugi #7 (2026-02-12)
+- **Rule:** CSS animations MUST NOT prevent baseline visibility. `opacity: 1` default, `.visible` for enhancement.
+- **Evidence:** Corporate X-Ray had `.card { opacity: 0 }` for scroll animation. On `file://` protocol, IntersectionObserver unreliable → all sections invisible.
+- **Validates:** 1x
+- **Violates:** 0x
+
+## P-QU-07: One Message Per Delivery
+- **Score:** 50
+- **Source:** Kintsugi #8 (2026-02-12)
+- **Rule:** Before every send: "Habe ich das schon geschickt?" Check message history.
+- **Evidence:** VC Use Case for X-Ray sent twice identically. Context compaction forgot first send.
+- **Validates:** 1x
+- **Violates:** 0x
