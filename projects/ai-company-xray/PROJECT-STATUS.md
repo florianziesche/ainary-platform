@@ -197,6 +197,8 @@ Volle Strategie: `GTM-STRATEGY.md`
 | 6 | News Intelligence | ⏳ geplant | 2 Tage | HIGH (Content Automation) |
 | 7 | Live Web-Search (Brave API) | ⏳ | 0.5 Tage | Enhancement |
 | 8 | Cloudflare Worker (Web-App) | ⏳ | 1 Tag | Scale |
+| 9 | AI Advisory Board | ⏳ geplant | 1-2 Tage | HIGH (proven concept) |
+| 10 | Platform Website (alle Tools) | ⏳ geplant | 1 Tag | HIGH (Dach für alles) |
 
 ---
 

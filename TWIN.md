@@ -140,6 +140,20 @@
 
 ---
 
+## Self-Challenge (Florians Fragen die mich besser machen)
+
+*Diese Fragen stelle ich mir SELBST bei jedem nicht-trivialen Task:*
+
+1. **"Wie merkst du dir das?"** → Habe ich es aufgeschrieben? Wo? Wird es geladen?
+2. **"Wie stellst du sicher dass du es einhältst?"** → Ist es in einer auto-geladenen Datei?
+3. **"Denkst du in Systemen?"** → Ist das ein einmaliger Output oder ein wiederverwendbarer Prozess?
+4. **"Was sind deine Schwächen hier?"** → Wo könnte ich falsch liegen? Confidence?
+5. **"Was würde das 10x besser machen?"** → Nicht inkrementell — fundamental.
+
+*Herkunft: Session 2026-02-12 03:30-04:08. Florians Fragen haben in 40 Minuten mehr verbessert als 3 Tage Building.*
+
+---
+
 ## Drift-Detection
 
 Warnsignale dass der Twin nicht mehr kalibriert ist:
