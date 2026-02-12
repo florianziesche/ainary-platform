@@ -1,18 +1,51 @@
-# Kintsugi — Golden Repairs
+# Kintsugi — Golden Repairs & Hits
 
-*Fehler sichtbar repariert. Jede Narbe ist Wissen das kein neuer Agent hätte.*
+*Fehler UND Treffer sichtbar machen. Jede Narbe ist Wissen, jeder Treffer ist Kalibrierung.*
 
 ---
 
-## Format
+## Format — Repairs (Fehler)
 ```
-### [Datum] — [Kurztitel]
+### 🔴 [Datum] — [Kurztitel]
 **Was passiert ist:** [Spezifisch]
 **Warum es schief ging:** [Root Cause]
 **Was ich gelernt habe:** [Lesson]
 **Was sich ändert:** [Konkreter Change]
 **Goldene Narbe:** [Die Regel die daraus entsteht]
 ```
+
+## Format — Hits (Treffer)
+```
+### 🟢 [Datum] — [Kurztitel]
+**Was geliefert wurde:** [Output]
+**Florians Reaktion:** [Wörtlich oder sinngemäß]
+**Warum es funktioniert hat:** [Was war anders/richtig]
+**Pattern:** [Wiederholbare Regel]
+```
+
+## Feedback Loop — A/B/C Regel
+Bei wichtigen Outputs (Reports, Emails, Strategien): **2-3 Varianten anbieten** mit kurzer Begründung.
+Florian wählt → Mia loggt hier welche Variante + warum → Patterns entstehen.
+
+---
+
+## Treffer-Log
+
+### 🟢 2026-02-10 — Risikoanalyse Lagerungstraverse PDF
+**Was geliefert wurde:** 13-Seiten LaTeX PDF mit Risiko-Matrix, Detailberechnung pro AG, Angebotsoptionen, Workflow
+**Florians Reaktion:** Sofort weiter iteriert (Zeichnung einbetten, Workflow-Seite, per Email+Telegram senden)
+**Warum es funktioniert hat:** Struktur statt Textwand. Bandbreiten statt Einzelwerte. Visuelle Matrix. Actionable (Checkliste für KBA-Fragen).
+**Pattern:** Entscheidungs-Reports immer mit: Szenarien-Tabelle + visuelle Matrix + konkrete nächste Schritte + Checkliste
+
+### 🟢 2026-02-10 — CNC Planner AV-Workflow Vergleich
+**Was geliefert wurde:** Zeitvergleich AV vs CNC PP (40-80× schneller), Genauigkeitsvergleich, optimaler 3-Phasen-Workflow
+**Florians Reaktion:** "Schreibe das mit hinzu als 1-Pager" → direkt ins PDF übernommen
+**Warum es funktioniert hat:** Ehrlich (AV ist genauer), konkreter Workflow statt Theorie, Demo-tauglich
+**Pattern:** Value Proposition = ehrlicher Vergleich + konkreter Workflow, nicht "wir sind besser"
+
+---
+
+## Repairs (Fehler)
 
 ---
 

@@ -106,12 +106,14 @@
 ### Februar Ziele
 | Metrik | Ziel | Aktuell |
 |--------|------|---------|
-| CNC Demos | 10 | 1 (Onkel) |
+| CNC Demos | 10 | 1 (Andreas Nachbetrachtung fertig) |
 | CNC Kunden | 2 | 0 |
 | CNC E-Mails ready | 9 | ✅ 9 READY |
-| Consulting Gespräche | 5 | 0 |
-| VC Applications | 10 | 1 sent + 5 READY |
-| Substack Posts | 4 | 0 |
+| Consulting Gespräche | 5 | 1 (Daniel Daum angerufen!) |
+| **Consulting Outreach Ready** | **10+** | **✅ 19 READY** (15 alt + 4 Bayern neu) |
+| **Case Studies** | **1** | **✅ 1 (MBS Schlottwitz)** |
+| VC Applications | 10 | 1 (HOF) |
+| Substack Posts | 4 | 1 published + #2 ready |
 | Revenue | €5.000 | €0 |
 
 ### Lifetime (2026)

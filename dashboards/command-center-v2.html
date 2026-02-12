@@ -1,0 +1,1827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Command Center v2 | Ainary</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Ainary CI Colors */
+            --gold-warm: #d4a853;
+            --gold-base: #c8aa50;
+            --gold-cool: #b09a45;
+            --gold-pale: #e8d89f;
+            --gold-deep: #9d7f3b;
+            
+            /* Light Theme */
+            --bg: #fafaf8;
+            --surface: #ffffff;
+            --surface-hover: #f5f5f3;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --text-tertiary: #999999;
+            --border: #e5e5e0;
+            --border-subtle: #f0f0eb;
+            --accent: #c8aa50;
+            --accent-bg: rgba(200, 170, 80, 0.08);
+            --accent-border: rgba(200, 170, 80, 0.25);
+            
+            /* Semantic Colors */
+            --danger: #dc2626;
+            --danger-bg: #fef2f2;
+            --warning: #f59e0b;
+            --warning-bg: #fffbeb;
+            --success: #059669;
+            --success-bg: #f0fdf4;
+            
+            /* Typography */
+            --font-display: 'Inter', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            /* Spacing */
+            --radius: 12px;
+            --radius-sm: 8px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
+            --shadow-hover: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0a0a0a;
+            --surface: #141414;
+            --surface-hover: #1a1a1a;
+            --text-primary: #f0f0f0;
+            --text-secondary: #888888;
+            --text-tertiary: #666666;
+            --border: #2a2a2a;
+            --border-subtle: #1f1f1f;
+            --accent-bg: rgba(200, 170, 80, 0.12);
+            --accent-border: rgba(200, 170, 80, 0.35);
+            --danger-bg: rgba(220, 38, 38, 0.1);
+            --warning-bg: rgba(245, 158, 11, 0.1);
+            --success-bg: rgba(5, 150, 105, 0.1);
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Header */
+        header {
+            margin-bottom: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1.25rem;
+        }
+
+        .theme-toggle:hover {
+            background: var(--surface-hover);
+        }
+
+        .refresh-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .refresh-btn:hover {
+            background: var(--surface-hover);
+            border-color: var(--accent-border);
+        }
+
+        /* Last Updated */
+        .last-updated {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            font-family: var(--font-mono);
+        }
+
+        /* Quick Add */
+        .quick-add {
+            background: var(--success-bg);
+            border: 2px solid var(--success);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .quick-add input {
+            flex: 1;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            color: var(--text-primary);
+        }
+
+        .quick-add button {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-add button:hover {
+            background: #047857;
+        }
+
+        /* Daily Summary */
+        .daily-summary {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .summary-stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .summary-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-value {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 1.125rem;
+        }
+
+        .summary-value.success {
+            color: var(--success);
+        }
+
+        .summary-value.warning {
+            color: var(--warning);
+        }
+
+        .summary-value.danger {
+            color: var(--danger);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 32px;
+            border-bottom: 2px solid var(--border);
+            overflow-x: auto;
+        }
+
+        .tab {
+            background: none;
+            border: none;
+            padding: 12px 24px;
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            color: var(--text-primary);
+        }
+
+        .tab.active {
+            color: var(--text-primary);
+            border-bottom-color: var(--accent);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Hero Action Card */
+        .hero-action {
+            background: var(--accent-bg);
+            border: 3px solid var(--accent);
+            border-radius: var(--radius);
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .hero-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .status-badge {
+            background: var(--accent);
+            color: white;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            letter-spacing: 0.5px;
+        }
+
+        .hero-action h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .hero-action p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 24px;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .hero-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .send-now-btn {
+            background: var(--gold-warm);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: var(--shadow-hover);
+        }
+
+        .send-now-btn:hover {
+            background: var(--gold-deep);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+        }
+
+        /* Mia Suggests */
+        .mia-suggests {
+            background: linear-gradient(135deg, var(--accent-bg) 0%, var(--success-bg) 100%);
+            border: 2px solid var(--accent);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .mia-suggests h3 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--accent);
+        }
+
+        .suggest-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .suggest-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .suggest-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .suggest-reason {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .suggest-outcome {
+            font-size: 0.875rem;
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            color: var(--text-primary);
+        }
+
+        .metric-value.danger {
+            color: var(--danger);
+        }
+
+        .metric-value.warning {
+            color: var(--warning);
+        }
+
+        .metric-value.success {
+            color: var(--success);
+        }
+
+        .metric-subtext {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            margin-top: 4px;
+        }
+
+        /* Section */
+        .section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+        }
+
+        .section-count {
+            font-size: 0.875rem;
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+            background: var(--accent-bg);
+            padding: 4px 10px;
+            border-radius: var(--radius-sm);
+        }
+
+        /* List Items */
+        .list-item {
+            padding: 16px;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            margin-bottom: 12px;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .list-item:hover {
+            border-color: var(--accent-border);
+            background: var(--accent-bg);
+        }
+
+        .list-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .list-item.network-multiplier {
+            border: 2px solid var(--gold-base);
+            background: var(--accent-bg);
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+            gap: 12px;
+        }
+
+        .item-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-primary);
+            flex: 1;
+        }
+
+        .item-title a {
+            color: var(--text-primary);
+            text-decoration: none;
+            border-bottom: 2px solid var(--accent-border);
+            transition: all 0.2s;
+        }
+
+        .item-title a:hover {
+            border-bottom-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .item-badge {
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .item-badge.ready {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        .item-badge.progress {
+            background: var(--warning-bg);
+            color: var(--warning);
+        }
+
+        .item-badge.submitted {
+            background: var(--accent-bg);
+            color: var(--accent);
+        }
+
+        .item-meta {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .item-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid;
+        }
+
+        .done-btn {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .done-btn:hover {
+            background: #047857;
+        }
+
+        .skip-btn {
+            background: var(--surface);
+            color: var(--text-secondary);
+            border-color: var(--border);
+        }
+
+        .skip-btn:hover {
+            background: var(--surface-hover);
+        }
+
+        select.skip-reason {
+            padding: 6px 10px;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        /* Icons using CSS */
+        .icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            background: currentColor;
+            mask-size: contain;
+            mask-repeat: no-repeat;
+            mask-position: center;
+        }
+
+        .icon-clock {
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'/%3E%3C/svg%3E");
+        }
+
+        .icon-link {
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14'/%3E%3C/svg%3E");
+        }
+
+        .icon-check {
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 13l4 4L19 7'/%3E%3C/svg%3E");
+        }
+
+        .icon-target {
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M13 10V3L4 14h7v7l9-11h-7z'/%3E%3C/svg%3E");
+        }
+
+        /* Pipeline */
+        .pipeline-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .pipeline-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+        }
+
+        .pipeline-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .pipeline-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .pipeline-stat:last-child {
+            border-bottom: none;
+        }
+
+        .pipeline-stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .pipeline-stat-value {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 1.125rem;
+        }
+
+        /* Notification Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--surface);
+            border: 2px solid var(--success);
+            border-radius: var(--radius);
+            padding: 16px 24px;
+            box-shadow: var(--shadow-hover);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+            
+            header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .header-controls {
+                justify-content: space-between;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pipeline-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-action {
+                padding: 20px;
+            }
+            
+            .hero-action h2 {
+                font-size: 1.5rem;
+            }
+            
+            .metric-value {
+                font-size: 1.75rem;
+            }
+
+            .hero-meta {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .section {
+                padding: 16px;
+            }
+
+            .item-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .quick-add {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .daily-summary {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .toast {
+                left: 16px;
+                right: 16px;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+            }
+            .header-controls,
+            .tabs,
+            .quick-add,
+            .action-btn,
+            .theme-toggle,
+            .refresh-btn {
+                display: none;
+            }
+            #pipeline, #analytics {
+                display: none !important;
+            }
+            .section, .metric-card {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <div class="logo">Ainary <span>Command Center</span> <span style="font-size: 0.75rem; color: var(--text-tertiary); font-weight: 400;">v2</span></div>
+                <div class="last-updated" id="lastUpdated">Loading...</div>
+            </div>
+            <div class="header-controls">
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode">
+                    <span id="themeIcon">🌙</span>
+                </button>
+                <button class="refresh-btn" onclick="loadData()">
+                    <span class="icon icon-check"></span> Refresh Data
+                </button>
+            </div>
+        </header>
+
+        <!-- Quick Add -->
+        <div class="quick-add">
+            <input type="text" id="quickAddInput" placeholder="Log a send: What did you ship today?" />
+            <button onclick="quickAddSend()">Log Send</button>
+        </div>
+
+        <!-- Daily Summary -->
+        <div class="daily-summary" id="dailySummary">
+            <div class="summary-stat">
+                <span class="summary-label">Today:</span>
+                <span class="summary-value success" id="completedToday">0</span>
+                <span class="summary-label">completed</span>
+            </div>
+            <div class="summary-stat">
+                <span class="summary-label">Skipped:</span>
+                <span class="summary-value warning" id="skippedToday">0</span>
+            </div>
+            <div class="summary-stat">
+                <span class="summary-label">Streak:</span>
+                <span class="summary-value" id="streakCounter">0</span>
+                <span class="summary-label">days</span>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('command-center')">Command Center</button>
+            <button class="tab" onclick="switchTab('pipeline')">Pipeline</button>
+            <button class="tab" onclick="switchTab('analytics')">Analytics</button>
+        </div>
+
+        <!-- Tab 1: Command Center -->
+        <div id="command-center" class="tab-content active">
+            <!-- Hero Action -->
+            <div class="hero-action" id="heroAction">
+                <div class="hero-header">
+                    <span class="status-badge" id="heroBadge">NEXT ACTION</span>
+                </div>
+                <h2 id="heroTitle">Loading...</h2>
+                <p id="heroDescription">Loading...</p>
+                <p style="font-weight: 700; color: var(--accent); margin-top: 8px;" id="heroImpact">
+                    
+                </p>
+                <div class="hero-meta" id="heroMeta">
+                    
+                </div>
+                <a href="#" id="heroLink" class="send-now-btn">SEND NOW</a>
+            </div>
+
+            <!-- Mia Suggests -->
+            <div class="mia-suggests" id="miaSuggests">
+                <h3>Mia Suggests (Time-Aware)</h3>
+                <div id="suggestionsContainer">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Sends This Week</div>
+                    <div class="metric-value" id="sendsThisWeek">0</div>
+                    <div class="metric-subtext">Target: 15/week</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Sends Today</div>
+                    <div class="metric-value success" id="sendsToday">0</div>
+                    <div class="metric-subtext">Keep the momentum</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Streak</div>
+                    <div class="metric-value" id="streakMetric">0</div>
+                    <div class="metric-subtext">Days in a row</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Ready to Send</div>
+                    <div class="metric-value warning" id="readyCount">0</div>
+                    <div class="metric-subtext" id="readyTime">0 min total</div>
+                </div>
+            </div>
+
+            <!-- Ready to Send -->
+            <div class="section">
+                <div class="section-header">
+                    <h3 class="section-title">Ready to Send (But You Haven't)</h3>
+                    <span class="section-count" id="readyCountHeader">0 items</span>
+                </div>
+                <div id="readyToSendList">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Completed Today -->
+            <div class="section" id="completedSection" style="display: none;">
+                <div class="section-header">
+                    <h3 class="section-title">Completed Today</h3>
+                    <span class="section-count" id="completedCountHeader">0 items</span>
+                </div>
+                <div id="completedTodayList">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Pipeline -->
+        <div id="pipeline" class="tab-content">
+            <div class="pipeline-grid">
+                <div class="pipeline-card">
+                    <h3>VC Applications</h3>
+                    <div class="pipeline-stat">
+                        <span class="pipeline-stat-label">Submitted</span>
+                        <span class="pipeline-stat-value" style="color: var(--success)" id="vcSubmitted">0</span>
+                    </div>
+                    <div class="pipeline-stat">
+                        <span class="pipeline-stat-label">Ready to Submit</span>
+                        <span class="pipeline-stat-value" style="color: var(--warning)" id="vcReady">0</span>
+                    </div>
+                    <div class="pipeline-stat">
+                        <span class="pipeline-stat-label">Researched</span>
+                        <span class="pipeline-stat-value" style="color: var(--text-secondary)" id="vcResearched">0</span>
+                    </div>
+                </div>
+
+                <div class="pipeline-card">
+                    <h3>Consulting Pipeline</h3>
+                    <div class="pipeline-stat">
+                        <span class="pipeline-stat-label">Active Opportunities</span>
+                        <span class="pipeline-stat-value" style="color: var(--success)" id="consultingActive">0</span>
+                    </div>
+                    <div class="pipeline-stat">
+                        <span class="pipeline-stat-label">Est. Value</span>
+                        <span class="pipeline-stat-value" style="color: var(--success)" id="consultingValue">€0</span>
+                    </div>
+                </div>
+
+                <div class="pipeline-card">
+                    <h3>Content Pipeline</h3>
+                    <div class="pipeline-stat">
+                        <span class="pipeline-stat-label">Published</span>
+                        <span class="pipeline-stat-value" style="color: var(--success)" id="contentPublished">0</span>
+                    </div>
+                    <div class="pipeline-stat">
+                        <span class="pipeline-stat-label">Ready to Publish</span>
+                        <span class="pipeline-stat-value" style="color: var(--warning)" id="contentReady">0</span>
+                    </div>
+                    <div class="pipeline-stat">
+                        <span class="pipeline-stat-label">Ideas</span>
+                        <span class="pipeline-stat-value" style="color: var(--text-secondary)" id="contentIdeas">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VC Funds Detail -->
+            <div class="section" style="margin-top: 24px;">
+                <div class="section-header">
+                    <h3 class="section-title">VC Funds Pipeline</h3>
+                    <span class="section-count" id="vcFundsCount">0 funds</span>
+                </div>
+                <div id="vcFundsList">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Consulting Detail -->
+            <div class="section">
+                <div class="section-header">
+                    <h3 class="section-title">Consulting Opportunities</h3>
+                    <span class="section-count" id="consultingCount">0 active</span>
+                </div>
+                <div id="consultingList">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Analytics -->
+        <div id="analytics" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <h3 class="section-title">Usage Analytics</h3>
+                </div>
+                <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 16px;">
+                    Analytics are tracked silently in localStorage. This data helps Mia understand your patterns.
+                </p>
+                <div id="analyticsData">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <h3 class="section-title">Send History</h3>
+                </div>
+                <div id="sendHistoryList">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <h3 class="section-title">Financial Reality</h3>
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">Total Debt</div>
+                        <div class="metric-value danger" id="totalDebt">€0</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Monthly Income</div>
+                        <div class="metric-value success" id="monthlyIncome">€0</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Expected ALG1</div>
+                        <div class="metric-value warning" id="expectedALG1">€0</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Runway</div>
+                        <div class="metric-value" id="runway">Unknown</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global data object
+        let dashboardData = null;
+        
+        // LocalStorage keys
+        const STORAGE_KEYS = {
+            THEME: 'dashboard_theme',
+            COMPLETED: 'dashboard_completed',
+            SKIPPED: 'dashboard_skipped',
+            ANALYTICS: 'dashboard_analytics',
+            STREAK: 'dashboard_streak',
+            LAST_SEND_DATE: 'dashboard_last_send_date'
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTheme();
+            loadData();
+            trackPageView();
+            updateDailySummary();
+        });
+
+        // Theme management
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem(STORAGE_KEYS.THEME, newTheme);
+            document.getElementById('themeIcon').textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem(STORAGE_KEYS.THEME) || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.getElementById('themeIcon').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // Embedded dashboard data (works with file:// protocol)
+        const EMBEDDED_DATA = {
+  "lastUpdated": "2026-02-10T21:49:00+01:00",
+  "heroAction": {
+    "title": "Send Andreas Email",
+    "description": "CNC Praxistest response. GJS-700, €1,200 material. Draft ready.",
+    "link": "file:///Users/florianziesche/.openclaw/workspace/projects/cnc-planner/email-andreas-praxistest.md",
+    "timeEstimate": "5 min",
+    "impact": "Unlocks 5+ warm intros in Sachsen manufacturing",
+    "daysPending": 4
+  },
+  "sends": {
+    "today": 1,
+    "thisWeek": 1,
+    "streak": 0,
+    "history": [
+      {
+        "date": "2026-02-10",
+        "count": 1,
+        "items": ["HOF Capital Application submitted"]
+      },
+      {
+        "date": "2026-02-09",
+        "count": 0,
+        "items": []
+      },
+      {
+        "date": "2026-02-08",
+        "count": 0,
+        "items": []
+      },
+      {
+        "date": "2026-02-07",
+        "count": 2,
+        "items": ["Sven Gleißberg email", "Andreas Brand initial contact"]
+      }
+    ]
+  },
+  "readyToSend": [
+    {
+      "id": "andreas-email",
+      "title": "Andreas Email (CNC Praxistest)",
+      "completion": 95,
+      "type": "Consulting",
+      "time": "5 min",
+      "link": "file:///Users/florianziesche/.openclaw/workspace/projects/cnc-planner/email-andreas-praxistest.md",
+      "daysPending": 4,
+      "impact": "5+ warm intros in Sachsen manufacturing"
+    },
+    {
+      "id": "substack-done-gap",
+      "title": "Substack: 'Your AI Agent Lies About Being Done'",
+      "completion": 90,
+      "type": "Content",
+      "time": "15 min",
+      "link": "file:///Users/florianziesche/.openclaw/workspace/content/substack-done-gap.md",
+      "daysPending": 1,
+      "impact": "Positions you as AI researcher with novel data"
+    },
+    {
+      "id": "betaworks",
+      "title": "Betaworks Application",
+      "completion": 85,
+      "type": "VC Application",
+      "time": "20 min",
+      "link": "file:///Users/florianziesche/.openclaw/workspace/job-applications/CL_Betaworks_Ziesche.pdf",
+      "daysPending": 3,
+      "impact": "Early-stage platform fund, strong network"
+    },
+    {
+      "id": "conviction",
+      "title": "Conviction Application",
+      "completion": 85,
+      "type": "VC Application",
+      "time": "20 min",
+      "link": "file:///Users/florianziesche/.openclaw/workspace/job-applications/CL_Conviction_Ziesche.pdf",
+      "daysPending": 3,
+      "impact": "Founder-focused, AI infrastructure"
+    },
+    {
+      "id": "firstmark",
+      "title": "FirstMark Application",
+      "completion": 85,
+      "type": "VC Application",
+      "time": "20 min",
+      "link": "file:///Users/florianziesche/.openclaw/workspace/job-applications/CL_FirstMark_Ziesche.pdf",
+      "daysPending": 3,
+      "impact": "NYC-based, strong platform services"
+    }
+  ],
+  "completed": [
+    {
+      "id": "hof-capital",
+      "title": "HOF Capital Application",
+      "type": "VC Application",
+      "completedAt": "2026-02-10T21:15:00+01:00"
+    }
+  ],
+  "vcPipeline": {
+    "submitted": 1,
+    "ready": 8,
+    "researched": 10,
+    "funds": [
+      {
+        "name": "HOF Capital",
+        "status": "submitted",
+        "date": "2026-02-10",
+        "link": "https://www.workstream.us/j/b3ae1199/hof-capital/new-york-4978/venture-capital-associate-ai-or-swe-experience-required-9d074175/apply"
+      },
+      {
+        "name": "Betaworks",
+        "status": "ready",
+        "link": "file:///Users/florianziesche/.openclaw/workspace/job-applications/CL_Betaworks_Ziesche.pdf"
+      },
+      {
+        "name": "Conviction",
+        "status": "ready",
+        "link": "file:///Users/florianziesche/.openclaw/workspace/job-applications/CL_Conviction_Ziesche.pdf"
+      },
+      {
+        "name": "FirstMark",
+        "status": "ready",
+        "link": "file:///Users/florianziesche/.openclaw/workspace/job-applications/CL_FirstMark_Ziesche.pdf"
+      },
+      {
+        "name": "General Catalyst",
+        "status": "ready",
+        "link": "file:///Users/florianziesche/.openclaw/workspace/job-applications/CL_GeneralCatalyst_Ziesche.pdf"
+      },
+      {
+        "name": "Bloomberg Beta",
+        "status": "ready",
+        "link": "file:///Users/florianziesche/.openclaw/workspace/job-applications/CL_BloombergBeta_Ziesche.pdf"
+      },
+      {
+        "name": "Point72",
+        "status": "ready",
+        "link": "file:///Users/florianziesche/.openclaw/workspace/job-applications/CL_Point72_Ziesche.pdf"
+      },
+      {
+        "name": "Lux Capital",
+        "status": "ready",
+        "link": "file:///Users/florianziesche/.openclaw/workspace/job-applications/CL_Lux_Ziesche.pdf"
+      },
+      {
+        "name": "Lionheart",
+        "status": "ready",
+        "link": "file:///Users/florianziesche/.openclaw/workspace/job-applications/CL_Lionheart_Ziesche.pdf"
+      },
+      {
+        "name": "Wingspan",
+        "status": "ready",
+        "link": "file:///Users/florianziesche/.openclaw/workspace/job-applications/CL_Wingspan_Ziesche.pdf"
+      }
+    ]
+  },
+  "consulting": {
+    "active": [
+      {
+        "name": "Andreas Brand (MBS)",
+        "status": "Email pending",
+        "value": "€5-15K",
+        "networkMultiplier": true,
+        "link": "file:///Users/florianziesche/.openclaw/workspace/projects/cnc-planner/email-andreas-praxistest.md"
+      }
+    ]
+  },
+  "content": {
+    "published": 1,
+    "readyToPublish": 1,
+    "ideas": 15,
+    "substackName": "Finite Matter"
+  },
+  "financial": {
+    "debt": 70000,
+    "monthlyIncome": 3000,
+    "expectedALG1": 2700,
+    "targetIncome": 6000,
+    "runway": "unknown"
+  },
+  "miaSuggests": [
+    {
+      "item": "andreas-email",
+      "time": "morning",
+      "reason": "Fresh mind for relationship communication",
+      "outcome": "5+ warm manufacturing intros"
+    },
+    {
+      "item": "substack-done-gap",
+      "time": "afternoon",
+      "reason": "Creative work when energy dips",
+      "outcome": "Positions you as AI researcher"
+    },
+    {
+      "item": "betaworks",
+      "time": "evening",
+      "reason": "Administrative task, low cognitive load",
+      "outcome": "One more fund in pipeline"
+    }
+  ]
+}
+;
+
+        // Load data - uses embedded data, falls back to fetch
+        async function loadData() {
+            try {
+                const response = await fetch('dashboard-data.json');
+                if (response.ok) {
+                    dashboardData = await response.json();
+                } else {
+                    throw new Error('fetch failed');
+                }
+            } catch (error) {
+                dashboardData = EMBEDDED_DATA;
+            }
+            renderDashboard();
+        }
+
+        function loadFallbackData() {
+            // Fallback embedded data if JSON fails
+            dashboardData = {
+                lastUpdated: new Date().toISOString(),
+                heroAction: {
+                    title: "Data Loading Error",
+                    description: "Could not load dashboard-data.json. Check file path.",
+                    link: "#",
+                    timeEstimate: "0 min",
+                    impact: "Fix data loading to continue",
+                    daysPending: 0
+                },
+                sends: { today: 0, thisWeek: 0, streak: 0, history: [] },
+                readyToSend: [],
+                completed: [],
+                vcPipeline: { submitted: 0, ready: 0, researched: 0, funds: [] },
+                consulting: { active: [] },
+                content: { published: 0, readyToPublish: 0, ideas: 0 },
+                financial: { debt: 0, monthlyIncome: 0, expectedALG1: 0, runway: "unknown" },
+                miaSuggests: []
+            };
+            renderDashboard();
+        }
+
+        // Render dashboard
+        function renderDashboard() {
+            if (!dashboardData) return;
+
+            // Update timestamp
+            const date = new Date(dashboardData.lastUpdated);
+            document.getElementById('lastUpdated').textContent = 
+                `Last updated: ${date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}, ${date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`;
+
+            // Hero Action
+            document.getElementById('heroTitle').textContent = dashboardData.heroAction.title;
+            document.getElementById('heroDescription').textContent = dashboardData.heroAction.description;
+            document.getElementById('heroImpact').innerHTML = 
+                `<span class="icon icon-target"></span> ${dashboardData.heroAction.impact}`;
+            document.getElementById('heroMeta').innerHTML = `
+                <span><span class="icon icon-clock"></span> ${dashboardData.heroAction.timeEstimate}</span>
+                <span>${dashboardData.heroAction.daysPending} days pending</span>
+            `;
+            document.getElementById('heroLink').href = dashboardData.heroAction.link;
+            document.getElementById('heroBadge').textContent = `${dashboardData.heroAction.daysPending} DAYS PENDING`;
+
+            // Mia Suggests
+            renderMiaSuggests();
+
+            // Metrics
+            document.getElementById('sendsToday').textContent = dashboardData.sends.today;
+            document.getElementById('sendsThisWeek').textContent = dashboardData.sends.thisWeek;
+            document.getElementById('streakMetric').textContent = dashboardData.sends.streak;
+            document.getElementById('streakCounter').textContent = dashboardData.sends.streak;
+            
+            const readyCount = dashboardData.readyToSend.length;
+            const totalTime = dashboardData.readyToSend.reduce((sum, item) => {
+                return sum + parseInt(item.time) || 0;
+            }, 0);
+            document.getElementById('readyCount').textContent = readyCount;
+            document.getElementById('readyTime').textContent = `${totalTime} min total`;
+            document.getElementById('readyCountHeader').textContent = `${readyCount} items | ${totalTime} min total`;
+
+            // Ready to Send list
+            renderReadyToSend();
+
+            // Completed Today
+            renderCompletedToday();
+
+            // Pipeline
+            document.getElementById('vcSubmitted').textContent = dashboardData.vcPipeline.submitted;
+            document.getElementById('vcReady').textContent = dashboardData.vcPipeline.ready;
+            document.getElementById('vcResearched').textContent = dashboardData.vcPipeline.researched;
+            document.getElementById('contentPublished').textContent = dashboardData.content.published;
+            document.getElementById('contentReady').textContent = dashboardData.content.readyToPublish;
+            document.getElementById('contentIdeas').textContent = dashboardData.content.ideas;
+            document.getElementById('consultingActive').textContent = dashboardData.consulting.active.length;
+            document.getElementById('consultingValue').textContent = dashboardData.consulting.active
+                .map(c => c.value)
+                .join(', ') || '€0';
+
+            // VC Funds list
+            renderVCFunds();
+
+            // Consulting list
+            renderConsulting();
+
+            // Analytics
+            renderAnalytics();
+
+            // Send History
+            renderSendHistory();
+
+            // Financial
+            document.getElementById('totalDebt').textContent = `€${(dashboardData.financial.debt / 1000).toFixed(0)}K`;
+            document.getElementById('monthlyIncome').textContent = `€${(dashboardData.financial.monthlyIncome / 1000).toFixed(1)}K`;
+            document.getElementById('expectedALG1').textContent = `€${(dashboardData.financial.expectedALG1 / 1000).toFixed(1)}K`;
+            document.getElementById('runway').textContent = dashboardData.financial.runway;
+        }
+
+        // Render Mia Suggests
+        function renderMiaSuggests() {
+            const hour = new Date().getHours();
+            const timeOfDay = hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : 'evening';
+            
+            const suggests = dashboardData.miaSuggests.filter(s => s.time === timeOfDay);
+            
+            const container = document.getElementById('suggestionsContainer');
+            if (suggests.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary); font-size: 0.875rem;">No specific suggestions for this time of day.</p>';
+                return;
+            }
+
+            container.innerHTML = suggests.map(s => `
+                <div class="suggest-item">
+                    <div class="suggest-title">${findItemTitle(s.item)}</div>
+                    <div class="suggest-reason">${s.reason}</div>
+                    <div class="suggest-outcome">→ ${s.outcome}</div>
+                </div>
+            `).join('');
+        }
+
+        function findItemTitle(itemId) {
+            const item = dashboardData.readyToSend.find(r => r.id === itemId);
+            return item ? item.title : itemId;
+        }
+
+        // Render Ready to Send
+        function renderReadyToSend() {
+            const container = document.getElementById('readyToSendList');
+            const completed = getCompleted();
+            const skipped = getSkipped();
+            
+            const items = dashboardData.readyToSend.filter(item => 
+                !completed.some(c => c.id === item.id) && !skipped.some(s => s.id === item.id)
+            );
+
+            if (items.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary);">All items completed or skipped! 🎉</p>';
+                return;
+            }
+
+            container.innerHTML = items.map(item => `
+                <div class="list-item">
+                    <div class="item-header">
+                        <div class="item-title">
+                            <a href="${item.link}" target="_blank">${item.title}</a>
+                        </div>
+                        <span class="item-badge ready">${item.completion}% Done</span>
+                    </div>
+                    <div class="item-meta">
+                        <span><span class="icon icon-link"></span> ${item.type}</span>
+                        <span><span class="icon icon-clock"></span> ${item.time}</span>
+                        <span>${item.daysPending} days pending</span>
+                    </div>
+                    <div style="font-size: 0.875rem; color: var(--success); font-weight: 600; margin-bottom: 8px;">
+                        <span class="icon icon-target"></span> ${item.impact}
+                    </div>
+                    <div class="item-actions">
+                        <button class="action-btn done-btn" onclick="markDone('${item.id}')">✓ Done</button>
+                        <select class="skip-reason" onchange="markSkipped('${item.id}', this.value)">
+                            <option value="">Skip (reason)...</option>
+                            <option value="not-ready">Not ready</option>
+                            <option value="avoiding">Avoiding it</option>
+                            <option value="blocked">Blocked</option>
+                            <option value="not-priority">Not priority</option>
+                        </select>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render Completed Today
+        function renderCompletedToday() {
+            const completed = getCompleted();
+            const today = new Date().toISOString().split('T')[0];
+            const todayCompleted = completed.filter(c => c.completedAt.startsWith(today));
+
+            const section = document.getElementById('completedSection');
+            const container = document.getElementById('completedTodayList');
+            const counter = document.getElementById('completedCountHeader');
+
+            if (todayCompleted.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+            counter.textContent = `${todayCompleted.length} items`;
+
+            container.innerHTML = todayCompleted.map(item => {
+                const time = new Date(item.completedAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+                return `
+                    <div class="list-item">
+                        <div class="item-header">
+                            <div class="item-title">${item.title}</div>
+                            <span class="item-badge ready">${time}</span>
+                        </div>
+                        <div class="item-meta">
+                            <span>${item.type || 'Item'}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render VC Funds
+        function renderVCFunds() {
+            const container = document.getElementById('vcFundsList');
+            const funds = dashboardData.vcPipeline.funds;
+            
+            document.getElementById('vcFundsCount').textContent = `${funds.length} funds`;
+
+            container.innerHTML = funds.map(fund => `
+                <div class="list-item">
+                    <div class="item-header">
+                        <div class="item-title">
+                            <a href="${fund.link}" target="_blank">${fund.name}</a>
+                        </div>
+                        <span class="item-badge ${fund.status === 'submitted' ? 'submitted' : 'ready'}">
+                            ${fund.status === 'submitted' ? 'Submitted' : 'Ready'}
+                        </span>
+                    </div>
+                    ${fund.date ? `<div class="item-meta"><span>${fund.date}</span></div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Render Consulting
+        function renderConsulting() {
+            const container = document.getElementById('consultingList');
+            const items = dashboardData.consulting.active;
+            
+            document.getElementById('consultingCount').textContent = `${items.length} active`;
+
+            container.innerHTML = items.map(item => `
+                <div class="list-item ${item.networkMultiplier ? 'network-multiplier' : ''}">
+                    <div class="item-header">
+                        <div class="item-title">
+                            ${item.networkMultiplier ? '⭐ ' : ''}
+                            <a href="${item.link}" target="_blank">${item.name}</a>
+                            ${item.networkMultiplier ? ' — NETWORK MULTIPLIER' : ''}
+                        </div>
+                        <span class="item-badge progress">${item.status}</span>
+                    </div>
+                    <div class="item-meta">
+                        <span>Est. value: ${item.value}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render Analytics
+        function renderAnalytics() {
+            const analytics = getAnalytics();
+            const container = document.getElementById('analyticsData');
+
+            const tabVisits = Object.entries(analytics.tabVisits || {})
+                .sort((a, b) => b[1] - a[1]);
+
+            const itemClicks = Object.entries(analytics.itemClicks || {})
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <h4 style="font-size: 0.875rem; font-weight: 600; margin-bottom: 12px; color: var(--text-secondary);">
+                        Tab Visits
+                    </h4>
+                    ${tabVisits.map(([tab, count]) => `
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-subtle);">
+                            <span>${tab}</span>
+                            <span style="font-family: var(--font-mono); font-weight: 700;">${count}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <div>
+                    <h4 style="font-size: 0.875rem; font-weight: 600; margin-bottom: 12px; color: var(--text-secondary);">
+                        Most Clicked Items (Top 5)
+                    </h4>
+                    ${itemClicks.length > 0 ? itemClicks.map(([item, count]) => `
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-subtle);">
+                            <span>${item}</span>
+                            <span style="font-family: var(--font-mono); font-weight: 700;">${count}</span>
+                        </div>
+                    `).join('') : '<p style="color: var(--text-secondary); font-size: 0.875rem;">No clicks tracked yet.</p>'}
+                </div>
+            `;
+        }
+
+        // Render Send History
+        function renderSendHistory() {
+            const container = document.getElementById('sendHistoryList');
+            const history = dashboardData.sends.history;
+
+            container.innerHTML = history.map(day => `
+                <div class="list-item">
+                    <div class="item-header">
+                        <div class="item-title">${day.date}</div>
+                        <span class="item-badge ${day.count > 0 ? 'ready' : 'progress'}">
+                            ${day.count} sends
+                        </span>
+                    </div>
+                    ${day.items.length > 0 ? `
+                        <div class="item-meta">
+                            <span>${day.items.join(', ')}</span>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Mark item as done
+        function markDone(itemId) {
+            const item = dashboardData.readyToSend.find(i => i.id === itemId);
+            if (!item) return;
+
+            const completed = getCompleted();
+            completed.push({
+                id: itemId,
+                title: item.title,
+                type: item.type,
+                completedAt: new Date().toISOString()
+            });
+            saveCompleted(completed);
+
+            updateStreak();
+            trackItemClick(itemId);
+            updateDailySummary();
+            renderReadyToSend();
+            renderCompletedToday();
+            showToast(`✓ ${item.title} marked as done!`, 'success');
+        }
+
+        // Mark item as skipped
+        function markSkipped(itemId, reason) {
+            if (!reason) return;
+
+            const item = dashboardData.readyToSend.find(i => i.id === itemId);
+            if (!item) return;
+
+            const skipped = getSkipped();
+            skipped.push({
+                id: itemId,
+                title: item.title,
+                reason: reason,
+                skippedAt: new Date().toISOString()
+            });
+            saveSkipped(skipped);
+
+            trackItemClick(itemId);
+            updateDailySummary();
+            renderReadyToSend();
+            showToast(`Skipped: ${item.title} (${reason})`, 'warning');
+        }
+
+        // Quick add send
+        function quickAddSend() {
+            const input = document.getElementById('quickAddInput');
+            const text = input.value.trim();
+            
+            if (!text) return;
+
+            const completed = getCompleted();
+            completed.push({
+                id: `quick-${Date.now()}`,
+                title: text,
+                type: 'Quick Log',
+                completedAt: new Date().toISOString()
+            });
+            saveCompleted(completed);
+
+            input.value = '';
+            updateStreak();
+            updateDailySummary();
+            renderCompletedToday();
+            showToast(`✓ Logged: ${text}`, 'success');
+        }
+
+        // Update daily summary
+        function updateDailySummary() {
+            const completed = getCompleted();
+            const skipped = getSkipped();
+            const today = new Date().toISOString().split('T')[0];
+
+            const todayCompleted = completed.filter(c => c.completedAt.startsWith(today)).length;
+            const todaySkipped = skipped.filter(s => s.skippedAt.startsWith(today)).length;
+
+            document.getElementById('completedToday').textContent = todayCompleted;
+            document.getElementById('skippedToday').textContent = todaySkipped;
+        }
+
+        // Streak management
+        function updateStreak() {
+            const lastSendDate = localStorage.getItem(STORAGE_KEYS.LAST_SEND_DATE);
+            const today = new Date().toISOString().split('T')[0];
+            
+            let streak = parseInt(localStorage.getItem(STORAGE_KEYS.STREAK)) || 0;
+
+            if (lastSendDate === today) {
+                // Already sent today, no change
+            } else if (lastSendDate === getPreviousDay(today)) {
+                // Sent yesterday, increment
+                streak++;
+            } else {
+                // Streak broken, restart
+                streak = 1;
+            }
+
+            localStorage.setItem(STORAGE_KEYS.STREAK, streak);
+            localStorage.setItem(STORAGE_KEYS.LAST_SEND_DATE, today);
+            document.getElementById('streakCounter').textContent = streak;
+            document.getElementById('streakMetric').textContent = streak;
+        }
+
+        function getPreviousDay(dateString) {
+            const date = new Date(dateString);
+            date.setDate(date.getDate() - 1);
+            return date.toISOString().split('T')[0];
+        }
+
+        // LocalStorage helpers
+        function getCompleted() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEYS.COMPLETED) || '[]');
+        }
+
+        function saveCompleted(data) {
+            localStorage.setItem(STORAGE_KEYS.COMPLETED, JSON.stringify(data));
+        }
+
+        function getSkipped() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEYS.SKIPPED) || '[]');
+        }
+
+        function saveSkipped(data) {
+            localStorage.setItem(STORAGE_KEYS.SKIPPED, JSON.stringify(data));
+        }
+
+        function getAnalytics() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEYS.ANALYTICS) || '{"tabVisits": {}, "itemClicks": {}}');
+        }
+
+        function saveAnalytics(data) {
+            localStorage.setItem(STORAGE_KEYS.ANALYTICS, JSON.stringify(data));
+        }
+
+        // Analytics tracking
+        function trackPageView() {
+            const analytics = getAnalytics();
+            analytics.tabVisits = analytics.tabVisits || {};
+            analytics.tabVisits['command-center'] = (analytics.tabVisits['command-center'] || 0) + 1;
+            saveAnalytics(analytics);
+        }
+
+        function trackTabView(tabName) {
+            const analytics = getAnalytics();
+            analytics.tabVisits = analytics.tabVisits || {};
+            analytics.tabVisits[tabName] = (analytics.tabVisits[tabName] || 0) + 1;
+            saveAnalytics(analytics);
+        }
+
+        function trackItemClick(itemId) {
+            const analytics = getAnalytics();
+            analytics.itemClicks = analytics.itemClicks || {};
+            analytics.itemClicks[itemId] = (analytics.itemClicks[itemId] || 0) + 1;
+            saveAnalytics(analytics);
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            trackTabView(tabName);
+        }
+
+        // Toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `
+                <div style="font-weight: 600; margin-bottom: 4px;">${type === 'success' ? '✓' : '⚠'} ${type === 'success' ? 'Success' : 'Notice'}</div>
+                <div style="font-size: 0.875rem; color: var(--text-secondary);">${message}</div>
+            `;
+            toast.style.borderColor = type === 'success' ? 'var(--success)' : 'var(--warning)';
+            
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 4000);
+        }
+
+        // Export analytics data
+        function exportAnalytics() {
+            const analytics = getAnalytics();
+            const completed = getCompleted();
+            const skipped = getSkipped();
+            
+            const data = {
+                analytics,
+                completed,
+                skipped,
+                streak: localStorage.getItem(STORAGE_KEYS.STREAK),
+                lastSendDate: localStorage.getItem(STORAGE_KEYS.LAST_SEND_DATE),
+                exportedAt: new Date().toISOString()
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `dashboard-analytics-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            showToast('Analytics exported!', 'success');
+        }
+    </script>
+</body>
+</html>

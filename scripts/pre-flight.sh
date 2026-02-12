@@ -11,6 +11,24 @@ echo "=== PRE-FLIGHT CHECK ==="
 echo "Task: $TASK"
 echo ""
 
+# SEND-FIRST CHECK for build-related tasks (CNC, content, dashboards)
+BUILD_TASKS="cnc|visual|design|dashboard"
+if [[ "$TASK" =~ $BUILD_TASKS ]]; then
+    echo "⚠️  BUILD-TASK DETECTED — SEND-FIRST CHECK REQUIRED ⚠️"
+    echo ""
+    # Run send-enforcer in silent mode (no shame)
+    if [ -f "$WS/scripts/send-enforcer.sh" ]; then
+        bash "$WS/scripts/send-enforcer.sh" 2>/dev/null || true
+    fi
+    echo ""
+    echo "🛑 RULE: No building >2 features without 1 send."
+    echo "   If zero sends today → SEND SOMETHING FIRST."
+    echo ""
+    read -p "Press ENTER to continue or Ctrl+C to send first..."
+    echo ""
+fi
+
+
 # Always load
 echo "📋 IMMER LADEN:"
 echo "  - TWIN.md (Entscheidungsmodell)"

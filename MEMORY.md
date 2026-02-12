@@ -21,7 +21,7 @@
 ## Aktive Threads (max 5)
 
 1. **Vault Umbau v3** — PARA-Struktur (7 Top-Level statt 13). HOF=VC-Career, CNC=Freelance, Kommunal=Tag. Linking-Regeln fertig.
-2. **AI Consulting Outreach** — Playbook fertig, go-digital AUSGELAUFEN, Bayern Digitalbonus Plus = bester Fit (€30K, keine Autorisierung). 10 Emails morgen.
+2. **AI Consulting Outreach** — 19 Emails ready (15 alt + 4 Bayern neu). Case Study MBS fertig (92% Zeitersparung). go-digital AUSGELAUFEN, Bayern Digitalbonus Plus = GOLD (€30K, 50%, keine Autorisierung). TOP 5: Funkwerk, Glatt, SITEC, Starrag, SGP — nur Kontaktdaten fehlen (2h Sprint morgen 09:00).
 3. **VC Applications** — HOF, Betaworks, Leonis, Wingspan ready. 0 submitted.
 4. **Content** — Artikel #1 published, Artikel #2 in Review. 15 Ideas priorisiert.
 5. **CNC Demo @ MBS** — Email an Andreas gesendet 06.02.
@@ -57,6 +57,8 @@
 - ADHS: Hyperfokus nutzen, Choice Paralysis vermeiden, 1 Empfehlung.
 - Do not disturb: 06:45-08:15, 17:45-20:00.
 - Kontakt: +49 151 230 39 208, florian@ainaryventures.com
+- **US Green Card** — volle Arbeitserlaubnis USA, kein Visa-Sponsorship nötig
+- Mietwohnung München €1.550, vermietet 2 Zimmer (Untermieter)
 
 ## Ainary Ventures
 
@@ -103,6 +105,27 @@ NICHT vermischen. Kintsugi #5.
 - **LaTeX > HTML für Print-PDFs** → IMMER
 - **Iterieren > Neu bauen** → v16>v17 Pattern
 - **Amplify > Replace** → Florians eigene Texte sind besser als meine Drafts
+
+## EvolveR Protocol (ab 2026-02-10)
+- **Vor jedem Task:** `grep -i "[keyword]" principles/*.md` — Gibt es eine Regel dazu?
+- **Nach jedem Task:** Principle validiert (+10 Score) oder verletzt (-20 Score)?
+- **Bei neuem Pattern:** ADD zu principles/ mit Score 50
+- **Wöchentlich:** Principles unter Score 20 reviewen → DELETE oder reformulieren
+- **Dateien:** `principles/execution.md`, `principles/quality.md`, `principles/research.md`, `principles/memory.md`
+
+## Harte Regel: INDEX.md ZUERST (ab 2026-02-10)
+- **Bei JEDER Aufgabe:** `grep -i "[keyword]" INDEX.md` + Vault-Suche BEVOR ich anfange
+- Wenn Prozess/Template/Strategie existiert → Florian SOFORT darauf hinweisen
+- "Wir haben dazu schon X — willst du das nutzen?"
+- NICHT neu erstellen wenn es schon existiert. NIEMALS.
+
+## X-Ray Platform (ab 2026-02-12)
+- **Master Reference:** `projects/ai-company-xray/PROJECT-STATUS.md` — IMMER zuerst lesen
+- Corporate X-Ray: `projects/ai-company-xray/` (GPT-4o, 5 Agents, Hyperthink, ~$0.15/Report)
+- Startup X-Ray: `projects/startup-xray/` (gleiche Engine, andere Prompts, Confidence Indicators)
+- GTM: `projects/ai-company-xray/GTM-STRATEGY.md`
+- Deployed (Mockup): https://fziescheus-alt.github.io/ga4-intelligence/
+- Nächste Schritte: Deploy Corporate auf Custom Domain, LinkedIn Post, 5 Consultancies
 
 ## Anti-Patterns (NIE wieder)
 

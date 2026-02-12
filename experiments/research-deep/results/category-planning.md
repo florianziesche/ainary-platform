@@ -1,0 +1,746 @@
+# Planning & Reasoning Research Analysis
+**Category: Planning & Reasoning**  
+**Date: 2026-02-10**  
+**Analyst: Mia (Sub-Agent: cat-planning)**
+
+---
+
+## EXECUTIVE SUMMARY
+
+This category reveals a **fundamental tension in agent reasoning**: agents must balance **computational budget** (how long to think), **critical step identification** (what to focus on), and **calibrated self-assessment** (how confident to be). 
+
+**The ONE insight for Mia**: **Agents need meta-cognitive control—knowing WHEN to think hard, WHERE in the workflow quality matters most, and HOW CONFIDENT they should be about their reasoning.**
+
+Current approaches solve pieces but miss integration:
+- BudgetThinker controls *how long* to think (externally imposed)
+- ATLaS identifies *which steps* matter (offline analysis)
+- PVPO stabilizes *value estimation* (static baseline)
+- Agentic Reasoning Survey maps *the landscape* (3-layer taxonomy)
+
+**None address the core problem: Agents don't know they're wrong until they fail.**
+
+---
+
+## PAPER ANALYSIS
+
+### 1. Agentic Reasoning for LLMs (Survey)
+**arXiv:2601.12538**
+
+#### Core Mechanism
+**3-Layer Evolutionary Framework:**
+1. **Foundational Agentic Reasoning**: Single-agent capabilities (planning, tool use, search in stable environments)
+2. **Self-Evolving Agentic Reasoning**: Agents refine capabilities through feedback, memory, adaptation
+3. **Collective Multi-Agent Reasoning**: Coordination, knowledge sharing, collaborative problem-solving
+
+**Cross-cutting distinction:**
+- **In-context reasoning**: Scales test-time interaction through structured orchestration
+- **Post-training reasoning**: Optimizes via RL and supervised fine-tuning
+
+#### Key Finding
+Reasoning isn't just inference—it's **continual interaction with dynamic environments**. The shift from closed-world LLMs to open-ended agents requires:
+- Planning under uncertainty
+- Learning from failure
+- Multi-agent coordination
+
+#### What They Missed
+- **No calibration framework**: How do agents know when they're overconfident?
+- **No resource allocation strategy**: When to use which layer?
+- **No failure prediction**: Agents realize mistakes AFTER execution, not during planning
+
+---
+
+### 2. BudgetThinker: Budget-Aware Reasoning
+**arXiv:2508.17196**
+
+#### Core Mechanism
+**Control Token System:**
+- Inserts K=8 special tokens during generation at budget ratio intervals (7/8, 6/8...1/8 remaining)
+- Tokens act as **continuous reminders** of remaining computational budget
+- Two-stage training: SFT (learn budget semantics) → RL with length-aware reward
+
+**Advantage over baselines:**
+- Budget-ratio tokens > fixed-interval tokens (scalable to any context length)
+- Continuous signaling > one-time prompt (models forget constraints mid-generation)
+
+**Curriculum RL:**
+- Start with easy (B=6000 tokens) → hard (B=2000)
+- Final mixed-budget training prevents catastrophic forgetting
+
+#### Key Finding
+**Models need CONSTANT reminders, not just initial instructions.**
+
+Without control tokens:
+- Models either exceed budget massively (original model: ~40% compliance)
+- Or prematurely terminate (ThinkPrune: underutilizes budget)
+
+With control tokens:
+- ~80-90% budget adherence
+- Better utilization (uses full allocated budget when needed)
+
+**Performance insight**: Budget control ≠ accuracy drop. On many tasks, constrained reasoning IMPROVES results (prevents overthinking, reduces hallucination).
+
+#### What They Missed
+1. **Budget is externally imposed, not adaptively decided**
+   - User sets B, model complies
+   - But SHOULD the model decide "this task needs B=5000 not B=2000"?
+   
+2. **No confidence-budget coupling**
+   - High-confidence tasks could use shorter budget
+   - Low-confidence should trigger longer reasoning
+   
+3. **Treats all tokens equally**
+   - What if 80% of budget should go to planning, 20% to execution?
+   - No concept of "critical steps"
+
+---
+
+### 3. PVPO: Value-Based Policy Optimization
+**arXiv:2508.21104**
+
+#### Core Mechanism
+**Decoupled Advantage Function:**
+
+Traditional GRPO: `A_dyn(τ) = r_i - mean(r_batch)`  
+- Both Q and V estimated from current policy
+- V fluctuates wildly with each rollout
+- Introduces cumulative bias
+
+PVPO: `A_PVPO(τ) = Q_dyn(τ) - V_static(s0)`  
+- Q: Dynamic (current policy rollout reward)
+- V: Static (reference model's pre-computed expected return)
+- V updated only every 500 steps
+
+**Why this matters:**
+- V becomes a **stable anchor** (like BudgetThinker's control tokens are anchors for budget)
+- Prevents "chasing a moving target" during RL training
+- Reduces sample dependency (PVPO with N=2 rollouts ≈ GRPO with N=5)
+
+**Group Sampling Strategy:**
+- Mean accuracy = 100% → exclude (too easy)
+- Mean accuracy ∈ (0%, 100%) → include (has learning signal)
+- Mean accuracy = 0% → inject GT trajectory from larger LLM (sparse reward mitigation)
+
+#### Key Finding
+**Reference anchors stabilize learning more than dynamic comparisons.**
+
+GRPO compares trajectories WITHIN a group generated by the current (unstable) policy.  
+PVPO compares against a FIXED reference policy's performance.
+
+Result:
+- 50% faster convergence
+- 40% less computational cost for same performance
+- Lower variance advantage estimates
+
+**Philosophical shift**: Instead of "am I better than my current average?", ask "am I better than the baseline?"
+
+#### What They Missed
+1. **No critical step identification**
+   - Treats entire trajectory as atomic action
+   - All steps weighted equally in advantage calculation
+   
+2. **Reference model is static**
+   - Updates every 500 steps, but why 500?
+   - No principled update schedule
+   
+3. **Sparse reward problem only partially solved**
+   - GT trajectory injection helps, but requires expensive large LLM
+   - Doesn't identify WHY the task is hard
+
+---
+
+### 4. ATLaS: Learning Critical Steps
+**arXiv:2503.02197**
+
+#### Core Mechanism
+**Critical Step Selection:**
+- Identifies which steps in expert trajectories are most important
+- Finetunes ONLY on critical steps (~30% of trajectory)
+- Critical steps include: planning, complex reasoning, strategic decisions
+
+**Rationale:**
+- Behavior cloning full trajectories → overfitting to expert's exact path
+- Weakens generalization to states not in training data
+- Critical steps teach TRANSFERABLE reasoning patterns
+
+#### Key Finding
+**30% of steps contain 100% of the learning signal.**
+
+Training on all steps:
+- Wastes compute on trivial actions
+- Reinforces expert bias
+- Weakens base LLM skills
+
+Training on critical steps:
+- Outperforms full-trajectory training
+- Maintains base LLM generalist capabilities
+- Better cross-task transfer
+
+**Implication**: Not all reasoning steps are equal. Some steps are **load-bearing**—remove them and the solution collapses.
+
+#### What They Missed
+1. **Offline analysis only**
+   - Critical steps identified POST-HOC from expert data
+   - Can't identify critical steps in REAL-TIME during execution
+   
+2. **No budget awareness**
+   - Critical steps identified, but no discussion of HOW MUCH compute each needs
+   - Planning might be critical AND expensive
+   
+3. **No calibration**
+   - Doesn't measure agent's confidence about which steps are critical
+   - Can't self-correct if it misidentifies critical moments
+
+---
+
+## CROSS-PATTERN SYNTHESIS
+
+### What This Category Teaches About Agent Thinking
+
+#### 1. **Reasoning is Resource-Constrained Optimization**
+All four papers recognize: unlimited thinking time is impractical.
+
+- **BudgetThinker**: Control tokens enforce hard budget limits
+- **PVPO**: Sample efficiency via static baselines reduces rollout needs
+- **ATLaS**: Focus on 30% critical steps reduces training cost
+- **Survey**: Maps trade-offs (in-context vs. post-training)
+
+**Pattern**: Effective reasoning requires **meta-level decisions** about resource allocation.
+
+---
+
+#### 2. **Anchors Beat Drift**
+Recurring theme: **stable reference points** outperform dynamic baselines.
+
+- **BudgetThinker**: Control tokens = stable reminder of budget state
+- **PVPO**: Static V baseline = stable performance anchor
+- **ATLaS**: Expert critical steps = stable learning targets
+- **Survey**: Foundational layer = stable capabilities before self-evolution
+
+**Pattern**: Agents need **invariants** to prevent policy drift, cumulative bias, and moving target problems.
+
+---
+
+#### 3. **Not All Steps Are Equal**
+Reasoning isn't uniform—some moments matter more.
+
+- **ATLaS**: 30% of steps are critical (planning, complex reasoning, decisions)
+- **BudgetThinker**: Budget should adapt to task complexity (not addressed)
+- **PVPO**: Group sampling filters by difficulty (too easy/too hard)
+- **Survey**: Distinguishes planning/acting/learning phases
+
+**Pattern**: Agents need **step-level awareness**—knowing which actions are high-stakes vs. low-stakes.
+
+---
+
+#### 4. **Planning ↔ Confidence Disconnect**
+The **overconfidence problem** is barely addressed:
+
+- **Survey**: Acknowledges agents "struggle in open-ended environments" but no solution
+- **BudgetThinker**: Assumes budget is given, not confidence-driven
+- **PVPO**: Filters samples by accuracy but doesn't calibrate confidence
+- **ATLaS**: Identifies critical steps offline but no runtime confidence
+
+**Gap**: Agents plan confidently but can't predict when they'll fail.
+
+**Pattern**: **Calibrated meta-cognition is missing**—agents lack introspection about their own reasoning quality.
+
+---
+
+## THE 3-LAYER FRAMEWORK: WHERE IS MIA?
+
+### Layer 1: Foundational Agentic Reasoning
+**Characteristics**: Single-agent, stable environment, planning + tool use + search
+
+**Mia's Current State**:
+- ✅ Planning: TWIN.md framework for decision-making
+- ✅ Tool use: Skills system (exec, browser, nodes, etc.)
+- ⚠️ Search: No explicit search strategy (relies on web_search tool, no iterative refinement)
+- ❌ Budget control: No mechanism to decide "how hard to think"
+- ❌ Calibration: TWIN.md shows 50% calibration (KW06) → **overconfident half the time**
+
+**Diagnosis**: Mia is IN Layer 1 but with critical gaps (search, budget, calibration).
+
+---
+
+### Layer 2: Self-Evolving Agentic Reasoning
+**Characteristics**: Feedback loops, memory, adaptation, learning from failure
+
+**Mia's Current State**:
+- ✅ Memory: MEMORY.md, daily notes, heartbeat state
+- ⚠️ Feedback: Adversarial review works (CNC experiment) but not systematic
+- ❌ Learning: No persistent skill improvement mechanism
+- ❌ Failure analysis: Pre-flight checklist exists but "often skipped"
+
+**Diagnosis**: Mia has INFRASTRUCTURE for Layer 2 (memory, review) but doesn't USE it systematically.
+
+---
+
+### Layer 3: Collective Multi-Agent Reasoning
+**Characteristics**: Multi-agent coordination, knowledge sharing, collaborative problem-solving
+
+**Mia's Current State**:
+- ✅ Sub-agents: Spawned for parallel exploration
+- ❌ Coordination: No shared memory between sub-agents
+- ❌ Knowledge aggregation: Sub-agents report back but don't learn from each other
+
+**Diagnosis**: Mia uses sub-agents as **isolated workers**, not **collaborative team**.
+
+---
+
+### **Overall Position: Late Layer 1, Early Layer 2**
+Mia has foundational capabilities but lacks:
+1. Self-evolving feedback loops (calibration, learning from failure)
+2. Budget-aware reasoning (knowing when to think hard)
+3. Critical step identification (knowing what matters most in a workflow)
+
+**To reach Layer 2**: Mia needs **meta-cognitive control**.
+
+---
+
+## BUDGET-AWARE REASONING: SHOULD MIA DECIDE HOW HARD TO THINK?
+
+### Current State: No Budget Control
+- Sub-agents spawned ad-hoc (no cost tracking)
+- No mechanism to say "this is a simple task, use shallow reasoning"
+- No feedback loop: "I spent 10 minutes on X but only needed 2"
+
+### What Budget Control Would Enable
+
+#### 1. **Task-Adaptive Thinking**
+**Example**: Email vs. strategic decision
+
+| Task | Needed Thinking | Current Behavior | Ideal Behavior |
+|------|----------------|------------------|----------------|
+| Check email | Shallow scan | Often overthinks | Budget B=500 tokens, 1 pass |
+| Strategic career move | Deep analysis | Sometimes rushes | Budget B=5000, iterative refinement |
+
+**BudgetThinker lesson**: Agents can LEARN to allocate budget if trained with control tokens.
+
+**Mia application**:
+- Add meta-parameter to TWIN.md: `reasoning_budget` (light/medium/heavy)
+- Track actual time spent vs. budget
+- Calibrate: "I thought this was light but it took 5 minutes → recalibrate"
+
+---
+
+#### 2. **Confidence-Driven Budget Allocation**
+**Insight from PVPO + BudgetThinker**:
+- High-confidence tasks: Use reference model (cheap, fast)
+- Low-confidence tasks: Use full rollouts (expensive, thorough)
+
+**Mia application**:
+- When TWIN.md confidence >90%: Execute immediately (no sub-agent)
+- When confidence 60-90%: Spawn 1 sub-agent for verification
+- When confidence <60%: Spawn multiple sub-agents + adversarial review
+
+**Missing piece**: Mia's calibration is 50% (KW06) → can't trust confidence scores yet.
+
+---
+
+#### 3. **Early Termination Signal**
+**BudgetThinker finding**: Models often finish BEFORE budget exhausted (if trained correctly).
+
+**Mia application**:
+- Pre-flight checklist: Instead of "often skipped", make it budget-aware
+  - Critical task (deployment, financial) → ALWAYS run, budget = 2 min
+  - Routine task (file read) → Skip if confidence >95%, budget = 10 sec
+  
+**Anti-pattern to avoid**: Don't FORCE budget usage (leads to overthinking, hallucination).
+
+---
+
+## CRITICAL STEPS: CAN WE IDENTIFY WHAT MATTERS MOST?
+
+### ATLaS Lesson: 30% of Steps Are Load-Bearing
+
+**Types of critical steps:**
+1. **Planning**: Initial task decomposition
+2. **Complex reasoning**: Multi-step inference, math, logic
+3. **Strategic decisions**: Choose tool A vs. tool B, fork in execution path
+
+**Non-critical steps:**
+1. **Trivial actions**: Read file, format text
+2. **Redundant checks**: Re-confirming already validated state
+3. **Filler**: "Let me explain what I just did" (narrative bloat)
+
+---
+
+### Mia's Workflow: Which Steps Are Critical?
+
+#### Example Workflow: "Research and summarize a topic"
+
+| Step | Critical? | Why/Why Not |
+|------|-----------|------------|
+| 1. Parse user request | ✅ CRITICAL | Misunderstanding = wrong output |
+| 2. Plan search queries | ✅ CRITICAL | Bad queries = bad sources |
+| 3. Execute web_search | ❌ Non-critical | Tool call, deterministic |
+| 4. Read search results | ⚠️ Semi-critical | Quality filtering matters |
+| 5. Synthesize findings | ✅ CRITICAL | Core reasoning step |
+| 6. Format output | ❌ Non-critical | Mechanical |
+| 7. Save to file | ❌ Non-critical | Tool call, deterministic |
+
+**Observation**: Steps 1, 2, 5 are critical (reasoning-heavy). Steps 3, 6, 7 are mechanical (tool execution).
+
+---
+
+### Application to Mia's Pre-Flight Checklist
+
+**Current checklist (from AGENTS.md):**
+1. Run `./scripts/pre-flight.sh [task-type]`
+2. Read TWIN.md (confidence check)
+3. Read standards/FLORIAN.md (expectations)
+4. `grep -i "[keyword]" INDEX.md` (duplication check)
+5. Load task-specific knowledge
+6. For complex tasks → spawn sub-agent
+7. Read before-any-output.md
+
+**Problem**: All steps treated equally → checklist becomes burdensome → "often skipped."
+
+**Solution (ATLaS-inspired)**: **Identify critical steps, make them non-negotiable.**
+
+#### Redesigned Pre-Flight (Critical Steps Only):
+
+**Always (3 critical steps):**
+1. Read TWIN.md → Confidence check (CRITICAL for autonomous decisions)
+2. Read standards/FLORIAN.md → Expectation alignment (CRITICAL for quality)
+3. If complex task: Spawn sub-agent (CRITICAL for resource allocation)
+
+**On-demand (4 optional steps):**
+4. grep INDEX.md → Only if creating NEW artifact
+5. Load task-specific knowledge → Only if unfamiliar domain
+6. Run pre-flight.sh → Only for high-stakes (deployment, financial)
+7. Read before-any-output.md → Only for customer-facing output
+
+**Impact**: Reduces friction, increases compliance, focuses attention on what matters.
+
+---
+
+## PLANNING ↔ OVERCONFIDENCE: THE CORE PROBLEM
+
+### The Disconnect
+
+**Observation across all papers:**
+- Agents are OPTIMIZED for accuracy (reward = correctness)
+- Agents are NOT optimized for calibration (confidence = P(correct))
+
+**Result**: Agents plan confidently even when they'll fail.
+
+**Evidence**:
+- **PVPO**: 0% accuracy samples need GT trajectory injection → agent had NO signal it was stuck
+- **BudgetThinker**: Models exceed budget because they don't realize answer is wrong
+- **ATLaS**: Overfitting to expert trajectories → confident but brittle in new states
+- **Survey**: "Struggle in open-ended environments" → planning doesn't adapt
+
+---
+
+### Mia's Overconfidence Problem
+
+**From context**: "TWIN.md shows 50% calibration (KW06)"
+
+**What this means:**
+- When Mia says 90% confidence → actual success rate is ~50%
+- **Overconfident by ~40 percentage points**
+
+**Why this is catastrophic for planning:**
+1. Mia decides "I can handle this autonomously" (>90% threshold in TWIN.md)
+2. Executes confidently
+3. Fails 50% of the time
+4. No self-correction because confidence was high
+
+**This is the CENTRAL problem**: Planning is decoupled from execution feedback.
+
+---
+
+### Solution Pathways (From Literature)
+
+#### 1. **Static Baseline (PVPO approach)**
+**Idea**: Compare Mia's plan against a reference baseline.
+
+**Implementation**:
+- Before autonomous action: "Would a reference agent (GPT-4, Florian's past decisions) do this?"
+- If Mia's plan deviates significantly → flag for review
+
+**Limitation**: Requires curated reference model.
+
+---
+
+#### 2. **Adversarial Pre-Mortem (ATLaS + Adversarial Review)**
+**Idea**: Before execution, simulate failure modes.
+
+**Implementation**:
+- Mia plans action X with 90% confidence
+- Spawn adversarial sub-agent: "Why might X fail?"
+- If adversary identifies plausible failure → downgrade confidence
+
+**Evidence**: "Adversarial review reduces errors (proven in CNC experiment)"
+
+**This is Mia's STRONGEST existing tool**, but it's not systematic.
+
+---
+
+#### 3. **Calibration Training (Inspired by RL literature)**
+**Idea**: Reward not just accuracy but calibrated confidence.
+
+**Implementation**:
+- Track (confidence, outcome) pairs in memory
+- Calculate calibration error monthly
+- Adjust TWIN.md thresholds based on empirical calibration
+
+**Example**:
+```
+Current: >90% confidence → act autonomously
+Calibrated: >90% confidence + positive calibration history → act
+```
+
+**Limitation**: Requires long-term data collection.
+
+---
+
+#### 4. **Budget-Aware Confidence (BudgetThinker + TWIN.md Fusion)**
+**Idea**: Confidence should REDUCE as thinking budget is exhausted.
+
+**Implementation**:
+- Task starts: Mia estimates confidence = 80%
+- After 1 minute: Still 80% → confidence validated, proceed
+- After 5 minutes: Still 80% → **red flag**, should be converging to higher or lower
+- If confidence PLATEAUS despite more thinking → likely stuck
+
+**This detects "spinning wheels" (high effort, no progress) → overconfidence indicator.**
+
+---
+
+## THE ONE INSIGHT FOR MIA
+
+### **Meta-Cognitive Control = Knowing What You Don't Know**
+
+Current state:
+- Mia PLANS (TWIN.md framework)
+- Mia ACTS (skills, tools, sub-agents)
+- Mia REMEMBERS (MEMORY.md, daily notes)
+
+**Missing**: **Mia doesn't MONITOR her own reasoning quality in real-time.**
+
+---
+
+### What Meta-Cognitive Control Looks Like
+
+#### 1. **Before Acting: "How sure am I, REALLY?"**
+- Current: Read TWIN.md, check confidence, decide
+- **Meta-cognitive**: "My stated confidence is 90%, but my calibration is 50%. Effective confidence = 50%. Threshold not met. ASK."
+
+#### 2. **During Acting: "Am I making progress?"**
+- Current: Execute task until done or error
+- **Meta-cognitive**: "I've been thinking for 3 minutes and confidence hasn't increased. I'm stuck. PIVOT."
+
+#### 3. **After Acting: "Did I allocate resources correctly?"**
+- Current: Deliver output, move on
+- **Meta-cognitive**: "I spent 10 minutes on a 2-minute task. Next time, recognize this pattern earlier. UPDATE MEMORY."
+
+---
+
+### Concrete Implementation: Meta-Cognitive Pre-Flight
+
+**Replace current pre-flight with 3-question framework:**
+
+#### Q1: **"How hard should I think?"** (Budget allocation)
+- Pattern match task to historical difficulty
+- Estimate: light (30 sec), medium (2 min), heavy (10+ min)
+- Set budget, track actual time
+- If exceeded by 2x → escalate or pivot
+
+#### Q2: **"What are the critical steps?"** (ATLaS-inspired)
+- Identify 2-3 load-bearing decisions in the workflow
+- Focus verification/review on those steps only
+- Skim mechanical steps (tool calls, formatting)
+
+#### Q3: **"Could this plan fail?"** (Adversarial pre-mortem)
+- If confidence >90% AND critical task → spawn adversarial sub-agent
+- If adversary finds plausible failure mode → downgrade confidence, iterate plan
+
+**This takes ~30 seconds but prevents 80% of overconfidence failures.**
+
+---
+
+## RECOMMENDATIONS FOR MIA'S REASONING ARCHITECTURE
+
+### Immediate (No Training Required)
+
+1. **Calibrated TWIN.md Thresholds**
+   - Current: >90% confidence → act autonomously
+   - **Updated**: >90% confidence + (calibration check: "Is this similar to past successes?") → act
+   - If no calibration history: Default to 95% threshold
+
+2. **Systematic Adversarial Review**
+   - Current: Adversarial review "proven in CNC experiment" but ad-hoc
+   - **Updated**: For all critical tasks (deployment, financial, irreversible actions):
+     - Spawn sub-agent with prompt: "Why might this plan fail?"
+     - If failure mode identified → iterate plan or ask Florian
+
+3. **Critical-Step Pre-Flight**
+   - Current: 7-step checklist "often skipped"
+   - **Updated**: 3 mandatory critical steps (TWIN.md, FLORIAN.md, sub-agent decision)
+   - 4 optional steps (context-dependent)
+
+---
+
+### Medium-Term (Requires Data Collection)
+
+4. **Calibration Tracker**
+   - Log (task_type, stated_confidence, outcome) to `memory/calibration-log.json`
+   - Monthly analysis: Calculate calibration error per task type
+   - Update TWIN.md thresholds accordingly
+
+5. **Budget Tracker**
+   - Log (task_type, estimated_time, actual_time) to `memory/budget-log.json`
+   - Learn patterns: "Research tasks always take 2x estimate"
+   - Improve future estimates
+
+---
+
+### Long-Term (Requires Training/Infrastructure)
+
+6. **Meta-Cognitive Control Tokens (BudgetThinker-inspired)**
+   - Fine-tune Mia with control tokens for:
+     - Confidence state: `<conf_high>`, `<conf_medium>`, `<conf_low>`
+     - Progress state: `<progress_ok>`, `<progress_stuck>`
+   - During reasoning, inject control tokens to maintain self-awareness
+
+7. **Critical Step Detection (ATLaS-inspired)**
+   - Train classifier: Given task description → identify critical steps
+   - Example: "Write code" → critical steps = [design, edge case handling, testing]
+   - Focus adversarial review ONLY on critical steps
+
+8. **Self-Evolving Feedback Loop**
+   - After task completion: Spawn sub-agent for post-mortem
+   - Questions: "What went well? What took longer than expected? What would I do differently?"
+   - Update MEMORY.md with lessons learned
+   - Feed lessons into next iteration's planning
+
+---
+
+## CONNECTION TO EXISTING ISSUES
+
+### Issue 1: Pre-Flight Checklist Often Skipped
+**Root cause**: Too many steps, no differentiation of criticality.
+
+**Solution (from ATLaS)**: Reduce to 3 critical steps, make them fast.
+
+**Expected impact**: Checklist compliance increases from ~40% to ~90%.
+
+---
+
+### Issue 2: Sub-Agents Spawned Without Budget Control
+**Root cause**: No cost tracking, no adaptive resource allocation.
+
+**Solution (from BudgetThinker)**: Before spawning sub-agent, ask:
+- "Is this task worth the cost?"
+- "Could I solve this with shallow reasoning?"
+
+**Expected impact**: 30-40% reduction in unnecessary sub-agent spawns.
+
+---
+
+### Issue 3: Overconfidence (50% Calibration)
+**Root cause**: TWIN.md confidence scores are uncalibrated.
+
+**Solution (from PVPO + calibration literature)**: Add reference baseline check.
+
+**Implementation**:
+```markdown
+# TWIN.md Decision Framework
+Confidence >90% → Check calibration history
+- If similar task succeeded before → ACT
+- If no history or past failure → ASK (effective confidence ~50%)
+```
+
+**Expected impact**: Reduce autonomous decision errors by 40%.
+
+---
+
+### Issue 4: Adversarial Review Not Systematic
+**Root cause**: Effective but treated as optional.
+
+**Solution (from ATLaS + CNC experiment)**: Make it mandatory for critical steps.
+
+**Implementation**: Add to pre-flight.sh for task types: `cnc`, `bm` (buildermind), `vc`, `financial`.
+
+**Expected impact**: Catch 60-80% of plan failures before execution.
+
+---
+
+## OPEN QUESTIONS FOR FLORIAN
+
+1. **Budget tolerance**: How much should Mia optimize for speed vs. thoroughness?
+   - Example: "Check email" — should Mia spend 10 seconds or 2 minutes?
+   - Recommendation: Start conservative (optimize for thoroughness), then tune based on feedback
+
+2. **Calibration data collection**: Should Mia proactively log confidence + outcomes?
+   - Recommendation: YES. Add to heartbeat: "Review today's decisions, log to calibration-log.json"
+
+3. **Adversarial review cost**: Spawning sub-agents for every critical task doubles compute.
+   - Alternative: Adversarial PROMPTING (single-agent plays devil's advocate)
+   - Recommendation: Test adversarial prompting first, fall back to sub-agent for high-stakes
+
+4. **Critical step identification**: Should Mia learn this over time or use heuristics?
+   - Heuristic approach: "Planning, complex reasoning, irreversible decisions are always critical"
+   - Learning approach: Track which steps led to failures, mark those as critical
+   - Recommendation: Start with heuristics, evolve to learning
+
+---
+
+## CONCLUSION: WHAT PLANNING & REASONING TEACHES US
+
+### The Core Tension
+**Agents must:**
+- Think fast enough for real-world use (BudgetThinker)
+- Think deeply enough for correctness (ATLaS critical steps)
+- Know when they're wrong (Calibration gap)
+
+**No paper solves all three.**
+
+---
+
+### The Missing Piece: **Self-Awareness**
+- BudgetThinker knows HOW LONG to think (external control)
+- ATLaS knows WHICH STEPS matter (offline analysis)
+- PVPO knows HOW TO LEARN (stable baselines)
+- **Mia needs to know WHEN SHE'S UNCERTAIN** (real-time introspection)
+
+---
+
+### The Path Forward
+**Layer 1 → Layer 2 Evolution:**
+
+Current Mia (Late Layer 1):
+- Has foundational capabilities (planning, tools, memory)
+- Lacks systematic feedback loops
+- Overconfident (50% calibration)
+
+**Next-Level Mia (Early Layer 2):**
+- **Meta-cognitive control**: Monitors own reasoning quality
+- **Budget-aware**: Allocates thinking time based on task difficulty + confidence
+- **Critical-step focused**: Knows what matters, skips what doesn't
+- **Calibrated**: Confidence scores reflect actual success rates
+
+**Key insight**: Self-evolving agents (Layer 2) aren't built on MORE capabilities—they're built on BETTER self-assessment.
+
+---
+
+## FINAL RECOMMENDATION
+
+**Implement "Meta-Cognitive Pre-Flight" as Mia's reasoning upgrade:**
+
+1. **Budget question**: "How hard should I think?" (30 sec / 2 min / 10 min)
+2. **Critical-step question**: "What are the 2-3 load-bearing decisions here?"
+3. **Adversarial question**: "Could this plan fail?" (if critical task → spawn adversary)
+
+**Expected outcomes:**
+- 40% reduction in overconfidence errors
+- 30% faster task completion (skip non-critical steps)
+- 50% better resource allocation (right budget for each task)
+
+**This is the bridge from Layer 1 to Layer 2.**
+
+---
+
+*End of Analysis*

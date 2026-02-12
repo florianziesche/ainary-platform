@@ -1,0 +1,205 @@
+- [10_Projects] Projects-MOC: --- type: moc status: active 
+- [Mia-Evolution] SYNTHESIS-v2: --- type: project status: active 
+- [Mia-Evolution] RED-TEAM-FINAL-REPORT: --- type: project status: active 
+- [Mia-Evolution] THE-PROTOCOL: --- type: project status: active 
+- [Compound-System] 90-Day-Goals: --- type: project status: active 
+- [Compound-System] FLYWHEEL-EXECUTION: --- type: project status: active 
+- [Compound-System] 00-Vision: --- type: project status: active 
+- [10_Projects] Project-Dashboard: --- type: dashboard status: active 
+- [Ainary-Website] Corporate-Identity: --- type: project status: active 
+- [Ainary-Website] Ainary-Website-Plan: --- type: project status: active 
+- [Ainary-Website] DESIGN-SPEC-V3: --- type: project status: active 
+- [Ainary-Website] Ainary-Website-Copy-v2: --- type: project status: active 
+- [Ainary-Website] DESIGN-SYNTHESIS-V3: --- type: project status: active 
+- [Content] CONTENT-QUEUE: --- type: project status: active 
+- [Articles-EN] article-1-100-agents: --- type: project status: active 
+- [Articles-EN] article-4-red-team: --- type: project status: active 
+- [Articles-EN] article-5-files-intelligence: --- type: project status: active 
+- [Articles-EN] article-3-kintsugi: --- type: project status: active 
+- [Articles-EN] article-2-urgency: --- type: project status: active 
+- [Drafts] post-specialist-ai-wins: --- type: project status: active 
+- [Drafts] post-microsoft-concentration-risk: --- type: project status: active 
+- [Drafts] Sequoia-AGI-Article-v2: --- type: project status: active 
+- [Drafts] Sequoia-AGI-Article-v2-DE: --- type: project status: active 
+- [Drafts] How-We-Work-Together: --- type: project status: active 
+- [Drafts] substack-launch-prompting-with-clarity: --- type: project status: active 
+- [Drafts] blog-outline-template: --- type: project status: active 
+- [Drafts] blog-compound-ai-stack: --- type: project status: active 
+- [Drafts] post-six-ways-companies-die: --- type: project status: active 
+- [Articles-DE] sequoia-agi-weltmodell-luecke: --- type: project status: active 
+- [Articles-DE] article-2-urgency-de: --- type: project status: active 
+- [Articles-DE] article-1-100-agents-de: --- type: project status: active 
+- [Articles-DE] 100-agents-48-stunden: --- type: project status: active 
+- [Social] sequoia-linkedin: --- type: project status: active 
+- [Social] thread-specialist-ai: --- type: project status: active 
+- [Social] linkedin-specialist-ai: --- type: project status: active 
+- [Social] thread-six-failure-modes: --- type: project status: active 
+- [Social] linkedin-microsoft-concentration: --- type: project status: active 
+- [Social] twitter-founder-to-vc: --- type: project status: active 
+- [Social] linkedin-founder-to-vc: --- type: project status: active 
+- [Social] twitter-ai-agents-employees: --- type: project status: active 
+- [Social] sequoia-twitter-thread: --- type: project status: active 
+- [Social] linkedin-six-failure-modes: --- type: project status: active 
+- [Publish] multi-agent-production: --- type: project status: active 
+- [Publish] dead-companies-walking-ai-era: --- type: project status: active 
+- [Publish] 100-agents-evolution: --- type: project status: active 
+- [Publish] microsoft-openai-concentration-risk: --- type: project status: active 
+- [Publish] niche-ai-investment-thesis: --- type: project status: active 
+- [Publish] reading-list: --- type: project status: active 
+- [Publish] ai-scaffolding-shift: --- type: project status: active 
+- [Publish] vertical-ai-moats: --- type: project status: active 
+- [Publish] investment-framework: --- type: project status: active 
+- [Publish] fund-thesis: --- type: project status: active 
+- [Publish] 00-START-HERE: --- type: project status: active 
+- [Reviewed] article-4-red-team-alles-herausfordern: --- type: project status: active 
+- [Reviewed] article-6-sequoia-agi-weltmodell-luecke: --- type: project status: active 
+- [Reviewed] article-3-kintsugi-protokoll: --- type: project status: active 
+- [Reviewed] article-2-dringlichkeit-ohne-zeit: --- type: project status: active 
+- [Reviewed] article-5-dateien-gleich-intelligenz: --- type: project status: active 
+- [Reviewed] article-1-100-agents-48-stunden: --- type: project status: active 
+- [Content] content-ideas-master: --- type: project status: active 
+- [Content] Content-MOC: --- type: moc status: active 
+- [Strategy] BRAND-ANALYSIS-FLORIAN: --- type: project status: active 
+- [Strategy] BRAND-SUMMARY-EXECUTIVE: --- type: project status: active 
+- [Strategy] VC-Positioning-Analysis: --- type: project status: active 
+- [Strategy] BLOG-CONCEPT-v2: --- type: project status: active 
+- [Strategy] Twitter-Growth-Strategy: --- type: project status: active 
+- [Strategy] Website-CRM-Setup: --- type: project status: active 
+- [Strategy] CONTENT-RECOMMENDATIONS: --- type: project status: active 
+- [Strategy] Substack - accounts that I follow: --- type: project status: active 
+- [Strategy] MONDAY-DEEP-DIVE: --- type: project status: active 
+- [Strategy] X-Twitter-Strategy: --- type: project status: active 
+- [Materials] 00-Job-Search-Strategy: 
+- [Networking] monique-barbanson-meeting-brief: 
+- [Networking] NETWORK-ACTIVATION-30DAY: 
+- [Networking] Contact-List: 
+- [Networking] LP-OUTREACH-PLAYBOOK: 
+- [Networking] LP-Resources-Guide: 
+- [Fund-Research] Decile-Capital: --- type: project status: active 
+- [Fund-Research] 00-Fund-Overview: --- type: project status: active 
+- [Applications] SUBMIT-CHECKLIST: --- type: project status: active 
+- [HOF-Capital] nascent-market-answer: --- type: project status: active 
+- [HOF-Capital] HOF-Capital: --- type: project status: active 
+- [HOF-Capital] HOF-Application: 
+- [HOF-Capital] CV_HOF_Ziesche_v3: 
+- [Applications] VC-Openings-Feb-2026: --- type: project status: active 
+- [Venture-Capital] VC-Career-MOC: --- type: moc status: active 
+- [Thesis] COMPETITIVE-INTEL: 
+- [Thesis] Ainary-Golden-Standard-Research: --- type: project status: active 
+- [Thesis] THESIS: 
+- [Thesis] Ainary-Ventures-Thesis: --- type: project status: active 
+- [Thesis] Ainary-Manifesto-Research: --- type: project status: active 
+- [Freelance] Freelance-MOC: --- type: moc status: active 
+- [CNC-Planner] Sales-Presentation: --- type: project status: active 
+- [CNC-Planner] CNC-Fertigungsplaner: --- type: project status: active 
+- [CNC-Planner] CNC-Competitive-Landscape-2026: --- type: project status: active 
+- [CNC-Planner] CNC-Planner-Feedback: --- type: project status: active 
+- [CNC-Planner] Meeting-Brief-Andreas-MBS: --- type: project status: active 
+- [Freelance] Outreach-Log: --- type: project status: active 
+- [AI-Consulting] Pitch-Freie-Presse: --- type: project status: active 
+- [AI-Consulting] Demo-Artikel-Freie-Presse: --- type: project status: active 
+- [AI-Consulting] KI-Assistent-Buergermeister-Konzept: --- type: project status: active 
+- [AI-Consulting] Meeting-Brief-BM-Glashuette: --- type: project status: active 
+- [Proposals] Leads-Sachsen: --- type: project status: active 
+- [Proposals] Outreach-Emails-CNC: --- type: project status: active 
+- [Proposals] Proposal-MBS-Schlottwitz: --- type: project status: draft 
+- [Networking] Andreas Brand: --- type: person status: active 
+- [Networking] Daniel-Daum: --- type: person status: active 
+- [Networking] Recruiters: --- type: person status: active 
+- [Networking] Sven-Gleissberg: --- type: person status: active 
+- [Networking] Andrew-Eberhart: --- type: person status: active 
+- [30_People] People-MOC: --- type: moc status: evergreen 
+- [Family] Floriana Ziesche: --- type: person status: active 
+- [Family] Nancy Ziesche: --- type: person status: active 
+- [VCs] Primary Venture Partners: --- type: person status: active 
+- [VCs] ERA: --- type: person status: active 
+- [VCs] Thrive Capital: --- type: person status: active 
+- [VCs] BBG Ventures: --- type: person status: active 
+- [VCs] Insight Partners: --- type: person status: active 
+- [VCs] Lerer Hippeau: --- type: person status: active 
+- [VCs] Greycroft: --- type: person status: active 
+- [VCs] Union Square Ventures: --- type: person status: active 
+- [VCs] Work-Bench: --- type: person status: active 
+- [VCs] Tomasz-Tunguz: --- type: person status: active 
+- [VCs] RRE Ventures: --- type: person status: active 
+- [VCs] General Catalyst: --- type: person status: active 
+- [VCs] Conviction: --- type: person status: active 
+- [VCs] Everywhere Ventures: --- type: person status: active 
+- [VCs] Harlem Capital: --- type: person status: active 
+- [VCs] Monique Barbanson: --- type: person status: active 
+- [VCs] Lux Capital: --- type: person status: active 
+- [VCs] Contrary Capital: --- type: person status: active 
+- [VCs] FirstMark Capital: --- type: person status: active 
+- [VCs] Bowery Capital: --- type: person status: active 
+- [VCs] Charge Ventures: --- type: person status: active 
+- [VCs] Notation Capital: --- type: person status: active 
+- [LPs] HarbourVest Partners: --- type: person status: active 
+- [LPs] Thema VC: --- type: person status: active 
+- [LPs] Industry Ventures: --- type: person status: active 
+- [LPs] StepStone Group: --- type: person status: active 
+- [LPs] Weathergage Capital: --- type: person status: active 
+- [LPs] NYC Pension Funds: --- type: person status: active 
+- [LPs] Cendana Capital: --- type: person status: active 
+- [LPs] Hamilton Lane: --- type: person status: active 
+- [LPs] Vintage Investment Partners: --- type: person status: active 
+- [LPs] Horsley Bridge Partners: --- type: person status: active 
+- [60_Resources] Resources-MOC: --- type: moc status: active 
+- [Business] Kommunal-KI: --- type: knowledge status: evergreen 
+- [Business] LLC-Registration: --- type: knowledge status: evergreen 
+- [Business] Foerdermittel-Sachsen: --- type: knowledge status: evergreen 
+- [Business] CNC-Fertigung: --- type: knowledge status: evergreen 
+- [Business] Ainary-Brand: --- type: knowledge status: evergreen 
+- [Business] Sales-Playbook: --- type: knowledge status: evergreen 
+- [Business] Content-Strategy: --- type: knowledge status: evergreen 
+- [VC] VC-Workflow-App-Ideas: --- type: knowledge status: evergreen 
+- [VC] Greylock-Partners: --- type: knowledge status: evergreen 
+- [VC] Target-Funds: --- type: knowledge status: evergreen 
+- [VC] 2026-W05-Digest: --- type: knowledge status: evergreen 
+- [VC] VC-Landscape: --- type: knowledge status: evergreen 
+- [VC] Dead-Companies-Walking-AI-Era: --- type: knowledge status: evergreen 
+- [VC] Terminology: --- type: knowledge status: evergreen 
+- [VC] Microsoft-OpenAI-Concentration-Risk: --- type: knowledge status: evergreen 
+- [VC] AI-Scaffolding-Shift: --- type: knowledge status: evergreen 
+- [VC] VC-Tech-Pain-Points-2025: --- type: knowledge status: evergreen 
+- [60_Resources] Knowledge-MOC: --- type: moc status: evergreen 
+- [AI] AI-State-of-Art: --- type: knowledge status: evergreen 
+- [AI] RAG: --- type: knowledge status: evergreen 
+- [AI] Paper-Clustering-Pipeline: --- type: knowledge status: evergreen 
+- [AI] AI-Fundamentals: --- type: knowledge status: evergreen 
+- [AI] AI-Memory-Self-Improvement: --- type: knowledge status: evergreen 
+- [AI] VC-Twitter-Voices: --- type: knowledge status: evergreen 
+- [AI] SOTA-Tracker: # SOTA Paper Tracker — AI Agents & Multi-Agent Systems  *Last updated: 2026-02-10* 
+- [AI] AI-Solopreneur-Revenue-Playbook: --- type: knowledge status: evergreen 
+- [AI] 2026-02-02-SOTA: --- type: knowledge status: evergreen 
+- [AI] Substack-Recommendations: --- type: knowledge status: evergreen 
+- [AI] CNC-VC-Problems: --- type: knowledge status: evergreen 
+- [AI] Tech-VC-Trends-2026: --- type: knowledge status: evergreen 
+- [AI] 2026-02-05-SOTA: --- type: knowledge status: evergreen 
+- [Prompts] AB-README: --- type: prompt status: active 
+- [Prompts] 05_CHANGELOG__What_changed_and_why: --- type: prompt status: active 
+- [Prompts] 04_PROMPT_REGISTRY__Versions_and_owners: --- type: prompt status: active 
+- [Prompts] 03_EVAL_PACKS__Exec_Research_Reports: --- type: prompt status: active 
+- [Prompts] 00_README__How_we_do_research_here: --- type: prompt status: active 
+- [Prompts] GPT-README: --- type: prompt status: active 
+- [Prompts] Atlas-System: --- type: prompt status: active 
+- [Prompts] Fund-Research: --- type: prompt status: active 
+- [Prompts] Prompts-MOC: --- type: moc status: evergreen 
+- [Prompts] Extract-Conversation-Learnings: --- type: prompt status: active 
+- [Prompts] Extract-Conversation-Learnings 2: --- type: prompt status: active 
+- [Prompts] 01_TEMPLATES__Copy_paste_blocks: --- type: prompt status: active 
+- [Prompts] Asset-Builder-System: --- type: prompt status: active 
+- [Prompts] 02_SOURCE_LOGS__BLANK_TEMPLATE: --- type: prompt status: active 
+- [Prompts] Executive-Research-System: --- type: prompt status: active 
+- [Lessons] Fundraising-Lessons: --- type: knowledge status: evergreen 
+- [Lessons] Fundraising-Mistakes: --- type: knowledge status: evergreen 
+- [Lessons] Claude-Learnings: --- type: knowledge status: evergreen 
+- [Standards] Before-Any-Output: --- type: standard status: active 
+- [Standards] Corporate-Identity: --- type: standard status: active 
+- [Standards] Research-Protocol: --- type: standard status: active 
+- [Standards] Florian: --- type: standard status: active 
+- [Standards] 3-Lean-Checklists: --- type: standard status: active 
+- [Standards] Synthesis-Protocol: --- type: standard status: active 
+- [Standards] Mental-Models-Lookup: --- type: standard status: active 
+- [Standards] Twin: --- type: standard status: active 
+- [Standards] Output-Preflight: --- type: standard status: active 
+- [Standards] Definition-of-Done: --- type: standard status: active 

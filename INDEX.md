@@ -186,3 +186,17 @@
 
 *Letzte Aktualisierung: 2026-02-08*
 *Bei Suche: `grep -i "keyword" INDEX.md`*
+
+## Principles (EvolveR-based, ab 2026-02-10)
+- `principles/README.md` — How the scoring system works
+- `principles/execution.md` — Sends, shipping, task management (P-EX-01 to P-EX-03)
+- `principles/quality.md` — Output quality, framing, delivery (P-QU-01 to P-QU-05)
+- `principles/research.md` — Research, experiments, multi-agent (P-RE-01 to P-RE-06)
+- `principles/memory.md` — Memory management, knowledge org (P-ME-01 to P-ME-05)
+
+## Memory Architecture (3-Layer + Manager)
+- `memory/YYYY-MM-DD.md` — Episodic (daily raw logs)
+- `memory/semantic/*.md` — Semantic (facts, contacts, projects, decisions)
+- `memory/procedural/*.md` — Procedural (how-to, patterns, rules)
+- `memory/memory-ops-YYYY-MM-DD.md` — Memory Manager decisions log
+- `MEMORY.md` — Curated long-term (legacy, being migrated)

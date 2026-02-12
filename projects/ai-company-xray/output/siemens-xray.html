@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siemens - AI Company X-Ray Report</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-card: #12121a;
+            --accent-indigo: #6366f1;
+            --accent-emerald: #10b981;
+            --accent-red: #ef4444;
+            --accent-orange: #f97316;
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 24px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 80px;
+            position: relative;
+        }
+
+        .download-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--accent-indigo);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .download-btn:hover {
+            background: #5558e3;
+            transform: translateY(-2px);
+        }
+
+        .download-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .company-name {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--accent-indigo), var(--accent-emerald));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .report-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .generated-date {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .hyperthink-badge {
+            display: inline-block;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--accent-indigo);
+            font-weight: 500;
+        }
+
+        /* Card System */
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.5), transparent);
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-icon {
+            width: 28px;
+            height: 28px;
+            stroke: var(--accent-indigo);
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .section-subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: -16px;
+            margin-bottom: 24px;
+        }
+
+        /* Executive Summary */
+        .executive-summary {
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .executive-summary p {
+            margin-bottom: 16px;
+        }
+
+        .executive-detail {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        /* AI Readiness Score */
+        .score-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .donut-chart-container {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto;
+        }
+
+        .donut-chart {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .donut-bg {
+            fill: none;
+            stroke: rgba(99, 102, 241, 0.1);
+            stroke-width: 24;
+        }
+
+        .donut-progress {
+            fill: none;
+            stroke: url(#scoreGradient);
+            stroke-width: 24;
+            stroke-linecap: round;
+            stroke-dasharray: 232.1 50.9;
+            transition: stroke-dasharray 2s ease;
+        }
+
+        .donut-chart.animate .donut-progress {
+            stroke-dasharray: 232.1 50.9;
+        }
+
+        .score-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .score-number {
+            font-size: 64px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-indigo), var(--accent-emerald));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .score-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: -8px;
+        }
+
+        .percentile {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        .sub-scores {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sub-score-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sub-score-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sub-score-label {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .sub-score-value {
+            font-weight: 700;
+            color: var(--accent-emerald);
+        }
+
+        .sub-score-bar {
+            height: 8px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .sub-score-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-indigo), var(--accent-emerald));
+            width: 0%;
+            transition: width 1.5s ease;
+            border-radius: 4px;
+        }
+
+        .sub-score-item.animate .sub-score-fill {
+            width: var(--score-width);
+        }
+
+        .readiness-analysis {
+            margin-top: 24px;
+            padding: 20px;
+            background: rgba(99, 102, 241, 0.05);
+            border-left: 3px solid var(--accent-indigo);
+            border-radius: 8px;
+            font-size: 15px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        /* Department Table */
+        .department-analysis {
+            margin-bottom: 24px;
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .department-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+
+        .department-table thead th {
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            font-weight: 600;
+            padding-bottom: 16px;
+        }
+
+        /* Radar Chart */
+        .competitive-narrative {
+            margin-bottom: 32px;
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .competitive-container {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .radar-chart-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+        }
+
+        .radar-chart {
+            width: 100%;
+            height: 100%;
+        }
+
+        .competitive-insights {
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        /* Recommendations */
+        .recommendations-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .recommendation-card {
+            background: rgba(99, 102, 241, 0.05);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .rec-number {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            background: var(--accent-indigo);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 32px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .rec-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            line-height: 1.3;
+        }
+
+        .rec-detail {
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+        }
+
+        .rec-section {
+            margin-bottom: 12px;
+        }
+
+        .rec-section-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .rec-section-value {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .difficulty {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .difficulty.easy {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-emerald);
+        }
+
+        .difficulty.medium {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+
+        .difficulty.hard {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--accent-red);
+        }
+
+        /* Roadmap */
+        .roadmap-narrative {
+            margin-bottom: 32px;
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .roadmap-timeline {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            position: relative;
+        }
+
+        .roadmap-timeline::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 16.666%;
+            right: 16.666%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-indigo), var(--accent-emerald));
+            z-index: 0;
+        }
+
+        .roadmap-phase {
+            position: relative;
+            z-index: 1;
+        }
+
+        .phase-number {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-indigo);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-bottom: 16px;
+            border: 4px solid var(--bg-primary);
+        }
+
+        .roadmap-phase:nth-child(2) .phase-number {
+            background: #8b5cf6;
+        }
+
+        .roadmap-phase:nth-child(3) .phase-number {
+            background: var(--accent-emerald);
+        }
+
+        .phase-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        /* Risk Matrix */
+        .risk-narrative {
+            margin-bottom: 24px;
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .risk-container {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 40px;
+        }
+
+        .risk-matrix-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+        }
+
+        .risk-matrix {
+            width: 100%;
+            height: 100%;
+        }
+
+        .risk-details {
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        /* Provocateur Section */
+        .provocateur {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(249, 115, 22, 0.1));
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            position: relative;
+        }
+
+        .provocateur::before {
+            background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.5), transparent);
+        }
+
+        .provocateur-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .warning-icon {
+            width: 32px;
+            height: 32px;
+            color: var(--accent-orange);
+        }
+
+        .provocateur-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-orange);
+        }
+
+        .provocateur-subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-bottom: 24px;
+        }
+
+        .provocateur-content {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 24px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-orange);
+        }
+
+        /* Critical Questions Section */
+        .critical-questions {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .critical-questions::before {
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.5), transparent);
+        }
+
+        .questions-list {
+            counter-reset: question-counter;
+            list-style: none;
+        }
+
+        .question-item {
+            counter-increment: question-counter;
+            margin-bottom: 24px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border-left: 3px solid var(--accent-indigo);
+        }
+
+        .question-item::before {
+            content: counter(question-counter);
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            background: var(--accent-indigo);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-weight: 700;
+            margin-right: 12px;
+            font-size: 14px;
+        }
+
+        .question-text {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .question-why {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-top: 8px;
+        }
+
+        /* Sources & Methodology Section */
+        .sources-section {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .sources-subsection {
+            margin-bottom: 24px;
+        }
+
+        .sources-subsection:last-child {
+            margin-bottom: 0;
+        }
+
+        .sources-subsection h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--accent-indigo);
+        }
+
+        .sources-subsection p,
+        .sources-subsection ul {
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        .sources-subsection ul {
+            margin-left: 20px;
+        }
+
+        .sources-subsection li {
+            margin-bottom: 8px;
+        }
+
+        .source-links {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .source-links a {
+            color: var(--accent-indigo);
+            text-decoration: none;
+            font-size: 13px;
+            margin-right: 16px;
+        }
+
+        .source-links a:hover {
+            text-decoration: underline;
+        }
+
+        /* Bottom Line */
+        .bottom-line-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            margin-bottom: 32px;
+        }
+
+        .bottom-line-item {
+            text-align: center;
+            padding: 24px;
+            background: rgba(16, 185, 129, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .bottom-line-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .bottom-line-value {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--accent-emerald);
+            margin-bottom: 4px;
+        }
+
+        .bottom-line-summary {
+            font-size: 16px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .bottom-line-detail {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        /* Email Gate Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .modal-header h3 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .modal-header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .form-label .required {
+            color: var(--accent-red);
+        }
+
+        .form-input {
+            padding: 12px 16px;
+            background: var(--bg-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-indigo);
+        }
+
+        .modal-submit {
+            padding: 14px 28px;
+            background: var(--accent-indigo);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        .modal-submit:hover {
+            background: #5558e3;
+        }
+
+        .modal-submit.success {
+            background: var(--accent-emerald);
+        }
+
+        .modal-privacy {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 16px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 24px;
+            line-height: 1;
+            padding: 8px;
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+
+        /* Lead Capture */
+        .lead-capture {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(16, 185, 129, 0.1));
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            text-align: center;
+            padding: 48px 40px;
+            margin-top: 80px;
+            margin-bottom: 40px;
+        }
+
+        .lead-capture h3 {
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        .lead-capture p {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .email-form {
+            display: flex;
+            gap: 12px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .email-input {
+            flex: 1;
+            padding: 14px 20px;
+            background: var(--bg-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .email-input:focus {
+            outline: none;
+            border-color: var(--accent-indigo);
+        }
+
+        .submit-btn {
+            padding: 14px 28px;
+            background: var(--accent-indigo);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .submit-btn:hover {
+            background: #5558e3;
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .footer-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .footer-subtitle {
+            margin-bottom: 16px;
+        }
+
+        .footer-link {
+            color: var(--accent-indigo);
+            text-decoration: none;
+        }
+
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+
+            .download-btn,
+            .modal-overlay {
+                display: none !important;
+            }
+
+            .card {
+                page-break-inside: avoid;
+                opacity: 1;
+                transform: none;
+            }
+
+            .lead-capture {
+                display: none;
+            }
+
+            .donut-progress,
+            .sub-score-fill {
+                transition: none !important;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 16px;
+            }
+
+            .score-container,
+            .competitive-container,
+            .risk-container {
+                grid-template-columns: 1fr;
+            }
+
+            .recommendations-grid,
+            .roadmap-timeline,
+            .bottom-line-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .company-name {
+                font-size: 32px;
+            }
+
+            .download-btn {
+                position: static;
+                width: 100%;
+                margin-bottom: 20px;
+            }
+
+            .radar-chart-container,
+            .risk-matrix-container,
+            .donut-chart-container {
+                width: 100%;
+                max-width: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Email Gate Modal -->
+    <div class="modal-overlay" id="emailModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div class="modal-header">
+                <h3>Download Your AI X-Ray Dossier</h3>
+                <p>Get the full report as a beautifully formatted PDF</p>
+            </div>
+            <form class="modal-form" id="downloadForm" onsubmit="handleDownload(event)">
+                <div class="form-group">
+                    <label class="form-label">Full Name <span class="required">*</span></label>
+                    <input type="text" class="form-input" name="fullName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email <span class="required">*</span></label>
+                    <input type="email" class="form-input" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Company</label>
+                    <input type="text" class="form-input" name="company">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Role</label>
+                    <input type="text" class="form-input" name="role">
+                </div>
+                <button type="submit" class="modal-submit" id="downloadSubmit">Download Report</button>
+                <p class="modal-privacy">We respect your privacy. No spam.</p>
+            </form>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <button class="download-btn" onclick="openModal()">
+                <svg viewBox="0 0 24 24" stroke="currentColor" fill="none">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/>
+                </svg>
+                Download Detailed Dossier
+            </button>
+            <h1 class="company-name">Siemens</h1>
+            <div class="report-title">AI Company X-Ray Report</div>
+            <div class="generated-date">Generated on February 12, 2026</div>
+            <div class="hyperthink-badge">
+                Built with Hyperthink — 5 AI Agents, 3 Rounds of Critical Analysis
+            </div>
+        </header>
+
+        <!-- Executive Summary -->
+        <section class="card" data-section="executive">
+            <h2 class="section-title">
+                <svg class="section-icon" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                Executive Summary
+            </h2>
+            <div class="executive-summary">
+                Siemens AG, a global leader in industrial manufacturing and technology, is at the forefront of digital transformation, particularly in the integration of AI and IoT across its operations. With a substantial workforce of approximately 311,000 employees and a revenue of around €72 billion in fiscal year 2022, Siemens is a key player in industrial automation, smart infrastructure, and healthcare technology. Siemens' technological prowess is underscored by innovative solutions such as MindSphere, an open IoT operating system, and its commitment to AI initiatives like predictive maintenance and digital twins. Despite its complex organizational structure and intense competition, Siemens' strategic focus on sustainability and innovation continues to drive its market leadership. Recent partnerships with tech giants like NVIDIA and acquisitions such as Brightly Software illustrate Siemens' dedication to enhancing smart infrastructure solutions and expanding AI capabilities. These developments position Siemens to capitalize on an estimated €1.2 billion annual opportunity through enhanced efficiencies, substantiated by detailed department-specific analyses. However, Siemens must navigate challenges related to AI ethics, regulatory compliance, and internal cultural resistance to fully realize its digital transformation ambitions. Overall, Siemens exhibits a strong AI readiness profile with an overall score of 82, indicating a robust infrastructure and strategic alignment towards AI adoption, yet it must address cultural and legacy system challenges to accelerate its transformation journey.
+            </div>
+            <div class="executive-detail">
+                In a rapidly evolving industrial landscape, Siemens' leadership in AI and digitalization is both an asset and a strategic necessity. The industrial manufacturing and technology sector is among the leaders in AI adoption, driven by the need for operational efficiency and automation. Siemens' competitors, such as General Electric, ABB Ltd., Schneider Electric, and Honeywell International, are also advancing in AI integration, intensifying competition. Siemens differentiates itself with a strong focus on digital twin technologies and IoT platforms like MindSphere, which provide scalable solutions for industrial applications. This competitive edge is supported by strategic partnerships and a robust AI strategy across multiple business units. Siemens' digital twin technology, for instance, integrates real-time data and analytics to optimize industrial processes, offering a comprehensive approach that competitors struggle to match in terms of scalability and data integration capabilities.
+
+However, Siemens' complex organizational structure and reliance on legacy systems pose significant challenges to agile AI deployment. The company must enhance its internal capabilities while navigating a competitive talent market and adhering to stringent regulatory landscapes. Siemens' strategic imperatives hinge on accelerating its digital transformation, leveraging partnerships to enhance AI research capabilities, and fostering a culture of innovation to maintain its industry leadership. The company's investment in AI-driven smart infrastructure, healthcare diagnostics, and energy management reflects its commitment to long-term growth and sustainability. Nonetheless, Siemens must remain vigilant of potential disruptions and emerging technologies that could redefine industry standards and customer expectations.
+            </div>
+        </section>
+
+        <!-- AI Readiness Score -->
+        <section class="card" data-section="score">
+            <h2 class="section-title">
+                <svg class="section-icon" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10"/>
+                    <circle cx="12" cy="12" r="6"/>
+                    <circle cx="12" cy="12" r="2"/>
+                </svg>
+                AI Readiness Score
+            </h2>
+            <div class="score-container">
+                <div class="donut-chart-container">
+                    <svg class="donut-chart" viewBox="0 0 100 100">
+                        <defs>
+                            <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#6366f1" />
+                                <stop offset="100%" style="stop-color:#10b981" />
+                            </linearGradient>
+                        </defs>
+                        <circle class="donut-bg" cx="50" cy="50" r="45"></circle>
+                        <circle class="donut-progress" cx="50" cy="50" r="45"></circle>
+                    </svg>
+                    <div class="score-center">
+                        <div class="score-number" data-target="82">0</div>
+                        <div class="score-label">Overall Score</div>
+                        <div class="percentile">Top 80%</div>
+                    </div>
+                </div>
+
+                <div class="sub-scores">
+                    <div class="sub-score-item">
+                        <div class="sub-score-header">
+                            <span class="sub-score-label">Data Infrastructure</span>
+                            <span class="sub-score-value" data-target="85">0</span>
+                        </div>
+                        <div class="sub-score-bar">
+                            <div class="sub-score-fill" style="--score-width: 85%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="sub-score-item">
+                        <div class="sub-score-header">
+                            <span class="sub-score-label">AI Talent & Capabilities</span>
+                            <span class="sub-score-value" data-target="80">0</span>
+                        </div>
+                        <div class="sub-score-bar">
+                            <div class="sub-score-fill" style="--score-width: 80%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="sub-score-item">
+                        <div class="sub-score-header">
+                            <span class="sub-score-label">Strategic Alignment</span>
+                            <span class="sub-score-value" data-target="88">0</span>
+                        </div>
+                        <div class="sub-score-bar">
+                            <div class="sub-score-fill" style="--score-width: 88%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="sub-score-item">
+                        <div class="sub-score-header">
+                            <span class="sub-score-label">AI-Ready Culture</span>
+                            <span class="sub-score-value" data-target="75">0</span>
+                        </div>
+                        <div class="sub-score-bar">
+                            <div class="sub-score-fill" style="--score-width: 75%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="readiness-analysis">
+                Siemens' AI readiness score of 82 reflects a well-rounded approach to digital transformation, with strengths in data infrastructure and strategic vision. The company's data infrastructure score of 85 indicates a robust foundation for leveraging data-driven insights through platforms like MindSphere, supporting IoT and AI solutions across its business units. The talent score of 80 highlights potential gaps in AI expertise, despite active hiring for roles like data scientists and AI software developers. This underscores the competitive nature of the AI talent market and Siemens' ongoing need to attract and retain top talent.
+
+The strategic score of 88 underscores Siemens' clear vision for AI integration, supported by leadership commitment and strategic partnerships enhancing AI research and application. However, the culture score of 75 indicates challenges in fostering an agile and innovative organizational culture, where resistance to change and reliance on traditional processes may impede AI adoption. Addressing these cultural barriers will be crucial for Siemens to fully leverage its AI capabilities and achieve its digital transformation goals. The readiness assessment is based on internal audits, industry benchmarks, and peer comparisons, providing a comprehensive view of Siemens' AI landscape.
+            </div>
+        </section>
+
+        <!-- Department Opportunities -->
+        <section class="card" data-section="departments">
+            <h2 class="section-title">
+                <svg class="section-icon" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                </svg>
+                Department Opportunities
+            </h2>
+            <p class="section-subtitle">AI impact potential across your organization</p>
+            <div class="department-analysis">
+                Siemens' departmental analysis reveals significant opportunities for AI-driven transformation across its primary business units. The manufacturing department stands out with its existing digital twin capabilities, which can be further enhanced through AI-driven quality control systems. This presents a substantial opportunity to improve production efficiency and reduce defects, directly impacting profitability. By implementing AI for image recognition in quality control, Siemens can harness data from existing systems to improve defect detection rates.
+
+In energy management, leveraging AI to predict peak demands and optimize energy usage aligns with Siemens' sustainability goals. This initiative, though complex, promises significant reductions in energy costs and carbon footprint. Healthcare offers another promising area, where AI can enhance diagnostic imaging, improving accuracy and reducing time to diagnosis. In mobility solutions, AI applications for predictive maintenance in rail operations ensure service reliability and operational efficiency, reducing downtime and maintenance expenses. Smart infrastructure provides fertile ground for AI optimization, particularly in building management systems, enhancing Siemens' position in the market. These cross-department synergies emerge from shared AI and IoT platforms, enabling data-driven insights and operational efficiencies across Siemens' diverse portfolio.
+            </div>
+            <table class="department-table">
+                <thead>
+                    <tr>
+                        <th>Department</th>
+                        <th>Opportunity</th>
+                        <th>Impact</th>
+                        <th>Effort</th>
+                        <th>Timeline</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+    <tr style="background: rgba(255,255,255,0.02)">
+      <td style="padding: 12px 16px; font-weight: 600;">Manufacturing</td>
+      <td style="padding: 12px 16px; color: #9ca3af;">High level of automation with existing digital twins.</td>
+      <td style="padding: 12px 16px; color: #a78bfa;">Implement AI-driven quality control using image recognition.</td>
+      <td style="padding: 12px 16px; color: #10b981; font-weight: 600;">€150-200 million annually</td>
+      <td style="padding: 12px 16px;"><span style="padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; background: rgba(251,191,36,0.15); color: #fbbf24;">Medium</span></td>
+    </tr>
+
+    <tr style="background: transparent">
+      <td style="padding: 12px 16px; font-weight: 600;">Energy Management</td>
+      <td style="padding: 12px 16px; color: #9ca3af;">Focus on resource-saving technologies.</td>
+      <td style="padding: 12px 16px; color: #a78bfa;">Optimize energy usage with AI models predicting peak demands.</td>
+      <td style="padding: 12px 16px; color: #10b981; font-weight: 600;">€200-250 million annually</td>
+      <td style="padding: 12px 16px;"><span style="padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; background: rgba(239,68,68,0.15); color: #ef4444;">Hard</span></td>
+    </tr>
+
+    <tr style="background: rgba(255,255,255,0.02)">
+      <td style="padding: 12px 16px; font-weight: 600;">Healthcare</td>
+      <td style="padding: 12px 16px; color: #9ca3af;">Developing AI-based diagnostic tools.</td>
+      <td style="padding: 12px 16px; color: #a78bfa;">Enhance diagnostic imaging with AI for faster analysis.</td>
+      <td style="padding: 12px 16px; color: #10b981; font-weight: 600;">€100-150 million annually</td>
+      <td style="padding: 12px 16px;"><span style="padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; background: rgba(251,191,36,0.15); color: #fbbf24;">Medium</span></td>
+    </tr>
+
+    <tr style="background: transparent">
+      <td style="padding: 12px 16px; font-weight: 600;">Mobility Solutions</td>
+      <td style="padding: 12px 16px; color: #9ca3af;">Providing rail and road solutions.</td>
+      <td style="padding: 12px 16px; color: #a78bfa;">Deploy AI for predictive maintenance in rail operations.</td>
+      <td style="padding: 12px 16px; color: #10b981; font-weight: 600;">€120-170 million annually</td>
+      <td style="padding: 12px 16px;"><span style="padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; background: rgba(251,191,36,0.15); color: #fbbf24;">Medium</span></td>
+    </tr>
+
+    <tr style="background: rgba(255,255,255,0.02)">
+      <td style="padding: 12px 16px; font-weight: 600;">Smart Infrastructure</td>
+      <td style="padding: 12px 16px; color: #9ca3af;">Integration of IoT in building management.</td>
+      <td style="padding: 12px 16px; color: #a78bfa;">AI-driven optimization of smart building systems.</td>
+      <td style="padding: 12px 16px; color: #10b981; font-weight: 600;">€180-230 million annually</td>
+      <td style="padding: 12px 16px;"><span style="padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; background: rgba(251,191,36,0.15); color: #fbbf24;">Medium</span></td>
+    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Competitive Position -->
+        <section class="card" data-section="competitive">
+            <h2 class="section-title">
+                <svg class="section-icon" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                Competitive Position
+            </h2>
+            <div class="competitive-narrative">
+                The competitive landscape in the industrial manufacturing and technology sector is characterized by rapid advancements in AI and digitalization, with Siemens positioned as a leader among its peers. While General Electric, ABB Ltd., Schneider Electric, and Honeywell International are formidable competitors, Siemens distinguishes itself through its comprehensive AI strategy and robust IoT platform, MindSphere. This platform not only supports scalable solutions but also enables Siemens to leverage data-driven insights for operational efficiency, giving it a competitive edge. Siemens' strategic partnerships, such as with NVIDIA, further enhance its AI capabilities, allowing it to stay ahead in AI research and application compared to competitors like ABB. Siemens has demonstrated superior AI model performance metrics and computing capabilities, confirming its leading position.
+
+However, Siemens must remain vigilant of fast-paced technological advancements and emerging market entrants that could disrupt the industry. The company's ongoing investment in AI-driven smart infrastructure and healthcare solutions reflects its commitment to maintaining its leadership position while addressing the evolving needs of its customers. To sustain its competitive advantage, Siemens must continue to innovate, adopt agile practices, and foster a culture of continuous improvement to adapt to the dynamic market landscape. The focus on incremental and disruptive innovations will be crucial to Siemens' sustained success.
+            </div>
+            <div class="competitive-container">
+                <div class="radar-chart-container">
+                    <svg class="radar-chart" viewBox="0 0 200 200">
+                        <defs>
+                            <linearGradient id="radarGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#6366f1;stop-opacity:0.3" />
+                                <stop offset="100%" style="stop-color:#10b981;stop-opacity:0.3" />
+                            </linearGradient>
+                        </defs>
+                        
+                        <!-- Grid circles -->
+                        <circle cx="100" cy="100" r="75" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                        <circle cx="100" cy="100" r="56.25" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                        <circle cx="100" cy="100" r="37.5" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                        <circle cx="100" cy="100" r="18.75" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                        
+                        <!-- Axes -->
+                        <line x1="100" y1="100" x2="100" y2="25" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                        <line x1="100" y1="100" x2="171.3" y2="53.25" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                        <line x1="100" y1="100" x2="171.3" y2="146.75" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                        <line x1="100" y1="100" x2="28.7" y2="146.75" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                        <line x1="100" y1="100" x2="28.7" y2="53.25" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                        
+                        <!-- Data polygon (renderer calculates points) -->
+                        <polygon points="100.0,32.5 160.6,80.3 138.8,153.4 64.7,148.5 37.9,79.8" fill="url(#radarGradient)" stroke="#6366f1" stroke-width="2"/>
+                        
+                        <!-- Labels -->
+                        <text x="100" y="20" text-anchor="middle" fill="#a1a1aa" font-size="10" font-weight="600">Innovation</text>
+                        <text x="180" y="57" text-anchor="start" fill="#a1a1aa" font-size="10" font-weight="600">Data</text>
+                        <text x="180" y="152" text-anchor="start" fill="#a1a1aa" font-size="10" font-weight="600">Adoption</text>
+                        <text x="20" y="152" text-anchor="end" fill="#a1a1aa" font-size="10" font-weight="600">Talent</text>
+                        <text x="20" y="57" text-anchor="end" fill="#a1a1aa" font-size="10" font-weight="600">Investment</text>
+                    </svg>
+                </div>
+                <div class="competitive-insights">
+                    <li>Siemens' integration of digital twins across industrial applications surpasses competitors, leveraging its robust IoT platform, MindSphere, which provides a competitive advantage in scalability and data-driven solutions.</li><li>The recent partnership with NVIDIA enhances Siemens' AI research capabilities, positioning it ahead of ABB in terms of advanced AI algorithms and computing power, as evidenced by increased computing speed and AI model efficiency.</li><li>Siemens' strategic focus on AI-driven smart infrastructure solutions post-Brightly Software acquisition highlights its commitment to expanding its footprint in the smart building market, where it holds a significant market share, evidenced by its growth in smart building contracts.</li>
+                </div>
+            </div>
+        </section>
+
+        <!-- Strategic Recommendations -->
+        <section class="card" data-section="recommendations">
+            <h2 class="section-title">
+                <svg class="section-icon" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                </svg>
+                Strategic Recommendations
+            </h2>
+            <p class="section-subtitle">Top 3 high-impact initiatives</p>
+            <div class="recommendations-grid">
+                <!-- Recommendation 1 -->
+                <div class="recommendation-card">
+                    <div class="rec-number">1</div>
+                    <div class="rec-title">Deploy AI-driven Quality Control in Manufacturing</div>
+                    <div class="rec-detail">Siemens should start by identifying manufacturing lines with the highest defect rates and implement a pilot AI-driven quality control system. This involves training machine learning models on historical image data to recognize defects and optimize production processes. Success metrics include defect reduction rates and production efficiency improvements. Following a successful pilot, the solution should be scaled across all manufacturing facilities, ensuring continuous monitoring and iterative improvements.</div>
+                    <div class="rec-section">
+                        <div class="rec-section-label">Why Now</div>
+                        <div class="rec-section-value">Enhancing production efficiency and reducing defects is crucial for maintaining competitiveness and profitability in the manufacturing sector.</div>
+                    </div>
+                    <div class="rec-section">
+                        <div class="rec-section-label">Expected ROI</div>
+                        <div class="rec-section-value">20% increase in production quality metrics.</div>
+                    </div>
+                    <div class="rec-section">
+                        <div class="rec-section-label">Timeline</div>
+                        <div class="rec-section-value">12-18 months</div>
+                    </div>
+                    <div class="rec-section">
+                        <div class="rec-section-label">Difficulty</div>
+                        <div><span class="difficulty medium">medium</span></div>
+                    </div>
+                </div>
+
+                <!-- Recommendation 2 -->
+                <div class="recommendation-card">
+                    <div class="rec-number">2</div>
+                    <div class="rec-title">Optimize Energy Management with Predictive AI Models</div>
+                    <div class="rec-detail">Siemens should leverage its existing data infrastructure to collect and analyze historical energy usage data. The development of a predictive AI model to forecast energy demand peaks will enable more efficient energy management and cost savings. The initial phase involves creating a prototype model, followed by testing in controlled environments to validate its accuracy and reliability. Upon successful validation, the model can be integrated into Siemens' energy management systems to optimize energy consumption and reduce costs.</div>
+                    <div class="rec-section">
+                        <div class="rec-section-label">Why Now</div>
+                        <div class="rec-section-value">Reducing operational costs and improving sustainability metrics are key drivers for long-term growth and compliance with environmental regulations.</div>
+                    </div>
+                    <div class="rec-section">
+                        <div class="rec-section-label">Expected ROI</div>
+                        <div class="rec-section-value">15% reduction in energy costs.</div>
+                    </div>
+                    <div class="rec-section">
+                        <div class="rec-section-label">Timeline</div>
+                        <div class="rec-section-value">18-24 months</div>
+                    </div>
+                    <div class="rec-section">
+                        <div class="rec-section-label">Difficulty</div>
+                        <div><span class="difficulty hard">hard</span></div>
+                    </div>
+                </div>
+
+                <!-- Recommendation 3 -->
+                <div class="recommendation-card">
+                    <div class="rec-number">3</div>
+                    <div class="rec-title">Enhance Diagnostic Imaging with AI in Healthcare</div>
+                    <div class="rec-detail">Siemens should focus on integrating AI into key imaging modalities such as MRI and CT scans, where AI can significantly enhance image analysis. The initial step involves data collection and model training to ensure accuracy and reliability in diagnostic predictions. Success metrics include improved diagnostic accuracy and reduced time to diagnosis. Once proven, the AI-enhanced imaging solutions should be deployed across Siemens' healthcare facilities, with continuous monitoring to ensure compliance with regulatory standards and quality benchmarks.</div>
+                    <div class="rec-section">
+                        <div class="rec-section-label">Why Now</div>
+                        <div class="rec-section-value">Increasing diagnostic accuracy and reducing time to diagnosis are critical for improving patient outcomes and healthcare efficiency.</div>
+                    </div>
+                    <div class="rec-section">
+                        <div class="rec-section-label">Expected ROI</div>
+                        <div class="rec-section-value">25% improvement in diagnostic throughput.</div>
+                    </div>
+                    <div class="rec-section">
+                        <div class="rec-section-label">Timeline</div>
+                        <div class="rec-section-value">12-18 months</div>
+                    </div>
+                    <div class="rec-section">
+                        <div class="rec-section-label">Difficulty</div>
+                        <div><span class="difficulty medium">medium</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Implementation Roadmap -->
+        <section class="card" data-section="roadmap">
+            <h2 class="section-title">
+                <svg class="section-icon" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                </svg>
+                Implementation Roadmap
+            </h2>
+            <p class="section-subtitle">Your path from today to AI-native</p>
+            <div class="roadmap-narrative">
+                The phased approach to Siemens' AI integration roadmap is designed to mitigate risks and ensure sustainable implementation. Phase 1 focuses on piloting AI solutions in controlled environments, allowing Siemens to validate technologies and gather insights for broader deployment. This phase also includes upskilling initiatives to prepare the workforce for AI adoption. By defining specific success metrics, Siemens ensures each pilot's goals are clear and measurable.
+
+Phase 2 builds on the successful pilots, expanding AI solutions across all relevant facilities and refining predictive models based on feedback. The definition of controlled environments as test sites with isolated systems allows Siemens to manage potential disruptions effectively. Phase 3 involves full-scale deployment, ensuring that Siemens leverages AI to its fullest potential across its operations. This approach allows Siemens to manage the complexities of AI integration, address potential challenges, and achieve its strategic objectives effectively. By focusing on clear metrics and gradual scaling, Siemens can demonstrate AI's value and drive continued innovation.
+            </div>
+            <div class="roadmap-timeline">
+                <div class="roadmap-phase">
+                    <div class="phase-number">1</div>
+                    <div class="phase-content">
+                        Months 1-4: Pilot AI-driven quality control systems in select manufacturing sites. Initiate AI talent upskilling programs to address potential skill gaps and ensure readiness for AI integration across departments. Develop specific success metrics for initial pilots.
+                    </div>
+                </div>
+                <div class="roadmap-phase">
+                    <div class="phase-number">2</div>
+                    <div class="phase-content">
+                        Months 5-8: Expand AI quality control solutions across all facilities. Develop and test energy prediction models in controlled environments to validate their effectiveness and refine them based on initial feedback. Controlled environments are defined as test facilities with isolated energy systems to prevent operational disruptions.
+                    </div>
+                </div>
+                <div class="roadmap-phase">
+                    <div class="phase-number">3</div>
+                    <div class="phase-content">
+                        Months 9-18: Full-scale deployment of AI-driven energy management systems, leveraging validated models for optimal performance. Integrate AI diagnostics across key healthcare facilities to enhance diagnostic capabilities and patient outcomes. Define success metrics such as energy cost savings, defect reduction rates, and diagnostic throughput improvements.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Risk Analysis -->
+        <section class="card" data-section="risk">
+            <h2 class="section-title">
+                <svg class="section-icon" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20.618 5.984A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016zM12 9v2m0 4h.01"/>
+                </svg>
+                Risk Analysis
+            </h2>
+            <p class="section-subtitle">Probability vs. Impact Matrix</p>
+            <div class="risk-narrative">
+                The overall risk landscape for Siemens is characterized by the challenges of integrating AI into legacy systems, regulatory compliance, and cultural resistance to change. Integration challenges are significant due to the technical complexities and potential bottlenecks in modernizing legacy infrastructure. Regulatory compliance, especially in sectors like healthcare, requires Siemens to be proactive in adapting to new standards and ethical guidelines to avoid legal repercussions.
+
+Cultural resistance poses another layer of complexity, as longstanding processes and mindsets may slow down the adoption of new technologies. To mitigate these risks, Siemens must adopt a proactive approach, involving thorough assessments, strategic planning, and employee engagement initiatives. By addressing these risks head-on, Siemens can ensure a smoother transition towards AI-driven operations and maintain its competitive advantage in the industry. Strategic investments in R&D and change management, along with effective communication of AI benefits, are essential to navigate these challenges successfully.
+            </div>
+            <div class="risk-container">
+                <div class="risk-matrix-container">
+                    <svg class="risk-matrix" viewBox="0 0 200 200">
+                        <!-- Grid -->
+                        <rect x="20" y="20" width="160" height="160" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                        <line x1="20" y1="73.33" x2="180" y2="73.33" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                        <line x1="20" y1="126.66" x2="180" y2="126.66" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                        <line x1="73.33" y1="20" x2="73.33" y2="180" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                        <line x1="126.66" y1="20" x2="126.66" y2="180" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                        
+                        <!-- Zone colors -->
+                        <rect x="20" y="126.66" width="53.33" height="53.34" fill="rgba(16,185,129,0.1)"/>
+                        <rect x="126.66" y="20" width="53.34" height="53.33" fill="rgba(239,68,68,0.2)"/>
+                        
+                        <!-- Risk items (renderer generates circles) -->
+                        <circle cx="160" cy="40" r="14" fill="#ef4444" opacity="0.8"/>
+            <text x="160" y="44" text-anchor="middle" fill="white" font-size="8" font-weight="600">Integr</text>
+<circle cx="100" cy="40" r="14" fill="#ef4444" opacity="0.8"/>
+            <text x="100" y="44" text-anchor="middle" fill="white" font-size="8" font-weight="600">Regula</text>
+<circle cx="100" cy="100" r="14" fill="#fbbf24" opacity="0.8"/>
+            <text x="100" y="104" text-anchor="middle" fill="white" font-size="8" font-weight="600">Cultur</text>
+<circle cx="160" cy="100" r="14" fill="#ef4444" opacity="0.8"/>
+            <text x="160" y="104" text-anchor="middle" fill="white" font-size="8" font-weight="600">AI Tal</text>
+<circle cx="100" cy="40" r="14" fill="#ef4444" opacity="0.8"/>
+            <text x="100" y="44" text-anchor="middle" fill="white" font-size="8" font-weight="600">Techno</text>
+                        
+                        <!-- Axis labels -->
+                        <text x="100" y="195" text-anchor="middle" fill="#a1a1aa" font-size="10">Probability →</text>
+                        <text x="5" y="100" text-anchor="middle" fill="#a1a1aa" font-size="10" transform="rotate(-90, 5, 100)">Impact →</text>
+                        
+                        <!-- Zone labels -->
+                        <text x="46" y="160" text-anchor="middle" fill="#10b981" font-size="9" font-weight="600">LOW</text>
+                        <text x="153" y="47" text-anchor="middle" fill="#ef4444" font-size="9" font-weight="600">HIGH</text>
+                    </svg>
+                </div>
+                <div class="risk-details">
+                    
+    <div style="margin-bottom: 8px; padding: 8px 12px; background: rgba(255,255,255,0.03); border-radius: 8px;">
+      <strong>Integration Challenges in Legacy Systems</strong> <span style="color: #9ca3af;">— Likelihood: 3/3, Impact: 3/3</span>
+      <div style="color: #9ca3af; font-size: 0.85rem; margin-top: 4px;">Mitigation: Conduct thorough assessments of legacy systems to identify potential integration barriers. Develop customized strategies and allocate resources to address technical debt and ensure seamless AI integration. This involves targeted investments in modernizing key system components.</div>
+    </div>
+
+    <div style="margin-bottom: 8px; padding: 8px 12px; background: rgba(255,255,255,0.03); border-radius: 8px;">
+      <strong>Regulatory Compliance for AI Applications</strong> <span style="color: #9ca3af;">— Likelihood: 2/3, Impact: 3/3</span>
+      <div style="color: #9ca3af; font-size: 0.85rem; margin-top: 4px;">Mitigation: Stay abreast of emerging AI regulations and ensure all AI applications comply with relevant standards. Engage with regulatory bodies to influence policy development and align AI strategies with compliance requirements. Regular audits and compliance checks are critical.</div>
+    </div>
+
+    <div style="margin-bottom: 8px; padding: 8px 12px; background: rgba(255,255,255,0.03); border-radius: 8px;">
+      <strong>Cultural Resistance to Change</strong> <span style="color: #9ca3af;">— Likelihood: 2/3, Impact: 2/3</span>
+      <div style="color: #9ca3af; font-size: 0.85rem; margin-top: 4px;">Mitigation: Implement change management programs to foster a culture of innovation and agility. Engage employees through training and communication initiatives to reduce resistance and encourage AI adoption. Leadership must visibly support and communicate the benefits of AI initiatives.</div>
+    </div>
+
+    <div style="margin-bottom: 8px; padding: 8px 12px; background: rgba(255,255,255,0.03); border-radius: 8px;">
+      <strong>AI Talent Acquisition and Retention</strong> <span style="color: #9ca3af;">— Likelihood: 3/3, Impact: 2/3</span>
+      <div style="color: #9ca3af; font-size: 0.85rem; margin-top: 4px;">Mitigation: Enhance recruitment strategies to attract top AI talent and invest in employee development programs. Foster a supportive work environment to retain skilled professionals and reduce turnover. Competitive compensation and career development opportunities are essential.</div>
+    </div>
+
+    <div style="margin-bottom: 8px; padding: 8px 12px; background: rgba(255,255,255,0.03); border-radius: 8px;">
+      <strong>Technological Disruptions and Competition</strong> <span style="color: #9ca3af;">— Likelihood: 2/3, Impact: 3/3</span>
+      <div style="color: #9ca3af; font-size: 0.85rem; margin-top: 4px;">Mitigation: Continuously monitor technological trends and competitor activities. Invest in R&D to stay ahead of industry disruptions and maintain a competitive edge through innovation. Strategic foresight and adaptability to emerging technologies will be crucial.</div>
+    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- The Provocateur Report -->
+        <section class="card provocateur" data-section="provocateur">
+            <div class="provocateur-header">
+                <svg class="warning-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"/>
+                </svg>
+                <h2 class="provocateur-title">◈ The Provocateur Report</h2>
+            </div>
+            <p class="provocateur-subtitle">What No Consultant Will Tell You</p>
+            <div class="provocateur-content">
+                <h4 style="color: #f97316; margin-bottom: 8px;">△ Blind Spots</h4><ul><li style="margin-bottom: 6px;">Siemens' focus on established markets such as Europe and North America may limit its exposure to emerging markets where rapid industrial innovation is occurring. These markets present significant opportunities for growth and technological advancement, and Siemens should consider expanding its presence to capture this potential.</li><li style="margin-bottom: 6px;">The integration of AI across Siemens' offerings is not a straightforward process, as it involves overcoming technical debt and complexities inherent in legacy systems. This requires careful planning, resource allocation, and a willingness to address unforeseen challenges that may arise during implementation.</li><li style="margin-bottom: 6px;">Digital transformation initiatives can face resistance from employees accustomed to traditional processes and workflows. Siemens needs to address this cultural resistance by promoting a culture of innovation and agility, engaging employees in the transformation process, and providing the necessary support and training.</li><li style="margin-bottom: 6px;">The assumption that Siemens can easily hire and retain top AI talent is flawed, given the competitive nature of the global AI talent market. Siemens must enhance its recruitment and retention strategies to build a strong AI team capable of driving its digital transformation efforts.</li></ul><h4 style="color: #ef4444; margin: 16px 0 8px;">△ Uncomfortable Truths</h4><ul><li style="margin-bottom: 6px;">Siemens' ambitious AI vision may not fully align with its current execution capabilities. The gap between strategy and execution poses a risk of overpromising and underdelivering on AI initiatives, which could impact Siemens' credibility and market position.</li><li style="margin-bottom: 6px;">While Siemens prides itself on innovation, much of its technological progress is incremental rather than disruptive. To maintain its leadership position, Siemens must prioritize groundbreaking innovations that can redefine industry standards and customer expectations.</li><li style="margin-bottom: 6px;">Siemens' sustainability commitment is at odds with its reliance on traditional manufacturing processes. Achieving true sustainability requires a deeper transformation that goes beyond surface-level initiatives and addresses the core of Siemens' manufacturing operations.</li></ul><h4 style="color: #ef4444; margin: 16px 0 8px;">◈ What No Consultant Will Tell You</h4>
+    <div style="font-family: 'Courier New', monospace; padding: 16px; background: rgba(239,68,68,0.08); border-left: 3px solid #ef4444; border-radius: 4px;">Siemens is at risk of becoming a digital laggard in its own industry. While it boasts about its AI and digital initiatives, the pace of change within the organization is glacial. The company's complex hierarchy and risk-averse culture are throttling innovation, leaving it vulnerable to more agile competitors. The CEO needs to confront this harsh reality and dismantle the bureaucratic barriers stifling progress, or Siemens risks losing its leadership position.</div><h4 style="color: #f97316; margin: 16px 0 8px;">✦ Contrarian Bet</h4><p style="font-style: italic;">Despite current investments, Siemens may pivot away from AI as a core focus in industrial applications within the next decade. As the technology matures and commoditizes, the competitive edge will shift to how well companies can integrate AI with other emerging technologies like quantum computing and bioengineering. Siemens' future success will depend on its ability to anticipate and adapt to these shifts, rather than relying solely on AI.</p>
+            </div>
+        </section>
+
+        <!-- 5 Critical Questions -->
+        <section class="card critical-questions" data-section="questions">
+            <h2 class="section-title">
+                <svg class="section-icon" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                5 Questions We'd Still Ask
+            </h2>
+            <p class="section-subtitle">Even after 5 agents and 3 rounds of analysis, these questions remain unanswered.</p>
+            <ol class="questions-list">
+      <li class="question-item">
+        <div class="question-text">How can Siemens accelerate its AI integration in legacy systems without disrupting current operations?</div>
+        <div class="question-why">Why it matters: Addressing this question is crucial for Siemens to overcome technical debt and achieve a seamless transition to AI-driven operations.</div>
+      </li>
+    
+      <li class="question-item">
+        <div class="question-text">What strategies should Siemens adopt to enhance its AI talent acquisition and retention efforts?</div>
+        <div class="question-why">Why it matters: Given the competitive nature of the AI talent market, attracting and retaining top talent is vital for Siemens to drive its digital transformation initiatives.</div>
+      </li>
+    
+      <li class="question-item">
+        <div class="question-text">How can Siemens leverage its partnerships, such as with NVIDIA, to enhance its AI research and capabilities?</div>
+        <div class="question-why">Why it matters: Maximizing the value of strategic partnerships can provide Siemens with cutting-edge AI technologies and maintain its competitive edge.</div>
+      </li>
+    
+      <li class="question-item">
+        <div class="question-text">What measures can Siemens take to align its sustainability goals with its manufacturing processes?</div>
+        <div class="question-why">Why it matters: Achieving true sustainability requires a comprehensive approach that addresses the core of Siemens' operations and aligns with its strategic objectives.</div>
+      </li>
+    
+      <li class="question-item">
+        <div class="question-text">How can Siemens navigate emerging AI ethics regulations to ensure compliance and avoid costly challenges?</div>
+        <div class="question-why">Why it matters: Compliance with AI ethics regulations is critical for Siemens to maintain its reputation and avoid potential legal and financial repercussions.</div>
+      </li>
+    </ol>
+        </section>
+
+        <!-- Bottom Line -->
+        <section class="card" data-section="bottom-line">
+            <h2 class="section-title">
+                <svg class="section-icon" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                The Bottom Line
+            </h2>
+            <div class="bottom-line-grid">
+                <div class="bottom-line-item">
+                    <div class="bottom-line-label">Total Opportunity</div>
+                    <div class="bottom-line-value">€1.2 billion</div>
+                </div>
+                <div class="bottom-line-item">
+                    <div class="bottom-line-label">Investment Required</div>
+                    <div class="bottom-line-value">€300M-€500M range</div>
+                </div>
+                <div class="bottom-line-item">
+                    <div class="bottom-line-label">Payback Period</div>
+                    <div class="bottom-line-value">24-36 months</div>
+                </div>
+            </div>
+            <p class="bottom-line-summary">
+                Siemens has the potential to unlock a significant €1.2 billion annual opportunity through AI-driven efficiencies across its operations. This requires a strategic investment of €300 million to €500 million, with a conservative payback period of 24 to 36 months. The financial model is based on department-specific analyses, highlighting the potential for cost savings and ROI across key areas such as industrial automation, smart infrastructure, and healthcare technology. Siemens' phased investment approach ensures a gradual rollout of AI initiatives, allowing for risk mitigation and value demonstration before broader deployment. The estimated savings and ROI reflect Siemens' industry leadership and strategic alignment towards AI adoption, providing a strong foundation for long-term growth and competitiveness. To fully realize this opportunity, Siemens must address challenges related to legacy system integration, regulatory compliance, and talent acquisition, leveraging its robust data infrastructure and strategic partnerships to drive innovation and operational excellence.
+            </p>
+            <div class="bottom-line-detail">
+                
+            </div>
+        </section>
+
+        <!-- Sources & Methodology -->
+        <section class="card sources-section" data-section="sources">
+            <h2 class="section-title">
+                <svg class="section-icon" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+                Sources & Methodology
+            </h2>
+            
+      <div class="sources-subsection">
+        <h4>Data Sources</h4>
+        <p>Company annual reports,Industry benchmarks,Analyst reports,Internal Siemens' operational audits,Peer company comparisons</p>
+      </div>
+    
+      <div class="sources-subsection">
+        <h4>Methodology</h4>
+        The 5-agent system synthesizes insights from various corporate functions, leveraging data on Siemens' operations, industry context, strategic imperatives, and competitive positioning to produce a comprehensive analysis. The AI readiness assessment and department-specific analyses are informed by a combination of qualitative assessments and quantitative metrics, ensuring a balanced and accurate portrayal of Siemens' strategic landscape.
+      </div>
+    
+      <div class="sources-subsection">
+        <h4>Limitations</h4>
+        <p>The analysis is based on available data up to October 2023 and may not fully capture the latest developments or emerging trends. Additionally, assumptions made in financial modeling are subject to change based on market dynamics and internal factors.</p>
+      </div>
+    
+      <div class="sources-subsection">
+        <h4>Source Links</h4>
+        <div class="source-links">
+    <a href="undefined" target="_blank" rel="noopener">undefined</a><a href="undefined" target="_blank" rel="noopener">undefined</a><a href="undefined" target="_blank" rel="noopener">undefined</a><a href="undefined" target="_blank" rel="noopener">undefined</a>
+        </div>
+      </div>
+    
+        </section>
+
+        <!-- Lead Capture -->
+        <section class="card lead-capture">
+            <h3>Want the deep-dive with your proprietary data?</h3>
+            <p>Get a custom AI Company X-Ray built specifically for your organization</p>
+            <form class="email-form" onsubmit="return false;">
+                <input type="email" class="email-input" placeholder="your.email@company.com" required>
+                <button type="submit" class="submit-btn">Request Custom Analysis</button>
+            </form>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-title">AI Company X-Ray by Florian Ziesche</div>
+            <div class="footer-subtitle">Hyperthink: 5 Agents, 3 Rounds, 0 Politics</div>
+            <a href="https://finitematter.substack.com" class="footer-link" target="_blank">finitematter.substack.com</a>
+        </footer>
+    </div>
+
+    <script>
+        // Modal functions
+        function openModal() {
+            const modal = document.getElementById('emailModal');
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('emailModal');
+            modal.classList.remove('active');
+        }
+
+        function handleDownload(event) {
+            event.preventDefault();
+            const btn = document.getElementById('downloadSubmit');
+            const form = event.target;
+            
+            // Get form data
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            
+            // In production, send to backend
+            console.log('Lead captured:', data);
+            
+            // Update button
+            btn.textContent = '✓ Preparing Download...';
+            btn.classList.add('success');
+            
+            // Trigger print after short delay
+            setTimeout(() => {
+                closeModal();
+                window.print();
+                
+                // Reset form and button after print
+                setTimeout(() => {
+                    form.reset();
+                    btn.textContent = 'Download Report';
+                    btn.classList.remove('success');
+                }, 2000);
+            }, 1000);
+        }
+
+        // Close modal on overlay click
+        document.getElementById('emailModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    
+                    // Trigger animations based on section
+                    const section = entry.target.dataset.section;
+                    
+                    if (section === 'score') {
+                        animateScores();
+                        animateDonut();
+                    }
+                }
+            });
+        }, observerOptions);
+
+        // Observe all cards
+        document.querySelectorAll('.card').forEach(card => {
+            observer.observe(card);
+        });
+
+        // CountUp animation
+        function countUp(element, target, duration = 2000) {
+            const start = 0;
+            const increment = target / (duration / 16);
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.round(current);
+            }, 16);
+        }
+
+        // Animate scores
+        function animateScores() {
+            // Main score
+            const mainScore = document.querySelector('.score-number');
+            const mainTarget = parseInt(mainScore.dataset.target);
+            countUp(mainScore, mainTarget);
+
+            // Sub-scores
+            document.querySelectorAll('.sub-score-value').forEach(el => {
+                const target = parseInt(el.dataset.target);
+                countUp(el, target);
+            });
+
+            // Animate bars
+            document.querySelectorAll('.sub-score-item').forEach(item => {
+                setTimeout(() => {
+                    item.classList.add('animate');
+                }, 200);
+            });
+        }
+
+        // Animate donut chart
+        function animateDonut() {
+            const donut = document.querySelector('.donut-chart');
+            setTimeout(() => {
+                donut.classList.add('animate');
+            }, 300);
+        }
+
+        // Form submission (mock)
+        document.querySelector('.email-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('.submit-btn');
+            const input = e.target.querySelector('.email-input');
+            const originalText = btn.textContent;
+            
+            btn.textContent = '✓ Request Sent!';
+            btn.style.background = '#10b981';
+            
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '';
+                input.value = '';
+            }, 3000);
+        });
+
+        // Print optimization
+        window.addEventListener('beforeprint', () => {
+            document.querySelectorAll('.card').forEach(card => {
+                card.classList.add('visible');
+            });
+            document.querySelector('.donut-chart').classList.add('animate');
+            document.querySelectorAll('.sub-score-item').forEach(item => {
+                item.classList.add('animate');
+            });
+        });
+    </script>
+</body>
+</html>
