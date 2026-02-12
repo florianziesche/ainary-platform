@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Agents Just Got Credit Cards – Ainary</title>
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/geist@1.0.0/dist/fonts/geist-sans/style.css" rel="stylesheet">
+  
+  <style>
+    /* Design System Variables */
+    :root {
+      /* Backgrounds */
+      --bg-page:          #08080c;
+      --bg-surface:       #111116;
+      --bg-surface-hover: #18181f;
+      --bg-elevated:      #1e1e26;
+      --bg-input:         #0e0e13;
+      
+      /* Borders */
+      --border-default:   rgba(255, 255, 255, 0.06);
+      --border-hover:     rgba(255, 255, 255, 0.10);
+      --border-active:    rgba(200, 170, 80, 0.30);
+      
+      /* Text */
+      --text-primary:     #ededf0;
+      --text-secondary:   #8b8b95;
+      --text-muted:       #55555e;
+      
+      /* Primary Accent - Indigo */
+      --accent:           #6366f1;
+      --accent-hover:     #818cf8;
+      --accent-muted:     rgba(99, 102, 241, 0.12);
+      --accent-border:    rgba(99, 102, 241, 0.20);
+      
+      /* Special Accent - Gold */
+      --gold:             #c8aa50;
+      --gold-hover:       #d4b85c;
+      --gold-muted:       rgba(200, 170, 80, 0.12);
+      --gold-border:      rgba(200, 170, 80, 0.20);
+      
+      /* Fonts */
+      --font-display: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: var(--bg-page);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    /* Navigation */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(8, 8, 12, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-default);
+      height: 56px;
+    }
+    
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .nav-logo {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 1.125rem;
+      color: var(--text-primary);
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+    
+    .nav-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.15s ease;
+    }
+    
+    .nav-link:hover {
+      color: var(--text-primary);
+    }
+    
+    /* Buttons */
+    .btn-primary {
+      background: var(--accent);
+      color: #ffffff;
+      font-family: var(--font-body);
+      font-weight: 500;
+      font-size: 0.875rem;
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+    
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+    
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    
+    /* Badge */
+    .badge {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: var(--accent-muted);
+      color: var(--accent);
+      border: 1px solid var(--accent-border);
+      display: inline-block;
+    }
+    
+    /* Article Header */
+    .article-header {
+      max-width: 720px;
+      margin: 0 auto;
+      padding-top: 80px;
+      padding-bottom: 48px;
+      text-align: center;
+    }
+    
+    .article-header__badge {
+      margin-bottom: 16px;
+    }
+    
+    .article-header__title {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+    }
+    
+    .article-header__subtitle {
+      font-size: 1.1rem;
+      font-weight: 300;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+    
+    .article-header__meta {
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: 48px;
+    }
+    
+    .article-header__meta .date {
+      font-family: var(--font-mono);
+    }
+    
+    .article-header__hero {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto 48px;
+      aspect-ratio: 16/9;
+      background: var(--bg-elevated);
+      border-radius: 12px;
+      border: 1px solid var(--border-default);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    
+    /* Article Body */
+    .article-body {
+      max-width: 680px;
+      margin: 0 auto;
+      padding-bottom: 80px;
+    }
+    
+    .article-body p {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: var(--text-primary);
+      margin-bottom: 24px;
+    }
+    
+    .article-body h2 {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-top: 48px;
+      margin-bottom: 16px;
+      line-height: 1.3;
+    }
+    
+    .article-body h3 {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+      margin-top: 32px;
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+    
+    .article-body blockquote {
+      border-left: 2px solid var(--accent);
+      padding-left: 20px;
+      margin: 32px 0;
+      font-style: italic;
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      line-height: 1.8;
+    }
+    
+    .article-body ul,
+    .article-body ol {
+      margin: 24px 0;
+      padding-left: 28px;
+    }
+    
+    .article-body li {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+    
+    .article-body a {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.15s ease;
+    }
+    
+    .article-body a:hover {
+      border-bottom-color: var(--accent);
+    }
+    
+    .article-body code {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+      color: var(--text-primary);
+    }
+    
+    .article-body pre {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      padding: 16px;
+      margin: 32px 0;
+      overflow-x: auto;
+    }
+    
+    .article-body pre code {
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+    
+    .article-body img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin: 32px 0;
+      border: 1px solid var(--border-default);
+    }
+    
+    /* Tool CTA */
+    .tool-cta {
+      max-width: 680px;
+      margin: 0 auto 80px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 12px;
+      padding: 32px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      transition: border-color 0.15s ease;
+    }
+    
+    .tool-cta:hover {
+      border-color: var(--border-hover);
+    }
+    
+    .tool-cta__icon {
+      width: 48px;
+      height: 48px;
+      background: var(--accent-muted);
+      border: 1px solid var(--accent-border);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .tool-cta__content {
+      flex: 1;
+    }
+    
+    .tool-cta__title {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    
+    .tool-cta__description {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    
+    .tool-cta__link {
+      color: var(--accent);
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: color 0.15s ease;
+    }
+    
+    .tool-cta__link:hover {
+      color: var(--accent-hover);
+    }
+    
+    /* Related Articles */
+    .related-articles {
+      padding-bottom: 80px;
+    }
+    
+    .related-articles__header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    
+    .related-articles__title {
+      font-family: var(--font-display);
+      font-size: 1.75rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    
+    .related-articles__grid {
+      max-width: 1000px;
+      margin: 0 auto 32px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    
+    .related-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.15s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .related-card:hover {
+      border-color: var(--border-hover);
+    }
+    
+    .related-card__image {
+      aspect-ratio: 16/9;
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border-default);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .related-card__content {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    
+    .related-card__badge {
+      margin-bottom: 10px;
+    }
+    
+    .related-card__title {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      line-height: 1.3;
+      min-height: 2.6em;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .related-card__meta {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: auto;
+    }
+    
+    .related-articles__link {
+      text-align: center;
+    }
+    
+    .related-articles__link a {
+      color: var(--accent);
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+    
+    .related-articles__link a:hover {
+      color: var(--accent-hover);
+    }
+    
+    /* Newsletter CTA */
+    .newsletter-cta {
+      text-align: center;
+      padding: 120px 0;
+    }
+    
+    .newsletter-cta h2 {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+    }
+    
+    .newsletter-subtitle {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+    }
+    
+    .newsletter-form {
+      max-width: 480px;
+      margin: 0 auto;
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    
+    .newsletter-input {
+      flex: 1;
+      background: var(--bg-input);
+      border: 1px solid var(--border-default);
+      border-radius: 10px;
+      padding: 12px 16px;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      transition: border-color 0.15s ease;
+    }
+    
+    .newsletter-input:focus {
+      outline: none;
+      border-color: var(--accent-border);
+      box-shadow: 0 0 0 3px var(--accent-muted);
+    }
+    
+    .newsletter-input::placeholder {
+      color: var(--text-muted);
+    }
+    
+    .newsletter-note {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    
+    /* Footer */
+    .footer {
+      border-top: 1px solid var(--border-default);
+      padding: 80px 0 40px 0;
+    }
+    
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 64px;
+      margin-bottom: 64px;
+    }
+    
+    .footer-column h4 {
+      font-family: var(--font-display);
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+    }
+    
+    .footer-links {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .footer-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: color 0.15s ease;
+    }
+    
+    .footer-link:hover {
+      color: var(--text-primary);
+    }
+    
+    .footer-bottom {
+      text-align: center;
+      padding-top: 32px;
+      border-top: 1px solid var(--border-default);
+    }
+    
+    .footer-copyright {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .related-articles__grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .article-header__title {
+        font-size: 2rem;
+      }
+      
+      .article-body p,
+      .article-body li,
+      .article-body blockquote {
+        font-size: 1rem;
+      }
+      
+      .tool-cta {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .related-articles__grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .newsletter-form {
+        flex-direction: column;
+      }
+      
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .nav-links {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. Navigation -->
+  <nav class="nav">
+    <div class="nav-container">
+      <a href="landing.html" class="nav-logo" style="text-decoration:none;color:inherit;"><span style="color:#c8aa50;margin-right:4px;">●</span>Ainary</a>
+      <div class="nav-links">
+        <a href="tools.html" class="nav-link">Tools</a>
+        <a href="#" class="nav-link">Daily Brief</a>
+        <a href="blog.html" class="nav-link">Blog</a>
+        <a href="pricing.html" class="nav-link">Pricing</a>
+      </div>
+      <div class="nav-auth" style="display:flex;align-items:center;gap:16px;">
+        <a href="#" class="nav-link">Log in</a>
+        <a href="#" class="btn-primary" style="padding: 8px 16px; font-size: 0.8rem;">Sign up</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 2. Article Header -->
+  <article>
+    <div class="container">
+      <header class="article-header">
+        <div class="article-header__badge">
+          <span class="badge">AI STRATEGY</span>
+        </div>
+        <h1 class="article-header__title">AI Agents Just Got Credit Cards</h1>
+        <p class="article-header__subtitle">When AI agents start making purchases, signing contracts, and managing budgets autonomously — commerce changes forever.</p>
+        <div class="article-header__meta">
+          Florian Ziesche · <span class="date">Feb 10, 2026</span> · 8 min read
+        </div>
+        
+        <!-- Hero Image Placeholder -->
+        <div class="article-header__hero">
+          <svg viewBox="0 0 800 450" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs><pattern id="hdots" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="0.8" fill="#1e1e26"/></pattern></defs>
+            <rect width="800" height="450" fill="url(#hdots)"/>
+            <g opacity="0.35">
+              <rect x="200" y="140" width="140" height="90" rx="8" fill="none" stroke="#6366f1" stroke-width="2"/>
+              <rect x="210" y="150" width="40" height="25" rx="4" fill="#6366f1"/>
+              <rect x="260" y="150" width="70" height="6" rx="2" fill="#6366f1" opacity="0.6"/>
+              <rect x="210" y="185" width="120" height="6" rx="2" fill="#6366f1" opacity="0.4"/>
+              <rect x="210" y="198" width="90" height="6" rx="2" fill="#6366f1" opacity="0.4"/>
+              <rect x="210" y="211" width="105" height="6" rx="2" fill="#6366f1" opacity="0.4"/>
+              
+              <rect x="370" y="140" width="140" height="90" rx="8" fill="none" stroke="#c8aa50" stroke-width="2"/>
+              <circle cx="440" cy="165" r="12" fill="#c8aa50"/>
+              <rect x="390" y="190" width="120" height="6" rx="2" fill="#c8aa50" opacity="0.6"/>
+              <rect x="390" y="203" width="95" height="6" rx="2" fill="#c8aa50" opacity="0.6"/>
+              
+              <rect x="540" y="140" width="140" height="90" rx="8" fill="none" stroke="#6366f1" stroke-width="2"/>
+              <rect x="560" y="160" width="100" height="50" rx="4" fill="#6366f1" opacity="0.15"/>
+              <rect x="570" y="172" width="30" height="8" rx="2" fill="#6366f1"/>
+              <rect x="610" y="172" width="30" height="8" rx="2" fill="#6366f1"/>
+              
+              <line x1="340" y1="185" x2="370" y2="185" stroke="#6366f1" stroke-width="2"/>
+              <line x1="510" y1="185" x2="540" y2="185" stroke="#c8aa50" stroke-width="2"/>
+              <circle cx="355" cy="185" r="3" fill="#6366f1"/>
+              <circle cx="525" cy="185" r="3" fill="#c8aa50"/>
+            </g>
+            <circle cx="780" cy="430" r="8" fill="#c8aa50"/>
+          </svg>
+        </div>
+      </header>
+
+      <!-- 3. Article Body -->
+      <div class="article-body">
+        <p>Last month, a major payment processor quietly launched support for autonomous AI agent transactions. No press release. No fanfare. Just a single line in their developer documentation.</p>
+        
+        <p>Within weeks, three Fortune 500 companies had deployed agents that now autonomously manage supplier payments, negotiate contracts, and allocate budgets across departments. No human approval required.</p>
+        
+        <p>This isn't science fiction. It's happening now. And most businesses are completely unprepared.</p>
+        
+        <h2>The Autonomous Commerce Layer</h2>
+        
+        <p>AI agents are no longer just answering questions or generating reports. They're taking actions that have real financial consequences. When an agent can analyze spend patterns, compare vendors, negotiate pricing, and execute a purchase order — all in the span of 30 seconds — the entire procurement function changes.</p>
+        
+        <blockquote>The question isn't whether AI agents will manage corporate spending. The question is whether your organization will adapt fast enough to benefit from it.</blockquote>
+        
+        <p>Traditional approval workflows assume humans are in the loop. Sign this form. Get three quotes. Escalate to a manager for purchases over $10,000. These processes made sense when humans were making decisions. They're friction when agents operate 24/7 across time zones.</p>
+        
+        <h3>What This Means for Your Business</h3>
+        
+        <p>If you're still thinking about AI as a productivity tool, you're missing the point. Here's what changes when agents control spending:</p>
+        
+        <ul>
+          <li><strong>Procurement cycles collapse.</strong> Three-week vendor evaluations become three-hour agent analyses. Your competition is already moving faster.</li>
+          <li><strong>Contracts become dynamic.</strong> Instead of annual renegotiations, agents continuously optimize terms based on usage patterns and market rates.</li>
+          <li><strong>Budget allocation shifts in real-time.</strong> Resources flow to high-performing initiatives automatically, not quarterly.</li>
+          <li><strong>Vendor relationships change.</strong> The best pitch deck won't matter if an agent can quantify value in milliseconds.</li>
+        </ul>
+        
+        <h2>The Trust Problem</h2>
+        
+        <p>Giving an AI agent a credit card sounds insane. And it is — if you haven't built the right infrastructure. The companies deploying this successfully have three things in common:</p>
+        
+        <p><strong>Bulletproof audit trails.</strong> Every decision, every data point, every reasoning step is logged. When an agent makes a $50,000 software purchase, you can trace exactly why.</p>
+        
+        <p><strong>Clear guardrails.</strong> Agents operate within defined parameters. Not "never make mistakes," but "mistakes that matter are caught before they cascade."</p>
+        
+        <p><strong>Human oversight at the right level.</strong> Not approval for every transaction, but monitoring for pattern changes and edge cases.</p>
+        
+        <h3>Implementation Reality Check</h3>
+        
+        <p>Here's what a basic autonomous procurement agent looks like in practice:</p>
+        
+        <pre><code>agent = ProcurementAgent(
+  budget_limit=50000,
+  category="software_saas",
+  approval_threshold=10000,
+  vendor_whitelist=approved_vendors,
+  audit_log=central_ledger
+)
+
+# Agent autonomously:
+# - Monitors usage and identifies needs
+# - Compares vendors and pricing
+# - Negotiates contracts within parameters
+# - Executes purchases under threshold
+# - Escalates edge cases to humans
+
+agent.run(continuous=True)</code></pre>
+        
+        <p>The code is simple. The trust framework isn't. Most organizations will spend more time on governance than implementation.</p>
+        
+        <h2>Where This Goes Next</h2>
+        
+        <p>Autonomous agents managing budgets is just the first step. The real shift happens when agents start making strategic decisions.</p>
+        
+        <p>Imagine an agent that doesn't just buy software — it identifies capability gaps, evaluates build-versus-buy trade-offs, allocates engineering resources, and adjusts course based on results. No roadmap meetings. No quarterly planning cycles. Just continuous intelligent capital allocation.</p>
+        
+        <p>That future is 18 months away, not 10 years. The companies that figure out the governance, trust, and infrastructure now will compound advantages faster than competitors can catch up.</p>
+        
+        <p>The ones waiting for "best practices to emerge" will wake up in a market that already moved on.</p>
+      </div>
+    </div>
+
+    <!-- 4. Tool CTA -->
+    <div class="container">
+      <div class="tool-cta">
+        <div class="tool-cta__icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="7.5 4.21 12 6.81 16.5 4.21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="7.5 19.79 7.5 14.6 3 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="21 12 16.5 14.6 16.5 19.79" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="12" y1="22.08" x2="12" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="tool-cta__content">
+          <div class="tool-cta__title">Built with Corporate X-Ray</div>
+          <div class="tool-cta__description">Deep-dive analysis on any company in 90 seconds. Due diligence, vendor evaluation, competitive intelligence.</div>
+        </div>
+        <a href="tools.html" class="tool-cta__link">Try it free →</a>
+      </div>
+    </div>
+
+    <!-- 5. Related Articles -->
+    <section class="related-articles">
+      <div class="container">
+        <div class="related-articles__header">
+          <h2 class="related-articles__title">More from the blog</h2>
+        </div>
+        
+        <div class="related-articles__grid">
+          <!-- Card 1 -->
+          <div class="related-card">
+            <div class="related-card__image">
+              <svg viewBox="0 0 400 225" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <defs><pattern id="r1" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="0.8" fill="#1e1e26"/></pattern></defs>
+                <rect width="400" height="225" fill="url(#r1)"/>
+                <g opacity="0.3">
+                  <path d="M 120 100 L 160 80 L 160 140 L 120 160 Z" fill="#c8aa50"/>
+                  <path d="M 160 80 L 200 100 L 200 160 L 160 140 Z" fill="#c8aa50" opacity="0.7"/>
+                  <path d="M 120 100 L 160 80 L 200 100 L 160 120 Z" fill="#c8aa50" opacity="0.9"/>
+                  <path d="M 180 110 L 220 90 L 220 160 L 180 180 Z" fill="#c8aa50"/>
+                  <path d="M 220 90 L 260 110 L 260 180 L 220 160 Z" fill="#c8aa50" opacity="0.7"/>
+                  <path d="M 180 110 L 220 90 L 260 110 L 220 130 Z" fill="#c8aa50" opacity="0.9"/>
+                </g>
+                <circle cx="385" cy="210" r="6" fill="#c8aa50"/>
+              </svg>
+            </div>
+            <div class="related-card__content">
+              <div class="related-card__badge">
+                <span class="badge">ENTERPRISE</span>
+              </div>
+              <h3 class="related-card__title">Why Manufacturing Is AI's Biggest Blind Spot</h3>
+              <div class="related-card__meta">Feb 11, 2026 · 9 min</div>
+            </div>
+          </div>
+          
+          <!-- Card 2 -->
+          <div class="related-card">
+            <div class="related-card__image">
+              <svg viewBox="0 0 400 225" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <defs><pattern id="r2" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="0.8" fill="#1e1e26"/></pattern></defs>
+                <rect width="400" height="225" fill="url(#r2)"/>
+                <g opacity="0.3">
+                  <rect x="60" y="50" width="180" height="8" fill="#6366f1" rx="2"/>
+                  <rect x="60" y="68" width="140" height="8" fill="#6366f1" rx="2"/>
+                  <rect x="60" y="86" width="220" height="8" fill="#6366f1" rx="2"/>
+                  <rect x="60" y="122" width="260" height="8" fill="#c8aa50" rx="2"/>
+                  <rect x="60" y="140" width="160" height="8" fill="#6366f1" rx="2"/>
+                  <rect x="60" y="176" width="200" height="8" fill="#c8aa50" rx="2"/>
+                </g>
+                <circle cx="385" cy="210" r="6" fill="#c8aa50"/>
+              </svg>
+            </div>
+            <div class="related-card__content">
+              <div class="related-card__badge">
+                <span class="badge">BEHIND THE SCENES</span>
+              </div>
+              <h3 class="related-card__title">I Built 5 AI Tools in 48 Hours</h3>
+              <div class="related-card__meta">Feb 12, 2026 · 12 min</div>
+            </div>
+          </div>
+          
+          <!-- Card 3 -->
+          <div class="related-card">
+            <div class="related-card__image">
+              <svg viewBox="0 0 400 225" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <defs><pattern id="r3" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="0.8" fill="#1e1e26"/></pattern></defs>
+                <rect width="400" height="225" fill="url(#r3)"/>
+                <g opacity="0.35">
+                  <circle cx="120" cy="110" r="30" fill="none" stroke="#6366f1" stroke-width="2"/>
+                  <circle cx="200" cy="110" r="30" fill="none" stroke="#6366f1" stroke-width="2"/>
+                  <circle cx="280" cy="110" r="30" fill="none" stroke="#6366f1" stroke-width="2"/>
+                  <line x1="150" y1="110" x2="170" y2="110" stroke="#c8aa50" stroke-width="2"/>
+                  <line x1="230" y1="110" x2="250" y2="110" stroke="#c8aa50" stroke-width="2"/>
+                  <circle cx="200" cy="110" r="8" fill="#c8aa50"/>
+                </g>
+                <circle cx="385" cy="210" r="6" fill="#c8aa50"/>
+              </svg>
+            </div>
+            <div class="related-card__content">
+              <div class="related-card__badge">
+                <span class="badge">AI STRATEGY</span>
+              </div>
+              <h3 class="related-card__title">Multi-Agent Systems Are Not The Future</h3>
+              <div class="related-card__meta">Feb 8, 2026 · 7 min</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="related-articles__link">
+          <a href="blog.html">View all articles →</a>
+        </div>
+      </div>
+    </section>
+
+  </article>
+
+  <!-- 6. Newsletter CTA -->
+  <section class="newsletter-cta">
+    <div class="container">
+      <h2>Stay ahead of the curve.</h2>
+      <p class="newsletter-subtitle">Weekly intelligence on AI strategy, tools, and trends. No spam.</p>
+      <form class="newsletter-form">
+        <input type="email" class="newsletter-input" placeholder="Enter your email">
+        <button type="submit" class="btn-primary">Subscribe</button>
+      </form>
+      <p class="newsletter-note">Join 0 professionals</p>
+    </div>
+  </section>
+
+  <!-- 7. Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        
+        <!-- Product -->
+        <div class="footer-column">
+          <h4>Product</h4>
+          <div class="footer-links">
+            <a href="tools.html" class="footer-link">X-Ray</a>
+            <a href="tools.html" class="footer-link">Advisory Board</a>
+            <a href="tools.html" class="footer-link">Research Engine</a>
+            <a href="#" class="footer-link">Daily Brief</a>
+          </div>
+        </div>
+        
+        <!-- Resources -->
+        <div class="footer-column">
+          <h4>Resources</h4>
+          <div class="footer-links">
+            <a href="blog.html" class="footer-link">Blog</a>
+            <a href="#" class="footer-link">Documentation</a>
+            <a href="#" class="footer-link">API</a>
+          </div>
+        </div>
+        
+        <!-- Company -->
+        <div class="footer-column">
+          <h4>Company</h4>
+          <div class="footer-links">
+            <a href="#" class="footer-link">About</a>
+            <a href="#" class="footer-link">Careers</a>
+            <a href="#" class="footer-link">Contact</a>
+          </div>
+        </div>
+        
+        <!-- Legal -->
+        <div class="footer-column">
+          <h4>Legal</h4>
+          <div class="footer-links">
+            <a href="#" class="footer-link">Privacy</a>
+            <a href="#" class="footer-link">Terms</a>
+            <a href="#" class="footer-link">Imprint</a>
+          </div>
+        </div>
+        
+      </div>
+      
+      <div class="footer-bottom">
+        <p class="footer-copyright">© 2026 Ainary. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

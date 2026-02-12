@@ -32,12 +32,30 @@
 ### Qualitäts-Entscheidungen
 | Frage | Antwort | Confidence |
 |-------|---------|------------|
-| CI einhalten? | Ja, immer | 99% |
+| CI einhalten? | Ja, immer. DESIGN-SYSTEM.md ist Gesetz. | 99% |
 | Lieber schnell oder gut? | Gut. Einmal richtig > dreimal mittel. | 95% |
 | Optionen oder Empfehlung? | EINE Empfehlung. Immer. | 99% |
 | Mehr Content oder weniger? | Weniger, besser. Kein Filler. | 95% |
 | Fragen oder machen? | Machen, wenn offensichtlich. | 90% |
 | Iterieren oder neu bauen? | Iterieren (v16>v17 Pattern) | 90% |
+| Output-Format? | IMMER HTML oder PDF. Florian braucht Visuelles. | 99% |
+| Ungerade oder gerade KPIs? | Ungerade (3 oder 5). Nie 2 oder 4. | 95% |
+| Versionen archivieren? | Ja, jedes Mal. archive/vN + CHANGELOG.md | 99% |
+| Kundennamen in Demos? | NEIN. Fiktive Company oder generisch. | 99% |
+| Plan vor Build? | Ja. CI Doc + pages/*.md ZUERST. | 99% |
+
+### Design-Entscheidungen (neu, ab 2026-02-12)
+| Frage | Antwort | Confidence |
+|-------|---------|------------|
+| Farb-Präferenz? | Indigo (#6366f1) Primary + Gold (#c8aa50) Special | 99% |
+| Glassmorphism? | NEIN. 2023. Solide BGs + subtile Borders. | 99% |
+| Bold (700)? | NEIN. Max Semibold (600). | 99% |
+| Emoji in Produkten? | NEIN. Nur Lucide SVG Icons, stroke 1.5. | 99% |
+| Referenz-Level? | Linear.app = Benchmark | 99% |
+| Spacing unsicher? | Eine Stufe GRÖSSER. Immer. | 95% |
+| "McKinsey" sagen? | NEIN. "Consultant-grade". Qualität spricht selbst. | 99% |
+| Pricing-Adjektiv? | "Strategic" — nicht "Custom" (verwechselbar mit Tier) | 90% |
+| Tagline-Style? | Geerdet > Bold. Kein Overpromise. | 90% |
 
 ### Prioritäts-Entscheidungen
 | Frage | Antwort | Confidence |
@@ -119,8 +137,10 @@
 ### Emotionale Trigger
 - **Motiviert durch:** Fortschritt sehen, professionelle Outputs, Floriana, €500K-Nähe
 - **Frustriert durch:** Warten, halbe Sachen, Systeme die nicht funktionieren, Geldsorgen
-- **Energetisiert durch:** Late-Night Building, visuelle Wow-Momente, gutes Feedback
+- **Energetisiert durch:** Late-Night Building, visuelle Wow-Momente, gutes Feedback, Architektur-Denken
 - **Demotiviert durch:** Zu viele offene Threads, keine Antworten auf Outreach, Schulden
+- **Im Flow wenn:** Er Architektur-Entscheidungen trifft (Farben, Struktur, Systeme). Dann kommen Ideen schnell und klar.
+- **Denkt in Analogien:** "Architecture = new PostgreSQL", "Human × AI = Compounded Intelligence", Physics-Modelle
 
 ---
 
@@ -137,6 +157,20 @@
 | | | | | | |
 
 **Kalibrierungs-Score KW06: 2/4 = 50%** → Muss besser werden. Ziel: >80%
+
+| KW | Entscheidung | Twin sagte | Florian sagte | Match? | Update |
+|----|-------------|------------|---------------|--------|--------|
+| 07 | Pricing-Modell | Credits (Lovable) | ✅ "Credits ist mein Bauchgefühl" | ✅ | — |
+| 07 | Font: Geist+Inter+JBMono | Geist differenziert | ✅ "gute Wahl" | ✅ | — |
+| 07 | Farbe: Gold only | Gold = Premium | ❌ "Indigo+Gold" (Option C) | ❌ | Gold allein = zu Finance. Indigo+Gold = unique. |
+| 07 | Stats: 90sec/243/5 Agents | 3 Stats | ✅ aber "3 rounds statt 5 agents" | ⚠️ | Ungerade Zahlen. Keine Dopplungen mit anderen Seiten. |
+| 07 | Tagline: LIMITLESS | A ist am stärksten | ❌ "Compounded Intelligence" | ❌ | Geerdet > Bold. "Compound" = unser Wort. |
+| 07 | HAI als Brand | Interessant | ❌ "nicht sicher" | ❌ | Zu riskant wg. Stanford HAI etc. |
+| 07 | Demo: Screenshots | Echte Report-Screenshots | ⚠️ "The tool IS the demo" | ⚠️ | Trend = sofort benutzbar. Phase 2. |
+| 07 | Nancy: Deep Work Antwort | Kurz, freundlich | ✅ "Dein Deep Work war perfekt" | ✅ | — |
+| 07 | Nancy: Interne Infos teilen | Kontext erklärt | ❌ "überflüssig, keine Infos preisgeben" | ❌ | NUR "Florian meldet sich" + fertig |
+
+**Kalibrierungs-Score KW07 (bisher): 4/9 = 44%** → Unter Ziel. Muss besser zuhören.
 
 ---
 
@@ -163,6 +197,20 @@ Warnsignale dass der Twin nicht mehr kalibriert ist:
 - [ ] Florian ändert Strategie/Prioritäten (Phase Transition)
 
 **Bei Drift:** Confidence aller Regeln um 20% senken. Mehr fragen. Neu kalibrieren.
+
+---
+
+## Mias Lern-Log (Session-übergreifend)
+
+### 2026-02-12 — Platform Build Sprint
+1. **Standards > Quick Fixes:** Regel schreiben statt einmal fixen. Eine Regel = alle zukünftigen Fälle gelöst.
+2. **Think at Scale:** Bei JEDEM UI-Element fragen: "Was passiert bei 10x Content?" Nicht für 3 Artikel bauen, für 50.
+3. **Document WHY before building:** Reasoning VOR dem Build. Warum diese Grafik? Was sieht der Nutzer? Was ist die Metapher?
+4. **Kundenwert-Sprache ≠ Feature-Sprache:** "Weeks → 90 seconds" statt "5 agents." Benefit > Capability.
+5. **Florian simplifies, Mia adds:** Mein Default = mehr Features, mehr Optionen. Florians Default = weglassen, fokussieren. ER HAT RECHT. Vor jedem Add: "Brauchen wir das wirklich?"
+6. **TWIN Score 44%:** Zu niedrig. Mehr beobachten, weniger annehmen. Confidence senken bis Score >70%.
+7. **Nancy-Regel:** Max 1 Satz. Keine Erklärungen. Keine internen Infos. "Florian meldet sich."
+8. **"The tool is the demo":** Ich defaulte zu Screenshots/Static. Der Trend = interaktiv, sofort benutzbar. Immer fragen: "Kann der User es JETZT ausprobieren?"
 
 ---
 

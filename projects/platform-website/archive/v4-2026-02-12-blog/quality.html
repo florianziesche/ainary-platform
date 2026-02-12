@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How We Build — Ainary Intelligence Platform</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/geist@1.0.0/dist/fonts/geist-sans/style.css" rel="stylesheet">
+    
+    <style>
+        /* ===== CSS Variables ===== */
+        :root {
+            /* Backgrounds */
+            --bg-page: #08080c;
+            --bg-surface: #111116;
+            --bg-surface-hover: #18181f;
+            --bg-elevated: #1e1e26;
+            --bg-input: #0e0e13;
+            
+            /* Borders */
+            --border-default: rgba(255, 255, 255, 0.06);
+            --border-hover: rgba(255, 255, 255, 0.10);
+            --border-active: rgba(200, 170, 80, 0.30);
+            
+            /* Text */
+            --text-primary: #ededf0;
+            --text-secondary: #8b8b95;
+            --text-muted: #55555e;
+            
+            /* Primary Accent - Indigo */
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --accent-muted: rgba(99, 102, 241, 0.12);
+            --accent-border: rgba(99, 102, 241, 0.20);
+            
+            /* Special Accent - Gold */
+            --gold: #c8aa50;
+            --gold-hover: #d4b85c;
+            --gold-muted: rgba(200, 170, 80, 0.12);
+            --gold-border: rgba(200, 170, 80, 0.20);
+            
+            /* Fonts */
+            --font-display: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+            
+            /* Spacing */
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 24px;
+            --space-6: 32px;
+            --space-8: 48px;
+            --space-10: 64px;
+            --space-12: 80px;
+            --space-16: 120px;
+        }
+        
+        /* ===== Reset & Base ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-page);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* ===== Navigation ===== */
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(8, 8, 12, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-default);
+            padding: 0 24px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .nav__logo {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+        
+        .nav__links {
+            display: flex;
+            gap: var(--space-6);
+            list-style: none;
+        }
+        
+        .nav__link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: color 0.15s ease;
+        }
+        
+        .nav__link:hover {
+            color: var(--text-primary);
+        }
+        
+        .nav__cta {
+            display: flex;
+            gap: var(--space-3);
+        }
+        
+        /* ===== Buttons ===== */
+        .btn {
+            font-family: var(--font-body);
+            font-weight: 500;
+            font-size: 0.875rem;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn--primary {
+            background: var(--accent);
+            color: #ffffff;
+            border: none;
+        }
+        
+        .btn--primary:hover {
+            background: var(--accent-hover);
+        }
+        
+        .btn--secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border-default);
+        }
+        
+        .btn--secondary:hover {
+            border-color: var(--border-hover);
+        }
+        
+        .btn--ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            border: none;
+        }
+        
+        .btn--ghost:hover {
+            color: var(--text-primary);
+        }
+        
+        /* ===== Layout ===== */
+        .section {
+            padding: var(--space-16) 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section--narrow {
+            max-width: 800px;
+        }
+        
+        /* ===== Hero ===== */
+        .hero {
+            text-align: center;
+            padding-top: var(--space-12);
+            padding-bottom: var(--space-16);
+        }
+        
+        .badge {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: var(--gold-muted);
+            color: var(--gold);
+            border: 1px solid var(--gold-border);
+            display: inline-block;
+            margin-bottom: var(--space-5);
+        }
+        
+        .hero__headline {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            color: var(--text-primary);
+            margin-bottom: var(--space-5);
+        }
+        
+        .hero__subtitle {
+            font-family: var(--font-body);
+            font-weight: 300;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            max-width: 680px;
+            margin: 0 auto;
+        }
+        
+        /* ===== Section Headers ===== */
+        .section__headline {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            color: var(--text-primary);
+            margin-bottom: var(--space-5);
+            text-align: center;
+        }
+        
+        .section__description {
+            font-family: var(--font-body);
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            max-width: 680px;
+            margin: 0 auto var(--space-10);
+            text-align: center;
+        }
+        
+        /* ===== Agent Cards ===== */
+        .agents {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: var(--space-4);
+            margin-top: var(--space-8);
+        }
+        
+        .agent-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-radius: 12px;
+            padding: var(--space-5);
+            text-align: center;
+            transition: border-color 0.2s ease;
+        }
+        
+        .agent-card:hover {
+            border-color: var(--border-hover);
+        }
+        
+        .agent-card__icon {
+            width: 24px;
+            height: 24px;
+            color: var(--accent);
+            margin: 0 auto var(--space-3);
+        }
+        
+        .agent-card__name {
+            font-family: var(--font-display);
+            font-weight: 500;
+            font-size: 1rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+        
+        .agent-card__description {
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            line-height: 1.4;
+            color: var(--text-secondary);
+        }
+        
+        /* ===== Process Steps (Vertical) ===== */
+        .process {
+            max-width: 600px;
+            margin: var(--space-10) auto 0;
+        }
+        
+        .process-step {
+            position: relative;
+            padding-left: var(--space-10);
+            margin-bottom: var(--space-10);
+        }
+        
+        .process-step:last-child {
+            margin-bottom: 0;
+        }
+        
+        .process-step:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 48px;
+            bottom: -48px;
+            width: 1px;
+            background: var(--border-default);
+        }
+        
+        .process-step__number {
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-family: var(--font-mono);
+            font-size: 2rem;
+            font-weight: 500;
+            color: var(--gold);
+            line-height: 1;
+        }
+        
+        .process-step__title {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+        
+        .process-step__description {
+            font-family: var(--font-body);
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+        
+        /* ===== Confidence Levels ===== */
+        .confidence-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-5);
+            margin-top: var(--space-8);
+        }
+        
+        .confidence-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-radius: 12px;
+            padding: var(--space-6);
+        }
+        
+        .confidence-card__dots {
+            display: flex;
+            gap: 6px;
+            margin-bottom: var(--space-4);
+        }
+        
+        .confidence-card__dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        .dot--green {
+            background: #34d399;
+        }
+        
+        .dot--yellow {
+            background: #fbbf24;
+        }
+        
+        .dot--red {
+            background: #f87171;
+        }
+        
+        .confidence-card__label {
+            font-family: var(--font-display);
+            font-weight: 500;
+            font-size: 1rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+        
+        .confidence-card__description {
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: var(--text-secondary);
+        }
+        
+        /* ===== Stats ===== */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-8);
+            margin-top: var(--space-10);
+            text-align: center;
+        }
+        
+        .stat__number {
+            font-family: var(--font-mono);
+            font-size: 2.5rem;
+            font-weight: 500;
+            color: var(--gold);
+            line-height: 1;
+            margin-bottom: var(--space-2);
+        }
+        
+        .stat__label {
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        /* ===== Comparison ===== */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-8);
+            margin-top: var(--space-10);
+        }
+        
+        .comparison-column {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-default);
+            border-radius: 12px;
+            padding: var(--space-6);
+        }
+        
+        .comparison-column--highlight {
+            border-left: 3px solid var(--accent-border);
+        }
+        
+        .comparison-column__title {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 1.25rem;
+            margin-bottom: var(--space-5);
+        }
+        
+        .comparison-column--dimmed .comparison-column__title {
+            color: var(--text-muted);
+        }
+        
+        .comparison-column--highlight .comparison-column__title {
+            color: var(--text-primary);
+        }
+        
+        .comparison-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+        
+        .comparison-list li {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: 0.875rem;
+        }
+        
+        .comparison-column--dimmed .comparison-list li {
+            color: var(--text-muted);
+        }
+        
+        .comparison-column--highlight .comparison-list li {
+            color: var(--text-primary);
+        }
+        
+        .comparison-list__icon {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+        
+        .icon--x {
+            color: var(--text-muted);
+        }
+        
+        .icon--check {
+            color: var(--accent);
+        }
+        
+        /* ===== CTA Section ===== */
+        .cta-section {
+            text-align: center;
+            padding: var(--space-16) 24px;
+            border-top: 1px solid var(--border-default);
+        }
+        
+        .cta-section__headline {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            margin-bottom: var(--space-6);
+        }
+        
+        .cta-section__buttons {
+            display: flex;
+            gap: var(--space-3);
+            justify-content: center;
+        }
+        
+        /* ===== Footer ===== */
+        .footer {
+            border-top: 1px solid var(--border-default);
+            padding: var(--space-10) 24px var(--space-6);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .footer__grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-8);
+            margin-bottom: var(--space-8);
+        }
+        
+        .footer__column-title {
+            font-family: var(--font-display);
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-4);
+        }
+        
+        .footer__links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+        
+        .footer__link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.15s ease;
+        }
+        
+        .footer__link:hover {
+            color: var(--text-primary);
+        }
+        
+        .footer__bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: var(--space-6);
+            border-top: 1px solid var(--border-default);
+        }
+        
+        .footer__copyright {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+        
+        .footer__social {
+            display: flex;
+            gap: var(--space-4);
+        }
+        
+        .footer__social-link {
+            color: var(--text-secondary);
+            transition: color 0.15s ease;
+        }
+        
+        .footer__social-link:hover {
+            color: var(--text-primary);
+        }
+        
+        /* ===== Responsive ===== */
+        @media (max-width: 1024px) {
+            .hero__headline {
+                font-size: 2.5rem;
+            }
+            
+            .agents {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .footer__grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .nav__links {
+                display: none;
+            }
+            
+            .hero__headline {
+                font-size: 2rem;
+            }
+            
+            .agents {
+                grid-template-columns: 1fr;
+            }
+            
+            .confidence-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+                gap: var(--space-6);
+            }
+            
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+            
+            .cta-section__buttons {
+                flex-direction: column;
+            }
+            
+            .footer__grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer__bottom {
+                flex-direction: column;
+                gap: var(--space-4);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <a href="/" class="nav__logo">Ainary</a>
+        <ul class="nav__links">
+            <li><a href="/tools" class="nav__link">Tools</a></li>
+            <li><a href="/daily-brief" class="nav__link">Daily Brief</a></li>
+            <li><a href="/blog" class="nav__link">Blog</a></li>
+            <li><a href="/pricing" class="nav__link">Pricing</a></li>
+        </ul>
+        <div class="nav__cta">
+            <a href="/login" class="btn btn--ghost">Log in</a>
+            <a href="/signup" class="btn btn--secondary">Sign up</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero section">
+        <span class="badge">HOW WE BUILD</span>
+        <h1 class="hero__headline">Quality isn't a feature. It's architecture.</h1>
+        <p class="hero__subtitle">Most AI tools are a single prompt wrapped in a UI. We built something fundamentally different: a multi-agent system that researches, critiques, and synthesizes — the way the best consulting teams work.
+        </p>
+        <p class="hero__tagline" style="font-family: var(--font-mono); font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); margin-top: 32px;">Human × AI = Compounded Intelligence</p>
+    </section>
+
+    <!-- Section 1: Why 5 Agents -->
+    <section class="section section--narrow">
+        <h2 class="section__headline">Fewer agents. Deeper analysis.</h2>
+        <p class="section__description">We didn't add agents until we ran out of ideas. Each one has a specific job. They work in parallel, challenge each other, then synthesize. More agents would dilute the process. Five is the sweet spot.</p>
+        
+        <div class="agents">
+            <div class="agent-card">
+                <svg class="agent-card__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <div class="agent-card__name">Researcher</div>
+                <div class="agent-card__description">Scans 243 sources. Finds what matters.</div>
+            </div>
+            
+            <div class="agent-card">
+                <svg class="agent-card__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                <div class="agent-card__name">Analyst</div>
+                <div class="agent-card__description">Structures raw data into insights.</div>
+            </div>
+            
+            <div class="agent-card">
+                <svg class="agent-card__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m16 12-4-4-4 4"/><path d="M12 16V8"/></svg>
+                <div class="agent-card__name">Strategist</div>
+                <div class="agent-card__description">Connects dots. Identifies patterns.</div>
+            </div>
+            
+            <div class="agent-card">
+                <svg class="agent-card__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                <div class="agent-card__name">Critic</div>
+                <div class="agent-card__description">Challenges every conclusion.</div>
+            </div>
+            
+            <div class="agent-card">
+                <svg class="agent-card__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="4"/></svg>
+                <div class="agent-card__name">Synthesizer</div>
+                <div class="agent-card__description">Distills into actionable intelligence.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Hyperthink -->
+    <section class="section section--narrow">
+        <h2 class="section__headline">Every insight survives three rounds of scrutiny.</h2>
+        
+        <div class="process">
+            <div class="process-step">
+                <div class="process-step__number">1</div>
+                <div class="process-step__title">Generate</div>
+                <div class="process-step__description">5 agents work independently. No groupthink.</div>
+            </div>
+            
+            <div class="process-step">
+                <div class="process-step__number">2</div>
+                <div class="process-step__title">Critique</div>
+                <div class="process-step__description">Each agent challenges the others' findings. Weak claims get eliminated.</div>
+            </div>
+            
+            <div class="process-step">
+                <div class="process-step__number">3</div>
+                <div class="process-step__title">Synthesize</div>
+                <div class="process-step__description">Surviving insights merge into a coherent intelligence report. Cited sources included.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Honest About Gaps -->
+    <section class="section">
+        <h2 class="section__headline">We tell you what we don't know.</h2>
+        <p class="section__description">Most AI tools hallucinate with confidence. We built confidence indicators into every insight. Green means strong data. Yellow means limited sources. Red means we're speculating — and we'll tell you why.</p>
+        
+        <div class="confidence-grid">
+            <div class="confidence-card">
+                <div class="confidence-card__dots">
+                    <div class="confidence-card__dot dot--green"></div>
+                    <div class="confidence-card__dot dot--green"></div>
+                    <div class="confidence-card__dot dot--green"></div>
+                </div>
+                <div class="confidence-card__label">High Confidence</div>
+                <div class="confidence-card__description">Strong data from multiple sources</div>
+            </div>
+            
+            <div class="confidence-card">
+                <div class="confidence-card__dots">
+                    <div class="confidence-card__dot dot--yellow"></div>
+                    <div class="confidence-card__dot dot--yellow"></div>
+                </div>
+                <div class="confidence-card__label">Medium Confidence</div>
+                <div class="confidence-card__description">Limited but reliable sources</div>
+            </div>
+            
+            <div class="confidence-card">
+                <div class="confidence-card__dots">
+                    <div class="confidence-card__dot dot--red"></div>
+                </div>
+                <div class="confidence-card__label">Low Confidence</div>
+                <div class="confidence-card__description">Speculative — treat with caution</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: The Numbers -->
+    <section class="section">
+        <h2 class="section__headline">The Numbers</h2>
+        
+        <div class="stats">
+            <div class="stat">
+                <div class="stat__number">90 sec</div>
+                <div class="stat__label">Average report time</div>
+            </div>
+            
+            <div class="stat">
+                <div class="stat__number">243</div>
+                <div class="stat__label">Sources scanned daily</div>
+            </div>
+            
+            <div class="stat">
+                <div class="stat__number">5</div>
+                <div class="stat__label">Specialized agents</div>
+            </div>
+            
+            <div class="stat">
+                <div class="stat__number">3</div>
+                <div class="stat__label">Synthesis rounds</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 5: Architecture, Not Prompts -->
+    <section class="section">
+        <h2 class="section__headline">This is what sets us apart.</h2>
+        
+        <div class="comparison">
+            <div class="comparison-column comparison-column--dimmed">
+                <div class="comparison-column__title">Generic AI</div>
+                <ul class="comparison-list">
+                    <li>
+                        <svg class="comparison-list__icon icon--x" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                        Single prompt
+                    </li>
+                    <li>
+                        <svg class="comparison-list__icon icon--x" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                        No verification
+                    </li>
+                    <li>
+                        <svg class="comparison-list__icon icon--x" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                        Hallucinated confidence
+                    </li>
+                    <li>
+                        <svg class="comparison-list__icon icon--x" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                        No source attribution
+                    </li>
+                    <li>
+                        <svg class="comparison-list__icon icon--x" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                        Same output every time
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="comparison-column comparison-column--highlight">
+                <div class="comparison-column__title">Our Intelligence Engine</div>
+                <ul class="comparison-list">
+                    <li>
+                        <svg class="comparison-list__icon icon--check" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                        5 specialized agents
+                    </li>
+                    <li>
+                        <svg class="comparison-list__icon icon--check" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                        3-round critical review
+                    </li>
+                    <li>
+                        <svg class="comparison-list__icon icon--check" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                        Confidence indicators
+                    </li>
+                    <li>
+                        <svg class="comparison-list__icon icon--check" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                        243 cited sources
+                    </li>
+                    <li>
+                        <svg class="comparison-list__icon icon--check" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                        Unique synthesis per query
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <h2 class="cta-section__headline">See it in action.</h2>
+        <div class="cta-section__buttons">
+            <a href="/try-xray" class="btn btn--primary">Try X-Ray Free</a>
+            <a href="/sample-report" class="btn btn--secondary">Read a sample report</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer__grid">
+            <div class="footer__column">
+                <div class="footer__column-title">Product</div>
+                <ul class="footer__links">
+                    <li><a href="/tools" class="footer__link">Intelligence Tools</a></li>
+                    <li><a href="/daily-brief" class="footer__link">Daily Brief</a></li>
+                    <li><a href="/pricing" class="footer__link">Pricing</a></li>
+                    <li><a href="/quality" class="footer__link">How We Build</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer__column">
+                <div class="footer__column-title">Resources</div>
+                <ul class="footer__links">
+                    <li><a href="/blog" class="footer__link">Blog</a></li>
+                    <li><a href="/docs" class="footer__link">Documentation</a></li>
+                    <li><a href="/api" class="footer__link">API</a></li>
+                    <li><a href="/support" class="footer__link">Support</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer__column">
+                <div class="footer__column-title">Company</div>
+                <ul class="footer__links">
+                    <li><a href="/about" class="footer__link">About</a></li>
+                    <li><a href="/careers" class="footer__link">Careers</a></li>
+                    <li><a href="/contact" class="footer__link">Contact</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer__column">
+                <div class="footer__column-title">Legal</div>
+                <ul class="footer__links">
+                    <li><a href="/privacy" class="footer__link">Privacy</a></li>
+                    <li><a href="/terms" class="footer__link">Terms</a></li>
+                    <li><a href="/security" class="footer__link">Security</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer__bottom">
+            <div class="footer__copyright">© 2026 Ainary. All rights reserved.</div>
+            <div class="footer__social">
+                <a href="https://twitter.com/ainary" class="footer__social-link" aria-label="Twitter">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
+                </a>
+                <a href="https://linkedin.com/company/ainary" class="footer__social-link" aria-label="LinkedIn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+                </a>
+                <a href="https://github.com/ainary" class="footer__social-link" aria-label="GitHub">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+                </a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
