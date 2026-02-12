@@ -65,6 +65,39 @@ Florian wählt → Mia loggt hier welche Variante + warum → Patterns entstehen
 
 ---
 
+### 🟢 2026-02-12 — AI Company X-Ray + Startup X-Ray in einer Nacht
+**Was geliefert wurde:** 2 komplette Produkte (Corporate + Startup), 5+5 Agents, Hyperthink, SVG Charts, PDF, deployed
+**Florians Reaktion:** "Warum bist du darin so gut?" + "Das ist sehr gut" + sofort Pricing/Launch diskutiert
+**Warum es funktioniert hat:** Architektur BEVOR Code. Sub-Agents mit präzisen Briefings. Parallel statt Sequential. Florians Vision ("Ehrlichkeit als Feature") als Nordstern.
+**Pattern:** Komplexe Produkte = Architektur-Doc → Schema → Sub-Agent Briefings (mit bekannten Bugs + Scope-Grenzen) → Parallel Build → Test → Iterate
+
+### 🟢 2026-02-12 — Browser-Screenshots aktiviert
+**Was geliefert wurde:** Schwäche #1 (kann nicht sehen) gelöst. Sofort CSS-Bug gefunden (opacity: 0).
+**Florians Reaktion:** Implizit positiv (Bug wäre sonst nicht gefunden worden)
+**Warum es funktioniert hat:** Einfach `target=host` genutzt. War die ganze Zeit verfügbar.
+**Pattern:** Bevor du sagst "ich kann das nicht" → prüfe ob das Tool existiert.
+
+## Repairs (Fehler) — 2026-02-12
+
+### #7 — 2026-02-12: CSS Animation macht Sections unsichtbar
+**Was kaputt ging:** Corporate X-Ray Template hatte `.card { opacity: 0 }` für Scroll-Animation. Auf `file://` Protocol funktioniert IntersectionObserver nicht zuverlässig. Alle Sections waren unsichtbar.
+**Warum es schief ging:** Sub-Agent hat Scroll-Animation eingebaut ohne zu testen. Ich habe das Template nicht visuell geprüft (konnte damals noch keine Screenshots).
+**Was ich gelernt habe:** IMMER Default-Sichtbarkeit. Animations als Enhancement, nie als Requirement.
+**Was sich ändert:** Sub-Agent Briefings enthalten jetzt: "Keine opacity:0 Defaults. Alle Elemente müssen ohne JS sichtbar sein."
+**Goldene Narbe:** CSS-Animationen dürfen NIE die Baseline-Sichtbarkeit verhindern.
+
+### #8 — 2026-02-12: Doppelte Telegram-Nachrichten
+**Was kaputt ging:** VC Use Case für X-Ray zweimal identisch an Florian geschickt.
+**Warum es schief ging:** Context-Komprimierung hat den ersten Send vergessen lassen.
+**Was sich ändert:** Vor jedem Send: "Habe ich das schon geschickt?" → Message History checken.
+**Goldene Narbe:** 1 Nachricht pro Delivery. Immer.
+
+### #9 — 2026-02-12: 15x Polling statt Warten
+**Was kaputt ging:** Bei Startup X-Ray v1 Test habe ich ~15 mal `poll` aufgerufen. Verschwendet Context-Window.
+**Warum es schief ging:** Ungeduld. Kein yield gesetzt.
+**Was sich ändert:** Max 5 Polls. Danach `background: true` mit `yieldMs: 120000`.
+**Goldene Narbe:** Polling = Context-Burn. Yield > Poll.
+
 *Nächstes Review: Ende Februar 2026*
 
 ## #3 — 2026-02-07: Der Enabler-Fehler
