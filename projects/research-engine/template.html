@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Research Engine — Intelligence Brief {{REPORT_DATE}}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-card: #12121a;
+      --bg-card-hover: #1a1a24;
+      --accent-emerald: #10b981;
+      --accent-teal: #14b8a6;
+      --text-primary: #e5e7eb;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(255, 255, 255, 0.15);
+    }
+
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent-emerald), var(--accent-teal));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+
+    .header .description {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      max-width: 800px;
+      margin: 0 auto 1.5rem;
+      line-height: 1.7;
+    }
+
+    .header .subtitle {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+    }
+
+    .header .meta {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-top: 1rem;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Source Stats */
+    .source-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-bottom: 3rem;
+    }
+
+    .stat {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .stat:hover {
+      border-color: var(--accent-emerald);
+      transform: translateY(-2px);
+    }
+
+    .stat-icon {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      display: block;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-value {
+      display: block;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--accent-emerald);
+    }
+
+    /* Section */
+    .section {
+      margin-bottom: 3rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-icon {
+      width: 32px;
+      height: 32px;
+      flex-shrink: 0;
+    }
+
+    .section-header h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+    }
+
+    /* Signal Card */
+    .signal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .signal-card:hover {
+      border-color: var(--accent-emerald);
+      background: var(--bg-card-hover);
+    }
+
+    .signal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .signal-header h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      flex: 1;
+    }
+
+    .signal-strength {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .strength-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .strength-bar {
+      display: flex;
+      gap: 4px;
+    }
+
+    .strength-bar .bar {
+      width: 8px;
+      height: 24px;
+      background: rgba(16, 185, 129, 0.2);
+      border-radius: 2px;
+    }
+
+    .strength-bar .bar.active {
+      background: var(--accent-emerald);
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+    }
+
+    .signal-why {
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+
+    .signal-sources {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .source-tag {
+      display: inline-block;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-emerald);
+      padding: 0.25rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    /* Deep Dive Card */
+    .dive-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .dive-card:hover {
+      border-color: var(--accent-teal);
+      background: var(--bg-card-hover);
+    }
+
+    .dive-card h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: var(--accent-teal);
+    }
+
+    .dive-summary {
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+
+    .dive-investigate {
+      background: rgba(20, 184, 166, 0.1);
+      border-left: 3px solid var(--accent-teal);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 4px;
+    }
+
+    .dive-investigate strong {
+      color: var(--accent-teal);
+    }
+
+    /* Contrarian Card */
+    .contrarian-card {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.05), rgba(249, 115, 22, 0.05));
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .contrarian-card h4 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #fca5a5;
+    }
+
+    .contrarian-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .contrarian-col strong {
+      display: block;
+      color: #f97316;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .contrarian-col p {
+      color: var(--text-secondary);
+    }
+
+    /* Pattern Card */
+    .pattern-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .pattern-card h4 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: var(--accent-emerald);
+    }
+
+    .pattern-card p {
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+
+    /* Source Insight */
+    .source-insight {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .source-insight strong {
+      color: var(--accent-emerald);
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Deeper Analysis Banner */
+    .deeper-analysis {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(20, 184, 166, 0.1));
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 3rem 0;
+      text-align: center;
+    }
+
+    .deeper-analysis h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--accent-emerald);
+    }
+
+    .deeper-analysis p {
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .deeper-analysis-btn {
+      display: inline-block;
+      background: var(--accent-emerald);
+      color: #000;
+      padding: 0.75rem 2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .deeper-analysis-btn:hover {
+      background: var(--accent-teal);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+    }
+
+    .download-btn {
+      display: inline-block;
+      background: var(--accent-emerald);
+      color: #000;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+      margin-top: 1rem;
+    }
+
+    .download-btn:hover {
+      background: var(--accent-teal);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+    }
+
+    /* Email Gate Modal */
+    .email-gate-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+
+    .email-gate-overlay.active {
+      display: flex;
+    }
+
+    .email-gate-modal {
+      background: var(--bg-card);
+      border: 1px solid var(--accent-emerald);
+      border-radius: 16px;
+      padding: 2.5rem;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .email-gate-modal h3 {
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+      color: var(--accent-emerald);
+    }
+
+    .email-gate-modal p {
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+    }
+
+    .email-gate-modal input {
+      width: 100%;
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      color: var(--text-primary);
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .email-gate-modal input:focus {
+      outline: none;
+      border-color: var(--accent-emerald);
+    }
+
+    .email-gate-modal button {
+      width: 100%;
+      background: var(--accent-emerald);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      padding: 0.875rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .email-gate-modal button:hover {
+      background: var(--accent-teal);
+      transform: translateY(-2px);
+    }
+
+    .email-gate-modal .close-btn {
+      background: transparent;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+
+    .email-gate-modal .close-btn:hover {
+      background: transparent;
+      color: var(--text-primary);
+      transform: none;
+    }
+
+    /* Feedback Section */
+    .feedback-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 3rem 0;
+      text-align: center;
+    }
+
+    .feedback-section h3 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .feedback-section p {
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+    }
+
+    .feedback-section a {
+      color: var(--accent-emerald);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+
+    .feedback-section a:hover {
+      color: var(--accent-teal);
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding-top: 3rem;
+      margin-top: 3rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* Print CSS */
+    @media print {
+      body {
+        background: white;
+        color: black;
+      }
+
+      .email-gate-overlay,
+      .deeper-analysis,
+      .feedback-section {
+        display: none !important;
+      }
+
+      .signal-card,
+      .dive-card,
+      .contrarian-card,
+      .pattern-card,
+      .stat {
+        border: 1px solid #ddd;
+        page-break-inside: avoid;
+      }
+
+      .header h1 {
+        color: #10b981;
+      }
+
+      a {
+        color: #10b981;
+        text-decoration: underline;
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      .signal-header {
+        flex-direction: column;
+      }
+
+      .contrarian-row {
+        grid-template-columns: 1fr;
+      }
+
+      .source-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .email-gate-modal {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>
+        <svg class="section-icon" style="display: inline-block; vertical-align: middle; margin-right: 0.5rem;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="9" stroke="#10b981"/>
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="#10b981"/>
+        </svg>
+        Research Engine
+      </h1>
+      <p class="description">
+        Early Warning System for Bleeding-Edge Ideas — Scanning ArXiv, Hacker News, Reddit, GitHub & VC Blogs to surface emerging signals before they go mainstream.
+      </p>
+      <p class="subtitle">Intelligence Brief — {{REPORT_DATE}}</p>
+      <div class="meta">
+        <div class="meta-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+          </svg>
+          <span>{{TIMEFRAME}}</span>
+        </div>
+        <div class="meta-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M7.5 4.21l4.5 2.6 4.5-2.6"/><path d="M12 22V12"/>
+          </svg>
+          <span>{{TOTAL_ITEMS}} items analyzed</span>
+        </div>
+        <div class="meta-item">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+          <span>Confidence: {{CONFIDENCE}}</span>
+        </div>
+      </div>
+      <button class="download-btn" onclick="openEmailGate()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 0.5rem;">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Download Full Report as PDF
+      </button>
+    </div>
+
+    <!-- Source Stats -->
+    {{SOURCE_STATS}}
+
+    <!-- Source Insights -->
+    {{SOURCE_INSIGHTS}}
+
+    <!-- Emerging Signals -->
+    <div class="section">
+      <div class="section-header">
+        <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="2"/>
+          <circle cx="12" cy="12" r="7" opacity="0.3"/>
+          <circle cx="12" cy="12" r="11" opacity="0.15"/>
+          <path d="M12 2v4m0 12v4M2 12h4m12 0h4"/>
+        </svg>
+        <h2>Emerging Signals</h2>
+      </div>
+      {{EMERGING_SIGNALS}}
+    </div>
+
+    <!-- Deep Dives -->
+    <div class="section">
+      <div class="section-header">
+        <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="M21 21l-4.35-4.35"/>
+          <circle cx="11" cy="11" r="3"/>
+        </svg>
+        <h2>Deep Dives</h2>
+      </div>
+      {{DEEP_DIVES}}
+    </div>
+
+    <!-- Contrarian Corner -->
+    <div class="section">
+      <div class="section-header">
+        <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <h2>Contrarian Corner</h2>
+      </div>
+      {{CONTRARIAN_CORNER}}
+    </div>
+
+    <!-- Cross-Source Patterns -->
+    <div class="section">
+      <div class="section-header">
+        <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="5" cy="5" r="3"/>
+          <circle cx="19" cy="5" r="3"/>
+          <circle cx="5" cy="19" r="3"/>
+          <circle cx="19" cy="19" r="3"/>
+          <line x1="7.5" y1="6.5" x2="16.5" y2="6.5"/>
+          <line x1="6.5" y1="7.5" x2="6.5" y2="16.5"/>
+          <line x1="17.5" y1="7.5" x2="17.5" y2="16.5"/>
+          <line x1="7.5" y1="17.5" x2="16.5" y2="17.5"/>
+        </svg>
+        <h2>Cross-Source Patterns</h2>
+      </div>
+      {{CROSS_SOURCE_PATTERNS}}
+    </div>
+
+    <!-- Want Deeper Analysis Banner -->
+    <div class="deeper-analysis">
+      <h3>📊 Want Deeper Analysis?</h3>
+      <p>
+        Get custom research reports tailored to your investment thesis, with deeper dives into specific signals and exclusive trend analysis.
+      </p>
+      <a href="mailto:florian@ainary.ai" class="deeper-analysis-btn">Request Custom Report</a>
+    </div>
+
+    <!-- Feedback Section -->
+    <div class="feedback-section">
+      <h3>💬 Help Us Improve</h3>
+      <p>
+        Was this report useful? What signals did we miss? Your feedback helps us refine the engine.
+      </p>
+      <a href="mailto:florian@ainary.ai?subject=Research Engine Feedback">Send Feedback</a>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>Generated by Research Engine — Early Warning System for Bleeding-Edge AI/Tech</p>
+      <p style="margin-top: 0.5rem; font-size: 0.85rem;">Built by Florian Ziesche</p>
+    </div>
+  </div>
+
+  <!-- Email Gate Modal -->
+  <div class="email-gate-overlay" id="emailGate">
+    <div class="email-gate-modal">
+      <h3>📥 Download Full Report</h3>
+      <p>
+        Enter your email to receive the complete PDF report with all insights, source links, and methodology details.
+      </p>
+      <input type="email" id="emailInput" placeholder="your@email.com" required>
+      <button onclick="submitEmail()">Download PDF Report</button>
+      <button class="close-btn" onclick="closeEmailGate()">Close</button>
+    </div>
+  </div>
+
+  <script>
+    function openEmailGate() {
+      document.getElementById('emailGate').classList.add('active');
+    }
+
+    function closeEmailGate() {
+      document.getElementById('emailGate').classList.remove('active');
+    }
+
+    function submitEmail() {
+      const email = document.getElementById('emailInput').value;
+      if (!email || !email.includes('@')) {
+        alert('Please enter a valid email address.');
+        return;
+      }
+      
+      // In production: send email to backend
+      console.log('Email submitted:', email);
+      alert(`Thanks! We'll send the report to ${email} shortly.`);
+      
+      // Trigger PDF download (in production, this would be a real PDF)
+      window.print();
+      
+      closeEmailGate();
+    }
+
+    // Close modal on overlay click
+    document.getElementById('emailGate')?.addEventListener('click', (e) => {
+      if (e.target.id === 'emailGate') closeEmailGate();
+    });
+  </script>
+</body>
+</html>
