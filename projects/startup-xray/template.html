@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{STARTUP_NAME}} — Startup X-Ray</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+      color: #f3f4f6;
+      line-height: 1.7;
+      padding: 0;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 60px;
+      padding: 40px 0;
+      border-bottom: 2px solid rgba(139,92,246,0.2);
+    }
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #8b5cf6;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+    .header .subtitle {
+      font-size: 1.1rem;
+      color: #9ca3af;
+      margin-bottom: 4px;
+    }
+    .header .date {
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+    .section {
+      margin-bottom: 50px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 12px;
+      padding: 30px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid rgba(139,92,246,0.3);
+    }
+    .section-header h2 {
+      font-size: 1.8rem;
+      color: #8b5cf6;
+      font-weight: 700;
+    }
+    .confidence-indicator {
+      font-size: 1.2rem;
+      color: #fbbf24;
+      letter-spacing: 2px;
+      cursor: help;
+    }
+    .deal-score-hero {
+      text-align: center;
+      padding: 40px;
+      background: linear-gradient(135deg, rgba(139,92,246,0.1), rgba(16,185,129,0.05));
+      border-radius: 16px;
+      margin-bottom: 30px;
+    }
+    .deal-score-number {
+      font-size: 5rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #8b5cf6, #10b981);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
+    .deal-score-label {
+      font-size: 1.2rem;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .scorecard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 30px;
+    }
+    .scorecard-item {
+      background: rgba(255,255,255,0.02);
+      padding: 16px;
+      border-radius: 8px;
+      border-left: 3px solid #8b5cf6;
+    }
+    .scorecard-item h4 {
+      color: #8b5cf6;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .scorecard-item .score {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #10b981;
+    }
+    .radar-chart {
+      margin: 30px auto;
+      text-align: center;
+    }
+    p {
+      color: #d1d5db;
+      line-height: 1.8;
+      margin-bottom: 14px;
+    }
+    .bull-bear-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .bull-case {
+      background: rgba(16,185,129,0.05);
+      padding: 20px;
+      border-radius: 8px;
+      border-left: 4px solid #10b981;
+    }
+    .bull-case h3 {
+      color: #10b981;
+      margin-bottom: 12px;
+    }
+    .bear-case {
+      background: rgba(239,68,68,0.05);
+      padding: 20px;
+      border-radius: 8px;
+      border-left: 4px solid #ef4444;
+    }
+    .bear-case h3 {
+      color: #ef4444;
+      margin-bottom: 12px;
+    }
+    .bottom-line {
+      background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(16,185,129,0.05));
+      padding: 30px;
+      border-radius: 12px;
+      border: 2px solid rgba(139,92,246,0.3);
+      margin-top: 30px;
+    }
+    .recommendation {
+      display: inline-block;
+      padding: 10px 24px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 1.2rem;
+      margin-bottom: 16px;
+    }
+    .recommendation.INVEST {
+      background: rgba(16,185,129,0.2);
+      color: #10b981;
+      border: 2px solid #10b981;
+    }
+    .recommendation.PASS {
+      background: rgba(239,68,68,0.2);
+      color: #ef4444;
+      border: 2px solid #ef4444;
+    }
+    .recommendation.DIG_DEEPER {
+      background: rgba(251,191,36,0.2);
+      color: #fbbf24;
+      border: 2px solid #fbbf24;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 60px;
+      padding: 30px 0;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      color: #6b7280;
+      font-size: 0.9rem;
+    }
+    .footer a {
+      color: #8b5cf6;
+      text-decoration: none;
+    }
+    .footer a:hover {
+      text-decoration: underline;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      background: #1a1a2e;
+      padding: 40px;
+      border-radius: 16px;
+      max-width: 500px;
+      width: 90%;
+      border: 2px solid rgba(139,92,246,0.3);
+    }
+    .modal h3 {
+      color: #8b5cf6;
+      margin-bottom: 20px;
+      font-size: 1.8rem;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      color: #9ca3af;
+      font-size: 0.9rem;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      color: #f3f4f6;
+      font-size: 1rem;
+    }
+    .form-group input:focus {
+      outline: none;
+      border-color: #8b5cf6;
+    }
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .btn:hover {
+      background: linear-gradient(135deg, #7c3aed, #5b21b6);
+    }
+    @media (max-width: 768px) {
+      .scorecard-grid, .bull-bear-grid {
+        grid-template-columns: 1fr;
+      }
+      .header h1 {
+        font-size: 2rem;
+      }
+      .deal-score-number {
+        font-size: 3.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>{{STARTUP_NAME}}</h1>
+      <div class="subtitle">Startup X-Ray — AI-Powered Due Diligence</div>
+      <div class="date">{{DATE}}</div>
+    </div>
+
+    <!-- TL;DR & Deal Score -->
+    <div class="section">
+      <div class="section-header">
+        <h2>Deal Score</h2>
+        <span class="confidence-indicator" title="{{OVERALL_CONFIDENCE_LABEL}}">{{OVERALL_CONFIDENCE}}</span>
+      </div>
+      <div class="deal-score-hero">
+        <div class="deal-score-number">{{DEAL_SCORE}}</div>
+        <div class="deal-score-label">Overall Deal Score</div>
+      </div>
+      <p>{{TLDR}}</p>
+      <p>{{TLDR_DETAIL}}</p>
+    </div>
+
+    <!-- Deal Scorecard -->
+    <div class="section">
+      <div class="section-header">
+        <h2>Deal Scorecard</h2>
+      </div>
+      <div class="radar-chart">
+        <svg viewBox="0 0 200 200" width="300" height="300">
+          <!-- Pentagon background -->
+          <polygon points="100,25 181.7,69.1 156.2,155.1 43.8,155.1 18.3,69.1" 
+                   fill="none" stroke="rgba(139,92,246,0.2)" stroke-width="1"/>
+          <polygon points="100,47.5 163.4,80.5 145.6,145.1 54.4,145.1 36.6,80.5" 
+                   fill="none" stroke="rgba(139,92,246,0.15)" stroke-width="1"/>
+          <polygon points="100,70 145.1,91.9 135.0,135.1 65.0,135.1 54.9,91.9" 
+                   fill="none" stroke="rgba(139,92,246,0.1)" stroke-width="1"/>
+          <!-- Lines from center -->
+          <line x1="100" y1="100" x2="100" y2="25" stroke="rgba(139,92,246,0.2)" stroke-width="1"/>
+          <line x1="100" y1="100" x2="181.7" y2="69.1" stroke="rgba(139,92,246,0.2)" stroke-width="1"/>
+          <line x1="100" y1="100" x2="156.2" y2="155.1" stroke="rgba(139,92,246,0.2)" stroke-width="1"/>
+          <line x1="100" y1="100" x2="43.8" y2="155.1" stroke="rgba(139,92,246,0.2)" stroke-width="1"/>
+          <line x1="100" y1="100" x2="18.3" y2="69.1" stroke="rgba(139,92,246,0.2)" stroke-width="1"/>
+          <!-- Data polygon -->
+          <polygon points="{{RADAR_POLYGON}}" fill="rgba(139,92,246,0.3)" stroke="#8b5cf6" stroke-width="2"/>
+          <!-- Labels -->
+          <text x="100" y="18" text-anchor="middle" fill="#8b5cf6" font-size="10" font-weight="600">TEAM</text>
+          <text x="190" y="72" text-anchor="start" fill="#8b5cf6" font-size="10" font-weight="600">MARKET</text>
+          <text x="162" y="170" text-anchor="start" fill="#8b5cf6" font-size="10" font-weight="600">PRODUCT</text>
+          <text x="38" y="170" text-anchor="end" fill="#8b5cf6" font-size="10" font-weight="600">TRACTION</text>
+          <text x="10" y="72" text-anchor="end" fill="#8b5cf6" font-size="10" font-weight="600">TIMING</text>
+        </svg>
+      </div>
+      <div class="scorecard-grid">
+        <div class="scorecard-item">
+          <h4>Team</h4>
+          <div class="score">{{DEAL_SCORE_TEAM}}/100</div>
+        </div>
+        <div class="scorecard-item">
+          <h4>Market</h4>
+          <div class="score">{{DEAL_SCORE_MARKET}}/100</div>
+        </div>
+        <div class="scorecard-item">
+          <h4>Product</h4>
+          <div class="score">{{DEAL_SCORE_PRODUCT}}/100</div>
+        </div>
+        <div class="scorecard-item">
+          <h4>Traction</h4>
+          <div class="score">{{DEAL_SCORE_TRACTION}}/100</div>
+        </div>
+        <div class="scorecard-item">
+          <h4>Timing</h4>
+          <div class="score">{{DEAL_SCORE_TIMING}}/100</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Founder X-Ray -->
+    <div class="section">
+      <div class="section-header">
+        <h2>Founder X-Ray</h2>
+        <span class="confidence-indicator" title="Founder data confidence">{{CONFIDENCE_FOUNDERS}}</span>
+      </div>
+      {{FOUNDERS_HTML}}
+      <h3 style="color: #8b5cf6; margin: 24px 0 12px 0;">Founder-Market Fit</h3>
+      <p>{{FOUNDER_MARKET_FIT}}</p>
+    </div>
+
+    <!-- Market Opportunity -->
+    <div class="section">
+      <div class="section-header">
+        <h2>Market Opportunity</h2>
+        <span class="confidence-indicator" title="Market data confidence">{{CONFIDENCE_MARKET}}</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+        <div style="text-align: center; padding: 16px; background: rgba(139,92,246,0.05); border-radius: 8px;">
+          <div style="font-size: 0.8rem; color: #9ca3af; margin-bottom: 4px;">TAM</div>
+          <div style="font-size: 1.5rem; font-weight: 700; color: #8b5cf6;">{{TAM}}</div>
+        </div>
+        <div style="text-align: center; padding: 16px; background: rgba(139,92,246,0.05); border-radius: 8px;">
+          <div style="font-size: 0.8rem; color: #9ca3af; margin-bottom: 4px;">SAM</div>
+          <div style="font-size: 1.5rem; font-weight: 700; color: #8b5cf6;">{{SAM}}</div>
+        </div>
+        <div style="text-align: center; padding: 16px; background: rgba(139,92,246,0.05); border-radius: 8px;">
+          <div style="font-size: 0.8rem; color: #9ca3af; margin-bottom: 4px;">SOM</div>
+          <div style="font-size: 1.5rem; font-weight: 700; color: #8b5cf6;">{{SOM}}</div>
+        </div>
+      </div>
+      <h3 style="color: #8b5cf6; margin: 24px 0 12px 0;">Market Timing: Why Now?</h3>
+      <p>{{MARKET_TIMING}}</p>
+      <h3 style="color: #8b5cf6; margin: 24px 0 12px 0;">Market Dynamics</h3>
+      <p>{{MARKET_DYNAMICS}}</p>
+    </div>
+
+    <!-- Competitive Landscape -->
+    <div class="section">
+      <div class="section-header">
+        <h2>Competitive Landscape</h2>
+        <span class="confidence-indicator" title="Competitive data confidence">{{CONFIDENCE_COMPETITIVE}}</span>
+      </div>
+      {{COMPETITORS_HTML}}
+      <h3 style="color: #8b5cf6; margin: 24px 0 12px 0;">Defensibility Analysis</h3>
+      <div style="margin: 16px 0;">
+        <div style="background: rgba(139,92,246,0.1); height: 12px; border-radius: 6px; overflow: hidden;">
+          <div style="background: linear-gradient(90deg, #8b5cf6, #10b981); width: {{DEFENSIBILITY_SCORE}}%; height: 100%;"></div>
+        </div>
+        <div style="text-align: right; margin-top: 4px; color: #9ca3af; font-size: 0.9rem;">
+          Defensibility Score: {{DEFENSIBILITY_SCORE}}/100
+        </div>
+      </div>
+      <p>{{DEFENSIBILITY}}</p>
+    </div>
+
+    <!-- Traction & Growth -->
+    <div class="section">
+      <div class="section-header">
+        <h2>Traction & Growth</h2>
+        <span class="confidence-indicator" title="Traction data confidence">{{CONFIDENCE_TRACTION}}</span>
+      </div>
+      <p>{{TRACTION_ASSESSMENT}}</p>
+      <div style="margin-top: 20px; padding: 16px; background: rgba(251,191,36,0.05); border-left: 3px solid #fbbf24; border-radius: 6px;">
+        <strong style="color: #fbbf24;">⚠️ Data Transparency Note:</strong>
+        <p style="margin: 8px 0 0 0; font-size: 0.9rem;">Most startups don't publicly disclose detailed traction metrics. The assessment above is based on available public information and industry benchmarks. Key data gaps should be addressed in founder conversations.</p>
+      </div>
+    </div>
+
+    <!-- Financial Assessment -->
+    <div class="section">
+      <div class="section-header">
+        <h2>Financial Assessment</h2>
+        <span class="confidence-indicator" title="Financial data confidence">{{CONFIDENCE_FINANCIAL}}</span>
+      </div>
+      <h3 style="color: #8b5cf6; margin: 0 0 12px 0;">Valuation Estimate</h3>
+      <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+        <div style="flex: 1; text-align: center; padding: 20px; background: rgba(16,185,129,0.05); border-radius: 8px;">
+          <div style="font-size: 0.85rem; color: #9ca3af; margin-bottom: 4px;">Low Estimate</div>
+          <div style="font-size: 1.8rem; font-weight: 700; color: #10b981;">{{VALUATION_LOW}}</div>
+        </div>
+        <div style="flex: 1; text-align: center; padding: 20px; background: rgba(139,92,246,0.05); border-radius: 8px;">
+          <div style="font-size: 0.85rem; color: #9ca3af; margin-bottom: 4px;">High Estimate</div>
+          <div style="font-size: 1.8rem; font-weight: 700; color: #8b5cf6;">{{VALUATION_HIGH}}</div>
+        </div>
+      </div>
+      <h3 style="color: #8b5cf6; margin: 24px 0 12px 0;">Comparable Deals</h3>
+      {{COMPARABLES_HTML}}
+      <h3 style="color: #8b5cf6; margin: 24px 0 12px 0;">Unit Economics Assessment</h3>
+      <p>{{UNIT_ECONOMICS}}</p>
+    </div>
+
+    <!-- Growth Levers -->
+    <div class="section">
+      <div class="section-header">
+        <h2>Growth Levers</h2>
+      </div>
+      {{GROWTH_LEVERS_HTML}}
+    </div>
+
+    <!-- Devil's Advocate -->
+    <div class="section" style="background: rgba(239,68,68,0.03); border: 1px solid rgba(239,68,68,0.2);">
+      <div class="section-header">
+        <h2 style="color: #ef4444;">Devil's Advocate</h2>
+      </div>
+      {{DEVILS_ADVOCATE_HTML}}
+    </div>
+
+    <!-- Investment Thesis vs Anti-Thesis -->
+    <div class="section">
+      <div class="section-header">
+        <h2>Investment Thesis</h2>
+        <span class="confidence-indicator" title="Thesis confidence">{{CONFIDENCE_THESIS}}</span>
+      </div>
+      <div class="bull-bear-grid">
+        <div class="bull-case">
+          <h3>🚀 Bull Case</h3>
+          <p>{{BULL_CASE}}</p>
+        </div>
+        <div class="bear-case">
+          <h3>⚠️ Bear Case</h3>
+          <p>{{BEAR_CASE}}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 Questions for the Founder -->
+    <div class="section">
+      <div class="section-header">
+        <h2>5 Questions for the Founder</h2>
+      </div>
+      {{QUESTIONS_HTML}}
+    </div>
+
+    <!-- Bottom Line -->
+    <div class="section">
+      <div class="section-header">
+        <h2>Bottom Line</h2>
+      </div>
+      <div class="bottom-line">
+        <div class="recommendation {{RECOMMENDATION}}">{{RECOMMENDATION}}</div>
+        <p>{{BOTTOM_LINE_REASONING}}</p>
+      </div>
+    </div>
+
+    <!-- Data Confidence Report -->
+    <div class="section">
+      <div class="section-header">
+        <h2>Data Confidence Report</h2>
+      </div>
+      <p style="margin-bottom: 20px;">This report is based on publicly available information. The confidence indicators show data quality for each section:</p>
+      <div style="margin: 16px 0; padding: 12px; background: rgba(255,255,255,0.02); border-radius: 8px;">
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; font-size: 0.85rem;">
+          <div><strong>●●●●●</strong> High Confidence (15+ sources)</div>
+          <div><strong>●●●●○</strong> Good Confidence (8-14 sources)</div>
+          <div><strong>●●●○○</strong> Moderate (3-7 sources)</div>
+          <div><strong>●●○○○</strong> Low (1-2 sources)</div>
+          <div><strong>●○○○○</strong> Speculative (estimates only)</div>
+        </div>
+      </div>
+      {{CONFIDENCE_REPORT_HTML}}
+      <div style="margin-top: 20px; padding: 16px; background: rgba(139,92,246,0.05); border-radius: 8px;">
+        <p style="font-size: 0.9rem; color: #9ca3af; margin: 0;">
+          <strong style="color: #8b5cf6;">Methodology:</strong> This analysis was generated by a 5-agent AI system (Scanner, Market Analyst, Investor Analyst, Financier, Devil's Advocate) with 3 rounds of synthesis and critique. Confidence scores are based on source count and data availability. All estimates are clearly flagged.
+        </p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p><strong>Startup X-Ray</strong> by <a href="https://ainary.ventures">Ainary Ventures</a></p>
+      <p>Created by Florian Ziesche · Powered by AI Due Diligence Engine</p>
+      <p style="margin-top: 12px; font-size: 0.8rem;">
+        This report is for informational purposes only and does not constitute investment advice.
+      </p>
+    </div>
+  </div>
+
+  <!-- Download Modal (for future email-gating) -->
+  <div class="modal" id="downloadModal">
+    <div class="modal-content">
+      <h3>Download Full Report</h3>
+      <form id="downloadForm">
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" name="name" required>
+        </div>
+        <div class="form-group">
+          <label>Email *</label>
+          <input type="email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label>Fund Name (optional)</label>
+          <input type="text" name="fund">
+        </div>
+        <div class="form-group">
+          <label>AUM (optional)</label>
+          <input type="text" name="aum" placeholder="e.g., $50M">
+        </div>
+        <button type="submit" class="btn">Download Due Diligence Report</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Future: Email gate logic for PDF download
+    // Currently just generates PDF directly
+  </script>
+</body>
+</html>
