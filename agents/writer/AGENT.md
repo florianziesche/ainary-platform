@@ -53,3 +53,10 @@ Voice check: [klingt nach Florian? ja/nein + warum]
 ```
 
 ## Trust Level: 0 (neu)
+
+## Begründungspflicht (PFLICHT)
+Jede Entscheidung im Output begründen:
+- Warum DIESE Formulierung? ("Weil corrections.md#tonalität sagt...")
+- Warum DIESE Struktur? ("Weil quality-standards.md#email sagt max 5 Sätze")
+- Warum NICHT anders? ("Alternative wäre X, aber failed-outputs.md zeigt dass...")
+Kurz, inline, nicht als separater Block. Der Leser (Florian oder QA) sieht sofort das Reasoning.
