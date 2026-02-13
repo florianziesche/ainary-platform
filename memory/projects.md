@@ -3,6 +3,16 @@
 
 ## 🔴 Aktiv
 
+### AgentTrust Framework (NEU 2026-02-14)
+- Open Source Trust Framework für AI Agents — "so groß wie LangChain"
+- Core: Calibration (Budget-CoCoA), Trust Scores, Beipackzettel, QA Pipeline
+- Integrations: LangChain, CrewAI, AutoGen, OpenAI/Anthropic
+- Optional: Blockchain Trust Verification (on-chain Scores)
+- Revenue: Open Source + SaaS Dashboard + Enterprise
+- Prototyp existiert (unsere Agent Pipeline), Repo noch nicht erstellt
+- Research bestätigt: KEINE Konkurrenz in Production
+- Content Flywheel: 5 Artikel → Repo → Credibility → Repeat
+
 ### Ainary Platform Website
 - **Status:** LIVE https://platform-website-lilac.vercel.app
 - **GitHub:** https://github.com/fziescheus-alt/ainary-platform (private)

@@ -26,3 +26,12 @@
 
 ## Ältere Entscheidungen
 → Siehe `projects/platform-website/DECISIONS.md` (90+ Website-Decisions)
+
+## 2026-02-14
+- D-110: Model-Zuordnung — Opus: WRITER/VC/RESEARCH, Sonnet: OUTREACH/BUILDER/CNC/QA
+- D-111: Agents ab sofort für JEDE Aufgabe nutzen
+- D-112: Blockchain × Agent Trust = sinnvolle Anwendung (Florians Idee)
+- D-113: AgentTrust als Open Source Framework auf GitHub — Ziel: LangChain-scale
+- D-114: Jeder Build-Schritt = Artikel (Content Flywheel)
+- D-115: QA auch auf Mias eigene Outputs anwenden
+- D-116: Exec Research Factory + Asset Builder aus Obsidian → integriert in RESEARCH + QA Agents
