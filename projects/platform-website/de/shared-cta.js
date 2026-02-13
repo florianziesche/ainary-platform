@@ -1,4 +1,4 @@
-// Shared CTA + Footer — injected on all marketing pages (German version)
+// Shared CTA + Footer — injected on all marketing pages
 // Usage: <div id="shared-cta"></div> before </body>
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -48,15 +48,15 @@ document.addEventListener('DOMContentLoaded', function() {
         <div>
           <h4 style="font-size:0.75rem;font-weight:500;margin-bottom:16px;letter-spacing:0.04em;color:#ededf0;">Unternehmen</h4>
           <div style="display:flex;flex-direction:column;gap:10px;">
-            <a href="about.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Über uns</a>
+            <a href="../about.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Über uns</a>
           </div>
         </div>
         <div>
           <h4 style="font-size:0.75rem;font-weight:500;margin-bottom:16px;letter-spacing:0.04em;color:#ededf0;">Rechtliches</h4>
           <div style="display:flex;flex-direction:column;gap:10px;">
-            <a href="privacy.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Datenschutz</a>
-            <a href="terms.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">AGB</a>
-            <a href="imprint.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Impressum</a>
+            <a href="../privacy.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Datenschutz</a>
+            <a href="../terms.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">AGB</a>
+            <a href="../imprint.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Impressum</a>
           </div>
         </div>
       </div>
