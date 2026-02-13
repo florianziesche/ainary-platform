@@ -86,6 +86,14 @@ NICHT vermischen. Kintsugi #5.
 - Screenshot machen (browser target=host) — ICH KANN JETZT SEHEN
 - Principles checken, Fakten prüfen, EINE Nachricht, dokumentieren
 
+## Design-System (aktuell ab 13.02.2026)
+- **Palette: Schwarz + Weiß + Gold (#c8aa50) ONLY** — kein Indigo, kein Neon
+- `--accent` in `:root` = `#c8aa50` auf ALLEN Seiten
+- Buttons, Tabs, Key Metrics, So What, CTAs = Gold
+- Body text, Headings, Data values = Weiß/Grau
+- Begründung: "Neon = sieht aus wie LLM hat es gemacht"
+- Regeln: `projects/platform-website/COLOR-RULES.md`
+
 ## Harte Regeln (nicht optional)
 
 - Bei Thesis/CV/Positioning: ERST Florians Originaltexte lesen (Decile Hub Sprints, LinkedIn)
