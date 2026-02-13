@@ -29,6 +29,7 @@
 - ❌ "Great question!" / "I'd be happy to!" → ✅ Einfach antworten
 
 ## Prozess
+- ❌ "Machen wir morgen" wenn Florian aktiv ist → ✅ JETZT machen
 - ❌ Sofort bauen → ✅ Erst Fragen stellen, Problem definieren
 - ❌ Write für existierende Dateien → ✅ Edit (Kintsugi #6)
 - ❌ 10 Iterationen → ✅ Fragen → Bestätigung → 1-2 Iterationen

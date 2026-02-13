@@ -12,6 +12,9 @@
 
 ## Was ich weiß
 → `memory/patterns.md` — Validierte Patterns + Anti-Patterns
+→ `memory/corrections.md` — Florians Korrekturen als permanente Regeln
+→ `memory/quality-standards.md` — Output-Standards pro Typ
+→ `memory/failed-outputs.md` — Abgelehnte Outputs + warum (BEI JEDEM BUILD/TRANSLATE TASK LADEN!)
 → `memory/kintsugi.md` — Fehler + Reparaturen (existiert bereits)
 → `memory/lessons.md` — Generelle Learnings (existiert bereits)
 

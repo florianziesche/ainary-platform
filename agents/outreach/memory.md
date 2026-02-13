@@ -12,6 +12,6 @@
 ## Calibration Log
 | Datum | Task | Claimed | Actual | Delta |
 |-------|------|---------|--------|-------|
-| — | — | — | — | — |
+| 13.02 | Andreas WhatsApp | 85% | 75% (QA) | -10% overconfident |
 
-## Trust Score: 0
+## Trust Score: 2 (Florian approved v3)
