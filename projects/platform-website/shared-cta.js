@@ -6,13 +6,16 @@ document.addEventListener('DOMContentLoaded', function() {
   if (!el) return;
 
   el.innerHTML = `
+    <style>
+      @keyframes subtle-pulse { 0%,100% { opacity:1; } 50% { opacity:0.85; } }
+    </style>
     <!-- CTA Section -->
     <section style="padding:100px 0 80px;text-align:center;border-top:1px solid rgba(255,255,255,0.06);">
       <div style="max-width:800px;margin:0 auto;padding:0 24px;">
         <h2 style="font-size:2rem;font-weight:600;letter-spacing:-0.02em;color:#ededf0;margin-bottom:40px;">Better decisions start here.</h2>
         <div style="display:flex;gap:16px;justify-content:center;">
-          <a href="contact.html" style="display:inline-flex;align-items:center;justify-content:center;padding:14px 36px;border-radius:8px;font-size:0.9rem;font-weight:500;text-decoration:none;background:rgba(255,255,255,0.9);color:#08080c;transition:background 0.15s;min-width:170px;">Contact me</a>
-          <a href="signup.html" style="display:inline-flex;align-items:center;justify-content:center;padding:14px 36px;border-radius:8px;font-size:0.9rem;font-weight:500;text-decoration:none;background:rgba(255,255,255,0.9);color:#08080c;transition:background 0.15s;min-width:170px;">Sign up</a>
+          <a href="contact.html" style="display:inline-flex;align-items:center;justify-content:center;padding:14px 36px;border-radius:8px;font-size:0.9rem;font-weight:500;text-decoration:none;background:transparent;color:#ededf0;border:1px solid rgba(255,255,255,0.5);transition:border-color 0.15s;min-width:170px;">Contact me</a>
+          <a href="signup.html" style="display:inline-flex;align-items:center;justify-content:center;padding:14px 36px;border-radius:8px;font-size:0.9rem;font-weight:500;text-decoration:none;background:#c8aa50;color:#ffffff;transition:opacity 0.15s;min-width:170px;animation:subtle-pulse 4s ease-in-out infinite;">Sign up</a>
         </div>
       </div>
     </section>
