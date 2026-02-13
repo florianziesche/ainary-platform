@@ -132,4 +132,45 @@
 
 ---
 
-*Letzte Aktualisierung: 2026-02-11 04:00 (Night Work)*
+## 🌙 Night Work (13.02. 02:00-04:00)
+
+### Deliverables:
+- ✅ **Sachsen Lead Expansion** — 15 neue Leads (local advantage!)
+- ✅ **TOP 5 Contact Research** — 2/5 verified (Funkwerk ✅, Glatt ⚠️)
+- ✅ **Email Templates (Local Angle)** — EFRE Sachsen + Digitalbonus Bayern
+- ✅ **Lead Scoring System** — 10 Tier 1 priorities (8-10 points)
+- ✅ **VC Applications Update** — 3 READY (HOF Capital 🔥, Primary VP, First Round)
+- ✅ **Strategic Positioning** — Sachsen > Bayern (Florian ist VOR ORT)
+
+### Pipeline Update:
+- **35 AI Consulting Leads** (15 Sachsen NEW, 8 Bayern, 5 Thüringen, 7 bundesweit)
+- **10 Tier 1 Leads** (Funkwerk, SITEC, Starrag, Glatt, MBS, SGP, + 4 more)
+- **7 VC Applications READY** (HOF, Primary, First Round, Comcast, Betaworks, Lux, USV)
+- **Projected Revenue:** €30K realistic (10 Tier 1 sends → 3 meetings → 1.5 projects @ €20K)
+
+### KEY INSIGHT:
+**Sachsen = Strategic Advantage:**
+- Florian IST dort (Schlottwitz/Glashütte)
+- EFRE Sachsen 50-60% (besser mit Software als reine Beratung)
+- MBS Case Study = lokale Referenz
+- Kürzere Anfahrten, schnellere Meetings
+
+### Hook:
+> **Sachsen:** "€22.000 CNC-Digitalisierung für €11.000 dank EFRE"  
+> **Bayern:** "€15.000 statt €30.000 dank Bayern Digitalbonus Plus"
+
+### Thursday Action Items (13.02.):
+1. ☐ 09:00-11:00: Contact Research (SITEC, Starrag, SGP + Bayern 4)
+2. ☐ 11:30: Send Funkwerk Email (Kerstin Schreiber) ✅ Contact found
+3. ☐ 12:00: Send MBS Follow-up (Andreas Brand)
+4. ☐ 14:00-15:30: Send 3 VC Applications (HOF 🔥, Primary, First Round)
+5. ☐ LinkedIn: Connection requests (5 decision-makers)
+
+### Files Created:
+- `memory/2026-02-13-night-work.md` (full report)
+- `memory/2026-02-13-night-work-vc.md` (VC focus)
+- `leads/sachsen-priority-leads.md` (10 Tier 1 leads + emails READY)
+
+---
+
+*Letzte Aktualisierung: 2026-02-13 04:00 (Night Work)*
