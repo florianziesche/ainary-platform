@@ -41,7 +41,6 @@ document.addEventListener('DOMContentLoaded', function() {
           <h4 style="font-size:0.75rem;font-weight:500;margin-bottom:16px;letter-spacing:0.04em;color:#ededf0;">Resources</h4>
           <div style="display:flex;flex-direction:column;gap:10px;">
             <a href="blog.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Blog</a>
-            <a href="quality.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">How I Build</a>
             <a href="https://finitematter.substack.com/" target="_blank" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Substack</a>
             <a href="https://linkedin.com/in/florianziesche" target="_blank" style="color:#55555e;text-decoration:none;font-size:0.8rem;">LinkedIn</a>
           </div>
