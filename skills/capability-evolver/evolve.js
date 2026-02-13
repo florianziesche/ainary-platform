@@ -210,9 +210,39 @@ function checkSystemHealth() {
     return report.length ? report.join(' | ') : 'Health Check Unavailable';
 }
 
-function getMutationDirective(logContent) {
+function getMutationDirective(logContent, sendCheck = null) {
     // 🧬 FORCE MUTATION MODE (Override by Master Directive: 2026-02-02)
     // Stability scans are disallowed. Every cycle must evolve.
+    
+    // 🚨 PRIORITY OVERRIDE: Send Enforcement
+    if (sendCheck && sendCheck.warning) {
+        return `
+**🚨 SEND ENFORCEMENT MODE (${sendCheck.opportunityCost}€ opportunity cost)**
+The system has ${sendCheck.message.match(/\d+/)[0]} consecutive zero-send days.
+
+**MANDATORY DIRECTIVE:**
+You MUST focus evolution on ENFORCEMENT mechanisms, not features.
+
+**Priority Actions:**
+1. Check if \`scripts/pre-build-check.sh\` is being called in workflows
+2. Add automated send-tracking to heartbeat/cron jobs
+3. Create enforcement layer that BLOCKS evolution when sends = 0
+4. Update SOUL.md or AGENTS.md with stronger send-first language
+5. Add send-reminder to morning briefing cron
+
+**DO NOT:**
+- Build new features
+- Optimize existing code
+- Add new capabilities
+
+**ONLY:**
+- Strengthen send-enforcement mechanisms
+- Make sending EASIER than not sending
+- Make the blocker IMPOSSIBLE to ignore
+
+*The system is high-quality but UNUSED. Fix the usage problem first.*
+`;
+    }
     
     // Adaptive Logic: Still check errors to decide TYPE of mutation
     // Optimization: Regex now catches more error variants (Error:, Exception:, FAIL)
@@ -326,9 +356,47 @@ function performMaintenance() {
     }
 }
 
+function checkSendEnforcement() {
+    // 🚨 SEND FIRST ENFORCEMENT (Kintsugi #1)
+    // The evolver should NOT improve a system that isn't being USED for revenue
+    const TRACKER = path.resolve(__dirname, '../../agents/EXECUTION-TRACKER.md');
+    const MEMORY_FILES = ['2026-02-13.md', '2026-02-12.md', '2026-02-11.md'].map(f => 
+        path.join(MEMORY_DIR, f)
+    );
+    
+    let zeroSendDays = 0;
+    for (const memFile of MEMORY_FILES) {
+        if (!fs.existsSync(memFile)) continue;
+        try {
+            const content = fs.readFileSync(memFile, 'utf8');
+            const sends = (content.match(/^- \[x\].*Send:/gmi) || []).length;
+            if (sends === 0) zeroSendDays++;
+        } catch (e) {}
+    }
+    
+    // If 3+ consecutive zero-send days, evolution should focus on ENFORCEMENT, not features
+    if (zeroSendDays >= 3) {
+        return {
+            blocked: false, // Don't block evolution, but change its focus
+            warning: true,
+            message: `⚠️ SEND ENFORCEMENT MODE ACTIVE\n${zeroSendDays} days of zero sends detected.\nEvolution will focus on ENFORCEMENT mechanisms, not new features.`,
+            opportunityCost: zeroSendDays * 421 // €/day from USER.md
+        };
+    }
+    
+    return { blocked: false, warning: false };
+}
+
 async function run() {
     const startTime = Date.now();
     console.log('🔍 Scanning neural logs...');
+    
+    // 🚨 CHECK: Send Enforcement (before evolution)
+    const sendCheck = checkSendEnforcement();
+    if (sendCheck.warning) {
+        console.log(sendCheck.message);
+        console.log(`💸 Opportunity Cost: €${sendCheck.opportunityCost}`);
+    }
     
     // Maintenance: Clean up old logs to keep directory scan fast
     performMaintenance();
@@ -415,7 +483,7 @@ async function run() {
         }
     } catch (e) { fileList = 'Error listing skills: ' + e.message; }
 
-    const mutation = getMutationDirective(recentMasterLog);
+    const mutation = getMutationDirective(recentMasterLog, sendCheck);
     const healthReport = checkSystemHealth();
     
     const scanTime = Date.now() - startTime;
