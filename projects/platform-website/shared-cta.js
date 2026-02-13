@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <p style="color:#8b8b95;font-size:1.1rem;font-weight:500;margin-bottom:32px;">HUMAN × AI SYSTEMS = LEVERAGE</p>
         <div style="display:flex;gap:16px;justify-content:center;margin-bottom:32px;">
           <a href="contact.html" style="display:inline-flex;align-items:center;justify-content:center;padding:12px 32px;border-radius:8px;font-size:0.85rem;font-weight:500;text-decoration:none;background:#ededf0;color:#08080c;transition:background 0.15s;min-width:160px;">Contact me</a>
-          <a href="signup.html" style="display:inline-flex;align-items:center;justify-content:center;padding:12px 32px;border-radius:8px;font-size:0.85rem;font-weight:500;text-decoration:none;background:#c8aa50;color:#08080c;transition:background 0.15s;min-width:160px;">Sign up</a>
+          <a href="signup.html" style="display:inline-flex;align-items:center;justify-content:center;padding:12px 32px;border-radius:8px;font-size:0.85rem;font-weight:500;text-decoration:none;background:#c8aa50;color:#ededf0;transition:background 0.15s;min-width:160px;">Sign up</a>
         </div>
         <div style="display:flex;justify-content:center;gap:0;flex-wrap:wrap;margin-bottom:12px;">
           ${links}
