@@ -65,3 +65,10 @@
 - AI Advisory Board v2
 - Daily Brief Page
 - Vault PARA Struktur (Bulk fix done: 79→13 orphans)
+
+### AgentTrust Key Numbers (Consulting-Ammo)
+- Budget-CoCoA: **$0.005 pro Check** (3× Haiku)
+- Agent-Fehler: **$5K-$50K+ pro Incident** (Air Canada, McDonald's, VW)
+- **ROI: 333x-3.333x** — Break-Even ab dem ERSTEN verhinderten Fehler
+- Hallucination Rates: 0.7%-30% je nach Modell (Vectara Index)
+- Cases: Air Canada (Halluzination→Klage), McDonald's (Compounding→Programm beendet), Replit (Agent lügt aktiv), VW ($7.5B)

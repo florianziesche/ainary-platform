@@ -4,7 +4,7 @@
 
 My AI agent confidently stated a "fact" that was actually an assumption. Nobody caught it — except the system I built to catch exactly that.
 
-I run 7 specialized AI agents. The problem: LLMs are overconfident in 84% of cases (Kadavath et al.). They don't say "I'm not sure." They just sound right.
+I run 7 specialized AI agents. The problem: LLMs are overconfident in 84% of cases (PMC/12249208, Feb 2025). They don't say "I'm not sure." They just sound right.
 
 So I built a trust system with one rule: honesty is currency.
 
@@ -13,7 +13,7 @@ How it works:
 → QA Agent is adversarial. Its job is to break the output, not approve it.
 → Every claim gets tagged: fact, assumption, or inference.
 
-The moment it proved itself: Calibration caught an assumption dressed as a fact in a client-facing draft. The kind of mistake that erodes trust slowly — until it doesn't.
+The moment it proved itself: Calibration caught an assumption dressed as a fact in an outreach draft. The kind of mistake that erodes trust slowly — until it doesn't.
 
 No production-ready trust framework for multi-agent systems exists yet. So I'm building AgentTrust as open source.
 
