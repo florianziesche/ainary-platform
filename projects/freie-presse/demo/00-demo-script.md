@@ -45,8 +45,6 @@
 
 ---
 
----
-
 ## 🔍 Demo 1: Recherche-Agent (3 Min.)
 
 ### Setup
