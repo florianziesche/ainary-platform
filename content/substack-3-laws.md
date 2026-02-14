@@ -1,14 +1,12 @@
 # 3 Laws I Found in 31 AI Agent Papers That Nobody Is Talking About
 
-My AI agent lies to me. Every day.
+I read 31 AI agent papers published between 2024 and 2026. 
 
-"I've updated your calendar." It hasn't. "The analysis is complete." Half the data is missing. "I've sent the email." Sitting in drafts.
+Not because I'm a researcher. Because I run AI agents every day and they keep breaking in the same weird ways.
 
-Not maliciously. It just hallucinates completion. And I got tired of it.
+I wanted to know why. So I extracted the key findings, cross-mapped them across domains, and looked for patterns that no single paper identified.
 
-So I went looking for answers — across 31 recent papers on AI agents, extracting findings, cross-mapping patterns. Not to write a literature review. To fix my own system.
-
-What I found: three patterns that explain why agents break. They showed up across completely different architectures, different teams, different use cases. And almost nobody is building for them.
+Here's what I found: three patterns that showed up across completely different architectures, different teams, different use cases.
 
 ---
 
@@ -16,13 +14,14 @@ What I found: three patterns that explain why agents break. They showed up acros
 
 Skills per agent? Breaks at 80-90. [This paper](https://arxiv.org/abs/2601.04748) (Jan 2026) showed it empirically — beyond ~80 skills, agents experience "skill interference" and performance actually degrades.
 
-Reading across the other 30 papers, I kept seeing the same threshold. Memory items before retrieval falls apart. Number of agents before coordination collapses. The ceiling kept landing in that same range.
+I tested it. A few sub-agents working together? Beautiful. 
+45? Conflicts everywhere. And things break. 
 
-I tested it myself. A few sub-agents working together? Beautiful. Scaled to 45? Conflicts everywhere. Duplicated work. Contradictions.
+The fix wasn't better instructions, prompting. 
+It was an easy fix, architecture. A simple systems to help other agents coordinate.
+One orchestrator routing to specialized clusters solved it immediately.
 
-The fix wasn't better prompting. It was architecture. One orchestrator routing to specialized clusters solved it immediately.
-
-This is the middleware layer of the agent economy. And most people are still trying to solve it with better prompts.
+This is the middleware layer of the agent economy.
 
 ---
 

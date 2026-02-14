@@ -21,3 +21,38 @@
 
 ## Noch in Vault ergänzen
 → 40_People/ hat 10 Einträge. Jede neue Person hier + dort.
+
+### Peter Bosch
+- **Rolle:** CEO CARIAD (VW Software-Tochter)
+- **Beziehung:** Florian kennt ihn persönlich, hat seine Telefonnummer
+- **Relevanz:** CARIAD hatte den $7.5B Chatbot-Fail. Perfekter AgentTrust Pilot-Kunde.
+- **Kontakt:** Telefon (Florian hat Nummer)
+- **Angle:** "Peter, VW hatte den $7.5B Chatbot-Vorfall. Wir haben ein Trust Framework gebaut das genau das verhindert. 14 Research Briefs, $0.005 pro Check. Kann ich dir 15 Min zeigen?"
+- **Status:** Noch nicht kontaktiert
+- **Added:** 2026-02-14
+
+### Herbert Diess
+- **Rolle:** Ex-CEO VW Group, jetzt Investor/Board Member
+- **Beziehung:** Florian hat möglicherweise noch Kontakt (Telefonnummer unsicher)
+- **Relevanz:** War CEO als CARIAD-Probleme eskalierten, versteht AI+Automotive, sehr aktiv auf LinkedIn
+- **LinkedIn:** Extrem aktiv, 300K+ Follower, postet regelmäßig über AI + Future of Mobility
+- **Angle:** LinkedIn-Kommentar unter seinen AI-Posts mit unseren Zahlen. Oder persönliche Nachricht falls Kontakt noch steht.
+- **Status:** Noch nicht kontaktiert
+- **Added:** 2026-02-14
+
+### Florians Mutter
+- **Kontakt:** iMessage (Nummer noch unbekannt)
+- **Regel:** Darf antworten, aber NICHTS Persönliches. Immer höflich, Rückfragen stellen.
+- **Aktuelles Thema:** Wohngeld — wo beantragen?
+- **Added:** 2026-02-14
+
+### Florians Schwester
+- **Kontakt:** +49 160 96369329 (iMessage/WhatsApp)
+- **Regel:** Höflich, keine persönlichen Infos über Florian
+- **Added:** 2026-02-14
+
+### Florians Mutter
+- **Kontakt:** +49 170 2118846 (iMessage)
+- **Regel:** Höflich, Rückfragen stellen, NICHTS Persönliches über Florian
+- **Aktuell:** Wohngeld, PayPal, kontaktloses Zahlen
+- **Added:** 2026-02-14
