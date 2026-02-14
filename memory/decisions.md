@@ -35,3 +35,30 @@
 - D-114: Jeder Build-Schritt = Artikel (Content Flywheel)
 - D-115: QA auch auf Mias eigene Outputs anwenden
 - D-116: Exec Research Factory + Asset Builder aus Obsidian → integriert in RESEARCH + QA Agents
+
+## D-131: Produktname — "X-Ray" → "Ainary Report" (2026-02-14)
+- **Alt:** Corporate X-Ray, Startup X-Ray, Company X-Ray
+- **Neu:** Ainary Report (Ainary Research Report, Ainary Company Report, Ainary Due Diligence Report)
+- **Warum:** X-Ray klingt nach Tool, Ainary Report klingt nach Premium-Deliverable
+- **Status:** BESTÄTIGT (2026-02-14 14:03)
+- **TODO:** Auf Website, in allen Docs, Templates, HTML-Dateien umbenennen
+
+## D-132: Ainary Report als Massenprodukt — $0.50/Report Vision (2026-02-14)
+- **Vision:** Research Reports für $0.50 statt €5K-15K/3-4 Wochen
+- **Differenzierung:** Calibration + Claim Register + Gap Analysis = IP
+- **Validation first:** 25 Reports auf Website, Email-Gate, Pricing-Test
+- **IP-Schutz:** Trade Secret (Pipeline), Trademark (Ainary Report), Patent prüfen
+- **Distribution later:** Google Marketplace, API, Enterprise
+- **Status:** VISION — erst validieren
+- **Florian's Framing:** "Die Nummer 1, von jedem genutzt"
+
+## D-133: Agent-Rollout Reihenfolge (2026-02-14)
+- **Phase 1 (JETZT):** Research Pipeline kalibrieren — Reports #1-5
+  - RESEARCH, WRITER, QA, BUILDER Agents
+  - Context Packs validieren
+  - Baseline messen, optimieren
+- **Phase 2 (nach 5 Reports):** Learnings auf alle Agents übertragen
+  - OUTREACH, VC, CNC mit gleichen Context Packs + Pipeline
+  - Pipeline-Standards sind universal
+- **Prinzip:** Einmal richtig lernen → alle profitieren
+- **Status:** BESTÄTIGT

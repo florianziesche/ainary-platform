@@ -54,3 +54,17 @@ Vor Phase 3, Mia Prime denkt laut:
 5. Welche Annahme ist am unsichersten?
 ```
 Ergebnis fließt als Briefing in den Agent.
+
+## Phase 2.5: GAP ANALYSIS (neu ab 2026-02-14)
+
+**Zwischen Synthesis und Write — PFLICHT für Reports/Artikel:**
+
+1. Synthesis lesen
+2. Blinde Flecken identifizieren (was fehlt?)
+3. Top 3 Lücken priorisieren nach Impact
+4. Lücken-Research durchführen
+5. Erst DANN schreiben
+
+**Warum:** Andere schreiben mit dem was sie haben. Wir schreiben mit dem was wir haben PLUS dem was fehlte. Das ist der Qualitätsunterschied.
+
+**AgentTrust Feature Candidate:** Automatic Gap Detection — Agent prüft eigene Wissensbasis vor Output.

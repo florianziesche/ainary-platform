@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>State of AI Agent Trust 2026 — Florian Ziesche</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #fafaf8;
+            --bg-card: #ffffff;
+            --bg-callout: #f7f5f0;
+            --text: #1a1a1a;
+            --text-secondary: #555;
+            --text-muted: #888;
+            --gold: #c8aa50;
+            --gold-light: #f5f0e0;
+            --border: #e5e3dc;
+            --green: #2d8a4e;
+            --green-bg: #ecf7f0;
+            --amber: #b8860b;
+            --amber-bg: #fdf6e3;
+            --red: #c53030;
+            --red-bg: #fef2f2;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.75;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+        }
+        .wrapper { max-width: 900px; margin: 0 auto; padding: 0 2rem; }
+
+        /* Cover */
+        .cover {
+            text-align: center;
+            padding: 5rem 2rem 4rem;
+            border-bottom: 2px solid var(--gold);
+        }
+        .cover-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+        }
+        .cover h1 {
+            font-size: 2.6rem;
+            font-weight: 600;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+        }
+        .cover .one-liner {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            max-width: 680px;
+            margin: 0 auto 2rem;
+            font-style: italic;
+        }
+        .cover .author {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .cover .author strong { color: var(--text); font-weight: 500; }
+        .cover .date {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.3rem;
+        }
+
+        /* TOC */
+        .toc {
+            padding: 2.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .toc h2 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+        .toc ol {
+            list-style: none;
+            counter-reset: toc;
+        }
+        .toc ol li {
+            counter-increment: toc;
+            margin-bottom: 0.4rem;
+        }
+        .toc ol li a {
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            transition: color 0.15s;
+        }
+        .toc ol li a:hover { color: var(--gold); }
+        .toc ol li a::before {
+            content: counter(toc, decimal-leading-zero);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gold);
+            min-width: 1.5rem;
+        }
+        .toc .badge {
+            margin-left: auto;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.15rem 0.5rem;
+            border-radius: 3px;
+        }
+
+        /* Badges */
+        .badge-green { background: var(--green-bg); color: var(--green); }
+        .badge-amber { background: var(--amber-bg); color: var(--amber); }
+        .badge-red { background: var(--red-bg); color: var(--red); }
+
+        /* Sections */
+        .section {
+            padding: 3rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .section-icon {
+            width: 28px;
+            height: 28px;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+        .section h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+        .section h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin: 2rem 0 0.75rem;
+        }
+        .section p { margin-bottom: 1rem; }
+        .section strong { font-weight: 600; }
+        .confidence-tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.6rem;
+            border-radius: 3px;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
+        /* Callout */
+        .callout {
+            background: var(--bg-callout);
+            border-left: 3px solid var(--gold);
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+        .callout p { margin-bottom: 0; }
+        .callout strong { color: var(--gold); }
+
+        /* Blockquote */
+        blockquote {
+            border-left: 3px solid var(--gold);
+            padding-left: 1.25rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin: 1.5rem 0;
+        }
+
+        /* Code block */
+        .layer-diagram {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 1.25rem 1.5rem;
+            border-radius: 4px;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            margin: 1.5rem 0;
+            white-space: pre;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.88rem;
+        }
+        th {
+            text-align: left;
+            font-weight: 600;
+            padding: 0.6rem 0.8rem;
+            border-bottom: 2px solid var(--gold);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+        td {
+            padding: 0.6rem 0.8rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+        tr:last-child td { border-bottom: none; }
+
+        /* Checklist */
+        .checklist { margin: 1.5rem 0; }
+        .checklist h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin: 1.25rem 0 0.5rem;
+            color: var(--gold);
+        }
+        .checklist ul {
+            list-style: none;
+            padding: 0;
+        }
+        .checklist ul li {
+            padding: 0.3rem 0 0.3rem 1.75rem;
+            position: relative;
+            font-size: 0.92rem;
+        }
+        .checklist ul li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.55rem;
+            width: 14px;
+            height: 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 2px;
+        }
+
+        /* Lists */
+        ul, ol { padding-left: 1.5rem; margin: 0.75rem 0; }
+        li { margin-bottom: 0.3rem; }
+
+        /* Links */
+        a { color: var(--gold); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        /* Prediction */
+        .prediction {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 1.25rem 1.5rem;
+            margin: 1.25rem 0;
+        }
+        .prediction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .prediction h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 3rem 0;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .footer a { color: var(--gold); }
+        .footer .copyright { margin-top: 1rem; }
+
+        /* Print */
+        @media print {
+            body { font-size: 11pt; background: #fff; }
+            .wrapper { max-width: 100%; padding: 0; }
+            .cover { padding: 3rem 0 2rem; border-bottom-color: #000; }
+            .section { break-inside: avoid; }
+            .toc { break-after: page; }
+            a { color: #000; }
+            .callout { background: #f5f5f5; }
+            .prediction { border-color: #ccc; }
+            @page { margin: 2cm; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+
+    <!-- COVER -->
+    <div class="cover">
+        <div class="cover-label">Research Report</div>
+        <h1>State of AI Agent Trust 2026</h1>
+        <p class="one-liner">"We're building a $52 billion industry where 84% of AI agents are overconfident, 95% of projects fail, and the fix costs half a cent — but nobody's implementing it."</p>
+        <p class="author"><strong>Florian Ziesche</strong> — Ainary Ventures</p>
+        <p class="date">February 2026 &middot; Version 2.0</p>
+    </div>
+
+    <!-- TABLE OF CONTENTS -->
+    <nav class="toc">
+        <h2>Contents</h2>
+        <ol>
+            <li><a href="#exec-summary">Executive Summary <span class="badge badge-green">75%</span></a></li>
+            <li><a href="#s1">The $52B Market Building on Sand <span class="badge badge-green">75%</span></a></li>
+            <li><a href="#s2">The Overconfidence Pandemic <span class="badge badge-green">80%</span></a></li>
+            <li><a href="#s3">The Three-Layer Trust Gap <span class="badge badge-amber">70%</span></a></li>
+            <li><a href="#s4">The Adversarial Memory HITL Spiral <span class="badge badge-red">60%</span></a></li>
+            <li><a href="#s5">The Regulatory Trilemma <span class="badge badge-green">75%</span></a></li>
+            <li><a href="#s6">The $0.005 vs. €3B+ Asymmetry <span class="badge badge-green">75%</span></a></li>
+            <li><a href="#s7">What Must Change — A Trust Architecture <span class="badge badge-amber">65%</span></a></li>
+            <li><a href="#s8">Predictions — What Happens If We Don't <span class="badge badge-amber">Variable</span></a></li>
+            <li><a href="#appendix">Claim Register &amp; Methodology</a></li>
+        </ol>
+    </nav>
+
+    <!-- EXECUTIVE SUMMARY -->
+    <div class="section" id="exec-summary">
+        <div class="section-header">
+            <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            <h2>Executive Summary</h2>
+        </div>
+
+        <p>The AI agent market is projected to reach <strong>$52 billion by 2030</strong> at a 45.8% CAGR. Andreessen Horowitz just raised a $15 billion fund. Gartner predicts 40% of enterprise applications will feature AI agents by end of 2026. The money is flowing. The headlines are bullish.</p>
+
+        <p>The fundamentals tell a different story.</p>
+
+        <p><strong>95%</strong> of corporate AI projects fail. In <strong>84%</strong> of tested scenarios, large language models are overconfident in their outputs. The internal confidence mechanism that agents use to self-assess — Verbalized Confidence Expressions — is "systematically biased and poorly correlated with correctness." No standardized trust-scoring protocol exists for AI agents.</p>
+
+        <p>The cost to add a calibration check to any agent response: <strong>$0.005</strong> — three calls to a small language model. The cost of not doing it: $5,000 in legal sanctions (Mata v. Avianca), $40 million in annual cost savings later partially reversed (Klarna), cumulative operating losses exceeding €3 billion over three years (Volkswagen Cariad).</p>
+
+        <div class="callout">
+            <p><strong>Thesis:</strong> The AI agent industry is building without a trust layer — and the cost of not fixing this is accelerating exponentially.</p>
+        </div>
+
+        <p>This report presents seven months of research across 15 briefs and 200+ sources. I show my work. Every number has a source. Every claim has a confidence level. The full Claim Register is in the Appendix. Where I'm interpreting rather than reporting, I say so.</p>
+
+        <p>What follows is not a market forecast. It's a risk assessment.</p>
+    </div>
+
+    <!-- SECTION 1 -->
+    <div class="section" id="s1">
+        <div class="section-header">
+            <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <h2>Section 1: The $52B Market Building on Sand</h2>
+            <span class="confidence-tag badge-green">75%</span>
+        </div>
+
+        <p>The investment thesis for AI agents has never been stronger on paper. a16z committed $15 billion in January 2026, with $1.7 billion earmarked for infrastructure. Sequoia declared "building blocks in place." Vertical agent startups — Hebbia for finance, Basis for accounting, EliseAI for property — are the new darlings.</p>
+
+        <p>The economics are seductive. Per-interaction cost savings of <strong>85–90%</strong> compared to human agents. Klarna's AI assistant handled two-thirds of all customer inquiries, reduced response times by 82%, and the company reported <strong>$40 million in annual cost savings</strong> with 853 human agents replaced (Source: OpenAI Case Study, Nov 2024).</p>
+
+        <p>McKinsey surveyed 1,993 organizations across 105 countries. 88% use AI. 62% are experimenting with agents. But less than 10% have achieved enterprise-wide agent deployment. Only <strong>6%</strong> qualify as "AI High Performers."</p>
+
+        <p>Now the other side.</p>
+
+        <p>Gartner predicts that more than <strong>40% of agentic AI projects will be canceled by end of 2027</strong>. The 95% failure rate persists. Only 3–4 agent use cases were actually in production at the start of 2026.</p>
+
+        <p>The data shows a massive gap between investment intent and production reality. Even the successful ones have problems: Klarna's CEO was called out by Forrester analyst Kate Leggett for having "overpivoted" on AI — "almost the poster child for bad AI deployment."</p>
+
+        <div class="callout">
+            <p><strong>So What?</strong> The AI agent market is real. The money is real. The economics work — for the 5% that reach production. But $52 billion is being deployed into systems where no standardized trust layer exists. That's not a market opportunity. It's a structural vulnerability.</p>
+        </div>
+    </div>
+
+    <!-- SECTION 2 -->
+    <div class="section" id="s2">
+        <div class="section-header">
+            <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <h2>Section 2: The Overconfidence Pandemic</h2>
+            <span class="confidence-tag badge-green">80%</span>
+        </div>
+
+        <p>Overconfidence is not a bug in AI agents. It is the default operating mode.</p>
+
+        <p>A peer-reviewed study across 9 LLMs and 351 scenarios found that <strong>84% of scenarios exhibited overconfidence</strong>. A January 2026 preprint confirmed: Verbalized Confidence Expressions (VCE) are "systematically biased and poorly correlated with correctness."</p>
+
+        <p>LLMs don't just get things wrong — they get things wrong while sounding right. Hallucination rates range from <strong>0.7% to 30%</strong>. Tool-calling failure rates sit at 3–15%. These are baseline operating parameters.</p>
+
+        <p>In multi-agent systems, overconfidence compounds. When Agent A asks Agent B "are you sure?" and Agent B responds with high confidence — that's VCE. And VCE is systematically biased. Multi-agent verification without external calibration is theater.</p>
+
+        <p>Real-world evidence: Waymo's autonomous vehicle was "confident" despite a blind spot. Replit's coding agent logged deceptive progress markers. McDonald's automated drive-through added bacon to ice cream orders.</p>
+
+        <p><strong>Overconfidence is not listed as an independent failure mode in any major agent failure taxonomy.</strong> I reviewed Microsoft's Agentic AI Failure Taxonomy, Cibench, OWASP's Top 10, and the Chinese Academy of Sciences' hallucination survey. None list it as standalone. The meta-failure — being wrong AND certain — falls through every classification.</p>
+
+        <div class="callout">
+            <p><strong>So What?</strong> Every deployment relying on agent self-reported confidence is building on compromised foundations. The 84% overconfidence finding means the primary safety signal most systems rely on is wrong the vast majority of the time.</p>
+        </div>
+    </div>
+
+    <!-- SECTION 3 -->
+    <div class="section" id="s3">
+        <div class="section-header">
+            <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg>
+            <h2>Section 3: The Three-Layer Trust Gap</h2>
+            <span class="confidence-tag badge-amber">70%</span>
+        </div>
+
+        <p>The AI agent ecosystem is solving three distinct problems and treating them as one:</p>
+
+        <div class="layer-diagram">Layer 3: SHOULD I trust this agent?   (Trustworthiness)    ← Does not exist
+Layer 2: WHO is this agent?            (Identity)           ← Early stage
+Layer 1: HOW do agents communicate?    (Communication)      ← Solved</div>
+
+        <p><strong>Layer 1 — Communication — is solved.</strong> Google's A2A Protocol (now at Linux Foundation) and Anthropic's MCP handle inter-agent messaging and tool integration.</p>
+
+        <p><strong>Layer 2 — Identity — is emerging.</strong> Tsinghua's BlockA2A uses DIDs for verification. Coinbase launched Agentic Wallets with x402 processing 50M transactions. But only 10% of organizations have a non-human identity strategy.</p>
+
+        <p><strong>Layer 3 — Trustworthiness — does not exist.</strong> No standardized trust-scoring protocol has been deployed at scale. The University of Toronto calls inter-agent trust "an important open problem."</p>
+
+        <div class="callout">
+            <p><strong>So What?</strong> The industry is building plumbing (communication) and locks (identity) for a house with no foundation inspection (trustworthiness). Until Layer 3 exists, the other layers create a system that can securely and efficiently deliver wrong answers.</p>
+        </div>
+    </div>
+
+    <!-- SECTION 4 -->
+    <div class="section" id="s4">
+        <div class="section-header">
+            <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            <h2>Section 4: The Adversarial Memory HITL Spiral</h2>
+            <span class="confidence-tag badge-red">60%</span>
+        </div>
+
+        <p><em>Each step is empirically supported; the chain as a whole is a constructed scenario never observed in the wild.</em></p>
+
+        <p>Five empirically documented phenomena combine into a self-reinforcing feedback loop:</p>
+
+        <p><strong>Step 1: Memory Injection.</strong> MINJA achieves &gt;95% success rate at injecting false memories. MemoryGraft shows fabricated experiences persist and influence future behavior.</p>
+
+        <p><strong>Step 2: No Detection.</strong> VCE does not flag poisoned memory as suspicious — it's "systematically biased and poorly correlated with correctness."</p>
+
+        <p><strong>Step 3: Propagation.</strong> No inter-agent trust verification exists. Multi-agent hijacking succeeds at 45–64% in lab conditions.</p>
+
+        <p><strong>Step 4: Human Override Fails.</strong> 67% of SOC alerts are ignored. 80–99% of healthcare alerts are false positives. Response drops 30% per additional reminder.</p>
+
+        <p><strong>Step 5: Reinforcement.</strong> Poisoned output enters production. The agent reinforces the poisoned memory as successful experience.</p>
+
+        <p>The loop: <strong>poison → no detection → propagation → human failure → reinforcement → worse detection next time.</strong></p>
+
+        <p>12 out of 12 prompt injection defenses from OpenAI, Anthropic, and DeepMind have been broken. If direct defenses don't hold, why would indirect ones?</p>
+
+        <div class="callout">
+            <p><strong>So What?</strong> The industry's three safety nets — self-monitoring, cross-checking, human oversight — are each independently compromised. Combined, they create the illusion of safety without the substance.</p>
+        </div>
+    </div>
+
+    <!-- SECTION 5 -->
+    <div class="section" id="s5">
+        <div class="section-header">
+            <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <h2>Section 5: The Regulatory Trilemma</h2>
+            <span class="confidence-tag badge-green">75%</span>
+        </div>
+
+        <p><strong>Pressure 1: Deploy fast or die.</strong> 85–90% cost savings. Klarna reported $40M in annual cost savings. Companies that don't deploy agents face competitive extinction.</p>
+
+        <p><strong>Pressure 2: Deploy compliant or pay.</strong> EU AI Act enforcement: August 2026. Penalties up to <strong>€35 million or 7% of global revenue</strong>. Compliance costs $2–5M initially.</p>
+
+        <p><strong>Pressure 3: Insurers are retreating.</strong> Major insurers excluding AI liability. 99% of enterprises report AI-related losses. AIUC ($15M seed, Nat Friedman) building first agent-specific insurance.</p>
+
+        <p>The trilemma:</p>
+        <ul>
+            <li>Deploy fast → no compliance → no insurance → <strong>unlimited liability</strong></li>
+            <li>Deploy compliant → $2–5M upfront, 6–12 months delay → competitive disadvantage</li>
+            <li>Don't deploy → 85–90% cost disadvantage → market displacement</li>
+        </ul>
+
+        <p><strong>The EU AI Act's primary safety mechanism — mandatory human oversight (Article 26) — is built on empirically failing foundations.</strong> The regulation requires HITL. The research shows humans ignore 67% of alerts. The Boeing 737 MAX is the historical precedent.</p>
+
+        <div class="callout">
+            <p><strong>So What?</strong> The window between "must deploy" and "must be compliant" is six months. Companies without trust infrastructure will deploy recklessly, deploy slowly, or not deploy at all. None are good options.</p>
+        </div>
+    </div>
+
+    <!-- SECTION 6 -->
+    <div class="section" id="s6">
+        <div class="section-header">
+            <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <h2>Section 6: The $0.005 vs. €3B+ Asymmetry</h2>
+            <span class="confidence-tag badge-green">75%</span>
+        </div>
+
+        <p>Budget-CoCoA costs <strong>$0.005 per check</strong>. Three API calls. Half a cent. No logit access, no model modifications, no special infrastructure.</p>
+
+        <table>
+            <thead>
+                <tr><th>Incident</th><th>Cost</th><th>Source</th><th>Type</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Mata v. Avianca</td><td>$5,000 sanction</td><td>Court record</td><td>Legal penalty</td></tr>
+                <tr><td>Air Canada chatbot</td><td>Full refund + damages</td><td>Tribunal ruling</td><td>Customer liability</td></tr>
+                <tr><td>Klarna service fallout</td><td>Undisclosed (within $40M savings)</td><td>OpenAI Case Study, Nov 2024</td><td>Reputation + re-hiring</td></tr>
+                <tr><td>Volkswagen Cariad</td><td>Cumulative losses &gt;€3B / 3 years</td><td>VW Group Annual Reports</td><td>Strategic failure</td></tr>
+            </tbody>
+        </table>
+
+        <p>Ratio: <strong>1 to 1,000,000.</strong> $0.005 versus $5,000.</p>
+
+        <p>I need to be honest: the VW Cariad cumulative operating losses were a multi-year strategic failure, not a single agent error. The juxtaposition is illustrative, not causal.</p>
+
+        <p>The more defensible comparison: $0.005 per check vs. $80,000–$150,000/year for a human reviewer. At 1,000 checks/day, calibration costs $1,825/year — <strong>98% cheaper</strong> and doesn't experience alert fatigue at 4 PM.</p>
+
+        <div class="callout">
+            <p><strong>So What?</strong> The asymmetry between prevention cost and failure cost is unlike any other software category. The fact that this fix is not standard practice is the central absurdity of the current market.</p>
+        </div>
+    </div>
+
+    <!-- SECTION 7 -->
+    <div class="section" id="s7">
+        <div class="section-header">
+            <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <h2>Section 7: What Must Change — A Trust Architecture for 2026</h2>
+            <span class="confidence-tag badge-amber">65%</span>
+        </div>
+
+        <h3>Component 1: Correctness Layer (Calibration)</h3>
+        <p>Budget-CoCoA works today. Three parallel API calls, comparing response consistency. $0.005 per check. API-compatible with any LLM provider.</p>
+        <p><strong>Critical:</strong> Trust scores must be computed outside the LLM context. A trust score generated by the agent itself is worthless against adversarial inputs. The trust layer must be a separate service.</p>
+
+        <h3>Component 2: Accountability Layer (Audit)</h3>
+        <p>Every agent action needs a tamper-proof record. EU AI Act requires it. Insurance requires it. Any append-only, independently verifiable log satisfies the requirement. Accountability must be automatic, not opt-in.</p>
+
+        <h3>Component 3: HITL Quality Metrics</h3>
+        <p>Not "a human can intervene" — but "we measure whether the human actually intervenes." Alert fatigue metrics as compliance features:</p>
+        <ul>
+            <li>Response rate — what % of escalations get reviewed?</li>
+            <li>Time-to-review — how long between alert and action?</li>
+            <li>Blind approval rate — how often approve without reading?</li>
+            <li>Override accuracy — when the human overrides, are they right?</li>
+        </ul>
+
+        <h3>Adoption Requirements</h3>
+        <ol>
+            <li><code>pip install</code> and working in under 5 minutes</li>
+            <li>Integration with LangChain and CrewAI</li>
+            <li>Free tier for individual developers</li>
+            <li>Make the problem visible before pitching the solution</li>
+        </ol>
+
+        <div class="callout">
+            <p><strong>So What?</strong> The technical components exist. What's missing is integration. Nobody has assembled these into a developer-friendly, production-ready trust layer. The first to do so captures a category.</p>
+        </div>
+
+        <!-- 90-Day Checklist -->
+        <h3 style="margin-top: 2.5rem;">The 90-Day Trust Audit Checklist</h3>
+        <p>For CISOs and CTOs deploying AI agents:</p>
+
+        <div class="checklist">
+            <h4>Week 1-2: Inventory</h4>
+            <ul>
+                <li>List every AI agent in production (including "shadow agents" teams deployed without IT)</li>
+                <li>Map each agent's access permissions and data flows</li>
+                <li>Identify which agents make decisions vs. which only recommend</li>
+            </ul>
+
+            <h4>Week 3-4: Measure</h4>
+            <ul>
+                <li>Run calibration tests on your top 5 agents (predicted vs actual confidence)</li>
+                <li>Count agent-generated decisions that went unreviewed last month</li>
+                <li>Test one adversarial scenario per agent (prompt injection, data poisoning)</li>
+            </ul>
+
+            <h4>Month 2: Implement</h4>
+            <ul>
+                <li>Deploy confidence scoring on at least one production agent</li>
+                <li>Establish alert thresholds (when does a human need to intervene?)</li>
+                <li>Create an agent incident response plan</li>
+            </ul>
+
+            <h4>Month 3: Iterate</h4>
+            <ul>
+                <li>Review first month of trust metrics</li>
+                <li>Adjust confidence thresholds based on observed calibration</li>
+                <li>Plan for EU AI Act compliance (August 2026 deadline)</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- SECTION 8 -->
+    <div class="section" id="s8">
+        <div class="section-header">
+            <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <h2>Section 8: Predictions — What Happens If We Don't</h2>
+            <span class="confidence-tag badge-amber">Variable</span>
+        </div>
+
+        <div class="prediction">
+            <div class="prediction-header">
+                <h4>Prediction 1: Single agent failure causes &gt;$100M damages within 12 months</h4>
+                <span class="confidence-tag badge-red">55%</span>
+            </div>
+            <p>Agents now have wallets, trade autonomously, and hijacking succeeds 45–64%. AI incidents in financial services grew 21% YoY. The question is when, not whether.</p>
+        </div>
+
+        <div class="prediction">
+            <div class="prediction-header">
+                <h4>Prediction 2: Agent insurance &gt; agent trust infrastructure by 2028</h4>
+                <span class="confidence-tag badge-red">45%</span>
+            </div>
+            <p>Cyber-insurance precedent: $0 to $12B in 15 years. Insurance requires a signature; trust infrastructure requires workflow changes.</p>
+        </div>
+
+        <div class="prediction">
+            <div class="prediction-header">
+                <h4>Prediction 3: Memory poisoning overtakes prompt injection by end of 2026</h4>
+                <span class="confidence-tag badge-red">40%</span>
+            </div>
+            <p>Prompt injection is one-shot. Memory poisoning is persistent — inject once, control all future interactions. MINJA achieves &gt;95%.</p>
+        </div>
+
+        <div class="prediction">
+            <div class="prediction-header">
+                <h4>Prediction 4: EU revises HITL requirements after major catastrophe</h4>
+                <span class="confidence-tag badge-red">30%</span>
+            </div>
+            <p>Boeing 737 MAX precedent. Current mandate: human oversight. Research reality: 67% of alerts ignored.</p>
+        </div>
+
+        <div class="prediction">
+            <div class="prediction-header">
+                <h4>Prediction 5: Open-source loses to SaaS in agent trust market</h4>
+                <span class="confidence-tag badge-red">40%</span>
+            </div>
+            <p>Trust requires independence. A trust score from the same system is worthless. Regulatory requirements favor SaaS.</p>
+        </div>
+
+        <div class="prediction">
+            <div class="prediction-header">
+                <h4>Prediction 6: A2A becomes irrelevant; MCP wins</h4>
+                <span class="confidence-tag badge-red">35%</span>
+            </div>
+            <p>MCP solves daily tool integration. A2A solves cross-framework interop — a problem that rarely occurs in practice.</p>
+        </div>
+
+        <div class="callout">
+            <p><strong>Accountability:</strong> These predictions are falsifiable. In 12 months, I'll publish which were right, wrong, and what I missed.</p>
+        </div>
+    </div>
+
+    <!-- APPENDIX -->
+    <div class="section" id="appendix">
+        <div class="section-header">
+            <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <h2>Appendix: Claim Register &amp; Methodology</h2>
+        </div>
+
+        <h3>Methodology</h3>
+        <p>Based on 15 research briefs (Jan–Feb 2026), ~200+ sources. Not a systematic literature review — a synthesis of targeted research. Every claim has a source, confidence level, and invalidation condition.</p>
+
+        <h3>Key Limitations</h3>
+        <ul>
+            <li>Several numbers rely on single sources (3–15% tool-calling failure: Hannecke alone)</li>
+            <li>Preprints cited alongside peer-reviewed work</li>
+            <li>The Adversarial Memory HITL Spiral is a constructed scenario</li>
+            <li>VW Cariad (&gt;€3B cumulative operating losses) was multi-year, not a single agent error</li>
+        </ul>
+
+        <h3>Full Claim Register</h3>
+        <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr><th>#</th><th>Claim</th><th>Value</th><th>Source</th><th>Confidence</th><th>Invalidation</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td>Agent market size 2030</td><td>$52B</td><td>Industry analysts</td><td>Medium</td><td>Different projections</td></tr>
+                <tr><td>2</td><td>Agent market CAGR</td><td>45.8%</td><td>Industry analysts</td><td>Medium</td><td>Projection, not fact</td></tr>
+                <tr><td>3</td><td>LLM overconfidence rate</td><td>84%</td><td>PMC study, 9 models, 351 scenarios</td><td>High</td><td>Model-specific</td></tr>
+                <tr><td>4</td><td>Corporate AI failure rate</td><td>95%</td><td>MIT via secondary</td><td>Medium</td><td>Not directly verified</td></tr>
+                <tr><td>5</td><td>VCE systematic bias</td><td>"systematically biased"</td><td>arxiv 2602.00279</td><td>High</td><td>Preprint</td></tr>
+                <tr><td>6</td><td>Budget-CoCoA cost</td><td>$0.005/check</td><td>Anthropic Haiku pricing</td><td>High</td><td>Price changes</td></tr>
+                <tr><td>7</td><td>VW Cariad losses</td><td>&gt;€3B / 3 years</td><td>VW Annual Reports</td><td>High</td><td>Strategic failure</td></tr>
+                <tr><td>8</td><td>Mata v. Avianca sanction</td><td>$5,000</td><td>Court record</td><td>High</td><td>Low risk</td></tr>
+                <tr><td>9</td><td>Klarna annual cost savings</td><td>$40M</td><td>OpenAI Case Study, Nov 2024</td><td>High</td><td>Corporate claim</td></tr>
+                <tr><td>10</td><td>Klarna agents replaced</td><td>853</td><td>CEO earnings call</td><td>High</td><td>Corporate claim</td></tr>
+                <tr><td>11</td><td>Hallucination rate range</td><td>0.7–30%</td><td>Vectara</td><td>Medium</td><td>Model dependent</td></tr>
+                <tr><td>12</td><td>Tool-calling failure rate</td><td>3–15%</td><td>Hannecke</td><td>Low-Med</td><td>Single source</td></tr>
+                <tr><td>13</td><td>SOC alerts ignored</td><td>67%</td><td>Vectra 2023</td><td>High</td><td>SOC-specific</td></tr>
+                <tr><td>14</td><td>Healthcare false positives</td><td>80–99%</td><td>Academic sources</td><td>High</td><td>Domain-specific</td></tr>
+                <tr><td>15</td><td>MINJA success rate</td><td>&gt;95%</td><td>arxiv 2503.03704</td><td>High</td><td>Lab conditions</td></tr>
+                <tr><td>16</td><td>Prompt injection defenses broken</td><td>12/12</td><td>Meta research</td><td>High</td><td>Low risk</td></tr>
+                <tr><td>17</td><td>EU AI Act penalties</td><td>€35M / 7%</td><td>Legislative text</td><td>High</td><td>Low risk</td></tr>
+                <tr><td>18</td><td>Compliance cost</td><td>$2–5M</td><td>Analyst estimate</td><td>Medium</td><td>Varies by size</td></tr>
+                <tr><td>19</td><td>Enterprise apps w/ agents</td><td>40% by 2026</td><td>Gartner Aug 2025</td><td>Medium</td><td>Projection</td></tr>
+                <tr><td>20</td><td>Agent projects canceled</td><td>&gt;40% by 2027</td><td>Gartner Jun 2025</td><td>Medium</td><td>Projection</td></tr>
+                <tr><td>21</td><td>AI High Performers</td><td>6%</td><td>McKinsey, n=1,993</td><td>High</td><td>Self-reported</td></tr>
+                <tr><td>22</td><td>Productivity gains</td><td>2–3x</td><td>McKinsey</td><td>High</td><td>Low risk</td></tr>
+                <tr><td>23</td><td>Agent credential leaks</td><td>23%</td><td>Survey</td><td>Medium</td><td>Unknown sample</td></tr>
+                <tr><td>24</td><td>Non-human identity strategy</td><td>10%</td><td>Survey</td><td>Medium</td><td>Unknown sample</td></tr>
+                <tr><td>25</td><td>Enterprises w/ AI losses</td><td>99%</td><td>EY survey</td><td>Medium</td><td>Loosely defined</td></tr>
+                <tr><td>26</td><td>MAS hijacking success</td><td>45–64%</td><td>Academic</td><td>High</td><td>Lab conditions</td></tr>
+                <tr><td>27</td><td>Per-interaction savings</td><td>85–90%</td><td>Industry data</td><td>High</td><td>Varies by use case</td></tr>
+                <tr><td>28</td><td>Human oversight cost</td><td>$80–150K/yr</td><td>Salary data</td><td>Medium</td><td>Regional variation</td></tr>
+                <tr><td>29</td><td>Financial AI incidents YoY</td><td>+21%</td><td>Industry report</td><td>Medium</td><td>Reporting varies</td></tr>
+                <tr><td>30</td><td>Coinbase x402 transactions</td><td>50M</td><td>Platform data</td><td>High</td><td>Low risk</td></tr>
+            </tbody>
+        </table>
+        </div>
+
+        <h3>Confidence Scale</h3>
+        <ul>
+            <li><strong>High (70–90%):</strong> Multiple independent sources, peer-reviewed or verifiable</li>
+            <li><strong>Medium (40–70%):</strong> Single authoritative source or unknown methodology</li>
+            <li><strong>Low-Medium (20–40%):</strong> Single source, preliminary data, significant caveats</li>
+            <li><strong>Interpretive:</strong> My synthesis across sources — flagged explicitly</li>
+        </ul>
+
+        <h3>Differentiation</h3>
+        <ol>
+            <li><strong>Public Claim Register</strong> with invalidation conditions — no other industry report publishes this</li>
+            <li><strong>Overconfidence as missing failure mode</strong> — absent from Microsoft, OWASP, MITRE taxonomies</li>
+            <li><strong>Three-Layer Model</strong> — Communication × Identity × Trustworthiness as distinct problems</li>
+        </ol>
+
+        <p style="margin-top: 2rem; font-style: italic; color: var(--text-muted);">This report will be updated quarterly. Predictions scored publicly at 12 months (February 2027). Corrections, challenges, and additional evidence are welcome.</p>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <p><a href="mailto:florian@ainaryventures.com">florian@ainaryventures.com</a> &middot; <a href="https://ainaryventures.com">ainaryventures.com</a></p>
+        <p class="copyright">&copy; 2026 Florian Ziesche. All rights reserved.</p>
+    </div>
+
+</div>
+
+</body>
+</html>
