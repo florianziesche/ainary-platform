@@ -62,3 +62,8 @@
   - Pipeline-Standards sind universal
 - **Prinzip:** Einmal richtig lernen → alle profitieren
 - **Status:** BESTÄTIGT
+
+### D-135: CNC Screenshots — BACKLOG (2026-02-14)
+- Problem: Echte Kundendaten + zu niedrige Zahlen (Value-Anker)
+- Lösung: Fiktive Mockups mit höheren Werten
+- Status: WARTEN — erst Reports fertig

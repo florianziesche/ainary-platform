@@ -39,3 +39,8 @@
 - CSS opacity:0 defaults
 - Neon-Farben ("Kinderparty")
 - Fake-Zahlen ("2,847 professionals")
+
+## Quiet Time Regeln (2026-02-14)
+- **Wochentag:** Strukturiert — 06:45-08:15 + 17:45-20:00 + 23:00-07:00
+- **Wochenende:** Random, keine festen Zeiten. Florian meldet sich wenn er Zeit hat.
+- **Regel:** Am Wochenende nicht auf Quiet Time achten, einfach antworten wenn er schreibt.

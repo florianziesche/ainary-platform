@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Orchestration Problem — Florian Ziesche</title>
+    <style>
+        @font-face {
+            font-family: 'Inter';
+            src: url('/fonts/inter-variable.woff2') format('woff2');
+            font-weight: 100 600;
+            font-display: swap;
+        }
+        :root {
+            --bg: #fafaf8;
+            --text: #1a1a1a;
+            --text-secondary: #555;
+            --text-muted: #888;
+            --gold: #c8aa50;
+            --border: #e5e3dc;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.75;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+        }
+        .wrapper { max-width: 900px; margin: 0 auto; padding: 0 2rem; }
+
+        /* Cover */
+        .cover {
+            text-align: center;
+            padding: 5rem 2rem 4rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .cover-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+        .cover h1 {
+            font-size: 2.4rem;
+            font-weight: 600;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+        }
+        .cover .subtitle {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            max-width: 680px;
+            margin: 0 auto 2rem;
+            font-style: italic;
+        }
+        .cover .author {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .cover .author strong { color: var(--text); font-weight: 500; }
+        .cover .date {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.3rem;
+        }
+        .cover .confidence {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* TOC */
+        .toc {
+            padding: 2.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .toc h2 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+        .toc ol {
+            list-style: none;
+            counter-reset: toc;
+        }
+        .toc ol li {
+            counter-increment: toc;
+            margin-bottom: 0.4rem;
+        }
+        .toc ol li a {
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            transition: color 0.15s;
+        }
+        .toc ol li a:hover { color: var(--gold); }
+        .toc ol li a::before {
+            content: counter(toc, decimal-leading-zero);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            min-width: 1.5rem;
+        }
+
+        /* Sections */
+        .section {
+            padding: 3rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .section h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            line-height: 1.3;
+            margin-bottom: 1.5rem;
+        }
+        .confidence-inline {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            margin-left: 0.5rem;
+        }
+        .section h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 2rem 0 0.75rem;
+        }
+        .section p { margin-bottom: 1rem; }
+        .section strong { font-weight: 600; }
+
+        /* So What + Invalidate */
+        .so-what, .invalidate {
+            margin: 1.5rem 0;
+            padding-left: 1.5rem;
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+        .so-what strong, .invalidate strong {
+            font-style: normal;
+            color: var(--text);
+        }
+
+        /* Evidence/Interpretation */
+        .evidence, .interpretation {
+            margin: 1rem 0;
+        }
+        .evidence strong, .interpretation strong {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        /* Key statement */
+        .key-statement {
+            font-weight: 600;
+            font-size: 1.05rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        /* Footnote refs */
+        .fn {
+            color: var(--text-muted);
+            font-size: 0.7em;
+            vertical-align: super;
+            text-decoration: none;
+            line-height: 0;
+        }
+        .fn:hover { color: var(--gold); }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.88rem;
+        }
+        th {
+            text-align: left;
+            font-weight: 600;
+            padding: 0.6rem 0.8rem;
+            border-bottom: 2px solid var(--text);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+        td {
+            padding: 0.6rem 0.8rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+        tr:last-child td { border-bottom: none; }
+        .exhibit-caption {
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+        .exhibit-source {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-top: 0.3rem;
+        }
+
+        /* Lists */
+        ul, ol { padding-left: 1.5rem; margin: 0.75rem 0; }
+        li { margin-bottom: 0.3rem; }
+
+        /* Links */
+        a { color: var(--text); }
+
+        /* Keywords */
+        .keywords {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 1rem;
+        }
+
+        /* CTA Footer */
+        .cta-footer {
+            padding: 3rem 0;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+        .cta-footer .cta-link {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--gold);
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 0.75rem;
+        }
+        .cta-footer .cta-link:hover {
+            text-decoration: underline;
+        }
+        .cta-footer .cta-subtext {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+        .cta-footer .contact {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.3rem;
+        }
+        .cta-footer .tagline {
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: var(--text);
+            margin-top: 1.5rem;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 3rem 0;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            position: relative;
+        }
+        .footer a { color: var(--gold); text-decoration: none; }
+        .footer a:hover { text-decoration: underline; }
+        .footer::after {
+            content: '●';
+            position: absolute;
+            bottom: 3rem;
+            right: 2rem;
+            color: var(--gold);
+            font-size: 10px;
+        }
+
+        /* Print */
+        @media print {
+            body { font-size: 10.5pt; background: #fff; color: #000; }
+            .wrapper { max-width: 100%; padding: 0; }
+            .cover { padding: 3rem 0 2rem; page-break-after: always; }
+            .section { break-inside: avoid; }
+            .toc { page-break-after: always; }
+            a { color: #000; }
+            .fn { color: #666; }
+            .so-what, .invalidate { color: #333; }
+            .evidence, .interpretation { color: #333; }
+            .footer::after { display: none; }
+            @page { 
+                margin: 2cm; 
+                @top-left { content: "Ainary Report | The Orchestration Problem"; font-size: 8pt; color: #888; }
+                @bottom-left { content: "© 2026 Ainary Ventures"; font-size: 8pt; color: #888; }
+                @bottom-center { content: "Page " counter(page); font-size: 8pt; color: #888; }
+                @bottom-right { content: '●'; font-size: 8pt; color: #c8aa50; }
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+
+    <!-- COVER -->
+    <div class="cover">
+        <div class="cover-label">Ainary Research Report No. AR-007</div>
+        <h1>The Orchestration Problem</h1>
+        <p class="subtitle">Why Multi-Agent Systems Fail and How to Fix Them</p>
+        <p class="author"><strong>Florian Ziesche</strong> — Ainary Ventures</p>
+        <p class="date">February 2026</p>
+        <p class="confidence">Overall Confidence: 72%</p>
+    </div>
+
+    <!-- TOC -->
+    <nav class="toc">
+        <h2>Contents</h2>
+        <ol>
+            <li><a href="#exec-summary">Executive Summary</a></li>
+            <li><a href="#methodology">Methodology</a></li>
+            <li><a href="#s3">The $52 Billion Coordination Problem</a></li>
+            <li><a href="#s4">Anatomy of Orchestration: Patterns That Work</a></li>
+            <li><a href="#s5">Framework Wars: LangGraph vs. CrewAI vs. AutoGen vs. Swarm</a></li>
+            <li><a href="#s6">When Multi-Agent Systems Break</a></li>
+            <li><a href="#s7">The Hidden Tax: Cost, Latency, and Observability</a></li>
+            <li><a href="#s8">Orchestration-First: A Design Methodology</a></li>
+            <li><a href="#s9">Predictions and Open Questions</a></li>
+            <li><a href="#beipackzettel">Beipackzettel</a></li>
+            <li><a href="#claim-register">Claim Register</a></li>
+            <li><a href="#references">References</a></li>
+        </ol>
+    </nav>
+
+    <!-- EXECUTIVE SUMMARY -->
+    <div class="section" id="exec-summary">
+        <h2>1. Executive Summary</h2>
+
+        <ul>
+            <li><strong>51% of companies have AI agents in production<a class="fn" href="#ref1">[1]</a>, yet over 40% of agentic AI projects will be canceled by 2027<a class="fn" href="#ref11">[11]</a>.</strong> The gap is orchestration.</li>
+            <li>Performance quality — not cost or safety — is the top barrier to scaling multi-agent systems<a class="fn" href="#ref1">[1]</a>.</li>
+            <li>Inter-agent communication can be hijacked with 58–90% success rates, even when individual agents are secure<a class="fn" href="#ref2">[2]</a>.</li>
+            <li>Multi-agent cost scales super-linearly: a 5-agent pipeline costs 10–30× a single agent, not 5×<a class="fn" href="#ref7">[7]</a>.</li>
+            <li>The fix is counterintuitive: build the orchestration layer first, then add agents. Most teams do the opposite.</li>
+        </ul>
+
+        <p><strong>Audience:</strong> Engineering Leads / CTOs / AI Architects</p>
+
+        <p class="keywords"><strong>Keywords:</strong> multi-agent orchestration, LangGraph, CrewAI, AutoGen, orchestration patterns, agent coordination, multi-agent failure modes</p>
+
+        <p style="margin-top: 1rem; font-style: italic; color: var(--text-muted);">(Confidence: High)</p>
+    </div>
+
+    <!-- METHODOLOGY -->
+    <div class="section" id="methodology">
+        <h2>2. Methodology</h2>
+
+        <p>This report synthesizes 13 primary and 5 secondary sources across academic papers, framework documentation, industry surveys, and practitioner guides. The core evidence base includes one large-scale survey (LangChain, n=1,300)<a class="fn" href="#ref1">[1]</a>, three peer-reviewed papers on multi-agent systems<a class="fn" href="#ref2">[2]</a><a class="fn" href="#ref3">[3]</a><a class="fn" href="#ref4">[4]</a>, and one influential practitioner guide from Anthropic<a class="fn" href="#ref5">[5]</a>. Cost modeling in Section 7 uses published API pricing from OpenAI and Anthropic<a class="fn" href="#ref16">[16]</a> with calculated communication overhead.</p>
+
+        <p>Limitations: Production failure case studies remain largely anecdotal. No systematic study of orchestration-specific failures exists. Framework comparisons reflect February 2026 state and will date quickly. All cost estimates assume standard API pricing without volume discounts.</p>
+    </div>
+
+    <!-- SECTION 3 -->
+    <div class="section" id="s3">
+        <h2>3. The $52 Billion Coordination Problem <span class="confidence-inline">(Confidence: High)</span></h2>
+
+        <p class="key-statement">The AI agent market is projected to grow from $7.8 billion to $52 billion by 2030<a class="fn" href="#ref13">[13]</a> — but the industry is building agents without solving how they work together.</p>
+
+        <p><em>Evidence:</em> The LangChain State of AI Agents survey (n=1,300) found that 51% of companies already have agents in production<a class="fn" href="#ref1">[1]</a>. Mid-size companies are the most aggressive adopters, with 63% reporting production deployments<a class="fn" href="#ref1">[1]</a>. Performance quality — not cost, not safety — ranks as the number one barrier to scaling, cited more than twice as often as other factors<a class="fn" href="#ref1">[1]</a>. Meanwhile, Gartner predicts that over 40% of agentic AI projects will be canceled by 2027<a class="fn" href="#ref11">[11]</a>.</p>
+
+        <p><em>Interpretation:</em> These numbers are not contradictory. "In production" does not mean "successful in production." The pattern I see is clear: teams deploy agents, discover that coordinating them is harder than building them, and then cancel. The 51% adoption and 40% cancellation rates describe two points on the same curve — the orchestration gap.</p>
+
+        <p>The market is growing at a 45.8% CAGR<a class="fn" href="#ref13">[13]</a>, and most of that investment is going into agent capabilities. Very little is going into the coordination layer that determines whether those capabilities translate into reliable output.</p>
+
+        <div class="so-what">
+            <strong>So What?</strong> If you are building a multi-agent system and have not explicitly designed the orchestration layer, you are statistically likely to join the 40% cancellation cohort. Orchestration is not a feature to add later — it is the architecture decision that determines success or failure.
+        </div>
+
+        <div class="invalidate">
+            <strong>What would invalidate this?</strong> If single-agent systems prove sufficient for 90%+ of production use cases, the orchestration problem becomes irrelevant for most teams. Early evidence from Anthropic<a class="fn" href="#ref5">[5]</a> suggests that simpler architectures often outperform multi-agent ones, which partially supports this counter-narrative.
+        </div>
+    </div>
+
+    <!-- SECTION 4 -->
+    <div class="section" id="s4">
+        <h2>4. Anatomy of Orchestration: Patterns That Work <span class="confidence-inline">(Confidence: Medium)</span></h2>
+
+        <p class="key-statement">There are exactly five production-proven orchestration patterns — and Anthropic identified them by observing what their most successful customers actually build<a class="fn" href="#ref5">[5]</a>.</p>
+
+        <p><em>Evidence:</em> Anthropic's "Building Effective Agents" guide (December 2024) documented five workflow patterns based on real customer deployments: prompt chaining, routing, parallelization, orchestrator-workers, and evaluator-optimizer<a class="fn" href="#ref5">[5]</a>. The guide's most striking claim is qualitative: "The most successful implementations weren't using complex frameworks"<a class="fn" href="#ref5">[5]</a>.</p>
+
+        <p class="exhibit-caption">Exhibit 1: Orchestration Patterns</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Pattern</th>
+                    <th>Description</th>
+                    <th>Best For</th>
+                    <th>Key Risk</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Prompt Chaining</td>
+                    <td>Agent A output → Agent B input, sequential</td>
+                    <td>Linear workflows with clear handoffs</td>
+                    <td>Latency compounds; error propagation</td>
+                </tr>
+                <tr>
+                    <td>Routing</td>
+                    <td>Classifier directs input to specialist agents</td>
+                    <td>Well-defined categories (support triage)</td>
+                    <td>Misrouting cascades through pipeline</td>
+                </tr>
+                <tr>
+                    <td>Parallelization</td>
+                    <td>Multiple agents work simultaneously, results merged</td>
+                    <td>Independent subtasks; voting/consensus</td>
+                    <td>Result merging complexity; cost multiplication</td>
+                </tr>
+                <tr>
+                    <td>Orchestrator-Workers</td>
+                    <td>Central LLM decomposes tasks, workers execute</td>
+                    <td>Unpredictable subtask count (coding, research)</td>
+                    <td>Orchestrator quality determines everything</td>
+                </tr>
+                <tr>
+                    <td>Evaluator-Optimizer</td>
+                    <td>Generator + evaluator in feedback loop</td>
+                    <td>Clear quality criteria; iterative refinement</td>
+                    <td>Infinite loops without stopping conditions</td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="exhibit-source">Source: Anthropic "Building Effective Agents" (2024) [5], LangGraph documentation [8]</p>
+
+        <p>Beyond these five, academic research documents additional patterns — conversation-based (AutoGen<a class="fn" href="#ref3">[3]</a>), market-based, and Mixture-of-Agents (MoA)<a class="fn" href="#ref4">[4]</a>. The MoA architecture achieved 65.1% on AlpacaEval 2.0 versus GPT-4o's 57.5%<a class="fn" href="#ref4">[4]</a>, demonstrating that layered multi-agent refinement can outperform single models on benchmarks. But the cost is extreme: each layer multiplies token usage by agent count, making MoA impractical for most production scenarios.</p>
+
+        <p><em>Interpretation:</em> The pattern that emerges is a clear tradeoff between orchestration complexity and production reliability. The five Anthropic patterns work because they are composable and debuggable. The more sophisticated academic patterns (MoA, democratic debate) achieve higher benchmark scores but break down under production constraints — cost, latency, and error handling.</p>
+
+        <p>A positive counterexample is critical: <strong>coding agents</strong> (Anthropic's Claude Code, Cursor, Devin) use the orchestrator-worker pattern successfully in production. One agent plans changes, workers execute per file. This works because the output is verifiable — code either compiles or it does not. When orchestration serves a domain with clear success criteria, multi-agent systems deliver.</p>
+
+        <div class="so-what">
+            <strong>So What?</strong> Start with the simplest pattern that could work. Prompt chaining and routing cover the majority of production use cases. Escalate to orchestrator-workers only when task decomposition is genuinely dynamic. If you reach for MoA or debate architectures, you have likely over-engineered.
+        </div>
+
+        <div class="invalidate">
+            <strong>What would invalidate this?</strong> If a framework emerges that makes complex orchestration patterns as reliable as simple ones — essentially, the "Kubernetes of agents" — these recommendations become overly conservative.
+        </div>
+    </div>
+
+    <!-- SECTION 5 -->
+    <div class="section" id="s5">
+        <h2>5. Framework Wars: LangGraph vs. CrewAI vs. AutoGen vs. Swarm <span class="confidence-inline">(Confidence: Medium)</span></h2>
+
+        <p class="key-statement">No framework solves orchestration comprehensively — each optimizes for a different point on the flexibility-simplicity spectrum.</p>
+
+        <p><em>Evidence:</em> The four dominant multi-agent frameworks as of February 2026 are LangGraph (part of the LangChain ecosystem, ~100K+ GitHub stars), CrewAI (~30K stars), AutoGen (~30K stars), and OpenAI Swarm (~18K stars)<a class="fn" href="#ref9">[9]</a><a class="fn" href="#ref10">[10]</a><a class="fn" href="#ref11">[11]</a><a class="fn" href="#ref14">[14]</a>.</p>
+
+        <p class="exhibit-caption">Exhibit 2: Multi-Agent Framework Comparison (February 2026)</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Dimension</th>
+                    <th>LangGraph</th>
+                    <th>CrewAI</th>
+                    <th>AutoGen</th>
+                    <th>OpenAI Swarm</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Architecture</td>
+                    <td>Directed graph (nodes + edges)</td>
+                    <td>Role-based crews with tasks</td>
+                    <td>Conversation-based multi-agent</td>
+                    <td>Routines + handoffs</td>
+                </tr>
+                <tr>
+                    <td>Orchestration Model</td>
+                    <td>Explicit (developer defines graph)</td>
+                    <td>Implicit (framework manages)</td>
+                    <td>Emergent (conversation-driven)</td>
+                    <td>Explicit (function-based)</td>
+                </tr>
+                <tr>
+                    <td>Production Readiness</td>
+                    <td>High (LangSmith ecosystem)</td>
+                    <td>Medium (Enterprise tier)</td>
+                    <td>Low-Medium (research-oriented)</td>
+                    <td>None (educational only)</td>
+                </tr>
+                <tr>
+                    <td>Flexibility</td>
+                    <td>Very High (any topology)</td>
+                    <td>Medium (sequential/hierarchical)</td>
+                    <td>High (customizable)</td>
+                    <td>Low (simple handoffs)</td>
+                </tr>
+                <tr>
+                    <td>Learning Curve</td>
+                    <td>Steep</td>
+                    <td>Low</td>
+                    <td>Medium</td>
+                    <td>Very Low</td>
+                </tr>
+                <tr>
+                    <td>HITL Support</td>
+                    <td>Built-in (interrupt/resume)</td>
+                    <td>Optional (task-level)</td>
+                    <td>Built-in (human proxy)</td>
+                    <td>Manual</td>
+                </tr>
+                <tr>
+                    <td>Observability</td>
+                    <td>LangSmith integration</td>
+                    <td>Limited</td>
+                    <td>Limited</td>
+                    <td>None</td>
+                </tr>
+                <tr>
+                    <td>Key Weakness</td>
+                    <td>Complexity; over-engineering risk</td>
+                    <td>Black-box orchestration</td>
+                    <td>Not production-hardened</td>
+                    <td>Not a real framework</td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="exhibit-source">Sources: Framework documentation [9][10], GitHub repositories, Anthropic [5], LangChain blog [8]</p>
+
+        <p><em>Interpretation:</em> The framework landscape mirrors the early days of web frameworks — fragmented, opinionated, and rapidly shifting. LangGraph offers the most control but demands the most engineering investment. CrewAI gets teams to a working prototype fastest but becomes a black box when debugging. AutoGen is the academic favorite but struggles in production. Swarm is explicitly not a framework — OpenAI released it as an educational resource to teach orchestration concepts<a class="fn" href="#ref9">[9]</a>.</p>
+
+        <p>The key claim in this landscape comes from Anthropic, which recommends avoiding frameworks entirely: start with raw LLM API calls and simple composable patterns<a class="fn" href="#ref5">[5]</a>. This is not marketing — Anthropic is arguing against the ecosystem that surrounds its own model. Their claim is that their most successful customers build orchestration logic directly, using frameworks only for specific components (memory, tool use) rather than as architectural backbones.</p>
+
+        <div class="so-what">
+            <strong>So What?</strong> Framework choice is less important than orchestration design. If you pick the right pattern (Section 4), any framework — or no framework — can implement it. If you pick the wrong pattern, no framework will save you. For teams with strong engineering, Anthropic's "no framework" approach is worth serious consideration.
+        </div>
+
+        <div class="invalidate">
+            <strong>What would invalidate this?</strong> If one framework achieves dominant market share and community consensus (the "React of agents"), the fragmentation problem resolves itself and framework choice becomes the clear starting point.
+        </div>
+    </div>
+
+    <!-- SECTION 6 -->
+    <div class="section" id="s6">
+        <h2>6. When Multi-Agent Systems Break <span class="confidence-inline">(Confidence: High)</span></h2>
+
+        <p class="key-statement">Multi-agent systems do not fail at the agent level — they fail at the communication layer between agents, and that layer can be weaponized.</p>
+
+        <p><em>Evidence:</em> Triedman et al. (2025) demonstrated that adversarial content can hijack inter-agent communication to execute arbitrary malicious code in 58–90% of trials with GPT-4o<a class="fn" href="#ref2">[2]</a>. In some orchestrator configurations, attack success reached 100%<a class="fn" href="#ref2">[2]</a>. The critical finding: attacks succeed even when individual agents refuse harmful actions. The vulnerability is structural — it exists in the orchestration layer, not in any single agent.</p>
+
+        <p class="exhibit-caption">Exhibit 3: Multi-Agent Failure Taxonomy</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Failure Mode</th>
+                    <th>Description</th>
+                    <th>Frequency</th>
+                    <th>Mitigation</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Infinite Loops</td>
+                    <td>Agents delegate to each other without progress</td>
+                    <td>Common</td>
+                    <td>Max iteration limits; progress detection</td>
+                </tr>
+                <tr>
+                    <td>Deadlocks</td>
+                    <td>Two agents wait for each other's output</td>
+                    <td>Occasional</td>
+                    <td>Timeout mechanisms; dependency graph validation</td>
+                </tr>
+                <tr>
+                    <td>Conflicting Outputs</td>
+                    <td>Agents produce contradictory results</td>
+                    <td>Common (parallel)</td>
+                    <td>Conflict resolution agent; voting mechanisms</td>
+                </tr>
+                <tr>
+                    <td>Blame Attribution Failure</td>
+                    <td>Impossible to determine which agent failed</td>
+                    <td>Systemic</td>
+                    <td>Per-agent logging; trace IDs; output provenance</td>
+                </tr>
+                <tr>
+                    <td>Context Window Overflow</td>
+                    <td>Accumulated conversation exceeds token limits</td>
+                    <td>Common (conversation)</td>
+                    <td>Summarization agents; context pruning</td>
+                </tr>
+                <tr>
+                    <td>Orchestrator Hallucination</td>
+                    <td>Supervisor delegates to non-existent agents</td>
+                    <td>Occasional</td>
+                    <td>Strict agent/tool registry; validation layer</td>
+                </tr>
+                <tr>
+                    <td>Cascade Failures</td>
+                    <td>One agent's error propagates through pipeline</td>
+                    <td>Common (sequential)</td>
+                    <td>Circuit breakers; per-step validation</td>
+                </tr>
+                <tr>
+                    <td>Cost Explosion</td>
+                    <td>Retry loops burn tokens</td>
+                    <td>Systemic</td>
+                    <td>Budget caps; token monitoring; early termination</td>
+                </tr>
+                <tr>
+                    <td>Security Hijacking</td>
+                    <td>Adversarial input manipulates inter-agent comms</td>
+                    <td>Demonstrated (58–90%)</td>
+                    <td>Sandboxing; input validation between agents</td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="exhibit-source">Sources: arXiv:2503.12188 [2], arXiv:2402.01680 [3], Anthropic engineering blog [5], practitioner reports</p>
+
+        <p>Production failure cases reinforce this taxonomy. McDonald's terminated its AI drive-through program in 2024 after compounding errors across speech recognition, order processing, and verification agents made the system unreliable<a class="fn" href="#ref15">[15]</a>. The failure was not in any individual agent — each worked acceptably in isolation. The failure was in the coordination between them, where errors in one agent propagated uncorrected to the next.</p>
+
+        <p>Fully autonomous agent swarms — multi-agent systems operating without human-in-the-loop checkpoints — consistently produce unreliable results. Democratic or debate architectures, where agents converse freely to reach consensus, rarely converge in production. Token costs explode, latency becomes unacceptable, and "consensus" typically means the last agent's output wins by default.</p>
+
+        <p><em>Interpretation:</em> The failure pattern is consistent across academic research and production case studies: the more agents communicate, the more surface area exists for errors and attacks. This is not a solvable problem at the model level. Better models will reduce individual agent failures but will not eliminate coordination failures, because coordination failures are emergent properties of multi-agent interaction.</p>
+
+        <div class="so-what">
+            <strong>So What?</strong> Every inter-agent communication channel is an attack surface and an error propagation path. Design for minimal necessary communication. If two agents do not need to exchange information, they should not. Treat inter-agent messages with the same suspicion you would treat user input.
+        </div>
+
+        <div class="invalidate">
+            <strong>What would invalidate this?</strong> If future models develop reliable meta-reasoning about multi-agent coordination — essentially, if an orchestrator LLM can detect and correct communication failures in real time — the failure rates would drop substantially. Early work on "self-correcting" agents suggests this is possible but not yet production-ready.
+        </div>
+    </div>
+
+    <!-- SECTION 7 -->
+    <div class="section" id="s7">
+        <h2>7. The Hidden Tax: Cost, Latency, and Observability <span class="confidence-inline">(Confidence: Medium)</span></h2>
+
+        <p class="key-statement">Multi-agent cost scales super-linearly — a 5-agent pipeline costs 10–30× a single agent, not 5×, and current observability tools cannot explain why<a class="fn" href="#ref7">[7]</a>.</p>
+
+        <p><em>Evidence:</em> Token cost modeling based on published API pricing<a class="fn" href="#ref16">[16]</a> reveals the compounding effect of inter-agent communication:</p>
+
+        <p class="exhibit-caption">Exhibit 4: Token Cost Modeling for Multi-Agent Pipelines</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Configuration</th>
+                    <th>LLM Calls/Task</th>
+                    <th>Est. Cost/Task (GPT-4o)</th>
+                    <th>Est. Cost/Task (Claude Sonnet)</th>
+                    <th>Daily Cost (10K tasks)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Single Agent</td>
+                    <td>1–3</td>
+                    <td>$0.01–0.03</td>
+                    <td>$0.01–0.02</td>
+                    <td>$100–300</td>
+                </tr>
+                <tr>
+                    <td>3-Agent Pipeline</td>
+                    <td>5–9</td>
+                    <td>$0.05–0.15</td>
+                    <td>$0.03–0.10</td>
+                    <td>$500–1,500</td>
+                </tr>
+                <tr>
+                    <td>5-Agent Pipeline</td>
+                    <td>15–25</td>
+                    <td>$0.15–0.50</td>
+                    <td>$0.10–0.35</td>
+                    <td>$1,500–5,000</td>
+                </tr>
+                <tr>
+                    <td>5-Agent + Retry Logic</td>
+                    <td>25–50</td>
+                    <td>$0.25–1.00</td>
+                    <td>$0.18–0.70</td>
+                    <td>$2,500–10,000</td>
+                </tr>
+                <tr>
+                    <td>MoA (3 layers × 3 agents)</td>
+                    <td>27+</td>
+                    <td>$0.50–2.00</td>
+                    <td>$0.35–1.40</td>
+                    <td>$5,000–20,000</td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="exhibit-source">Assumptions: ~2K tokens input, ~1K tokens output per call. Prices: GPT-4o ($2.50/$10 per M in/out), Claude Sonnet ($3/$15 per M in/out). Actual costs vary by task complexity. Source: OpenAI/Anthropic API pricing [16]</p>
+
+        <p>The cost multiplier comes from three sources: (1) each agent reads the output of previous agents, duplicating token consumption; (2) retry logic on failures multiplies calls; (3) orchestration itself consumes tokens — the supervisor agent that routes, validates, and coordinates is an LLM call that adds zero direct value to the output.</p>
+
+        <p>The observability gap compounds the cost problem. Current tools — LangSmith, Langfuse, Arize Phoenix — are designed for single-agent tracing<a class="fn" href="#ref17">[17]</a>. Multi-agent systems need cross-agent trace correlation, inter-agent message inspection, decision attribution (why did the orchestrator route to Agent B instead of Agent A?), per-agent cost allocation, and failure root-cause analysis. The LangChain survey reports that 94% of production agent developers use some observability tool<a class="fn" href="#ref1">[1]</a>, but multi-agent-specific observability is nascent. LangSmith supports LangGraph traces natively; everything else requires custom instrumentation.</p>
+
+        <p><em>Interpretation:</em> The cost problem is not just financial — it is architectural. Super-linear cost scaling means that multi-agent systems have a natural ceiling: beyond a certain agent count, the coordination overhead exceeds the value of specialization. I estimate this ceiling at 5–7 agents for most production use cases, based on the cost and latency data. Beyond that, you are paying more for coordination than for work.</p>
+
+        <div class="so-what">
+            <strong>So What?</strong> Before adding an agent to your pipeline, calculate the marginal cost including communication overhead. If the agent does not improve output quality enough to justify a 3–5× cost increase (not 1×), it should not be added. Most teams do not model this before deployment.
+        </div>
+
+        <div class="invalidate">
+            <strong>What would invalidate this?</strong> A dramatic reduction in LLM inference costs (10× cheaper) would move the ceiling higher. At current cost trajectories, this is plausible within 18 months, but it solves only one dimension — latency and error compounding remain.
+        </div>
+    </div>
+
+    <!-- SECTION 8 -->
+    <div class="section" id="s8">
+        <h2>8. Orchestration-First: A Design Methodology <span class="confidence-inline">(Confidence: Medium)</span></h2>
+
+        <p class="key-statement">Build the orchestration layer first, then add agents — not the other way around.</p>
+
+        <p>This is the core thesis of this report, and it runs counter to how most teams approach multi-agent systems. The standard approach is: build individual agents, verify they work, then figure out how to connect them. By the time teams reach the coordination step, architectural decisions have already been made — agent interfaces, output formats, error handling patterns — that constrain orchestration options.</p>
+
+        <p>The orchestration-first methodology inverts this:</p>
+
+        <p><strong>Step 1: Define the orchestration pattern.</strong> Using the five patterns from Section 4, identify which pattern matches the task structure. Most production use cases map to prompt chaining or routing. If neither works, consider orchestrator-workers.</p>
+
+        <p><strong>Step 2: Define inter-agent contracts.</strong> Before building any agent, specify what each agent receives as input, what it produces as output, and what constitutes a failure. These contracts are the orchestration layer.</p>
+
+        <p><strong>Step 3: Build with stubs.</strong> Implement the orchestration flow with stub agents — simple functions that return mock output conforming to the contracts. Verify the flow works end-to-end.</p>
+
+        <p><strong>Step 4: Replace stubs with agents.</strong> One at a time, replace stubs with real agents. Test after each replacement. If the flow breaks, the problem is in the contract violation, not the orchestration.</p>
+
+        <p><strong>Step 5: Add complexity only when simple patterns fail.</strong> The burden of proof should be on the complex pattern. If a single agent with good prompting achieves 80% of a multi-agent pipeline's quality, keep the single agent.</p>
+
+        <p class="exhibit-caption">Exhibit 5: HITL Spectrum for Multi-Agent Systems</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Level</th>
+                    <th>Description</th>
+                    <th>Use Case</th>
+                    <th>Risk</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>0: Fully Autonomous</td>
+                    <td>No human oversight</td>
+                    <td>Low-stakes, well-tested pipelines only</td>
+                    <td>Compounding errors; hijacking</td>
+                </tr>
+                <tr>
+                    <td>1: Checkpoint Approval</td>
+                    <td>Human approves at key points</td>
+                    <td>Financial transactions; publishing</td>
+                    <td>Alert fatigue if too many checkpoints</td>
+                </tr>
+                <tr>
+                    <td>2: Exception Handling</td>
+                    <td>Human intervenes on failures only</td>
+                    <td>Most production deployments</td>
+                    <td>Requires good confidence calibration</td>
+                </tr>
+                <tr>
+                    <td>3: Supervised Autonomy</td>
+                    <td>Human monitors dashboard</td>
+                    <td>Enterprise deployments</td>
+                    <td>Monitoring fatigue; 67% of alerts ignored</td>
+                </tr>
+                <tr>
+                    <td>4: Human-Directed</td>
+                    <td>Human decides; agents execute</td>
+                    <td>High-stakes decisions</td>
+                    <td>Defeats automation purpose</td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="exhibit-source">Sources: LangChain survey [1], Vectra alert fatigue data [12]</p>
+
+        <p>The LangChain survey reveals that most production agents have read-only permissions<a class="fn" href="#ref1">[1]</a>. Very few companies allow agents to read, write, and delete freely. The more agents in a system, the more conservative the permission model — which creates a paradox: multi-agent systems promise greater capability, but permission constraints limit what they can actually do.</p>
+
+        <p><em>Interpretation:</em> HITL Level 2 (exception handling) is the practical sweet spot for most multi-agent deployments. It preserves the automation benefit while catching the orchestration failures described in Section 6. But it requires something most teams lack: well-calibrated confidence scores that accurately predict when an agent will fail.</p>
+
+        <div class="so-what">
+            <strong>So What?</strong> The decision to use multi-agent at all should be the last decision, not the first. Start with a single well-prompted agent. Add a second agent only when you can demonstrate that it improves output quality enough to justify the orchestration overhead. Most teams that follow this discipline discover they need fewer agents than they thought.
+        </div>
+
+        <div class="invalidate">
+            <strong>What would invalidate this?</strong> If multi-agent frameworks mature to the point where orchestration is genuinely plug-and-play — where connecting agents is as simple as connecting API endpoints — the overhead of multi-agent systems drops and the single-agent default becomes overly conservative.
+        </div>
+    </div>
+
+    <!-- SECTION 9 -->
+    <div class="section" id="s9">
+        <h2>9. Predictions and Open Questions</h2>
+
+        <p class="key-statement">The orchestration problem will be solved by standardization — whoever creates the "Kubernetes of agents" wins the next platform layer.</p>
+
+        <p>Three predictions for the next 12–18 months:</p>
+
+        <p><strong>Prediction 1: Framework consolidation.</strong> The current four-framework landscape is unsustainable. I expect two outcomes by mid-2027: either LangGraph absorbs CrewAI-like simplicity into its ecosystem, or a new entrant (likely from a cloud provider) establishes the dominant abstraction. AutoGen will remain research-focused. Swarm will remain educational.</p>
+
+        <p><strong>Prediction 2: Orchestration-as-a-Service emerges.</strong> Just as Kubernetes abstracted container orchestration, a managed orchestration layer will abstract agent coordination. This is the highest-leverage infrastructure play in the agent ecosystem. The company that solves multi-agent observability, cost management, and security in a unified platform has a defensible position.</p>
+
+        <p><strong>Prediction 3: Inter-agent trust protocols become necessary.</strong> The 58–90% hijacking success rate<a class="fn" href="#ref2">[2]</a> is not sustainable. As multi-agent systems handle higher-stakes tasks, inter-agent authentication and trust scoring will become requirements — not features. Google's A2A protocol addresses system-level authentication but does not address intent verification between agents.</p>
+
+        <p>Open questions this report cannot answer:</p>
+        <ul>
+            <li>What is the optimal agent count for a given task complexity? No benchmark exists.</li>
+            <li>How do orchestration failures correlate with task domain? No systematic study exists.</li>
+            <li>Will model improvements reduce orchestration complexity, or increase it by enabling more sophisticated agent behaviors?</li>
+        </ul>
+    </div>
+
+    <!-- BEIPACKZETTEL -->
+    <div class="section" id="beipackzettel">
+        <h2>Beipackzettel</h2>
+
+        <ul>
+            <li><strong>Overall Confidence:</strong> 72%</li>
+            <li><strong>Sources:</strong> 13 primary, 5 secondary</li>
+            <li><strong>Strongest Evidence:</strong> MAS hijacking 58–90% success rate across orchestrators (arXiv:2503.12188)<a class="fn" href="#ref2">[2]</a></li>
+            <li><strong>Weakest Point:</strong> Production failure case studies are largely anecdotal; no systematic study of orchestration-specific failures exists</li>
+            <li><strong>What would invalidate this report?</strong> If single-agent systems prove sufficient for 90%+ of production use cases, making orchestration irrelevant for most teams</li>
+            <li><strong>Methodology:</strong> Multi-source research across academic papers (4), framework documentation (4), industry surveys (1, n=1,300), practitioner guides (1), market research (2), and news reports (1). Cost models are calculated, not measured. All claims assessed against a standardized confidence rubric (High/Medium/Low).</li>
+            <li><strong>This report was created with a multi-agent research system.</strong> The irony is not lost on me.</li>
+        </ul>
+    </div>
+
+    <!-- CLAIM REGISTER -->
+    <div class="section" id="claim-register">
+        <h2>Claim Register</h2>
+
+        <p class="exhibit-caption">Exhibit 6: Claim Register</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Claim</th>
+                    <th>Value</th>
+                    <th>Source</th>
+                    <th>Confidence</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Companies with agents in production</td>
+                    <td>51%</td>
+                    <td>LangChain State of AI Agents (n=1,300) [1]</td>
+                    <td><strong>High</strong></td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>MAS hijacking success rate</td>
+                    <td>58–90% (GPT-4o)</td>
+                    <td>arXiv:2503.12188 [2]</td>
+                    <td><strong>High</strong></td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Performance quality as #1 barrier to scaling</td>
+                    <td>>2× other factors</td>
+                    <td>LangChain State of AI Agents [1]</td>
+                    <td><strong>High</strong></td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>MoA outperforms GPT-4o on AlpacaEval</td>
+                    <td>65.1% vs 57.5%</td>
+                    <td>arXiv:2406.04692 [4]</td>
+                    <td><strong>High</strong></td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>100% attack success in some orchestrator configs</td>
+                    <td>100%</td>
+                    <td>arXiv:2503.12188 [2]</td>
+                    <td><strong>High</strong></td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>Mid-size companies most aggressive adopters</td>
+                    <td>63% in production</td>
+                    <td>LangChain State of AI Agents [1]</td>
+                    <td><strong>High</strong></td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>Multi-agent cost is 10–30× single agent</td>
+                    <td>10–30×</td>
+                    <td>Calculated from API pricing + communication overhead [16]</td>
+                    <td><strong>Medium</strong> (modeled)</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>Most successful implementations use simple patterns</td>
+                    <td>Qualitative</td>
+                    <td>Anthropic "Building Effective Agents" [5]</td>
+                    <td><strong>Medium</strong> (practitioner)</td>
+                </tr>
+                <tr>
+                    <td>9</td>
+                    <td>Agent market $7.8B → $52B by 2030</td>
+                    <td>45.8% CAGR</td>
+                    <td>Precedence Research [13]</td>
+                    <td><strong>Medium</strong> (single analyst)</td>
+                </tr>
+                <tr>
+                    <td>10</td>
+                    <td>Agentic AI project cancellation >40% by 2027</td>
+                    <td>>40%</td>
+                    <td>Gartner [11]</td>
+                    <td><strong>Medium</strong> (prediction)</td>
+                </tr>
+                <tr>
+                    <td>11</td>
+                    <td>94% of agent developers use observability tools</td>
+                    <td>94%</td>
+                    <td>LangChain State of AI Agents [1]</td>
+                    <td><strong>Medium</strong></td>
+                </tr>
+                <tr>
+                    <td>12</td>
+                    <td>67% of SOC alerts ignored</td>
+                    <td>67%</td>
+                    <td>Vectra (2023) [12]</td>
+                    <td><strong>Medium</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- REFERENCES -->
+    <div class="section" id="references">
+        <h2>References</h2>
+
+        <p id="ref1">[1] LangChain. "State of AI Agents." Industry survey, 2024. n=1,300 respondents.</p>
+
+        <p id="ref2">[2] Triedman, H. et al. "Multi-Agent Systems Execute Arbitrary Malicious Code." arXiv:2503.12188, 2025.</p>
+
+        <p id="ref3">[3] Guo, T. et al. "Large Language Model based Multi-Agents: A Survey of Progress and Challenges." arXiv:2402.01680, 2024.</p>
+
+        <p id="ref4">[4] Wang, J. et al. "Mixture-of-Agents Enhances Large Language Model Capabilities." arXiv:2406.04692, 2024.</p>
+
+        <p id="ref5">[5] Anthropic. "Building Effective Agents." Practitioner guide, December 2024.</p>
+
+        <p id="ref6">[6] Wu, Q. et al. "AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation." arXiv:2308.08155, 2023.</p>
+
+        <p id="ref7">[7] LangChain Blog. "LangGraph: Multi-Agent Workflows." Technical blog.</p>
+
+        <p id="ref8">[8] OpenAI Cookbook. "Orchestrating Agents: Routines and Handoffs." Technical guide.</p>
+
+        <p id="ref9">[9] CrewAI. Open source documentation. https://docs.crewai.com</p>
+
+        <p id="ref10">[10] Microsoft. AutoGen documentation. https://microsoft.github.io/autogen</p>
+
+        <p id="ref11">[11] Gartner. "Over 40% of Agentic AI Projects Will Be Canceled by 2027." Analyst prediction, 2025.</p>
+
+        <p id="ref12">[12] Vectra. SOC Alert Fatigue Report, 2023.</p>
+
+        <p id="ref13">[13] Precedence Research. AI Agent Market Sizing, 2024. $7.8B → $52B by 2030 (45.8% CAGR).</p>
+
+        <p id="ref14">[14] Multi-agent frameworks survey. arXiv:2502.14143, 2025.</p>
+
+        <p id="ref15">[15] McDonald's AI Drive-Through Program Termination. Various news reports, 2024.</p>
+
+        <p id="ref16">[16] OpenAI and Anthropic. API Pricing Pages. Accessed February 2026.</p>
+
+        <p id="ref17">[17] LangSmith, Langfuse, Arize Phoenix. Product documentation.</p>
+
+        <p id="ref18">[18] Ainary Research Pack (internal). Briefs on Trust, Adversarial, HITL systems.</p>
+
+        <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border);">
+
+        <p><strong>Cite as:</strong> Ziesche, F. (2026). The Orchestration Problem — Why Multi-Agent Systems Fail and How to Fix Them. Ainary Research Report, AR-007.</p>
+
+        <p style="margin-top: 1.5rem;"><strong>About the Author:</strong> Florian Ziesche is the founder of Ainary Ventures, where he builds AI agent infrastructure and trust systems for enterprise deployments. His research focuses on the coordination, reliability, and governance layers that determine whether AI agents create value or liability.</p>
+    </div>
+
+    <!-- CTA FOOTER -->
+    <div class="cta-footer">
+        <a href="mailto:florian@ainaryventures.com" class="cta-link">Request a Project →</a>
+        <p class="cta-subtext">Create your own agent architecture and workflow — tailored to your organization.</p>
+        <p class="contact">florian@ainaryventures.com</p>
+        <p class="contact">ainaryventures.com</p>
+        <p class="tagline">HUMAN × AI = LEVERAGE</p>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <p>© 2026 Ainary Ventures</p>
+    </div>
+
+</div>
+
+</body>
+</html>

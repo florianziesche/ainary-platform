@@ -137,3 +137,142 @@ RESEARCH → SYNTHESIS → GAP RESEARCH → OUTLINE → WRITE → QA → BUILD/P
 ---
 
 *Load this pack for any pipeline-related task: writing, QA, building, or orchestration.*
+
+### Report Typography Rules (Florian Feedback 2026-02-14 15:43)
+- Fußnoten [1] [2]: Grau (#888), hochgestellt, dezent
+- Key Numbers/Stats: Schwarz (#1a1a1a) auf weißem Hintergrund
+- Section Icons (SVG): Grau (#888), nicht Gold
+- Bullet Points + Bold Text: Schwarz
+- "So What?" Callouts: OK wie bisher (dezenter Gold left-border)
+- "What would invalidate this?": OK wie bisher
+- KEIN Gold für Zahlen, Icons, oder strukturelle Elemente
+
+### Report Box Rules (Florian Feedback 2026-02-14 15:45)
+- KEINE Boxes/Cards um Content-Blöcke (schlecht zum Ausdrucken)
+- "So What?" = nur Text, kein Box/Border
+- Exec Summary = Text, kein Box
+- Predictions = Text, kein Box
+- Claim Register = Tabelle (OK)
+- Report #1 = Referenz: keine Boxes, clean Text
+- Alles muss auf Papier (A4 Print) genauso gut aussehen wie am Screen
+
+### Content Type Rules (Florian Feedback 2026-02-14 15:48)
+- Research Report: KEINE persönliche Story. Nie. Daten sprechen.
+- Blog Post: Persönlicher Hook JA, aber spezifisch + aktuell
+  - ✅ "Last week I ran..." / "This week I noticed..."
+  - ❌ "I've built AI products in Munich and New York" (CV-Style, zu generisch)
+  - Hook = konkretes Erlebnis dieser Woche, nicht Lebenslauf
+
+### Report Branding (Florian Feedback 2026-02-14 15:53)
+- Gold-Punkt (●) rechts unten auf jeder Seite — 8-12px, #c8aa50, subtle
+- Ainary Logo NUR auf Cover-Seite + letzte Seite (Footer)
+- NICHT auf jeder Seite (wirkt wie Werbung)
+- Der Punkt = Wiedererkennungsmerkmal, wie ein Qualitätssiegel
+
+### Report Structure Standards (Florian Feedback 2026-02-14 16:17)
+
+HEADER (jede Seite, Print + Screen):
+- Links: "Ainary Report"
+- Rechts: Report-Thema
+
+FOOTER (jede Seite):
+- Links: "© 2026 Ainary Ventures"
+- Mitte: Seite X von Y
+- Rechts: Gold-Punkt (●) 8px #c8aa50
+
+COVER (Seite 1):
+- Ainary Logo (wenn vorhanden)
+- Titel + Untertitel
+- Autor: Florian Ziesche — Ainary Ventures
+- Datum
+- Gesamtconfidence Score
+
+BEIPACKZETTEL (letzte Seite vor References, PFLICHT):
+- Gesamtconfidence: X%
+- Anzahl Quellen: X primär, X sekundär
+- Stärkste Evidenz: [welcher Claim]
+- Schwächste Stelle: [was]
+- "Was würde diesen Report entwerten?"
+- Methodik: Kurzbeschreibung der Pipeline
+- "Dieser Report wurde mit einem Multi-Agent Research System erstellt"
+
+CONFIDENCE pro Section: Als Text "(Confidence: High/Medium)" — zurück als fester Bestandteil
+
+### Chapter & Academic Standards (Florian Feedback 2026-02-14 16:19)
+
+KAPITEL-NUMMERIERUNG:
+- "1. Executive Summary", "2. The Problem", "3. Evidence"
+- Nur 1 Level tief (keine 1.1, 1.2 — zu akademisch)
+- Nummerierung in TOC und im Text
+
+TABELLEN/GRAFIKEN:
+- "Exhibit 1:", "Exhibit 2:" (McKinsey-Standard)
+- Jedes Exhibit hat Titel + Source-Zeile darunter
+
+ZITIER-VORSCHLAG (am Ende, vor References):
+- "Cite as: Ziesche, F. (2026). [Title]. Ainary Research Report, No. [X]."
+
+KEYWORDS (unter Executive Summary):
+- 5-7 Keywords, kommasepariert
+
+KEY INSIGHT pro Kapitel:
+- Erster Satz fett, 1 Zeile — die Kernaussage des Kapitels
+- Wie McKinsey "At a glance"
+
+AUTOREN-BIO (letzte Seite):
+- 2-3 Zeilen: "Florian Ziesche is the founder of Ainary Ventures..."
+
+REPORT-NUMMER:
+- Jeder Report bekommt eine Nummer: AR-001, AR-002, etc.
+- AR = Ainary Report
+
+### Report Footer/CTA (Florian Feedback 2026-02-14 17:00)
+- Nach References: CTA Section
+- "Request a Project →" (Gold link, text-link style)
+- Subtext: "Create your own agent architecture and workflow — tailored to your organization."
+- Email: florian@ainaryventures.com
+- Website: ainaryventures.com
+- Tagline: "HUMAN × AI = LEVERAGE"
+- Gold-Punkt (●) rechts unten
+- Stil: Clean, wie Website-Footer, nicht aufdringlich
+
+### So What / Invalidation Design — FINAL (Florian Feedback 2026-02-14 17:02)
+- ÜBERSCHREIBT vorherige Regel "nur Text"
+- Stil von Report #3 (eu-us-regulation-2026.html) ist der Standard:
+  - Gold left-border (3px, #c8aa50)
+  - Leichter Background (gold-light/transparent)
+  - "SO WHAT?" als Label (uppercase, gold, small)
+  - Text darunter normal
+  - "What would invalidate this?" als bold inline, gleicher Callout-Stil
+- Das sind FUNKTIONALE Callouts, keine dekorativen Boxes
+- Confidence Badges mit SVG Icons (High=checkmark green, Medium=circle orange) = OK
+- ALLE Reports sollen diesen Stil haben
+
+### Section Headers — NO ICONS (Florian Feedback 2026-02-14 17:28)
+- KEINE Icons/Symbole/Emoji vor Kapitel-Überschriften
+- NUR Nummern: "1. Executive Summary", "2. The Problem"
+- KEINE SVG Icons vor Headers
+- KEINE Apple-Symbole
+- Icons haben keinen Mehrwert, nur Noise
+- ÜBERSCHREIBT vorherige Regel "Section Icons in Grau"
+
+### Brand Messaging — FINAL (Florian 2026-02-14 17:37)
+- NIEMALS "replace consultants" oder "replace $200K"
+- Hero: "Multiply your team."
+- Subline: "We do 80% of the work. You do the 20% that matters."
+- Tagline: "HUMAN × AI = LEVERAGE"
+- "Power of Ainary" = Compounding + Brand
+- Positioning: Augmentation > Replacement
+- Respekt für den Kunden, nicht Bedrohung
+
+### Report Cover/Layout Feedback (Florian 2026-02-14 18:05)
+- "Florian Ziesche — Ainary Ventures" zu prominent auf Seite 1 → dezenter
+- Datum in Header ODER Footer (nicht Cover-prominent)
+- CTA Footer: NICHT "Create your own agent architecture..." → stattdessen Services auflisten: "Multi-Agent Architecture · AI Systems · Automation · Second Brain · Pilot Projects"
+- Ainary Logo auf erste Seite (rechts oben oder Mitte) UND letzte Seite
+- Referenz: Blog Post Layout mit Photo + rundes Symbol rechts unten → für Reports adaptieren
+- REST ist gut
+
+### Sales Angles aus Reports (Florian 2026-02-14)
+- "Board age 59.1 avg + refreshment at 10-year low = AI competence gap" → Pitch für Board Advisory/Governance Reports
+- Jeder Report soll 1-2 Sales Angles identifizieren die wir für Outreach nutzen können

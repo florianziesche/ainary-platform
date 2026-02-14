@@ -72,3 +72,11 @@
 - **ROI: 333x-3.333x** — Break-Even ab dem ERSTEN verhinderten Fehler
 - Hallucination Rates: 0.7%-30% je nach Modell (Vectara Index)
 - Cases: Air Canada (Halluzination→Klage), McDonald's (Compounding→Programm beendet), Replit (Agent lügt aktiv), VW ($7.5B)
+
+### TrustCheck as Ainary Service — BACKLOG (2026-02-14)
+- Concept: Claim-level fact-checking als Service
+- Format: Traffic-Light System (Verified/Partially/False) pro Claim
+- Input: URL oder Text → Output: PDF Report mit Claim Register
+- Monetarisierung: Free (1/Tag) → Pro ($X/Monat)
+- Demo existiert bereits (TrustCheck, QA 88/100)
+- Priority: NACH Reports + Launch

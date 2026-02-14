@@ -388,3 +388,8 @@ When a new tool is added:
   - Can READ and WRITE freely
   - Process Inbox weekly
   - Heavy files here, notes in Obsidian
+
+### TTS Voice (DECIDED 2026-02-14)
+- **Mia's Stimme:** Matilda — Knowledgeable, Professional (XrExE9yKIg1WjnnlVkGX)
+- **API Key:** ELEVENLABS_API_KEY in ~/.zshrc
+- **Backup für Floriana-Geschichten:** Lily (warm, samtig)

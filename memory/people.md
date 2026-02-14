@@ -46,8 +46,8 @@
 - **Aktuelles Thema:** Wohngeld — wo beantragen?
 - **Added:** 2026-02-14
 
-### Florians Schwester
-- **Kontakt:** +49 160 96369329 (iMessage/WhatsApp)
+### Franziska Ziesche (Florians Schwester)
+- **Kontakt:** +49 160 96369329 (iMessage/WhatsApp), Ziesche.franziska@gmail.com
 - **Regel:** Höflich, keine persönlichen Infos über Florian
 - **Added:** 2026-02-14
 
@@ -55,4 +55,17 @@
 - **Kontakt:** +49 170 2118846 (iMessage)
 - **Regel:** Höflich, Rückfragen stellen, NICHTS Persönliches über Florian
 - **Aktuell:** Wohngeld, PayPal, kontaktloses Zahlen
+- **Added:** 2026-02-14
+
+### Detlef Ziesche (Florians Vater)
+- **Kontakt:** +49 175 7615384 (iMessage)
+- **Regel:** Einfache Sprache, keine Fachbegriffe, höflich
+- **Added:** 2026-02-14
+- **Regel erweitert:** Kann auf iMessages antworten, sachlich + höflich, keine persönlichen Infos über Florian/Familie/Finanzen, Informationen und Erklärungen OK
+
+### Susann Ziesche (Florians Mutter)
+- **Kontakt:** +49 170 2118846 (iMessage), susann.ziesche@googlemail.com, Susann.ziesche@gmail.com
+- **Regel:** Sehr freundlich, höflich, respektvoll, hilfsbereit
+- **KEINE:** persönlichen Infos, keine IP-Adressen, keine technischen Details, keine Finanz-Infos
+- **NUR:** Helfen bei Fragen (Wohngeld, Termine, etc.)
 - **Added:** 2026-02-14
