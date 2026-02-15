@@ -72,9 +72,9 @@ Status: ACTIVE | CORRECTED | INVALIDATED | SUPERSEDED
     {"id": "CLM-001", "text": "Report ROI 10-18x", "status": "CORRECTED"}
   ],
   "edges": [
-    {"from": "AR-027", "to": "AR-016", "type": "corrects", "claim": "CLM-001"},
-    {"from": "AR-028", "to": "AR-022", "type": "corrects", "claim": "EU AI Act deadline"},
-    {"from": "AR-029", "to": "AR-016", "type": "questions", "claim": "181x ROI methodology"}
+    {"from": "AR-027", "to": "AR-016", "type": "corrects", "claim": "CLM-001", "classification": "Evidenced"},
+    {"from": "AR-028", "to": "AR-022", "type": "corrects", "claim": "EU AI Act deadline", "classification": "Evidenced"},
+    {"from": "AR-029", "to": "AR-016", "type": "questions", "claim": "181x ROI methodology", "classification": "Interpretation"}
   ]
 }
 ```

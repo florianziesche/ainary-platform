@@ -21,16 +21,33 @@ The merge takes the Factory's structure as backbone and adds Mia's unique capabi
 - AR_ID: AR-[NNN]
 - TOPIC: {string}
 - DECISION_TO_INFORM: {string — what decision does this help?}
+- DECISION_OWNER: {string or role — who acts on this?}
 - AUDIENCE: {Founder | Exec | Board | Operator | Investor | Public}
 - RISK_TIER: {1 | 2 | 3}
 - FRESHNESS: {timeless | last_12m | last_90d | last_30d | today}
+- BROWSING: {allowed | not_allowed} — if not_allowed: reduce confidence, state explicitly
 - EXPERIMENT_TYPE: {none | simulation | measurement | comparison | case_study}
 - OUTPUT: {html+pdf | html_only | markdown}
+- OUTPUT_WRITEBACK: {true | false} — generate Asset Pack (Phase 9)?
+- OUTPUT_LENGTH: {standard | extensive} (default: extensive)
+- SCOPE_CONSTRAINTS: {geo/industry/timeframe — what's OUT of scope}
+- MUST_INCLUDE: {topics, angles, comparisons that MUST appear}
+- MUST_NOT: {topics, claims, framings to AVOID}
 - CROSS_REFS: {list of AR-IDs to build on}
+- SUCCESS_CRITERIA: {3-7 bullets — when is this report "done"?}
+- WHAT_HAPPENS_IF_WRONG: {risk/cost of wrong conclusions}
 - STOPPING_CRITERIA: {what confidence is "enough"? what evidence changes conclusion?}
 ```
 
 If any value is missing, infer conservatively and list assumptions.
+
+### FRESHNESS Rule (NON-NEGOTIABLE)
+FRESHNESS is a SOURCE FILTER, not a label:
+- `last_12m` → sources older than 12 months are SECONDARY only (provide context, not load-bearing evidence)
+- `last_90d` → only sources from last 90 days as primary evidence
+- `last_30d` / `today` → strict recency; older sources must be flagged with "[DATED]"
+- `timeless` → no filter, but access dates still required
+- Every source in the Source Log must note its publication date. If outside FRESHNESS window → mark as "[OUTSIDE FRESHNESS WINDOW — context only]"
 
 ---
 
@@ -85,6 +102,8 @@ If any value is missing, infer conservatively and list assumptions.
 7. Planned Methods & Sources (web search queries, internal cross-refs, academic sources)
 8. Stopping Criteria (confidence target, acceptable uncertainty, what changes conclusion)
 
+9. Evidence Criteria — what counts as acceptable evidence? (inclusion/exclusion rules BEFORE searching)
+
 **Quality Gate:** Brief must be approved before Phase 2 begins.
 
 ---
@@ -110,12 +129,20 @@ S[N]
 - Title:
 - Publisher / Type: {official | standard | primary_research | reputable_secondary | blog | internal}
 - URL:
-- Access date:
+- Publication date: YYYY-MM-DD (or "unknown")
+- Access date: YYYY-MM-DD
+- Freshness check: {WITHIN_WINDOW | OUTSIDE_WINDOW — context only}
 - Key points (bullets):
 - Supports (claims/sections):
-- Caveats/limits:
+- Caveats/limits: {bias, scope, outdatedness, incentives}
 - Quality: {High | Medium | Low}
 ```
+
+### FRESHNESS Enforcement in Source Log
+- Count sources WITHIN_WINDOW vs OUTSIDE_WINDOW
+- Tier 2: ≥ 60% of load-bearing sources must be WITHIN_WINDOW
+- Tier 3: ≥ 80% of load-bearing sources must be WITHIN_WINDOW
+- OUTSIDE_WINDOW sources may provide context/history but NOT be the sole evidence for a claim
 
 ### 2d. Artifact B — Claim Ledger (Mandatory Tier 2+)
 
@@ -135,7 +162,7 @@ For each conflict:
 ```
 - Conflict:
 - Sources: S[N] vs S[M]
-- Why they differ:
+- Why they differ: {definitions | timeframe | methodology | incentives}
 - Impact on decision:
 - Resolution or what would resolve:
 ```
@@ -209,11 +236,26 @@ Answer explicitly:
 14. **References** — Numbered, hanging indent, access dates
 15. **Back Cover** — Branding, contact
 
+### Writing Style: Retrieval-Optimized
+- **Explicit nouns** (not "this approach" → "the 3-link threshold approach")
+- **Standalone bullets** (each bullet makes sense without context)
+- **Explicit relationships** ("A contradicts B", "X depends on Y", not vague "relates to")
+- Every section answerable with: "This section answers: ..."
+
 ### Citation Rules
 - Inline numbered citations [1], [2]...
-- Every citation maps to References
-- Never cite sources not used
-- **Internal sources (AR-XXX) labeled as "Internal — not independent"**
+- Every citation maps to References AND Source Log
+- Never cite sources not in Source Log
+- **Internal sources (AR-XXX) labeled as "[Internal — not independent]"**
+- If BROWSING=not_allowed: state explicitly, reduce confidence, label affected claims
+
+### Partial Run Commands
+The pipeline supports partial execution:
+- "Run Phase 1 only" → Research Brief only
+- "Run Phases 1-2" → Brief + Source Log + Claim Ledger
+- "Run Phases 1-4" → Everything except writing
+- "Reviewer Pass only" → Rubric + Claim Audit on existing report
+- "Repair only" → Apply fix requests
 
 ### Separation Rule (NON-NEGOTIABLE)
 Every claim must be labeled:
