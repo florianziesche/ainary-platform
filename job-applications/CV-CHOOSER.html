@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV Template Chooser — Florian Ziesche</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --bg: #fafaf8;
+            --text: #1a1a1a;
+            --text-secondary: #555;
+            --text-muted: #888;
+            --gold: #c8aa50;
+            --border: #e5e3dc;
+            --selected: rgba(200, 170, 80, 0.12);
+            --selected-border: var(--gold);
+            --sidebar-w: 280px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+            font-size: 15px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            top: 0; left: 0;
+            width: var(--sidebar-w);
+            height: 100vh;
+            overflow-y: auto;
+            background: #f3f2ee;
+            border-right: 1px solid var(--border);
+            padding: 1.5rem 1rem;
+            z-index: 100;
+        }
+        .sidebar h2 {
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+        .sidebar a {
+            display: block;
+            padding: 0.35rem 0.6rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 4px;
+            margin-bottom: 2px;
+            transition: all 0.15s;
+        }
+        .sidebar a:hover { background: rgba(0,0,0,0.05); color: var(--text); }
+        .sidebar a.active { background: var(--selected); color: var(--text); font-weight: 500; }
+        .sidebar .sep { height: 1px; background: var(--border); margin: 0.75rem 0; }
+        .sidebar .progress {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: rgba(200,170,80,0.08);
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        .sidebar .progress strong { color: var(--text); }
+        .sidebar .actions {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+        .sidebar button {
+            width: 100%;
+            padding: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: 1px solid var(--border);
+            background: #fff;
+            color: var(--text);
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 0.5rem;
+            transition: all 0.15s;
+        }
+        .sidebar button:hover { background: var(--gold); color: #fff; border-color: var(--gold); }
+
+        /* MAIN */
+        .main {
+            margin-left: var(--sidebar-w);
+            max-width: 1400px;
+            padding: 2rem 3rem 4rem;
+        }
+
+        /* HEADER */
+        .page-header {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+        }
+        .page-header p { color: var(--text-secondary); font-size: 0.95rem; max-width: 700px; line-height: 1.6; }
+
+        /* SECTIONS */
+        .element-section {
+            margin-bottom: 4rem;
+            padding-top: 1rem;
+            scroll-margin-top: 2rem;
+        }
+        .element-section h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        .element-section .section-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            font-style: italic;
+        }
+
+        /* OPTIONS GRID */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        @media (max-width: 1300px) {
+            .options-grid { grid-template-columns: 1fr; }
+        }
+
+        .option-card {
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            position: relative;
+            background: #fff;
+        }
+        .option-card:hover { border-color: #ccc; }
+        .option-card.selected {
+            border-color: var(--selected-border);
+            box-shadow: 0 0 0 3px rgba(200, 170, 80, 0.2);
+        }
+        .option-card .vote-badge {
+            position: absolute;
+            top: 10px; right: 10px;
+            background: var(--gold);
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 3px;
+            letter-spacing: 0.5px;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+        .option-label {
+            padding: 0.6rem 0.9rem;
+            background: #f5f4f0;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+        .option-preview {
+            padding: 1.5rem;
+            min-height: 200px;
+            background: #fff;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            overflow: hidden;
+        }
+        .option-rationale {
+            padding: 1rem 1.25rem;
+            background: #f9f8f5;
+            border-top: 1px solid var(--border);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        .option-rationale strong { color: var(--text); font-weight: 600; }
+        .option-rationale .confidence {
+            display: inline-block;
+            font-weight: 600;
+            color: var(--gold);
+            margin-left: 0.25rem;
+        }
+
+        /* COMMENT TEXTAREA */
+        .comment-area {
+            padding: 1rem 1.25rem;
+            background: #f5f4f0;
+            border-top: 1px solid var(--border);
+        }
+        .comment-area label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+        .comment-area textarea {
+            width: 100%;
+            min-height: 70px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 0.6rem 0.8rem;
+            font-family: 'Inter', system-ui, sans-serif;
+            font-size: 0.85rem;
+            color: var(--text);
+            background: #fff;
+            resize: vertical;
+            line-height: 1.5;
+        }
+        .comment-area textarea:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 2px rgba(200, 170, 80, 0.15);
+        }
+        .comment-area textarea::placeholder { color: #bbb; }
+
+        /* QA BLOCK */
+        .qa-block {
+            margin-top: 1.5rem;
+            padding: 1rem 1.25rem;
+            background: #f5f4f0;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+        .qa-block h4 {
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+        .qa-block .question {
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+        .qa-block .answer-field {
+            width: 100%;
+            min-height: 60px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 0.6rem 0.8rem;
+            font-family: 'Inter', system-ui, sans-serif;
+            font-size: 0.85rem;
+            color: var(--text);
+            background: #fff;
+            resize: vertical;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        .qa-block .answer-field:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 2px rgba(200, 170, 80, 0.15);
+        }
+        .qa-block .answer-field::placeholder { color: #bbb; }
+
+        /* CV PREVIEW STYLES */
+        .cv-preview {
+            font-family: 'Inter', -apple-system, sans-serif;
+            font-size: 9.5pt;
+            line-height: 1.45;
+            color: #1a1a1a;
+        }
+
+        /* Header previews */
+        .cv-header-current {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #1a1a1a;
+        }
+        .cv-header-current h3 {
+            font-size: 19pt;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            margin-bottom: 2px;
+        }
+        .cv-header-current .subtitle {
+            font-size: 9pt;
+            font-weight: 400;
+            color: #555;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .cv-header-current .contact {
+            text-align: right;
+            font-size: 8.5pt;
+            color: #444;
+            line-height: 1.6;
+        }
+
+        .cv-header-centered {
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #1a1a1a;
+        }
+        .cv-header-centered h3 {
+            font-size: 19pt;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+        .cv-header-centered .contact {
+            font-size: 8.5pt;
+            color: #444;
+        }
+
+        .cv-header-twocol {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--gold);
+        }
+        .cv-header-twocol h3 {
+            font-size: 19pt;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            margin-bottom: 2px;
+        }
+        .cv-header-twocol .subtitle {
+            font-size: 9pt;
+            color: #555;
+            letter-spacing: 0.5px;
+        }
+        .cv-header-twocol .contact {
+            text-align: right;
+            font-size: 8.5pt;
+            color: #444;
+            line-height: 1.6;
+        }
+
+        /* Summary previews */
+        .cv-summary-current {
+            font-size: 9pt;
+            color: #333;
+            line-height: 1.5;
+            padding: 8px 12px;
+            background: #f8f8f8;
+            border-left: 3px solid #c8aa50;
+            text-align: justify;
+        }
+
+        .cv-summary-unfair {
+            font-size: 9pt;
+            color: #1a1a1a;
+            line-height: 1.5;
+            padding: 8px 12px;
+            background: #f8f8f8;
+            border-left: 3px solid #c8aa50;
+            font-weight: 500;
+        }
+
+        .cv-summary-thesis {
+            font-size: 9pt;
+            color: #333;
+            line-height: 1.5;
+            padding: 8px 12px;
+            background: #f8f8f8;
+            border-left: 3px solid #c8aa50;
+            font-style: italic;
+        }
+
+        /* Experience block styles */
+        .cv-role {
+            margin-bottom: 0.75rem;
+        }
+        .cv-role-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+        .cv-role-title {
+            font-size: 10pt;
+            font-weight: 600;
+        }
+        .cv-role-date {
+            font-size: 8.5pt;
+            font-weight: 500;
+            color: #555;
+        }
+        .cv-role-company {
+            font-size: 8.5pt;
+            color: #666;
+            font-style: italic;
+            margin-bottom: 3px;
+        }
+        .cv-role-bullets {
+            padding-left: 16px;
+            font-size: 9pt;
+        }
+        .cv-role-bullets li {
+            margin-bottom: 1.5px;
+            color: #2a2a2a;
+        }
+        .cv-role-bullets li strong {
+            font-weight: 600;
+        }
+
+        /* Footer styles */
+        .cv-footer {
+            font-size: 8pt;
+            color: #999;
+            padding-top: 6px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Skills grid */
+        .cv-skills-grid {
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            gap: 3px 12px;
+            font-size: 8.5pt;
+        }
+        .cv-skills-label {
+            font-weight: 600;
+            color: #333;
+        }
+        .cv-skills-value {
+            color: #555;
+        }
+
+        /* Education */
+        .cv-edu-block {
+            margin-bottom: 0.5rem;
+        }
+        .cv-edu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+        .cv-edu-degree {
+            font-size: 9.5pt;
+            font-weight: 600;
+        }
+        .cv-edu-year {
+            font-size: 8.5pt;
+            color: #555;
+        }
+        .cv-edu-school {
+            font-size: 8.5pt;
+            color: #666;
+        }
+        .cv-edu-detail {
+            font-size: 8pt;
+            color: #777;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h2>CV Elements</h2>
+        <a href="#elem-01">01. Header & Contact</a>
+        <a href="#elem-02">02. Subtitle / Tagline</a>
+        <a href="#elem-03">03. Summary / Profile</a>
+        <a href="#elem-04">04. Ainary Ventures Block</a>
+        <a href="#elem-05">05. 36ZERO Vision Block</a>
+        <a href="#elem-06">06. Earlier Roles</a>
+        <a href="#elem-07">07. VC Lab Block</a>
+        <a href="#elem-08">08. Education</a>
+        <a href="#elem-09">09. Proficiencies / Skills</a>
+        <a href="#elem-10">10. Footer</a>
+        <a href="#elem-11">11. Design / Layout</a>
+        <a href="#elem-12">12. Customization Strategy</a>
+        
+        <div class="sep"></div>
+        
+        <div class="progress">
+            <strong id="progress-count">0</strong> of 12 elements selected
+        </div>
+
+        <div class="actions">
+            <button onclick="saveChoices()">💾 Save Choices</button>
+            <button onclick="exportChoices()">📄 Export Summary</button>
+            <button onclick="clearChoices()">🗑️ Clear All</button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+        <div class="page-header">
+            <h1>CV Template Chooser</h1>
+            <p>Select the best option for each CV element. Click an option to select it, add comments and answer QA questions where relevant. Mia's recommended choices are marked with a gold badge and confidence percentage. All selections are saved automatically to localStorage.</p>
+        </div>
+
+        <!-- ELEMENT 01: Header & Contact -->
+        <div class="element-section" id="elem-01">
+            <h2>01. Header & Contact</h2>
+            <p class="section-meta">The first impression — establishes visual hierarchy and professionalism</p>
+
+            <div class="options-grid">
+                <!-- Option A -->
+                <div class="option-card" data-element="01" data-option="A" onclick="selectOption('01', 'A')">
+                    <div class="vote-badge">MIA'S VOTE · 85%</div>
+                    <div class="option-label">Option A — Current Layout</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div class="cv-header-current">
+                                <div>
+                                    <h3>Florian Ziesche</h3>
+                                    <div class="subtitle">Investor — IBM Ventures</div>
+                                </div>
+                                <div class="contact">
+                                    New York, NY · Green Card Holder<br>
+                                    +1 347 740 1465<br>
+                                    florian@ainaryventures.com
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Clean two-column hierarchy. Name gets maximum attention (largest element), subtitle contextualizes for specific role, contact info doesn't compete. Standard for US VC/finance roles. <strong>Research:</strong> Sequoia, a16z, Benchmark partner bios follow this pattern — name dominates, context follows. <span class="confidence">85% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="01" data-option="A" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Option B -->
+                <div class="option-card" data-element="01" data-option="B" onclick="selectOption('01', 'B')">
+                    <div class="option-label">Option B — Centered Minimal</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div class="cv-header-centered">
+                                <h3>Florian Ziesche</h3>
+                                <div class="contact">
+                                    New York, NY · florian@ainaryventures.com · +1 347 740 1465
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Maximum restraint. No subtitle = forces content to speak. Clean for universal applications. <strong>Risk:</strong> Loses role-specific context that helps screeners route to right pile. <strong>Research:</strong> Top MBA resumes (HBS, Stanford GSB) sometimes use this for multi-audience applications. <span class="confidence">65% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="01" data-option="B" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Option C -->
+                <div class="option-card" data-element="01" data-option="C" onclick="selectOption('01', 'C')">
+                    <div class="option-label">Option C — Two-Column with Gold Accent</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div class="cv-header-twocol">
+                                <div>
+                                    <h3>Florian Ziesche</h3>
+                                    <div class="subtitle">Investor — IBM Ventures</div>
+                                </div>
+                                <div class="contact">
+                                    New York, NY<br>
+                                    Green Card Holder<br>
+                                    +1 347 740 1465<br>
+                                    florian@ainaryventures.com
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Gold accent adds visual interest without distracting. Symmetric grid = modern. <strong>Risk:</strong> Color can feel "designed" rather than "serious" in conservative VC contexts. <strong>Research:</strong> Works better for tech/product roles than traditional finance. <span class="confidence">55% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="01" data-option="C" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ELEMENT 02: Subtitle / Tagline -->
+        <div class="element-section" id="elem-02">
+            <h2>02. Subtitle / Tagline</h2>
+            <p class="section-meta">Should be swappable per application — contextualizes who you are in 3-7 words</p>
+
+            <div class="options-grid">
+                <!-- Option A -->
+                <div class="option-card" data-element="02" data-option="A" onclick="selectOption('02', 'A')">
+                    <div class="vote-badge">MIA'S VOTE · 90%</div>
+                    <div class="option-label">Option A — Role-Specific (Current)</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div style="font-size: 9pt; font-weight: 400; color: #555; letter-spacing: 0.5px; text-transform: uppercase;">
+                                Investor — IBM Ventures
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Immediately tells screener what role you're applying for. Shows intent. Easy to swap per application. <strong>Research:</strong> McKinsey, BCG, top-tier finance applications recommend role-specific header customization. Shows you're not spraying generic CVs. <strong>For IBM Ventures application:</strong> Perfect. <span class="confidence">90% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="02" data-option="A" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Option B -->
+                <div class="option-card" data-element="02" data-option="B" onclick="selectOption('02', 'B')">
+                    <div class="option-label">Option B — Universal Identity</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div style="font-size: 9pt; font-weight: 400; color: #555; letter-spacing: 0.5px;">
+                                AI Operator · Investor · Fund Builder
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Captures full identity — shows multidimensional value. Good for networking CVs, portfolio sites. <strong>Risk:</strong> Less focused. VC firms want to know you're serious about THEIR role, not hedging across 3 careers. <strong>Use case:</strong> LinkedIn headline, personal site. Not for specific applications. <span class="confidence">50% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="02" data-option="B" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Option C -->
+                <div class="option-card" data-element="02" data-option="C" onclick="selectOption('02', 'C')">
+                    <div class="option-label">Option C — Value Proposition</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div style="font-size: 9pt; font-weight: 400; color: #555; letter-spacing: 0.3px;">
+                                Operator Who Builds What VCs Fund
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Provocative. Immediately positions unfair advantage. Memorable. <strong>Risk:</strong> Can feel overly clever for conservative firms. Works better for operator-first funds (Unusual Ventures, Founder Collective) than traditional Sand Hill Road. <strong>Research:</strong> Operator-turned-investor taglines work when backed by real operational outcomes. You have them. <span class="confidence">70% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="02" data-option="C" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ELEMENT 03: Summary / Profile -->
+        <div class="element-section" id="elem-03">
+            <h2>03. Summary / Profile</h2>
+            <p class="section-meta">Your 3-sentence elevator pitch — what makes you uniquely qualified</p>
+
+            <div class="options-grid">
+                <!-- Option A -->
+                <div class="option-card" data-element="03" data-option="A" onclick="selectOption('03', 'A')">
+                    <div class="option-label">Option A — Current (Comprehensive)</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div class="cv-summary-current">
+                                Built and scaled an AI company to BMW, Siemens, Bosch over 5 years. $5.5M raised across equity and grants. German-born, built companies in Munich, now based in New York. Bridging European technical founders with US venture capital. Currently VC Lab Fellow (Decile Group, Cohort 6): building an AI-focused fund thesis with hands-on deal sourcing, due diligence, and LP outreach.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Covers all bases — operational outcomes, fundraising, geographic bridge, current VC training. Safe, comprehensive. <strong>Risk:</strong> Doesn't lead with the most differentiated fact. Reads like a list. <strong>Research:</strong> Traditional CV summaries prioritize breadth. Works for screeners checking boxes. <span class="confidence">70% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="03" data-option="A" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Option B -->
+                <div class="option-card" data-element="03" data-option="B" onclick="selectOption('03', 'B')">
+                    <div class="vote-badge">MIA'S VOTE · 88%</div>
+                    <div class="option-label">Option B — Unfair Advantage Lead</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div class="cv-summary-unfair">
+                                One of few VC candidates who has built AI products, sold to enterprise, AND raised $5.5M — on both sides of the Atlantic. 5 years as CEO of 36ZERO Vision (computer vision SaaS): scaled to BMW, Siemens, Bosch, 327% revenue growth. Now transitioning to invest in what I've built. VC Lab Fellow developing AI-focused fund thesis.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Opens with differentiation. "One of few" = scarcity = attention. Specific outcomes follow. <strong>Research:</strong> YC application advice: lead with what makes you rare. This does. VC hiring = pattern matching rare profiles. <strong>IBM Ventures context:</strong> They want operator-investors. This screams it. <span class="confidence">88% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="03" data-option="B" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Option C -->
+                <div class="option-card" data-element="03" data-option="C" onclick="selectOption('03', 'C')">
+                    <div class="option-label">Option C — Thesis-Driven</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div class="cv-summary-thesis">
+                                I believe the best investors have built what they fund. 5 years as AI CEO, $5.5M raised, enterprise clients like BMW and Siemens — now transitioning to invest in what I know. Building AI-focused fund thesis at VC Lab (Decile Group): vertical AI, founder-operator advantage, trust systems.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Opens with conviction = memorable. Shows you have a thesis (critical for investor roles). Personal story arc: builder → investor. <strong>Risk:</strong> Italic + "I believe" can feel informal. <strong>Research:</strong> Founder-turned-VC bios (Elad Gil, Naval) often lead with conviction. Works for operator-first firms. <span class="confidence">75% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="03" data-option="C" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="qa-block">
+                <h4>QA: Ainary Current Work</h4>
+                <div class="question">Should the summary mention Ainary's current work (research reports, multi-agent system)?</div>
+                <textarea class="answer-field" data-qa="03-ainary" placeholder="Your answer: Does mentioning current research strengthen or dilute the operator → investor narrative?"></textarea>
+                
+                <div class="question">Pro: Shows you're still building (not just coasting). Con: Might signal you're hedging / not fully committed to VC transition. What's the trade-off?</div>
+                <textarea class="answer-field" data-qa="03-hedge" placeholder="Your analysis..."></textarea>
+            </div>
+        </div>
+
+        <!-- ELEMENT 04: Ainary Ventures Block -->
+        <div class="element-section" id="elem-04">
+            <h2>04. Experience: Ainary Ventures Block</h2>
+            <p class="section-meta">How to position current work — advisory, research, or fundraising-focused?</p>
+
+            <div class="options-grid">
+                <!-- Option A -->
+                <div class="option-card" data-element="04" data-option="A" onclick="selectOption('04', 'A')">
+                    <div class="option-label">Option A — Current (Advisory)</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div class="cv-role">
+                                <div class="cv-role-header">
+                                    <span class="cv-role-title">Operating Founder Advisor & Startup Mentor</span>
+                                    <span class="cv-role-date">2025 – Present</span>
+                                </div>
+                                <div class="cv-role-company">Ainary Ventures · U.S. & Germany</div>
+                                <ul class="cv-role-bullets">
+                                    <li><strong>Fundraising:</strong> Raised $300K in initial capital for an early-stage startup post-engagement</li>
+                                    <li><strong>Advisory:</strong> Term sheet advisory, due diligence organization, data room preparation</li>
+                                    <li><strong>Go-to-Market:</strong> US market entry strategy and business plan coaching for international founders</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Shows you've been on the other side of the table recently. $300K outcome = credibility. <strong>Risk:</strong> "Advisor" can sound vague. <strong>Research:</strong> VCs value advisors who generate outcomes, not just give advice. $300K raise proves value. <span class="confidence">75% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="04" data-option="A" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Option B -->
+                <div class="option-card" data-element="04" data-option="B" onclick="selectOption('04', 'B')">
+                    <div class="vote-badge">MIA'S VOTE · 82%</div>
+                    <div class="option-label">Option B — Research-Focused</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div class="cv-role">
+                                <div class="cv-role-header">
+                                    <span class="cv-role-title">Founder — AI Research & Advisory</span>
+                                    <span class="cv-role-date">2025 – Present</span>
+                                </div>
+                                <div class="cv-role-company">Ainary Ventures · U.S. & Germany</div>
+                                <ul class="cv-role-bullets">
+                                    <li><strong>Research:</strong> Built multi-agent research system producing consultant-grade reports. 9 published research reports on AI agent trust, governance, and enterprise adoption.</li>
+                                    <li><strong>Fundraising:</strong> Raised $300K for early-stage client through term sheet negotiation and data room preparation.</li>
+                                    <li><strong>Due Diligence:</strong> AI strategy advisory for startups and SMEs evaluating AI investments and partnerships.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Research system = technical depth. 9 reports = output proof. Shows you think like an analyst (critical for VC). <strong>IBM Ventures context:</strong> They want technical rigor + business sense. This shows both. <strong>Research:</strong> Top VCs publish theses (a16z, GGV). You're doing that. <span class="confidence">82% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="04" data-option="B" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Option C -->
+                <div class="option-card" data-element="04" data-option="C" onclick="selectOption('04', 'C')">
+                    <div class="option-label">Option C — Advisory-Focused</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div class="cv-role">
+                                <div class="cv-role-header">
+                                    <span class="cv-role-title">Founder & AI Strategy Advisor</span>
+                                    <span class="cv-role-date">2025 – Present</span>
+                                </div>
+                                <div class="cv-role-company">Ainary Ventures · U.S. & Germany</div>
+                                <ul class="cv-role-bullets">
+                                    <li><strong>Client Success:</strong> Raised $300K in seed capital for early-stage AI startup post-engagement.</li>
+                                    <li><strong>Advisory:</strong> AI strategy, due diligence support, and fundraising guidance for startups and SMEs.</li>
+                                    <li><strong>Market Entry:</strong> US expansion strategy and business plan development for European AI founders.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Positions you as operator helping founders (VC-adjacent work). $300K outcome first = results-oriented. <strong>Risk:</strong> Downplays research depth that differentiates you. <strong>Use case:</strong> Better for pure advisory roles than investor roles. <span class="confidence">60% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="04" data-option="C" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ELEMENT 05: 36ZERO Vision Block -->
+        <div class="element-section" id="elem-05">
+            <h2>05. Experience: 36ZERO Vision Block</h2>
+            <p class="section-meta">Your core operator credential — should you show breadth or focus on commercial impact?</p>
+
+            <div class="options-grid">
+                <!-- Option A -->
+                <div class="option-card" data-element="05" data-option="A" onclick="selectOption('05', 'A')">
+                    <div class="vote-badge">MIA'S VOTE · 80%</div>
+                    <div class="option-label">Option A — Current (Comprehensive)</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div class="cv-role">
+                                <div class="cv-role-header">
+                                    <span class="cv-role-title">Co-Founder & CEO → CRO</span>
+                                    <span class="cv-role-date">2019 – 2024</span>
+                                </div>
+                                <div class="cv-role-company">36ZERO Vision GmbH — Cloud Computer Vision SaaS · Munich</div>
+                                <ul class="cv-role-bullets">
+                                    <li><strong>Fundraising:</strong> Raised $5.5M total — $3.5M equity (Pre-Seed & Seed) from European and US investors plus $1.5M+ in non-dilutive grants.</li>
+                                    <li><strong>Revenue Growth:</strong> Grew signed annual contract value from $240K to $1M+ within one year — 327% growth. Maintained 9% monthly pipeline growth.</li>
+                                    <li><strong>Enterprise Sales:</strong> Closed BMW, Siemens, Bosch, Magna, Linamar. Built strategic partnerships with SAP, Bosch Rexroth, and Siemens.</li>
+                                    <li><strong>Product:</strong> Led product from prototype to production-grade AI visual inspection system deployed on automotive production lines.</li>
+                                    <li><strong>Team:</strong> Built international team from 0 to 15+. Board member. Keynote speaker at international industry conferences.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Comprehensive = shows full startup lifecycle. Fundraising, revenue, product, team = all VC evaluation criteria covered. <strong>Research:</strong> VCs pattern-match to full-stack founders who've done it all. This shows it. <span class="confidence">80% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="05" data-option="A" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Option B -->
+                <div class="option-card" data-element="05" data-option="B" onclick="selectOption('05', 'B')">
+                    <div class="option-label">Option B — Impact-First (Reordered)</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div class="cv-role">
+                                <div class="cv-role-header">
+                                    <span class="cv-role-title">Co-Founder & CEO → CRO</span>
+                                    <span class="cv-role-date">2019 – 2024</span>
+                                </div>
+                                <div class="cv-role-company">36ZERO Vision GmbH — Cloud Computer Vision SaaS · Munich</div>
+                                <ul class="cv-role-bullets">
+                                    <li><strong>Revenue Growth:</strong> Grew signed annual contract value from $240K to $1M+ within one year — 327% growth. Maintained 9% monthly pipeline growth.</li>
+                                    <li><strong>Fundraising:</strong> Raised $5.5M total — $3.5M equity (Pre-Seed & Seed) from European and US investors plus $1.5M+ in non-dilutive grants.</li>
+                                    <li><strong>Enterprise Sales:</strong> Closed BMW, Siemens, Bosch, Magna, Linamar. Built strategic partnerships with SAP, Bosch Rexroth, and Siemens.</li>
+                                    <li><strong>Product:</strong> Led product from prototype to production-grade AI visual inspection system deployed on automotive production lines.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Revenue first = commercial traction first. VCs want to see you can build revenue engines, not just raise money. 327% growth hits hard. <strong>Research:</strong> Jason Lemkin (SaaStr): "Revenue cures all." Leading with commercial success > fundraising shows operator priority. <span class="confidence">78% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="05" data-option="B" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Option C -->
+                <div class="option-card" data-element="05" data-option="C" onclick="selectOption('05', 'C')">
+                    <div class="option-label">Option C — Condensed (3 bullets max)</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div class="cv-role">
+                                <div class="cv-role-header">
+                                    <span class="cv-role-title">Co-Founder & CEO → CRO</span>
+                                    <span class="cv-role-date">2019 – 2024</span>
+                                </div>
+                                <div class="cv-role-company">36ZERO Vision GmbH — Cloud Computer Vision SaaS · Munich</div>
+                                <ul class="cv-role-bullets">
+                                    <li><strong>Fundraising:</strong> Raised $5.5M total ($3.5M equity + $1.5M grants) from European and US investors.</li>
+                                    <li><strong>Revenue:</strong> Scaled ARR from $240K to $1M+ in 12 months (327% growth). 9% monthly pipeline growth.</li>
+                                    <li><strong>Enterprise:</strong> Closed BMW, Siemens, Bosch, Magna. Built strategic partnerships with SAP and Siemens.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Maximum density. Cuts product/team bullets to save space. Three power metrics: fundraising, revenue, logos. <strong>Risk:</strong> Loses product depth (important for technical VC roles). <strong>Use case:</strong> When space is critical or applying to pure business-focused roles. <span class="confidence">68% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="05" data-option="C" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ELEMENT 06: Earlier Roles -->
+        <div class="element-section" id="elem-06">
+            <h2>06. Experience: Earlier Roles</h2>
+            <p class="section-meta">BNP, BMW, Celgene — how much detail do pre-startup roles deserve?</p>
+
+            <div class="options-grid">
+                <!-- Option A -->
+                <div class="option-card" data-element="06" data-option="A" onclick="selectOption('06', 'A')">
+                    <div class="vote-badge">MIA'S VOTE · 85%</div>
+                    <div class="option-label">Option A — Current (3 one-liners)</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div style="font-size: 9pt; margin-bottom: 4px;">
+                                <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                                    <span style="font-weight: 600;">ML Engineer (Thesis)</span>
+                                    <span style="font-size: 8.5pt; color: #555;">2018 – 2019</span>
+                                </div>
+                                <div style="font-size: 8.5pt; color: #666; font-style: italic;">BNP Paribas Consors Finanz · Munich</div>
+                            </div>
+                            <div style="font-size: 9pt; margin-bottom: 4px;">
+                                <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                                    <span style="font-weight: 600;">Business Analyst</span>
+                                    <span style="font-size: 8.5pt; color: #555;">2016 – 2017</span>
+                                </div>
+                                <div style="font-size: 8.5pt; color: #666; font-style: italic;">BMW AG & BMW Canada · Munich & Toronto</div>
+                            </div>
+                            <div style="font-size: 9pt;">
+                                <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                                    <span style="font-weight: 600;">Commercial Operations Intern</span>
+                                    <span style="font-size: 8.5pt; color: #555;">2015</span>
+                                </div>
+                                <div style="font-size: 8.5pt; color: #666; font-style: italic;">Celgene Corporation · Munich</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Shows trajectory without taking space. BNP = finance, BMW = automotive (connects to 36ZERO clients), Celgene = enterprise. Signals "worked in real companies before starting own." <strong>Research:</strong> VCs like founders who've seen inside before building. <span class="confidence">85% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="06" data-option="A" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Option B -->
+                <div class="option-card" data-element="06" data-option="B" onclick="selectOption('06', 'B')">
+                    <div class="option-label">Option B — BMW Expanded</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div style="font-size: 9pt; margin-bottom: 6px;">
+                                <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                                    <span style="font-weight: 600;">ML Engineer (Thesis)</span>
+                                    <span style="font-size: 8.5pt; color: #555;">2018 – 2019</span>
+                                </div>
+                                <div style="font-size: 8.5pt; color: #666; font-style: italic;">BNP Paribas Consors Finanz · Munich</div>
+                            </div>
+                            <div style="font-size: 9pt; margin-bottom: 6px;">
+                                <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                                    <span style="font-weight: 600;">Business Analyst</span>
+                                    <span style="font-size: 8.5pt; color: #555;">2016 – 2017</span>
+                                </div>
+                                <div style="font-size: 8.5pt; color: #666; font-style: italic; margin-bottom: 2px;">BMW AG & BMW Canada · Munich & Toronto</div>
+                                <ul style="padding-left: 16px; font-size: 8.5pt; margin: 0;">
+                                    <li>Analyzed automotive manufacturing processes and data systems, laying groundwork for later AI computer vision work at 36ZERO Vision (BMW became client).</li>
+                                </ul>
+                            </div>
+                            <div style="font-size: 9pt;">
+                                <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                                    <span style="font-weight: 600;">Commercial Operations Intern</span>
+                                    <span style="font-size: 8.5pt; color: #555;">2015</span>
+                                </div>
+                                <div style="font-size: 8.5pt; color: #666; font-style: italic;">Celgene Corporation · Munich</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Draws narrative arc: BMW analyst → 36ZERO founder → BMW client. Shows domain knowledge compounded. <strong>Risk:</strong> Takes space. Might feel forced ("laying groundwork"). <strong>Use case:</strong> When domain expertise is core to role (e.g., automotive-focused VC). <span class="confidence">65% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="06" data-option="B" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Option C -->
+                <div class="option-card" data-element="06" data-option="C" onclick="selectOption('06', 'C')">
+                    <div class="option-label">Option C — Remove Celgene</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div style="font-size: 9pt; margin-bottom: 4px;">
+                                <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                                    <span style="font-weight: 600;">ML Engineer (Thesis)</span>
+                                    <span style="font-size: 8.5pt; color: #555;">2018 – 2019</span>
+                                </div>
+                                <div style="font-size: 8.5pt; color: #666; font-style: italic;">BNP Paribas Consors Finanz · Munich</div>
+                            </div>
+                            <div style="font-size: 9pt;">
+                                <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                                    <span style="font-weight: 600;">Business Analyst</span>
+                                    <span style="font-size: 8.5pt; color: #555;">2016 – 2017</span>
+                                </div>
+                                <div style="font-size: 8.5pt; color: #666; font-style: italic;">BMW AG & BMW Canada · Munich & Toronto</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Cuts non-relevant role (pharma intern not connected to AI/VC). Saves space. Keeps finance + automotive = relevant domains. <strong>Risk:</strong> Loses enterprise/pharma signal. Shows gap in early career. <strong>Research:</strong> Career coaches recommend cutting roles >7 years old unless highly relevant. <span class="confidence">70% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="06" data-option="C" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ELEMENT 07: VC Lab Block -->
+        <div class="element-section" id="elem-07">
+            <h2>07. VC Lab Block</h2>
+            <p class="section-meta">Your active VC training — generic bullets vs specific outcomes vs thesis-forward?</p>
+
+            <div class="options-grid">
+                <!-- Option A -->
+                <div class="option-card" data-element="07" data-option="A" onclick="selectOption('07', 'A')">
+                    <div class="option-label">Option A — Current (Generic)</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div class="cv-role">
+                                <div class="cv-role-header">
+                                    <span class="cv-role-title">VC Lab Fellow — Fund Formation Program</span>
+                                    <span class="cv-role-date">2025 – Present</span>
+                                </div>
+                                <div class="cv-role-company">Decile Group, Cohort 6 · New York</div>
+                                <ul class="cv-role-bullets">
+                                    <li><strong>Fund Thesis:</strong> Developing AI-focused venture thesis targeting vertical AI and founder-operator advantage</li>
+                                    <li><strong>Deal Flow:</strong> Sourcing, screening, and conducting due diligence on early-stage AI startups</li>
+                                    <li><strong>LP Strategy:</strong> Portfolio construction modeling and LP outreach preparation</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Covers program scope. Shows you're learning VC mechanics. Safe. <strong>Risk:</strong> Generic. Every VC Lab fellow could write this. No differentiation. <strong>Research:</strong> Hiring managers see 100+ "developing thesis, sourcing deals" bullets. <span class="confidence">60% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="07" data-option="A" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Option B -->
+                <div class="option-card" data-element="07" data-option="B" onclick="selectOption('07', 'B')">
+                    <div class="vote-badge">MIA'S VOTE · 88%</div>
+                    <div class="option-label">Option B — Specific Outcomes</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div class="cv-role">
+                                <div class="cv-role-header">
+                                    <span class="cv-role-title">VC Lab Fellow — Fund Formation Program</span>
+                                    <span class="cv-role-date">2025 – Present</span>
+                                </div>
+                                <div class="cv-role-company">Decile Group, Cohort 6 · New York</div>
+                                <ul class="cv-role-bullets">
+                                    <li><strong>Deal Flow:</strong> Evaluated 50+ AI startups across enterprise AI, vertical SaaS, and infrastructure. Conducted deep-dive due diligence on 8 companies.</li>
+                                    <li><strong>Fund Thesis:</strong> Built AI-focused investment thesis: vertical AI companies where founder-operator advantage compounds. Focus areas: AI infrastructure, enterprise AI, trust systems.</li>
+                                    <li><strong>LP Outreach:</strong> Completed LP strategy program including portfolio construction modeling and fundraising strategy for emerging fund managers.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Specific numbers (50+ evaluated, 8 deep dives). Shows work product, not just activities. Thesis has actual content (vertical AI, operator advantage, trust). <strong>Research:</strong> VCs hire for output. "Evaluated 50" > "sourcing deals." <span class="confidence">88% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="07" data-option="B" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Option C -->
+                <div class="option-card" data-element="07" data-option="C" onclick="selectOption('07', 'C')">
+                    <div class="option-label">Option C — Thesis-Led</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div class="cv-role">
+                                <div class="cv-role-header">
+                                    <span class="cv-role-title">VC Lab Fellow — Fund Formation Program</span>
+                                    <span class="cv-role-date">2025 – Present</span>
+                                </div>
+                                <div class="cv-role-company">Decile Group, Cohort 6 · New York</div>
+                                <ul class="cv-role-bullets">
+                                    <li><strong>Investment Thesis:</strong> Vertical AI companies where founder-operator advantage compounds. Focus: AI infrastructure (orchestration, observability), enterprise AI (legal, manufacturing), trust systems (governance, explainability).</li>
+                                    <li><strong>Due Diligence:</strong> Evaluated 50+ AI startups. Deep technical and commercial diligence on enterprise AI companies.</li>
+                                    <li><strong>Fund Strategy:</strong> Portfolio construction and LP outreach strategy for emerging managers in AI-focused venture.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Leads with thesis = shows you think like an investor. Specific focus areas (orchestration, legal, governance) = researched conviction. <strong>Risk:</strong> Thesis in CV might box you in if firm's focus differs. <strong>Use case:</strong> Best for firms where your thesis aligns (IBM Ventures = enterprise AI ✓). <span class="confidence">75% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="07" data-option="C" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ELEMENT 08: Education -->
+        <div class="element-section" id="elem-08">
+            <h2>08. Education</h2>
+            <p class="section-meta">TUM degrees — comprehensive, condensed, or with honors/extras?</p>
+
+            <div class="options-grid">
+                <!-- Option A -->
+                <div class="option-card" data-element="08" data-option="A" onclick="selectOption('08', 'A')">
+                    <div class="vote-badge">MIA'S VOTE · 82%</div>
+                    <div class="option-label">Option A — Current (Full Detail)</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div class="cv-edu-block">
+                                <div class="cv-edu-header">
+                                    <span class="cv-edu-degree">M.Sc. Business Administration — Technology & Management</span>
+                                    <span class="cv-edu-year">2017 – 2019</span>
+                                </div>
+                                <div class="cv-edu-school">Technical University of Munich (TUM)</div>
+                                <div class="cv-edu-detail">Thesis: "Human Interpretable ML for Risk Scoring at BNP PARIBAS Consors Finanz"<br>Focus: Corporate Finance, Data Science & ML</div>
+                            </div>
+                            <div class="cv-edu-block">
+                                <div class="cv-edu-header">
+                                    <span class="cv-edu-degree">B.Sc. Business Administration — Technology & Management</span>
+                                    <span class="cv-edu-year">2012 – 2017</span>
+                                </div>
+                                <div class="cv-edu-school">Technical University of Munich (TUM)</div>
+                                <div class="cv-edu-detail">Focus: Finance & Accounting, Mechanical Engineering</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Shows depth. Thesis title proves technical ML work. Finance focus = relevant for VC. Mechanical Engineering = explains manufacturing/automotive domain expertise. <strong>Research:</strong> Top VCs value technical + business education. TUM = strong European engineering brand. <span class="confidence">82% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="08" data-option="A" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Option B -->
+                <div class="option-card" data-element="08" data-option="B" onclick="selectOption('08', 'B')">
+                    <div class="option-label">Option B — Condensed (One Line)</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div style="font-size: 9.5pt; font-weight: 600; margin-bottom: 2px;">
+                                M.Sc. & B.Sc. Business Administration — Technology & Management
+                            </div>
+                            <div style="font-size: 8.5pt; color: #666; margin-bottom: 2px;">
+                                Technical University of Munich (TUM) · 2012 – 2019
+                            </div>
+                            <div style="font-size: 8pt; color: #777; font-style: italic;">
+                                Focus: Corporate Finance, Data Science, Machine Learning
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Maximum space efficiency. Combines both degrees. Keeps focus areas. Loses thesis detail. <strong>Risk:</strong> Thesis was technical proof point (interpretable ML). Losing it weakens technical credibility signal. <strong>Use case:</strong> When space is critical and experience speaks louder than education. <span class="confidence">60% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="08" data-option="B" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Option C -->
+                <div class="option-card" data-element="08" data-option="C" onclick="selectOption('08', 'C')">
+                    <div class="option-label">Option C — With Honors/Extras</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div class="cv-edu-block">
+                                <div class="cv-edu-header">
+                                    <span class="cv-edu-degree">M.Sc. Business Administration — Technology & Management</span>
+                                    <span class="cv-edu-year">2017 – 2019</span>
+                                </div>
+                                <div class="cv-edu-school">Technical University of Munich (TUM)</div>
+                                <div class="cv-edu-detail">
+                                    Thesis: "Human Interpretable ML for Risk Scoring at BNP PARIBAS Consors Finanz"<br>
+                                    Focus: Corporate Finance, Data Science & ML · Alchemist Accelerator (2023)
+                                </div>
+                            </div>
+                            <div class="cv-edu-block">
+                                <div class="cv-edu-header">
+                                    <span class="cv-edu-degree">B.Sc. Business Administration — Technology & Management</span>
+                                    <span class="cv-edu-year">2012 – 2017</span>
+                                </div>
+                                <div class="cv-edu-school">Technical University of Munich (TUM)</div>
+                                <div class="cv-edu-detail">Focus: Finance & Accounting, Mechanical Engineering</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Adds Alchemist (top startup accelerator) as credential. Shows continued learning post-degree. <strong>Risk:</strong> Alchemist under Education feels forced (it's professional, not academic). <strong>Alternative:</strong> Move Alchemist to Affiliations in Skills section. <span class="confidence">68% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="08" data-option="C" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ELEMENT 09: Proficiencies / Skills -->
+        <div class="element-section" id="elem-09">
+            <h2>09. Proficiencies / Skills</h2>
+            <p class="section-meta">Current grid layout vs VC-first ordering vs minimal approach</p>
+
+            <div class="options-grid">
+                <!-- Option A -->
+                <div class="option-card" data-element="09" data-option="A" onclick="selectOption('09', 'A')">
+                    <div class="option-label">Option A — Current Grid</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div class="cv-skills-grid">
+                                <span class="cv-skills-label">Business</span>
+                                <span class="cv-skills-value">Venture Creation (0→1) · Fundraising & Investor Relations · Financial Modeling · Enterprise GTM · Negotiation (GAP 2022, MIT 2018)</span>
+                                
+                                <span class="cv-skills-label">VC Tooling</span>
+                                <span class="cv-skills-value">Decile Hub · PitchBook · Crunchbase</span>
+                                
+                                <span class="cv-skills-label">Technology</span>
+                                <span class="cv-skills-value">AI/ML (Python, LangChain, RAG Systems) · Cloud (AWS, GCP) · Multi-Agent Architectures · AI Governance</span>
+                                
+                                <span class="cv-skills-label">Affiliations</span>
+                                <span class="cv-skills-value">Alchemist Accelerator · VC Lab (Decile Group) · UnternehmerTUM</span>
+                                
+                                <span class="cv-skills-label">Languages</span>
+                                <span class="cv-skills-value">German (native) · English (fluent)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Comprehensive. Shows business + technical depth. VC Tooling = proof you're learning the trade. <strong>Risk:</strong> Takes vertical space. <strong>Research:</strong> Top operator-investor CVs show both business and technical skills (Sarah Guo, Elad Gil pattern). <span class="confidence">78% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="09" data-option="A" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Option B -->
+                <div class="option-card" data-element="09" data-option="B" onclick="selectOption('09', 'B')">
+                    <div class="vote-badge">MIA'S VOTE · 85%</div>
+                    <div class="option-label">Option B — VC-First</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div class="cv-skills-grid">
+                                <span class="cv-skills-label">VC Skills</span>
+                                <span class="cv-skills-value">Deal Sourcing · Due Diligence · Financial Modeling · Fund Structuring · Fundraising ($5.5M raised) · Investor Relations</span>
+                                
+                                <span class="cv-skills-label">Technology</span>
+                                <span class="cv-skills-value">AI/ML (Python, LangChain, RAG Systems) · Multi-Agent Architectures · Cloud (AWS, GCP) · AI Governance</span>
+                                
+                                <span class="cv-skills-label">Business</span>
+                                <span class="cv-skills-value">Enterprise GTM · Venture Creation (0→1) · Negotiation (GAP 2022, MIT 2018)</span>
+                                
+                                <span class="cv-skills-label">Affiliations</span>
+                                <span class="cv-skills-value">Alchemist Accelerator · VC Lab (Decile Group) · UnternehmerTUM</span>
+                                
+                                <span class="cv-skills-label">Languages</span>
+                                <span class="cv-skills-value">German (native) · English (fluent)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Reorders to put VC skills first (matches job goal). Combines VC Tooling into VC Skills. Shows investor skillset upfront. <strong>Research:</strong> Recruiters scan top-to-bottom. Lead with what matches job description. <span class="confidence">85% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="09" data-option="B" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Option C -->
+                <div class="option-card" data-element="09" data-option="C" onclick="selectOption('09', 'C')">
+                    <div class="option-label">Option C — Minimal (2 rows)</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div class="cv-skills-grid">
+                                <span class="cv-skills-label">Technical</span>
+                                <span class="cv-skills-value">AI/ML (Python, LangChain, RAG, Multi-Agent) · Cloud (AWS, GCP) · AI Governance</span>
+                                
+                                <span class="cv-skills-label">Business</span>
+                                <span class="cv-skills-value">Fundraising ($5.5M) · Financial Modeling · Due Diligence · Enterprise GTM · Negotiation (GAP, MIT) · German (native) & English (fluent)</span>
+                            </div>
+                            <div style="font-size: 7pt; color: #999; margin-top: 6px; font-style: italic;">
+                                Alchemist Accelerator · VC Lab (Decile Group) · UnternehmerTUM
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Maximum restraint. Drops VC Tooling (obvious if you're in VC Lab). Languages inline. Affiliations = footer note. <strong>Risk:</strong> Loses some structure/scannability. <strong>Use case:</strong> When space is absolute premium. <span class="confidence">65% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="09" data-option="C" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ELEMENT 10: Footer -->
+        <div class="element-section" id="elem-10">
+            <h2>10. Footer</h2>
+            <p class="section-meta">Application-specific vs universal vs with portfolio link</p>
+
+            <div class="options-grid">
+                <!-- Option A -->
+                <div class="option-card" data-element="10" data-option="A" onclick="selectOption('10', 'A')">
+                    <div class="vote-badge">MIA'S VOTE · 88%</div>
+                    <div class="option-label">Option A — Current (Application-Specific)</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div class="cv-footer">
+                                <span>Florian Ziesche — Application for Investor, IBM Ventures</span>
+                                <span>February 2026</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Shows this is tailored, not generic. Respectful + professional. Easy to swap per application. <strong>Research:</strong> McKinsey, BCG application guides recommend role-specific footer. Signals attention to detail. <span class="confidence">88% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="10" data-option="A" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Option B -->
+                <div class="option-card" data-element="10" data-option="B" onclick="selectOption('10', 'B')">
+                    <div class="option-label">Option B — Universal</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div class="cv-footer">
+                                <span>Florian Ziesche</span>
+                                <span>February 2026</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Clean, universal. No need to swap. Works for networking, portfolio site, non-specific applications. <strong>Risk:</strong> Loses customization signal. <strong>Use case:</strong> Base template when you're applying broadly and want one master CV. <span class="confidence">65% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="10" data-option="B" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Option C -->
+                <div class="option-card" data-element="10" data-option="C" onclick="selectOption('10', 'C')">
+                    <div class="option-label">Option C — With Portfolio Link</div>
+                    <div class="option-preview">
+                        <div class="cv-preview">
+                            <div class="cv-footer">
+                                <span>Florian Ziesche · ainaryventures.com/research</span>
+                                <span>February 2026</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Drives to research portfolio (proof of analytical work). Shows you publish. <strong>Risk:</strong> Footer link can feel sales-y. Link is already in header contact. <strong>Use case:</strong> When research portfolio is core differentiator AND you remove it from header to save space. <span class="confidence">60% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="10" data-option="C" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ELEMENT 11: Design / Layout -->
+        <div class="element-section" id="elem-11">
+            <h2>11. Design / Layout</h2>
+            <p class="section-meta">Color treatment and visual restraint strategy. Must print perfectly on 1 page.</p>
+
+            <div class="options-grid">
+                <!-- Option A -->
+                <div class="option-card" data-element="11" data-option="A" onclick="selectOption('11', 'A')">
+                    <div class="vote-badge">MIA'S VOTE · 85%</div>
+                    <div class="option-label">Option A — Current (Clean + Gold Accent)</div>
+                    <div class="option-preview">
+                        <div style="padding: 1rem; background: #fff; border: 1px solid #ddd;">
+                            <div style="font-size: 0.75rem; color: #666; margin-bottom: 0.75rem;">
+                                <strong>Design:</strong> Inter font, clean typography, minimal color
+                            </div>
+                            <div style="padding: 0.5rem 0.75rem; background: #f8f8f8; border-left: 3px solid #c8aa50; font-size: 0.75rem; margin-bottom: 0.5rem;">
+                                Gold accent on summary border (subtle, professional)
+                            </div>
+                            <div style="font-size: 0.7rem; color: #888;">
+                                Black text, gold accent (#c8aa50) only on summary left border. Maximum restraint. Professional for finance/VC contexts.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> One accent color = restrained but not sterile. Gold = sophisticated, not playful. Prints perfectly (color adjusts). <strong>Research:</strong> Top finance/VC CVs use one accent color max. McKinsey, Goldman, a16z bios follow this pattern. <span class="confidence">85% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="11" data-option="A" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Option B -->
+                <div class="option-card" data-element="11" data-option="B" onclick="selectOption('11', 'B')">
+                    <div class="option-label">Option B — Pure Black & White</div>
+                    <div class="option-preview">
+                        <div style="padding: 1rem; background: #fff; border: 1px solid #ddd;">
+                            <div style="font-size: 0.75rem; color: #666; margin-bottom: 0.75rem;">
+                                <strong>Design:</strong> Inter font, zero color, maximum restraint
+                            </div>
+                            <div style="padding: 0.5rem 0.75rem; background: #f8f8f8; border-left: 3px solid #1a1a1a; font-size: 0.75rem; margin-bottom: 0.5rem;">
+                                Summary border: black, not gold
+                            </div>
+                            <div style="font-size: 0.7rem; color: #888;">
+                                Pure monochrome. No color anywhere. Traditional finance/law aesthetic. Maximum seriousness.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Zero risk. Works everywhere (print, screen, ATS). Ultra-conservative. <strong>Risk:</strong> Can feel outdated. Modern CVs (even in finance) use subtle color. <strong>Use case:</strong> Very traditional firms (old-school PE, law, banking). Less relevant for tech-forward VC. <span class="confidence">55% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="11" data-option="B" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Option C -->
+                <div class="option-card" data-element="11" data-option="C" onclick="selectOption('11', 'C')">
+                    <div class="option-label">Option C — Expanded Gold Accents</div>
+                    <div class="option-preview">
+                        <div style="padding: 1rem; background: #fff; border: 1px solid #ddd;">
+                            <div style="font-size: 0.75rem; color: #666; margin-bottom: 0.75rem;">
+                                <strong>Design:</strong> Inter font, gold accents on section titles + header
+                            </div>
+                            <div style="padding: 0.5rem 0.75rem; border-bottom: 2px solid #c8aa50; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.5rem;">
+                                SECTION TITLE (gold underline)
+                            </div>
+                            <div style="font-size: 0.7rem; color: #888;">
+                                Gold on: header bottom line, section title underlines, summary border. More visual interest.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> More visual hierarchy. Section titles pop. Modern, designed feel. <strong>Risk:</strong> Can feel over-designed for VC (they want content > design). <strong>Research:</strong> Works better for consulting (BCG, Bain) than VC. VCs often prefer minimal design. <span class="confidence">62% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="11" data-option="C" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ELEMENT 12: Customization Strategy -->
+        <div class="element-section" id="elem-12">
+            <h2>12. Customization Strategy</h2>
+            <p class="section-meta">How much do you customize per application? One universal CV or multiple variants?</p>
+
+            <div class="options-grid">
+                <!-- Option A -->
+                <div class="option-card" data-element="12" data-option="A" onclick="selectOption('12', 'A')">
+                    <div class="vote-badge">MIA'S VOTE · 90%</div>
+                    <div class="option-label">Option A — Universal + Swap Subtitle Only</div>
+                    <div class="option-preview">
+                        <div style="padding: 1rem; background: #f5f4f0; font-size: 0.85rem; line-height: 1.6;">
+                            <strong>Strategy:</strong> One master CV. Only change subtitle per application.<br><br>
+                            <strong>Examples:</strong><br>
+                            • IBM Ventures → "Investor — IBM Ventures"<br>
+                            • Sequoia → "Investor — Sequoia Capital"<br>
+                            • Advisory role → "AI Strategy Advisor"<br><br>
+                            <strong>Why:</strong> 95% of content stays the same. Subtitle shows customization. Cover letter does heavy targeting.
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Efficient. One source of truth. Subtitle swap = 30 seconds. Cover letter carries differentiation. <strong>Research:</strong> Top career coaches (HBS, Stanford GSB) recommend this approach for senior roles. Content speaks, cover letter targets. <span class="confidence">90% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="12" data-option="A" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Option B -->
+                <div class="option-card" data-element="12" data-option="B" onclick="selectOption('12', 'B')">
+                    <div class="option-label">Option B — Universal Base + Cover Letter Targeting</div>
+                    <div class="option-preview">
+                        <div style="padding: 1rem; background: #f5f4f0; font-size: 0.85rem; line-height: 1.6;">
+                            <strong>Strategy:</strong> One completely universal CV (no role subtitle). All customization in cover letter.<br><br>
+                            <strong>CV Header:</strong><br>
+                            "Florian Ziesche" (no subtitle)<br><br>
+                            <strong>Why:</strong> CV = facts. Cover letter = narrative. Cleanest separation. No risk of forgetting to update subtitle.
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Zero customization = zero errors. Cover letter is where you explain fit. <strong>Risk:</strong> CV doesn't signal intent. Screeners might not connect dots. <strong>Research:</strong> Works for well-known candidates (where brand speaks). Riskier for emerging candidates who need every signal. <span class="confidence">70% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="12" data-option="B" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Option C -->
+                <div class="option-card" data-element="12" data-option="C" onclick="selectOption('12', 'C')">
+                    <div class="option-label">Option C — 3 Variants (Investor / Advisor / Technical)</div>
+                    <div class="option-preview">
+                        <div style="padding: 1rem; background: #f5f4f0; font-size: 0.85rem; line-height: 1.6;">
+                            <strong>Strategy:</strong> 3 CV variants with different emphasis:<br><br>
+                            <strong>1. VC Investor:</strong> Summary = unfair advantage. Ainary = research-focused. VC Lab = outcomes.<br>
+                            <strong>2. AI Advisor/Consultant:</strong> Summary = advisor. Ainary = advisory-focused. 36ZERO = client logos.<br>
+                            <strong>3. Technical/Operator:</strong> Summary = builder. Ainary = research system. 36ZERO = product detail.<br><br>
+                            <strong>Why:</strong> Different audiences, different priorities.
+                        </div>
+                    </div>
+                    <div class="option-rationale">
+                        <strong>Why this works:</strong> Maximum targeting. Each CV optimized for audience. <strong>Risk:</strong> Maintenance burden. 3 files to update. Risk of version confusion. <strong>Research:</strong> Recommended for candidates pursuing truly different careers (e.g., VC vs tech leadership). Not necessary if goal is clear (VC). <span class="confidence">55% confidence</span>
+                    </div>
+                    <div class="comment-area">
+                        <label>Your Comments</label>
+                        <textarea class="comment-field" data-element="12" data-option="C" placeholder="Add your thoughts on this option..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="qa-block">
+                <h4>QA: Version Control</h4>
+                <div class="question">If you choose Option A (universal + subtitle swap), where will you store the master CV and how will you version-control changes?</div>
+                <textarea class="answer-field" data-qa="12-version" placeholder="Your system: Notion? Obsidian? Google Docs? Git?"></textarea>
+                
+                <div class="question">If you choose Option C (3 variants), how will you ensure all 3 stay in sync when you update shared content (e.g., adding a new client to Ainary block)?</div>
+                <textarea class="answer-field" data-qa="12-sync" placeholder="Your maintenance strategy..."></textarea>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // State management
+        let selections = {};
+        let comments = {};
+        let qaAnswers = {};
+
+        // Load saved state on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            updateProgress();
+            updateSidebarHighlight();
+        });
+
+        // Select option
+        function selectOption(element, option) {
+            // Update selection
+            selections[element] = option;
+            
+            // Update UI
+            document.querySelectorAll(`[data-element="${element}"]`).forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.querySelector(`[data-element="${element}"][data-option="${option}"]`).classList.add('selected');
+            
+            // Save and update
+            saveState();
+            updateProgress();
+        }
+
+        // Update progress counter
+        function updateProgress() {
+            const total = 12;
+            const selected = Object.keys(selections).length;
+            document.getElementById('progress-count').textContent = selected;
+            
+            // Update sidebar links to show completion
+            for (let i = 1; i <= total; i++) {
+                const elemId = String(i).padStart(2, '0');
+                const link = document.querySelector(`a[href="#elem-${elemId}"]`);
+                if (selections[elemId]) {
+                    link.style.fontWeight = '600';
+                    link.style.color = 'var(--text)';
+                } else {
+                    link.style.fontWeight = '400';
+                    link.style.color = 'var(--text-secondary)';
+                }
+            }
+        }
+
+        // Update sidebar active link on scroll
+        function updateSidebarHighlight() {
+            const sections = document.querySelectorAll('.element-section');
+            const links = document.querySelectorAll('.sidebar a');
+            
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (window.scrollY >= sectionTop - 100) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                links.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${current}`) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        }
+
+        // Save comments in real-time
+        document.addEventListener('input', (e) => {
+            if (e.target.classList.contains('comment-field')) {
+                const element = e.target.dataset.element;
+                const option = e.target.dataset.option;
+                const key = `${element}-${option}`;
+                comments[key] = e.target.value;
+                saveState();
+            }
+            
+            if (e.target.classList.contains('answer-field')) {
+                const qa = e.target.dataset.qa;
+                qaAnswers[qa] = e.target.value;
+                saveState();
+            }
+        });
+
+        // Save state to localStorage
+        function saveState() {
+            localStorage.setItem('cv-chooser-selections', JSON.stringify(selections));
+            localStorage.setItem('cv-chooser-comments', JSON.stringify(comments));
+            localStorage.setItem('cv-chooser-qa', JSON.stringify(qaAnswers));
+        }
+
+        // Load state from localStorage
+        function loadState() {
+            const savedSelections = localStorage.getItem('cv-chooser-selections');
+            const savedComments = localStorage.getItem('cv-chooser-comments');
+            const savedQA = localStorage.getItem('cv-chooser-qa');
+            
+            if (savedSelections) {
+                selections = JSON.parse(savedSelections);
+                Object.entries(selections).forEach(([element, option]) => {
+                    const card = document.querySelector(`[data-element="${element}"][data-option="${option}"]`);
+                    if (card) card.classList.add('selected');
+                });
+            }
+            
+            if (savedComments) {
+                comments = JSON.parse(savedComments);
+                Object.entries(comments).forEach(([key, value]) => {
+                    const [element, option] = key.split('-');
+                    const field = document.querySelector(`textarea[data-element="${element}"][data-option="${option}"]`);
+                    if (field) field.value = value;
+                });
+            }
+            
+            if (savedQA) {
+                qaAnswers = JSON.parse(savedQA);
+                Object.entries(qaAnswers).forEach(([qa, value]) => {
+                    const field = document.querySelector(`textarea[data-qa="${qa}"]`);
+                    if (field) field.value = value;
+                });
+            }
+        }
+
+        // Save choices (download or copy to clipboard)
+        function saveChoices() {
+            alert('✅ Choices saved to localStorage! They will persist across browser sessions.');
+        }
+
+        // Export summary
+        function exportChoices() {
+            let summary = '# CV TEMPLATE CHOICES — Florian Ziesche\n\n';
+            
+            for (let i = 1; i <= 12; i++) {
+                const elemId = String(i).padStart(2, '0');
+                const titles = {
+                    '01': 'Header & Contact',
+                    '02': 'Subtitle / Tagline',
+                    '03': 'Summary / Profile',
+                    '04': 'Ainary Ventures Block',
+                    '05': '36ZERO Vision Block',
+                    '06': 'Earlier Roles',
+                    '07': 'VC Lab Block',
+                    '08': 'Education',
+                    '09': 'Proficiencies / Skills',
+                    '10': 'Footer',
+                    '11': 'Design / Layout',
+                    '12': 'Customization Strategy'
+                };
+                
+                summary += `## ${elemId}. ${titles[elemId]}\n`;
+                if (selections[elemId]) {
+                    summary += `**Selected:** Option ${selections[elemId]}\n`;
+                    const commentKey = `${elemId}-${selections[elemId]}`;
+                    if (comments[commentKey]) {
+                        summary += `**Comment:** ${comments[commentKey]}\n`;
+                    }
+                } else {
+                    summary += `**Selected:** (none)\n`;
+                }
+                summary += '\n';
+            }
+            
+            // Add QA answers
+            if (Object.keys(qaAnswers).length > 0) {
+                summary += '## QA Answers\n\n';
+                Object.entries(qaAnswers).forEach(([qa, answer]) => {
+                    summary += `**${qa}:** ${answer}\n\n`;
+                });
+            }
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(summary).then(() => {
+                alert('📄 Summary copied to clipboard!');
+            });
+        }
+
+        // Clear all choices
+        function clearChoices() {
+            if (confirm('Are you sure you want to clear all selections, comments, and QA answers?')) {
+                selections = {};
+                comments = {};
+                qaAnswers = {};
+                localStorage.removeItem('cv-chooser-selections');
+                localStorage.removeItem('cv-chooser-comments');
+                localStorage.removeItem('cv-chooser-qa');
+                location.reload();
+            }
+        }
+
+        // Smooth scroll for sidebar links
+        document.querySelectorAll('.sidebar a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = document.querySelector(link.getAttribute('href'));
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+    </script>
+
+</body>
+</html>
