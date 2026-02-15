@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ainary Website v2 — Design Chooser</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: #f5f5f0; color: #1a1a1a; line-height: 1.6; }
+  
+  .chooser-header {
+    background: #1a1a1a; color: #fff; padding: 40px 32px; text-align: center;
+  }
+  .chooser-header h1 { font-size: 1.8rem; font-weight: 600; margin-bottom: 8px; }
+  .chooser-header p { color: #999; font-size: 0.9rem; max-width: 600px; margin: 0 auto; }
+  
+  .brief {
+    max-width: 900px; margin: 32px auto; padding: 0 24px;
+  }
+  .brief-box {
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 32px;
+    margin-bottom: 32px;
+  }
+  .brief-box h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; color: #1a1a1a; }
+  .brief-box h3 { font-size: 0.95rem; font-weight: 600; margin: 20px 0 8px; color: #333; }
+  .brief-box p, .brief-box li { font-size: 0.85rem; color: #555; }
+  .brief-box ul { padding-left: 20px; }
+  .brief-box li { margin-bottom: 4px; }
+  .brief-box table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.8rem; }
+  .brief-box th { text-align: left; padding: 8px; background: #f8f8f6; border-bottom: 2px solid #e0e0e0; font-weight: 600; }
+  .brief-box td { padding: 8px; border-bottom: 1px solid #eee; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; margin-left: 8px; }
+  .tag-current { background: #e3f2fd; color: #1565c0; }
+  .tag-rec { background: #e8f5e9; color: #2e7d32; }
+  .tag-alt { background: #fff3e0; color: #e65100; }
+  
+  .section-divider {
+    max-width: 900px; margin: 48px auto 24px; padding: 0 24px;
+    font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: #999;
+    border-bottom: 1px solid #ddd; padding-bottom: 8px;
+  }
+  
+  .options-grid {
+    max-width: 900px; margin: 0 auto 48px; padding: 0 24px;
+    display: flex; flex-direction: column; gap: 32px;
+  }
+  
+  .option {
+    background: #fff; border: 2px solid #e0e0e0; border-radius: 16px; overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .option:hover { border-color: #c8aa50; }
+  .option-header {
+    padding: 24px 28px 16px; border-bottom: 1px solid #f0f0f0;
+    display: flex; justify-content: space-between; align-items: flex-start;
+  }
+  .option-title { font-size: 1rem; font-weight: 600; }
+  .option-subtitle { font-size: 0.8rem; color: #888; margin-top: 4px; }
+  .option-body { padding: 0; }
+  
+  /* Preview frames */
+  .preview {
+    background: #08080c; padding: 32px; min-height: 500px;
+    font-family: 'Inter', sans-serif; color: #ededf0;
+    position: relative; overflow: hidden;
+  }
+  .preview-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.06);
+    margin-bottom: 40px; font-size: 0.75rem;
+  }
+  .preview-logo { font-weight: 600; font-size: 0.85rem; color: #ededf0; }
+  .preview-logo .dot { display: inline-block; width: 8px; height: 8px; background: #c8aa50; border-radius: 50%; margin-right: 6px; }
+  .preview-nav-links { display: flex; gap: 20px; color: #8b8b95; }
+  .preview-nav-links span { cursor: default; }
+  .preview-nav-links .active { color: #ededf0; }
+  .preview-btn { background: #c8aa50; color: #fff; padding: 6px 14px; border-radius: 6px; font-size: 0.7rem; font-weight: 500; display: inline-block; }
+  .preview-btn-outline { border: 1px solid rgba(255,255,255,0.1); color: #ededf0; padding: 6px 14px; border-radius: 6px; font-size: 0.7rem; font-weight: 500; display: inline-block; }
+  
+  .preview h1 { font-size: 1.8rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; }
+  .preview h2 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 16px; }
+  .preview .subtitle { font-size: 0.85rem; color: #8b8b95; margin: 12px 0 24px; line-height: 1.6; max-width: 500px; }
+  .preview .hero { text-align: center; padding: 40px 0; }
+  .preview .hero h1 { margin-bottom: 0; }
+  .preview .hero .subtitle { margin: 12px auto 24px; }
+  .preview .cta-row { display: flex; gap: 12px; justify-content: center; margin-top: 20px; }
+  
+  .preview .stats-bar {
+    display: flex; justify-content: center; gap: 40px; padding: 20px 0;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    margin: 30px 0;
+    font-size: 0.75rem; color: #8b8b95;
+  }
+  .preview .stat-num { font-size: 1.1rem; font-weight: 600; color: #c8aa50; display: block; }
+  
+  .preview .card-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px;
+  }
+  .preview .card {
+    background: #111116; border: 1px solid rgba(255,255,255,0.06); border-radius: 12px;
+    padding: 20px; font-size: 0.75rem;
+  }
+  .preview .card-title { font-weight: 600; font-size: 0.8rem; margin-bottom: 6px; color: #ededf0; }
+  .preview .card-desc { color: #8b8b95; font-size: 0.7rem; line-height: 1.5; margin-bottom: 10px; }
+  .preview .card-meta { display: flex; gap: 12px; font-size: 0.65rem; color: #55555e; }
+  .preview .badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 0.6rem; font-weight: 600; }
+  .preview .badge-high { background: rgba(200,170,80,0.15); color: #c8aa50; }
+  .preview .badge-med { background: rgba(139,139,149,0.15); color: #8b8b95; }
+  
+  .preview .section-title {
+    font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em;
+    color: #55555e; margin-bottom: 20px;
+  }
+  
+  .option-footer {
+    padding: 20px 28px; background: #fafaf8; border-top: 1px solid #f0f0f0;
+    font-size: 0.8rem; color: #666;
+  }
+  .option-footer strong { color: #1a1a1a; }
+  .pro { color: #2e7d32; }
+  .con { color: #c62828; }
+  
+  /* Linear style extras */
+  .preview-linear { background: #000; }
+  .preview-linear h1 { font-size: 1.6rem; }
+  
+  /* McKinsey style */
+  .preview-mckinsey { background: #fff; color: #1a1a1a; }
+  .preview-mckinsey .preview-nav { border-bottom-color: #e0e0e0; }
+  .preview-mckinsey .preview-logo { color: #1a1a1a; }
+  .preview-mckinsey .preview-nav-links { color: #888; }
+  .preview-mckinsey .subtitle { color: #666; }
+  .preview-mckinsey .stats-bar { border-color: #e0e0e0; color: #888; }
+  .preview-mckinsey .stat-num { color: #1a1a1a; }
+  .preview-mckinsey .card { background: #f8f8f6; border-color: #e0e0e0; }
+  .preview-mckinsey .card-title { color: #1a1a1a; }
+  .preview-mckinsey .card-desc { color: #666; }
+  .preview-mckinsey .card-meta { color: #999; }
+  .preview-mckinsey .badge-high { background: #e8f5e9; color: #2e7d32; }
+  .preview-mckinsey .section-title { color: #999; }
+  .preview-mckinsey .preview-btn { background: #1a1a1a; }
+</style>
+</head>
+<body>
+
+<div class="chooser-header">
+  <h1>Ainary Website v2 — Design Chooser</h1>
+  <p>4 options for the Research-Brand website. Pick the overall direction, then we fine-tune.</p>
+</div>
+
+<!-- CONTEXT BRIEF -->
+<div class="brief">
+  <div class="brief-box">
+    <h2>📋 Context & Strategy</h2>
+    <p><strong>Current state:</strong> Landing page looks good but sells a SaaS product that doesn't exist. Sub-pages have design drift. "Sign up" leads nowhere.</p>
+    
+    <h3>What we have (real)</h3>
+    <ul>
+      <li>Multi-agent research pipeline (5 agents, ~10 min/report, 18/20 QA avg)</li>
+      <li>3 published reports with original frameworks</li>
+      <li>Florian's operator background (CEO, €5.5M raised, BMW/Siemens/Bosch)</li>
+    </ul>
+    
+    <h3>What we don't have (yet)</h3>
+    <ul>
+      <li>No self-serve product / No active users / No paying customers</li>
+      <li>No login/signup functionality / No pricing validation</li>
+    </ul>
+    
+    <h3>Agreed: Research-Brand, not SaaS Launch</h3>
+    <table>
+      <tr><th>Nav Item</th><th>Page</th><th>Purpose</th></tr>
+      <tr><td>Research</td><td>3-5 report cards</td><td>THE product right now</td></tr>
+      <tr><td>About</td><td>Operator story + pipeline</td><td>Credibility</td></tr>
+      <tr><td>Blog</td><td>Articles</td><td>SEO + Thought Leadership</td></tr>
+      <tr><td>Contact</td><td>Calendly + email</td><td>Conversion</td></tr>
+    </table>
+    
+    <h3>KPI Decision</h3>
+    <table>
+      <tr><th>KPI Type</th><th>Where</th><th>Example</th><th>Verdict</th></tr>
+      <tr><td>Pipeline Quality</td><td>Global stats bar</td><td>5 agents · 25+ sources · 18/20 QA · &lt;10 min</td><td style="color:#2e7d32;font-weight:600;">✅ Real & unique</td></tr>
+      <tr><td>Use-Case Impact</td><td>Per report card</td><td>"€40-60K savings identified" on CNC report</td><td style="color:#2e7d32;font-weight:600;">✅ Contextual & proven</td></tr>
+      <tr><td>Generic SaaS</td><td>Stats bar</td><td>"€50K+ savings · &lt;1 week setup"</td><td style="color:#c62828;font-weight:600;">❌ Not verifiable yet</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ======================= OPTIONS ======================= -->
+
+<div class="section-divider">Option A — Current Website (As-Is)</div>
+<div class="options-grid">
+  <div class="option">
+    <div class="option-header">
+      <div>
+        <div class="option-title">A — Current Website <span class="tag tag-current">CURRENT</span></div>
+        <div class="option-subtitle">SaaS product page with "Multiply your team" hero</div>
+      </div>
+    </div>
+    <div class="option-body">
+      <div class="preview">
+        <div class="preview-nav">
+          <span class="preview-logo"><span class="dot"></span>Ainary</span>
+          <div class="preview-nav-links">
+            <span>Use Cases</span>
+            <span>AI Research & Brief</span>
+            <span>Blog</span>
+            <span>Pricing</span>
+            <span>Log in</span>
+            <span class="preview-btn">Sign up</span>
+          </div>
+        </div>
+        <div class="hero">
+          <h1>Multiply your team.</h1>
+          <div class="subtitle">We do 80% of the work. You do the 20% that matters.<br>Five agents research, cross-check, and synthesize — so you can focus on what only humans can.</div>
+          <div class="cta-row">
+            <span class="preview-btn">Get Started Free</span>
+            <span class="preview-btn-outline">See For Yourself</span>
+          </div>
+        </div>
+        <div class="stats-bar">
+          <div><span class="stat-num">30+</span> Research Reports</div>
+          <div><span class="stat-num">5</span> Agent Pipeline</div>
+          <div><span class="stat-num">~10 min</span> Per Report</div>
+        </div>
+        <div style="margin-top: 30px; padding: 20px; background: #111116; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+          <div style="font-size: 0.7rem; color: #8b8b95; margin-bottom: 12px;">Product showcase with tabs: AI Readiness | Due Diligence | AI Research</div>
+          <div style="font-size: 0.8rem; font-weight: 600;">EXECUTIVE SUMMARY</div>
+          <div style="font-size: 0.7rem; color: #8b8b95; margin-top: 6px;">Contract manufacturer, 35 employees, CNC milling...</div>
+        </div>
+      </div>
+    </div>
+    <div class="option-footer">
+      <strong>Pros:</strong> <span class="pro">Bold, looks professional, good showcase</span><br>
+      <strong>Cons:</strong> <span class="con">Sells a product that doesn't exist. "Sign up" → nothing. "Pricing" → no validation. Credibility risk when someone clicks through.</span>
+    </div>
+  </div>
+</div>
+
+<div class="section-divider">Option B — Research Brand (Recommended)</div>
+<div class="options-grid">
+  <div class="option" style="border-color: #c8aa50;">
+    <div class="option-header">
+      <div>
+        <div class="option-title">B — Research Brand <span class="tag tag-rec">★ RECOMMENDED</span></div>
+        <div class="option-subtitle">Trust-first. Show the pipeline, show the outputs. No fake product.</div>
+      </div>
+    </div>
+    <div class="option-body">
+      <div class="preview">
+        <div class="preview-nav">
+          <span class="preview-logo"><span class="dot"></span>Ainary</span>
+          <div class="preview-nav-links">
+            <span class="active">Research</span>
+            <span>About</span>
+            <span>Blog</span>
+            <span class="preview-btn">Get in touch</span>
+          </div>
+        </div>
+        <div class="hero">
+          <h1>AI agents can research.<br>We make them trustworthy.</h1>
+          <div class="subtitle">A multi-agent pipeline that researches, cross-verifies, and scores its own confidence. Every claim sourced. Every limitation disclosed. Reports in minutes, not weeks.</div>
+          <div class="cta-row">
+            <span class="preview-btn">Read our research</span>
+            <span class="preview-btn-outline">How it works</span>
+          </div>
+        </div>
+        <div class="stats-bar">
+          <div><span class="stat-num">5</span> specialized agents</div>
+          <div><span class="stat-num">25+</span> sources per report</div>
+          <div><span class="stat-num">18/20</span> avg QA score</div>
+          <div><span class="stat-num">&lt;10 min</span> per report</div>
+        </div>
+        <div class="section-title">Latest Research</div>
+        <div class="card-grid">
+          <div class="card">
+            <div class="card-title">State of AI Agent Trust 2026</div>
+            <div class="card-desc">Capability is doubling every 7 months. Governance updates annually. The race between what agents can break and what enterprises can control.</div>
+            <div class="card-meta">
+              <span class="badge badge-high">73% confidence</span>
+              <span>25 sources</span>
+              <span>Trust Race Model</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Personal AI Stack Architecture</div>
+            <div class="card-desc">Personal AI is an OS you compile, not a product you download. The gateway is the kernel — not the LLM.</div>
+            <div class="card-meta">
+              <span class="badge badge-high">72% confidence</span>
+              <span>21 sources</span>
+              <span>Kernel Model</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Knowledge Compounding: Obsidian + Agent</div>
+            <div class="card-desc">Zettelkasten accidentally built the ideal RAG architecture 30 years early. Your YAML frontmatter is invisible to AI.</div>
+            <div class="card-meta">
+              <span class="badge badge-med">62% confidence</span>
+              <span>18 sources</span>
+              <span>PKM Flywheel</span>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: 40px; text-align: center;">
+          <div class="section-title">How the pipeline works</div>
+          <div style="display: flex; justify-content: center; gap: 8px; font-size: 0.7rem; color: #8b8b95;">
+            <span style="padding: 6px 12px; background: #111116; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">Research</span>
+            <span style="color: #55555e;">→</span>
+            <span style="padding: 6px 12px; background: #111116; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">Thesis</span>
+            <span style="color: #55555e;">→</span>
+            <span style="padding: 6px 12px; background: #111116; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">Writing</span>
+            <span style="color: #55555e;">→</span>
+            <span style="padding: 6px 12px; background: #111116; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">QA (18/20)</span>
+            <span style="color: #55555e;">→</span>
+            <span style="padding: 6px 12px; background: #111116; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">Fix</span>
+            <span style="color: #55555e;">→</span>
+            <span style="padding: 6px 12px; background: rgba(200,170,80,0.15); border-radius: 6px; border: 1px solid rgba(200,170,80,0.25); color: #c8aa50;">Publish</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="option-footer">
+      <strong>Pros:</strong> <span class="pro">100% honest. Every claim verifiable. Reports ARE the product. Pipeline metrics are unique differentiator. No dead-end clicks. CTA = Calendly (real conversion).</span><br>
+      <strong>Cons:</strong> <span class="con">Doesn't look like a "startup with a product." Less ambitious first impression. Need 3-5 strong reports to fill the page.</span>
+    </div>
+  </div>
+</div>
+
+<div class="section-divider">Option C — Linear-Inspired (Minimal Product)</div>
+<div class="options-grid">
+  <div class="option">
+    <div class="option-header">
+      <div>
+        <div class="option-title">C — Linear-Inspired <span class="tag tag-alt">ALTERNATIVE</span></div>
+        <div class="option-subtitle">Product-forward minimal design. Research as a feature, not the whole story.</div>
+      </div>
+    </div>
+    <div class="option-body">
+      <div class="preview preview-linear">
+        <div class="preview-nav">
+          <span class="preview-logo"><span class="dot"></span>Ainary</span>
+          <div class="preview-nav-links">
+            <span>Features</span>
+            <span>Research</span>
+            <span>Pricing</span>
+            <span>Blog</span>
+            <span class="preview-btn">Get started</span>
+          </div>
+        </div>
+        <div class="hero">
+          <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: #c8aa50; margin-bottom: 12px;">AI-Powered Research Infrastructure</div>
+          <h1>Research that scores<br>its own confidence.</h1>
+          <div class="subtitle">Multi-agent pipeline for strategic intelligence. 5 agents research, verify, and synthesize — then honestly score what they don't know.</div>
+          <div class="cta-row">
+            <span class="preview-btn">Request a report →</span>
+          </div>
+        </div>
+        <div style="margin-top: 40px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+          <div style="padding: 20px;">
+            <div style="font-size: 0.8rem; font-weight: 600; margin-bottom: 6px;">Source-grounded</div>
+            <div style="font-size: 0.7rem; color: #8b8b95;">25+ sources per report. Every claim linked to its origin. Academic, industry, practitioner — balanced.</div>
+          </div>
+          <div style="padding: 20px;">
+            <div style="font-size: 0.8rem; font-weight: 600; margin-bottom: 6px;">Honest about gaps</div>
+            <div style="font-size: 0.7rem; color: #8b8b95;">Confidence scores on every claim. Transparency notes. Conflict of interest disclosed. No hand-waving.</div>
+          </div>
+          <div style="padding: 20px;">
+            <div style="font-size: 0.8rem; font-weight: 600; margin-bottom: 6px;">10 minutes, not 10 days</div>
+            <div style="font-size: 0.7rem; color: #8b8b95;">Same rigor as a consulting engagement. Fraction of the time. Pipeline QA scores 18/20 on average.</div>
+          </div>
+        </div>
+        <div style="margin-top: 40px;">
+          <div class="section-title" style="text-align: center;">Featured Research</div>
+          <div class="card-grid">
+            <div class="card" style="background: #0a0a0f;">
+              <div class="card-title">State of AI Agent Trust 2026</div>
+              <div class="card-desc">The Trust Race Model: why capability velocity is outrunning governance tempo.</div>
+              <div class="card-meta"><span class="badge badge-high">73%</span> <span>Read →</span></div>
+            </div>
+            <div class="card" style="background: #0a0a0f;">
+              <div class="card-title">Personal AI Stack Architecture</div>
+              <div class="card-desc">The gateway is the kernel. The LLM is just the CPU.</div>
+              <div class="card-meta"><span class="badge badge-high">72%</span> <span>Read →</span></div>
+            </div>
+            <div class="card" style="background: #0a0a0f;">
+              <div class="card-title">Knowledge Compounding</div>
+              <div class="card-desc">Zettelkasten accidentally built ideal RAG architecture.</div>
+              <div class="card-meta"><span class="badge badge-med">62%</span> <span>Read →</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="option-footer">
+      <strong>Pros:</strong> <span class="pro">Clean, premium feel. Product-forward without faking a product. "Request a report" is honest CTA. Feature-pillars explain value proposition clearly.</span><br>
+      <strong>Cons:</strong> <span class="con">Still implies a product exists. "Features" and "Pricing" nav items need real pages. Less personal/founder-driven.</span>
+    </div>
+  </div>
+</div>
+
+<div class="section-divider">Option D — McKinsey/Institutional (White Background)</div>
+<div class="options-grid">
+  <div class="option">
+    <div class="option-header">
+      <div>
+        <div class="option-title">D — Institutional Research <span class="tag tag-alt">ALTERNATIVE</span></div>
+        <div class="option-subtitle">McKinsey-meets-Substack. White background. Research institution, not startup.</div>
+      </div>
+    </div>
+    <div class="option-body">
+      <div class="preview preview-mckinsey">
+        <div class="preview-nav">
+          <span class="preview-logo">Ainary <span style="font-weight: 300; color: #888;">Ventures</span></span>
+          <div class="preview-nav-links">
+            <span class="active" style="color: #1a1a1a;">Research</span>
+            <span>About</span>
+            <span>Insights</span>
+            <span style="background: #1a1a1a; color: #fff; padding: 6px 14px; border-radius: 6px; font-size: 0.7rem;">Contact</span>
+          </div>
+        </div>
+        <div style="padding: 60px 0 40px; max-width: 600px;">
+          <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: #999; margin-bottom: 12px;">Ainary Research</div>
+          <h1 style="color: #1a1a1a; font-size: 2rem; line-height: 1.2;">AI agent intelligence.<br>Scored for trust.</h1>
+          <div class="subtitle" style="font-size: 0.9rem;">We run a multi-agent research pipeline that produces analyst-grade reports — then honestly scores what it knows and what it doesn't. Every claim sourced. Every limitation disclosed.</div>
+          <div style="margin-top: 24px;">
+            <span style="background: #1a1a1a; color: #fff; padding: 10px 20px; border-radius: 6px; font-size: 0.8rem; font-weight: 500;">Browse research</span>
+          </div>
+        </div>
+        <div class="stats-bar" style="justify-content: flex-start; gap: 48px;">
+          <div><span class="stat-num" style="color: #1a1a1a;">5</span> specialized agents</div>
+          <div><span class="stat-num" style="color: #1a1a1a;">25+</span> sources/report</div>
+          <div><span class="stat-num" style="color: #1a1a1a;">18/20</span> QA score</div>
+        </div>
+        <div class="section-title" style="margin-top: 30px;">Latest Publications</div>
+        <div style="display: flex; flex-direction: column; gap: 1px;">
+          <div style="padding: 20px 0; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-weight: 600; font-size: 0.85rem; color: #1a1a1a;">State of AI Agent Trust 2026</div>
+              <div style="font-size: 0.75rem; color: #888; margin-top: 4px;">Trust Race Model · 25 sources · 73% confidence</div>
+            </div>
+            <span style="font-size: 0.75rem; color: #999;">Feb 2026 →</span>
+          </div>
+          <div style="padding: 20px 0; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-weight: 600; font-size: 0.85rem; color: #1a1a1a;">Personal AI Stack Architecture 2026</div>
+              <div style="font-size: 0.75rem; color: #888; margin-top: 4px;">Personal AI Kernel Model · 21 sources · 72% confidence</div>
+            </div>
+            <span style="font-size: 0.75rem; color: #999;">Feb 2026 →</span>
+          </div>
+          <div style="padding: 20px 0; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-weight: 600; font-size: 0.85rem; color: #1a1a1a;">Knowledge Compounding: Obsidian + Agent</div>
+              <div style="font-size: 0.75rem; color: #888; margin-top: 4px;">PKM Compounding Flywheel · 18 sources · 62% confidence</div>
+            </div>
+            <span style="font-size: 0.75rem; color: #999;">Feb 2026 →</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="option-footer">
+      <strong>Pros:</strong> <span class="pro">Maximum credibility. Looks like a research institution, not a startup. Clean, readable. Confidence scores front and center. Works great for VC/LP audience.</span><br>
+      <strong>Cons:</strong> <span class="con">Less "tech startup" energy. White background = less distinctive. Might feel too corporate for Florian's brand. No product aspiration visible.</span>
+    </div>
+  </div>
+</div>
+
+<!-- SUMMARY TABLE -->
+<div class="brief">
+  <div class="brief-box">
+    <h2>📊 Comparison Matrix</h2>
+    <table>
+      <tr>
+        <th>Dimension</th>
+        <th>A (Current)</th>
+        <th>B (Research) ★</th>
+        <th>C (Linear)</th>
+        <th>D (McKinsey)</th>
+      </tr>
+      <tr>
+        <td><strong>Honesty</strong></td>
+        <td style="color:#c62828;">Low — sells vapor</td>
+        <td style="color:#2e7d32;">High — only real things</td>
+        <td>Medium — implies product</td>
+        <td style="color:#2e7d32;">High — institution feel</td>
+      </tr>
+      <tr>
+        <td><strong>VC Impression</strong></td>
+        <td>Ambitious but shallow</td>
+        <td style="color:#2e7d32;">Credible operator</td>
+        <td>Polished builder</td>
+        <td style="color:#2e7d32;">Serious researcher</td>
+      </tr>
+      <tr>
+        <td><strong>Dead-end clicks</strong></td>
+        <td style="color:#c62828;">Many (signup, login, pricing)</td>
+        <td style="color:#2e7d32;">Zero</td>
+        <td>Some (features, pricing)</td>
+        <td style="color:#2e7d32;">Zero</td>
+      </tr>
+      <tr>
+        <td><strong>Effort to build</strong></td>
+        <td>Already built</td>
+        <td>~2h (restructure existing)</td>
+        <td>~3h (new layout)</td>
+        <td>~3h (new design system)</td>
+      </tr>
+      <tr>
+        <td><strong>Scales to product</strong></td>
+        <td>Yes (add real pages)</td>
+        <td style="color:#2e7d32;">Yes (add product section)</td>
+        <td style="color:#2e7d32;">Yes (designed for it)</td>
+        <td>Harder (different aesthetic)</td>
+      </tr>
+      <tr>
+        <td><strong>KPI approach</strong></td>
+        <td>Generic SaaS stats</td>
+        <td style="color:#2e7d32;">Pipeline quality + per-report</td>
+        <td>Feature pillars + reports</td>
+        <td>Institutional metrics</td>
+      </tr>
+      <tr>
+        <td><strong>Brand signal</strong></td>
+        <td>"AI startup"</td>
+        <td>"AI operator who ships"</td>
+        <td>"Premium AI tool"</td>
+        <td>"Research institution"</td>
+      </tr>
+    </table>
+    
+    <h3 style="margin-top: 20px;">💡 My Take</h3>
+    <p><strong>Option B</strong> if you want maximum honesty and fastest launch (today). Everything on the page is real. Sameer clicks through → nothing is fake.</p>
+    <p><strong>Option C</strong> if you want to signal "I'm building a product" while still being mostly honest. Better long-term but needs more pages.</p>
+    <p><strong>Option D</strong> if your primary audience is VCs/LPs who value institutional credibility over startup energy.</p>
+    <p><strong>Hybrid B+C</strong> is also viable: Research-Brand structure (nav, CTA) with Linear-style feature pillars explaining the pipeline.</p>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Landing Page Sections — Chooser</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  :root {
+    --bg: #fafaf8; --text: #1a1a1a; --text-secondary: #555; --text-muted: #888;
+    --gold: #c8aa50; --border: #e5e3dc; --surface: #f5f4f0;
+    --selected: rgba(200, 170, 80, 0.12); --selected-border: var(--gold); --sidebar-w: 260px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.65; font-size: 15px; -webkit-font-smoothing: antialiased; }
+
+  .sidebar {
+    position: fixed; top: 0; left: 0; width: var(--sidebar-w); height: 100vh;
+    overflow-y: auto; background: #f3f2ee; border-right: 1px solid var(--border);
+    padding: 1.5rem 1rem; z-index: 100;
+  }
+  .sidebar h2 { font-size: 0.7rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 1rem; }
+  .sidebar .section-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin: 16px 0 6px; padding-top: 10px; border-top: 1px solid var(--border); }
+  .sidebar a { display: block; padding: 0.35rem 0.6rem; font-size: 0.78rem; color: var(--text-secondary); text-decoration: none; border-radius: 4px; margin-bottom: 2px; transition: all 0.15s; }
+  .sidebar a:hover { background: var(--surface); color: var(--text); }
+
+  .main { margin-left: var(--sidebar-w); padding: 32px 40px 80px; max-width: 960px; }
+  .main h1 { font-size: 1.3rem; font-weight: 700; margin-bottom: 6px; }
+  .main > p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 32px; }
+
+  .section-divider { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-muted); margin: 48px 0 16px; padding-bottom: 6px; border-bottom: 1px solid var(--border); scroll-margin-top: 20px; }
+
+  .option {
+    border: 2px solid var(--border); border-radius: 14px; overflow: hidden;
+    margin-bottom: 24px; cursor: pointer; transition: all 0.2s; position: relative;
+  }
+  .option:hover { border-color: #ccc; }
+  .option.selected { border-color: var(--gold); box-shadow: 0 0 0 3px var(--selected); }
+  .option.selected::after { content: '★ PICK'; position: absolute; top: 12px; right: 12px; background: var(--gold); color: #fff; padding: 3px 10px; border-radius: 5px; font-size: 0.6rem; font-weight: 700; z-index: 5; }
+
+  .opt-header { padding: 14px 20px; background: #fff; border-bottom: 1px solid #f0f0ec; display: flex; justify-content: space-between; align-items: center; }
+  .opt-name { font-size: 0.85rem; font-weight: 700; }
+  .opt-conf { font-size: 0.65rem; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+  .conf-high { background: #e8f5e9; color: #2e7d32; }
+  .conf-med { background: #fff3e0; color: #e65100; }
+  .conf-low { background: #fce4ec; color: #c62828; }
+
+  .opt-rationale { padding: 12px 20px; background: #fff; font-size: 0.78rem; color: var(--text-secondary); border-bottom: 1px solid #f0f0ec; }
+  .opt-rationale strong { color: var(--text); }
+
+  .preview { background: #08080c; padding: 32px; color: #ededf0; font-family: 'Inter', sans-serif; }
+
+  .comment-row { padding: 12px 20px; background: var(--surface); display: flex; gap: 10px; align-items: center; }
+  .comment-row label { font-size: 0.68rem; color: var(--text-muted); white-space: nowrap; }
+  .comment-row input { flex: 1; padding: 7px 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 0.78rem; font-family: inherit; background: #fff; }
+  .comment-row input:focus { outline: none; border-color: var(--gold); }
+
+  /* Preview components */
+  .p-tabs { display: flex; gap: 12px; margin-bottom: 20px; }
+  .p-tab { padding: 8px 20px; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; font-size: 0.78rem; color: #8b8b95; cursor: default; }
+  .p-tab.active { border-color: rgba(200,170,80,0.3); color: #c8aa50; background: rgba(200,170,80,0.08); }
+
+  .p-card { background: #111116; border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 20px; margin-bottom: 12px; }
+  .p-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .p-title { font-weight: 600; font-size: 0.82rem; margin-bottom: 4px; }
+  .p-desc { font-size: 0.72rem; color: #8b8b95; line-height: 1.5; }
+  .p-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; color: #55555e; margin-bottom: 14px; }
+
+  .p-stats { display: flex; gap: 32px; padding: 16px 0; border-top: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06); margin: 20px 0; font-size: 0.72rem; color: #8b8b95; }
+  .p-stat-n { font-size: 1.1rem; font-weight: 600; color: #c8aa50; display: block; }
+
+  .p-pillar { padding: 16px 0; }
+  .p-pillar-title { font-weight: 600; font-size: 0.82rem; margin-bottom: 4px; }
+  .p-pillar-desc { font-size: 0.72rem; color: #8b8b95; line-height: 1.5; }
+
+  .p-agent-row { display: flex; gap: 8px; margin-top: 8px; }
+  .p-agent { padding: 4px 10px; background: #111116; border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; font-size: 0.68rem; color: #8b8b95; }
+
+  .export-bar { margin-top: 48px; }
+  .export-btn { background: var(--gold); color: #fff; border: none; padding: 12px 24px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .export-output { margin-top: 12px; padding: 16px; background: #1a1a1a; color: #ededf0; border-radius: 8px; font-family: monospace; font-size: 0.75rem; white-space: pre-wrap; display: none; }
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <h2>Landing Sections</h2>
+  <a href="#s1">S1 — KPI Bar</a>
+  <a href="#s2">S2 — Showcase Tabs</a>
+  <a href="#s3">S3 — Value Pillars</a>
+  <a href="#s4">S4 — Why I Built This</a>
+  <div class="section-label" style="margin-top: 24px;">Summary</div>
+  <a href="#export">Export Picks</a>
+</div>
+
+<div class="main">
+<h1>Landing Page Sections — Chooser</h1>
+<p>4 sections to decide. Click to select, add comments. Each option has a confidence score and rationale.</p>
+
+<!-- ===== S1: KPI BAR ===== -->
+<div id="s1" class="section-divider">S1 — KPI Stats Bar (below hero)</div>
+
+<div class="option" id="opt-s1a" onclick="sel('s1','a')">
+  <div class="opt-header">
+    <span class="opt-name">A — Remove entirely</span>
+    <span class="opt-conf conf-high">90% confident</span>
+  </div>
+  <div class="opt-rationale">
+    <strong>Why:</strong> The current stats ("30+ Research Reports · 5 Agent Pipeline · ~10 min") are real but sound like vanity metrics. McKinsey, Stripe, Linear — none show stats bars on their hero. The work speaks for itself below. <strong>Removing clutter above the fold = stronger hero.</strong>
+  </div>
+  <div class="preview" style="min-height: 60px; text-align: center; display: flex; align-items: center; justify-content: center;">
+    <span style="font-size: 0.75rem; color: #55555e; font-style: italic;">[No stats bar — clean transition from hero to showcase]</span>
+  </div>
+  <div class="comment-row"><label>Comment:</label><input type="text" id="c-s1a" placeholder="..."></div>
+</div>
+
+<div class="option" id="opt-s1b" onclick="sel('s1','b')">
+  <div class="opt-header">
+    <span class="opt-name">B — Inline in hero (not a bar)</span>
+    <span class="opt-conf conf-med">60% confident</span>
+  </div>
+  <div class="opt-rationale">
+    <strong>Why:</strong> Instead of a separate bar, weave KPIs into the body text: "Five agents. Ten minutes. Every claim sourced." Feels natural, not boastful. But might get lost in the paragraph.
+  </div>
+  <div class="preview" style="min-height: 80px; text-align: center; padding-top: 20px;">
+    <p style="font-size: 0.9rem; color: #8b8b95; line-height: 1.7; max-width: 520px; margin: 0 auto;">Five agents research, cross-check, and synthesize. <span style="color:#c8aa50;">Ten minutes.</span> <span style="color:#c8aa50;">Every claim sourced.</span> So you can focus on what only humans can: judgment, relationships, and decisions.</p>
+  </div>
+  <div class="comment-row"><label>Comment:</label><input type="text" id="c-s1b" placeholder="..."></div>
+</div>
+
+<div class="option" id="opt-s1c" onclick="sel('s1','c')">
+  <div class="opt-header">
+    <span class="opt-name">C — Compact impact stats</span>
+    <span class="opt-conf conf-med">55% confident</span>
+  </div>
+  <div class="opt-rationale">
+    <strong>Why:</strong> If you keep a bar, make it about IMPACT not process. But honestly: with 1 real client project, these numbers are thin. Only do this if you're comfortable with the Andreas data point backing "€50K+".
+  </div>
+  <div class="preview">
+    <div class="p-stats" style="justify-content: center;">
+      <div><span class="p-stat-n">80%</span> of your work — automated</div>
+      <div><span class="p-stat-n">&lt;10 min</span> per task</div>
+      <div><span class="p-stat-n">5-agent</span> AI system</div>
+    </div>
+  </div>
+  <div class="comment-row"><label>Comment:</label><input type="text" id="c-s1c" placeholder="..."></div>
+</div>
+
+<!-- ===== S2: SHOWCASE TABS ===== -->
+<div id="s2" class="section-divider">S2 — Showcase Tabs</div>
+
+<div class="option" id="opt-s2a" onclick="sel('s2','a')">
+  <div class="opt-header">
+    <span class="opt-name">A — AI Systems · AI Research · Second Brain</span>
+    <span class="opt-conf conf-high">85% confident</span>
+  </div>
+  <div class="opt-rationale">
+    <strong>Why:</strong> Shows breadth — not just "report generator." Each tab demonstrates a different kind of AI system. "AI Systems" = CNC/Andreas project (process automation). "AI Research" = the report pipeline. "Second Brain" = personal knowledge system. <strong>Matches the "AI Systems Studio" positioning.</strong> All three are real. Confidence docked 15% because the Second Brain tab content needs to be built.
+  </div>
+  <div class="preview">
+    <div style="text-align: center; margin-bottom: 20px;">
+      <div style="font-size: 1.1rem; font-weight: 600; margin-bottom: 6px;">This is what AI systems produce.</div>
+      <div style="font-size: 0.78rem; color: #8b8b95;">Real outputs. Real data. Judge the quality yourself.</div>
+    </div>
+    <div class="p-tabs" style="justify-content: center;">
+      <span class="p-tab active">AI Systems</span>
+      <span class="p-tab">AI Research</span>
+      <span class="p-tab">Second Brain</span>
+    </div>
+    <div class="p-card">
+      <div style="font-size: 0.65rem; color: #c8aa50; font-weight: 600; margin-bottom: 8px;">CNC QUOTING — PROCESS INTELLIGENCE</div>
+      <div style="font-size: 0.82rem; font-weight: 600; margin-bottom: 6px;">Contract manufacturer, 35 employees. Manual quoting: 45 min/part.</div>
+      <div style="font-size: 0.72rem; color: #8b8b95; margin-bottom: 12px;">AI system reduced quoting to 4 minutes. €50K/year savings identified. Break-even in 3 months.</div>
+      <div style="display: flex; gap: 24px; font-size: 0.72rem; color: #8b8b95;">
+        <div><span style="font-size: 1rem; font-weight: 600; color: #c8aa50;">€50K+/yr</span><br>savings</div>
+        <div><span style="font-size: 1rem; font-weight: 600; color: #c8aa50;">92%</span><br>time saved</div>
+        <div><span style="font-size: 1rem; font-weight: 600; color: #c8aa50;">3 mo</span><br>break-even</div>
+      </div>
+    </div>
+  </div>
+  <div class="comment-row"><label>Comment:</label><input type="text" id="c-s2a" placeholder="..."></div>
+</div>
+
+<div class="option" id="opt-s2b" onclick="sel('s2','b')">
+  <div class="opt-header">
+    <span class="opt-name">B — Use Cases by audience (Enterprise · Research · Personal)</span>
+    <span class="opt-conf conf-med">65% confident</span>
+  </div>
+  <div class="opt-rationale">
+    <strong>Why:</strong> Segments by WHO, not WHAT. Enterprise = CNC/process, Research = reports, Personal = second brain. More intuitive for visitors ("which one am I?"). But: "Enterprise" is a stretch with 1 project. Confidence lower because it over-promises audience fit.
+  </div>
+  <div class="preview">
+    <div class="p-tabs" style="justify-content: center;">
+      <span class="p-tab active">Enterprise</span>
+      <span class="p-tab">Research</span>
+      <span class="p-tab">Personal</span>
+    </div>
+    <div class="p-card">
+      <div style="font-size: 0.78rem; font-weight: 600; margin-bottom: 4px;">Process Intelligence for Mittelstand</div>
+      <div class="p-desc">AI systems that automate operational bottlenecks. Quoting, analysis, reporting — months to minutes.</div>
+    </div>
+  </div>
+  <div class="comment-row"><label>Comment:</label><input type="text" id="c-s2b" placeholder="..."></div>
+</div>
+
+<div class="option" id="opt-s2c" onclick="sel('s2','c')">
+  <div class="opt-header">
+    <span class="opt-name">C — Single showcase, no tabs (scroll-through)</span>
+    <span class="opt-conf conf-med">50% confident</span>
+  </div>
+  <div class="opt-rationale">
+    <strong>Why:</strong> Instead of tabs, show all 3 projects as stacked cards you scroll through. Simpler. No interaction needed. But loses the "multiple capabilities" reveal moment. Less dynamic.
+  </div>
+  <div class="preview">
+    <div class="p-card" style="margin-bottom: 10px;">
+      <div style="font-size: 0.65rem; color: #c8aa50; font-weight: 600;">AI SYSTEMS</div>
+      <div style="font-size: 0.78rem; font-weight: 600;">CNC Quoting Automation — €50K/yr savings</div>
+    </div>
+    <div class="p-card" style="margin-bottom: 10px;">
+      <div style="font-size: 0.65rem; color: #c8aa50; font-weight: 600;">AI RESEARCH</div>
+      <div style="font-size: 0.78rem; font-weight: 600;">State of AI Agent Trust 2026 — 73% confidence</div>
+    </div>
+    <div class="p-card">
+      <div style="font-size: 0.65rem; color: #c8aa50; font-weight: 600;">SECOND BRAIN</div>
+      <div style="font-size: 0.78rem; font-weight: 600;">Personal AI Knowledge System — Obsidian + Agents</div>
+    </div>
+  </div>
+  <div class="comment-row"><label>Comment:</label><input type="text" id="c-s2c" placeholder="..."></div>
+</div>
+
+<!-- ===== S3: VALUE PILLARS ===== -->
+<div id="s3" class="section-divider">S3 — Value Pillars (currently: Source-grounded / Honest / Operator)</div>
+
+<div class="option" id="opt-s3a" onclick="sel('s3','a')">
+  <div class="opt-header">
+    <span class="opt-name">A — Systems-focused pillars (NEW)</span>
+    <span class="opt-conf conf-high">85% confident</span>
+  </div>
+  <div class="opt-rationale">
+    <strong>Why:</strong> Current pillars are research-only ("Source-grounded", "Honest about gaps"). If Ainary = AI Systems Studio, the pillars should reflect systems capabilities. "Rapid Architecture" = &lt;1 week. "Trust by Default" = confidence scoring, transparency. "Operator-Built" = not academic. These work for research AND process AND second brain.
+  </div>
+  <div class="preview">
+    <div class="p-grid">
+      <div>
+        <div class="p-pillar-title">Rapid Architecture</div>
+        <div class="p-pillar-desc">From problem definition to working AI system in days. Multi-agent pipelines, custom integrations, production-ready outputs. The CNC quoting system took 4 days.</div>
+      </div>
+      <div>
+        <div class="p-pillar-title">Trust by Default</div>
+        <div class="p-pillar-desc">Every system we build scores its own confidence. Sources linked. Gaps disclosed. Limitations documented. Not because we have to — because decisions need honest inputs.</div>
+      </div>
+      <div>
+        <div class="p-pillar-title">Operator-Built</div>
+        <div class="p-pillar-desc">5 years as CEO building enterprise AI. €5.5M raised. Delivered to BMW, Siemens, Bosch. These systems are built for real decisions, not demos.</div>
+      </div>
+    </div>
+  </div>
+  <div class="comment-row"><label>Comment:</label><input type="text" id="c-s3a" placeholder="..."></div>
+</div>
+
+<div class="option" id="opt-s3b" onclick="sel('s3','b')">
+  <div class="opt-header">
+    <span class="opt-name">B — Keep current but broaden language</span>
+    <span class="opt-conf conf-med">60% confident</span>
+  </div>
+  <div class="opt-rationale">
+    <strong>Why:</strong> The current pillars are well-written and real. Just change "Every report" → "Every output" and "Sources scanned daily" → drop the list (it's too specific to research). Minimal effort, OK result. But still feels research-heavy.
+  </div>
+  <div class="preview">
+    <div class="p-grid">
+      <div>
+        <div class="p-pillar-title">Source-grounded</div>
+        <div class="p-pillar-desc">Every output linked to its sources. Cross-verified by multiple agents. No hallucination — evidence or honest uncertainty.</div>
+      </div>
+      <div>
+        <div class="p-pillar-title">Honest about gaps</div>
+        <div class="p-pillar-desc">Confidence indicators on every output. You'll see exactly where data is strong and where it's missing. High · Medium · Low — no hand-waving.</div>
+      </div>
+      <div>
+        <div class="p-pillar-title">Operator perspective</div>
+        <div class="p-pillar-desc">Built by someone who runs companies — not a research lab. Applied AI for real decisions, not academic theory.</div>
+      </div>
+    </div>
+  </div>
+  <div class="comment-row"><label>Comment:</label><input type="text" id="c-s3b" placeholder="..."></div>
+</div>
+
+<div class="option" id="opt-s3c" onclick="sel('s3','c')">
+  <div class="opt-header">
+    <span class="opt-name">C — Process-focused: Speed · Quality · Honesty</span>
+    <span class="opt-conf conf-med">70% confident</span>
+  </div>
+  <div class="opt-rationale">
+    <strong>Why:</strong> Frames the value prop as a process: how fast, how good, how honest. Universal — works for any AI system. Less about the person, more about the method. "Quality" can include the agent pipeline and QA scoring.
+  </div>
+  <div class="preview">
+    <div class="p-grid">
+      <div>
+        <div class="p-pillar-title">Days, not months</div>
+        <div class="p-pillar-desc">Problem to working system in under a week. Research reports in 10 minutes. The speed comes from multi-agent architecture, not shortcuts.</div>
+      </div>
+      <div>
+        <div class="p-pillar-title">QA-scored outputs</div>
+        <div class="p-pillar-desc">Every system includes built-in quality checks. Our research pipeline scores 18/20 on average. Every claim tagged: Evidenced, Interpreted, or Judgment.</div>
+      </div>
+      <div>
+        <div class="p-pillar-title">Honest by design</div>
+        <div class="p-pillar-desc">Confidence scores on every output. Limitations disclosed upfront. Conflicts of interest stated. Because useful AI means knowing what it doesn't know.</div>
+      </div>
+    </div>
+  </div>
+  <div class="comment-row"><label>Comment:</label><input type="text" id="c-s3c" placeholder="..."></div>
+</div>
+
+<!-- ===== S4: WHY I BUILT THIS ===== -->
+<div id="s4" class="section-divider">S4 — "Why I Built This" Section</div>
+
+<div class="option" id="opt-s4a" onclick="sel('s4','a')">
+  <div class="opt-header">
+    <span class="opt-name">A — Systems origin story (NEW)</span>
+    <span class="opt-conf conf-high">80% confident</span>
+  </div>
+  <div class="opt-rationale">
+    <strong>Why:</strong> Current text focuses on "synthesis" and "reports." New version frames the story as: "I built enterprise AI → learned that speed + trust are everything → now I build AI systems that have both." Broader. Still personal. Still honest. Removes the 5-agent detail (that's in the showcase now).
+  </div>
+  <div class="preview">
+    <div class="p-label">Why I built this</div>
+    <div style="max-width: 520px;">
+      <p style="font-size: 0.85rem; color: #ededf0; line-height: 1.7; margin-bottom: 14px;">I spent 5 years as a CEO building AI systems for BMW, Siemens, and Bosch. Raised €5.5M. Shipped production software to the largest manufacturers in Germany.</p>
+      <p style="font-size: 0.85rem; color: #ededf0; line-height: 1.7; margin-bottom: 14px;">I learned one thing: most AI projects fail not because the technology doesn't work — but because nobody trusts the output enough to act on it.</p>
+      <p style="font-size: 0.85rem; color: #ededf0; line-height: 1.7; margin-bottom: 14px;">So I started building AI systems differently. Systems that score their own confidence. That cross-verify before presenting. That tell you what they don't know.</p>
+      <p style="font-size: 0.85rem; color: #8b8b95; line-height: 1.7;">— Florian Ziesche, Founder</p>
+    </div>
+  </div>
+  <div class="comment-row"><label>Comment:</label><input type="text" id="c-s4a" placeholder="..."></div>
+</div>
+
+<div class="option" id="opt-s4b" onclick="sel('s4','b')">
+  <div class="opt-header">
+    <span class="opt-name">B — Shorter, punchier</span>
+    <span class="opt-conf conf-med">70% confident</span>
+  </div>
+  <div class="opt-rationale">
+    <strong>Why:</strong> 3 paragraphs might be too much for a landing page. This version compresses to 2 sentences + a statement. Faster to read. Loses some of the operator story. Trade-off: brevity vs credibility detail.
+  </div>
+  <div class="preview">
+    <div class="p-label">Why I built this</div>
+    <div style="max-width: 520px;">
+      <p style="font-size: 0.85rem; color: #ededf0; line-height: 1.7; margin-bottom: 14px;">After 5 years building enterprise AI — BMW, Siemens, Bosch, €5.5M raised — I learned that the problem isn't intelligence. It's trust.</p>
+      <p style="font-size: 0.85rem; color: #ededf0; line-height: 1.7; margin-bottom: 14px;">Ainary builds AI systems that know what they don't know.</p>
+      <p style="font-size: 0.85rem; color: #8b8b95; line-height: 1.7;">— Florian Ziesche</p>
+    </div>
+  </div>
+  <div class="comment-row"><label>Comment:</label><input type="text" id="c-s4b" placeholder="..."></div>
+</div>
+
+<div class="option" id="opt-s4c" onclick="sel('s4','c')">
+  <div class="opt-header">
+    <span class="opt-name">C — Timeline / milestones format</span>
+    <span class="opt-conf conf-low">45% confident</span>
+  </div>
+  <div class="opt-rationale">
+    <strong>Why:</strong> Replace prose with a visual timeline: 2019 → CEO AI startup → 2021 → €5.5M raised → 2024 → Enterprise delivery → 2026 → Ainary. Visual, scannable, impressive. But: feels like a CV on a landing page. Might be too self-focused. Low confidence.
+  </div>
+  <div class="preview">
+    <div class="p-label">The path here</div>
+    <div style="display: flex; gap: 20px; font-size: 0.72rem;">
+      <div style="text-align: center; flex: 1;">
+        <div style="font-size: 1rem; font-weight: 600; color: #c8aa50;">2019</div>
+        <div style="color: #8b8b95; margin-top: 4px;">Founded AI startup<br>CEO, 30+ employees</div>
+      </div>
+      <div style="color: #333; padding-top: 12px;">→</div>
+      <div style="text-align: center; flex: 1;">
+        <div style="font-size: 1rem; font-weight: 600; color: #c8aa50;">2021</div>
+        <div style="color: #8b8b95; margin-top: 4px;">€5.5M raised<br>BMW · Siemens · Bosch</div>
+      </div>
+      <div style="color: #333; padding-top: 12px;">→</div>
+      <div style="text-align: center; flex: 1;">
+        <div style="font-size: 1rem; font-weight: 600; color: #c8aa50;">2025</div>
+        <div style="color: #8b8b95; margin-top: 4px;">AI systems that<br>score their own trust</div>
+      </div>
+      <div style="color: #333; padding-top: 12px;">→</div>
+      <div style="text-align: center; flex: 1;">
+        <div style="font-size: 1rem; font-weight: 600; color: #c8aa50;">Now</div>
+        <div style="color: #8b8b95; margin-top: 4px;">Ainary<br>AI Systems Studio</div>
+      </div>
+    </div>
+  </div>
+  <div class="comment-row"><label>Comment:</label><input type="text" id="c-s4c" placeholder="..."></div>
+</div>
+
+<!-- EXPORT -->
+<div id="export" class="section-divider">Export</div>
+<div class="export-bar">
+  <button class="export-btn" onclick="exportAll()">Export all picks</button>
+  <div class="export-output" id="export-out"></div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+const picks = {};
+function sel(section, opt) {
+  document.querySelectorAll(`[id^="opt-${section}"]`).forEach(el => el.classList.remove('selected'));
+  document.getElementById(`opt-${section}${opt}`).classList.add('selected');
+  picks[section] = opt.toUpperCase();
+}
+function exportAll() {
+  const out = document.getElementById('export-out');
+  let text = 'LANDING PAGE PICKS\n==================\n\n';
+  const sections = {s1: 'KPI Bar', s2: 'Showcase Tabs', s3: 'Value Pillars', s4: 'Why I Built This'};
+  for (const [s, label] of Object.entries(sections)) {
+    text += `${label}: ${picks[s] || 'NO PICK'}\n`;
+    ['a','b','c'].forEach(o => {
+      const c = document.getElementById(`c-${s}${o}`);
+      if (c && c.value) text += `  ${o.toUpperCase()} comment: ${c.value}\n`;
+    });
+    text += '\n';
+  }
+  out.textContent = text;
+  out.style.display = 'block';
+}
+</script>
+
+</body>
+</html>

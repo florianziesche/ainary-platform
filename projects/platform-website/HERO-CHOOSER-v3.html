@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hero B3 Refined — Subline Size Options</title>
+<link href="https://cdn.jsdelivr.net/npm/geist@1.0.0/dist/fonts/geist-sans/style.css" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, sans-serif; background: #f5f5f0; color: #1a1a1a; }
+
+  .top-bar {
+    position: sticky; top: 0; z-index: 100; background: #1a1a1a; color: #fff;
+    padding: 16px 24px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .top-bar h1 { font-size: 0.85rem; font-weight: 600; }
+  .top-bar .pick-label { font-size: 0.75rem; color: #c8aa50; }
+
+  .options { max-width: 1100px; margin: 32px auto; padding: 0 24px; }
+
+  .option {
+    border: 3px solid #e0e0e0; border-radius: 16px; overflow: hidden;
+    margin-bottom: 32px; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s;
+    position: relative;
+  }
+  .option:hover { border-color: #ccc; }
+  .option.selected { border-color: #c8aa50; box-shadow: 0 0 0 3px rgba(200,170,80,0.2); }
+  .option.selected::after {
+    content: '★ SELECTED'; position: absolute; top: 16px; right: 16px;
+    background: #c8aa50; color: #fff; padding: 4px 12px; border-radius: 6px;
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.05em; z-index: 10;
+  }
+
+  .option-label {
+    padding: 16px 24px; background: #fff; border-bottom: 1px solid #f0f0ec;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .option-name { font-size: 0.9rem; font-weight: 700; }
+  .option-specs { font-size: 0.7rem; color: #888; font-family: monospace; }
+
+  .preview {
+    background: #08080c; padding: 60px 48px; text-align: center; min-height: 400px;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+  }
+
+  .btn-gold { background: #c8aa50; color: #fff; padding: 14px 32px; border-radius: 8px; font-size: 0.9rem; font-weight: 500; text-decoration: none; display: inline-block; }
+  .btn-outline { border: 1px solid rgba(255,255,255,0.15); color: #ededf0; padding: 14px 32px; border-radius: 8px; font-size: 0.9rem; font-weight: 500; text-decoration: none; display: inline-block; }
+
+  .diff-note {
+    padding: 12px 24px; background: #fff; font-size: 0.75rem; color: #555;
+    border-top: 1px solid #f0f0ec;
+  }
+  .diff-note strong { color: #1a1a1a; }
+  .change { color: #c8aa50; font-weight: 600; }
+
+  .comment-row {
+    padding: 14px 24px; background: #fafaf8; border-top: 1px solid #f0f0ec;
+    display: flex; gap: 12px; align-items: center;
+  }
+  .comment-row input {
+    flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px;
+    font-size: 0.8rem; font-family: inherit; background: #fff;
+  }
+  .comment-row input:focus { outline: none; border-color: #c8aa50; }
+  .comment-row label { font-size: 0.7rem; color: #888; white-space: nowrap; }
+
+  .ref-box {
+    max-width: 1100px; margin: 0 auto 32px; padding: 0 24px;
+  }
+  .ref-card {
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 20px 24px;
+    font-size: 0.8rem;
+  }
+  .ref-card h3 { font-size: 0.85rem; font-weight: 700; margin-bottom: 8px; }
+  .ref-card table { width: 100%; border-collapse: collapse; }
+  .ref-card th { text-align: left; padding: 6px 8px; background: #f8f8f6; font-size: 0.7rem; font-weight: 600; border-bottom: 2px solid #e0e0e0; }
+  .ref-card td { padding: 6px 8px; border-bottom: 1px solid #eee; font-size: 0.75rem; }
+
+  .export-bar { max-width: 1100px; margin: 0 auto 48px; padding: 0 24px; }
+  .export-btn {
+    background: #c8aa50; color: #fff; border: none; padding: 12px 24px;
+    border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; font-family: inherit;
+  }
+  .export-output {
+    margin-top: 12px; padding: 16px; background: #1a1a1a; color: #ededf0;
+    border-radius: 8px; font-family: monospace; font-size: 0.75rem;
+    white-space: pre-wrap; display: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <h1>Hero B3 Refined — Subline sizing (click to pick)</h1>
+  <div class="pick-label" id="pick-status">No selection</div>
+</div>
+
+<!-- Reference -->
+<div class="ref-box" style="margin-top: 24px;">
+  <div class="ref-card">
+    <h3>📐 Typography Research: Optimal Subline at Weight 300</h3>
+    <table>
+      <tr><th>Rule</th><th>Value</th><th>Why</th></tr>
+      <tr><td>H1:Sub ratio</td><td>2.4:1 – 2.8:1</td><td>Industry standard (Linear 2.8, Vercel 2.6, Stripe 2.6)</td></tr>
+      <tr><td>Light weight compensation</td><td>+10-15% size</td><td>Weight 300 occupies less visual area than 500</td></tr>
+      <tr><td>Subline sweet spot for H1 3.75rem</td><td>1.35–1.6rem</td><td>Below 1.35 = lost. Above 1.6 = competes with H1.</td></tr>
+      <tr><td>Line-height for subline</td><td>1.4–1.5</td><td>More air than headline, less than body</td></tr>
+      <tr><td>Tracking for light text</td><td>0 to +0.01em</td><td>Light text benefits from slightly open tracking (unlike bold which needs tight)</td></tr>
+    </table>
+    <p style="margin-top: 10px; font-size: 0.75rem; color: #888;"><strong>Baseline B3 (previous):</strong> Sub was 1.35rem/300 — right at the lower bound. All 3 options below increase it.</p>
+  </div>
+</div>
+
+<div class="options">
+
+<!-- B3.1 -->
+<div class="option" id="opt-1" onclick="selectOption('1')">
+  <div class="option-label">
+    <div class="option-name">B3.1 — Subtle Bump (1.45rem)</div>
+    <div class="option-specs">H1: 3.75rem/600 · Sub: 1.45rem/300 · Ratio 2.59:1</div>
+  </div>
+  <div class="preview">
+    <h1 style="font-family: 'Geist', -apple-system, sans-serif; font-size: 3.75rem; font-weight: 600; color: #ededf0; letter-spacing: -0.025em; line-height: 1.05; margin-bottom: 16px;">
+      Multiply your team.
+    </h1>
+    <p style="font-family: 'Geist', -apple-system, sans-serif; font-size: 1.45rem; font-weight: 300; color: #ededf0; letter-spacing: 0; line-height: 1.45; margin-bottom: 24px;">
+      We do 80% of the work. You do the 20% that matters.
+    </p>
+    <p style="font-family: 'Geist', -apple-system, sans-serif; font-size: 1rem; font-weight: 400; color: #8b8b95; line-height: 1.7; max-width: 520px; margin-bottom: 36px;">
+      Five agents research, cross-check, and synthesize — so you can focus on what only humans can: judgment, relationships, and decisions.
+    </p>
+    <div style="display: flex; gap: 16px;">
+      <span class="btn-gold">See our work</span>
+      <span class="btn-outline">How it works</span>
+    </div>
+  </div>
+  <div class="diff-note">
+    <strong>Vs previous B3:</strong> Sub <span class="change">1.35→1.45rem</span>. Conservative bump. Still clearly subordinate to headline. Safe choice.
+  </div>
+  <div class="comment-row">
+    <label>Comment:</label>
+    <input type="text" id="comment-1" placeholder="...">
+  </div>
+</div>
+
+<!-- B3.2 -->
+<div class="option" id="opt-2" onclick="selectOption('2')">
+  <div class="option-label">
+    <div class="option-name">B3.2 — Sweet Spot (1.55rem) <span style="color:#c8aa50;font-size:0.7rem;">★ REC</span></div>
+    <div class="option-specs">H1: 3.75rem/600 · Sub: 1.55rem/300 · Ratio 2.42:1</div>
+  </div>
+  <div class="preview">
+    <h1 style="font-family: 'Geist', -apple-system, sans-serif; font-size: 3.75rem; font-weight: 600; color: #ededf0; letter-spacing: -0.025em; line-height: 1.05; margin-bottom: 16px;">
+      Multiply your team.
+    </h1>
+    <p style="font-family: 'Geist', -apple-system, sans-serif; font-size: 1.55rem; font-weight: 300; color: #ededf0; letter-spacing: 0.005em; line-height: 1.45; margin-bottom: 24px;">
+      We do 80% of the work. You do the 20% that matters.
+    </p>
+    <p style="font-family: 'Geist', -apple-system, sans-serif; font-size: 1rem; font-weight: 400; color: #8b8b95; line-height: 1.7; max-width: 520px; margin-bottom: 36px;">
+      Five agents research, cross-check, and synthesize — so you can focus on what only humans can: judgment, relationships, and decisions.
+    </p>
+    <div style="display: flex; gap: 16px;">
+      <span class="btn-gold">See our work</span>
+      <span class="btn-outline">How it works</span>
+    </div>
+  </div>
+  <div class="diff-note">
+    <strong>Vs previous B3:</strong> Sub <span class="change">1.35→1.55rem</span> + slight <span class="change">+0.005em tracking</span> (opens up light text). Ratio 2.42 = Anthropic territory. Subline reads as a confident statement, not a caption. The weight contrast (600 vs 300) keeps hierarchy clear despite larger size.
+  </div>
+  <div class="comment-row">
+    <label>Comment:</label>
+    <input type="text" id="comment-2" placeholder="...">
+  </div>
+</div>
+
+<!-- B3.3 -->
+<div class="option" id="opt-3" onclick="selectOption('3')">
+  <div class="option-label">
+    <div class="option-name">B3.3 — Bold Subline (1.65rem)</div>
+    <div class="option-specs">H1: 3.75rem/600 · Sub: 1.65rem/300 · Ratio 2.27:1</div>
+  </div>
+  <div class="preview">
+    <h1 style="font-family: 'Geist', -apple-system, sans-serif; font-size: 3.75rem; font-weight: 600; color: #ededf0; letter-spacing: -0.025em; line-height: 1.05; margin-bottom: 14px;">
+      Multiply your team.
+    </h1>
+    <p style="font-family: 'Geist', -apple-system, sans-serif; font-size: 1.65rem; font-weight: 300; color: #ededf0; letter-spacing: 0.005em; line-height: 1.4; margin-bottom: 24px;">
+      We do 80% of the work. You do the 20% that matters.
+    </p>
+    <p style="font-family: 'Geist', -apple-system, sans-serif; font-size: 1rem; font-weight: 400; color: #8b8b95; line-height: 1.7; max-width: 520px; margin-bottom: 36px;">
+      Five agents research, cross-check, and synthesize — so you can focus on what only humans can: judgment, relationships, and decisions.
+    </p>
+    <div style="display: flex; gap: 16px;">
+      <span class="btn-gold">See our work</span>
+      <span class="btn-outline">How it works</span>
+    </div>
+  </div>
+  <div class="diff-note">
+    <strong>Vs previous B3:</strong> Sub <span class="change">1.35→1.65rem</span>. At the upper bound. Subline becomes almost a second headline. Ratio 2.27 is below standard — <span class="change">risk: hierarchy flattens</span>. Works if "80/20" IS the main message and "Multiply your team" is just the hook.
+  </div>
+  <div class="comment-row">
+    <label>Comment:</label>
+    <input type="text" id="comment-3" placeholder="...">
+  </div>
+</div>
+
+</div>
+
+<div class="export-bar">
+  <button class="export-btn" onclick="exportPick()">Export my pick</button>
+  <div class="export-output" id="export-output"></div>
+</div>
+
+<script>
+let selected = null;
+function selectOption(id) {
+  document.querySelectorAll('.option').forEach(el => el.classList.remove('selected'));
+  document.getElementById('opt-' + id).classList.add('selected');
+  selected = 'B3.' + id;
+  document.getElementById('pick-status').textContent = 'Selected: B3.' + id;
+}
+function exportPick() {
+  const out = document.getElementById('export-output');
+  const comments = {
+    'B3.1': document.getElementById('comment-1').value,
+    'B3.2': document.getElementById('comment-2').value,
+    'B3.3': document.getElementById('comment-3').value,
+  };
+  let text = `HERO PICK: ${selected || 'NONE'}\n\n`;
+  for (const [k, v] of Object.entries(comments)) {
+    if (v) text += `${k} comment: ${v}\n`;
+  }
+  out.textContent = text;
+  out.style.display = 'block';
+}
+</script>
+
+</body>
+</html>

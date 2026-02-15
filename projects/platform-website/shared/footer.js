@@ -6,49 +6,38 @@
   if (!el) return;
 
   el.innerHTML = `
-    <style>
-      @keyframes subtle-pulse { 0%,100% { opacity:1; } 50% { opacity:0.85; } }
-    </style>
     <!-- CTA Section -->
     <section style="padding:100px 0 80px;text-align:center;border-top:1px solid rgba(255,255,255,0.06);">
       <div style="max-width:800px;margin:0 auto;padding:0 24px;">
-        <h2 style="font-size:2rem;font-weight:600;letter-spacing:-0.02em;color:#ededf0;margin-bottom:40px;">Better decisions start here.</h2>
-        <div style="display:flex;gap:16px;justify-content:center;">
-          <a href="https://calendly.com/florian-ainaryventures/15-minutes-chat" target="_blank" style="display:inline-flex;align-items:center;justify-content:center;padding:14px 36px;border-radius:8px;font-size:0.9rem;font-weight:500;text-decoration:none;background:transparent;color:#ededf0;border:1px solid rgba(255,255,255,0.5);transition:border-color 0.15s;min-width:170px;">Contact me</a>
-          <a href="signup.html" style="display:inline-flex;align-items:center;justify-content:center;padding:14px 36px;border-radius:8px;font-size:0.9rem;font-weight:500;text-decoration:none;background:#c8aa50;color:#ffffff;transition:opacity 0.15s;min-width:170px;animation:subtle-pulse 4s ease-in-out infinite;">Sign up</a>
-        </div>
+        <h2 style="font-size:2rem;font-weight:600;letter-spacing:-0.02em;color:#ededf0;margin-bottom:16px;">Let's talk.</h2>
+        <p style="color:#8b8b95;font-size:0.9rem;margin-bottom:40px;">Have a problem that needs an AI system? 15 minutes to find out if we can help.</p>
+        <a href="https://calendly.com/florian-ainaryventures/15-minutes-chat" target="_blank" style="display:inline-flex;align-items:center;justify-content:center;padding:14px 36px;border-radius:8px;font-size:0.9rem;font-weight:500;text-decoration:none;background:#c8aa50;color:#ffffff;transition:opacity 0.15s;min-width:170px;">Get in touch</a>
       </div>
     </section>
 
     <!-- Footer -->
     <footer style="padding:60px 0 30px;border-top:1px solid rgba(255,255,255,0.06);">
-      <div style="max-width:1200px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:1fr repeat(4,auto);gap:60px;margin-bottom:60px;">
+      <div style="max-width:1200px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:1fr repeat(3,auto);gap:60px;margin-bottom:60px;">
         <div>
           <a href="/" style="text-decoration:none;color:#ededf0;font-weight:600;font-size:0.95rem;display:flex;align-items:center;">
             <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#c8aa50;margin-right:6px;"></span>Ainary
           </a>
-          <p style="color:#55555e;font-size:0.7rem;margin-top:12px;letter-spacing:0.02em;">HUMAN × AI SYSTEMS = LEVERAGE</p>
+          <p style="color:#55555e;font-size:0.7rem;margin-top:12px;letter-spacing:0.02em;">AI SYSTEMS THAT WORK</p>
         </div>
         <div>
-          <h4 style="font-size:0.75rem;font-weight:500;margin-bottom:16px;letter-spacing:0.04em;color:#ededf0;">Product</h4>
+          <h4 style="font-size:0.75rem;font-weight:500;margin-bottom:16px;letter-spacing:0.04em;color:#ededf0;">Explore</h4>
           <div style="display:flex;flex-direction:column;gap:10px;">
-            <a href="tools.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Use Cases</a>
-            <a href="reports.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">AI Research & Brief</a>
-            <a href="pricing.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Pricing</a>
-          </div>
-        </div>
-        <div>
-          <h4 style="font-size:0.75rem;font-weight:500;margin-bottom:16px;letter-spacing:0.04em;color:#ededf0;">Resources</h4>
-          <div style="display:flex;flex-direction:column;gap:10px;">
-            <a href="blog.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Blog</a>
-            <a href="https://finitematter.substack.com/" target="_blank" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Substack</a>
-            <a href="https://linkedin.com/in/florianziesche" target="_blank" style="color:#55555e;text-decoration:none;font-size:0.8rem;">LinkedIn</a>
-          </div>
-        </div>
-        <div>
-          <h4 style="font-size:0.75rem;font-weight:500;margin-bottom:16px;letter-spacing:0.04em;color:#ededf0;">Company</h4>
-          <div style="display:flex;flex-direction:column;gap:10px;">
+            <a href="reports.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Research</a>
             <a href="about.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">About</a>
+            <a href="blog.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Blog</a>
+          </div>
+        </div>
+        <div>
+          <h4 style="font-size:0.75rem;font-weight:500;margin-bottom:16px;letter-spacing:0.04em;color:#ededf0;">Connect</h4>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <a href="https://linkedin.com/in/florianziesche" target="_blank" style="color:#55555e;text-decoration:none;font-size:0.8rem;">LinkedIn</a>
+            <a href="https://finitematter.substack.com/" target="_blank" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Substack</a>
+            <a href="https://github.com/fziescheus-alt/agenttrust" target="_blank" style="color:#55555e;text-decoration:none;font-size:0.8rem;">GitHub</a>
           </div>
         </div>
         <div>

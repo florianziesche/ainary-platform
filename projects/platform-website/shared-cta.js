@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <footer style="padding:60px 0 30px;border-top:1px solid rgba(255,255,255,0.06);">
       <div style="max-width:1200px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:1fr repeat(4,auto);gap:60px;margin-bottom:60px;">
         <div>
-          <a href="landing.html" style="text-decoration:none;color:#ededf0;font-weight:600;font-size:0.95rem;display:flex;align-items:center;">
+          <a href="/" style="text-decoration:none;color:#ededf0;font-weight:600;font-size:0.95rem;display:flex;align-items:center;">
             <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#c8aa50;margin-right:6px;"></span>Ainary
           </a>
           <p style="color:#55555e;font-size:0.7rem;margin-top:12px;letter-spacing:0.02em;">HUMAN × AI SYSTEMS = LEVERAGE</p>
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <h4 style="font-size:0.75rem;font-weight:500;margin-bottom:16px;letter-spacing:0.04em;color:#ededf0;">Product</h4>
           <div style="display:flex;flex-direction:column;gap:10px;">
             <a href="tools.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Use Cases</a>
-            <a href="daily-brief.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Daily Brief</a>
+            <a href="reports.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">AI Research & Brief</a>
             <a href="pricing.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Pricing</a>
           </div>
         </div>
