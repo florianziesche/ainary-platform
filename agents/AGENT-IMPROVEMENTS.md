@@ -8,14 +8,15 @@
 - Konkrete Negativbeispiele: zu viel Gold, Boxes, generische Story, CV-Hooks
 - Agents lernen schneller von "Das war schlecht" als von "Das soll gut sein"
 
-### 2. Report #1 HTML als BUILDER-Referenz
-- Report #1 Section 8 (Predictions) = Design-Goldstandard
-- BUILDER soll den HTML-Code sehen können, nicht nur Textbeschreibungen
+### 2. ~~Report #1 HTML als BUILDER-Referenz~~ ✅ DONE (2026-02-15)
+- REPORT-TEMPLATE-FINAL.html = locked standard
+- BUILDER copies template, swaps content only
+- TEMPLATE-RULES.md = 16 elements + hard rules
 
-### 3. pipeline-pack aufteilen
-- `design-rules.md` — nur CSS/HTML/Layout
-- `content-rules.md` — nur Text/Voice/Structure
-- pipeline-pack wird zu groß, Agents ertrinken in Kontext
+### 3. ~~pipeline-pack aufteilen~~ PARTIALLY DONE (2026-02-15)
+- Design rules now in TEMPLATE-RULES.md + 00-design-tokens.html
+- Content rules in pipeline-pack.md (voice section)
+- Pipeline-pack header now points to template as override
 
 ### 4. Feedback-Log strukturieren
 - `agents/feedback-log.md`

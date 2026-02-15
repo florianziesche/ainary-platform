@@ -138,6 +138,27 @@ RESEARCH → SYNTHESIS → GAP RESEARCH → OUTLINE → WRITE → QA → BUILD/P
 
 *Load this pack for any pipeline-related task: writing, QA, building, or orchestration.*
 
+---
+
+## ⚠️ TEMPLATE LOCKED (2026-02-15 01:58 CET)
+
+**ALL report design rules below are SUPERSEDED by the locked template.**
+- Template: `content/reports/REPORT-TEMPLATE-FINAL.html`
+- Rules: `content/reports/TEMPLATE-RULES.md`
+- Design Tokens: `content/reports/template-elements/00-design-tokens.html`
+- PDF Script: `scripts/html-to-pdf.sh` (Headless Chrome, $0, 2s)
+
+**For BUILDER agent:** Copy REPORT-TEMPLATE-FINAL.html, swap content only. Never build from scratch.
+**For QA agent:** Check against TEMPLATE-RULES.md, not "looks good."
+**For WRITER agent:** Follow voice rules above + TEMPLATE-RULES.md content rules.
+
+**Citation:** `Ainary Research (2026). [Title]. AR-XXX.` (NOT Ziesche, F.)
+**Author Bio:** Fixed text, identical across all reports (see TEMPLATE-RULES.md)
+**Back Cover CTA:** "Contact · Feedback" (NOT "Start a project →")
+**PDF:** Always run `./scripts/html-to-pdf.sh` at end of pipeline. No agent for PDF.
+
+### LEGACY RULES BELOW (kept for reference, template overrides all)
+
 ### Report Typography Rules (Florian Feedback 2026-02-14 15:43)
 - Fußnoten [1] [2]: Grau (#888), hochgestellt, dezent
 - Key Numbers/Stats: Schwarz (#1a1a1a) auf weißem Hintergrund
@@ -276,3 +297,25 @@ REPORT-NUMMER:
 ### Sales Angles aus Reports (Florian 2026-02-14)
 - "Board age 59.1 avg + refreshment at 10-year low = AI competence gap" → Pitch für Board Advisory/Governance Reports
 - Jeder Report soll 1-2 Sales Angles identifizieren die wir für Outreach nutzen können
+
+### Report Cover + Footer STANDARD — McKinsey-Style (D-143, 2026-02-14)
+OVERRIDES all previous cover/footer rules.
+
+**Cover (Seite 1):**
+- ● Ainary — oben links, klein, Gold-Punkt + "Ainary" in #1a1a1a
+- AR-XXX — oben rechts, grau (#888), klein
+- Titel — groß, linksbündig, max 2 Zeilen, font-weight 600
+- Subtitle — kleiner, grau (#666)
+- Datum — unten links, klein, grau
+- NICHTS SONST. Kein Autor, kein Confidence, kein Slogan, kein CTA.
+- 80% der Seite = Whitespace
+
+**Letzte Seite (Back Cover):**
+- ● Ainary — zentriert
+- "AI Strategy · Published Research · Daily Intelligence" — grau (#666)
+- "Start a project →" — grau (#888), gleiche Größe wie Email, KEIN Button, KEIN Gold, KEIN Bold
+- ainaryventures.com
+- florian@ainaryventures.com
+- NICHTS SONST. Kein Slogan, kein "HUMAN × AI = LEVERAGE"
+
+**Prinzip:** Der Report beweist. Die Website pitcht.

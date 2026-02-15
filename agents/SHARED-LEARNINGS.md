@@ -18,8 +18,20 @@
 - **McKinsey-level or don't bother.** No emojis in professional decks. No clip-art energy.
 - **Whitespace is king.** Slides need air to breathe. Never compress margins to fit more content.
 - **Title + Content must complement, never repeat.** "93% weniger Fehler" as title + "93%" as stat = redundant.
-- **Electric Blue #2563eb, Space Grotesk, Dark Theme** for branded materials.
+- **Black + White + Gold (#c8aa50) ONLY** for all Ainary materials.
 - **Beim Rewrite: Design beibehalten.** Don't compress CSS when rewriting code. Original spacing is intentional.
+- **REPORT TEMPLATE LOCKED (2026-02-15).** All reports use `REPORT-TEMPLATE-FINAL.html`. Copy + swap content. Never build from scratch.
+- **PDF via `./scripts/html-to-pdf.sh`** — $0, 2s, no agent needed.
+
+### Report-Specific Rules (2026-02-15)
+- **Citation: `Ainary Research (2026). [Title]. AR-XXX.`** — System = author, not Florian
+- **"Checkbox security" not "Security Theater"** — know audience vocabulary
+- **"Contact · Feedback" not "Start a project →"** — Sales CTA kills research trust
+- **Bio identical across all reports** — never customize per report
+- **Chooser Pattern for ALL design decisions** — 3+ options, research-based, per-option comments, Florian picks
+- **Research > Meinung** — every design option needs a benchmark (BCG, McKinsey, Economist)
+- **Invalidation BEFORE So What** — always, no exceptions
+- **Template-First (Kintsugi #8)** — feedback → template, never individual reports
 
 ### Document Standards
 - **"Would Florian send this UNCHANGED to a client/investor?"** If no → not done.

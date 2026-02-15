@@ -67,3 +67,173 @@
 - Problem: Echte Kundendaten + zu niedrige Zahlen (Value-Anker)
 - Lösung: Fiktive Mockups mit höheren Werten
 - Status: WARTEN — erst Reports fertig
+
+### D-136: Brand Messaging FINAL (2026-02-14 17:37)
+- NIEMALS "replace" oder "$200K consultants"
+- Hero: "Multiply your team." + "We do 80%. You do the 20% that matters."
+- Tagline: "HUMAN × AI = LEVERAGE"
+- Florian's Worte, nicht Mia's
+
+### D-137: Report Cover dezenter (2026-02-14 18:05)
+- "Florian Ziesche — Ainary Ventures" weniger prominent
+- Datum in Header/Footer, nicht Cover
+- Ainary Logo auf erste + letzte Seite
+- CTA = Services auflisten: Multi-Agent Architecture · AI Systems · Automation · Second Brain · Pilot Projects
+
+### D-138: CNC Screenshots = Fiktive Daten (2026-02-14 17:42)
+- Fiktive Zahlen, keine echten Firmennamen
+- Status: BACKLOG nach Reports
+
+### D-139: Self-Improvement Loop testen + versionieren (2026-02-14 18:16)
+- Research → LLM fragt "was würdest du anders machen?"
+- v1-spec.md erstellt, Hypothesen-Register angelegt
+- Test ab AR-010
+
+### D-140: TrustCheck = Backlog Service (2026-02-14 18:20)
+- Erst Launch, dann TrustCheck als Ainary Service
+
+### D-141: TrustCheck Report Standards (2026-02-14 18:30)
+- Beipackzettel mandatory
+- Confidence Score pro Claim
+- Keine Apple Symbole → CSS Badges
+- Design = gleich wie Ainary Reports
+- CTA Footer = Standard
+- Source Quality Rating für Future
+
+### D-142: Projekt-Separation nötig (2026-02-14 17:43)
+- Florian: "Machst du gute die Projekte getrennt zu halten?" → "Nein"
+- Plan: pipeline-pack aufteilen, Feedback-Log pro Projekt, FLORIAN-INSIGHTS.md
+- Status: BACKLOG
+
+### D-143: Report Cover + Footer FINAL McKinsey-Style (2026-02-14 19:25-19:29)
+**Cover:**
+- ● Ainary oben links, klein
+- AR-XXX oben rechts, grau
+- Titel groß, linksbündig, max 2 Zeilen
+- Subtitle kleiner, grau
+- Datum unten links, klein
+- KEIN Autorenname, KEIN Confidence, KEIN Slogan auf Cover
+- 80% Whitespace
+
+**Letzte Seite:**
+- ● Ainary zentriert
+- "AI Strategy · Published Research · Daily Intelligence"
+- "Start a project →" in GRAU (#888), diskret, kein Button
+- ainaryventures.com
+- florian@ainaryventures.com
+- KEIN "HUMAN × AI = LEVERAGE", KEIN "Multiply your team"
+
+**Prinzip:** Report beweist. Website pitcht. Unterschiedliche Jobs.
+
+### D-144: Brave Pro weiter nutzen (2026-02-14 19:33)
+- Qualität > Kosten. $5/Mo ist nichts vs schlechte Research.
+- Florian: "Qualität ist wichtig!"
+
+### D-145: Template-First Workflow (2026-02-14 19:31)
+- KEIN Report ohne locked Template
+- Feedback → Template, nie in einzelne Reports
+- Template LOCK nach Florians Go
+- Automatischer Compliance-Check vor Delivery
+- Kintsugi #8: "10 Reports und noch immer Anpassungen"
+
+### D-146: Report Template FINAL Spec (2026-02-14 23:46) — Florian's Consolidated Feedback
+
+**Cover (Seite 1):**
+- Security Playbook v2 = Referenz ✅ "best so far"
+- Overall Confidence in Header oben? → Florian fragt, diskutieren
+
+**Quote Page:**
+- NEUE SEITE: Wichtigste Zitate mit Referenz zu Sections/Chapters
+- Referenz: Financial Services Quote "We're building a $52 billion industry..."
+
+**Contents/TOC:**
+- Maturity Model = Referenz ✅
+- Nummerierung: 01, 02, 03 (elegant, professional, confident)
+- Hover-Effekt: Schwarz → Gold bei Mouse-over
+- SEITENZAHLEN FEHLEN → hinzufügen
+
+**Executive Summary:**
+- Maturity Model Style = Referenz ✅
+- Bold Text + kleinerer Text + Source-Anzeige
+- Gold für KEY FIGURES (nicht dekorativ, sondern Readability-Hilfe)
+- Thesis im Exec Summary = gut (State of Trust Referenz)
+
+**Keywords:**
+- Security Playbook Style ✅
+
+**Bold Elements:**
+- Wichtige Elemente in Bold Schwarz (State of Trust Referenz)
+
+**Methodology:**
+- Kurz (Maturity Model) UND lang (Security Playbook) — McKinsey Research needed
+- "The model itself is a proposed framework..." Statement = gut
+- "Confidence ratings follow a three-tier system" + "Limitations" = Bold, wertschaffend
+- Confidence-Level Definition: VOR dem Report oder am Ende mit klickbarem Link
+
+**KPI Figures:**
+- Trust Tax Style ✅ — aber Schwarz auf Weiß, NICHT farbig (lenkt ab)
+
+**Source Display:**
+- Inline Sources mit Confidence = gut
+- Format: "Source: [Name], [Date]. [Publication]. | Confidence: High"
+
+**Sections:**
+- Längerer Text bevorzugt (Security Playbook > Maturity Model)
+- ABER Sources/Info-Dichte wie Maturity Model
+- Key Statement nach Header muss KLAR als Zusammenfassung erkennbar sein (Financial Services besser als Security Playbook)
+- Prozent-Badges nach Headers (60% etc) mit Farbe + Background = funktioniert
+
+### D-146 (continued): Report Template — Section-Level Feedback
+
+**Layered Text Display:**
+- State of Trust "Three-Layer Trust Gap" style = gut
+- Layer 3/2/1 mit ← Annotations — visuell klar, elegant
+
+**So What / What Would Invalidate:**
+- REIHENFOLGE: "What would invalidate" ZUERST, dann "So What"
+- Text muss DIREKT unter dem Label stehen, nicht auf nächster Seite umbrechen
+- Maturity Model Style gut, ABER braucht grafisches Element
+- Mindestens: Light Grey Background (#f5f4f0)
+- Zwei Varianten: "What would invalidate" = Grau, "So What" = Gold-left-border
+- Security Playbook = beste Referenz für diese Elemente
+
+**"I reviewed..." Formulierungen → ENTFERNEN**
+- "I reviewed 6 major AI maturity models" = Credibility-Killer
+- Jeder weiß es ist AI-generiert → "I" verliert Glaubwürdigkeit
+- Doppelt negativ: unglaubwürdig + unnötig
+- NUR Fakten. CEO will Ergebnisse, nicht Prozess.
+- NEUE REGEL: Kein "I reviewed/analyzed/examined" in Reports
+
+**Key Claims als grafisches Element:**
+- "Prompt injection is not a bug to be patched..." = Claim
+- Eigenes Element: Grau-Hintergrund (nicht Gold), klar als Claim erkennbar
+- Unterscheidung: Claim (grau) vs So What (gold) vs Invalidation (grau, andere Variante)
+
+**Chapter Spacing:**
+- Footer-to-Header Abstand zu groß bei Seitenumbrüchen → reduzieren
+
+**Confidence pro Section in Header:**
+- "4. Prompt Injection (Confidence: High)" = gut
+- Projections mit separater Confidence: "High Confidence (regulatory) · Medium (projections)" = baut Vertrauen
+
+**KPI/Projection Likelihood:**
+- Trust Tax Style: Likelihood bei Projektionen angeben
+- "(medium)" neben Projektionen = ehrlich + vertrauensbildend
+
+### D-147: Template Chooser = potentielles Produkt (2026-02-15 00:02)
+- Florian: "Genial!! Sollten wir pflegen und vlt als Product mitliefern."
+- Für den Moment nur intern
+- Pflegen + weiterentwickeln
+
+### D-148: Cover Audience — Audience in Exec Summary, NOT on Cover (2026-02-15 00:13)
+- Problem: CEO/CTO zu eng, VCs + Startups + Consultants sollen auch angesprochen werden
+- Florian: "Audience ist besser als die Rolle, und die first page ist dann cleaner"
+- ENTSCHIEDEN: Cover bleibt clean (keine Audience/Rolle). Audience-Definition in Exec Summary.
+
+### D-149: Research = Ground Truth (2026-02-15 00:15)
+- "Research ist die ground truth for me"
+- Alle Design-Entscheidungen müssen Benchmarks zitieren (BCG, McKinsey, Economist)
+
+### D-150: Chooser Workflow = Standard für alles (2026-02-15 00:10)
+- "We should always work like this, same for website, other tools, dashboards plus an option to write comments"
+- Template Chooser Pattern für alle Design-Entscheidungen verwenden

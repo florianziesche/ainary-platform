@@ -22,7 +22,16 @@
 - [ ] Link/Pfad zum Output dabei
 - [ ] Kein Filler ("Great question!", "I'd be happy to...")
 
-## 5. DOKUMENTATION
+## 5. REPORT-SPECIFIC (nur für Reports)
+- [ ] TEMPLATE-RULES.md eingehalten? (16 Elemente gecheckt)
+- [ ] Invalidation VOR So What?
+- [ ] Kein Gold bei Zahlen?
+- [ ] Kein "I reviewed/analyzed"?
+- [ ] Citation = "Ainary Research (2026)"?
+- [ ] PDF generiert? (`./scripts/html-to-pdf.sh`)
+- [ ] "Checkbox security" nicht "Security Theater"?
+
+## 6. DOKUMENTATION
 - [ ] PROJECT-STATUS.md updated?
 - [ ] Memory updated wenn relevant?
 - [ ] Committed?

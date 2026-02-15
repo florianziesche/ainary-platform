@@ -34,9 +34,16 @@ Bevor irgendein Agent gespawnt wird:
 - QA prüft erneut
 - Nach 2 Runden: An Florian mit ehrlichem Status ("QA sagt 75, hier sind die offenen Punkte")
 
-## Phase 6: DELIVER
-- Output + Beipackzettel + QA Score an Florian
+## Phase 6: BUILD (for Reports)
+- BUILDER copies `content/reports/REPORT-TEMPLATE-FINAL.html` — swaps content only
+- Checks against `content/reports/TEMPLATE-RULES.md` (16 elements + hard rules)
+- Runs `./scripts/html-to-pdf.sh report.html report.pdf` ($0, 2s)
+- NEVER builds report HTML from scratch. Template = locked standard.
+
+## Phase 7: DELIVER
+- Output + Beipackzettel + QA Score + PDF an Florian
 - Florians Feedback → Trust Score Update + Agent Memory Update
+- Feedback → TEMPLATE update (never individual report fix)
 
 ## Wann Phasen überspringen?
 - Triviale Tasks (< 2 Sätze): Nur PLAN + EXECUTE
