@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.0.0/dist/fonts/geist-sans/style.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.0.0/dist/fonts/geist-mono/style.css" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { 
+    background: #08080c; 
+    display: flex; justify-content: center; align-items: center; 
+    min-height: 100vh; padding: 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  /* Ambient glow */
+  body::before {
+    content: '';
+    position: absolute;
+    top: 30%; left: 50%;
+    width: 600px; height: 400px;
+    background: radial-gradient(ellipse, rgba(200,170,80,0.04) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  
+  .card {
+    width: 880px;
+    background: linear-gradient(180deg, #131318 0%, #111116 100%);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    overflow: hidden;
+    font-family: 'Geist', -apple-system, sans-serif;
+    color: #ededf0;
+    box-shadow: 
+      0 0 0 1px rgba(255,255,255,0.03),
+      0 4px 24px rgba(0,0,0,0.4),
+      0 1px 3px rgba(0,0,0,0.2);
+    position: relative;
+  }
+
+  .header {
+    padding: 20px 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255,255,255,0.01);
+  }
+  .report-id {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.58rem;
+    color: #55555e;
+    letter-spacing: 0.03em;
+  }
+  .report-title {
+    font-family: 'Geist', -apple-system, sans-serif;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #ededf0;
+    margin-top: 2px;
+    letter-spacing: -0.01em;
+  }
+  .badge {
+    padding: 5px 12px;
+    border-radius: 7px;
+    font-size: 0.58rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    font-family: 'Geist Mono', monospace;
+    background: rgba(200,170,80,0.08);
+    color: #c8aa50;
+    border: 1px solid rgba(200,170,80,0.18);
+  }
+
+  .body {
+    padding: 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+
+  .section-label {
+    font-family: 'Geist', -apple-system, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #ededf0;
+    margin-bottom: 16px;
+  }
+
+  .finding {
+    padding: 14px 16px;
+    background: rgba(255,255,255,0.025);
+    border-radius: 10px;
+    margin-bottom: 8px;
+    border: 1px solid rgba(255,255,255,0.055);
+    transition: border-color 0.15s;
+  }
+  .finding-title {
+    font-family: 'Geist', -apple-system, sans-serif;
+    font-size: 0.76rem;
+    font-weight: 500;
+    color: #ededf0;
+    margin-bottom: 5px;
+    line-height: 1.45;
+    letter-spacing: -0.005em;
+  }
+  .finding-meta {
+    font-size: 0.58rem;
+    color: #55555e;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .finding-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px; height: 16px;
+    border-radius: 4px;
+    font-size: 0.45rem;
+    font-weight: 700;
+    font-family: 'Geist Mono', monospace;
+    background: rgba(200,170,80,0.1);
+    color: #c8aa50;
+    flex-shrink: 0;
+  }
+
+  .conf-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .conf-label {
+    font-family: 'Geist', -apple-system, sans-serif;
+    font-size: 0.62rem;
+    color: #8b8b95;
+    min-width: 95px;
+  }
+  .conf-track {
+    flex: 1;
+    height: 4px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .conf-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #c8aa50, #d4bb6a);
+  }
+  .conf-pct {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.6rem;
+    color: #c8aa50;
+    font-weight: 500;
+    min-width: 28px;
+    text-align: right;
+  }
+
+  .claim-bar {
+    display: flex;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 14px 0 10px;
+    gap: 2px;
+  }
+  .claim-seg { height: 100%; border-radius: 3px; }
+  .claim-legend {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .claim-legend span {
+    font-size: 0.58rem;
+    color: #8b8b95;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .claim-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .stat-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 24px;
+  }
+  .stat {
+    flex: 1;
+    padding: 16px 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px;
+    text-align: center;
+    background: rgba(255,255,255,0.02);
+  }
+  .stat-n {
+    font-family: 'Geist Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #ededf0;
+    letter-spacing: -0.02em;
+  }
+  .stat-l {
+    font-family: 'Geist', -apple-system, sans-serif;
+    font-size: 0.55rem;
+    color: #55555e;
+    margin-top: 4px;
+  }
+
+  .source-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .pill {
+    padding: 4px 8px;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 5px;
+    font-size: 0.52rem;
+    color: #6b6b75;
+    font-family: 'Geist Mono', monospace;
+  }
+
+  .footer {
+    padding: 16px 32px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255,255,255,0.008);
+  }
+  .footer-meta {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.52rem;
+    color: #4a4a52;
+  }
+  .agents {
+    display: flex;
+    gap: 4px;
+  }
+  .agent {
+    padding: 4px 9px;
+    border: 1px solid rgba(200,170,80,0.15);
+    border-radius: 5px;
+    font-size: 0.5rem;
+    color: #c8aa50;
+    font-family: 'Geist Mono', monospace;
+    background: rgba(200,170,80,0.04);
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="header">
+    <div>
+      <div class="report-id">AR-001 · FEB 2026</div>
+      <div class="report-title">State of AI Agent Trust 2026</div>
+    </div>
+    <span class="badge">73% CONFIDENCE</span>
+  </div>
+
+  <div class="body">
+    <div>
+      <div class="section-label">Key Findings</div>
+      
+      <div class="finding">
+        <div class="finding-title">Trust gap costs $4.2B/yr in delayed enterprise adoption</div>
+        <div class="finding-meta"><span class="finding-tag">E</span> McKinsey State of AI 2025 · Gartner Hype Cycle</div>
+      </div>
+
+      <div class="finding">
+        <div class="finding-title">87% experiment with agents — only 14% deploy in production</div>
+        <div class="finding-meta"><span class="finding-tag">E</span> Deloitte Enterprise AI Survey Q4 2025</div>
+      </div>
+
+      <div class="finding">
+        <div class="finding-title">Verifiable outputs increase adoption 3.2× over black-box</div>
+        <div class="finding-meta"><span class="finding-tag">E</span> MIT Human-AI Decision Study 2025</div>
+      </div>
+
+      <div class="finding">
+        <div class="finding-title">Confidence scoring emerging as standard within 18 months</div>
+        <div class="finding-meta"><span class="finding-tag">J</span> Industry trend synthesis · 6 converging signals</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">Confidence Breakdown</div>
+      
+      <div class="conf-row">
+        <span class="conf-label">Data Quality</span>
+        <div class="conf-track"><div class="conf-fill" style="width:78%"></div></div>
+        <span class="conf-pct">78%</span>
+      </div>
+      <div class="conf-row">
+        <span class="conf-label">Source Diversity</span>
+        <div class="conf-track"><div class="conf-fill" style="width:82%"></div></div>
+        <span class="conf-pct">82%</span>
+      </div>
+      <div class="conf-row">
+        <span class="conf-label">Recency</span>
+        <div class="conf-track"><div class="conf-fill" style="width:71%"></div></div>
+        <span class="conf-pct">71%</span>
+      </div>
+      <div class="conf-row">
+        <span class="conf-label">Methodology</span>
+        <div class="conf-track"><div class="conf-fill" style="width:65%"></div></div>
+        <span class="conf-pct">65%</span>
+      </div>
+
+      <div class="section-label" style="margin-top:24px;">Claim Transparency</div>
+      <div class="claim-bar">
+        <div class="claim-seg" style="width:62%;background:#c8aa50;"></div>
+        <div class="claim-seg" style="width:24%;background:#6b6b75;"></div>
+        <div class="claim-seg" style="width:14%;background:#3a3a42;"></div>
+      </div>
+      <div class="claim-legend">
+        <span><span class="claim-dot" style="background:#c8aa50;"></span> Evidenced 62%</span>
+        <span><span class="claim-dot" style="background:#6b6b75;"></span> Interpreted 24%</span>
+        <span><span class="claim-dot" style="background:#3a3a42;"></span> Judgment 14%</span>
+      </div>
+
+      <div class="section-label">Sources</div>
+      <div class="source-pills">
+        <span class="pill">SEC Filings</span>
+        <span class="pill">ArXiv</span>
+        <span class="pill">McKinsey</span>
+        <span class="pill">Gartner</span>
+        <span class="pill">MIT</span>
+        <span class="pill">Deloitte</span>
+        <span class="pill">GitHub</span>
+        <span class="pill">+38 more</span>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat">
+          <div class="stat-n">47</div>
+          <div class="stat-l">Sources</div>
+        </div>
+        <div class="stat">
+          <div class="stat-n">18/20</div>
+          <div class="stat-l">QA Score</div>
+        </div>
+        <div class="stat">
+          <div class="stat-n">&lt;10m</div>
+          <div class="stat-l">Build Time</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-meta">5 agents · 3 synthesis rounds · 25+ source types</div>
+    <div class="agents">
+      <span class="agent">Researcher</span>
+      <span class="agent">Analyst</span>
+      <span class="agent">Strategist</span>
+      <span class="agent">Writer</span>
+      <span class="agent">QA</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
