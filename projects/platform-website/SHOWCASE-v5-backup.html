@@ -313,8 +313,8 @@
     </div>
   </section>
 
-  <!-- CONCEPT 5: Real Report Scroll — shown when pre-built tag is selected -->
-  <section id="real-report-section" style="padding:0 0 100px;display:none;">
+  <!-- CONCEPT 5: Real Report Scroll — "Judge the quality yourself" -->
+  <section style="padding:0 0 100px;">
     <div class="container">
       <h2 style="font-family:var(--font-display);font-size:1.3rem;font-weight:600;text-align:center;margin-bottom:6px;">This is the output. Judge it yourself.</h2>
       <p style="text-align:center;font-size:0.8rem;color:var(--text-secondary);margin-bottom:32px;">Real report structure. Real data. Scroll through it.</p>
@@ -322,7 +322,7 @@
       <div style="max-width:900px;margin:0 auto;border:1px solid var(--border-default);border-radius:16px;overflow:hidden;background:var(--bg-surface);max-height:560px;overflow-y:auto;" class="report-scroll">
         <!-- Report Header (sticky) -->
         <div style="padding:16px 28px;border-bottom:1px solid var(--border-default);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--bg-surface);z-index:10;">
-          <span id="rr-header-text" style="font-family:var(--font-mono);font-size:0.6rem;color:var(--text-muted);">AI Company Assessment · Mid-market Manufacturer · Feb 2026</span>
+          <span style="font-family:var(--font-mono);font-size:0.6rem;color:var(--text-muted);">AI Company Assessment · Mid-market Manufacturer · Feb 2026</span>
           <span style="font-family:var(--font-mono);font-size:0.6rem;padding:4px 10px;border:1px solid var(--border-hover);border-radius:6px;color:var(--text-secondary);">5 agents · 47 sources · 4 min 32 sec</span>
         </div>
 
@@ -432,13 +432,13 @@
             <input id="task-input" type="text" placeholder="Research on..." value="AI readiness assessment for a mid-market manufacturer" style="flex:1;padding:8px 12px;font-family:var(--font-mono);font-size:0.75rem;background:transparent;border:1px solid var(--border-default);border-radius:6px;color:var(--text-primary);outline:none;" onfocus="this.style.borderColor='rgba(255,255,255,0.2)'" onblur="this.style.borderColor='rgba(255,255,255,0.06)'">
             <button onclick="runSim()" style="padding:8px 16px;font-family:var(--font-mono);font-size:0.7rem;background:transparent;border:1px solid rgba(200,170,80,0.3);border-radius:6px;color:var(--gold);cursor:pointer;white-space:nowrap;transition:all 0.15s;" onmouseover="this.style.borderColor='rgba(200,170,80,0.6)'" onmouseout="this.style.borderColor='rgba(200,170,80,0.3)'">Run →</button>
           </div>
-          <!-- Quick examples — pre-built reports -->
+          <!-- Quick examples -->
           <div style="padding:8px 24px;border-bottom:1px solid var(--border-default);display:flex;gap:6px;flex-wrap:wrap;">
-            <span class="eg-tag" onclick="setTask('AI readiness assessment for a mid-market manufacturer','readiness')">Mid-market manufacturer</span>
-            <span class="eg-tag" onclick="setTask('Due diligence on Startup X — Series B candidate','diligence')">Startup due diligence</span>
-            <span class="eg-tag" onclick="setTask('State of AI Agent Trust — research report','research-trust')">AI Agent Trust</span>
-            <span class="eg-tag" onclick="setTask('Personal AI Stack Architecture — research report','research-stack')">Personal AI Stack</span>
-            <span class="eg-tag" onclick="setTask('Competitive landscape — industrial AI in DACH region','custom')">Competitive landscape</span>
+            <span class="eg-tag" onclick="setTask('AI readiness assessment for a mid-market manufacturer')">AI readiness</span>
+            <span class="eg-tag" onclick="setTask('Due diligence on Startup X — Series B candidate')">Due diligence</span>
+            <span class="eg-tag" onclick="setTask('Competitive landscape — industrial AI in DACH region')">Competitive landscape</span>
+            <span class="eg-tag" onclick="setTask('Risk assessment for expanding into US market')">Risk assessment</span>
+            <span class="eg-tag" onclick="setTask('Technology scouting — computer vision for quality control')">Tech scouting</span>
           </div>
           <!-- Terminal -->
           <div id="sim-output" style="padding:20px 24px;font-family:var(--font-mono);font-size:0.72rem;line-height:2.2;color:var(--text-secondary);min-height:120px;">
@@ -464,32 +464,29 @@
       </style>
 
       <script>
-        let currentReportType = 'custom';
-
-        function setTask(text, type) {
+        function setTask(text) {
           document.getElementById('task-input').value = text;
-          currentReportType = type || 'custom';
           runSim();
         }
 
         document.getElementById('task-input').addEventListener('keydown', function(e) {
-          if (e.key === 'Enter') { currentReportType = 'custom'; runSim(); }
+          if (e.key === 'Enter') runSim();
         });
 
         function runSim() {
           const task = document.getElementById('task-input').value || 'Research task';
           const output = document.getElementById('sim-output');
           const report = document.getElementById('sim-report');
-          const realReport = document.getElementById('real-report-section');
           report.style.display = 'none';
-          if (realReport) realReport.style.display = 'none';
 
+          // Generate filename from task
           const fname = task.split(/[\s—,]+/).slice(0, 4).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('-').replace(/[^a-zA-Z0-9-]/g, '') + '.pdf';
           const pages = Math.floor(Math.random() * 20) + 35;
           const sources = 47;
           const time = Math.floor(Math.random() * 5) + 4;
           const secs = Math.floor(Math.random() * 50) + 10;
 
+          // Clear and animate lines
           output.innerHTML = '';
           const lines = [
             { delay: 200, html: '<span style="color:var(--text-muted)">09:15:01</span> → <span style="color:var(--text-primary)">"' + task + '"</span>' },
@@ -507,26 +504,12 @@
               output.appendChild(div);
               requestAnimationFrame(() => div.style.opacity = '1');
 
+              // Show report after last line
               if (i === lines.length - 1) {
                 setTimeout(() => {
                   document.getElementById('sim-filename').textContent = fname;
                   document.getElementById('sim-filemeta').textContent = pages + ' pages · ' + sources + ' sources · cross-verified · ' + time + ' min ' + secs + ' sec';
                   report.style.display = 'flex';
-
-                  // Show real report for pre-built types
-                  if (realReport && currentReportType !== 'custom') {
-                    // Update report header based on type
-                    const headerMap = {
-                      'readiness': 'AI Company Assessment · Mid-market Manufacturer · Feb 2026',
-                      'diligence': 'Due Diligence Report · Startup X · Series B · Feb 2026',
-                      'research-trust': 'Research Report · State of AI Agent Trust · Feb 2026',
-                      'research-stack': 'Research Report · Personal AI Stack Architecture · Feb 2026'
-                    };
-                    const hdr = document.getElementById('rr-header-text');
-                    if (hdr && headerMap[currentReportType]) hdr.textContent = headerMap[currentReportType];
-                    realReport.style.display = 'block';
-                    realReport.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }
                 }, 800);
               }
             }, line.delay);
