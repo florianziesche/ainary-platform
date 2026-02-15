@@ -252,10 +252,11 @@ Answer explicitly:
 ### Partial Run Commands
 The pipeline supports partial execution:
 - "Run Phase 1 only" → Research Brief only
-- "Run Phases 1-2" → Brief + Source Log + Claim Ledger
+- "Run Phases 1-2" → Brief + Source Log skeleton + Claim Ledger + **recommended sources to seek** (types + publishers, not fabricated URLs)
 - "Run Phases 1-4" → Everything except writing
-- "Reviewer Pass only" → Rubric + Claim Audit on existing report
-- "Repair only" → Apply fix requests
+- "Run full report" → Full deliverable (all phases, plus Asset Building if OUTPUT_WRITEBACK=true)
+- "Reviewer Pass only" → Rubric + Claim Audit + fix requests (no rewrite)
+- "Repair using these fix requests" → Apply fixes only; no new uncited claims
 
 ### Separation Rule (NON-NEGOTIABLE)
 Every claim must be labeled:
