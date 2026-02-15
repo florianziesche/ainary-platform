@@ -92,3 +92,31 @@
 1. Telegram Blockquotes testen für strukturiertere Nachrichten
 2. Browser-Tool für ClawHub-Scan bei nächstem Heartbeat nutzen
 3. "Decompose → Execute → Validate" Pattern bewusster in Sub-Agent Tasks einbauen
+
+---
+
+## 2026-02-15 (Sonntag)
+
+### OpenClaw Updates (v2026.2.14)
+- **Telegram Polls:** `openclaw message poll` — nützlich für Feedback/Entscheidungen
+- **Slack/Discord dmPolicy:** Neue DM-Zugangskontrolle
+- **Sandbox browser binds:** Separate Browser-Container-Mounts
+- **Fix:** One-shot `message send` hängt nicht mehr
+
+### AI Agent Patterns (Anthropic Blog)
+- **81% der Orgs** planen komplexere Multi-Step Agent Workflows in 2026
+- **Key Insight:** "Agents as infrastructure, not experiments" — genau Mias Positionierung
+- **Thomson Reuters:** 150 Jahre Fallrecht in Minuten durchsuchbar via Agent
+- **eSentire:** Threat-Analyse von 5h → 7min (95% Übereinstimmung mit Experten)
+- **Content-Idee für Florian:** "How I built my personal AI agent infrastructure" — unique angle vs. Enterprise-Fokus
+
+### Workflow-Analyse (letzte 24h, Feb 14)
+- **Wins:** 9/9 Research Reports fertig, Google Drive Sync funktioniert, Template v2 erstellt
+- **Problem:** Viel gebaut (Reports), aber unklar ob gesendet → Send-First Pattern weiter enforced
+- **Prof. Friedl Outreach** wartet auf Input — Follow-up nötig
+- **Nancy iMessage** "talk about Floriana and us" — Florian sollte priorisieren
+
+### Sofort umsetzbar
+1. **Telegram Poll-Feature** für Quick Decisions nutzen (z.B. "Welchen Report zuerst senden?")
+2. **Content-Pitch:** Anthropic Enterprise Agent Survey als Hook für LinkedIn Post
+3. **Send-Tracker:** Gestern 9 Reports gebaut — wie viele davon raus? Heute enforced
