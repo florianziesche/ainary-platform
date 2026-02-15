@@ -9,9 +9,8 @@
     <!-- CTA Section -->
     <section style="padding:100px 0 80px;text-align:center;border-top:1px solid rgba(255,255,255,0.06);">
       <div style="max-width:800px;margin:0 auto;padding:0 24px;">
-        <h2 style="font-size:2rem;font-weight:600;letter-spacing:-0.02em;color:#ededf0;margin-bottom:16px;">Let's talk.</h2>
-        <p style="color:#8b8b95;font-size:0.9rem;margin-bottom:40px;">Have a problem that needs an AI system? 15 minutes to find out if we can help.</p>
-        <a href="https://calendly.com/florian-ainaryventures/15-minutes-chat" target="_blank" style="display:inline-flex;align-items:center;justify-content:center;padding:14px 36px;border-radius:8px;font-size:0.9rem;font-weight:500;text-decoration:none;background:#c8aa50;color:#ffffff;transition:opacity 0.15s;min-width:170px;">Get in touch</a>
+        <h2 style="font-size:2rem;font-weight:600;letter-spacing:-0.02em;color:#ededf0;margin-bottom:40px;">Better decisions start here.</h2>
+        <a href="https://calendly.com/florian-ainaryventures/15-minutes-chat" target="_blank" style="display:inline-flex;align-items:center;justify-content:center;padding:14px 36px;border-radius:8px;font-size:0.9rem;font-weight:500;text-decoration:none;background:transparent;color:#ededf0;border:1px solid rgba(255,255,255,0.5);transition:border-color 0.15s;min-width:170px;">Get in touch</a>
       </div>
     </section>
 
