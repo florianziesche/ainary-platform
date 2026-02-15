@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ainary Research Pipeline v2.0</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: #0a0a0a; color: #e0e0e0; padding: 40px 20px; }
+  h1 { font-size: 28px; font-weight: 600; text-align: center; margin-bottom: 8px; letter-spacing: -0.5px; }
+  .subtitle { text-align: center; color: #888; font-size: 14px; margin-bottom: 48px; }
+  .gold { color: #c8aa50; }
+
+  .pipeline { max-width: 1200px; margin: 0 auto; }
+
+  /* Phase cards */
+  .phase { 
+    display: grid; 
+    grid-template-columns: 80px 1fr 200px 200px; 
+    gap: 20px; 
+    align-items: start;
+    margin-bottom: 2px;
+    padding: 24px 20px;
+    border-left: 2px solid #1a1a1a;
+    position: relative;
+  }
+  .phase:hover { background: #111; }
+  .phase::before {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: 28px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #c8aa50;
+  }
+
+  .phase-num { 
+    font-size: 11px; 
+    font-weight: 600; 
+    color: #c8aa50; 
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding-top: 2px;
+  }
+  .phase-content h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+  .phase-content p { font-size: 13px; color: #999; line-height: 1.5; }
+  .phase-content .key-rule { 
+    font-size: 12px; 
+    color: #c8aa50; 
+    margin-top: 8px; 
+    padding: 6px 10px;
+    background: rgba(200,170,80,0.08);
+    border-radius: 4px;
+    display: inline-block;
+  }
+
+  .artifacts, .agents { font-size: 12px; color: #777; }
+  .artifacts h4, .agents h4 { 
+    font-size: 10px; 
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
+    color: #555; 
+    margin-bottom: 6px; 
+  }
+  .artifacts ul, .agents ul { list-style: none; }
+  .artifacts li, .agents li { 
+    padding: 3px 0; 
+    border-bottom: 1px solid #1a1a1a; 
+  }
+  .artifacts li:last-child, .agents li:last-child { border: none; }
+
+  .tag { 
+    display: inline-block; 
+    font-size: 10px; 
+    padding: 2px 6px; 
+    border-radius: 3px; 
+    margin: 1px 2px; 
+  }
+  .tag-tier1 { background: #1a2a1a; color: #6a9; }
+  .tag-tier2 { background: #2a2a1a; color: #ca5; }
+  .tag-tier3 { background: #2a1a1a; color: #c55; }
+  .tag-new { background: #1a1a2a; color: #88f; }
+
+  /* Quality gates */
+  .gate {
+    max-width: 1200px;
+    margin: 0 auto 2px;
+    padding: 12px 20px 12px 100px;
+    background: rgba(200,170,80,0.04);
+    border-left: 2px solid #c8aa50;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .gate-icon { font-size: 14px; color: #c8aa50; }
+  .gate-text { font-size: 12px; color: #c8aa50; }
+
+  /* Systems section */
+  .systems { 
+    max-width: 1200px; 
+    margin: 48px auto 0; 
+    padding-top: 32px;
+    border-top: 1px solid #1a1a1a;
+  }
+  .systems h2 { font-size: 18px; font-weight: 600; margin-bottom: 24px; }
+  .systems-grid { 
+    display: grid; 
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 12px; 
+  }
+  .system-card {
+    padding: 16px;
+    background: #111;
+    border-radius: 6px;
+    border: 1px solid #1a1a1a;
+  }
+  .system-card h4 { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+  .system-card p { font-size: 11px; color: #777; line-height: 1.4; }
+
+  /* Governance */
+  .governance {
+    max-width: 1200px;
+    margin: 48px auto 0;
+    padding-top: 32px;
+    border-top: 1px solid #1a1a1a;
+  }
+  .governance h2 { font-size: 18px; font-weight: 600; margin-bottom: 24px; }
+  .gov-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .gov-card { padding: 16px; background: #111; border-radius: 6px; border: 1px solid #1a1a1a; }
+  .gov-card h4 { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .gov-card p { font-size: 11px; color: #777; line-height: 1.4; }
+
+  /* Origin */
+  .origin {
+    max-width: 1200px;
+    margin: 48px auto 0;
+    padding: 24px;
+    background: #111;
+    border-radius: 6px;
+    border: 1px solid #1a1a1a;
+    display: grid;
+    grid-template-columns: 1fr 40px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  .origin h3 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+  .origin ul { list-style: none; font-size: 12px; color: #888; }
+  .origin li { padding: 3px 0; }
+  .merge-arrow { 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 20px; 
+    color: #c8aa50; 
+    padding-top: 20px;
+  }
+
+  /* Tier legend */
+  .tier-legend {
+    max-width: 1200px;
+    margin: 32px auto;
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+  }
+  .tier-item { font-size: 11px; display: flex; align-items: center; gap: 6px; }
+
+  /* Footer */
+  .footer { text-align: center; margin-top: 48px; font-size: 11px; color: #444; }
+
+  @media (max-width: 900px) {
+    .phase { grid-template-columns: 60px 1fr; }
+    .artifacts, .agents { display: none; }
+    .systems-grid { grid-template-columns: repeat(2, 1fr); }
+    .gov-grid { grid-template-columns: 1fr; }
+    .origin { grid-template-columns: 1fr; }
+    .merge-arrow { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Ainary Research Pipeline <span class="gold">v2.0</span></h1>
+<p class="subtitle">9 Phases · 7 Agents · 8 Systems · 10 Regression Tests · 16-Point Rubric</p>
+
+<div class="tier-legend">
+  <div class="tier-item"><span class="tag tag-tier1">Tier 1</span> Internal exploration</div>
+  <div class="tier-item"><span class="tag tag-tier2">Tier 2</span> Decision support</div>
+  <div class="tier-item"><span class="tag tag-tier3">Tier 3</span> Public-facing</div>
+  <div class="tier-item"><span class="tag tag-new">NEW in v2</span> From ChatGPT merge</div>
+</div>
+
+<div class="pipeline">
+
+  <!-- Phase 0 -->
+  <div class="phase">
+    <div class="phase-num">Phase 0</div>
+    <div class="phase-content">
+      <h3>Intake & Clarify</h3>
+      <p>Fill Control Panel: AR-ID, Topic, Decision, Audience, Risk Tier, Freshness, Experiment Type, Cross-Refs, Stopping Criteria. Max 1 clarifying question.</p>
+      <div class="key-rule">NEW: Control Panel + Stopping Criteria (from ChatGPT)</div>
+    </div>
+    <div class="artifacts">
+      <h4>Artifacts</h4>
+      <ul>
+        <li>Control Panel <span class="tag tag-new">NEW</span></li>
+        <li>Assumptions Register <span class="tag tag-new">NEW</span></li>
+      </ul>
+    </div>
+    <div class="agents">
+      <h4>Agent</h4>
+      <ul>
+        <li>Main (Mia) · Opus</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Phase 1 -->
+  <div class="phase">
+    <div class="phase-num">Phase 1</div>
+    <div class="phase-content">
+      <h3>Research Brief</h3>
+      <p>Primary question, decision context, 5-12 sub-questions, evidence criteria, key terms, methods, stopping criteria. Brief must be approved before Phase 2.</p>
+      <div class="key-rule">NEW: Stopping Criteria — "what confidence is enough?"</div>
+    </div>
+    <div class="artifacts">
+      <h4>Artifacts</h4>
+      <ul>
+        <li>Research Brief <span class="tag tag-new">NEW</span></li>
+      </ul>
+    </div>
+    <div class="agents">
+      <h4>Agent</h4>
+      <ul>
+        <li>Main (Mia) · Opus</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Gate -->
+  <div class="gate">
+    <span class="gate-icon">◆</span>
+    <span class="gate-text">QUALITY GATE — Brief approved before proceeding</span>
+  </div>
+
+  <!-- Phase 2 -->
+  <div class="phase">
+    <div class="phase-num">Phase 2</div>
+    <div class="phase-content">
+      <h3>Multi-Source Investigation</h3>
+      <p>Web research (5-25 sources by tier), internal cross-refs, build Source Log + Claim Ledger + Contradiction Register. Claims classified E/I/J/A BEFORE writing.</p>
+      <div class="key-rule">NEW: Source Log, Claim Ledger, Contradiction Register, E/I/J/A classification</div>
+    </div>
+    <div class="artifacts">
+      <h4>Artifacts</h4>
+      <ul>
+        <li>Source Log (SL-AR-XXX) <span class="tag tag-new">NEW</span></li>
+        <li>Claim Ledger (CL-AR-XXX) <span class="tag tag-new">NEW</span></li>
+        <li>Contradiction Register <span class="tag tag-new">NEW</span></li>
+      </ul>
+    </div>
+    <div class="agents">
+      <h4>Agent</h4>
+      <ul>
+        <li>Research Agent · Opus</li>
+        <li><span class="tag tag-tier2">T2+</span> Required</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Gate -->
+  <div class="gate">
+    <span class="gate-icon">◆</span>
+    <span class="gate-text">QUALITY GATE — Source Log + Claim Ledger must exist before Phase 3</span>
+  </div>
+
+  <!-- Phase 3 -->
+  <div class="phase">
+    <div class="phase-num">Phase 3</div>
+    <div class="phase-content">
+      <h3>Experiment</h3>
+      <p>Simulation, measurement, comparison, or case study. Raw data in JSON. Methodology documented. Honest labeling enforced.</p>
+      <div class="key-rule">EXISTING: "Simulation" not "Experiment" — honest labeling</div>
+    </div>
+    <div class="artifacts">
+      <h4>Artifacts</h4>
+      <ul>
+        <li>experiments/{slug}/README.md</li>
+        <li>experiments/{slug}/raw-data.json</li>
+        <li>experiments/{slug}/RESULTS.md</li>
+      </ul>
+    </div>
+    <div class="agents">
+      <h4>Agent</h4>
+      <ul>
+        <li>Experiment Agent · Opus</li>
+        <li><span class="tag tag-tier3">T3</span> Required</li>
+        <li><span class="tag tag-tier2">T2</span> Optional</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Phase 4 -->
+  <div class="phase">
+    <div class="phase-num">Phase 4</div>
+    <div class="phase-content">
+      <h3>Validation & Gap Check</h3>
+      <p>Cross-validate claims against independent sources. Gap check: missing angles, counterarguments, recency risk. Internal consistency across CROSS_REFS.</p>
+      <div class="key-rule">NEW: Formal validation pass BEFORE writing (from ChatGPT Phase 3)</div>
+    </div>
+    <div class="artifacts">
+      <h4>Artifacts</h4>
+      <ul>
+        <li>Validation Report <span class="tag tag-new">NEW</span></li>
+        <li>Updated Contradiction Register</li>
+      </ul>
+    </div>
+    <div class="agents">
+      <h4>Agent</h4>
+      <ul>
+        <li>Validation Agent · Opus + Search</li>
+        <li><span class="tag tag-tier2">T2+</span> Required</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Gate -->
+  <div class="gate">
+    <span class="gate-icon">◆</span>
+    <span class="gate-text">QUALITY GATE — Validation passes or return to Phase 2</span>
+  </div>
+
+  <!-- Phase 5 -->
+  <div class="phase">
+    <div class="phase-num">Phase 5</div>
+    <div class="phase-content">
+      <h3>Synthesis (Write)</h3>
+      <p>HTML report per TEMPLATE-RULES. 15 sections. Every claim carries E/I/J/A badge. Citations match Source Log exactly. Math shown. No claims beyond Claim Ledger.</p>
+      <div class="key-rule">NEW: E/I/J/A badges mandatory — no unlabeled claims</div>
+    </div>
+    <div class="artifacts">
+      <h4>Artifacts</h4>
+      <ul>
+        <li>HTML Report</li>
+        <li>"Claims Added During Writing" appendix <span class="tag tag-new">NEW</span></li>
+      </ul>
+    </div>
+    <div class="agents">
+      <h4>Agent</h4>
+      <ul>
+        <li>Writer Agent · Opus</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Phase 6 -->
+  <div class="phase">
+    <div class="phase-num">Phase 6</div>
+    <div class="phase-content">
+      <h3>Review</h3>
+      <p>16-point rubric (8 dimensions × 0-2). Claim audit per section. Adversarial perspectives (4+). Math verification. Every cited number checked against source.</p>
+      <div class="key-rule">NEW: 16-point rubric replaces free-form scores (from ChatGPT Eval Pack)</div>
+    </div>
+    <div class="artifacts">
+      <h4>Artifacts</h4>
+      <ul>
+        <li>Rubric Score (/16) <span class="tag tag-new">NEW</span></li>
+        <li>Claim Audit Report</li>
+        <li>Math Verification Report <span class="tag tag-new">NEW</span></li>
+        <li>Fix Requests (🔴/🟡/🟢)</li>
+      </ul>
+    </div>
+    <div class="agents">
+      <h4>Agent</h4>
+      <ul>
+        <li>QA Agent · Opus</li>
+        <li><span class="tag tag-tier3">T3</span> + Adversarial</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Phase 7 -->
+  <div class="phase">
+    <div class="phase-num">Phase 7</div>
+    <div class="phase-content">
+      <h3>Repair</h3>
+      <p>Surgical fixes only. NO new uncited claims. If fix needs new evidence → return to Phase 2. Max 2 repair cycles. Re-score changed sections.</p>
+      <div class="key-rule">NEW: "No new uncited claims" cardinal rule (from ChatGPT Template H)</div>
+    </div>
+    <div class="artifacts">
+      <h4>Artifacts</h4>
+      <ul>
+        <li>Changes Made (bullets)</li>
+        <li>"New claims added: 0" verification <span class="tag tag-new">NEW</span></li>
+      </ul>
+    </div>
+    <div class="agents">
+      <h4>Agent</h4>
+      <ul>
+        <li>Fix Agent · Sonnet</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Gate -->
+  <div class="gate">
+    <span class="gate-icon">◆</span>
+    <span class="gate-text">QUALITY GATE — Score ≥ threshold. T1: 10/16 · T2: 13/16 · T3: 15/16 + human sign-off</span>
+  </div>
+
+  <!-- Phase 8 -->
+  <div class="phase">
+    <div class="phase-num">Phase 8</div>
+    <div class="phase-content">
+      <h3>Output & Release</h3>
+      <p>Generate PDF. Save Source Log + Claim Ledger. Update TRUST-LEDGER, Claim Registry, Prediction Scorecard. Git commit. Tier 3: human sign-off.</p>
+      <div class="key-rule">NEW: Claim Registry + Prediction Scorecard updates</div>
+    </div>
+    <div class="artifacts">
+      <h4>Artifacts</h4>
+      <ul>
+        <li>PDF Report</li>
+        <li>TRUST-LEDGER.json entry</li>
+        <li>CLAIM-REGISTRY.md update <span class="tag tag-new">NEW</span></li>
+        <li>PREDICTION-SCORECARD.md update <span class="tag tag-new">NEW</span></li>
+      </ul>
+    </div>
+    <div class="agents">
+      <h4>Agent</h4>
+      <ul>
+        <li>Main (Mia)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Phase 9 -->
+  <div class="phase">
+    <div class="phase-num">Phase 9</div>
+    <div class="phase-content">
+      <h3>Asset Building</h3>
+      <p>Convert report → Atomic Notes, Playbooks, Templates, RAG JSON. No new facts. Coverage map: every Key Takeaway → ≥1 asset. Entity + relation graph.</p>
+      <div class="key-rule">NEW: Entire phase from ChatGPT Asset Builder system</div>
+    </div>
+    <div class="artifacts">
+      <h4>Artifacts</h4>
+      <ul>
+        <li>Asset Pack (AP-AR-XXX.md) <span class="tag tag-new">NEW</span></li>
+        <li>RAG JSON (AP-AR-XXX.json) <span class="tag tag-new">NEW</span></li>
+      </ul>
+    </div>
+    <div class="agents">
+      <h4>Agent</h4>
+      <ul>
+        <li>Asset Agent · Sonnet</li>
+        <li><span class="tag tag-new">NEW</span></li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<!-- Supporting Systems -->
+<div class="systems">
+  <h2>Supporting Systems</h2>
+  <div class="systems-grid">
+    <div class="system-card">
+      <h4>📊 Prediction Scorecard</h4>
+      <p>Monthly: check if report predictions came true. +10 correct, -10 wrong. Feeds into confidence calibration.</p>
+    </div>
+    <div class="system-card">
+      <h4>⏰ Freshness Decay</h4>
+      <p>Auto-flag stale reports. Tech: 3mo, Regulation: 6mo, Academic: 12mo. Action: Update, Archive, or Revalidate.</p>
+    </div>
+    <div class="system-card">
+      <h4>🔗 Claim Lifecycle</h4>
+      <p>Central registry. When AR-027 corrects AR-016, both get updated. Status: Active, Corrected, Invalidated.</p>
+    </div>
+    <div class="system-card">
+      <h4>🕸️ Knowledge Graph</h4>
+      <p>JSON graph: reports + claims + edges (corrects, contradicts, builds_on). Query: "What contradicts AR-016?"</p>
+    </div>
+    <div class="system-card">
+      <h4>🎯 Topic Selection</h4>
+      <p>Weighted scoring: VC Interview (3x), Revenue (3x), Audience (2x), Compound (2x), Data Advantage (2x).</p>
+    </div>
+    <div class="system-card">
+      <h4>👤 Feedback Loop</h4>
+      <p>Florian reads 1/batch. Scores: Useful? Credible? Surprising? Would send? 15 min human > 100 agent-hours.</p>
+    </div>
+    <div class="system-card">
+      <h4>✅ Orchestrator Checklist</h4>
+      <p>Pre-spawn + Post-spawn gates. Template used? Source Log exists? Claims added = 0? PDF renders?</p>
+    </div>
+    <div class="system-card">
+      <h4>🛡️ Consistency Enforcement</h4>
+      <p>Monthly self-audit. Spot-checks. Spawn templates = canonical (no ad-hoc). Pipeline versioned.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Governance -->
+<div class="governance">
+  <h2>Governance</h2>
+  <div class="gov-grid">
+    <div class="gov-card">
+      <h4>📋 Prompt Registry</h4>
+      <p>7 spawn templates versioned + status tracked. Only Active templates allowed for Tier 2+. Deprecation rules.</p>
+    </div>
+    <div class="gov-card">
+      <h4>📝 Changelog</h4>
+      <p>Every pipeline/template change: what, why, expected impact, observed impact, regressions, approval.</p>
+    </div>
+    <div class="gov-card">
+      <h4>🧪 Eval Pack</h4>
+      <p>16-point rubric + 10 regression tests. Run after template changes, monthly audit, and after QA failures.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Origin -->
+<div class="origin">
+  <div>
+    <h3>ChatGPT Exec Research Factory</h3>
+    <ul>
+      <li>✓ Control Panel + Risk Tiers</li>
+      <li>✓ Source Log + Claim Ledger</li>
+      <li>✓ Contradiction Register</li>
+      <li>✓ E/I/J/A Classification</li>
+      <li>✓ 16-Point Rubric</li>
+      <li>✓ "No new claims in Repair"</li>
+      <li>✓ Regression Tests</li>
+      <li>✓ Prompt Registry + Changelog</li>
+      <li>✓ Asset Builder (RAG JSON)</li>
+      <li style="color: #555;">✗ No multi-agent execution</li>
+      <li style="color: #555;">✗ No experiments/primary data</li>
+      <li style="color: #555;">✗ No web search</li>
+      <li style="color: #555;">✗ No PDF generation</li>
+    </ul>
+  </div>
+  <div class="merge-arrow">→</div>
+  <div>
+    <h3>Mia A+ Pipeline v1</h3>
+    <ul>
+      <li>✓ Multi-agent (spawn + QA)</li>
+      <li>✓ Experiments/Simulations</li>
+      <li>✓ Web search (Brave API)</li>
+      <li>✓ PDF generation (Headless Chrome)</li>
+      <li>✓ Adversarial review (4 perspectives)</li>
+      <li>✓ Cross-referencing (30 reports)</li>
+      <li>✓ Template design system</li>
+      <li>✓ Trust Ledger (SHA-256)</li>
+      <li style="color: #555;">✗ No Source Log / Claim Ledger</li>
+      <li style="color: #555;">✗ No E/I/J/A separation</li>
+      <li style="color: #555;">✗ Free-form scores (not rubric)</li>
+      <li style="color: #555;">✗ Ad-hoc spawn prompts</li>
+      <li style="color: #555;">✗ Fix agents add new claims</li>
+      <li style="color: #555;">✗ No asset building</li>
+    </ul>
+  </div>
+</div>
+
+<div class="footer">
+  Ainary Research Pipeline v2.0 · Created 2026-02-15 · Merge of ChatGPT Exec Research Factory + Mia A+ Pipeline<br>
+  "The best research system is the one you actually follow."
+</div>
+
+</body>
+</html>
