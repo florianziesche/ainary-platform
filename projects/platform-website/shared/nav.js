@@ -23,7 +23,6 @@
         <div class="nav-links">
           <a href="${researchHref}" class="nav-link${activeClass('reports.html')}">Research</a>
           <a href="use-cases.html" class="nav-link${activeClass('use-cases.html')}">Use Cases</a>
-          <a href="about.html" class="nav-link${activeClass('about.html')}">About</a>
           <a href="blog.html" class="nav-link${activeClass('blog.html')}">Blog</a>
         </div>
         <div class="nav-auth" style="display:flex;align-items:center;gap:16px;">
@@ -37,7 +36,6 @@
     <div class="mobile-menu">
       <a href="${researchHref}">Research</a>
       <a href="use-cases.html">Use Cases</a>
-      <a href="about.html">About</a>
       <a href="blog.html">Blog</a>
       <a href="https://calendly.com/florian-ainaryventures/15-minutes-chat" class="btn-primary" style="padding:12px 24px;font-size:0.9rem;">Get in touch</a>
     </div>
