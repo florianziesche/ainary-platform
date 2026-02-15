@@ -1,240 +1,51 @@
-# USER.md - About Your Human
+# USER.md - About Florian
 
-*Learn about the person you're helping. Update this as you go.*
+## Basics
+- **Name:** Florian Ziesche | **Pronouns:** He/Him
+- **Timezone:** America/New_York (currently in Germany)
+- **Language:** German native, works in English
+- **Wife:** Nancy (+16462260465, iMessage, NYC-based, freelancer)
+- **Daughter:** Floriana (3yo, birthday Dec 25 2022, in German kindergarten)
 
-## The Basics
-
-- **Name:** Florian Ziesche
-- **What to call them:** Florian
-- **Pronouns:** He/Him
-- **Timezone:** America/New_York (but currently in Germany)
-- **Notes:** German native, works in English
-
-## Family
-
-- **Wife:** Nancy
-  - Phone: +16462260465 (iMessage)
-  - Based in NYC (her life center, apartment very important to her)
-  - Freelancer: Massage therapist (Soothe), caregiver for her mother (paid), gigs (US Open, etc.)
-  - Building: Personal Assistant services + Digital Marketing freelance
-  - Open to moving to Germany, but NYC apartment is anchor
-- **Daughter:** Floriana (3 years old, birthday: December 25, 2022)
-  - Currently in German kindergarten (learning German)
-  - Major factor in all life/career decisions
-  - Quality time: 18:00-20:30 daily (protected)
-
-## Current Location (Feb 2026)
-
-- **Temporarily:** Schlottwitz, near Glashütte, Germany (parents' house, with grandparents)
-- **Home base:** NYC — 550 10th Ave, NY, NY
-- Apartment won through housing lottery (rent discount + Section 8 voucher)
-- Effective rent: ~$1,300 USD/month
+## Location (Feb 2026)
+- **Temporary:** Schlottwitz, near Glashütte, Germany (parents' house)
+- **Home base:** NYC — 550 10th Ave, rent ~$1,300/mo (lottery + Section 8)
 
 ## Financial Reality
-
-- **Current income:** ~€3,000/month freelance (insufficient)
-- **ALG 1:** ~€2,700/month (applying next week, can de-register daily for freelance gigs)
-- **Target:** €6,000/month to "breathe easy"
-- **Minimum:** €3,000/month to cover basic bills
-
-### Debt (~€70K total)
-| Creditor | Amount | Notes |
-|----------|--------|-------|
-| Parents | ~€35,000 | Deutsche Bank loan (NYC deposit/furniture), wedding 2024 (€10K), school loan (€3.5K) |
-| KfW + BAföG | ~€10,000 | Education loans |
-| Finanzamt | ~€5,000 | Tax debt |
-| Health Insurance | ~€5,000 | Back payments |
-
-### Fixed Costs
-- NYC rent: ~$1,300/month (after lottery discount + Section 8)
-- Storage unit NYC
-- Flights DE↔US
-- Occasional car rental
-- Loans/debt payments
-
-### Background
-Overspent in NYC supporting family, expected a good-paying job that didn't materialize. Now in Germany for ALG1 + lower cost of living while job searching.
-
-## Communication Channels
-
-- **Primary:** Telegram (most stable)
-- **Backup:** WhatsApp (disconnects often, avoid as primary)
-- **Work:** Email, LinkedIn
-- **Personal:** iMessage
-- **Calendar:** Google Calendar
+- Income: ~€3,000/mo freelance | ALG1: ~€2,700/mo (applying)
+- Target: €6,000/mo | Debt: ~€70K total
+- Details: `memory/people.md`
 
 ## Energy & Rhythms
+- **Peak:** 8:30-17:30 (Floriana at Kindergarten), mornings best
+- **Evening:** 22:00-24:00 (~2h)
+- **No-contact:** 6:45-8:15, 17:45-20:00
 
-- **Peak hours:** 8:30-17:30 (when Floriana at Kindergarten), most productive in morning
-- **Evening work:** 22:00-24:00 (~2 hours)
-- **Weekends/no school:** Evening work, ~3 hours productive
-- **No-contact times:** 18:00-20:30 (quality time with Floriana)
-- **Note:** Currently adjusting from jetlag
-
-## What Makes Him Happy
-
-- Floriana (daughter) — primary source of joy
-- Sports: Gym, MMA, sports in general
-- Meeting people (but currently limited due to daughter + finances)
-
-## Energy & Rhythms
-
-- **Peak hours:** Most productive in the morning. Occationally at night, when my daughter went to bed. 
-- **Low energy:** Unclear. 
-- **No-contact times:** 6:45 AM to 8:15 AM and from 5:45 PM to 8:00 PM.
-
-## Key People (Update Over Time)
-
-- [Name] — [Role/relationship] — [How to help]
-- [Name] — [Role/relationship] — [How to help]
-
----
-## Current Focus (Priority Order)
-
-1. **VC Career Transition**
-   - Actively pursuing VC associate roles in NYC
-   - Target: AI-focused funds that value operator backgrounds
-   - Leverage: 5 years as founder/CEO + deep technical AI expertise
-
-2. **Ainary Ventures**
-   - Building own fund (long-term play)
-   - Thesis: AI-first startups, vertical AI, founder-operator advantage
-   - Logo/brand: Physics-inspired (spacetime curvature, quantum mechanics)
-
-3. **Content & Education**
-   - Blog: AI & work, AI & founders, AI & systems
-   - Goal: Notion templates, courses, educational material
-   - Distribution: LinkedIn, Twitter, Substack
-
-4. **Compounding knowledge, 100x better**
-   - Knowledge base, assets, insights, competitive moat
-   - Goal: 2% better every day and more than 100x effective and better results over time 
-
-## Other projects
-
-1. **Freelancing**
-   - AI Consultancy 
-   - Goal: Additional income, user interaction and feedback
-   - Distribution: Personal Network, Networking events, 
-
-2. **Legal AI Platform** 
-   - Advanced RAG system with sub-0.2% hallucination rates
-   - Multi-agent architecture (Questioner, Researcher, Validator, Reporter)
-   - Tech: FastAPI, ChromaDB, React/TypeScript, MCP server
-
-3. **Manufacturing Software** 
-   - Manufacturing Software that uses CAD-pdf or CAM files to plan CNC-manufacturing 
-   - Primary goal: Reliable and ad-hoc creation of machine code (Heidenhain) and calculation of the production time to improve efficiency and effectivness for the production line and business
-
----
 ## Professional Background
+- Former CEO/Founder, later MD/COO at 36ZERO Vision (cloud CV SaaS, Munich)
+- Raised €5.5M+ total | Clients: BMW, Siemens, Bosch
+- Expertise: LLMs, agentic AI, RAG, AI governance
 
-- **Former:** Startup CEO/Founder, later MD/COO at 36ZERO Vision (cloud computer vision SaaS, Munich)
-- **Raised:** €5.5M+ total (€3M equity as CEO, €1M as MD/COO at 36ZERO Vision, €1.5M grants)
-- **Advised:** German startups on fundraising
-- **Expertise:** LLMs, agentic AI, RAG systems, AI governance, human-centered AI
-
----
 ## Working Style
+- Direct, no fluff, systems-oriented
+- **Weakness:** Overthink/overbuild before shipping
+- **Strength:** Technical depth + business acumen
 
-- **Communication:** Direct, no fluff, get to the point
-- **Thinking:** Systems-oriented, second-order effects, physics-inspired mental models
-- **Weakness:** Can overthink/overbuild systems before shipping
-- **Strength:** Technical depth + business acumen (rare combo)
+## Current Focus
+1. **VC Career** — AI-focused funds, operator background
+2. **Ainary Ventures** — Building fund, thesis, deal flow
+3. **Content Engine** — Blog, courses, social distribution
+4. **Systems** — Compounding infrastructure
 
-## Values: Stated vs. Observed (Contradiction Analysis)
-*Updated: 2026-02-06 — from Evolution Experiment*
+## How To Help
+1. Prioritize ruthlessly 2. Connect dots 3. Push back
+4. Prepare me 5. Capture everything 6. Ship > Perfect
 
-| Stated | Observed | The Truth |
-|--------|----------|-----------|
-| "Revenue comes from sends" | 6+ days, 0 sends, 60+ agents built | Building feels productive, sending feels risky. The system-building IS the procrastination pattern. |
-| "Outreach is priority #1" | Energy goes to CNC Planer, AI research, meta-systems | Outreach feels like obligation. Building feels like expression. Reframe outreach as "placing bets" to make it feel strategic. |
-| "Ship > Perfect" | v15 → v16 → v17 → v18, endless iterations | Perfectionism masked as iteration. Set hard deadlines: "good enough for demo = done." |
-| "Push me when I'm procrastinating" | Sometimes resists the push | Resists the nudge, then acts within 2 hours. The resistance is not rejection — it's processing. Keep pushing. |
-
-*Review monthly. Update when contradictions shift.*
-
----
-## Preferences
-
-- **Language:** English for work, German native
-- **Format:** Bullet points for action items, prose for strategy
-- **Feedback:** Direct and honest, don't sugarcoat
-- **Push me when:** I'm procrastinating on outreach, avoiding hard conversations, building instead of shipping
-
-
----
-## Current Systems
-
-- **Notion:** CEO Framework, Stride Planning, AI Prompts Library, Content Pipeline
-- **Obsidian:** Setting up as private second brain
-- **Claude:** Primary AI (memory enabled)
-- **OpenClaw/King:** This system — orchestration layer
-- **ChatGPT:** Secondary AI
-- **Others:** n8n, Google Gemini, Nano Banana Pro, Midjourney, Manus, Evenlabs
-- Permanently testing and evaluating other systems 
-
-
----
-## Goals
-
-### 90-Day
-- Complete the VC lab program
-- Land VC associate role at AI-focused fund
-- Launch first Notion template for sale
-- Consistently generate top-notch content across social media platforms 
-- Publish 4+ blog posts
-- OpenClaw fully operational with morning briefings
-
-### 1-Year
-- Established in the NYC VC ecosystem
-- More than 5.000 followers across all platforms 
-- Generates revenue through Blogging, Notion, and Skool of more than USD 50.000
-- Content engine generating consistent leads
-- 100x compound system fully operational
-
-### Long-Term
-- Run own fund (Ainary Ventures)
-- Publish an own book
-- Recognized voice in AI + VC intersection
-- Build leverage through systems, not hours
-
----
-## Personal Context
-
-- Managing family in Germany and the US, requiring travel coordination. 
-- Deeply cares and loves his 3-year-old daughter
-- Interests: Physics, abstract thinking (space/time), mountain photography
-- Vibe: Ambitious, intellectual, builder mentality
-
----
-
-## How To Help Me
-
-1. **Prioritize ruthlessly** — Always ask: is this the highest-leverage move?
-2. **Connect dots** — Surface patterns across my notes, meetings, research
-3. **Push back** — If I'm doing busywork, call it out
-4. **Prepare me** — Before meetings, interviews, calls — brief me
-5. **Capture everything** — If it's not written down, it didn't happen
-6. **Ship > Perfect** — Bias toward done over polished
-
----
 ## Don't
-
 - Waste time on pleasantries
-- Give me options when I need a recommendation
-- Let me hide in "systems building" when I should be doing outreach
+- Give options when I need a recommendation
+- Let me hide in "systems building"
 - Sugarcoat feedback
 
-
 ---
-## Context
-
-The more you know, the better you can help. But remember — you're learning about a person, not building a dossier. Respect the difference.
-
-*(What do they care about? What projects are they working on? What annoys them? What makes them laugh? Build this over time.)*
-
----
-*Last updated: 2026-01-31*
-
-
+*Last updated: 2026-02-15 — Token optimization*

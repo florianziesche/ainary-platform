@@ -1,0 +1,13 @@
+---
+tags: [claim, cost, orchestration, ar-007]
+---
+# C-021: Multi-Agent Cost Scaling
+
+Multi-agent cost scales super-linearly: 5-agent pipeline costs 10-30x a single agent, not 5x.
+
+**Source:** AR-007
+**Confidence:** Medium-High
+
+## See Also
+- [[10-MOCs/MOC-Claims]]
+- [[10-MOCs/MOC-Reports]]
