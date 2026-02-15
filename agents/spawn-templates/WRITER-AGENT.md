@@ -67,12 +67,25 @@ If a claim from the Claim Ledger is classified "Evidenced" but you can't find th
 - Headline numbers MUST match exhibit/table data exactly
 - If you calculate from raw data, document the formula
 
+## Writing Style: Retrieval-Optimized (NON-NEGOTIABLE)
+- **Explicit nouns** — not "this approach" → "the 3-link threshold approach"
+- **Standalone bullets** — each bullet understandable without surrounding context
+- **Explicit relationships** — "A contradicts B", "X depends on Y", not "relates to"
+- Every section must be answerable with: "This section answers: ..."
+- Write for REUSE (Asset Builder will extract), not just for reading
+
 ## Honest Labeling Rules
 - "Simulation" not "Experiment" (if no real-world data)
 - "N=1" if single case
 - "Machine-assessed" not "Verified" (if AI-only QA)
 - State actual sample size, not inflated derivatives
 - Confidence must reflect actual evidence strength, not "sounds about right"
+
+## Freshness Compliance
+- Check Source Log for OUTSIDE_WINDOW sources
+- NEVER use an OUTSIDE_WINDOW source as sole evidence for a claim
+- If citing older foundational work (e.g., Watts-Strogatz 1998): label as "[Foundational — not recency-dependent]"
+- Flag any claim where the best available evidence is outside the freshness window
 
 ## You MUST NOT
 - Add claims not in the Claim Ledger (if you discover something new → note it in a "Claims Added During Writing" appendix with classification)

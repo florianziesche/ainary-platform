@@ -73,7 +73,13 @@ List every number in the report that involves calculation:
 | Location | Claim | Source Data | My Calculation | Match? |
 |----------|-------|-------------|----------------|--------|
 
-## Deliverable 5: Fix Requests
+## Deliverable 5: Freshness Audit
+
+Check Source Log against FRESHNESS setting from Control Panel:
+| Source | Publication Date | Within Window? | Used as Primary Evidence? | Issue? |
+If OUTSIDE_WINDOW sources are used as sole evidence for claims → 🔴 BLOCKER.
+
+## Deliverable 6: Fix Requests
 
 Priority levels:
 - 🔴 BLOCKER — must fix before release (wrong facts, wrong math, misleading labels)

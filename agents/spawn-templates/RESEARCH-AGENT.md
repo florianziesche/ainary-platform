@@ -40,9 +40,26 @@ S[N]
 Rules:
 - Use web_search (5-10 searches) and web_fetch (deep-read top sources)
 - Target: {TIER_SOURCES} sources minimum
-- Internal sources (AR-XXX) MUST be labeled "Type: internal" 
+- Internal sources (AR-XXX) MUST be labeled "Type: internal"
 - Prefer primary/official sources over blogs
-- If a source contradicts another → note it
+- If a source contradicts another → note it AND specify why (definitions/timeframe/methodology/incentives)
+
+### FRESHNESS FILTER (NON-NEGOTIABLE)
+FRESHNESS for this report: {FRESHNESS}
+- Check publication date of EVERY source
+- If source is OUTSIDE the freshness window → mark as "Freshness: OUTSIDE_WINDOW — context only"
+- OUTSIDE_WINDOW sources CANNOT be the sole evidence for a load-bearing claim
+- Tier 2: ≥ 60% of load-bearing sources must be WITHIN_WINDOW
+- Tier 3: ≥ 80% of load-bearing sources must be WITHIN_WINDOW
+- If you can't find enough fresh sources → note it and reduce planned confidence
+
+### EVIDENCE CRITERIA (from Research Brief)
+Only accept sources that match the Evidence Criteria defined in the Research Brief.
+If a source is interesting but doesn't meet criteria → note in "Excluded Sources" section with reason.
+
+### SCOPE CONSTRAINTS
+Respect SCOPE_CONSTRAINTS from Control Panel. Do NOT research outside defined scope.
+Respect MUST_NOT list — avoid these topics/framings even if sources mention them.
 
 ### Deliverable 2: Claim Ledger → save to `/Users/florianziesche/.openclaw/workspace/content/reports/claim-ledgers/CL-{AR_ID}.md`
 
@@ -98,6 +115,7 @@ CONTRADICTION [N]
 | {AR_ID} | e.g. AR-031 |
 | {TOPIC} | Report topic |
 | {TIER_SOURCES} | Tier 1: 3-5, Tier 2: 5-15, Tier 3: 15-25 |
-| {paste Control Panel} | From Phase 0 |
-| {paste Research Brief} | From Phase 1 |
+| {FRESHNESS} | timeless, last_12m, last_90d, last_30d, today |
+| {paste Control Panel} | From Phase 0 (includes SCOPE_CONSTRAINTS, MUST_INCLUDE, MUST_NOT) |
+| {paste Research Brief} | From Phase 1 (includes Evidence Criteria) |
 | {list paths} | Paths to CROSS_REF reports |
