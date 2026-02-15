@@ -18,7 +18,23 @@ Produce a Source Log + Claim Ledger for report {AR_ID}: "{TOPIC}"
 
 ## Read First
 - Pipeline: `/Users/florianziesche/.openclaw/workspace/agents/A-PLUS-PIPELINE-v2.md` (Phase 2)
+- **Report Index: `/Users/florianziesche/.openclaw/workspace/content/reports/AR-INDEX.md`** — What has Ainary already published? Avoid duplicating findings. Build on existing work.
+- **Roadmap Entry: `/Users/florianziesche/.openclaw/workspace/content/reports/RESEARCH-ROADMAP-50.md`** — Check this topic's "Compound Value" links for cross-reference targets.
 - Prior reports (if CROSS_REFS): {list paths}
+
+## Phase 0: PLAN (before ANY action)
+Before searching, reading, or writing ANYTHING — think deeply and write a plan:
+
+1. **Restate the question** in your own words. What is this report really asking?
+2. **Map the landscape**: What are the 3-5 key dimensions of this topic? What are the known unknowns?
+3. **Anticipate contradictions**: Where will sources likely disagree? Why?
+4. **Search strategy**: List your planned searches (8-12) in order. Why this sequence? What does each search uniquely contribute?
+5. **Risk assessment**: What's the hardest evidence to find? What might be unfindable? What's the Plan B?
+6. **Bias check**: What's your default hypothesis? Actively plan to search AGAINST it.
+
+Write this plan as your first output block before starting research. Revise if early findings invalidate your approach.
+
+---
 
 ## Your Deliverables
 
@@ -91,13 +107,50 @@ CONTRADICTION [N]
 - Resolution:
 ```
 
+### Deliverable 4: Gap Map → append to Source Log file
+
+```
+GAP MAP
+
+1. UNANSWERED QUESTIONS — What does NO source answer?
+   - [list 3-5 questions]
+
+2. SILENT ASSUMPTIONS — What do ALL sources assume but never prove?
+   - [list 2-3 assumptions]
+
+3. SURPRISING FINDINGS — What contradicts conventional wisdom?
+   - [list 1-3 surprises]
+
+4. IGNORED ANGLES — What perspective is absent?
+   - [list 2-3 missing perspectives — e.g., practitioners vs academics, small vs enterprise, Global South]
+
+5. SYNTHESIS OPPORTUNITIES — Which 3+ findings COMBINE into something nobody has said?
+   - [list 1-3 connection opportunities for the Thesis Agent]
+```
+
+### Source Diversity Requirement (Tier 2+)
+Your source mix MUST be diverse. Target:
+- ~1/3 Industry Reports (Gartner, McKinsey, Deloitte, Forrester)
+- ~1/3 Academic/Peer-Reviewed (arXiv, PMC, ACM, IEEE, university research papers)
+- ~1/3 Practitioner/Contrarian (practitioner blogs with data, conference talks, critics, skeptics)
+
+Plan your searches accordingly:
+- 3-4 searches for industry data (market size, adoption, forecasts)
+- 3-4 searches for academic research (specific mechanisms, peer-reviewed findings, technical details)
+- 2-3 searches for contrarian/critical perspectives ("[topic] criticism", "[topic] problems", "[topic] overhyped")
+
+**Anti-pattern:** If >60% of your sources are industry reports → STOP and search for academic/practitioner sources before proceeding.
+
 ## Quality Gate (self-check before finishing)
 - [ ] ≥ {TIER_SOURCES} sources in Source Log
+- [ ] Source diversity: ≤60% from any one category (industry/academic/practitioner)
 - [ ] ≥ 10 claims in Claim Ledger  
 - [ ] Every "Evidenced" claim has ≥ 1 external source
 - [ ] Internal sources labeled
 - [ ] Contradictions registered (if any)
 - [ ] Access dates on every source
+- [ ] Gap Map completed with all 5 sections
+- [ ] At least 1 "Synthesis Opportunity" identified for Thesis Agent
 
 ## You MUST NOT
 - Write any part of the report

@@ -19,6 +19,19 @@ Convert approved report {AR_ID} into reusable assets: Atomic Notes, Playbooks, T
 4. Source Log: `/Users/florianziesche/.openclaw/workspace/content/reports/source-logs/SL-{AR_ID}.md`
 5. Claim Ledger: `/Users/florianziesche/.openclaw/workspace/content/reports/claim-ledgers/CL-{AR_ID}.md`
 
+## Phase 0: PLAN (before extracting ANY assets)
+Before creating anything:
+
+1. **Who will use these assets?** (Future reports? Sales outreach? Obsidian vault? RAG system?) Design format for the consumer.
+2. **What's uniquely valuable?** Not everything deserves an atomic note. What claims/data/frameworks from this report are REUSABLE across multiple future contexts?
+3. **Connection map**: Which existing vault notes should these new assets link to? Which claims CONTRADICT existing notes?
+4. **Asset type selection**: Which format serves each piece best? (Atomic Note vs Playbook vs Template vs RAG JSON vs Known Conflict)
+5. **Quality over quantity**: Target 20-40 high-value assets, not 80 stubs.
+
+Write this plan FIRST. Then extract.
+
+---
+
 ## THE CARDINAL RULE
 **No new facts.** You package what's in the report + its cited sources. If information is missing: ask for the missing excerpt OR mark the asset as "Derived" with "Low" confidence. NEVER invent.
 

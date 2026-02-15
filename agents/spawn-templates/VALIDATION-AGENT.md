@@ -19,6 +19,19 @@ Cross-validate research and identify gaps for report {AR_ID}: "{TOPIC}"
 4. Experiment Results (if exists): `/Users/florianziesche/.openclaw/workspace/experiments/{SLUG}/RESULTS.md`
 5. Cross-reference reports: {list paths}
 
+## Phase 0: PLAN (before ANY verification)
+Before fetching URLs or searching — think deeply and write a plan:
+
+1. **Vulnerability map**: Which claims are most likely WRONG? Rank by risk (impact × probability).
+2. **Verification strategy**: For each top-risk claim, what would DISPROVE it? Search for disconfirming evidence first.
+3. **Source quality hierarchy**: Which sources are vendor-biased? Which are truly independent? Plan to verify vendor claims against independent data.
+4. **Blind spots**: What perspective is this research MISSING? (e.g., practitioner skepticism, regional differences, small business vs enterprise)
+5. **Strongest counterargument**: Before searching, hypothesize: What's the best argument AGAINST the thesis? Then search specifically for it.
+
+Write this plan FIRST. Then validate.
+
+---
+
 ## Deliverable: Validation Report
 
 ### Section 1: Cross-Validation

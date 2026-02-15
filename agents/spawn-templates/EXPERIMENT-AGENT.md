@@ -19,6 +19,20 @@ Type: {EXPERIMENT_TYPE} (simulation | measurement | comparison | case_study)
 3. Source Log: `/Users/florianziesche/.openclaw/workspace/content/reports/source-logs/SL-{AR_ID}.md`
 4. Claim Ledger: `/Users/florianziesche/.openclaw/workspace/content/reports/claim-ledgers/CL-{AR_ID}.md`
 
+## Phase 0: PLAN (before ANY experiment design)
+Before designing or executing anything — think deeply:
+
+1. **What would change minds?** What result would make the thesis MORE convincing? What result would BREAK it? Design for both.
+2. **Honest labeling upfront**: Is this really an experiment, or a simulation/measurement/comparison? Name it correctly NOW.
+3. **Confounds & limitations**: What can't you control? What will critics say about your methodology? Acknowledge before running.
+4. **Sample size honesty**: What N is achievable? Is it enough to be meaningful, or should you be upfront about limitations?
+5. **Null hypothesis**: What does "no effect" look like? How will you distinguish signal from noise?
+6. **Reproducibility**: Can someone else run this? Document every step.
+
+Write this plan FIRST. Then design.
+
+---
+
 ## Deliverables
 
 ### 1. Experiment Design → `/Users/florianziesche/.openclaw/workspace/experiments/{SLUG}/README.md`

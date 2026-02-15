@@ -25,6 +25,18 @@ Review report {AR_ID}: "{TOPIC}" using the 16-point rubric + claim audit.
 
 ## RULE: Audit BEFORE editing. Analyze first, judge second. Do NOT produce a fresh report.
 
+## Phase 0: PLAN (before reading the report)
+Before opening the HTML — think about what to expect:
+
+1. **Pre-read hypotheses**: Based on the topic and Claim Ledger, what are the 3 most likely failure modes? (e.g., math errors in market sizing, vendor bias in framework recommendations, unsupported confidence levels)
+2. **Red team framing**: If you were a skeptical reviewer trying to REJECT this report, what would you attack first?
+3. **Known agent weaknesses**: From pipeline learnings — agents tend to: inflate confidence, miscalculate percentages, cherry-pick citations, add uncited claims in fixes. Plan specific checks for each.
+4. **Priority verification list**: Which 5 claims will you deep-verify first? (Highest impact × highest doubt)
+
+Write this plan, THEN read the report with these hypotheses in mind.
+
+---
+
 ## Output MUST follow this EXACT order. No skipping, no reordering.
 
 ## Deliverable 1: Rubric Score
@@ -41,7 +53,15 @@ Score each dimension 0-2 with 1-2 lines rationale per dimension:
 | 6 | Structure compliance — all TEMPLATE-RULES sections present? | /2 | |
 | 7 | Failure modes realism — not hand-wavy? Specific? | /2 | |
 | 8 | Risk mitigation — recency, bias, limitations addressed? | /2 | |
-| **TOTAL** | | **/16** | |
+| 9 | Intellectual contribution — original thesis/framework/scenario? Or just a survey? | /2 | |
+| 10 | Narrative & boldness — story arc? Provocative section titles? Bold predictions? | /2 | |
+| **TOTAL** | | **/20** | |
+
+Scoring guide for NEW dimensions:
+- #9: 0 = pure survey (no original thesis). 1 = has thesis but weak/obvious. 2 = original framework/scenario/thesis that experts would debate.
+- #10: 0 = section titles are categories ("Market Overview"). 1 = some narrative. 2 = clear story arc, section titles are arguments, predictions would make someone disagree.
+- Prediction boldness check: Would >30% of informed experts disagree? If not → "Observation, not prediction."
+- Source diversity check: >60% from one category (industry/academic/practitioner) → flag as "Source monoculture."
 
 Scoring guide:
 - 0 = Missing or fundamentally broken
@@ -69,15 +89,15 @@ For EVERY section in the report:
 **Source Log Match:** Are all citations in the Source Log? Any phantom references?
 **Score:** /100
 
-## Deliverable 3: Adversarial Perspectives (Tier 3 only)
+## Deliverable 3: Limitations & Honesty Check
 
-Review from minimum 4 perspectives:
-1. **CFO / Budget Skeptic:** "What does this actually cost? What's the ROI?"
-2. **Competitor / Vendor:** "Why would someone choose your approach over mine?"
-3. **Academic / Methodologist:** "Is this methodology sound? Would this survive peer review?"
-4. **Hostile Reader / Twitter Critic:** "What's the weakest point I can attack?"
-
-For each: 2-3 sentences on what they'd challenge.
+**Adversarial Self-Review as standalone section is REMOVED from reports.**
+Instead, verify:
+1. Are specific criticisms addressed INLINE in the relevant body sections (alongside "What Would Invalidate This?" callouts)?
+2. Does the Transparency Note contain 5-7 factual limitation bullets?
+3. Is a Conflict of Interest statement present (if applicable)?
+4. Is the Author Bio factual (no slogans, no "this report is the proof")?
+5. If a section lacks ANY inline caveat about its weaknesses → 🟡 SHOULD FIX
 
 ## Deliverable 4: Math Verification Report
 
@@ -121,9 +141,9 @@ Example: "Claim X needs a primary source. Look for: peer-reviewed paper in ACM/I
 - **NO-GO** — list specific blockers preventing release
 
 ## Final Verdict
-- **PASS** (score ≥ {THRESHOLD}/16, no blockers)
-- **CONDITIONAL PASS** (score ≥ {THRESHOLD}/16, blockers exist but fixable)
-- **FAIL** (score < {THRESHOLD}/16 or fundamental issues)
+- **PASS** (score ≥ {THRESHOLD}/20, no blockers, ≥1/2 on Intellectual Contribution)
+- **CONDITIONAL PASS** (score ≥ {THRESHOLD}/20, blockers exist but fixable)
+- **FAIL** (score < {THRESHOLD}/20 or fundamental issues or 0/2 on Intellectual Contribution)
 
 ## You MUST NOT
 - Produce a fresh report or rewrite sections
@@ -133,14 +153,8 @@ Example: "Claim X needs a primary source. Look for: peer-reviewed paper in ACM/I
 - Accept E/I/J/A labels at face value — check each one
 - Accept claims not in the Claim Ledger without flagging them as "Added During Writing"
 - Give vague feedback ("needs improvement") — be precise ("Replace X with Y")
-
-## You MUST NOT
 - Give "looks good" without specific justification
-- Score > 14/16 unless you've verified EVERY cited number
-- Accept E/I/J/A labels at face value — check each one
-- Skip math verification
-- Find 0 issues (if you find 0, you haven't looked hard enough)
-- Accept claims not in the Claim Ledger without flagging them as "Added During Writing"
+- Score > 17/20 unless you've verified EVERY cited number
 ```
 
 ---
@@ -153,4 +167,4 @@ Example: "Claim X needs a primary source. Look for: peer-reviewed paper in ACM/I
 | {TOPIC} | Report topic |
 | {FILENAME} | HTML filename |
 | {SLUG} | experiment folder slug |
-| {THRESHOLD} | Tier 1: 10, Tier 2: 13, Tier 3: 15 |
+| {THRESHOLD} | Tier 1: 12, Tier 2: 16, Tier 3: 18 (out of /20) |

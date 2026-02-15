@@ -27,19 +27,32 @@
 - RULE: Only include if quote is genuinely strong. Weak quote = no quote page.
 - RULE: Quote must be external (not from the report itself)
 
-### 03. TOC — Option C (Grouped)
+### 03. TOC — Option C (Grouped, TIGHTENED)
 - "CONTENTS" heading: Black (#1a1a1a), weight 600, uppercase
 - Section markers: Grey (#888), 0.65rem, uppercase (FOUNDATION / ANALYSIS / ACTION)
 - Plain numbers (1, 2, 3 — NOT 01, 02)
+- **TOC entry padding: 8px 0** (NOT 12px — academic-tight spacing)
+- **TOC section-label margin-bottom: 8px** (NOT 12px)
 - Hover: title turns gold (#c8aa50)
 - Page numbers right-aligned (print only)
 - Appendix items (Transparency Note, Claim Register, References) listed in TOC
 
-### 04. How to Read — Option B (Standalone Mini-Section)
-- Table: Rating / Meaning / Example
-- Mentions multi-agent pipeline
-- Links to Transparency Note
+### 04. How to Read — Option B (Standalone Mini-Section, STANDARDIZED)
 - Position: between TOC and Executive Summary
+- **Structure (exact order, identical across ALL reports):**
+  1. Intro paragraph: "Every claim in this report carries a classification badge and confidence level."
+  2. **Table 1: Evidence Classification** — 4 rows, columns: Badge / Meaning / Example
+     - Use TEXT labels, not colored badge spans: `[E] Evidenced`, `[I] Interpretation`, `[J] Judgment`, `[A] Assumption`
+     - Examples must be report-specific
+  3. **Table 2: Confidence Levels** — 3 rows, columns: Confidence / Meaning
+     - High: "3+ independent sources, peer-reviewed or large-sample primary data"
+     - Medium: "1–2 sources, plausible but not independently confirmed"
+     - Low: "Single secondary source, methodology unclear, or extrapolated"
+  4. **Overall Confidence Score paragraph** (MANDATORY): "Overall Report Confidence (X%): This score reflects..." + 3 factors + "The score is an honest signal, not a mathematical output."
+  5. Pipeline mention: "This report was produced using a multi-agent research pipeline. Full methodology and limitations are in the Transparency Note (Section N)."
+- RULE: NO inline badge explanation paragraphs (use the table)
+- RULE: Table 1 header = "Badge", NOT "Rating"
+- RULE: Confidence Score paragraph references the specific framework by name
 
 ### 05. Executive Summary — Option C (Thesis + Bullets + Keywords)
 - Explicit thesis sentence first (always)
@@ -97,18 +110,24 @@
 - Versioning note: "Predictions scored publicly at 12 months."
 - RULE: Only include if report has forward-looking claims
 
-### 12. Transparency Note — Option A
+### 12. Transparency Note — Option A (expanded)
 - Heading: "Transparency Note" (English, not Beipackzettel)
-- Fields: Overall Confidence, Sources (with counts), Strongest Evidence, Weakest Point, What would invalidate, Methodology (full version here), System disclosure
+- Fields: Overall Confidence, Sources (with counts), Strongest Evidence, Weakest Point, What would invalidate, Methodology (full version here), Limitations, Conflict of Interest
+- **Limitations** (absorbs Adversarial Self-Review): 5-7 honest bullets about what this report does NOT do well. Factual, no role-play, no theatrical perspectives.
+- **Conflict of Interest**: "The publisher of this report researches, builds, and advises on AI agent systems — and has a commercial interest in the conclusions presented here. Evaluate evidence independently; claims marked [J] reflect judgment, not evidence."
+- RULE: Not bold. No specific service lists. Covers research + build + advisory in one line.
+- **NO System Disclosure section** — redundant with Methodology (Full) and "About This Report" on the last page. Saying it 3 times is too many.
 - NO quarterly update commitment
-- "This report was created with a multi-agent research system" as full sentence
 
-### 13. Claim Register — Option A (Financial Services Full Table)
-- Columns: # / Claim / Value / Source / Confidence / Used In
+### 13. Claim Register — Option B (Fixed Column Widths)
+- `table-layout: fixed` — MANDATORY to prevent auto-width collapse
+- Columns and widths: # (5%) / Claim (45%) / Type (8%, centered) / Source (17%) / Confidence (10%) / Used In (15%)
+- Header "Classification" → "Type" (shorter = less wasted width)
 - 10-20 claims (better 10 good than 20 bad)
 - Top 5 claims get "Invalidated If" note below table
 - Confidence types: "High (modeled)", "Medium (practitioner)", "Low (single analyst)"
 - No gold. No colored backgrounds.
+- `page-break-inside: auto` for tables >10 rows (don't force to next page)
 
 ### 14. References + Citation — Option A + Citation B
 - Numbered [1][2][3] with hanging indent
@@ -117,12 +136,13 @@
 - RULE: Ainary Research = author (not Florian Ziesche). System produced it, Florian directed it. Name is in Author Bio.
 - Cite as: last line in References section
 
-### 15. Author Bio — Option B (Minimal + Mission)
-- Initials circle (48px, #e5e3dc background)
-- Name bold
-- Bio text: "Florian Ziesche is the founder of Ainary Ventures, where AI does 80% of the research and humans do the 20% that matters. Before Ainary, he was CEO of 36ZERO Vision and advised startups and SMEs on AI strategy and due diligence. His conviction: HUMAN × AI = LEVERAGE. This report is the proof."
+### 15. About This Report (replaces Author Bio)
+- Heading: "About This Report"
+- Text: "This report was produced by Ainary's multi-agent research system — a pipeline of specialized AI agents that research, validate, write, and quality-check independently."
 - Link: ainaryventures.com
-- RULE: Bio is identical across all reports (not customized per report)
+- RULE: Identical across all reports
+- RULE: No personal name. No credentials. No slogans. Ainary = the brand. Who's behind it → website.
+- RULE: Technical details (agent count, model, pipeline timing) belong in Transparency Note, not here.
 
 ### 16. Back Cover — Option A (D-143)
 - Gold-Punkt + "Ainary" centered

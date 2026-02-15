@@ -13,6 +13,16 @@ This pipeline merges two systems:
 
 The merge takes the Factory's structure as backbone and adds Mia's unique capabilities.
 
+## Core Principle: PLAN BEFORE DOING
+
+Every agent in this pipeline MUST start with a **Phase 0: PLAN** before any action. This means:
+- Think deeply about the problem space before searching/writing/verifying
+- Write the plan as first output (visible, auditable)
+- Anticipate failures, contradictions, and blind spots BEFORE encountering them
+- Revise the plan if early findings invalidate the approach
+
+This is non-negotiable. Agents that skip planning produce lower quality work.
+
 ---
 
 ## Control Panel (Required — Set Before Every Report)
@@ -26,7 +36,9 @@ The merge takes the Factory's structure as backbone and adds Mia's unique capabi
 - RISK_TIER: {1 | 2 | 3}
 - FRESHNESS: {timeless | last_12m | last_90d | last_30d | today}
 - BROWSING: {allowed | not_allowed} — if not_allowed: reduce confidence, state explicitly
-- EXPERIMENT_TYPE: {none | simulation | measurement | comparison | case_study}
+- EXPERIMENT_TYPE: {thought_experiment | constructed_scenario | simulation | measurement | comparison | case_study | none_with_justification}
+- ORIGINAL_THESIS: {string — "What is our original contribution?" — required for Tier 2+}
+- NARRATIVE_ARC: {string — "Reader goes from [A] to [B]" — required for Tier 2+}
 - OUTPUT: {html+pdf | html_only | markdown}
 - OUTPUT_WRITEBACK: {true | false} — generate Asset Pack (Phase 9)?
 - OUTPUT_LENGTH: {standard | extensive} (default: extensive)
@@ -167,17 +179,85 @@ For each conflict:
 - Resolution or what would resolve:
 ```
 
-**Quality Gate:** Source Log + Claim Ledger must exist before Phase 3.
+### 2f. Artifact D — Gap Map (Recommended Tier 2, Required Tier 3)
+
+Answer explicitly:
+```
+1. UNANSWERED QUESTIONS — What does NO source answer?
+2. SILENT ASSUMPTIONS — What do all sources assume but never prove?
+3. SURPRISING FINDINGS — What contradicts conventional wisdom?
+4. IGNORED ANGLES — What perspective is absent? (practitioners vs academics, small vs large, EU vs US)
+5. SYNTHESIS OPPORTUNITIES — Which 3+ findings COMBINE into something nobody has said?
+```
+
+### 2g. Source Diversity Requirement (Tier 2+)
+
+Sources must be diverse. Target mix:
+- ~1/3 Industry Reports (Gartner, McKinsey, Deloitte, Forrester)
+- ~1/3 Academic/Peer-Reviewed (arXiv, PMC, ACM, IEEE, university research)
+- ~1/3 Practitioner/Contrarian (blogs with data, conference talks, practitioners, critics)
+
+Anti-pattern: If >60% of sources are industry reports → flag as "Source Monoculture" and search for academic/practitioner sources before proceeding.
+
+**Quality Gate:** Source Log + Claim Ledger + Gap Map must exist before Phase 2.5.
+
+---
+
+## Phase 2.5 — Thesis Development (Required Tier 2+, skippable Tier 1)
+
+**Purpose:** Transform research into an original intellectual contribution. A report without a thesis is a survey.
+
+**Input:** Source Log + Claim Ledger + Gap Map
+
+**Output — 5 Deliverables:**
+
+### A. Original Thesis (1 sentence)
+- Must be PROVOCATIVE — test: "Would a reasonable expert disagree?"
+- If the thesis is "The market is growing" or "Companies should prepare" → TOO WEAK. Dig deeper.
+- Example weak: "Enterprises should invest in trust infrastructure."
+- Example strong: "The AI agent industry is building a $52B market without a trust layer — and the primary safety signal (agent self-reported confidence) is wrong 84% of the time."
+
+### B. Proposed Framework (if applicable)
+- If the data reveals a pattern that no source has named → NAME IT.
+- Must be visualizable as an Exhibit (table, matrix, stack diagram).
+- Example: "Three-Layer Trust Stack" (Communication / Identity / Trustworthiness)
+- Not every report needs this — but Tier 3 should try.
+
+### C. Constructed Scenario or Thought Experiment
+- Combine 3+ empirically documented phenomena into a chain that has NOT been observed as a whole.
+- HONEST LABEL: "Constructed scenario — each step empirically documented, full chain not observed in the wild."
+- Example: "Memory Injection → No VCE Detection → Multi-Agent Propagation → HITL Failure → Reinforcement"
+- For `thought_experiment`: "What would happen if X at scale?"
+- For `constructed_scenario`: "Steps A+B+C are each proven — here's what happens when they combine."
+
+### D. Narrative Arc
+- State explicitly: "The reader starts believing [A] and ends understanding [B]."
+- The report is a JOURNEY, not a table of contents.
+- Section titles must be ARGUMENTS, not categories.
+  - ❌ "Market Reality" → category
+  - ✅ "The $52B Market Building on Sand" → argument
+
+### E. "Nobody Else Is Saying" (3 bullets)
+- Three insights that appear in NONE of the sources.
+- These are YOUR synthesis — label as [I] or [J], not [E].
+- Example: "Overconfidence is not listed as an independent failure mode in ANY major agent failure taxonomy."
+
+**Quality Gate:** Thesis must pass "Would someone disagree?" test. If no → return and sharpen.
 
 ---
 
 ## Phase 3 — Experiment (Tier 3 required, Tier 2 optional)
 
 **Types:**
-- **Simulation:** Modeled scenarios with disclosed parameters (label: "Simulation")
-- **Measurement:** Real data from own pipeline/system (label: "Measurement")
-- **Comparison:** A vs B testing (label: "Comparison")
-- **Case Study:** Applied framework to real scenario (label: "Case Study")
+- **Thought Experiment:** "What would happen if X at scale?" — logical deduction from empirical premises. Label: "Thought Experiment"
+- **Constructed Scenario:** Chain of 3+ documented phenomena that haven't been observed together. Label: "Constructed Scenario — each step documented, chain not observed"
+- **Simulation:** Modeled scenarios with disclosed parameters. Label: "Simulation"
+- **Measurement:** Real data from own pipeline/system. Label: "Measurement"
+- **Comparison:** A vs B testing. Label: "Comparison"
+- **Case Study:** Applied framework to real scenario. Label: "Case Study"
+- **none_with_justification:** Explicitly state WHY no experiment. Tier 2+ must justify.
+
+**For Tier 2+:** If `EXPERIMENT_TYPE: none_with_justification`, the report MUST compensate with a strong Thesis + Framework from Phase 2.5. A report with neither experiment NOR original thesis is a survey, not research.
 
 **Requirements:**
 - Document methodology in `experiments/[slug]/README.md`
@@ -204,7 +284,15 @@ Answer explicitly:
 - What is immature/rapidly evolving?
 - What counterarguments exist? (web_search "[topic] criticism")
 
-### 4c. Internal Consistency Check
+### 4c. Originality Check (Tier 2+)
+Answer explicitly:
+1. **"Would an expert learn something new from this report?"** — If no → RETURN to Phase 2.5.
+2. **"What is the original contribution?"** — Name it. If answer is "synthesis of existing sources" → that's a survey, not research. Flag.
+3. **"Does the thesis provoke?"** — "Would someone disagree?" test. If universally agreeable → thesis is too weak.
+4. **"Does the narrative work?"** — Is it a story or a table of contents?
+5. **Source diversity:** Count industry vs academic vs practitioner. Flag monoculture.
+
+### 4d. Internal Consistency Check
 - Cross-check against CROSS_REFS reports
 - Flag where this report updates/contradicts prior findings
 - **If correcting a prior report: state explicitly what changed and why**
@@ -212,6 +300,27 @@ Answer explicitly:
 ---
 
 ## Phase 5 — Synthesis (Write the Report)
+
+### Mandatory Inputs from Phase 2.5 (Tier 2+)
+The Writer MUST integrate:
+1. **Original Thesis** → becomes the opening sentence of the Executive Summary
+2. **Proposed Framework** → becomes an Exhibit in the relevant section
+3. **Constructed Scenario** → gets its own section with honest labeling
+4. **Narrative Arc** → drives section ordering and titles
+5. **"Nobody Else Is Saying"** → distributed as Key Insights in relevant sections
+
+### Section Title Rule (NON-NEGOTIABLE for Tier 2+)
+Every section title must be an ARGUMENT, not a category.
+- Test: "Does this title state a position?"
+- ❌ "Market Reality" → category, tells nothing
+- ✅ "The $52B Market Building on Sand" → position, reader knows what's coming
+- ❌ "Trust Frameworks" → category
+- ✅ "ISO 42001 and NIST Exist — But Only 1 in 5 Enterprises Use Them" → position
+
+### Key Insight Rule (STRENGTHENED)
+The first sentence of every section (the `key-insight` span) must be ORIGINAL — not a summary of sources.
+- Test: "Is this sentence in any of the Sources?" If yes → not original enough.
+- It should be YOUR synthesis from combining multiple sources.
 
 ### Structure (per TEMPLATE-RULES.md):
 
@@ -228,13 +337,18 @@ Answer explicitly:
    - So What (decision relevance)
 7. **External Evidence** — Literature review
 8. **Experiment Results** (if Phase 3 ran)
-9. **Adversarial Self-Review** (Tier 3)
-10. **Recommendations** — Decision criteria, phased plan
-11. **Predictions** — Testable, dated, BETA badge
-12. **Transparency Note** — All metadata, limitations, weakest point
-13. **Claim Register** — 10-20 claims with confidence + invalidation
-14. **References** — Numbered, hanging indent, access dates
-15. **Back Cover** — Branding, contact
+9. **Recommendations** — Decision criteria, phased plan
+10. **Predictions** — Testable, dated, BETA badge, must pass "Would >30% of experts disagree?" test
+11. **Transparency Note** — All metadata, limitations (absorbs Adversarial), conflict of interest, weakest point, system disclosure
+12. **Claim Register** — 10-20 claims with confidence + invalidation
+13. **References** — Numbered, hanging indent, access dates
+14. **Back Cover** — Branding, contact
+
+**REMOVED: Adversarial Self-Review as standalone section.**
+- Specific critiques → move INTO the relevant body sections (alongside "What Would Invalidate This?" callouts)
+- General limitations → 5-7 bullets in Transparency Note
+- Conflict of interest → 1 sentence in Transparency Note
+- Rationale: Theatrical role-play format undermines credibility. Honest inline caveats + factual limitations are stronger.
 
 ### Writing Style: Retrieval-Optimized
 - **Explicit nouns** (not "this approach" → "the 3-link threshold approach")
@@ -281,11 +395,13 @@ Every claim must be labeled:
 | 6 | Structure compliance (template rules) | /2 |
 | 7 | Failure modes realism | /2 |
 | 8 | Risk mitigation | /2 |
+| 9 | Intellectual contribution — original thesis/framework/scenario? Or just a survey? | /2 |
+| 10 | Narrative & boldness — story arc? Provocative section titles? Bold predictions? | /2 |
 
-**Thresholds:**
-- Tier 1: ≥ 10/16 recommended
-- Tier 2: ≥ 13/16 required, no blockers
-- Tier 3: ≥ 15/16 required + injection test + human sign-off
+**Thresholds (updated — /20 scale):**
+- Tier 1: ≥ 12/20 recommended
+- Tier 2: ≥ 16/20 required, no blockers, ≥ 1/2 on Intellectual Contribution
+- Tier 3: ≥ 18/20 required + injection test + human sign-off + ≥ 1/2 on both new dimensions
 
 ### 6b. Claim Audit (per QA-AGENT-SPEC.md)
 For EVERY section:
@@ -395,11 +511,12 @@ Per asset:
 | Phase | Agent | Model | Notes |
 |-------|-------|-------|-------|
 | 0-1 | Main (Mia) | Opus | Control Panel + Brief |
-| 2 | Research Agent | Opus + Search | Source Log + Claim Ledger |
+| 2 | Research Agent | Opus + Search | Source Log + Claim Ledger + Gap Map |
+| 2.5 | Thesis Agent | Opus | Original Thesis + Framework + Scenario + Narrative Arc |
 | 3 | Experiment Agent | Opus | Design + Execute + Document |
-| 4 | Validation Agent | Opus + Search | Cross-check + Gap Check |
-| 5 | Writer Agent | Opus | Synthesis per template |
-| 6 | QA Agent | Opus | Rubric + Claim Audit + Adversarial |
+| 4 | Validation Agent | Opus + Search | Cross-check + Gap Check + Originality Check |
+| 5 | Writer Agent | Opus | Synthesis per template (Thesis-driven, narrative arc) |
+| 6 | QA Agent | Opus | 10-pt Rubric (/20) + Claim Audit + Limitations Check |
 | 7 | Fix Agent | Sonnet | Surgical repairs only |
 | 8 | Main (Mia) | — | Release + Systems update |
 | 9 | Asset Agent | Sonnet | Asset Pack + RAG JSON |
@@ -442,6 +559,7 @@ Per asset:
 |---------|------|--------|
 | v1.0 | 2026-02-15 04:00 | Original Mia pipeline (ad-hoc, 6 phases) |
 | v2.0 | 2026-02-15 12:35 | Merge with Exec Research Factory + Asset Builder |
+| v2.3 | 2026-02-15 13:55 | Originality Engine: Phase 2.5 Thesis Development, Gap Map, Source Diversity, Section Title Rule, Key Insight Rule, Narrative Arc, QA 10-pt rubric (/20), Prediction Boldness Check, Experiment types expanded |
 
 ---
 

@@ -36,7 +36,12 @@ Für JEDEN Report-Abschnitt (nicht den ganzen Report auf einmal):
 - Alle TEMPLATE-RULES.md Regeln eingehalten?
 - Invalidation VOR So What?
 - Keine Apple Symbols, keine Gold-Nummern?
-- Author Bio standard? Back Cover standard?
+- Author Bio factual (keine Slogans, kein "this report is the proof")?
+- Back Cover standard?
+- KEINE Adversarial Self-Review Section (wurde entfernt — Kritik gehört IN die Sections + Limitations in Transparency Note)
+- Transparency Note hat Limitations-Bullets UND Conflict of Interest?
+- Section-Titel sind ARGUMENTE, nicht Kategorien? ("The $52B Market Building on Sand" ✅, "Market Reality" ❌)
+- Key Insights sind ORIGINAL, nicht Zusammenfassungen?
 
 ### 6. Self-Interrogation (nach jedem Abschnitt)
 - "Habe ich an alles gedacht?"

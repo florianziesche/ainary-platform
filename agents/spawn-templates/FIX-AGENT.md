@@ -19,6 +19,18 @@ Apply QA fix requests to report {AR_ID}: "{TOPIC}"
 ## Report to Fix
 - HTML: `/Users/florianziesche/.openclaw/workspace/content/reports/{FILENAME}.html`
 
+## Phase 0: PLAN (before ANY edits)
+Before touching the HTML:
+
+1. **Read ALL fix requests first** — understand the full scope before starting.
+2. **Dependency map**: Do any fixes depend on others? (e.g., adding a source before citing it). Order accordingly.
+3. **Ripple effects**: Will fixing X break Y? (e.g., renumbering references affects all inline citations). Plan the cascade.
+4. **Cardinal Rule check**: For each fix, ask: "Does this require new factual claims?" If yes → flag, don't fix.
+
+Then execute in dependency order.
+
+---
+
 ## Fix Requests to Apply
 {paste fix requests from QA Agent}
 
