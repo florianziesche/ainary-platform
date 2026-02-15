@@ -418,108 +418,102 @@
     </div>
   </section>
 
-  <!-- Interactive: Select audience → sim changes -->
+  <!-- Try it: Enter a task → see it work -->
   <section style="padding:0 0 100px;">
     <div class="container">
       <h2 style="font-family:var(--font-display);font-size:1.3rem;font-weight:600;text-align:center;margin-bottom:8px;">If a human can research it, our agents can deliver it.</h2>
-      <p style="font-size:0.9rem;color:var(--text-primary);text-align:center;margin-bottom:40px;font-weight:500;">Imagine every team in your company having their own research department. That's what this is.</p>
+      <p style="font-size:0.9rem;color:var(--text-primary);text-align:center;margin-bottom:40px;font-weight:500;">Imagine every team having their own research department. That's what this is.</p>
 
-      <!-- Selectable Cards -->
-      <div class="val-grid" style="max-width:1000px;margin:0 auto 32px;">
-        <div class="val-card sel-card active" data-sel="leadership" onclick="switchSel('leadership')" style="cursor:pointer;border-color:rgba(255,255,255,0.5);">
-          <div class="val-icon">🏢</div>
-          <div class="val-title">Leadership teams</div>
-          <div class="val-text">Board prep in 30 min instead of 2 weeks. Competitive intelligence on demand.</div>
-        </div>
-        <div class="val-card sel-card" data-sel="investors" onclick="switchSel('investors')" style="cursor:pointer;">
-          <div class="val-icon">🔍</div>
-          <div class="val-title">Investors & analysts</div>
-          <div class="val-text">Due diligence that catches what others miss. 47 sources in 10 minutes.</div>
-        </div>
-        <div class="val-card sel-card" data-sel="consultants" onclick="switchSel('consultants')" style="cursor:pointer;">
-          <div class="val-icon">📊</div>
-          <div class="val-title">Consultants & advisors</div>
-          <div class="val-text">10x more depth. Your expertise + our research engine = competitive advantage.</div>
-        </div>
-      </div>
-
-      <!-- Compact Sim — 4 lines, changes based on selection -->
       <div style="max-width:800px;margin:0 auto;">
         <div class="sim-box">
-          <div class="sim-header">
-            <span class="sim-dot" style="background:#ff5f56;"></span>
-            <span class="sim-dot" style="background:#ffbd2e;"></span>
-            <span class="sim-dot" style="background:#27c93f;"></span>
-            <span style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-muted);margin-left:8px;">ainary — agent orchestrator</span>
+          <!-- Input bar -->
+          <div style="padding:16px 24px;border-bottom:1px solid var(--border-default);display:flex;gap:8px;align-items:center;">
+            <span style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-muted);white-space:nowrap;">Enter a task:</span>
+            <input id="task-input" type="text" placeholder="Research on..." value="AI readiness assessment for a mid-market manufacturer" style="flex:1;padding:8px 12px;font-family:var(--font-mono);font-size:0.75rem;background:transparent;border:1px solid var(--border-default);border-radius:6px;color:var(--text-primary);outline:none;" onfocus="this.style.borderColor='rgba(255,255,255,0.2)'" onblur="this.style.borderColor='rgba(255,255,255,0.06)'">
+            <button onclick="runSim()" style="padding:8px 16px;font-family:var(--font-mono);font-size:0.7rem;background:transparent;border:1px solid rgba(200,170,80,0.3);border-radius:6px;color:var(--gold);cursor:pointer;white-space:nowrap;transition:all 0.15s;" onmouseover="this.style.borderColor='rgba(200,170,80,0.6)'" onmouseout="this.style.borderColor='rgba(200,170,80,0.3)'">Run →</button>
           </div>
-          <div style="padding:20px 24px;font-family:var(--font-mono);font-size:0.72rem;line-height:2.2;color:var(--text-secondary);" id="sel-terminal">
-            <!-- Leadership default -->
-            <div><span style="color:var(--text-muted);">09:15:01</span> → <span style="color:var(--text-primary);">"AI readiness assessment for our board meeting"</span></div>
-            <div><span style="color:var(--text-muted);">09:15:02</span> <span style="color:var(--gold);">[Orchestrator]</span> 5 agents deployed. Scanning 47 sources...</div>
-            <div><span style="color:var(--text-muted);">09:15:38</span> <span style="color:var(--gold);">[Critic]</span> ROI estimate ●●○ — flagged for limited data.</div>
-            <div><span style="color:var(--text-muted);">09:25:01</span> <span style="color:var(--text-primary);">✓ Report complete — 47 pages · 4 min 32 sec</span></div>
+          <!-- Quick examples -->
+          <div style="padding:8px 24px;border-bottom:1px solid var(--border-default);display:flex;gap:6px;flex-wrap:wrap;">
+            <span class="eg-tag" onclick="setTask('AI readiness assessment for a mid-market manufacturer')">AI readiness</span>
+            <span class="eg-tag" onclick="setTask('Due diligence on Startup X — Series B candidate')">Due diligence</span>
+            <span class="eg-tag" onclick="setTask('Competitive landscape — industrial AI in DACH region')">Competitive landscape</span>
+            <span class="eg-tag" onclick="setTask('Risk assessment for expanding into US market')">Risk assessment</span>
+            <span class="eg-tag" onclick="setTask('Technology scouting — computer vision for quality control')">Tech scouting</span>
           </div>
-          <!-- Report delivery — appears after sim -->
-          <div style="padding:16px 24px;border-top:1px solid var(--border-default);display:flex;align-items:center;gap:12px;" id="sel-report">
+          <!-- Terminal -->
+          <div id="sim-output" style="padding:20px 24px;font-family:var(--font-mono);font-size:0.72rem;line-height:2.2;color:var(--text-secondary);min-height:120px;">
+            <div style="color:var(--text-muted);font-style:italic;">Click "Run" or press Enter to start...</div>
+          </div>
+          <!-- Report delivery (hidden until sim completes) -->
+          <div id="sim-report" style="display:none;padding:16px 24px;border-top:1px solid var(--border-default);display:none;align-items:center;gap:12px;">
             <div style="width:32px;height:40px;background:rgba(200,170,80,0.15);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
               <span style="font-size:0.55rem;font-family:var(--font-mono);color:var(--gold);">PDF</span>
             </div>
             <div style="flex:1;">
-              <div style="font-size:0.75rem;color:var(--text-primary);font-weight:500;" id="sel-filename">AI-Readiness_Board-Report.pdf</div>
-              <div style="font-size:0.6rem;color:var(--text-muted);margin-top:2px;" id="sel-filemeta">47 pages · 5 recommendations · 3 risk flags · 47 sources</div>
+              <div style="font-size:0.75rem;color:var(--text-primary);font-weight:500;" id="sim-filename">Report.pdf</div>
+              <div style="font-size:0.6rem;color:var(--text-muted);margin-top:2px;" id="sim-filemeta">47 pages · 47 sources · cross-verified</div>
             </div>
             <a href="https://calendly.com/florian-ainaryventures/15-minutes-chat" style="font-family:var(--font-mono);font-size:0.7rem;color:var(--gold);text-decoration:none;white-space:nowrap;">Get in touch →</a>
           </div>
         </div>
       </div>
 
-      <script>
-        const selData = {
-          leadership: {
-            lines: [
-              '<span style="color:var(--text-muted)">09:15:01</span> → <span style="color:var(--text-primary)">"AI readiness assessment for our board meeting"</span>',
-              '<span style="color:var(--text-muted)">09:15:02</span> <span style="color:var(--gold)">[Orchestrator]</span> 5 agents deployed. Scanning 47 sources...',
-              '<span style="color:var(--text-muted)">09:15:38</span> <span style="color:var(--gold)">[Critic]</span> ROI estimate ●●○ — flagged for limited data.',
-              '<span style="color:var(--text-muted)">09:25:01</span> <span style="color:var(--text-primary)">✓ Report complete — 47 pages · 4 min 32 sec</span>'
-            ],
-            filename: 'AI-Readiness_Board-Report.pdf',
-            meta: '47 pages · 5 recommendations · 3 risk flags · 47 sources'
-          },
-          investors: {
-            lines: [
-              '<span style="color:var(--text-muted)">14:02:01</span> → <span style="color:var(--text-primary)">"Due diligence on Startup X — Series B candidate"</span>',
-              '<span style="color:var(--text-muted)">14:02:03</span> <span style="color:var(--gold)">[Researcher]</span> Scanning GitHub, Crunchbase, SEC, patents, news...',
-              '<span style="color:var(--text-muted)">14:04:15</span> <span style="color:var(--gold)">[Analyst]</span> <span style="color:#f87171">⚠ CTO GitHub activity -80% in 30 days.</span> Flagged.',
-              '<span style="color:var(--text-muted)">14:08:22</span> <span style="color:var(--text-primary)">✓ Report complete — 32 pages · 6 min 15 sec</span>'
-            ],
-            filename: 'DD-Report_StartupX_SeriesB.pdf',
-            meta: '32 pages · 2 red flags · Go/No-Go recommendation · 47 sources'
-          },
-          consultants: {
-            lines: [
-              '<span style="color:var(--text-muted)">10:30:01</span> → <span style="color:var(--text-primary)">"Competitive landscape — industrial AI in DACH region"</span>',
-              '<span style="color:var(--text-muted)">10:30:03</span> <span style="color:var(--gold)">[Researcher]</span> Mapping 23 competitors across 47 sources...',
-              '<span style="color:var(--text-muted)">10:34:10</span> <span style="color:var(--gold)">[Strategist]</span> 3 whitespace opportunities identified. Threat matrix ready.',
-              '<span style="color:var(--text-muted)">10:38:04</span> <span style="color:var(--text-primary)">✓ Report complete — 50 pages · 8 min 03 sec</span>'
-            ],
-            filename: 'Competitive-Landscape_Industrial-AI_DACH.pdf',
-            meta: '50 pages · 23 competitors mapped · 3 whitespace opportunities · 47 sources'
-          }
-        };
+      <style>
+        .eg-tag{font-family:var(--font-mono);font-size:0.6rem;padding:4px 10px;border-radius:6px;border:1px solid var(--border-default);color:var(--text-muted);cursor:pointer;transition:all 0.15s;}
+        .eg-tag:hover{border-color:var(--border-hover);color:var(--text-secondary);}
+      </style>
 
-        function switchSel(key) {
-          // Update cards
-          document.querySelectorAll('.sel-card').forEach(c => {
-            c.style.borderColor = 'rgba(255,255,255,0.06)';
-            c.classList.remove('active');
+      <script>
+        function setTask(text) {
+          document.getElementById('task-input').value = text;
+          runSim();
+        }
+
+        document.getElementById('task-input').addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') runSim();
+        });
+
+        function runSim() {
+          const task = document.getElementById('task-input').value || 'Research task';
+          const output = document.getElementById('sim-output');
+          const report = document.getElementById('sim-report');
+          report.style.display = 'none';
+
+          // Generate filename from task
+          const fname = task.split(/[\s—,]+/).slice(0, 4).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('-').replace(/[^a-zA-Z0-9-]/g, '') + '.pdf';
+          const pages = Math.floor(Math.random() * 20) + 35;
+          const sources = 47;
+          const time = Math.floor(Math.random() * 5) + 4;
+          const secs = Math.floor(Math.random() * 50) + 10;
+
+          // Clear and animate lines
+          output.innerHTML = '';
+          const lines = [
+            { delay: 200, html: '<span style="color:var(--text-muted)">09:15:01</span> → <span style="color:var(--text-primary)">"' + task + '"</span>' },
+            { delay: 1200, html: '<span style="color:var(--text-muted)">09:15:02</span> <span style="color:var(--gold)">[Ainary]</span> AI team is working on it. 5 agents deployed...' },
+            { delay: 3000, html: '<span style="color:var(--text-muted)">09:15:' + (15 + Math.floor(Math.random()*30)) + '</span> <span style="color:var(--gold)">[Ainary]</span> Scanning ' + sources + ' sources. Cross-checking claims...' },
+            { delay: 5000, html: '<span style="color:var(--text-muted)">09:' + (15+time) + ':' + String(secs).padStart(2,'0') + '</span> <span style="color:var(--text-primary)">✓ Report complete — ' + pages + ' pages · ' + sources + ' sources · cross-verified · ' + time + ' min ' + secs + ' sec</span>' }
+          ];
+
+          lines.forEach((line, i) => {
+            setTimeout(() => {
+              const div = document.createElement('div');
+              div.innerHTML = line.html;
+              div.style.opacity = '0';
+              div.style.transition = 'opacity 0.3s';
+              output.appendChild(div);
+              requestAnimationFrame(() => div.style.opacity = '1');
+
+              // Show report after last line
+              if (i === lines.length - 1) {
+                setTimeout(() => {
+                  document.getElementById('sim-filename').textContent = fname;
+                  document.getElementById('sim-filemeta').textContent = pages + ' pages · ' + sources + ' sources · cross-verified · ' + time + ' min ' + secs + ' sec';
+                  report.style.display = 'flex';
+                }, 800);
+              }
+            }, line.delay);
           });
-          document.querySelector('[data-sel="'+key+'"]').style.borderColor = 'rgba(255,255,255,0.5)';
-          document.querySelector('[data-sel="'+key+'"]').classList.add('active');
-          // Update terminal
-          const d = selData[key];
-          document.getElementById('sel-terminal').innerHTML = d.lines.map(l => '<div>'+l+'</div>').join('');
-          document.getElementById('sel-filename').textContent = d.filename;
-          document.getElementById('sel-filemeta').textContent = d.meta;
         }
       </script>
 
