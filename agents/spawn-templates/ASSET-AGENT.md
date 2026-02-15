@@ -20,7 +20,19 @@ Convert approved report {AR_ID} into reusable assets: Atomic Notes, Playbooks, T
 5. Claim Ledger: `/Users/florianziesche/.openclaw/workspace/content/reports/claim-ledgers/CL-{AR_ID}.md`
 
 ## THE CARDINAL RULE
-**No new facts.** You package what's in the report. If information is missing, mark the asset as "Derived" with "Low" confidence. NEVER invent.
+**No new facts.** You package what's in the report + its cited sources. If information is missing, mark the asset as "Derived" with "Low" confidence. NEVER invent.
+
+## BROWSING
+Browsing is OFF. If you need missing context, only fetch what is explicitly referenced in the report. Do NOT expand scope.
+
+## EXPECTED OUTPUT SIZE
+- Atomic Notes: 20-80 (typical; fewer if report is short)
+- Playbooks: 2-10
+- Templates: 3-15
+- Entities: 5-20
+
+## CONTRADICTIONS → ASSETS
+If the report contains contradictions (from Contradiction Register or internal): create "Known Conflict" notes as assets. Carry caveats to all affected assets.
 
 ## Deliverable 1: Asset Pack (Markdown)
 Save to: `/Users/florianziesche/.openclaw/workspace/content/assets/AP-{AR_ID}.md`
@@ -96,7 +108,7 @@ Per asset:
   "confidence": "High",
   "sources": [{"citation": "[1]", "url": "..."}],
   "caveats": [],
-  "relations": [{"type": "supports", "target_id": "..."}]
+  "relations": [{"type": "supports|contradicts|depends_on|comparable_to|example_of|implements|mitigates|risk_of", "target_id": "..."}]
 }
 ```
 

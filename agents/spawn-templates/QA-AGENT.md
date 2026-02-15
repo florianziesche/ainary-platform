@@ -23,12 +23,16 @@ Review report {AR_ID}: "{TOPIC}" using the 16-point rubric + claim audit.
 - HTML: `/Users/florianziesche/.openclaw/workspace/content/reports/{FILENAME}.html`
 - Experiment data (if exists): `/Users/florianziesche/.openclaw/workspace/experiments/{SLUG}/`
 
+## RULE: Audit BEFORE editing. Analyze first, judge second. Do NOT produce a fresh report.
+
+## Output MUST follow this EXACT order. No skipping, no reordering.
+
 ## Deliverable 1: Rubric Score
 
-Score each dimension 0-2:
+Score each dimension 0-2 with 1-2 lines rationale per dimension:
 
-| # | Dimension | Score | Justification (1-2 sentences) |
-|---|-----------|-------|-------------------------------|
+| # | Dimension | Score | Rationale |
+|---|-----------|-------|-----------|
 | 1 | Decision alignment — does this help DECISION_TO_INFORM? | /2 | |
 | 2 | Evidence discipline — E/I/J/A labels present? Citations match Source Log? | /2 | |
 | 3 | Uncertainty integrity — confidence justified? Stopping criteria addressed? | /2 | |
@@ -43,6 +47,14 @@ Scoring guide:
 - 0 = Missing or fundamentally broken
 - 1 = Present but with significant issues
 - 2 = Meets standard
+
+## Deliverable 2: Top 5 Failures (with exact locations)
+
+Each failure:
+- **Section:** [exact name]
+- **Quote/Reference:** [specific text]
+- **Why it fails:**
+- **Severity:** Minor | Major | Blocker
 
 ## Deliverable 2: Claim Audit
 
@@ -79,22 +91,48 @@ Check Source Log against FRESHNESS setting from Control Panel:
 | Source | Publication Date | Within Window? | Used as Primary Evidence? | Issue? |
 If OUTSIDE_WINDOW sources are used as sole evidence for claims → 🔴 BLOCKER.
 
-## Deliverable 6: Fix Requests
+## Deliverable 6: Contradiction Scan
+
+Separate from Claim Audit — dedicated scan for:
+1. **Internal contradictions** (within the report — does Section 3 contradict Section 7?)
+2. **Source contradictions** (S[N] vs S[M] — do cited sources disagree?)
+3. **Cross-report contradictions** (does this report contradict CROSS_REF reports?)
+
+For each: state implications for the decision + what would resolve it.
+
+## Deliverable 7: Fix Requests
+
+**Precise and prioritized.** Use exact phrasing:
+- "Replace [exact text] with [exact replacement]"
+- "Add caveat in Section X: [exact text]"
+- "Remove Reference [N] (phantom — not cited in body)"
 
 Priority levels:
 - 🔴 BLOCKER — must fix before release (wrong facts, wrong math, misleading labels)
 - 🟡 SHOULD FIX — significantly improves quality
 - 🟢 NICE TO HAVE — minor improvements
 
-Format:
-```
-🔴/🟡/🟢 [Section]: [What's wrong] → [Specific fix instruction]
-```
+If evidence is missing: suggest **source types and publishers** to look for (NOT fabricated sources).
+Example: "Claim X needs a primary source. Look for: peer-reviewed paper in ACM/IEEE, or official vendor documentation."
+
+## Deliverable 8: GO / NO-GO (Tier 3 only)
+
+- **GO** — meets threshold, no blockers
+- **NO-GO** — list specific blockers preventing release
 
 ## Final Verdict
 - **PASS** (score ≥ {THRESHOLD}/16, no blockers)
 - **CONDITIONAL PASS** (score ≥ {THRESHOLD}/16, blockers exist but fixable)
 - **FAIL** (score < {THRESHOLD}/16 or fundamental issues)
+
+## You MUST NOT
+- Produce a fresh report or rewrite sections
+- Introduce new factual claims (even as suggestions)
+- Skip math verification
+- Find 0 issues (if you find 0, you haven't looked hard enough)
+- Accept E/I/J/A labels at face value — check each one
+- Accept claims not in the Claim Ledger without flagging them as "Added During Writing"
+- Give vague feedback ("needs improvement") — be precise ("Replace X with Y")
 
 ## You MUST NOT
 - Give "looks good" without specific justification
