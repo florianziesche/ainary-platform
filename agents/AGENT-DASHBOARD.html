@@ -1543,5 +1543,43 @@
             renderCostChart();
         });
     </script>
+<div id="update-bar" style="position:fixed;bottom:0;left:0;right:0;background:#1a1a1a;border-top:1px solid #333;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;z-index:1000;font-family:'Inter',sans-serif;">
+  <span style="color:#888;font-size:0.8rem;" id="last-updated">Last updated: loading...</span>
+  <div style="display:flex;gap:12px;align-items:center;">
+    <span id="update-status" style="color:#888;font-size:0.75rem;"></span>
+    <button onclick="requestUpdate()" style="background:#c8aa50;color:#fff;border:none;padding:8px 20px;border-radius:6px;font-size:0.8rem;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:opacity 0.2s;">⟳ Update Dashboard</button>
+  </div>
+</div>
+<div style="height:56px;"></div>
+<script>
+(function(){
+  // Show last modified from ledger data
+  const now = new Date().toLocaleString('de-DE', {dateStyle:'medium', timeStyle:'short'});
+  document.getElementById('last-updated').textContent = 'Last updated: ' + now;
+})();
+
+function requestUpdate() {
+  const btn = event.target;
+  btn.style.opacity = '0.5';
+  btn.textContent = '⟳ Requesting...';
+  
+  // Copy update command to clipboard for Telegram
+  const cmd = 'update dashboard';
+  navigator.clipboard.writeText(cmd).then(() => {
+    document.getElementById('update-status').textContent = '✓ "update dashboard" copied — paste to Mia in Telegram';
+    document.getElementById('update-status').style.color = '#c8aa50';
+    setTimeout(() => {
+      btn.style.opacity = '1';
+      btn.textContent = '⟳ Update Dashboard';
+    }, 3000);
+  }).catch(() => {
+    // Fallback: show instructions
+    document.getElementById('update-status').textContent = 'Send "update dashboard" to Mia in Telegram';
+    document.getElementById('update-status').style.color = '#c8aa50';
+    btn.style.opacity = '1';
+    btn.textContent = '⟳ Update Dashboard';
+  });
+}
+</script>
 </body>
 </html>

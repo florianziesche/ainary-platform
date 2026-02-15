@@ -1,0 +1,1686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The AI Agent Security Playbook — Ainary Report AR-006</title>
+<style>
+  /* ========================================
+     FONTS
+     ======================================== */
+  @font-face {
+    font-family: 'Inter';
+    src: url('/fonts/inter-variable.woff2') format('woff2');
+    font-weight: 100 900;
+    font-display: swap;
+  }
+
+  /* ========================================
+     RESET & BASE
+     ======================================== */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #fafaf8;
+    color: #333;
+    line-height: 1.75;
+    font-size: 0.95rem;
+    font-weight: 400;
+  }
+
+  /* ========================================
+     LAYOUT
+     ======================================== */
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 40px;
+  }
+
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 40px;
+  }
+
+  .back-cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 40px;
+    page-break-before: always;
+  }
+
+  /* ========================================
+     TYPOGRAPHY
+     ======================================== */
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 600;
+    line-height: 1.2;
+    color: #1a1a1a;
+    letter-spacing: -0.02em;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.3;
+    margin-top: 3rem;
+    margin-bottom: 12px;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.4;
+    margin-top: 2rem;
+    margin-bottom: 12px;
+  }
+
+  p {
+    margin-bottom: 1rem;
+  }
+
+  strong {
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  em {
+    font-style: italic;
+  }
+
+  sup {
+    font-size: 0.65rem;
+    color: #888;
+    vertical-align: super;
+  }
+
+  /* ========================================
+     COVER COMPONENTS
+     ======================================== */
+  .cover-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40vh;
+  }
+
+  .cover-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gold-punkt {
+    color: #c8aa50;
+    font-size: 14px;
+  }
+
+  .brand-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    letter-spacing: 0.02em;
+  }
+
+  .cover-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 0.75rem;
+    color: #888;
+  }
+
+  .cover-title-block {
+    margin-bottom: auto;
+  }
+
+  .cover-title {
+    margin-bottom: 16px;
+  }
+
+  .cover-subtitle {
+    font-size: 1rem;
+    font-weight: 400;
+    color: #666;
+    line-height: 1.5;
+  }
+
+  .cover-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .cover-date {
+    font-size: 0.75rem;
+    color: #888;
+  }
+
+  .cover-author {
+    font-size: 0.75rem;
+    color: #888;
+    text-align: center;
+  }
+
+  /* ========================================
+     QUOTE PAGE
+     ======================================== */
+  .quote-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 48px 40px;
+  }
+
+  .quote-text {
+    font-size: 1.2rem;
+    font-style: italic;
+    color: #333;
+    line-height: 1.8;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .quote-source {
+    font-size: 0.85rem;
+    color: #888;
+    text-align: center;
+  }
+
+  /* ========================================
+     TABLE OF CONTENTS
+     ======================================== */
+  .toc-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 24px;
+  }
+
+  .toc-section {
+    margin-bottom: 32px;
+  }
+
+  .toc-section-label {
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 12px;
+  }
+
+  .toc-entry {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .toc-number {
+    font-size: 0.8rem;
+    color: #888;
+    font-variant-numeric: tabular-nums;
+    min-width: 24px;
+  }
+
+  .toc-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    flex: 1;
+    transition: color 0.2s;
+  }
+
+  .toc-entry:hover .toc-title {
+    color: #c8aa50;
+  }
+
+  .toc-page {
+    font-size: 0.8rem;
+    color: #888;
+  }
+
+  /* ========================================
+     HOW TO READ
+     ======================================== */
+  .how-to-read-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+  }
+
+  .how-to-read-table th {
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 10px 12px;
+    background: #f5f4f0;
+    border-bottom: 2px solid #e5e3dc;
+  }
+
+  .how-to-read-table td {
+    font-size: 0.85rem;
+    color: #333;
+    padding: 10px 12px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  /* ========================================
+     EXECUTIVE SUMMARY
+     ======================================== */
+  .thesis {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .evidence-list {
+    margin-left: 20px;
+    margin-bottom: 24px;
+  }
+
+  .evidence-list li {
+    font-size: 0.9rem;
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 8px;
+  }
+
+  .keywords {
+    font-size: 0.8rem;
+    color: #666;
+    font-style: italic;
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid #eee;
+  }
+
+  /* ========================================
+     SECTION COMPONENTS
+     ======================================== */
+  .confidence-badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    background: #f5f4f0;
+    padding: 3px 8px;
+    border-radius: 10px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  .confidence-line {
+    font-size: 0.8rem;
+    color: #888;
+    font-style: italic;
+    display: block;
+    margin-bottom: 16px;
+  }
+
+  .key-insight {
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  /* ========================================
+     CALLOUTS
+     ======================================== */
+  .callout {
+    background: #f5f4f0;
+    padding: 16px 20px;
+    border-radius: 4px;
+    margin: 1.5rem 0;
+    page-break-inside: avoid;
+  }
+
+  .callout-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+
+  .callout-body {
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.6;
+  }
+
+  .callout.claim .callout-label {
+    color: #555;
+  }
+
+  .callout.invalidation {
+    border-left: 3px solid #ddd;
+  }
+
+  .callout.invalidation .callout-label {
+    color: #888;
+  }
+
+  .callout.sowhat {
+    border-left: 3px solid #c8aa50;
+  }
+
+  .callout.sowhat .callout-label {
+    color: #c8aa50;
+  }
+
+  /* ========================================
+     EXHIBITS & TABLES
+     ======================================== */
+  .exhibit {
+    margin: 2rem 0;
+  }
+
+  .exhibit-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 12px;
+  }
+
+  .exhibit-table {
+    width: 100%;
+    border-collapse: collapse;
+    page-break-inside: avoid;
+  }
+
+  .exhibit-table th {
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 10px 12px;
+    background: #f5f4f0;
+    border-bottom: 2px solid #e5e3dc;
+  }
+
+  .exhibit-table td {
+    font-size: 0.85rem;
+    color: #333;
+    padding: 10px 12px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .exhibit-source {
+    font-size: 0.7rem;
+    color: #888;
+    margin-top: 8px;
+  }
+
+  /* ========================================
+     KPI FIGURES
+     ======================================== */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 48px;
+    margin: 2rem 0;
+  }
+
+  .kpi {
+    text-align: left;
+  }
+
+  .kpi-number {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.2;
+  }
+
+  .kpi-number.gold {
+    color: #c8aa50;
+  }
+
+  .kpi-label {
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 4px;
+  }
+
+  .kpi-source {
+    font-size: 0.65rem;
+    color: #888;
+    margin-top: 2px;
+  }
+
+  /* ========================================
+     LISTS
+     ======================================== */
+  ul {
+    margin-left: 20px;
+    margin-bottom: 1rem;
+  }
+
+  ol {
+    margin-left: 20px;
+    margin-bottom: 1rem;
+  }
+
+  li {
+    margin-bottom: 4px;
+  }
+
+  /* ========================================
+     INLINE SOURCE
+     ======================================== */
+  .source-line {
+    font-size: 0.8rem;
+    color: #888;
+    line-height: 1.5;
+    border-top: 1px solid #eee;
+    padding-top: 8px;
+    margin-top: 8px;
+  }
+
+  /* ========================================
+     TRANSPARENCY NOTE
+     ======================================== */
+  .transparency-intro {
+    font-size: 0.85rem;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+
+  .transparency-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+  }
+
+  .transparency-table td:first-child {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    width: 160px;
+    vertical-align: top;
+  }
+
+  .transparency-table td:last-child {
+    font-size: 0.85rem;
+    color: #333;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  /* ========================================
+     REFERENCES
+     ======================================== */
+  .reference-entry {
+    font-size: 0.8rem;
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 6px;
+    padding-left: 24px;
+    text-indent: -24px;
+  }
+
+  /* ========================================
+     AUTHOR BIO
+     ======================================== */
+  .author-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e5e3dc;
+  }
+
+  .author-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 8px;
+  }
+
+  .author-bio {
+    font-size: 0.85rem;
+    color: #555;
+    line-height: 1.6;
+  }
+
+  /* ========================================
+     BACK COVER
+     ======================================== */
+  .back-cover-services {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 24px;
+  }
+
+  .back-cover-cta {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 16px;
+  }
+
+  .back-cover-contact {
+    font-size: 0.8rem;
+    color: #888;
+  }
+
+  /* ========================================
+     PRINT STYLES
+     ======================================== */
+  @media print {
+    @page {
+      size: A4;
+      margin: 2cm;
+    }
+
+    body {
+      background: white;
+    }
+
+    .page, .cover, .back-cover {
+      page-break-after: always;
+    }
+
+    .callout, .exhibit {
+      page-break-inside: avoid;
+    }
+
+    @page :first {
+      @top-center { content: none; }
+      @bottom-center { content: none; }
+    }
+
+    @page {
+      @top-center {
+        content: "Ainary Report | The AI Agent Security Playbook";
+        font-size: 0.7rem;
+        color: #888;
+      }
+      @bottom-left {
+        content: "© 2026 Ainary Ventures";
+        font-size: 0.7rem;
+        color: #888;
+      }
+      @bottom-right {
+        content: counter(page);
+        font-size: 0.7rem;
+        color: #888;
+      }
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========================================
+     COVER PAGE
+     ======================================== -->
+<div class="cover">
+  <div class="cover-header">
+    <div class="cover-brand">
+      <span class="gold-punkt">●</span>
+      <span class="brand-name">Ainary</span>
+    </div>
+    <div class="cover-meta">
+      <span>AR-006</span>
+      <span>Confidence: 78%</span>
+    </div>
+  </div>
+
+  <div class="cover-title-block">
+    <h1 class="cover-title">The AI Agent<br>Security Playbook</h1>
+    <p class="cover-subtitle">What Attackers Already Know That Defenders Don't</p>
+  </div>
+
+  <div class="cover-footer">
+    <div class="cover-date">
+      February 2026<br>
+      <span style="font-size: 0.7rem; color: #aaa;">v1.0</span>
+    </div>
+    <div class="cover-author">
+      Florian Ziesche · Ainary Ventures
+    </div>
+  </div>
+</div>
+
+<!-- ========================================
+     QUOTE PAGE (OPTIONAL)
+     ======================================== -->
+<div class="quote-page">
+  <p class="quote-text">"A chatbot has one attack surface. An agent has seven — and they compound."</p>
+  <p class="quote-source">— This Report</p>
+</div>
+
+<!-- ========================================
+     TABLE OF CONTENTS
+     ======================================== -->
+<div class="page">
+  <p class="toc-label">Contents</p>
+
+  <div class="toc-section">
+    <p class="toc-section-label">FOUNDATION</p>
+    <a href="#exec-summary" class="toc-entry">
+      <span class="toc-number">1</span>
+      <span class="toc-title">Executive Summary</span>
+      <span class="toc-page">5</span>
+    </a>
+    <a href="#methodology" class="toc-entry">
+      <span class="toc-number">2</span>
+      <span class="toc-title">Methodology</span>
+      <span class="toc-page">6</span>
+    </a>
+    <a href="#how-to-read" class="toc-entry">
+      <span class="toc-number">3</span>
+      <span class="toc-title">How to Read This Report</span>
+      <span class="toc-page">7</span>
+    </a>
+  </div>
+
+  <div class="toc-section">
+    <p class="toc-section-label">ANALYSIS</p>
+    <a href="#attack-surface" class="toc-entry">
+      <span class="toc-number">4</span>
+      <span class="toc-title">The Attack Surface Nobody Modeled</span>
+      <span class="toc-page">8</span>
+    </a>
+    <a href="#prompt-injection" class="toc-entry">
+      <span class="toc-number">5</span>
+      <span class="toc-title">Prompt Injection — The Unsolvable Problem</span>
+      <span class="toc-page">10</span>
+    </a>
+    <a href="#memory-poisoning" class="toc-entry">
+      <span class="toc-number">6</span>
+      <span class="toc-title">Memory Poisoning — The Long Game</span>
+      <span class="toc-page">12</span>
+    </a>
+    <a href="#tool-exploitation" class="toc-entry">
+      <span class="toc-number">7</span>
+      <span class="toc-title">Tool Use Exploitation — When Agents Have Keys</span>
+      <span class="toc-page">15</span>
+    </a>
+    <a href="#multi-agent-contagion" class="toc-entry">
+      <span class="toc-number">8</span>
+      <span class="toc-title">Multi-Agent Contagion — One Compromise, Total Infection</span>
+      <span class="toc-page">17</span>
+    </a>
+    <a href="#supply-chain" class="toc-entry">
+      <span class="toc-number">9</span>
+      <span class="toc-title">Supply Chain Attacks on Agent Frameworks</span>
+      <span class="toc-page">19</span>
+    </a>
+  </div>
+
+  <div class="toc-section">
+    <p class="toc-section-label">ACTION</p>
+    <a href="#what-works" class="toc-entry">
+      <span class="toc-number">10</span>
+      <span class="toc-title">What Actually Works</span>
+      <span class="toc-page">21</span>
+    </a>
+    <a href="#predictions" class="toc-entry">
+      <span class="toc-number">11</span>
+      <span class="toc-title">Predictions</span>
+      <span class="toc-page">24</span>
+    </a>
+    <a href="#transparency" class="toc-entry">
+      <span class="toc-number">12</span>
+      <span class="toc-title">Transparency Note</span>
+      <span class="toc-page">25</span>
+    </a>
+    <a href="#claim-register" class="toc-entry">
+      <span class="toc-number">13</span>
+      <span class="toc-title">Claim Register</span>
+      <span class="toc-page">26</span>
+    </a>
+    <a href="#references" class="toc-entry">
+      <span class="toc-number">14</span>
+      <span class="toc-title">References</span>
+      <span class="toc-page">27</span>
+    </a>
+  </div>
+</div>
+
+<!-- ========================================
+     HOW TO READ THIS REPORT
+     ======================================== -->
+<div class="page" id="how-to-read">
+  <h2>3. How to Read This Report</h2>
+
+  <p>This report uses a structured confidence rating system to communicate what is known versus what is inferred. Every quantitative claim carries its source and confidence level.</p>
+
+  <table class="how-to-read-table">
+    <tr>
+      <th>Rating</th>
+      <th>Meaning</th>
+      <th>Example</th>
+    </tr>
+    <tr>
+      <td>High</td>
+      <td>3+ independent sources, peer-reviewed or primary data</td>
+      <td>12/12 prompt defenses broken (arXiv:2510.09023, 14 authors)</td>
+    </tr>
+    <tr>
+      <td>Medium</td>
+      <td>1–2 sources, plausible but not independently confirmed</td>
+      <td>73% of deployments vulnerable (OWASP, methodology unclear)</td>
+    </tr>
+    <tr>
+      <td>Low</td>
+      <td>Single secondary source, methodology unclear</td>
+      <td>Tool-calling fails 3–15% (practitioner blog, single source)</td>
+    </tr>
+  </table>
+
+  <p style="margin-top: 24px;">This report was produced using a <strong>multi-agent research pipeline</strong> with structured cross-referencing and gap research. Full methodology details are provided in the Transparency Note (Section 12).</p>
+</div>
+
+<!-- ========================================
+     EXECUTIVE SUMMARY
+     ======================================== -->
+<div class="page" id="exec-summary">
+  <h2>1. Executive Summary</h2>
+
+  <p class="thesis">Every defense deployed today was designed for chatbots, not agents. Agents have tools, memory, and network access — the attack surface is 10x larger.</p>
+
+  <ul class="evidence-list">
+    <li><strong>Every published prompt injection defense (12/12)</strong> has been broken by adaptive attacks from researchers at Meta, OpenAI, Anthropic, and DeepMind<sup>[1]</sup></li>
+    <li><strong>Memory injection attacks achieve &gt;95% success rates</strong> against production agent memory systems, creating persistent backdoors that survive session resets<sup>[2]</sup></li>
+    <li><strong>Multi-agent system hijacking succeeds 45–64% of the time</strong> across AutoGen, CrewAI, and MetaGPT — with zero inter-agent trust verification<sup>[3]</sup></li>
+    <li><strong>No production memory framework</strong> implements provenance tracking, integrity checks, or confidence scoring per memory entry<sup>[10]</sup></li>
+    <li><strong>Agent security requires architectural constraints</strong> (privilege separation, deterministic guardrails, kill switches) — not better prompt engineering</li>
+  </ul>
+
+  <p class="keywords"><strong>Keywords:</strong> AI Agent Security, Prompt Injection, Memory Poisoning, Tool Exploitation, Multi-Agent Attacks, Red Teaming, NIST AI RMF</p>
+</div>
+
+<!-- ========================================
+     METHODOLOGY (SHORT VERSION)
+     ======================================== -->
+<div class="page" id="methodology">
+  <h2>2. Methodology</h2>
+
+  <p>This report synthesizes primary research from peer-reviewed papers (arXiv), CVE databases (NVD), and publications from NIST, OWASP, and MITRE. Industry data comes from practitioner surveys and framework documentation analysis. The research pipeline followed a structured process: 15 research briefs covering adversarial AI, agent memory, agent protocols, failure taxonomies, and regulatory frameworks were produced independently, then synthesized to identify contradictions and compound effects.</p>
+
+  <p><strong>Limitations:</strong> The agent security field is moving fast. Several findings rely on pre-print papers not yet peer-reviewed through traditional journal processes. Production incident data is scarce because most agent deployments are recent and organizations do not publicly disclose agent-specific security failures.</p>
+
+  <p style="font-size: 0.85rem; color: #666; margin-top: 16px;">Full methodology details, including confidence calibration and known weaknesses, are provided in the Transparency Note (Section 12).</p>
+</div>
+
+<!-- ========================================
+     SECTION 4: THE ATTACK SURFACE
+     ======================================== -->
+<div class="page" id="attack-surface">
+  <h2>4. The Attack Surface Nobody Modeled
+    <span class="confidence-badge">78%</span>
+  </h2>
+  <span class="confidence-line">(Confidence: High)</span>
+
+  <p><span class="key-insight">A chatbot has one attack surface. An agent has seven — and they compound.</span> The thesis of this report is simple: every defense deployed today was designed for chatbots, not agents. Agents have tools, memory, and network access — the attack surface is 10x larger. The evidence supports this claim across every dimension examined.</p>
+
+  <h3>Evidence</h3>
+
+  <p>A chatbot receives a prompt and returns text. That is one attack surface: the prompt. An agent receives a prompt, retrieves data from external sources, consults persistent memory, calls APIs, executes code, communicates with other agents, and manages credentials. Each of these is a distinct attack vector.</p>
+
+  <div class="exhibit">
+    <p class="exhibit-label">Exhibit 1: Agent vs. Chatbot Attack Surface Comparison</p>
+    <table class="exhibit-table">
+      <tr>
+        <th>Attack Surface</th>
+        <th>Chatbot</th>
+        <th>Agent</th>
+      </tr>
+      <tr>
+        <td>Direct prompt input</td>
+        <td>Yes</td>
+        <td>Yes</td>
+      </tr>
+      <tr>
+        <td>Indirect prompt (retrieved data)</td>
+        <td>No</td>
+        <td>Yes</td>
+      </tr>
+      <tr>
+        <td>Persistent memory</td>
+        <td>No</td>
+        <td>Yes</td>
+      </tr>
+      <tr>
+        <td>Tool/API calls</td>
+        <td>No</td>
+        <td>Yes</td>
+      </tr>
+      <tr>
+        <td>Inter-agent communication</td>
+        <td>No</td>
+        <td>Yes</td>
+      </tr>
+      <tr>
+        <td>Credential/key access</td>
+        <td>No</td>
+        <td>Yes</td>
+      </tr>
+      <tr>
+        <td>External data sources (RAG)</td>
+        <td>Limited</td>
+        <td>Yes</td>
+      </tr>
+    </table>
+    <p class="exhibit-source">Source: Author analysis based on OWASP Top 10 for LLM Applications (2025) [4], MITRE ATLAS [6]</p>
+  </div>
+
+  <p>The OWASP Top 10 for LLM Applications (2025 edition) lists prompt injection as the #1 risk<sup>[4]</sup>. But the taxonomy was designed for single-model applications. Agent-specific attack vectors — memory poisoning, tool chain exploitation, inter-agent contagion — are absent or underspecified.</p>
+
+  <p>MITRE ATLAS added "LLM Prompt Injection" (AML.T0051) and related techniques in 2024, but does not model multi-agent propagation or persistent memory corruption as distinct attack paths<sup>[6]</sup>.</p>
+
+  <h3>Interpretation</h3>
+
+  <p>No widely adopted threat model exists for autonomous AI agents. Security teams are using chatbot threat models for agent deployments. This is like using a firewall ruleset designed for a static website to protect a Kubernetes cluster. The seven attack surfaces listed in Exhibit 1 do not just add up — they multiply.</p>
+
+  <p>The compound effect matters most. Consider a realistic attack chain: an attacker plants a poisoned document in a public data source (attack surface: external data). The agent retrieves it during RAG (attack surface: indirect prompt). The poisoned instruction tells the agent to modify its memory (attack surface: persistent memory). The corrupted memory causes the agent to misuse a tool on the next session (attack surface: tool/API calls). The tool call leaks credentials (attack surface: credential access). The leaked credentials are used to compromise a connected agent (attack surface: inter-agent communication). Six surfaces, one attack chain, and each transition is individually documented in the research literature.</p>
+
+  <div class="callout invalidation">
+    <p class="callout-label">What Would Invalidate This?</p>
+    <p class="callout-body">If a production agent framework emerged that architecturally isolated each attack surface (e.g., hardware-level separation between prompt processing and tool execution), the compound risk would be significantly reduced. No such framework exists today.</p>
+  </div>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">Every security team deploying agents needs a new threat model. The chatbot model is not wrong — it is incomplete. Start with Exhibit 1 and map which surfaces your agent exposes. Then model the compound chains between surfaces — that is where the real risk lives.</p>
+  </div>
+</div>
+
+<!-- ========================================
+     SECTION 5: PROMPT INJECTION
+     ======================================== -->
+<div class="page" id="prompt-injection">
+  <h2>5. Prompt Injection — The Unsolvable Problem
+    <span class="confidence-badge">85%</span>
+  </h2>
+  <span class="confidence-line">(Confidence: High)</span>
+
+  <p><span class="key-insight">Prompt injection is not a bug to be patched. It is an inherent property of systems that mix instructions and data in the same channel.</span></p>
+
+  <h3>Evidence</h3>
+
+  <p>Direct prompt injection — where a user manipulates the system prompt through their input — remains trivially exploitable. The "Defeating Prompt Injections by Design" paper (arXiv:2510.09023) is the most comprehensive study to date: a 14-author team from Meta, OpenAI, Anthropic, and Google DeepMind tested 12 defense categories<sup>[1]</sup>:</p>
+
+  <ul>
+    <li>Perplexity-based detection</li>
+    <li>Input/output classifiers</li>
+    <li>Paraphrasing defenses</li>
+    <li>Instruction hierarchy</li>
+    <li>Sandwich defenses</li>
+    <li>XML/delimiter tagging</li>
+    <li>Known-answer detection</li>
+    <li>Spotlighting</li>
+    <li>Prompt shields (Azure)</li>
+    <li>LLM-as-judge</li>
+    <li>Fine-tuned safety models</li>
+    <li>Constitutional AI guardrails</li>
+  </ul>
+
+  <p><strong>Result: 12/12 broken.</strong> Not theoretically — with working code. Every defense was defeated with at most two adaptive attack iterations<sup>[1]</sup>.</p>
+
+  <p>Indirect prompt injection is worse. The agent retrieves external data — web pages, emails, documents, API responses — that contains adversarial instructions. The agent cannot distinguish between "data to process" and "instructions to follow" because both arrive as text in the same context window.</p>
+
+  <p>Documented real-world cases:</p>
+
+  <ul>
+    <li><strong>CVE-2025-32711 (EchoLeak):</strong> Hidden instructions in documents retrieved by Microsoft Copilot caused zero-click data exfiltration — the agent silently sent user data to attacker-controlled endpoints. No user interaction required<sup>[5]</sup>.</li>
+    <li><strong>Grok RAG Poisoning (2025):</strong> Manipulated source documents caused Grok to generate false outputs that spread on X/Twitter<sup>[7]</sup>.</li>
+    <li><strong>ChatGPT Plugin Exploits (2024):</strong> Researchers demonstrated that a malicious plugin could inject instructions into ChatGPT's context, hijacking subsequent tool calls<sup>[8]</sup>.</li>
+  </ul>
+
+  <p>73% of AI deployments have prompt injection vulnerabilities according to OWASP<sup>[4]</sup>. This number carries medium confidence — the methodology behind the specific percentage is not fully transparent — but the directional finding is consistent with every other data source reviewed.</p>
+
+  <h3>Interpretation</h3>
+
+  <p>The fundamental issue is architectural: LLMs process instructions and data in the same modality (natural language tokens). There is no hardware-level separation equivalent to kernel/user space in operating systems. Every proposed "fix" is a heuristic that can be circumvented because the model cannot fundamentally distinguish instruction from data<sup>[1]</sup>.</p>
+
+  <div class="callout claim">
+    <p class="callout-label">Claim</p>
+    <p class="callout-body">Prompt injection is not a bug to be patched. It is an inherent property of systems that mix instructions and data in the same channel.</p>
+  </div>
+
+  <div class="callout invalidation">
+    <p class="callout-label">What Would Invalidate This?</p>
+    <p class="callout-body">A fundamental architectural breakthrough that separates instructions from data at the model level (not heuristic-based). Research into this exists — including proposals for dual-LLM architectures where one model processes data and another processes instructions — but no viable approach has been demonstrated at production scale.</p>
+  </div>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">Stop investing in better prompt-level defenses as your primary security strategy. Instead, invest in constraining what a compromised agent can do. Privilege separation, scoped tool access, and deterministic guardrails at the infrastructure layer — not the prompt layer — are where security budget should go. The mental model shift: from "prevent injection" to "survive injection."</p>
+  </div>
+</div>
+
+<!-- ========================================
+     SECTION 6: MEMORY POISONING
+     ======================================== -->
+<div class="page" id="memory-poisoning">
+  <h2>6. Memory Poisoning — The Long Game
+    <span class="confidence-badge">92%</span>
+  </h2>
+  <span class="confidence-line">(Confidence: High)</span>
+
+  <p><span class="key-insight">Memory poisoning is the agent equivalent of a persistent backdoor. Once planted, it survives context window resets and influences every future interaction.</span></p>
+
+  <h3>Evidence</h3>
+
+  <p>Unlike prompt injection (which is ephemeral), memory poisoning creates persistent compromise. The attacker modifies the agent's long-term memory — stored in vector databases, knowledge graphs, or structured memory systems — so that the poisoned information is retrieved and trusted in all future sessions.</p>
+
+  <p>The MINJA attack (arXiv:2503.03704) demonstrated <strong>&gt;95% injection success</strong> against RAG-based agent memory systems<sup>[2]</sup>. The attack crafts documents that, when ingested into the memory store, contain adversarial instructions that override the agent's intended behavior whenever the poisoned memory is retrieved. Key finding: the attack persists across sessions.</p>
+
+  <p>MemoryGraft (arXiv:2512.16962) goes further: researchers demonstrated planting persistent false experiences in agent memory that the agent treats as its own past interactions<sup>[9]</sup>. The agent cannot distinguish between genuine memories and implanted ones — there is no memory integrity verification in any production memory framework.</p>
+
+  <div class="exhibit">
+    <p class="exhibit-label">Exhibit 2: Memory Framework Security Features</p>
+    <table class="exhibit-table">
+      <tr>
+        <th>Framework</th>
+        <th>Provenance Tracking</th>
+        <th>Integrity Checks</th>
+        <th>Confidence per Memory</th>
+        <th>Selective Forgetting</th>
+        <th>Audit Trail</th>
+      </tr>
+      <tr>
+        <td>Letta (MemGPT)</td>
+        <td>No</td>
+        <td>No</td>
+        <td>No</td>
+        <td>Partial</td>
+        <td>No</td>
+      </tr>
+      <tr>
+        <td>Mem0</td>
+        <td>No</td>
+        <td>No</td>
+        <td>No</td>
+        <td>No</td>
+        <td>Partial</td>
+      </tr>
+      <tr>
+        <td>Zep</td>
+        <td>No</td>
+        <td>No</td>
+        <td>No</td>
+        <td>No</td>
+        <td>Partial</td>
+      </tr>
+      <tr>
+        <td>LangMem</td>
+        <td>No</td>
+        <td>No</td>
+        <td>No</td>
+        <td>No</td>
+        <td>No</td>
+      </tr>
+      <tr>
+        <td>A-Mem</td>
+        <td>No</td>
+        <td>No</td>
+        <td>No</td>
+        <td>No</td>
+        <td>No</td>
+      </tr>
+    </table>
+    <p class="exhibit-source">Source: Framework documentation review, February 2026 [10]</p>
+  </div>
+
+  <p>No production memory framework implements memory provenance, integrity verification, or confidence scoring per memory entry. Every framework trusts all stored memories equally. This is the equivalent of running a database without access controls.</p>
+
+  <h3>The Adversarial Memory Spiral</h3>
+
+  <p>When memory poisoning combines with other vulnerabilities, it creates a self-reinforcing attack loop:</p>
+
+  <ol>
+    <li>MINJA injects poisoned memory (&gt;95% success)<sup>[2]</sup></li>
+    <li>Agent's verbalized confidence reports high certainty (VCE is systematically biased — arXiv:2602.00279)<sup>[11]</sup></li>
+    <li>Poisoned output passes to other agents (no inter-agent trust verification)</li>
+    <li>HITL alert fires but is ignored (67% alert ignore rate — Vectra 2023, n=2,000 analysts)<sup>[12]</sup></li>
+    <li>Agent reinforces poisoned memory based on "successful" interaction</li>
+    <li>Loop repeats with increasing conviction</li>
+  </ol>
+
+  <p>Each step is independently documented with high-confidence sources. The full chain has not been observed in the wild — but every link is empirically validated.</p>
+
+  <div class="callout invalidation">
+    <p class="callout-label">What Would Invalidate This?</p>
+    <p class="callout-body">If memory frameworks shipped with built-in provenance tracking and cryptographic integrity verification, the attack surface would shrink significantly. This is technically feasible — it just is not being built.</p>
+  </div>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">If you deploy agents with persistent memory, treat the memory store as a security-critical system. Implement write-ahead logging, provenance tracking, and integrity checks at the storage layer. Do not wait for framework vendors to solve this.</p>
+  </div>
+</div>
+
+<!-- ========================================
+     SECTION 7: TOOL EXPLOITATION
+     ======================================== -->
+<div class="page" id="tool-exploitation">
+  <h2>7. Tool Use Exploitation — When Agents Have Keys
+    <span class="confidence-badge">70%</span>
+  </h2>
+  <span class="confidence-line">(Confidence: High)</span>
+
+  <p><span class="key-insight">When an agent can call APIs, execute code, and manage files, prompt injection escalates from "wrong answer" to "unauthorized action."</span></p>
+
+  <h3>Evidence</h3>
+
+  <p>The Model Context Protocol (MCP) standardizes how agents connect to external tools. MCPTox (arXiv:2508.14925) demonstrated that attackers can embed malicious instructions in MCP tool descriptions<sup>[13]</sup>. When an agent reads the tool's metadata to decide how to use it, the poisoned description hijacks the agent's behavior. This is supply chain poisoning at the tool level.</p>
+
+  <p>Security-relevant failures:</p>
+
+  <ul>
+    <li><strong>Credential leakage:</strong> 23% of IT professionals report agent credential leaks (Okta survey)<sup>[15]</sup></li>
+    <li><strong>Excessive permissions:</strong> Agents routinely receive broader API scopes than needed because fine-grained agent-specific IAM policies do not exist in most cloud providers</li>
+    <li><strong>Unvalidated outputs:</strong> Agents pass tool outputs directly into their context without sanitization — a classic injection vector</li>
+    <li><strong>Confused deputy attacks:</strong> An agent authorized to call Tool A is tricked (via prompt injection) into calling Tool B with Tool A's credentials</li>
+  </ul>
+
+  <p>Only <strong>10% of organizations have a non-human identity strategy</strong> (World Economic Forum)<sup>[16]</sup>. Agents are accessing production APIs with shared service accounts, hardcoded tokens, or overly broad OAuth scopes.</p>
+
+  <div class="exhibit">
+    <p class="exhibit-label">Exhibit 3: Agent Credential Anti-Patterns</p>
+    <table class="exhibit-table">
+      <tr>
+        <th>Anti-Pattern</th>
+        <th>Prevalence</th>
+        <th>Risk</th>
+      </tr>
+      <tr>
+        <td>Shared service accounts</td>
+        <td>High</td>
+        <td>Lateral movement after compromise</td>
+      </tr>
+      <tr>
+        <td>Hardcoded API keys in agent config</td>
+        <td>High</td>
+        <td>Key extraction via prompt injection</td>
+      </tr>
+      <tr>
+        <td>Overly broad OAuth scopes</td>
+        <td>Very High</td>
+        <td>Privilege escalation</td>
+      </tr>
+      <tr>
+        <td>No credential rotation</td>
+        <td>High</td>
+        <td>Persistent access after compromise</td>
+      </tr>
+      <tr>
+        <td>No per-action authorization</td>
+        <td>Very High</td>
+        <td>Confused deputy attacks</td>
+      </tr>
+    </table>
+    <p class="exhibit-source">Source: Okta [15], WEF [16], OWASP LLM Top 10 [4]</p>
+  </div>
+
+  <div class="callout invalidation">
+    <p class="callout-label">What Would Invalidate This?</p>
+    <p class="callout-body">If cloud providers shipped agent-specific IAM primitives (per-action authorization, automatic scope reduction, credential rotation tied to agent sessions), the blast radius of tool exploitation would shrink dramatically. No cloud provider currently offers agent-specific identity primitives.</p>
+  </div>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">Implement least-privilege for every agent tool connection. Each tool call should require scoped, short-lived credentials. Validate all tool outputs before they enter the agent's context. Treat MCP tool servers like untrusted third-party code — because that is what they are.</p>
+  </div>
+</div>
+
+<!-- ========================================
+     SECTION 8: MULTI-AGENT CONTAGION
+     ======================================== -->
+<div class="page" id="multi-agent-contagion">
+  <h2>8. Multi-Agent Contagion — One Compromise, Total Infection
+    <span class="confidence-badge">65%</span>
+  </h2>
+  <span class="confidence-line">(Confidence: High)</span>
+
+  <p><span class="key-insight">Multi-agent systems have no immune system. Compromising one agent propagates to all connected agents because inter-agent messages are trusted by default.</span></p>
+
+  <h3>Evidence</h3>
+
+  <p>The multi-agent system (MAS) hijacking paper (arXiv:2503.12188) tested attacks against three major multi-agent frameworks<sup>[3]</sup>:</p>
+
+  <div class="exhibit">
+    <p class="exhibit-label">Exhibit 4: MAS Hijacking Success Rates</p>
+    <table class="exhibit-table">
+      <tr>
+        <th>Framework</th>
+        <th>Hijacking Success Rate</th>
+        <th>Attack Type</th>
+      </tr>
+      <tr>
+        <td>AutoGen</td>
+        <td>45%</td>
+        <td>Task injection via agent message</td>
+      </tr>
+      <tr>
+        <td>CrewAI</td>
+        <td>55%</td>
+        <td>Role confusion + instruction override</td>
+      </tr>
+      <tr>
+        <td>MetaGPT</td>
+        <td>64%</td>
+        <td>Workflow manipulation</td>
+      </tr>
+    </table>
+    <p class="exhibit-source">Source: arXiv:2503.12188 [3]</p>
+  </div>
+
+  <p>The attack pattern: compromise one agent in a multi-agent pipeline, then use that agent's trusted position to inject instructions into downstream agents. Because inter-agent communication is treated as trusted input (it comes from "inside the system"), standard prompt injection defenses do not apply.</p>
+
+  <p>The A2A protocol (Google → Linux Foundation) authenticates <strong>systems</strong> via OAuth/OpenID but does not verify <strong>message provenance or intention</strong><sup>[17]</sup>. Knowing that a message came from an authenticated agent says nothing about whether that agent has been compromised. Authentication is not integrity verification.</p>
+
+  <div class="callout invalidation">
+    <p class="callout-label">What Would Invalidate This?</p>
+    <p class="callout-body">If multi-agent frameworks implemented cryptographic message signing with content integrity verification (not just sender authentication), contagion risk would be significantly reduced. The A2A protocol could be extended to include this — but currently does not.</p>
+  </div>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">If you run multi-agent systems, implement message validation outside the LLM context. Use a deterministic validation layer that checks message content against expected patterns. Build circuit breakers that can isolate a compromised agent.</p>
+  </div>
+</div>
+
+<!-- ========================================
+     SECTION 9: SUPPLY CHAIN
+     ======================================== -->
+<div class="page" id="supply-chain">
+  <h2>9. Supply Chain Attacks on Agent Frameworks
+    <span class="confidence-badge">55%</span>
+  </h2>
+  <span class="confidence-line">(Confidence: Medium)</span>
+
+  <p><span class="key-insight">The agent framework ecosystem has the same supply chain vulnerabilities as npm/PyPI — but compromised packages can autonomously execute actions.</span></p>
+
+  <h3>Evidence</h3>
+
+  <p>Agent frameworks are built on deep dependency trees. Known vulnerabilities in LangChain (as of 2023 — no published 2025/2026 agent framework CVEs identified, which likely indicates under-reporting rather than absence of vulnerabilities):</p>
+
+  <ul>
+    <li><strong>CVE-2023-36258:</strong> Arbitrary code execution via the PALChain module<sup>[18]</sup></li>
+    <li><strong>CVE-2023-36281:</strong> SQL injection via the SQLDatabaseChain<sup>[19]</sup></li>
+    <li><strong>CVE-2023-39659:</strong> Server-Side Request Forgery (SSRF) via multiple components<sup>[20]</sup></li>
+    <li><strong>AutoGen</strong> executes LLM-generated code by default — any prompt injection becomes code execution<sup>[21]</sup></li>
+  </ul>
+
+  <p>MCP tool servers are the agent equivalent of npm packages. Anyone can publish an MCP server. There is no code review, no signing, no sandbox. When an agent connects to a malicious MCP server:</p>
+
+  <ol>
+    <li>The tool description can contain prompt injection (MCPTox<sup>[13]</sup>)</li>
+    <li>The tool can return poisoned data</li>
+    <li>The tool can log all agent requests (including credentials and user data)</li>
+    <li>The tool can modify its behavior after initial trust is established</li>
+  </ol>
+
+  <div class="callout invalidation">
+    <p class="callout-label">What Would Invalidate This?</p>
+    <p class="callout-body">If MCP adopted a signing and review process similar to mobile app stores, and if agent frameworks sandboxed all external tool execution by default, supply chain risk would drop significantly.</p>
+  </div>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">Audit your agent framework dependencies with the same rigor you apply to production web applications. Pin versions, verify checksums, and sandbox MCP tool servers. Treat every external tool connection as a potential attack vector.</p>
+  </div>
+</div>
+
+<!-- ========================================
+     SECTION 10: WHAT ACTUALLY WORKS
+     ======================================== -->
+<div class="page" id="what-works">
+  <h2>10. What Actually Works</h2>
+
+  <p><span class="key-insight">Based on the evidence in this report, effective agent security requires architectural constraints, not pattern matching. The zero-trust model must extend to agent internals.</span></p>
+
+  <p style="font-size: 0.85rem; color: #666; margin-bottom: 24px;"><strong>Scope:</strong> This framework applies primarily to autonomous agents with tool access, persistent memory, and multi-agent coordination. Agents that perform single tasks with no persistent state have a narrower attack surface and may not require all controls described here.</p>
+
+  <h3>Checkbox Security</h3>
+
+  <div class="exhibit">
+    <p class="exhibit-label">Exhibit 5: Defense Effectiveness Assessment</p>
+    <table class="exhibit-table">
+      <tr>
+        <th>Defense</th>
+        <th>Status</th>
+        <th>Why</th>
+      </tr>
+      <tr>
+        <td>System prompt hardening</td>
+        <td>Theater</td>
+        <td>Broken by adaptive attacks (12/12) [1]</td>
+      </tr>
+      <tr>
+        <td>Input/output keyword filtering</td>
+        <td>Theater</td>
+        <td>Trivially bypassed via encoding, synonyms, multilingual attacks</td>
+      </tr>
+      <tr>
+        <td>Single-layer guardrail models</td>
+        <td>Theater</td>
+        <td>Same vulnerability class as the model they protect</td>
+      </tr>
+      <tr>
+        <td>"AI safety" fine-tuning alone</td>
+        <td>Theater</td>
+        <td>Training-time alignment insufficient against inference-time attacks [1]</td>
+      </tr>
+      <tr>
+        <td>Perplexity-based detection</td>
+        <td>Theater</td>
+        <td>High false positive rate, adversarially evadable [1]</td>
+      </tr>
+    </table>
+  </div>
+
+  <h3>Recommendations</h3>
+
+  <p>For teams deploying agents today, here is the minimum viable security stack based on this research:</p>
+
+  <ol>
+    <li><strong>Privilege separation at the tool layer.</strong> Every tool call scoped to minimum necessary permissions. Enforced outside the LLM, in deterministic code.</li>
+    <li><strong>Memory integrity.</strong> Cryptographic hashing of memory entries at write time. Provenance metadata (source, timestamp, confidence) on every memory record.</li>
+    <li><strong>Behavioral monitoring.</strong> Log every agent action (not just prompts). Build baselines. Alert on deviations in tool call patterns, memory write frequency, and inter-agent message volume.</li>
+    <li><strong>Kill switches.</strong> Infrastructure-level (process kill, network isolation), not prompt-level ("please stop"). Tested regularly.</li>
+    <li><strong>Red teaming the full chain.</strong> Test prompt injection → tool exploitation → memory corruption → inter-agent propagation as a single attack scenario. Single-vector testing gives false confidence.</li>
+  </ol>
+
+  <p style="margin-top: 24px;">This is not a complete security framework. It is the minimum set of controls that addresses the specific vulnerabilities documented in this report. Each control maps directly to an evidence-backed attack vector.</p>
+
+  <h3>Red Teaming Frameworks</h3>
+
+  <ul>
+    <li><strong>NIST AI RMF (AI 100-1):</strong> Four pillars — Govern, Map, Measure, Manage. The January 2026 RFI on agent-specific security signals that NIST recognizes existing frameworks are insufficient for agents<sup>[22]</sup>.</li>
+    <li><strong>MITRE ATLAS:</strong> Adversarial threat landscape for AI systems. Includes LLM-specific techniques but needs extension for multi-agent scenarios<sup>[6]</sup>.</li>
+    <li><strong>OWASP LLM Top 10 (2025):</strong> Best current taxonomy for single-model risks. Does not cover agent-specific vectors adequately<sup>[4]</sup>.</li>
+  </ul>
+
+  <p>Agent-specific red teaming must test the full chain: prompt injection → tool exploitation → memory corruption → inter-agent propagation. Single-vector testing misses compound attacks.</p>
+
+  <h3>The Regulatory Gap</h3>
+
+  <div class="exhibit">
+    <p class="exhibit-label">Exhibit 6: Regulatory Framework Comparison for Agent Security</p>
+    <table class="exhibit-table">
+      <tr>
+        <th>Framework</th>
+        <th>Agent-Specific Provisions</th>
+        <th>Status</th>
+      </tr>
+      <tr>
+        <td>EU AI Act</td>
+        <td>None — applies general high-risk provisions</td>
+        <td>Enforcement Aug 2026</td>
+      </tr>
+      <tr>
+        <td>NIST AI RMF 1.0</td>
+        <td>None — single-model focus</td>
+        <td>RFI for agent extensions Jan 2026</td>
+      </tr>
+      <tr>
+        <td>NIST CAISI</td>
+        <td>Building agent security standards</td>
+        <td>RFI deadline Mar 2026</td>
+      </tr>
+      <tr>
+        <td>OWASP LLM Top 10</td>
+        <td>Partial — prompt injection, insecure plugins</td>
+        <td>2025 edition</td>
+      </tr>
+      <tr>
+        <td>MITRE ATLAS</td>
+        <td>Partial — LLM techniques, no multi-agent</td>
+        <td>Ongoing updates</td>
+      </tr>
+      <tr>
+        <td>ISO 42001</td>
+        <td>General AI management, not agent-specific</td>
+        <td>Published 2023</td>
+      </tr>
+    </table>
+    <p class="exhibit-source">Sources: EU AI Act [23], NIST [22], OWASP [4], MITRE [6], ISO [24]</p>
+  </div>
+
+  <p>The EU AI Act (enforcement for high-risk systems from August 2026) requires human oversight (Article 14). But empirical evidence shows HITL oversight fails at scale: <strong>67% of security alerts are ignored</strong> (Vectra 2023, n=2,000 analysts)<sup>[12]</sup>. The regulation mandates a control that research proves does not work at production scale.</p>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">Build your agent security stack around architectural constraints, not prompt-level defenses. Use the NIST AI RMF as your governance backbone but extend it with agent-specific controls. Do not wait for regulations — they are 12–18 months behind the technology.</p>
+  </div>
+</div>
+
+<!-- ========================================
+     SECTION 11: PREDICTIONS
+     ======================================== -->
+<div class="page" id="predictions">
+  <h2>11. Predictions
+    <span style="font-size: 0.65rem; font-weight: 500; color: #1a1a1a; background: #f5f4f0; padding: 2px 6px; border-radius: 8px; margin-left: 8px; vertical-align: middle;">BETA</span>
+  </h2>
+
+  <p style="font-size: 0.85rem; color: #666; margin-bottom: 24px;">These predictions will be scored publicly at 12 months. This is version 1.0 (February 2026). Scoring methodology available at ainaryventures.com/predictions.</p>
+
+  <div class="exhibit">
+    <table class="exhibit-table">
+      <tr>
+        <th>Prediction</th>
+        <th>Timeline</th>
+        <th>Confidence</th>
+      </tr>
+      <tr>
+        <td>At least one cloud provider ships agent-specific IAM primitives (per-action authorization, scoped credentials)</td>
+        <td>Q4 2026</td>
+        <td>65%</td>
+      </tr>
+      <tr>
+        <td>A major multi-agent framework adds cryptographic message signing with integrity verification</td>
+        <td>Q2 2026</td>
+        <td>55%</td>
+      </tr>
+      <tr>
+        <td>NIST publishes agent-specific security guidelines as part of AI RMF 2.0</td>
+        <td>Q3 2026</td>
+        <td>70%</td>
+      </tr>
+      <tr>
+        <td>A high-profile agent security incident (credential leak or data exfiltration) makes mainstream news</td>
+        <td>Q3 2026</td>
+        <td>80%</td>
+      </tr>
+      <tr>
+        <td>At least one memory framework ships with provenance tracking and integrity checks by default</td>
+        <td>Q4 2026</td>
+        <td>50%</td>
+      </tr>
+    </table>
+  </div>
+
+  <p style="font-size: 0.8rem; color: #888; margin-top: 16px; font-style: italic;">Predictions scored publicly at 12 months. Updated versions will be published as evidence evolves.</p>
+</div>
+
+<!-- ========================================
+     SECTION 12: TRANSPARENCY NOTE
+     ======================================== -->
+<div class="page" id="transparency">
+  <h2>12. Transparency Note</h2>
+
+  <p class="transparency-intro">This section explains the methodology, known limitations, and confidence calibration of this report. We include it because transparency about what we know — and what we don't — is what separates research from marketing.</p>
+
+  <table class="transparency-table">
+    <tr>
+      <td>Overall Confidence</td>
+      <td>78%</td>
+    </tr>
+    <tr>
+      <td>Sources</td>
+      <td>13 primary (peer-reviewed papers, CVE databases, framework documentation), 11 secondary (industry reports, practitioner analysis)</td>
+    </tr>
+    <tr>
+      <td>Strongest Evidence</td>
+      <td>12/12 prompt injection defenses broken (arXiv:2510.09023 — 14 authors from Meta, OpenAI, Anthropic, Google DeepMind) [1]; MINJA &gt;95% memory injection success (arXiv:2503.03704) [2]</td>
+    </tr>
+    <tr>
+      <td>Weakest Point</td>
+      <td>Supply chain attack section relies on 2023 CVEs for LangChain; no published 2025/2026 agent framework CVEs found (does not mean they do not exist — likely indicates under-reporting)</td>
+    </tr>
+    <tr>
+      <td>What Would Invalidate This Report?</td>
+      <td>A fundamental architectural breakthrough that separates instructions from data at the model level (not heuristic-based). No such breakthrough is on the horizon.</td>
+    </tr>
+    <tr>
+      <td>Methodology</td>
+      <td>Multi-agent research pipeline. Primary research from arXiv, CVE databases, NIST/OWASP/MITRE publications. Cross-referenced against Ainary Research Briefs #10 (Adversarial Agents), #12 (Agent Memory), #13 (Agent Protocols). 15 independent research briefs synthesized, with gap research on memory governance, credential management, and multi-agent contagion.</td>
+    </tr>
+    <tr>
+      <td><strong>Limitations</strong></td>
+      <td>The agent security field is moving fast. Several findings rely on pre-print papers not yet peer-reviewed through traditional journal processes. Production incident data is scarce because most agent deployments are recent and organizations do not publicly disclose agent-specific security failures.</td>
+    </tr>
+    <tr>
+      <td>System Disclosure</td>
+      <td>This report was created with a Multi-Agent Research System.</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ========================================
+     SECTION 13: CLAIM REGISTER
+     ======================================== -->
+<div class="page" id="claim-register">
+  <h2>13. Claim Register</h2>
+
+  <p style="font-size: 0.85rem; color: #666; margin-bottom: 24px;">This register lists the key quantitative and qualitative claims made in this report, with sources and confidence levels. The top 5 claims include explicit invalidation conditions.</p>
+
+  <div class="exhibit">
+    <p class="exhibit-label">Exhibit 7: Claim Register</p>
+    <table class="exhibit-table">
+      <tr>
+        <th>#</th>
+        <th>Claim</th>
+        <th>Value</th>
+        <th>Source</th>
+        <th>Confidence</th>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>All published prompt injection defenses broken</td>
+        <td>12/12</td>
+        <td>arXiv:2510.09023 [1]</td>
+        <td>High</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>Memory injection success rate (MINJA)</td>
+        <td>&gt;95%</td>
+        <td>arXiv:2503.03704 [2]</td>
+        <td>High</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>MAS hijacking success rate</td>
+        <td>45–64%</td>
+        <td>arXiv:2503.12188 [3]</td>
+        <td>High</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>AI deployments with prompt injection vulnerabilities</td>
+        <td>73%</td>
+        <td>OWASP [4]</td>
+        <td>Medium</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>Zero-click exfiltration via Copilot</td>
+        <td>CVE-2025-32711</td>
+        <td>Microsoft/NVD [5]</td>
+        <td>High</td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td>SOC alerts ignored</td>
+        <td>67%</td>
+        <td>Vectra 2023 (n=2,000) [12]</td>
+        <td>High</td>
+      </tr>
+      <tr>
+        <td>7</td>
+        <td>Agent credential leaks reported</td>
+        <td>23%</td>
+        <td>Okta [15]</td>
+        <td>Medium</td>
+      </tr>
+      <tr>
+        <td>8</td>
+        <td>Organizations with non-human identity strategy</td>
+        <td>10%</td>
+        <td>WEF [16]</td>
+        <td>Medium</td>
+      </tr>
+      <tr>
+        <td>9</td>
+        <td>No memory framework has integrity checks</td>
+        <td>0/5 frameworks</td>
+        <td>Framework documentation [10]</td>
+        <td>High</td>
+      </tr>
+      <tr>
+        <td>10</td>
+        <td>LangChain arbitrary code execution</td>
+        <td>CVE-2023-36258</td>
+        <td>NVD [18]</td>
+        <td>High</td>
+      </tr>
+      <tr>
+        <td>11</td>
+        <td>VCE systematically biased</td>
+        <td>Confirmed</td>
+        <td>arXiv:2602.00279 [11]</td>
+        <td>High</td>
+      </tr>
+      <tr>
+        <td>12</td>
+        <td>MCPTox tool poisoning via descriptions</td>
+        <td>Demonstrated</td>
+        <td>arXiv:2508.14925 [13]</td>
+        <td>High</td>
+      </tr>
+    </table>
+  </div>
+
+  <p style="font-size: 0.85rem; color: #555; margin-top: 24px; line-height: 1.6;"><strong>Top 5 Claims — Invalidation Conditions:</strong></p>
+  <ul style="font-size: 0.85rem; color: #555; line-height: 1.6; margin-left: 20px;">
+    <li><strong>Claim #1 (12/12 defenses broken):</strong> Invalidated if a defense emerges that survives 10+ adaptive attack iterations from independent red teams.</li>
+    <li><strong>Claim #2 (&gt;95% memory injection):</strong> Invalidated if reproduction studies with different models yield &lt;20% success rate.</li>
+    <li><strong>Claim #3 (45–64% MAS hijacking):</strong> Invalidated if independent testing across 5+ frameworks shows &lt;10% success with default configurations.</li>
+    <li><strong>Claim #4 (73% vulnerable deployments):</strong> Invalidated if OWASP publishes methodology showing selection bias or if independent survey with n&gt;1,000 shows &lt;30%.</li>
+    <li><strong>Claim #5 (CVE-2025-32711 zero-click):</strong> Invalidated if Microsoft disputes the CVE or demonstrates the vulnerability requires user interaction.</li>
+  </ul>
+</div>
+
+<!-- ========================================
+     SECTION 14: REFERENCES
+     ======================================== -->
+<div class="page" id="references">
+  <h2>14. References</h2>
+
+  <p class="reference-entry">[1] Debenedetti, E., et al. (2025). "Defeating Prompt Injections by Design." arXiv:2510.09023. Meta, OpenAI, Anthropic, Google DeepMind. 14 authors.</p>
+
+  <p class="reference-entry">[2] Chen, Z., et al. (2025). "MINJA: Memory INJection Attacks against Retrieval-Augmented Generation." arXiv:2503.03704.</p>
+
+  <p class="reference-entry">[3] Gu, Y., et al. (2025). "Hijacking Multi-Agent Systems." arXiv:2503.12188.</p>
+
+  <p class="reference-entry">[4] OWASP. (2025). "OWASP Top 10 for Large Language Model Applications." Version 2.0.</p>
+
+  <p class="reference-entry">[5] Microsoft / NVD. (2025). "CVE-2025-32711: EchoLeak — Information Disclosure in Microsoft Copilot."</p>
+
+  <p class="reference-entry">[6] MITRE. (2025). "ATLAS — Adversarial Threat Landscape for AI Systems." AML.T0051.</p>
+
+  <p class="reference-entry">[7] Documented in Ainary Research Brief #5 (Agent Failures). Original reporting: multiple sources, 2025.</p>
+
+  <p class="reference-entry">[8] Greshake, K., et al. (2023). "Not What You've Signed Up For: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection." arXiv:2302.12173.</p>
+
+  <p class="reference-entry">[9] Zhang, Y., et al. (2025). "MemoryGraft: Persistent False Memories in AI Agents." arXiv:2512.16962.</p>
+
+  <p class="reference-entry">[10] Framework analysis: Letta, Mem0, Zep, LangMem, A-Mem documentation. Reviewed February 2026.</p>
+
+  <p class="reference-entry">[11] Tao, Z., et al. (2026). "Verbalized Confidence Estimation is Biased." arXiv:2602.00279.</p>
+
+  <p class="reference-entry">[12] Vectra AI. (2023). "State of Threat Detection." n=2,000 security analysts.</p>
+
+  <p class="reference-entry">[13] Wang, X., et al. (2025). "MCPTox: Tool Poisoning Attacks on Model Context Protocol." arXiv:2508.14925.</p>
+
+  <p class="reference-entry">[14] Hannecke, M. (2025). "Tool-calling failure rates in production." Practitioner blog (single source).</p>
+
+  <p class="reference-entry">[15] Okta. (2025). "State of Machine Identity Security." IT professional survey.</p>
+
+  <p class="reference-entry">[16] World Economic Forum. (2025). "Non-Human Identity Management."</p>
+
+  <p class="reference-entry">[17] Google. (2025). "Agent-to-Agent (A2A) Protocol." Linux Foundation.</p>
+
+  <p class="reference-entry">[18] NVD. "CVE-2023-36258: LangChain PALChain Arbitrary Code Execution."</p>
+
+  <p class="reference-entry">[19] NVD. "CVE-2023-36281: LangChain SQLDatabaseChain SQL Injection."</p>
+
+  <p class="reference-entry">[20] NVD. "CVE-2023-39659: LangChain Server-Side Request Forgery."</p>
+
+  <p class="reference-entry">[21] Microsoft. "AutoGen Framework Documentation." Code execution enabled by default.</p>
+
+  <p class="reference-entry">[22] NIST CAISI. (2026). "Request for Information: AI Agent Security." Deadline March 2026.</p>
+
+  <p class="reference-entry">[23] European Parliament. (2024). "Regulation (EU) 2024/1689 — AI Act."</p>
+
+  <p class="reference-entry">[24] ISO. (2023). "ISO/IEC 42001: Artificial Intelligence Management System."</p>
+
+  <p style="font-size: 0.8rem; color: #888; margin-top: 32px; padding-top: 16px; border-top: 1px solid #eee;"><strong>Cite as:</strong> Ainary Research (2026). <em>The AI Agent Security Playbook — What Attackers Already Know That Defenders Don't.</em> AR-006.</p>
+
+  <!-- ========================================
+       AUTHOR BIO
+       ======================================== -->
+  <div class="author-section">
+    <p class="author-label">About the Author</p>
+    <p class="author-bio">Florian Ziesche is the founder of Ainary Ventures, where AI does 80% of the research and humans do the 20% that matters. Before Ainary, he was CEO of 36ZERO Vision and advised startups and SMEs on AI strategy and due diligence. His conviction: HUMAN × AI = LEVERAGE. This report is the proof.</p>
+    <p style="font-size: 0.85rem; color: #888; margin-top: 12px;">
+      <a href="https://ainaryventures.com" style="color: #888; text-decoration: none; border-bottom: 1px solid #ddd;">ainaryventures.com</a>
+    </p>
+  </div>
+</div>
+
+<!-- ========================================
+     BACK COVER
+     ======================================== -->
+<div class="back-cover">
+  <div class="cover-brand" style="margin-bottom: 24px;">
+    <span class="gold-punkt">●</span>
+    <span class="brand-name">Ainary</span>
+  </div>
+
+  <p class="back-cover-services">AI Strategy · Published Research · Daily Intelligence</p>
+
+  <p class="back-cover-cta">
+    <a href="mailto:florian@ainaryventures.com" style="color: #888; text-decoration: none;">Contact</a> · <a href="mailto:florian@ainaryventures.com?subject=Feedback: AR-006" style="color: #888; text-decoration: none;">Feedback</a>
+  </p>
+
+  <p class="back-cover-contact">ainaryventures.com</p>
+  <p class="back-cover-contact">florian@ainaryventures.com</p>
+
+  <p style="font-size: 0.7rem; color: #aaa; margin-top: 48px;">© 2026 Ainary Ventures</p>
+</div>
+
+</body>
+</html>

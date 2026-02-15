@@ -17,6 +17,11 @@
 3. 1 Nachricht. Nicht drei.
 4. Unsicher → Confidence angeben.
 
+## After Every Sub-Agent Result
+1. **TRUST-LEDGER.json updaten** — neuer Eintrag mit Hash, QA, Runtime, Claims
+2. **Vault Cite=Verify** — wenn Vault-Notes genutzt: `last_verified` updaten
+3. Kein Agent-Ergebnis ohne Ledger-Update. Keine Ausnahme.
+
 ## Done Gap Detector
 Before delivery: Attack → Score (10-90%) → Tag: `⧖ Completion: X% | Missing: [was] | Confidence: Y%`
 
