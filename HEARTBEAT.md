@@ -1,8 +1,16 @@
 # HEARTBEAT.md — Proactive Check-Ins
 
-## 🔴 Execution Check (JEDER Heartbeat)
-- `./scripts/send-enforcer.sh` — Heute 0 Outreach? → ansprechen
-- 2+ Tage ohne → Eskalation
+## 🔴 SEND ENFORCEMENT (JEDER Heartbeat, KRITISCH)
+```bash
+./scripts/send-enforcer.sh
+```
+**Bei 0 Sends heute:**
+1. FRAGE: "Du hast heute nicht gesendet. Was blockiert?"
+2. KEINE weiteren Build-Tasks bis gesendet (außer Florian sagt explizit weiter)
+3. REGEL: Wöchentliche Targets (KW Goals), aber Distribution Days heilig (Montag)
+
+**Bei 2+ Tage ohne:**
+ESKALATION: "€X Opportunity Cost. Sollen wir das Projekt pausieren bis Distribution läuft?"
 
 ## 🌅 Morning (wenn online)
 FIRST: Read NORTH_STAR.md
