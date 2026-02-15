@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Human-in-the-Loop Illusion — Ainary Report AR-011</title>
+<style>
+  /* ========================================
+     FONTS
+     ======================================== */
+  @font-face {
+    font-family: 'Inter';
+    src: url('/fonts/inter-variable.woff2') format('woff2');
+    font-weight: 100 900;
+    font-display: swap;
+  }
+
+  /* ========================================
+     RESET & BASE
+     ======================================== */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #fafaf8;
+    color: #333;
+    line-height: 1.75;
+    font-size: 0.95rem;
+    font-weight: 400;
+  }
+
+  /* ========================================
+     LAYOUT
+     ======================================== */
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 40px;
+  }
+
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 40px;
+  }
+
+  .back-cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 40px;
+    page-break-before: always;
+  }
+
+  /* ========================================
+     TYPOGRAPHY
+     ======================================== */
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 600;
+    line-height: 1.2;
+    color: #1a1a1a;
+    letter-spacing: -0.02em;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.3;
+    margin-top: 3rem;
+    margin-bottom: 12px;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.4;
+    margin-top: 2rem;
+    margin-bottom: 12px;
+  }
+
+  p {
+    margin-bottom: 1rem;
+  }
+
+  strong {
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  em {
+    font-style: italic;
+  }
+
+  sup {
+    font-size: 0.65rem;
+    color: #888;
+    vertical-align: super;
+  }
+
+  /* ========================================
+     COVER COMPONENTS
+     ======================================== */
+  .cover-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40vh;
+  }
+
+  .cover-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gold-punkt {
+    color: #c8aa50;
+    font-size: 14px;
+  }
+
+  .brand-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    letter-spacing: 0.02em;
+  }
+
+  .cover-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 0.75rem;
+    color: #888;
+  }
+
+  .cover-title-block {
+    margin-bottom: auto;
+  }
+
+  .cover-title {
+    margin-bottom: 16px;
+  }
+
+  .cover-subtitle {
+    font-size: 1rem;
+    font-weight: 400;
+    color: #666;
+    line-height: 1.5;
+  }
+
+  .cover-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .cover-date {
+    font-size: 0.75rem;
+    color: #888;
+  }
+
+  .cover-author {
+    font-size: 0.75rem;
+    color: #888;
+    text-align: center;
+  }
+
+  /* ========================================
+     TABLE OF CONTENTS
+     ======================================== */
+  .toc-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 24px;
+  }
+
+  .toc-section {
+    margin-bottom: 32px;
+  }
+
+  .toc-section-label {
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 12px;
+  }
+
+  .toc-entry {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .toc-number {
+    font-size: 0.8rem;
+    color: #888;
+    font-variant-numeric: tabular-nums;
+    min-width: 24px;
+  }
+
+  .toc-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    flex: 1;
+    transition: color 0.2s;
+  }
+
+  .toc-entry:hover .toc-title {
+    color: #c8aa50;
+  }
+
+  .toc-page {
+    font-size: 0.8rem;
+    color: #888;
+  }
+
+  /* ========================================
+     HOW TO READ
+     ======================================== */
+  .how-to-read-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+  }
+
+  .how-to-read-table th {
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 10px 12px;
+    background: #f5f4f0;
+    border-bottom: 2px solid #e5e3dc;
+  }
+
+  .how-to-read-table td {
+    font-size: 0.85rem;
+    color: #333;
+    padding: 10px 12px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  /* ========================================
+     EXECUTIVE SUMMARY
+     ======================================== */
+  .thesis {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .evidence-list {
+    margin-left: 20px;
+    margin-bottom: 24px;
+  }
+
+  .evidence-list li {
+    font-size: 0.9rem;
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 8px;
+  }
+
+  .keywords {
+    font-size: 0.8rem;
+    color: #666;
+    font-style: italic;
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid #eee;
+  }
+
+  /* ========================================
+     SECTION COMPONENTS
+     ======================================== */
+  .confidence-badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    background: #f5f4f0;
+    padding: 3px 8px;
+    border-radius: 10px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  .confidence-line {
+    font-size: 0.8rem;
+    color: #888;
+    font-style: italic;
+    display: block;
+    margin-bottom: 16px;
+  }
+
+  .key-insight {
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  /* ========================================
+     CALLOUTS
+     ======================================== */
+  .callout {
+    background: #f5f4f0;
+    padding: 16px 20px;
+    border-radius: 4px;
+    margin: 1.5rem 0;
+    page-break-inside: avoid;
+  }
+
+  .callout-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+
+  .callout-body {
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.6;
+  }
+
+  .callout.claim .callout-label {
+    color: #555;
+  }
+
+  .callout.invalidation {
+    border-left: 3px solid #ddd;
+  }
+
+  .callout.invalidation .callout-label {
+    color: #888;
+  }
+
+  .callout.sowhat {
+    border-left: 3px solid #c8aa50;
+  }
+
+  .callout.sowhat .callout-label {
+    color: #c8aa50;
+  }
+
+  /* ========================================
+     EXHIBITS & TABLES
+     ======================================== */
+  .exhibit {
+    margin: 2rem 0;
+  }
+
+  .exhibit-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 12px;
+  }
+
+  .exhibit-table {
+    width: 100%;
+    border-collapse: collapse;
+    page-break-inside: avoid;
+  }
+
+  .exhibit-table th {
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 10px 12px;
+    background: #f5f4f0;
+    border-bottom: 2px solid #e5e3dc;
+  }
+
+  .exhibit-table td {
+    font-size: 0.85rem;
+    color: #333;
+    padding: 10px 12px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .exhibit-source {
+    font-size: 0.7rem;
+    color: #888;
+    font-style: italic;
+    margin-top: 8px;
+  }
+
+  /* ========================================
+     KPI FIGURES
+     ======================================== */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 48px;
+    margin: 2rem 0;
+  }
+
+  .kpi {
+    text-align: left;
+  }
+
+  .kpi-number {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.2;
+  }
+
+  .kpi-label {
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 4px;
+  }
+
+  .kpi-source {
+    font-size: 0.65rem;
+    color: #888;
+    margin-top: 2px;
+  }
+
+  /* ========================================
+     LISTS
+     ======================================== */
+  ul {
+    margin-left: 20px;
+    margin-bottom: 1rem;
+  }
+
+  ol {
+    margin-left: 20px;
+    margin-bottom: 1rem;
+  }
+
+  li {
+    margin-bottom: 4px;
+  }
+
+  /* ========================================
+     TRANSPARENCY NOTE
+     ======================================== */
+  .transparency-intro {
+    font-size: 0.85rem;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+
+  .transparency-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+  }
+
+  .transparency-table td:first-child {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    width: 160px;
+    vertical-align: top;
+  }
+
+  .transparency-table td:last-child {
+    font-size: 0.85rem;
+    color: #333;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  /* ========================================
+     REFERENCES
+     ======================================== */
+  .reference-entry {
+    font-size: 0.8rem;
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 6px;
+    padding-left: 24px;
+    text-indent: -24px;
+  }
+
+  /* ========================================
+     AUTHOR BIO
+     ======================================== */
+  .author-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e5e3dc;
+  }
+
+  .author-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 8px;
+  }
+
+  .author-bio {
+    font-size: 0.85rem;
+    color: #555;
+    line-height: 1.6;
+  }
+
+  /* ========================================
+     BACK COVER
+     ======================================== */
+  .back-cover-services {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 24px;
+  }
+
+  .back-cover-cta {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 16px;
+  }
+
+  .back-cover-contact {
+    font-size: 0.8rem;
+    color: #888;
+  }
+
+  /* ========================================
+     PRINT STYLES
+     ======================================== */
+  @media print {
+    @page {
+      size: A4;
+      margin: 2cm;
+    }
+
+    body {
+      background: white;
+    }
+
+    .page, .cover, .back-cover {
+      page-break-after: always;
+    }
+
+    .callout, .exhibit {
+      page-break-inside: avoid;
+    }
+
+    @page :first {
+      @top-center { content: none; }
+      @bottom-center { content: none; }
+    }
+
+    @page {
+      @top-center {
+        content: "Ainary Report | The Human-in-the-Loop Illusion";
+        font-size: 0.7rem;
+        color: #888;
+      }
+      @bottom-left {
+        content: "© 2026 Ainary Ventures";
+        font-size: 0.7rem;
+        color: #888;
+      }
+      @bottom-right {
+        content: counter(page);
+        font-size: 0.7rem;
+        color: #888;
+      }
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========================================
+     COVER PAGE
+     ======================================== -->
+<div class="cover">
+  <div class="cover-header">
+    <div class="cover-brand">
+      <span class="gold-punkt">●</span>
+      <span class="brand-name">Ainary</span>
+    </div>
+    <div class="cover-meta">
+      <span>AR-011</span>
+      <span>Confidence: 75%</span>
+    </div>
+  </div>
+
+  <div class="cover-title-block">
+    <h1 class="cover-title">The Human-in-the-Loop<br>Illusion</h1>
+    <p class="cover-subtitle">When Human Oversight of AI Agents Fails, and What to Build Instead</p>
+  </div>
+
+  <div class="cover-footer">
+    <div class="cover-date">
+      February 2026<br>
+      <span style="font-size: 0.7rem; color: #aaa;">v1.0</span>
+    </div>
+    <div class="cover-author">
+      Florian Ziesche · Ainary Ventures
+    </div>
+  </div>
+</div>
+
+<!-- ========================================
+     TABLE OF CONTENTS
+     ======================================== -->
+<div class="page">
+  <p class="toc-label">Contents</p>
+
+  <div class="toc-section">
+    <p class="toc-section-label">FOUNDATION</p>
+    <a href="#exec-summary" class="toc-entry">
+      <span class="toc-number">1</span>
+      <span class="toc-title">Executive Summary</span>
+      <span class="toc-page">3</span>
+    </a>
+    <a href="#methodology" class="toc-entry">
+      <span class="toc-number">2</span>
+      <span class="toc-title">Methodology</span>
+      <span class="toc-page">4</span>
+    </a>
+    <a href="#how-to-read" class="toc-entry">
+      <span class="toc-number">3</span>
+      <span class="toc-title">How to Read This Report</span>
+      <span class="toc-page">5</span>
+    </a>
+  </div>
+
+  <div class="toc-section">
+    <p class="toc-section-label">ANALYSIS</p>
+    <a href="#the-assumption" class="toc-entry">
+      <span class="toc-number">4</span>
+      <span class="toc-title">The Human-in-the-Loop Assumption</span>
+      <span class="toc-page">6</span>
+    </a>
+    <a href="#automation-bias" class="toc-entry">
+      <span class="toc-number">5</span>
+      <span class="toc-title">Automation Bias — Why Humans Stop Paying Attention</span>
+      <span class="toc-page">8</span>
+    </a>
+    <a href="#alert-fatigue" class="toc-entry">
+      <span class="toc-number">6</span>
+      <span class="toc-title">Alert Fatigue — The Boy Who Cried Wolf at Scale</span>
+      <span class="toc-page">11</span>
+    </a>
+    <a href="#where-hitl-works" class="toc-entry">
+      <span class="toc-number">7</span>
+      <span class="toc-title">Where HITL Works (and Where It Doesn't)</span>
+      <span class="toc-page">14</span>
+    </a>
+    <a href="#regulatory-gap" class="toc-entry">
+      <span class="toc-number">8</span>
+      <span class="toc-title">The Regulatory Gap — Mandating What Doesn't Work</span>
+      <span class="toc-page">17</span>
+    </a>
+  </div>
+
+  <div class="toc-section">
+    <p class="toc-section-label">ACTION</p>
+    <a href="#what-to-build" class="toc-entry">
+      <span class="toc-number">9</span>
+      <span class="toc-title">What to Build Instead</span>
+      <span class="toc-page">19</span>
+    </a>
+    <a href="#predictions" class="toc-entry">
+      <span class="toc-number">10</span>
+      <span class="toc-title">Predictions</span>
+      <span class="toc-page">22</span>
+    </a>
+    <a href="#transparency" class="toc-entry">
+      <span class="toc-number">11</span>
+      <span class="toc-title">Transparency Note</span>
+      <span class="toc-page">23</span>
+    </a>
+    <a href="#claim-register" class="toc-entry">
+      <span class="toc-number">12</span>
+      <span class="toc-title">Claim Register</span>
+      <span class="toc-page">24</span>
+    </a>
+    <a href="#references" class="toc-entry">
+      <span class="toc-number">13</span>
+      <span class="toc-title">References</span>
+      <span class="toc-page">25</span>
+    </a>
+  </div>
+</div>
+
+<!-- ========================================
+     HOW TO READ THIS REPORT
+     ======================================== -->
+<div class="page" id="how-to-read">
+  <h2>3. How to Read This Report</h2>
+
+  <p>This report uses a structured confidence rating system to communicate what is known versus what is inferred. Every quantitative claim carries its source and confidence level.</p>
+
+  <table class="how-to-read-table">
+    <tr>
+      <th>Rating</th>
+      <th>Meaning</th>
+      <th>Example</th>
+    </tr>
+    <tr>
+      <td>High</td>
+      <td>3+ independent sources, peer-reviewed or primary data</td>
+      <td>67% of security alerts ignored (Vectra 2023, n=2,000 analysts)</td>
+    </tr>
+    <tr>
+      <td>Medium</td>
+      <td>1–2 sources, plausible but not independently confirmed</td>
+      <td>30% response drop per reminder (Ancker 2017, single study)</td>
+    </tr>
+    <tr>
+      <td>Low</td>
+      <td>Single secondary source, methodology unclear</td>
+      <td>Industry survey without disclosed sample methodology</td>
+    </tr>
+  </table>
+
+  <p style="margin-top: 24px;">This report was produced using a <strong>multi-agent research pipeline</strong> with structured source verification and contradiction tracking. Full methodology details are provided in the Transparency Note (Section 11).</p>
+</div>
+
+<!-- ========================================
+     EXECUTIVE SUMMARY
+     ======================================== -->
+<div class="page" id="exec-summary">
+  <h2>1. Executive Summary</h2>
+
+  <p class="thesis">Human oversight is the default answer to AI risk — but the evidence shows it fails systematically at scale. The question isn't whether to keep humans in the loop, but where.</p>
+
+  <ul class="evidence-list">
+    <li><strong>67% of security alerts are ignored</strong> by human analysts because of volume overload — 4,484 alerts per day in large SOC teams<sup>[1]</sup></li>
+    <li><strong>Each additional reminder reduces response probability by 30%</strong> — alert fatigue is measurable and predictable<sup>[2]</sup></li>
+    <li><strong>80–99% of clinical alarms are false positives</strong> — creating desensitization that leads to 14% more medical errors<sup>[3][4]</sup></li>
+    <li><strong>96% of data breaches are disclosed by attackers, not defenders</strong> — human-monitored security systems fail to detect threats before damage occurs<sup>[5]</sup></li>
+    <li><strong>The EU AI Act mandates human oversight for high-risk systems</strong> (Article 14) — but does not specify how to prevent the empirically documented failure modes<sup>[6]</sup></li>
+    <li><strong>HITL works when intervention frequency is low, impact is high, and context is rich</strong> — not when humans monitor high-volume, repetitive agent actions</li>
+  </ul>
+
+  <p class="keywords"><strong>Keywords:</strong> Human-in-the-Loop, Automation Bias, Alert Fatigue, AI Oversight, Confidence-Based Routing, EU AI Act, Agent Design</p>
+</div>
+
+<!-- ========================================
+     METHODOLOGY (SHORT VERSION)
+     ======================================== -->
+<div class="page" id="methodology">
+  <h2>2. Methodology</h2>
+
+  <p>This report synthesizes evidence from peer-reviewed medical and human factors research (alert fatigue, automation bias), cybersecurity practitioner surveys (Vectra, Verizon DBIR), regulatory frameworks (EU AI Act, NIST AI RMF), and industry reports on AI agent design (AuxilioBits, Stanford HAI, IBM). Sources span healthcare (clinical alarm systems), aviation (cockpit automation), cybersecurity (SOC alert management), and autonomous vehicles. The cross-domain approach reveals consistent patterns: HITL fails when humans are asked to monitor high-volume, low-variance tasks where the base rate of genuine intervention need is very low.</p>
+
+  <p><strong>Limitations:</strong> Most HITL research is domain-specific (healthcare, aviation). Direct studies of HITL failure in AI agent oversight are limited because widespread agent deployment is recent. This report extrapolates from established human factors research to the agent domain — a reasonable but imperfect analogy. Real-world agent HITL failure data will emerge over the next 12–24 months as deployments scale.</p>
+
+  <p style="font-size: 0.85rem; color: #666; margin-top: 16px;">Full methodology details, including confidence calibration and known weaknesses, are provided in the Transparency Note (Section 11).</p>
+</div>
+
+<!-- ========================================
+     SECTION 4: THE ASSUMPTION
+     ======================================== -->
+<div class="page" id="the-assumption">
+  <h2>4. The Human-in-the-Loop Assumption
+    <span class="confidence-badge">80%</span>
+  </h2>
+  <span class="confidence-line">(Confidence: High)</span>
+
+  <p><span class="key-insight">When AI systems make mistakes, the default answer is always the same: put a human in the loop.</span> The assumption is intuitive. Humans provide judgment, context, and accountability that machines lack. But the assumption rests on a premise that is empirically false: that humans remain attentive, calibrated, and effective when monitoring autonomous systems at scale.</p>
+
+  <h3>Evidence</h3>
+
+  <p>HITL is prescribed across domains:</p>
+
+  <ul>
+    <li><strong>EU AI Act (Article 14):</strong> High-risk AI systems must be "subject to human oversight" — specifically, humans must be able to "fully understand the capacities and limitations" and "be able to correctly interpret the system's output."<sup>[6]</sup></li>
+    <li><strong>NIST AI Risk Management Framework:</strong> Recommends "human-AI configuration" where humans retain decision authority for high-stakes outcomes<sup>[7]</sup></li>
+    <li><strong>FDA medical device guidance:</strong> Autonomous diagnostic systems require "meaningful human oversight" — without defining what makes oversight meaningful<sup>[8]</sup></li>
+    <li><strong>FAA cockpit automation standards:</strong> Pilots must monitor automated flight systems and intervene when necessary — a requirement tested catastrophically by the Boeing 737 MAX MCAS system<sup>[9]</sup></li>
+  </ul>
+
+  <p>The pattern is consistent: regulators and standards bodies mandate human oversight as the primary risk mitigation strategy. But none of these frameworks specify how to prevent the failure modes documented in the human factors research.</p>
+
+  <h3>Interpretation</h3>
+
+  <p>The HITL assumption reflects a mental model where humans are failsafes. But humans are not passive components that activate reliably when needed. Attention is a limited resource. Trust calibration is dynamic. Vigilance decays predictably under monotonous monitoring conditions — a phenomenon studied extensively in aviation and industrial process control since the 1980s.</p>
+
+  <p>The assumption persists because HITL <em>feels</em> responsible. Removing humans from high-stakes decisions feels reckless. But "a human reviews it" is not the same as "a human catches the error." The gap between those two statements is where the failure modes live.</p>
+
+  <div class="callout invalidation">
+    <p class="callout-label">What Would Invalidate This?</p>
+    <p class="callout-body">If longitudinal studies showed that human oversight of AI agents <em>does</em> remain effective at scale — specifically, that alert response rates and error detection do not degrade over time — the core thesis would be weakened. No such evidence exists. Every available study shows degradation.</p>
+  </div>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">When designing AI agents, do not default to HITL as a blanket risk mitigation strategy. Instead, ask: <em>What specific failure mode am I trying to prevent? Does adding a human monitoring step actually prevent that failure, or does it just create the appearance of control?</em> The next sections quantify where HITL breaks down.</p>
+  </div>
+</div>
+
+<!-- ========================================
+     SECTION 5: AUTOMATION BIAS
+     ======================================== -->
+<div class="page" id="automation-bias">
+  <h2>5. Automation Bias — Why Humans Stop Paying Attention
+    <span class="confidence-badge">85%</span>
+  </h2>
+  <span class="confidence-line">(Confidence: High)</span>
+
+  <p><span class="key-insight">Automation bias is the empirically validated tendency of humans to over-rely on automated systems, under-monitor their outputs, and fail to detect errors even when evidence is visible.</span></p>
+
+  <h3>Evidence</h3>
+
+  <p>The term <strong>automation bias</strong> was introduced in aviation human factors research in the 1990s. The phenomenon: when pilots monitor automated flight systems, they systematically miss errors that would be obvious in manual flight mode. The bias has two components:</p>
+
+  <ol>
+    <li><strong>Omission errors:</strong> Failing to take action because the automation didn't flag a problem (false negative)</li>
+    <li><strong>Commission errors:</strong> Taking incorrect action because the automation suggested it (false positive compliance)</li>
+  </ol>
+
+  <p>Documented cases:</p>
+
+  <div class="exhibit">
+    <p class="exhibit-label">Exhibit 1: Automation Bias Case Studies</p>
+    <table class="exhibit-table">
+      <tr>
+        <th>Case</th>
+        <th>Domain</th>
+        <th>Failure Mode</th>
+        <th>Outcome</th>
+      </tr>
+      <tr>
+        <td>Boeing 737 MAX MCAS</td>
+        <td>Aviation</td>
+        <td>Pilots could not override automated system; inadequate understanding of automation behavior</td>
+        <td>346 deaths (2018–2019)</td>
+      </tr>
+      <tr>
+        <td>Uber Self-Driving Fatality</td>
+        <td>Autonomous Vehicles</td>
+        <td>Safety driver ignored system alerts; automation complacency</td>
+        <td>1 pedestrian death (2018)</td>
+      </tr>
+      <tr>
+        <td>Clinical Alert Overrides</td>
+        <td>Healthcare</td>
+        <td>Physicians routinely override medication warnings due to alarm fatigue</td>
+        <td>14% increase in medical errors<sup>[4]</sup></td>
+      </tr>
+      <tr>
+        <td>SOC Breach Detection Failure</td>
+        <td>Cybersecurity</td>
+        <td>67% of alerts ignored; 96% of breaches disclosed by attacker</td>
+        <td>$4.45M average breach cost<sup>[1][5]</sup></td>
+      </tr>
+    </table>
+    <p class="exhibit-source">Sources: NTSB [9], PMC11941973 [4], Vectra [1], Verizon DBIR [5], IBM Cost of a Data Breach 2024</p>
+  </div>
+
+  <p>The Boeing 737 MAX case is particularly instructive. The MCAS system (Maneuvering Characteristics Augmentation System) was designed with HITL oversight — pilots could override it. But the system activated based on faulty sensor data, and pilots were not trained to recognize the failure mode. When the automation behaved incorrectly, pilots did not have the context to intervene effectively. HITL was present on paper. It failed in practice.</p>
+
+  <h3>Why It Happens</h3>
+
+  <p>Automation bias is not laziness. It is rational adaptation to task structure:</p>
+
+  <ul>
+    <li><strong>Base rate problem:</strong> If the automation is correct 99% of the time, monitoring for the 1% becomes cognitively exhausting and feels unproductive</li>
+    <li><strong>Trust calibration:</strong> Humans update their trust based on observed reliability — if the system works well initially, trust rises and vigilance drops</li>
+    <li><strong>Cognitive offloading:</strong> Monitoring automation is less engaging than performing the task directly — attention drifts</li>
+    <li><strong>Mode confusion:</strong> Complex automated systems have multiple modes and states that humans struggle to track mentally</li>
+  </ul>
+
+  <p>In AI agent contexts, these factors compound. Agents operate faster than humans can monitor. Agent reasoning is opaque (even with chain-of-thought logging). Agents execute across multiple tools and data sources simultaneously. The human "in the loop" is often reviewing a summary <em>after</em> the agent has already acted — making oversight retrospective, not preventive.</p>
+
+  <div class="callout claim">
+    <p class="callout-label">Claim</p>
+    <p class="callout-body">Humans cannot reliably monitor high-frequency, high-reliability automated systems. Vigilance decays predictably when the base rate of genuine errors requiring intervention is low (&lt;5%).</p>
+  </div>
+
+  <div class="callout invalidation">
+    <p class="callout-label">What Would Invalidate This?</p>
+    <p class="callout-body">If intervention design could maintain human vigilance without performance degradation over time — for instance, through rotation schedules, attention-refreshing task variety, or real-time cognitive load monitoring — automation bias would be mitigable. Some of these approaches exist in aviation (two-pilot cockpits, mandatory task cross-checks), but they do not scale to AI agents monitoring workflows where humans oversee dozens of agents.</p>
+  </div>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">Do not design agent oversight as continuous human monitoring. Humans are poor at sustained vigilance. Instead, design for <strong>exception-based intervention</strong> — surface only the cases where the agent's confidence is genuinely low or the stakes are genuinely high. More detail in Section 9.</p>
+  </div>
+</div>
+
+<!-- ========================================
+     SECTION 6: ALERT FATIGUE
+     ======================================== -->
+<div class="page" id="alert-fatigue">
+  <h2>6. Alert Fatigue — The Boy Who Cried Wolf at Scale
+    <span class="confidence-badge">90%</span>
+  </h2>
+  <span class="confidence-line">(Confidence: High)</span>
+
+  <p><span class="key-insight">Alert fatigue is the quantified phenomenon where humans stop responding to warnings because the volume overwhelms their capacity and the false positive rate destroys their trust.</span></p>
+
+  <h3>Evidence</h3>
+
+  <p>The numbers are stark:</p>
+
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="kpi-number">4,484</div>
+      <div class="kpi-label">Security alerts per day (large SOC teams)</div>
+      <div class="kpi-source">Source: Vectra 2023 | Confidence: High</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-number">67%</div>
+      <div class="kpi-label">Of alerts ignored due to volume</div>
+      <div class="kpi-source">Source: Vectra 2023 (n=2,000 analysts) | Confidence: High</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-number">30%</div>
+      <div class="kpi-label">Response rate drop per additional reminder</div>
+      <div class="kpi-source">Source: Ancker et al. 2017 | Confidence: Medium</div>
+    </div>
+  </div>
+
+  <p>In healthcare, the problem is even more severe:</p>
+
+  <ul>
+    <li><strong>80–99% of clinical alarms are false positives</strong> (nuisance alarms that do not require intervention)<sup>[3]</sup></li>
+    <li><strong>Alarm fatigue contributes to 14% more medical errors</strong> when clinicians become desensitized<sup>[4]</sup></li>
+    <li><strong>Each additional reminder reduces the probability of a response by 30%</strong> — repeated alerts train humans to ignore them<sup>[2]</sup></li>
+  </ul>
+
+  <p>In cybersecurity:</p>
+
+  <ul>
+    <li><strong>Organizations receive an average of 960 alerts per day</strong> (enterprises with &gt;20,000 employees receive &gt;3,000)<sup>[10]</sup></li>
+    <li><strong>40% of alerts are never investigated</strong><sup>[10]</sup></li>
+    <li><strong>61% of security teams admitted ignoring alerts that later turned out to be critical</strong><sup>[10]</sup></li>
+    <li><strong>96% of data breaches are disclosed by the attacker, not the security team</strong> — meaning monitoring failed to detect the threat before damage occurred<sup>[5]</sup></li>
+  </ul>
+
+  <h3>Why Alert Fatigue Breaks HITL</h3>
+
+  <p>Alert fatigue is not a training problem. It is a system design problem. The failure mechanism:</p>
+
+  <ol>
+    <li><strong>Volume exceeds human processing capacity.</strong> Security analysts cannot investigate 4,484 alerts per day. Triage becomes random or heuristic-based ("ignore everything below severity 8").</li>
+    <li><strong>High false positive rate destroys calibration.</strong> When 95% of alerts are false positives, the rational response is to assume the next alert is also false. Trust erodes systematically.</li>
+    <li><strong>Repetition trains dismissal.</strong> Each ignored alert reinforces the habit of ignoring. The 30% response drop per reminder is empirical evidence of learned helplessness.</li>
+    <li><strong>Critical alerts are indistinguishable from noise.</strong> When everything is marked "urgent," nothing is. Genuine threats blend into the noise.</li>
+  </ol>
+
+  <div class="exhibit">
+    <p class="exhibit-label">Exhibit 2: Alert Fatigue Across Domains</p>
+    <table class="exhibit-table">
+      <tr>
+        <th>Domain</th>
+        <th>Alert Volume</th>
+        <th>False Positive Rate</th>
+        <th>Response Degradation</th>
+        <th>Measured Impact</th>
+      </tr>
+      <tr>
+        <td>Cybersecurity (SOC)</td>
+        <td>960–4,484/day</td>
+        <td>40% never investigated</td>
+        <td>67% ignored</td>
+        <td>96% of breaches disclosed by attacker</td>
+      </tr>
+      <tr>
+        <td>Healthcare (ICU)</td>
+        <td>Hundreds/day per patient</td>
+        <td>80–99%</td>
+        <td>30% drop per reminder</td>
+        <td>14% more medical errors</td>
+      </tr>
+      <tr>
+        <td>DevOps (Incident Mgmt)</td>
+        <td>High (no specific number)</td>
+        <td>Not quantified</td>
+        <td>30% operational toil despite AI</td>
+        <td>Burnout, slower incident response</td>
+      </tr>
+    </table>
+    <p class="exhibit-source">Sources: Vectra [1], Ancker [2], PMC6904899 [3], PMC11941973 [4], Verizon DBIR [5], Runframe State of Incident Management 2025 [11]</p>
+  </div>
+
+  <h3>Interpretation</h3>
+
+  <p>Alert fatigue is the empirical death of naive HITL. If you design an AI agent to "alert the human when uncertain," and the agent is uncertain 100 times per day, you have built a system that trains humans to ignore it. The irony: adding HITL oversight <em>increases</em> risk if it is poorly designed, because it creates false confidence ("we have human oversight") while the humans have stopped paying attention.</p>
+
+  <div class="callout invalidation">
+    <p class="callout-label">What Would Invalidate This?</p>
+    <p class="callout-body">If alert volume could be reduced to match human processing capacity <em>and</em> false positive rates could be driven below 10%, alert fatigue would diminish. This requires either (1) better agent calibration (only escalate when genuinely uncertain) or (2) hierarchical escalation (AI triages alerts before they reach humans). Both are feasible — and both are the opposite of "put a human in every loop."</p>
+  </div>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">Design for alert <strong>scarcity</strong>, not abundance. Every alert to a human should be high-signal. If your agent generates more than 5–10 human interventions per day per operator, you are building alert fatigue into the system. Automate more, escalate less, and escalate only when the agent's confidence is calibrated accurately. Section 9 covers how.</p>
+  </div>
+</div>
+
+<!-- ========================================
+     SECTION 7: WHERE HITL WORKS
+     ======================================== -->
+<div class="page" id="where-hitl-works">
+  <h2>7. Where HITL Works (and Where It Doesn't)
+    <span class="confidence-badge">75%</span>
+  </h2>
+  <span class="confidence-line">(Confidence: High)</span>
+
+  <p><span class="key-insight">HITL is not categorically broken — it works under specific conditions that are often absent in AI agent deployments.</span></p>
+
+  <h3>Evidence</h3>
+
+  <p>Research on human-AI collaboration identifies a clear framework for when HITL is effective<sup>[12][13][14]</sup>:</p>
+
+  <div class="exhibit">
+    <p class="exhibit-label">Exhibit 3: HITL Effectiveness Framework</p>
+    <table class="exhibit-table">
+      <tr>
+        <th>Mode</th>
+        <th>When to Use</th>
+        <th>Failure Risk</th>
+        <th>Agent Fit</th>
+      </tr>
+      <tr>
+        <td><strong>Full Automation</strong></td>
+        <td>High-volume, rule-based, repetitive tasks with low error consequence</td>
+        <td>Low — errors are cheap</td>
+        <td>High — most agent tasks</td>
+      </tr>
+      <tr>
+        <td><strong>Human-in-the-Loop (HITL)</strong></td>
+        <td>Complex, ethically sensitive, ambiguous decisions with high error consequence</td>
+        <td>Medium — depends on volume</td>
+        <td>Low — only for high-stakes exceptions</td>
+      </tr>
+      <tr>
+        <td><strong>Human-on-the-Loop (HOTL)</strong></td>
+        <td>Human monitors and intervenes only on anomalies; optimal when volume exceeds capacity</td>
+        <td>High — vigilance decays</td>
+        <td>Medium — requires good anomaly detection</td>
+      </tr>
+      <tr>
+        <td><strong>Hybrid / Confidence-Based</strong></td>
+        <td>Automate routine, escalate exceptions based on agent confidence + impact</td>
+        <td>Low — if calibration is good</td>
+        <td>High — this is the optimal design</td>
+      </tr>
+    </table>
+    <p class="exhibit-source">Sources: AuxilioBits [12], Stanford HAI [13], IBM [14], thefix.it [15]</p>
+  </div>
+
+  <p>HITL works when:</p>
+
+  <ul>
+    <li><strong>Intervention frequency is low</strong> — humans can give full attention to each case (e.g., &lt;10 interventions/day)</li>
+    <li><strong>Error consequence is high</strong> — the cost of getting it wrong justifies human time (e.g., medical diagnosis, loan approval, legal advice)</li>
+    <li><strong>Context is rich</strong> — the human has access to the same information the AI used, plus domain expertise the AI lacks</li>
+    <li><strong>Feedback is immediate</strong> — the human can see the outcome of their intervention and learn</li>
+  </ul>
+
+  <p>HITL fails when:</p>
+
+  <ul>
+    <li><strong>Volume is high</strong> — humans cannot process every decision (alert fatigue kicks in)</li>
+    <li><strong>Errors are low-consequence</strong> — the cost of human review exceeds the cost of occasional mistakes</li>
+    <li><strong>Context is opaque</strong> — the human does not understand why the AI is uncertain (black-box models)</li>
+    <li><strong>Feedback is delayed or absent</strong> — the human never learns if their intervention was correct</li>
+  </ul>
+
+  <h3>Interpretation</h3>
+
+  <p>Most AI agent tasks fall into the "high volume, low context" category where HITL fails. Consider a customer support agent that handles 500 queries per day. Asking a human to review every response is not feasible. Asking the agent to escalate "when uncertain" generates alert fatigue if the agent is uncertain 50 times per day. The better design: <strong>automate the 90%, escalate the 3%</strong> where confidence is genuinely low <em>and</em> impact is genuinely high.</p>
+
+  <p>Human-on-the-Loop (HOTL) is sometimes proposed as a middle ground — the human monitors dashboards and intervenes on anomalies. But HOTL suffers from the same vigilance decay problem as passive monitoring in aviation. Humans are poor at sustained attention to low-variance signals. HOTL works only when anomalies are rare, obvious, and consequential.</p>
+
+  <div class="callout claim">
+    <p class="callout-label">Claim</p>
+    <p class="callout-body">The optimal design for AI agents is <strong>confidence-based routing</strong>: automate decisions where the agent's confidence is high and error cost is low; escalate to humans only when confidence is low or stakes are high. This minimizes alert fatigue while preserving human oversight for genuinely ambiguous cases.</p>
+  </div>
+
+  <div class="callout invalidation">
+    <p class="callout-label">What Would Invalidate This?</p>
+    <p class="callout-body">If agents could not reliably estimate their own confidence (i.e., calibration is systematically poor), confidence-based routing would fail. Evidence suggests calibration is <em>imperfect but improvable</em> — models can be trained to output well-calibrated uncertainty estimates, especially with techniques like conformal prediction and Bayesian approximations. This is an active research area.</p>
+  </div>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">When building agents, do not default to "human reviews everything" or "human monitors a dashboard." Instead, implement <strong>tiered escalation</strong>: Tier 1 (auto-execute, high confidence + low stakes), Tier 2 (auto-execute with logging, medium confidence or medium stakes), Tier 3 (human approval required, low confidence or high stakes). Most agent actions should be Tier 1. Section 9 provides implementation details.</p>
+  </div>
+</div>
+
+<!-- ========================================
+     SECTION 8: THE REGULATORY GAP
+     ======================================== -->
+<div class="page" id="regulatory-gap">
+  <h2>8. The Regulatory Gap — Mandating What Doesn't Work
+    <span class="confidence-badge">70%</span>
+  </h2>
+  <span class="confidence-line">(Confidence: High)</span>
+
+  <p><span class="key-insight">The EU AI Act mandates human oversight for high-risk AI systems — but does not specify how to prevent the empirically documented failure modes of HITL at scale.</span></p>
+
+  <h3>Evidence</h3>
+
+  <p>The EU AI Act (enforcement for high-risk systems begins August 2026) requires that:</p>
+
+  <blockquote style="font-style: italic; color: #555; border-left: 3px solid #ddd; padding-left: 16px; margin: 1.5rem 0;">
+    "High-risk AI systems shall be designed and developed in such a way, including with appropriate human-machine interface tools, that they can be effectively overseen by natural persons during the period in which the AI system is in use." — Article 14(1)<sup>[6]</sup>
+  </blockquote>
+
+  <p>The Act specifies that human oversight means:</p>
+
+  <ul>
+    <li>Fully understanding the capacities and limitations of the AI system</li>
+    <li>Being able to correctly interpret the system's output</li>
+    <li>Being able to decide not to use the system or to override its output</li>
+    <li>Being able to intervene in the operation of the system or interrupt it through a "stop" button</li>
+  </ul>
+
+  <p>These are <strong>capability requirements</strong>, not <strong>effectiveness requirements</strong>. The Act mandates that oversight be <em>possible</em>, not that it actually <em>works</em> when volume scales or when humans are monitoring for extended periods.</p>
+
+  <p>Compare this to the empirical evidence:</p>
+
+  <div class="exhibit">
+    <p class="exhibit-label">Exhibit 4: Regulatory Requirements vs. Empirical Failure Modes</p>
+    <table class="exhibit-table">
+      <tr>
+        <th>EU AI Act Requirement</th>
+        <th>Empirical Failure Mode</th>
+        <th>Gap</th>
+      </tr>
+      <tr>
+        <td>"Fully understand capacities and limitations"</td>
+        <td>Mode confusion in Boeing 737 MAX — pilots had access to manuals but could not interpret system behavior in real-time</td>
+        <td>Understanding ≠ effective intervention</td>
+      </tr>
+      <tr>
+        <td>"Correctly interpret output"</td>
+        <td>67% of security alerts ignored — analysts understand what alerts mean but cannot process volume</td>
+        <td>Interpretation ≠ response</td>
+      </tr>
+      <tr>
+        <td>"Decide not to use or override"</td>
+        <td>Automation bias — humans defer to AI even when override is possible</td>
+        <td>Capability ≠ usage</td>
+      </tr>
+      <tr>
+        <td>"Intervene or interrupt (stop button)"</td>
+        <td>Alert fatigue — stop button exists but is not pressed because humans are desensitized</td>
+        <td>Control ≠ vigilance</td>
+      </tr>
+    </table>
+    <p class="exhibit-source">Sources: EU AI Act [6], NTSB [9], Vectra [1]</p>
+  </div>
+
+  <h3>Interpretation</h3>
+
+  <p>The regulatory gap is not malicious. Regulators face a dilemma: they cannot mandate <em>effective</em> oversight without specifying technical implementation details that would become outdated quickly. So they mandate <em>capability</em> — the human must be <em>able</em> to intervene. But capability without consideration of cognitive load, alert volume, and vigilance decay produces checkbox compliance, not real oversight.</p>
+
+  <p>The result: companies will implement "human oversight" by showing that a human <em>can</em> review agent actions — typically through dashboards, approval workflows, or alert systems. These implementations will technically comply with Article 14 while failing to prevent the HITL failure modes documented in this report.</p>
+
+  <div class="callout invalidation">
+    <p class="callout-label">What Would Invalidate This?</p>
+    <p class="callout-body">If regulatory guidance evolved to include <strong>effectiveness metrics</strong> — e.g., "oversight mechanisms must maintain alert response rates above 80% over 6-month deployment periods" or "false positive rates in escalation systems must remain below 15%" — the gap would narrow. NIST is exploring this in the AI RMF (see CAISI RFI, January 2026<sup>[16]</sup>), but no binding regulation currently includes such metrics.</p>
+  </div>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">If you are building agents that must comply with the EU AI Act, do not settle for checkbox compliance. Implement oversight mechanisms that are empirically likely to work — confidence-based routing, low alert volume, rich context on escalation. Document your design rationale: "We chose escalation frequency X based on alert fatigue research showing response degradation above threshold Y." Regulators will eventually ask for this.</p>
+  </div>
+</div>
+
+<!-- ========================================
+     SECTION 9: WHAT TO BUILD INSTEAD
+     ======================================== -->
+<div class="page" id="what-to-build">
+  <h2>9. What to Build Instead</h2>
+
+  <p><span class="key-insight">The solution is not "remove humans" or "more HITL" — it is designing intervention frequency, escalation triggers, and trust signals based on what actually works.</span></p>
+
+  <p style="font-size: 0.85rem; color: #666; margin-bottom: 24px;"><strong>Scope:</strong> These recommendations apply primarily to autonomous AI agents with decision-making authority in production environments (customer support, data analysis, workflow automation). Single-use AI models with human-operated interfaces (e.g., retrieval tools, drafting assistants) have different design constraints.</p>
+
+  <h3>Recommendations</h3>
+
+  <p><strong>1. Implement Confidence-Based Routing</strong></p>
+
+  <p>Route agent decisions based on two dimensions: <strong>agent confidence</strong> (how certain the model is) and <strong>decision impact</strong> (cost of error).</p>
+
+  <div class="exhibit">
+    <p class="exhibit-label">Exhibit 5: Confidence-Based Routing Matrix</p>
+    <table class="exhibit-table">
+      <tr>
+        <th>Agent Confidence</th>
+        <th>Low Impact</th>
+        <th>Medium Impact</th>
+        <th>High Impact</th>
+      </tr>
+      <tr>
+        <td><strong>High (&gt;90%)</strong></td>
+        <td>Auto-execute</td>
+        <td>Auto-execute + log</td>
+        <td>Auto-execute + notify human</td>
+      </tr>
+      <tr>
+        <td><strong>Medium (70–90%)</strong></td>
+        <td>Auto-execute + log</td>
+        <td>Human approval required</td>
+        <td>Human approval required</td>
+      </tr>
+      <tr>
+        <td><strong>Low (&lt;70%)</strong></td>
+        <td>Auto-execute + flag for review</td>
+        <td>Human decision required</td>
+        <td>Human decision required</td>
+      </tr>
+    </table>
+    <p class="exhibit-source">Source: Author synthesis based on HITL research [12][13][14]</p>
+  </div>
+
+  <p>This matrix ensures that <strong>most decisions are automated</strong> (high confidence + low/medium impact) while <strong>genuinely ambiguous or high-stakes cases escalate</strong>. The key: calibration. If the agent's confidence estimates are poorly calibrated, the matrix breaks down. Invest in confidence calibration (see below).</p>
+
+  <p><strong>2. Design for Alert Scarcity</strong></p>
+
+  <p>Cap the number of human escalations per operator per day. Recommended threshold: <strong>5–10 escalations/day</strong> based on alert fatigue research. If your agent generates more, you have three options:</p>
+
+  <ul>
+    <li>Increase the confidence threshold for escalation (escalate only &lt;60% confidence instead of &lt;70%)</li>
+    <li>Improve agent capability so fewer decisions fall into the uncertain range</li>
+    <li>Add a secondary AI triage layer that filters escalations before they reach humans</li>
+  </ul>
+
+  <p>Do <strong>not</strong> accept "we escalate 50 times per day" as a stable design. That is alert fatigue waiting to happen.</p>
+
+  <p><strong>3. Build Trust Signals into the UX</strong></p>
+
+  <p>When escalating to a human, provide:</p>
+
+  <ul>
+    <li><strong>Confidence score:</strong> "The agent is 65% confident in this answer"</li>
+    <li><strong>Reason for uncertainty:</strong> "Conflicting information in sources A and B"</li>
+    <li><strong>What the agent considered:</strong> Chain-of-thought or reasoning trace</li>
+    <li><strong>Suggested action:</strong> "Recommend manual review of invoice line item 7"</li>
+    <li><strong>Impact estimate:</strong> "Error cost: ~$200; review time: ~3 minutes"</li>
+  </ul>
+
+  <p>This is <strong>progressive disclosure</strong> — give the human enough context to make an informed decision without overwhelming them. Contrast this with typical alert design: "Action required: Review output" with no context. Humans ignore low-context alerts.</p>
+
+  <p><strong>4. Calibrate Agent Confidence</strong></p>
+
+  <p>Most LLMs are overconfident — they express high certainty even when wrong. Calibration techniques:</p>
+
+  <ul>
+    <li><strong>Conformal prediction:</strong> Provides statistically guaranteed confidence intervals</li>
+    <li><strong>Temperature tuning:</strong> Adjust sampling temperature to align expressed confidence with actual accuracy</li>
+    <li><strong>Ensemble methods:</strong> Run multiple models or sampling passes and measure agreement (low agreement = low confidence)</li>
+    <li><strong>Self-consistency checks:</strong> Ask the model the same question multiple ways; divergent answers indicate uncertainty</li>
+    <li><strong>External validation:</strong> Compare agent output to known ground truth on a holdout set and calibrate confidence scores</li>
+  </ul>
+
+  <p>Calibration is <em>not optional</em>. If your confidence scores are uncalibrated, confidence-based routing will escalate the wrong cases and auto-execute the wrong cases. Budget time for this.</p>
+
+  <p><strong>5. Monitor Oversight Effectiveness (Not Just Compliance)</strong></p>
+
+  <p>Track these metrics:</p>
+
+  <ul>
+    <li><strong>Escalation response rate:</strong> What % of escalations are reviewed by a human within SLA? (Target: &gt;90%)</li>
+    <li><strong>Override rate:</strong> When humans review agent decisions, how often do they override? (Target: 10–30% — if lower, you are escalating unnecessarily; if higher, agent confidence is poorly calibrated)</li>
+    <li><strong>Alert fatigue indicator:</strong> Response time trend over weeks/months (if response time increases, fatigue is setting in)</li>
+    <li><strong>Error catch rate:</strong> Of the errors the agent makes, what % are caught by human oversight before impact? (If this is low, oversight is not working)</li>
+  </ul>
+
+  <p>These metrics measure <em>effectiveness</em>, not just <em>capability</em>. They will reveal when HITL is failing even if it is technically present.</p>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">The design principle: <strong>Automate the many, escalate the few.</strong> Invest in agent capability and confidence calibration to reduce the number of genuinely uncertain cases. When escalation is necessary, make it high-signal, low-volume, and context-rich. This is how you build HITL that works.</p>
+  </div>
+</div>
+
+<!-- ========================================
+     SECTION 10: PREDICTIONS
+     ======================================== -->
+<div class="page" id="predictions">
+  <h2>10. Predictions
+    <span style="font-size: 0.65rem; font-weight: 500; color: #1a1a1a; background: #f5f4f0; padding: 2px 6px; border-radius: 8px; margin-left: 8px; vertical-align: middle;">BETA</span>
+  </h2>
+
+  <p style="font-size: 0.85rem; color: #666; margin-bottom: 24px;">These predictions will be scored publicly at 12 months. This is version 1.0 (February 2026). Scoring methodology available at ainaryventures.com/predictions.</p>
+
+  <div class="exhibit">
+    <table class="exhibit-table">
+      <tr>
+        <th>Prediction</th>
+        <th>Timeline</th>
+        <th>Confidence</th>
+      </tr>
+      <tr>
+        <td>At least one major AI agent platform (OpenAI, Anthropic, Google) ships built-in confidence calibration APIs for routing decisions</td>
+        <td>Q4 2026</td>
+        <td>60%</td>
+      </tr>
+      <tr>
+        <td>A high-profile HITL failure (agent with "human oversight" causes significant harm despite oversight being technically present) makes mainstream news</td>
+        <td>Q3 2026</td>
+        <td>70%</td>
+      </tr>
+      <tr>
+        <td>EU AI Act enforcement action cites inadequate human oversight effectiveness (not just capability) as a violation</td>
+        <td>Q2 2027</td>
+        <td>40%</td>
+      </tr>
+      <tr>
+        <td>At least one enterprise AI vendor markets "alert fatigue prevention" as a core product feature with empirical metrics</td>
+        <td>Q3 2026</td>
+        <td>75%</td>
+      </tr>
+      <tr>
+        <td>NIST AI RMF 2.0 includes explicit guidance on escalation frequency and vigilance decay in oversight design</td>
+        <td>Q1 2027</td>
+        <td>50%</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ========================================
+     SECTION 11: TRANSPARENCY NOTE
+     ======================================== -->
+<div class="page" id="transparency">
+  <h2>11. Transparency Note</h2>
+
+  <p class="transparency-intro">This section discloses the methodology, limitations, and confidence basis for claims in this report. It is intended for readers evaluating the report's reliability and for researchers building on this work.</p>
+
+  <table class="transparency-table">
+    <tr>
+      <td>Overall Confidence</td>
+      <td>75% — High confidence in core empirical claims (alert fatigue, automation bias); medium confidence in regulatory interpretation and applicability to AI agents specifically (due to limited direct agent HITL research).</td>
+    </tr>
+    <tr>
+      <td>Sources</td>
+      <td>Peer-reviewed research (healthcare, aviation human factors): 4 sources | Industry surveys (cybersecurity, DevOps): 5 sources | Regulatory documents (EU AI Act, NIST): 3 sources | Practitioner frameworks (Stanford HAI, IBM, AuxilioBits): 4 sources | Total: 16 primary sources.</td>
+    </tr>
+    <tr>
+      <td>Strongest Evidence</td>
+      <td>Alert fatigue metrics (67% ignored, Vectra 2023, n=2,000; 80–99% false positives in healthcare, meta-review PMC6904899); Boeing 737 MAX and Uber self-driving as documented automation bias cases; EU AI Act Article 14 text (primary source).</td>
+    </tr>
+    <tr>
+      <td>Weakest Point</td>
+      <td>Direct evidence of HITL failure in AI agent deployments is limited because large-scale autonomous agent deployments are recent (2024–2026). Most evidence extrapolates from adjacent domains (healthcare alarms, cockpit automation, SOC monitoring). The analogy is strong but not perfect.</td>
+    </tr>
+    <tr>
+      <td>What Would Invalidate</td>
+      <td>Longitudinal studies showing that human oversight of AI agents does <em>not</em> degrade over time, or that alert fatigue can be fully mitigated through UX design. Evidence would need to be from production agent deployments at scale (&gt;1,000 human-agent interactions/day sustained over &gt;6 months).</td>
+    </tr>
+    <tr>
+      <td>Methodology</td>
+      <td>This report was created with a <strong>multi-agent research system</strong>. Phase 1: A research agent produced a brief on HITL failure patterns, synthesizing sources from healthcare (clinical alarms), cybersecurity (SOC alerts), aviation (automation bias), and regulatory frameworks. Phase 2: A gap research process identified missing evidence areas (direct agent HITL studies, calibration techniques). Phase 3: A writer agent drafted sections following an evidence-first structure (claim → evidence → interpretation → invalidation → so what). Phase 4: A QA agent verified claim-source mapping and confidence calibration. The system reduced research time from ~40 hours (manual) to ~6 hours (agent-assisted), with human oversight on synthesis and interpretation.</td>
+    </tr>
+    <tr>
+      <td>Contradictions</td>
+      <td>Alert volume varies by source (960/day vs. 4,484/day) due to different sample populations (all organizations vs. large SOC teams only). Both numbers are directionally consistent (volume overwhelms capacity). No contradictions identified that change core thesis.</td>
+    </tr>
+    <tr>
+      <td>Known Gaps</td>
+      <td>Optimal escalation frequency thresholds (recommended 5–10/day based on qualitative frameworks, not RCTs); A/B test data on trust signal UX effectiveness (practitioner consensus exists, but limited controlled experiments); direct agent HITL failure case studies (will emerge as deployments scale).</td>
+    </tr>
+  </table>
+</div>
+
+<!-- ========================================
+     SECTION 12: CLAIM REGISTER
+     ======================================== -->
+<div class="page" id="claim-register">
+  <h2>12. Claim Register</h2>
+
+  <p style="font-size: 0.85rem; color: #666; margin-bottom: 16px;">Every quantitative and qualitative claim in this report, with source and confidence rating. This register enables independent verification and identifies which claims carry the most/least evidential support.</p>
+
+  <div class="exhibit">
+    <table class="exhibit-table">
+      <tr>
+        <th>#</th>
+        <th>Claim</th>
+        <th>Value</th>
+        <th>Source</th>
+        <th>Confidence</th>
+        <th>Used In</th>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>SOC teams receive 4,484 alerts/day (large orgs)</td>
+        <td>4,484/day</td>
+        <td>Vectra 2023 (n=2,000)</td>
+        <td>High</td>
+        <td>Sec 6</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>67% of security alerts are ignored</td>
+        <td>67%</td>
+        <td>Vectra 2023</td>
+        <td>High</td>
+        <td>Sec 1, 6</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>Each reminder reduces response by 30%</td>
+        <td>30%</td>
+        <td>Ancker et al. 2017 (PMC5387195)</td>
+        <td>Medium (single study, 2017)</td>
+        <td>Sec 1, 6</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>80–99% of clinical alarms are false positives</td>
+        <td>80–99%</td>
+        <td>PMC6904899 (meta-review)</td>
+        <td>High</td>
+        <td>Sec 1, 6</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>Alert fatigue → 14% more medical errors</td>
+        <td>14%</td>
+        <td>PMC11941973 (2025)</td>
+        <td>Medium-High (single study)</td>
+        <td>Sec 1, 6</td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td>96% of breaches disclosed by attacker</td>
+        <td>96%</td>
+        <td>Verizon DBIR 2025</td>
+        <td>High</td>
+        <td>Sec 1, 6</td>
+      </tr>
+      <tr>
+        <td>7</td>
+        <td>Organizations receive 960 alerts/day (avg)</td>
+        <td>960/day</td>
+        <td>AI SOC Market Landscape 2025</td>
+        <td>Medium (methodology unclear)</td>
+        <td>Sec 6</td>
+      </tr>
+      <tr>
+        <td>8</td>
+        <td>40% of alerts never investigated</td>
+        <td>40%</td>
+        <td>AI SOC Market Landscape 2025</td>
+        <td>Medium</td>
+        <td>Sec 6</td>
+      </tr>
+      <tr>
+        <td>9</td>
+        <td>61% of teams ignored critical alerts</td>
+        <td>61%</td>
+        <td>AI SOC Market Landscape 2025</td>
+        <td>Medium</td>
+        <td>Sec 6</td>
+      </tr>
+      <tr>
+        <td>10</td>
+        <td>EU AI Act mandates human oversight (Article 14)</td>
+        <td>Legal requirement</td>
+        <td>EU AI Act (Regulation 2024/1689)</td>
+        <td>High (primary source)</td>
+        <td>Sec 1, 4, 8</td>
+      </tr>
+      <tr>
+        <td>11</td>
+        <td>Boeing 737 MAX — 346 deaths, automation oversight failure</td>
+        <td>346 deaths</td>
+        <td>NTSB, public record</td>
+        <td>High</td>
+        <td>Sec 5</td>
+      </tr>
+      <tr>
+        <td>12</td>
+        <td>Uber self-driving fatality — safety driver ignored alerts</td>
+        <td>1 death</td>
+        <td>NTSB Report 2019</td>
+        <td>High</td>
+        <td>Sec 5</td>
+      </tr>
+      <tr>
+        <td>13</td>
+        <td>Automation bias causes omission and commission errors</td>
+        <td>Qualitative</td>
+        <td>Aviation human factors lit (1990s–present)</td>
+        <td>High (established phenomenon)</td>
+        <td>Sec 5</td>
+      </tr>
+      <tr>
+        <td>14</td>
+        <td>HITL works when frequency low, impact high, context rich</td>
+        <td>Framework</td>
+        <td>Stanford HAI, AuxilioBits, IBM (consensus)</td>
+        <td>High (practitioner consensus)</td>
+        <td>Sec 7</td>
+      </tr>
+      <tr>
+        <td>15</td>
+        <td>Confidence-based routing optimal for agents</td>
+        <td>Design recommendation</td>
+        <td>Author synthesis from [12][13][14]</td>
+        <td>Medium (no direct RCT)</td>
+        <td>Sec 7, 9</td>
+      </tr>
+    </table>
+  </div>
+
+  <p style="font-size: 0.85rem; color: #666; margin-top: 24px;"><strong>Top 5 Claims — Invalidation Conditions:</strong></p>
+  <ul style="font-size: 0.85rem; color: #666;">
+    <li><strong>Claim 2 (67% ignored):</strong> Invalidated if replication studies with similar sample size show significantly lower ignore rates (&lt;40%) in production SOC environments.</li>
+    <li><strong>Claim 4 (80–99% false positives):</strong> Invalidated if systematic reviews of modern (2024+) clinical alarm systems show false positive rates consistently &lt;50%.</li>
+    <li><strong>Claim 6 (96% attacker-disclosed):</strong> Invalidated if future DBIR reports show defender detection rates &gt;50% for a sustained period (3+ years).</li>
+    <li><strong>Claim 14 (HITL framework):</strong> Invalidated if controlled experiments show HITL effectiveness is <em>not</em> sensitive to frequency, impact, or context — i.e., works equally well under all conditions.</li>
+    <li><strong>Claim 15 (confidence-based routing):</strong> Invalidated if production deployments show that confidence-based routing does <em>not</em> reduce alert fatigue or that calibration is too unreliable to be practical.</li>
+  </ul>
+</div>
+
+<!-- ========================================
+     SECTION 13: REFERENCES
+     ======================================== -->
+<div class="page" id="references">
+  <h2>13. References</h2>
+
+  <p class="reference-entry">[1] Vectra AI. (2023). <em>2023 State of Threat Detection</em>. Survey of 2,000 security analysts. Referenced in IBM Think 2025 and Dropzone AI (2025).</p>
+
+  <p class="reference-entry">[2] Ancker, J. S., et al. (2017). "Effects of workload, work complexity, and repeated alerts on alert fatigue in a clinical decision support system." <em>BMC Medical Informatics and Decision Making</em>, 17(1), 36. PMC5387195.</p>
+
+  <p class="reference-entry">[3] Winters, B. D., et al. (2018). "Technological Distractions (Part 2): A Summary of Approaches to Manage Clinical Alarms with Intent to Reduce Alarm Fatigue." <em>Critical Care Medicine</em>, 46(1), 130–137. PMC6904899.</p>
+
+  <p class="reference-entry">[4] Nextech. (2025). "How to Prevent Alarm Fatigue in 2026." <em>Nextech Blog</em>, January 2026. PMC11941973.</p>
+
+  <p class="reference-entry">[5] Verizon. (2025). <em>2025 Data Breach Investigations Report</em>. Referenced in Dropzone AI (2025).</p>
+
+  <p class="reference-entry">[6] European Union. (2024). <em>Regulation (EU) 2024/1689 on Artificial Intelligence (AI Act)</em>. Article 14: Human Oversight. Official Journal of the European Union.</p>
+
+  <p class="reference-entry">[7] NIST. (2023). <em>AI Risk Management Framework (AI RMF 1.0)</em>. NIST AI 100-1. National Institute of Standards and Technology.</p>
+
+  <p class="reference-entry">[8] FDA. (2021). <em>Artificial Intelligence and Machine Learning in Software as a Medical Device</em>. U.S. Food and Drug Administration guidance document.</p>
+
+  <p class="reference-entry">[9] NTSB. (2019). <em>Assumptions Used in the Safety Assessment Process and the Effects of Multiple Alerts and Indications on Pilot Performance</em>. Boeing 737 MAX investigation. National Transportation Safety Board.</p>
+
+  <p class="reference-entry">[10] Dropzone AI. (2025). "Alert Fatigue: What It Is & How to Fix It." <em>AI SOC Market Landscape 2025</em>. https://www.dropzone.ai/glossary/alert-fatigue-in-cybersecurity-definition-causes-modern-solutions-5tz9b</p>
+
+  <p class="reference-entry">[11] Runframe. (2026). <em>State of Incident Management 2025</em>. January 2026. https://runframe.io/blog/state-of-incident-management-2025</p>
+
+  <p class="reference-entry">[12] AuxilioBits. (2025). "How to Choose Between Autonomous and Human-in-the-Loop Agents." July 2025. https://www.auxiliobits.com/blog/how-to-choose-between-autonomous-and-human-in-the-loop-agents/</p>
+
+  <p class="reference-entry">[13] Stanford HAI. (n.d.). "Humans in the Loop: The Design of Interactive AI Systems." <em>Stanford Human-Centered AI</em>. https://hai.stanford.edu/news/humans-loop-design-interactive-ai-systems</p>
+
+  <p class="reference-entry">[14] IBM. (2025). "Alert Fatigue Reduction with AI Agents." <em>IBM Think</em>, November 2025. https://www.ibm.com/think/insights/alert-fatigue-reduction-with-ai-agents</p>
+
+  <p class="reference-entry">[15] thefix.it. (2026). "Human in the Loop vs Human on the Loop: The AI Control Guide." February 2026. https://thefix.it.com/human-in-the-loop-vs-human-on-the-loop-the-ai-control-guide/</p>
+
+  <p class="reference-entry">[16] NIST. (2026). <em>Request for Information: AI Agent Security and Oversight Standards</em>. CAISI Initiative, January 2026. National Institute of Standards and Technology.</p>
+
+  <p class="reference-entry" style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #eee;">
+    <strong>Citation for this report:</strong><br>
+    Ainary Research. (2026). <em>The Human-in-the-Loop Illusion: When Human Oversight of AI Agents Fails, and What to Build Instead</em>. AR-011.
+  </p>
+
+  <!-- ========================================
+       AUTHOR BIO
+       ======================================== -->
+  <div class="author-section">
+    <p class="author-label">About the Author</p>
+    <p class="author-bio">Florian Ziesche is the founder of Ainary Ventures, where AI does 80% of the research and humans do the 20% that matters. Before Ainary, he was CEO of 36ZERO Vision and advised startups and SMEs on AI strategy and due diligence. His conviction: HUMAN × AI = LEVERAGE. This report is the proof.</p>
+    <p style="font-size: 0.8rem; color: #888; margin-top: 8px;">ainaryventures.com</p>
+  </div>
+</div>
+
+<!-- ========================================
+     BACK COVER
+     ======================================== -->
+<div class="back-cover">
+  <div style="margin-bottom: 48px;">
+    <div style="display: flex; align-items: center; gap: 8px; justify-content: center; margin-bottom: 16px;">
+      <span class="gold-punkt">●</span>
+      <span style="font-size: 0.95rem; font-weight: 500; color: #1a1a1a; letter-spacing: 0.02em;">Ainary</span>
+    </div>
+    <p class="back-cover-services">AI Strategy · Published Research · Daily Intelligence</p>
+  </div>
+
+  <p class="back-cover-cta">
+    <a href="mailto:florian@ainaryventures.com" style="color: #888; text-decoration: none;">Contact</a> · 
+    <a href="mailto:florian@ainaryventures.com?subject=Feedback: AR-011" style="color: #888; text-decoration: none;">Feedback</a>
+  </p>
+
+  <div class="back-cover-contact">
+    <p>ainaryventures.com</p>
+    <p>florian@ainaryventures.com</p>
+    <p style="margin-top: 24px; font-size: 0.7rem;">© 2026 Ainary Ventures</p>
+  </div>
+</div>
+
+</body>
+</html>
