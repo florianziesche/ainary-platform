@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Landing Page Rebuild — Complete Chooser</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  :root {
+    --bg: #fafaf8; --text: #1a1a1a; --text-s: #555; --text-m: #888;
+    --gold: #c8aa50; --border: #e5e3dc; --surface: #f5f4f0;
+    --sel: rgba(200,170,80,0.12); --sel-b: var(--gold); --sidebar-w: 250px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; font-size: 15px; -webkit-font-smoothing: antialiased; }
+
+  .sidebar {
+    position: fixed; top: 0; left: 0; width: var(--sidebar-w); height: 100vh;
+    overflow-y: auto; background: #f3f2ee; border-right: 1px solid var(--border);
+    padding: 1.5rem 1rem; z-index: 100;
+  }
+  .sidebar h2 { font-size: 0.65rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-m); margin-bottom: 1rem; }
+  .sidebar .sep { font-size: 0.55rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-m); margin: 14px 0 6px; padding-top: 10px; border-top: 1px solid var(--border); }
+  .sidebar a { display: block; padding: 0.3rem 0.6rem; font-size: 0.75rem; color: var(--text-s); text-decoration: none; border-radius: 4px; margin-bottom: 1px; }
+  .sidebar a:hover { background: var(--surface); color: var(--text); }
+  .sidebar .pick-count { font-size: 0.65rem; color: var(--gold); margin-top: 16px; font-weight: 600; }
+
+  .main { margin-left: var(--sidebar-w); padding: 28px 36px 80px; max-width: 980px; }
+  .main > h1 { font-size: 1.2rem; font-weight: 700; margin-bottom: 4px; }
+  .main > p { font-size: 0.8rem; color: var(--text-s); margin-bottom: 28px; }
+
+  .sdiv { font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-m); margin: 44px 0 14px; padding-bottom: 6px; border-bottom: 1px solid var(--border); scroll-margin-top: 16px; }
+
+  .opt {
+    border: 2px solid var(--border); border-radius: 12px; overflow: hidden;
+    margin-bottom: 20px; cursor: pointer; transition: all 0.2s; position: relative;
+  }
+  .opt:hover { border-color: #ccc; }
+  .opt.sel { border-color: var(--gold); box-shadow: 0 0 0 3px var(--sel); }
+  .opt.sel::after { content: '★ PICK'; position: absolute; top: 10px; right: 10px; background: var(--gold); color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 0.55rem; font-weight: 700; z-index: 5; }
+
+  .oh { padding: 12px 18px; background: #fff; border-bottom: 1px solid #f0f0ec; display: flex; justify-content: space-between; align-items: center; }
+  .on { font-size: 0.82rem; font-weight: 700; }
+  .oc { font-size: 0.6rem; font-weight: 600; padding: 2px 7px; border-radius: 4px; }
+  .ch { background: #e8f5e9; color: #2e7d32; }
+  .cm { background: #fff3e0; color: #e65100; }
+  .cl { background: #fce4ec; color: #c62828; }
+
+  .orat { padding: 10px 18px; background: #fff; font-size: 0.75rem; color: var(--text-s); border-bottom: 1px solid #f0f0ec; line-height: 1.6; }
+  .orat strong { color: var(--text); }
+
+  .prev { background: #08080c; padding: 28px; color: #ededf0; font-family: 'Inter', sans-serif; overflow-x: auto; }
+
+  .cmt { padding: 10px 18px; background: var(--surface); display: flex; gap: 8px; align-items: center; }
+  .cmt label { font-size: 0.65rem; color: var(--text-m); white-space: nowrap; }
+  .cmt input { flex: 1; padding: 6px 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 0.75rem; font-family: inherit; background: #fff; }
+  .cmt input:focus { outline: none; border-color: var(--gold); }
+
+  /* Preview helpers */
+  .p-label { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.1em; color: #55555e; margin-bottom: 12px; font-weight: 600; }
+  .p-tabs { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; }
+  .p-tab { padding: 6px 16px; border: 1px solid rgba(255,255,255,0.08); border-radius: 7px; font-size: 0.72rem; color: #8b8b95; }
+  .p-tab.act { border-color: rgba(200,170,80,0.3); color: #c8aa50; background: rgba(200,170,80,0.08); }
+  .p-card { background: #111116; border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 18px; margin-bottom: 8px; }
+  .p-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .p-stat { text-align: center; }
+  .p-stat-n { font-size: 1.1rem; font-weight: 600; color: #c8aa50; }
+  .p-stat-l { font-size: 0.55rem; color: #55555e; margin-top: 2px; }
+
+  .exp-bar { margin-top: 40px; }
+  .exp-btn { background: var(--gold); color: #fff; border: none; padding: 10px 20px; border-radius: 7px; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .exp-out { margin-top: 10px; padding: 14px; background: #1a1a1a; color: #ededf0; border-radius: 7px; font-family: monospace; font-size: 0.72rem; white-space: pre-wrap; display: none; }
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <h2>Landing Rebuild</h2>
+  <a href="#s1">S1 — Tab Order & Labels</a>
+  <a href="#s2">S2 — Tab 1: AI Research</a>
+  <a href="#s3">S3 — Tab 2: Second Brain</a>
+  <a href="#s4">S4 — Tab 3: AI Systems</a>
+  <div class="sep">Below Showcase</div>
+  <a href="#s5">S5 — Value Pillars</a>
+  <a href="#s6">S6 — Why I Built This</a>
+  <a href="#s7">S7 — KPI Bar (below hero)</a>
+  <div class="sep">Actions</div>
+  <a href="#export">Export Picks</a>
+  <div class="pick-count" id="pc">0/7 picked</div>
+</div>
+
+<div class="main">
+<h1>Landing Page Rebuild — Complete Chooser</h1>
+<p>7 sections. Pick one option per section. Comment. Export. One build.</p>
+
+<!-- ===================== S1: TAB ORDER ===================== -->
+<div id="s1" class="sdiv">S1 — Showcase Tab Order & Labels</div>
+
+<div class="opt" id="opt-s1a" onclick="sel('s1','a')">
+  <div class="oh">
+    <span class="on">A — AI Research → Second Brain → AI Systems ★</span>
+    <span class="oc ch">90%</span>
+  </div>
+  <div class="orat">
+    <strong>Why:</strong> Flywheel-Logik. Research produziert Wissen → Second Brain compoundiert es → AI Systems deployen es in Tage. Jeder Tab baut auf dem vorherigen auf. Nicht 3 separate Cases, sondern eine Story. <strong>Dein Input: "Research is essential to be at the top."</strong>
+  </div>
+  <div class="prev">
+    <div class="p-tabs">
+      <span class="p-tab act">AI Research</span>
+      <span class="p-tab">Second Brain</span>
+      <span class="p-tab">AI Systems</span>
+    </div>
+    <div style="text-align:center;font-size:0.7rem;color:#55555e;margin-top:8px;">Research → Knowledge → Deployment</div>
+  </div>
+  <div class="cmt"><label>Comment:</label><input type="text" id="c-s1a"></div>
+</div>
+
+<div class="opt" id="opt-s1b" onclick="sel('s1','b')">
+  <div class="oh">
+    <span class="on">B — AI Systems → AI Research → Second Brain</span>
+    <span class="oc cm">45%</span>
+  </div>
+  <div class="orat">
+    <strong>Why:</strong> Lead mit dem stärksten Business Case (€50K). Aber: bricht die Story-Logik. Besucher sehen "CNC Quoting" und denken "das ist ein Nischen-Tool." Erst Research zeigen positioniert dich als Denker, nicht als Implementierer.
+  </div>
+  <div class="prev">
+    <div class="p-tabs">
+      <span class="p-tab act">AI Systems</span>
+      <span class="p-tab">AI Research</span>
+      <span class="p-tab">Second Brain</span>
+    </div>
+  </div>
+  <div class="cmt"><label>Comment:</label><input type="text" id="c-s1b"></div>
+</div>
+
+<!-- ===================== S2: TAB 1 CONTENT — AI RESEARCH ===================== -->
+<div id="s2" class="sdiv">S2 — Tab 1: AI Research (Content)</div>
+
+<div class="opt" id="opt-s2a" onclick="sel('s2','a')">
+  <div class="oh">
+    <span class="on">A — Real Report Preview (AR-001 Agent Trust) ★</span>
+    <span class="oc ch">90%</span>
+  </div>
+  <div class="orat">
+    <strong>Why:</strong> Zeigt den ECHTEN publizierten Report. Findings, Confidence Bars, Claim Transparency, Source Pills. Alles verifizierbar — Besucher können den Report lesen. Kein Fake. Nutzt das ai-research-visual.png Format. <strong>Confidence 90% weil: echte Daten, echter Report, live link.</strong>
+  </div>
+  <div class="prev">
+    <div class="p-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <div>
+          <div style="font-size:0.55rem;color:#55555e;font-family:monospace;">AR-001 · FEB 2026</div>
+          <div style="font-size:0.85rem;font-weight:600;">State of AI Agent Trust 2026</div>
+        </div>
+        <span style="padding:4px 10px;background:rgba(200,170,80,0.1);color:#c8aa50;border-radius:6px;font-size:0.58rem;font-weight:600;font-family:monospace;">73% CONFIDENCE</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div>
+          <div style="font-size:0.62rem;font-weight:600;color:#ededf0;margin-bottom:8px;">Key Findings</div>
+          <div style="padding:8px 12px;background:rgba(255,255,255,0.025);border-radius:8px;border:1px solid rgba(255,255,255,0.05);margin-bottom:6px;">
+            <div style="font-size:0.72rem;font-weight:500;">Trust gap costs $4.2B/yr in delayed adoption</div>
+            <div style="font-size:0.55rem;color:#55555e;">McKinsey · Gartner 2025</div>
+          </div>
+          <div style="padding:8px 12px;background:rgba(255,255,255,0.025);border-radius:8px;border:1px solid rgba(255,255,255,0.05);margin-bottom:6px;">
+            <div style="font-size:0.72rem;font-weight:500;">87% experiment — only 14% deploy in production</div>
+            <div style="font-size:0.55rem;color:#55555e;">Deloitte Q4 2025</div>
+          </div>
+          <div style="padding:8px 12px;background:rgba(255,255,255,0.025);border-radius:8px;border:1px solid rgba(255,255,255,0.05);">
+            <div style="font-size:0.72rem;font-weight:500;">Verifiable outputs increase adoption 3.2×</div>
+            <div style="font-size:0.55rem;color:#55555e;">MIT 2025</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:0.62rem;font-weight:600;color:#ededf0;margin-bottom:8px;">Confidence Breakdown</div>
+          <div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:0.6rem;color:#8b8b95;margin-bottom:3px;"><span>Data Quality</span><span style="color:#c8aa50;">78%</span></div><div style="height:3px;background:rgba(255,255,255,0.04);border-radius:2px;overflow:hidden;"><div style="width:78%;height:100%;background:#c8aa50;border-radius:2px;"></div></div></div>
+          <div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:0.6rem;color:#8b8b95;margin-bottom:3px;"><span>Source Diversity</span><span style="color:#c8aa50;">82%</span></div><div style="height:3px;background:rgba(255,255,255,0.04);border-radius:2px;overflow:hidden;"><div style="width:82%;height:100%;background:#c8aa50;border-radius:2px;"></div></div></div>
+          <div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;font-size:0.6rem;color:#8b8b95;margin-bottom:3px;"><span>Recency</span><span style="color:#c8aa50;">71%</span></div><div style="height:3px;background:rgba(255,255,255,0.04);border-radius:2px;overflow:hidden;"><div style="width:71%;height:100%;background:#c8aa50;border-radius:2px;"></div></div></div>
+          <div style="margin-bottom:14px;"><div style="display:flex;justify-content:space-between;font-size:0.6rem;color:#8b8b95;margin-bottom:3px;"><span>Methodology</span><span style="color:#c8aa50;">65%</span></div><div style="height:3px;background:rgba(255,255,255,0.04);border-radius:2px;overflow:hidden;"><div style="width:65%;height:100%;background:#c8aa50;border-radius:2px;"></div></div></div>
+          <div style="display:flex;gap:8px;">
+            <div style="flex:1;text-align:center;padding:10px;border:1px solid rgba(255,255,255,0.06);border-radius:8px;"><div style="font-size:1rem;font-weight:600;">47</div><div style="font-size:0.5rem;color:#55555e;">Sources</div></div>
+            <div style="flex:1;text-align:center;padding:10px;border:1px solid rgba(255,255,255,0.06);border-radius:8px;"><div style="font-size:1rem;font-weight:600;">18/20</div><div style="font-size:0.5rem;color:#55555e;">QA Score</div></div>
+            <div style="flex:1;text-align:center;padding:10px;border:1px solid rgba(255,255,255,0.06);border-radius:8px;"><div style="font-size:1rem;font-weight:600;">&lt;10m</div><div style="font-size:0.5rem;color:#55555e;">Build Time</div></div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06);font-size:0.52rem;color:#4a4a52;font-family:monospace;">5 agents · 3 synthesis rounds · 25+ source types</div>
+    </div>
+  </div>
+  <div class="cmt"><label>Comment:</label><input type="text" id="c-s2a"></div>
+</div>
+
+<div class="opt" id="opt-s2b" onclick="sel('s2','b')">
+  <div class="oh">
+    <span class="on">B — Keep current (Arclight Due Diligence style)</span>
+    <span class="oc cl">30%</span>
+  </div>
+  <div class="orat">
+    <strong>Why not:</strong> Arclight AI ist fiktiv. Du hast "fake product pages" selbst kritisiert. Wenn jemand Arclight googelt — nichts. Zerstört Credibility. Nur Option wenn du KEINEN echten Report zeigen willst. <strong>30% weil: widersprüchlich zu "honest about gaps" Positioning.</strong>
+  </div>
+  <div class="prev" style="text-align:center;min-height:80px;display:flex;align-items:center;justify-content:center;">
+    <span style="font-size:0.75rem;color:#55555e;font-style:italic;">[Current content — Arclight AI fictional due diligence]</span>
+  </div>
+  <div class="cmt"><label>Comment:</label><input type="text" id="c-s2b"></div>
+</div>
+
+<!-- ===================== S3: TAB 2 — SECOND BRAIN ===================== -->
+<div id="s3" class="sdiv">S3 — Tab 2: Second Brain (Content)</div>
+
+<div class="opt" id="opt-s3a" onclick="sel('s3','a')">
+  <div class="oh">
+    <span class="on">A — Obsidian Graph + Knowledge Compounding ★</span>
+    <span class="oc ch">85%</span>
+  </div>
+  <div class="orat">
+    <strong>Why:</strong> Dein echtes Obsidian Graph-Bild + Kernaussagen aus dem AR-032 Report. Zeigt: "Mein Wissen compoundiert — und daraus entstehen die AI Systems." Bridge zwischen Research und Deployment. <strong>85% weil: echtes Bild, echter Report, aber "Second Brain" als Concept muss für Nicht-Nerds erklärt werden.</strong>
+  </div>
+  <div class="prev">
+    <div class="p-card">
+      <div style="display:flex;gap:20px;">
+        <div style="flex:1;">
+          <div style="font-size:0.55rem;color:#55555e;font-family:monospace;margin-bottom:4px;">KNOWLEDGE COMPOUNDING</div>
+          <div style="font-size:0.85rem;font-weight:600;margin-bottom:10px;">Personal AI Knowledge System</div>
+          <div style="font-size:0.72rem;color:#8b8b95;line-height:1.6;margin-bottom:14px;">AI agents don't just retrieve — they connect, challenge, and compound knowledge over time. Every note becomes part of a growing intelligence graph.</div>
+          <div style="display:flex;gap:8px;">
+            <div style="padding:8px 12px;background:rgba(255,255,255,0.025);border-radius:8px;border:1px solid rgba(255,255,255,0.05);font-size:0.68rem;">
+              <div style="font-size:0.55rem;color:#55555e;">Auto-surfaces connections you'd miss</div>
+            </div>
+            <div style="padding:8px 12px;background:rgba(255,255,255,0.025);border-radius:8px;border:1px solid rgba(255,255,255,0.05);font-size:0.68rem;">
+              <div style="font-size:0.55rem;color:#55555e;">Daily synthesis: links, contradictions, gaps</div>
+            </div>
+          </div>
+        </div>
+        <div style="flex-shrink:0;width:240px;height:180px;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.06);">
+          <div style="width:100%;height:100%;background:#1a1a1a;display:flex;align-items:center;justify-content:center;font-size:0.6rem;color:#55555e;">[Your Obsidian Graph Image]</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cmt"><label>Comment:</label><input type="text" id="c-s3a"></div>
+</div>
+
+<div class="opt" id="opt-s3b" onclick="sel('s3','b')">
+  <div class="oh">
+    <span class="on">B — Stats-focused (no image)</span>
+    <span class="oc cm">50%</span>
+  </div>
+  <div class="orat">
+    <strong>Why not preferred:</strong> Zahlen allein (1000+ notes, 5× retrieval) wirken wie vanity metrics ohne das Graph-Bild. Das Bild IST der Beweis. Ohne Bild muss man dir glauben. <strong>50% weil: funktioniert, aber verschenkt den stärksten Asset.</strong>
+  </div>
+  <div class="prev">
+    <div class="p-card" style="text-align:center;">
+      <div style="display:flex;gap:24px;justify-content:center;">
+        <div class="p-stat"><div class="p-stat-n">1,000+</div><div class="p-stat-l">Notes Indexed</div></div>
+        <div class="p-stat"><div class="p-stat-n">5×</div><div class="p-stat-l">Faster Retrieval</div></div>
+        <div class="p-stat"><div class="p-stat-n">24/7</div><div class="p-stat-l">Compounding</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="cmt"><label>Comment:</label><input type="text" id="c-s3b"></div>
+</div>
+
+<!-- ===================== S4: TAB 3 — AI SYSTEMS ===================== -->
+<div id="s4" class="sdiv">S4 — Tab 3: AI Systems / CNC (Content)</div>
+
+<div class="opt" id="opt-s4a" onclick="sel('s4','a')">
+  <div class="oh">
+    <span class="on">A — Keep current CNC card (already strong) ★</span>
+    <span class="oc ch">85%</span>
+  </div>
+  <div class="orat">
+    <strong>Why:</strong> Der CNC Tab ist das stärkste Element auf der ganzen Seite. Echte Daten, echtes Projekt, konkrete Zahlen. Nicht anfassen. <strong>85% weil: der Content ist gut, aber "AI Systems" als Tab-Label suggeriert Breite die wir mit 1 Case noch nicht haben.</strong>
+  </div>
+  <div class="prev" style="text-align:center;min-height:60px;display:flex;align-items:center;justify-content:center;">
+    <span style="font-size:0.75rem;color:#8b8b95;">[Current CNC card — unchanged. €50K, 92% time saved, Before/After]</span>
+  </div>
+  <div class="cmt"><label>Comment:</label><input type="text" id="c-s4a"></div>
+</div>
+
+<div class="opt" id="opt-s4b" onclick="sel('s4','b')">
+  <div class="oh">
+    <span class="on">B — Replace with Before/After visual (ai-systems-visual.png)</span>
+    <span class="oc cm">70%</span>
+  </div>
+  <div class="orat">
+    <strong>Why consider:</strong> Das neue Visual zeigt Before/After + 5-Step Process kompakter und visuell stärker. Aber: der aktuelle Tab hat mehr Detail (Executive Summary, Recommendations, Hidden Insights). Trade-off: visuelle Stärke vs. Informationstiefe. <strong>70% weil: sieht besser aus, verliert aber Content.</strong>
+  </div>
+  <div class="prev" style="text-align:center;min-height:60px;display:flex;align-items:center;justify-content:center;">
+    <span style="font-size:0.75rem;color:#8b8b95;">[New ai-systems-visual.png — Before/After + Process Steps]</span>
+  </div>
+  <div class="cmt"><label>Comment:</label><input type="text" id="c-s4b"></div>
+</div>
+
+<!-- ===================== S5: VALUE PILLARS ===================== -->
+<div id="s5" class="sdiv">S5 — Value Pillars (currently: Source-grounded / Honest / Operator)</div>
+
+<div class="opt" id="opt-s5a" onclick="sel('s5','a')">
+  <div class="oh">
+    <span class="on">A — Systems-focused: Rapid Architecture / Trust by Default / Operator-Built ★</span>
+    <span class="oc ch">85%</span>
+  </div>
+  <div class="orat">
+    <strong>Why:</strong> Current pillars are research-only. If Ainary = AI Systems Studio, pillars should reflect ALL capabilities. "Rapid Architecture" = days not months. "Trust by Default" = confidence scoring. "Operator-Built" = not academic. Works for research AND process AND second brain. <strong>85% weil: breitere Positionierung, aber "Rapid Architecture" klingt noch etwas generisch.</strong>
+  </div>
+  <div class="prev">
+    <div class="p-grid">
+      <div class="p-card">
+        <div style="font-size:0.78rem;font-weight:600;margin-bottom:4px;">Rapid Architecture</div>
+        <div style="font-size:0.65rem;color:#8b8b95;line-height:1.5;">Problem to working AI system in days. The CNC quoting system took 4 days. Research reports take 10 minutes.</div>
+      </div>
+      <div class="p-card">
+        <div style="font-size:0.78rem;font-weight:600;margin-bottom:4px;">Trust by Default</div>
+        <div style="font-size:0.65rem;color:#8b8b95;line-height:1.5;">Every system scores its own confidence. Sources linked. Gaps disclosed. Not because we have to — because decisions need honest inputs.</div>
+      </div>
+      <div class="p-card">
+        <div style="font-size:0.78rem;font-weight:600;margin-bottom:4px;">Operator-Built</div>
+        <div style="font-size:0.65rem;color:#8b8b95;line-height:1.5;">5 years as CEO building enterprise AI. €5.5M raised. BMW, Siemens, Bosch. Built for real decisions, not demos.</div>
+      </div>
+    </div>
+  </div>
+  <div class="cmt"><label>Comment:</label><input type="text" id="c-s5a"></div>
+</div>
+
+<div class="opt" id="opt-s5b" onclick="sel('s5','b')">
+  <div class="oh">
+    <span class="on">B — Process-focused: Days not Months / QA-scored / Honest by Design</span>
+    <span class="oc cm">70%</span>
+  </div>
+  <div class="orat">
+    <strong>Why:</strong> Frames value as HOW you work, not WHO you are. Universal — works for any AI system. Less personal, more method. "QA-scored" is concrete and differentiating. <strong>70% weil: solide aber verliert die Operator-Story die dich von jedem AI-Agentur unterscheidet.</strong>
+  </div>
+  <div class="prev">
+    <div class="p-grid">
+      <div class="p-card">
+        <div style="font-size:0.78rem;font-weight:600;margin-bottom:4px;">Days, not months</div>
+        <div style="font-size:0.65rem;color:#8b8b95;line-height:1.5;">Problem to working system in under a week. Research in 10 minutes. Speed from architecture, not shortcuts.</div>
+      </div>
+      <div class="p-card">
+        <div style="font-size:0.78rem;font-weight:600;margin-bottom:4px;">QA-scored outputs</div>
+        <div style="font-size:0.65rem;color:#8b8b95;line-height:1.5;">Every system includes built-in quality checks. 18/20 avg QA. Every claim tagged: Evidenced, Interpreted, or Judgment.</div>
+      </div>
+      <div class="p-card">
+        <div style="font-size:0.78rem;font-weight:600;margin-bottom:4px;">Honest by design</div>
+        <div style="font-size:0.65rem;color:#8b8b95;line-height:1.5;">Confidence scores on every output. Limitations upfront. Because useful AI means knowing what it doesn't know.</div>
+      </div>
+    </div>
+  </div>
+  <div class="cmt"><label>Comment:</label><input type="text" id="c-s5b"></div>
+</div>
+
+<div class="opt" id="opt-s5c" onclick="sel('s5','c')">
+  <div class="oh">
+    <span class="on">C — Keep current (Source-grounded / Honest about gaps / Operator)</span>
+    <span class="oc cm">50%</span>
+  </div>
+  <div class="orat">
+    <strong>Why not:</strong> Still research-only language. "Sources scanned daily: SEC Filings, ArXiv..." is too specific to one use case. Doesn't represent CNC or Second Brain. <strong>50% weil: gut geschrieben aber zu eng für "AI Systems Studio."</strong>
+  </div>
+  <div class="prev" style="text-align:center;min-height:50px;display:flex;align-items:center;justify-content:center;">
+    <span style="font-size:0.75rem;color:#55555e;font-style:italic;">[Current content — unchanged]</span>
+  </div>
+  <div class="cmt"><label>Comment:</label><input type="text" id="c-s5c"></div>
+</div>
+
+<!-- ===================== S6: WHY I BUILT THIS ===================== -->
+<div id="s6" class="sdiv">S6 — "Why I Built This" (with your McKinsey input)</div>
+
+<div class="opt" id="opt-s6a" onclick="sel('s6','a')">
+  <div class="oh">
+    <span class="on">A — Compounding Thesis (your input) ★</span>
+    <span class="oc ch">90%</span>
+  </div>
+  <div class="orat">
+    <strong>Why:</strong> Dein eigener Input — authentisch, unique, kein CV-Recital. McKinsey-Datenpunkt als Hook, dann deine eigene Beobachtung die WEITER geht. Endet mit der Thesis: Standards compoundieren, deshalb eigene AI-Systeme. <strong>90% weil: das bist DU, nicht irgendein Founder-Template. Einziges Risiko: "unlimited resources" muss präziser formuliert werden.</strong>
+  </div>
+  <div class="prev">
+    <div style="max-width:540px;margin:0 auto;">
+      <div class="p-label">Why I built this</div>
+      <p style="font-size:0.82rem;color:#ededf0;line-height:1.8;margin-bottom:14px;">McKinsey found that AI power users produce 2-3× more output. What I've seen is significantly more — because an agent system has unlimited resources once you've built the process, system, and standard.</p>
+      <p style="font-size:0.82rem;color:#ededf0;line-height:1.8;margin-bottom:14px;">The standard keeps rising. The processes around you go from weeks to days to minutes. What took a team three weeks to research, five agents now produce in ten minutes — with every claim sourced and confidence-scored.</p>
+      <p style="font-size:0.82rem;color:#ededf0;line-height:1.8;margin-bottom:14px;">That's why I decided to build my own AI systems. Research is essential to stay at the top. But research that compounds into knowledge, and knowledge that deploys into systems — that's the real leverage.</p>
+      <p style="font-size:0.78rem;color:#55555e;margin-top:20px;">— Florian Ziesche · 5 years building enterprise AI · €5.5M raised · BMW, Siemens, Bosch</p>
+    </div>
+  </div>
+  <div class="cmt"><label>Comment:</label><input type="text" id="c-s6a"></div>
+</div>
+
+<div class="opt" id="opt-s6b" onclick="sel('s6','b')">
+  <div class="oh">
+    <span class="on">B — Short version (2 paragraphs)</span>
+    <span class="oc cm">70%</span>
+  </div>
+  <div class="orat">
+    <strong>Why:</strong> Komprimiert auf 2 Absätze. Schneller zu lesen. Aber verliert die McKinsey-Brücke und die Compounding-Thesis. <strong>70% weil: funktioniert, aber ist weniger differenzierend.</strong>
+  </div>
+  <div class="prev">
+    <div style="max-width:540px;margin:0 auto;">
+      <div class="p-label">Why I built this</div>
+      <p style="font-size:0.82rem;color:#ededf0;line-height:1.8;margin-bottom:14px;">AI agents have unlimited resources once the system is built. The standard keeps rising — what took weeks now takes minutes. Research compounds into knowledge. Knowledge deploys into systems.</p>
+      <p style="font-size:0.82rem;color:#ededf0;line-height:1.8;margin-bottom:14px;">I built Ainary to stay at that edge. Five years of enterprise AI, now focused on systems that know what they don't know.</p>
+      <p style="font-size:0.78rem;color:#55555e;margin-top:20px;">— Florian Ziesche</p>
+    </div>
+  </div>
+  <div class="cmt"><label>Comment:</label><input type="text" id="c-s6b"></div>
+</div>
+
+<div class="opt" id="opt-s6c" onclick="sel('s6','c')">
+  <div class="oh">
+    <span class="on">C — Keep current (enterprise story)</span>
+    <span class="oc cl">35%</span>
+  </div>
+  <div class="orat">
+    <strong>Why not:</strong> "I spent 5 years building AI systems for enterprise clients. Raised venture capital." — das ist ein LinkedIn About. Kein Visitor bleibt dafür stehen. Dein neuer Input hat eine THESE. Der alte Text hat einen CV. <strong>35% weil: wahr, aber langweilig.</strong>
+  </div>
+  <div class="prev" style="text-align:center;min-height:50px;display:flex;align-items:center;justify-content:center;">
+    <span style="font-size:0.75rem;color:#55555e;font-style:italic;">[Current: "I spent 5 years building AI systems..."]</span>
+  </div>
+  <div class="cmt"><label>Comment:</label><input type="text" id="c-s6c"></div>
+</div>
+
+<!-- ===================== S7: KPI BAR ===================== -->
+<div id="s7" class="sdiv">S7 — KPI Bar (below hero)</div>
+
+<div class="opt" id="opt-s7a" onclick="sel('s7','a')">
+  <div class="oh">
+    <span class="on">A — Keep: 80% Automated · ~10 Min · 5-Agent ★</span>
+    <span class="oc ch">80%</span>
+  </div>
+  <div class="orat">
+    <strong>Why:</strong> Du hast diese KPIs selbst gewählt. Sie sind breit genug für alle 3 Use Cases. Kurz, scanbar, glaubwürdig. <strong>80% weil: "80% Automated" ist schwer zu beweisen als globale Aussage — es stimmt für Research, weniger klar für andere Cases.</strong>
+  </div>
+  <div class="prev">
+    <div style="display:flex;justify-content:center;gap:40px;">
+      <div style="text-align:center;"><div style="font-size:1.2rem;font-weight:600;color:#c8aa50;">80%</div><div style="font-size:0.6rem;color:#8b8b95;">Automated</div></div>
+      <div style="text-align:center;"><div style="font-size:1.2rem;font-weight:600;color:#c8aa50;">~10 Min</div><div style="font-size:0.6rem;color:#8b8b95;">Per Task</div></div>
+      <div style="text-align:center;"><div style="font-size:1.2rem;font-weight:600;color:#c8aa50;">5-Agent</div><div style="font-size:0.6rem;color:#8b8b95;">AI System</div></div>
+    </div>
+  </div>
+  <div class="cmt"><label>Comment:</label><input type="text" id="c-s7a"></div>
+</div>
+
+<div class="opt" id="opt-s7b" onclick="sel('s7','b')">
+  <div class="oh">
+    <span class="on">B — Remove KPI bar entirely</span>
+    <span class="oc cm">55%</span>
+  </div>
+  <div class="orat">
+    <strong>Why:</strong> Hero + Tabs sagen schon alles. KPI Bar wiederholt. McKinsey, Stripe, Linear zeigen keine Stats Bars. Cleaner. Aber: die 3 Zahlen geben einen sofortigen "credibility snapshot." <strong>55% weil: cleaner, aber verliert einen schnellen Vertrauensanker.</strong>
+  </div>
+  <div class="prev" style="text-align:center;min-height:40px;display:flex;align-items:center;justify-content:center;">
+    <span style="font-size:0.75rem;color:#55555e;font-style:italic;">[No stats bar — clean transition hero → showcase]</span>
+  </div>
+  <div class="cmt"><label>Comment:</label><input type="text" id="c-s7b"></div>
+</div>
+
+<!-- ===================== EXPORT ===================== -->
+<div id="export" class="sdiv">Export</div>
+<div class="exp-bar">
+  <button class="exp-btn" onclick="doExport()">Export all picks + comments</button>
+  <div class="exp-out" id="exp-out"></div>
+</div>
+
+</div>
+
+<script>
+const picks = {};
+const sections = ['s1','s2','s3','s4','s5','s6','s7'];
+const sNames = {'s1':'Tab Order','s2':'Tab 1: AI Research','s3':'Tab 2: Second Brain','s4':'Tab 3: AI Systems','s5':'Value Pillars','s6':'Why I Built This','s7':'KPI Bar'};
+
+function sel(s, o) {
+  document.querySelectorAll(`[id^="opt-${s}"]`).forEach(el => el.classList.remove('sel'));
+  document.getElementById(`opt-${s}${o}`).classList.add('sel');
+  picks[s] = o.toUpperCase();
+  document.getElementById('pc').textContent = Object.keys(picks).length + '/7 picked';
+}
+
+function doExport() {
+  const out = document.getElementById('exp-out');
+  let t = 'LANDING PAGE REBUILD PICKS\n=========================\n\n';
+  for (const s of sections) {
+    t += `${sNames[s]}: ${picks[s] || 'NO PICK'}\n`;
+    const opts = document.querySelectorAll(`[id^="c-${s}"]`);
+    opts.forEach(inp => {
+      if (inp.value) {
+        const o = inp.id.replace(`c-${s}`, '').toUpperCase();
+        t += `  ${o} comment: ${inp.value}\n`;
+      }
+    });
+    t += '\n';
+  }
+  out.textContent = t;
+  out.style.display = 'block';
+}
+</script>
+
+</body>
+</html>
