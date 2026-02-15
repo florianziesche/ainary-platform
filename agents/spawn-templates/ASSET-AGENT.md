@@ -20,7 +20,13 @@ Convert approved report {AR_ID} into reusable assets: Atomic Notes, Playbooks, T
 5. Claim Ledger: `/Users/florianziesche/.openclaw/workspace/content/reports/claim-ledgers/CL-{AR_ID}.md`
 
 ## THE CARDINAL RULE
-**No new facts.** You package what's in the report + its cited sources. If information is missing, mark the asset as "Derived" with "Low" confidence. NEVER invent.
+**No new facts.** You package what's in the report + its cited sources. If information is missing: ask for the missing excerpt OR mark the asset as "Derived" with "Low" confidence. NEVER invent.
+
+## OPTIONAL CONSTRAINTS (from Control Panel)
+- Max assets: {MAX_ASSETS} (default: no limit — but prefer fewer, higher-quality over bloated output)
+- Target audience: {AUDIENCE}
+- Target system: {TARGET_SYSTEM} (Obsidian | Notion | Supabase | RAG | markdown)
+- If Notion-ready: keep markdown clean, consistent, scannable
 
 ## BROWSING
 Browsing is OFF. If you need missing context, only fetch what is explicitly referenced in the report. Do NOT expand scope.
