@@ -83,21 +83,45 @@
 
 ---
 
-## Diese Woche (KW 6: 3.-9. Feb)
+## Letzte Woche (KW 7: 10.-16. Feb) — Review
+- [x] 25 Research Reports produziert (AR-001→AR-025), Avg QA 86/100
+- [x] Pipeline v2.3 "Originality Engine" gebaut + validiert
+- [x] AgentTrust Repo + Dashboard gebaut
+- [x] Website redesigned + 3 Reports deployed (ainaryventures.com/research/)
+- [x] CV v4 Universal fertig
+- [x] Vault optimiert (77→89 Health Score)
+- [x] Template System gelocked
+- [ ] ❌ Applications: 0/3
+- [ ] ❌ Outreach: 0/5
+- [ ] ❌ Content published: 0/3
+- [ ] ❌ Revenue: €0
+**Lesson: Massive Build-Woche, NULL Distribution. Pattern bestätigt.**
 
-### Montag 3. Feb
-- [x] CNC Demo für Onkel vorbereiten
-- [ ] Onkel Meeting 12:00
-- [ ] LinkedIn Post 14:00
-- [ ] Monique Meeting 18:00
-- [ ] Decile Application absenden
+## Diese Woche (KW 8: 16.-22. Feb)
 
-### Rest der Woche
-- [ ] 9 CNC E-Mails senden (READY in products/cnc-planner/leads/READY-TO-SEND-EMAILS.md)
-- [ ] 5 VC Applications senden (READY in job-applications/READY-TO-APPLY.md)
-- [ ] 10 Consulting Leads kontaktieren
-- [ ] Substack Artikel #1 publizieren
-- [ ] VC Lab Sprint 2 finalisieren
+### Montag 16. Feb — DISTRIBUTION DAY 🚀
+- [ ] Substack publizieren: "Folders Don't Matter. Links Do."
+- [ ] 3 LinkedIn Posts (Research-based)
+- [ ] AgentTrust Repo PUBLIC + HN + Reddit Launch
+- [ ] 5 Outreach-Mails mit Reports als Proof Points
+- [ ] Sameer Nanda: AR-001-v2.3 Link senden (WhatsApp)
+
+### Dienstag-Mittwoch
+- [ ] 5 VC Applications senden (HOF done, 4 more)
+- [ ] 5 Consulting Outreach-Mails (19 READY)
+- [ ] Pipeline Python Orchestrator (pipeline.py)
+
+### Donnerstag-Freitag
+- [ ] 5 weitere Outreach-Mails
+- [ ] 1 weiterer Substack Artikel
+- [ ] 3 LinkedIn Posts
+- [ ] Website: Landing Page Chooser Picks umsetzen
+
+### KW 8 Targets
+- Outreach: 15 Mails (5 CNC + 5 Consulting + 5 VC)
+- Content published: 2 Substack + 6 LinkedIn
+- Revenue: €0→erste Gespräche
+- External Feedback: 3 (Sameer + 2 weitere)
 
 ---
 
@@ -106,14 +130,13 @@
 ### Februar Ziele
 | Metrik | Ziel | Aktuell |
 |--------|------|---------|
-| CNC Demos | 10 | 1 (Andreas Nachbetrachtung fertig) |
+| CNC Demos | 10 | 1 |
 | CNC Kunden | 2 | 0 |
-| CNC E-Mails ready | 9 | ✅ 9 READY |
-| Consulting Gespräche | 5 | 1 (Daniel Daum angerufen!) |
-| **Consulting Outreach Ready** | **10+** | **✅ 19 READY** (15 alt + 4 Bayern neu) |
-| **Case Studies** | **1** | **✅ 1 (MBS Schlottwitz)** |
+| Consulting Gespräche | 5 | 1 (Daniel Daum) |
+| Consulting Outreach | 10+ | 0 sent (19 READY) |
 | VC Applications | 10 | 1 (HOF) |
-| Substack Posts | 4 | 1 published + #2 ready |
+| Substack Posts | 4 | 1 published + 2 ready |
+| Research Reports | — | **25 DONE** (AR-001→025) |
 | Revenue | €5.000 | €0 |
 
 ### Lifetime (2026)
@@ -134,4 +157,4 @@ Nicht 10 Sachen. Eine.
 
 ---
 
-*Updated: 2026-02-03 03:15*
+*Updated: 2026-02-15 20:00*

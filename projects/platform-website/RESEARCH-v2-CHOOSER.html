@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Research Tab v2 — 5 Editorial Variants</title>
+<link href="https://cdn.jsdelivr.net/npm/geist@1.0.0/dist/fonts/geist-sans/style.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08080c;--surface:#111116;--elevated:#1e1e26;--input:#0e0e13;
+  --border:rgba(255,255,255,0.06);--border-h:rgba(255,255,255,0.10);--border-a:rgba(200,170,80,0.30);
+  --text:#ededf0;--text2:#8b8b95;--muted:#55555e;
+  --accent:#6366f1;--accent-h:#818cf8;--accent-m:rgba(99,102,241,0.12);--accent-b:rgba(99,102,241,0.20);
+  --gold:#c8aa50;--gold-h:#d4b85c;--gold-m:rgba(200,170,80,0.12);--gold-b:rgba(200,170,80,0.20);
+  --success:#34d399;--warning:#fbbf24;--error:#f87171;
+  --display:'Geist',-apple-system,sans-serif;--body:'Inter',-apple-system,sans-serif;--mono:'JetBrains Mono','Fira Code',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--body);-webkit-font-smoothing:antialiased;font-size:16px;}
+
+/* Nav */
+.nav{position:sticky;top:0;z-index:100;background:rgba(8,8,12,0.8);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;gap:12px;}
+.nav h1{font-family:var(--display);font-size:0.85rem;font-weight:600;letter-spacing:-0.02em;margin-right:auto;}
+.tb{font-family:var(--body);font-size:0.8rem;font-weight:500;padding:8px 16px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--text2);cursor:pointer;transition:border-color 0.15s ease,color 0.15s ease;}
+.tb:hover{border-color:var(--border-h);color:var(--text);}
+.tb.a{border-color:var(--accent-b);background:var(--accent-m);color:var(--accent-h);}
+
+/* Sections */
+.sec{display:none;padding:32px 24px;max-width:1200px;margin:0 auto;}
+.sec.a{display:block;}
+
+/* Meta */
+.meta{display:flex;gap:16px;margin-bottom:20px;padding:16px 20px;background:var(--surface);border:1px solid var(--border);border-radius:16px;align-items:center;flex-wrap:wrap;}
+.meta .nm{font-family:var(--display);font-size:0.9rem;font-weight:600;letter-spacing:-0.02em;margin-right:auto;}
+.conf{font-family:var(--mono);font-size:0.7rem;font-weight:500;padding:4px 10px;border-radius:6px;}
+.conf-g{background:rgba(52,211,153,0.08);color:var(--success);border:1px solid rgba(52,211,153,0.15);}
+.conf-b{background:var(--accent-m);color:var(--accent-h);border:1px solid var(--accent-b);}
+.conf-w{background:rgba(251,191,36,0.08);color:var(--warning);border:1px solid rgba(251,191,36,0.15);}
+.wh{font-size:0.75rem;color:var(--text2);line-height:1.6;max-width:420px;}
+.rk{font-size:0.75rem;color:var(--muted);line-height:1.6;max-width:300px;}
+
+/* Preview */
+.pv{border:1px solid var(--border);border-radius:16px;overflow:hidden;background:var(--bg);min-height:500px;}
+
+/* Comment + Pick */
+.cm{margin-top:12px;}
+.cm textarea{width:100%;background:var(--input);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--text);font-family:var(--body);font-size:0.875rem;resize:vertical;min-height:40px;transition:border-color 0.15s ease;}
+.cm textarea:focus{outline:none;border-color:var(--accent-b);box-shadow:0 0 0 3px var(--accent-m);}
+.cm textarea::placeholder{color:var(--muted);}
+.pk{display:flex;justify-content:center;margin-top:14px;}
+.pk button{background:var(--accent);color:#fff;font-family:var(--body);font-weight:500;font-size:0.875rem;padding:10px 20px;border-radius:8px;border:none;cursor:pointer;transition:background 0.15s ease;}
+.pk button:hover{background:var(--accent-h);}
+
+/* === LAYOUT STYLES === */
+
+/* Shared */
+.report-label{font-family:var(--mono);font-size:0.7rem;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--gold);padding:4px 10px;border-radius:6px;background:var(--gold-m);border:1px solid var(--gold-b);display:inline-block;}
+.kpi-row{display:flex;gap:16px;margin:24px 0;}
+.kpi{padding:16px 20px;border:1px solid var(--border);border-radius:12px;background:var(--surface);text-align:center;flex:1;}
+.kpi-num{font-family:var(--mono);font-size:1.6rem;font-weight:500;color:var(--gold);}
+.kpi-label{font-family:var(--body);font-size:0.75rem;color:var(--muted);margin-top:4px;}
+.finding{padding:12px 16px;border-left:2px solid var(--accent);margin-bottom:8px;background:rgba(99,102,241,0.03);border-radius:0 8px 8px 0;}
+.finding-title{font-family:var(--body);font-size:0.8rem;font-weight:600;color:var(--text);margin-bottom:2px;}
+.finding-desc{font-family:var(--body);font-size:0.75rem;color:var(--text2);line-height:1.6;}
+.finding-source{font-family:var(--mono);font-size:0.6rem;color:var(--muted);margin-top:4px;}
+.cta-link{color:var(--accent);font-family:var(--body);font-size:0.875rem;font-weight:500;text-decoration:none;transition:color 0.15s;}
+.cta-link:hover{color:var(--accent-h);}
+.footer-meta{font-family:var(--mono);font-size:0.65rem;color:var(--muted);letter-spacing:0.02em;}
+.section-sub{font-family:var(--body);font-size:0.875rem;color:var(--text2);max-width:540px;line-height:1.6;}
+.urgency-bar{padding:12px 16px;background:rgba(248,113,113,0.04);border:1px solid rgba(248,113,113,0.12);border-radius:10px;display:flex;justify-content:space-between;align-items:center;}
+.urgency-bar .date{font-family:var(--mono);font-size:0.75rem;font-weight:500;color:var(--error);}
+.urgency-bar .penalty{font-family:var(--mono);font-size:0.7rem;color:var(--muted);}
+
+/* Claim transparency bar */
+.ct-bar{display:flex;height:6px;border-radius:3px;overflow:hidden;margin-top:8px;}
+.ct-e{background:var(--success);}
+.ct-i{background:var(--warning);}
+.ct-j{background:var(--accent);}
+.ct-legend{display:flex;gap:16px;margin-top:6px;}
+.ct-leg{display:flex;align-items:center;gap:4px;font-size:0.65rem;color:var(--muted);}
+.ct-dot{width:6px;height:6px;border-radius:50%;}
+
+/* Confidence ring (SVG) */
+.conf-ring{position:relative;display:inline-flex;align-items:center;justify-content:center;}
+.conf-ring svg{transform:rotate(-90deg);}
+.conf-ring-val{position:absolute;font-family:var(--mono);font-size:1rem;font-weight:500;color:var(--gold);}
+
+/* === V1: EDITORIAL COMPLETE === */
+.v1{padding:48px 40px;}
+.v1 .label-row{margin-bottom:24px;}
+.v1 .headline{font-family:var(--display);font-size:2rem;font-weight:600;letter-spacing:-0.02em;line-height:1.2;margin-bottom:8px;}
+.v1 .subline{font-family:var(--body);font-size:0.95rem;color:var(--text2);font-style:italic;margin-bottom:32px;line-height:1.6;}
+.v1 .grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:24px;}
+.v1 .exec{font-family:var(--body);font-size:0.85rem;color:var(--text2);line-height:1.8;}
+.v1 .exec-label{font-family:var(--mono);font-size:0.7rem;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+
+/* === V2: REPORT PREVIEW === */
+.v2{padding:40px;}
+.v2 .report-card{border:1px solid var(--border);border-radius:16px;background:var(--surface);overflow:hidden;}
+.v2 .report-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.v2 .report-title{font-family:var(--display);font-size:1.1rem;font-weight:600;letter-spacing:-0.02em;}
+.v2 .report-body{padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+.v2 .report-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+
+/* === V3: DATA STORY === */
+.v3{padding:48px 40px;max-width:720px;margin:0 auto;}
+.v3 .hero-stat{text-align:center;margin-bottom:40px;}
+.v3 .hero-num{font-family:var(--mono);font-size:4rem;font-weight:500;letter-spacing:-0.02em;}
+.v3 .hero-label{font-family:var(--body);font-size:0.95rem;color:var(--text2);margin-top:8px;}
+.v3 .story-block{margin-bottom:32px;padding-bottom:32px;border-bottom:1px solid var(--border);}
+.v3 .story-num{font-family:var(--mono);font-size:2rem;font-weight:500;margin-bottom:4px;}
+.v3 .story-title{font-family:var(--display);font-size:1rem;font-weight:600;letter-spacing:-0.02em;margin-bottom:8px;}
+.v3 .story-text{font-family:var(--body);font-size:0.85rem;color:var(--text2);line-height:1.8;}
+.v3 .story-bar{height:4px;border-radius:2px;margin-top:12px;}
+
+/* === V4: SPLIT MAGAZINE === */
+.v4{display:grid;grid-template-columns:380px 1fr;min-height:520px;}
+.v4 .left{padding:40px 32px;border-right:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;}
+.v4 .right{padding:40px 32px;display:flex;flex-direction:column;justify-content:center;}
+.v4 .pull-quote{font-family:var(--display);font-size:1.8rem;font-weight:600;letter-spacing:-0.02em;line-height:1.3;margin-bottom:16px;}
+.v4 .pull-source{font-family:var(--mono);font-size:0.65rem;color:var(--muted);}
+
+/* === V5: DASHBOARD HYBRID === */
+.v5{padding:32px;}
+.v5 .top-row{display:grid;grid-template-columns:1fr 1fr 1fr 140px;gap:12px;margin-bottom:20px;}
+.v5 .stat-card{padding:20px;border:1px solid var(--border);border-radius:12px;background:var(--surface);}
+.v5 .stat-num{font-family:var(--mono);font-size:1.4rem;font-weight:500;}
+.v5 .stat-label{font-size:0.7rem;color:var(--muted);margin-top:4px;}
+.v5 .bottom-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.v5 .exec-card{padding:20px;border:1px solid var(--border);border-radius:12px;background:var(--surface);}
+.v5 .findings-card{padding:20px;border:1px solid var(--border);border-radius:12px;background:var(--surface);}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <h1>AI Research — 5 Editorial+ Variants</h1>
+  <button class="tb a" onclick="sw('v1',this)">1. Editorial Complete</button>
+  <button class="tb" onclick="sw('v2',this)">2. Report Preview</button>
+  <button class="tb" onclick="sw('v3',this)">3. Data Story</button>
+  <button class="tb" onclick="sw('v4',this)">4. Split Magazine</button>
+  <button class="tb" onclick="sw('v5',this)">5. Dashboard Hybrid</button>
+</div>
+
+<!-- === V1: EDITORIAL COMPLETE === -->
+<div class="sec a" id="s-v1">
+  <div class="meta">
+    <span class="nm">1. Editorial Complete</span>
+    <span class="conf conf-g">88%</span>
+    <span class="wh"><strong>Stärke:</strong> Alles drin — Exec Summary, Findings, KPIs, Claim Transparency, EU AI Act. Wie Seite 1 eines Economist-Features.</span>
+    <span class="rk"><strong>Risk:</strong> Viel Content. Kann überladen wirken.</span>
+  </div>
+  <div class="pv">
+    <div class="v1">
+      <div class="label-row"><span class="report-label">AR-001 · Feb 2026</span></div>
+      <div class="headline">57% of Enterprises Deploy AI Agents. Only 6% Trust Them.</div>
+      <div class="subline">The trust gap that will separate winners from casualties by 2027.</div>
+
+      <div class="kpi-row">
+        <div class="kpi"><div class="kpi-num">51pt</div><div class="kpi-label">Trust–Deploy Gap</div></div>
+        <div class="kpi"><div class="kpi-num">40%</div><div class="kpi-label">Projects Canceled by '27</div></div>
+        <div class="kpi"><div class="kpi-num">7 mo</div><div class="kpi-label">Capability Doubling</div></div>
+        <div class="kpi"><div class="kpi-num">47</div><div class="kpi-label">Sources Analyzed</div></div>
+      </div>
+
+      <div class="grid">
+        <div>
+          <div class="exec-label">Executive Summary</div>
+          <div class="exec">Enterprise AI adoption has reached an inflection point: while 57% of organizations now deploy AI agents, only 6% report trusting their outputs for critical decisions. This 51-point chasm isn't closing — it's widening. Gartner projects 40% of agentic AI projects will be canceled by 2027 as organizations realize they built capability without trust infrastructure.</div>
+          <div style="margin-top:16px;">
+            <div class="exec-label">Claim Transparency</div>
+            <div class="ct-bar"><div class="ct-e" style="width:62%;"></div><div class="ct-i" style="width:24%;"></div><div class="ct-j" style="width:14%;"></div></div>
+            <div class="ct-legend">
+              <span class="ct-leg"><span class="ct-dot" style="background:var(--success);"></span> 62% Evidenced</span>
+              <span class="ct-leg"><span class="ct-dot" style="background:var(--warning);"></span> 24% Interpreted</span>
+              <span class="ct-leg"><span class="ct-dot" style="background:var(--accent);"></span> 14% Judgment</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="exec-label">Key Findings</div>
+          <div class="finding">
+            <div class="finding-title">The Cancellation Wave</div>
+            <div class="finding-desc">40% of agentic AI projects will be canceled by 2027. Trust infrastructure = survival selection.</div>
+            <div class="finding-source">Gartner, 2024</div>
+          </div>
+          <div class="finding">
+            <div class="finding-title">The Trust Race</div>
+            <div class="finding-desc">Agent capability doubles every 7 months. Governance updates annually. The gap is structural.</div>
+            <div class="finding-source">Anthropic Research, 2025</div>
+          </div>
+          <div class="finding">
+            <div class="finding-title">The Unproven Stack</div>
+            <div class="finding-desc">Multi-agent orchestration rests on architecture that benchmarks can't validate.</div>
+            <div class="finding-source">Internal analysis, AR-001</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="urgency-bar">
+        <span class="date">EU AI Act Full Enforcement: August 2, 2026</span>
+        <span class="penalty">Penalties up to €35M or 7% global revenue</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:24px;">
+        <a href="/research/state-of-agent-trust-2026/" class="cta-link">Read the full 47-page report →</a>
+        <span class="footer-meta">5 agents · 3 synthesis rounds · confidence 73%</span>
+      </div>
+    </div>
+  </div>
+  <div class="cm"><textarea placeholder="Your comment..."></textarea></div>
+  <div class="pk"><button>Pick This Layout</button></div>
+</div>
+
+<!-- === V2: REPORT PREVIEW === -->
+<div class="sec" id="s-v2">
+  <div class="meta">
+    <span class="nm">2. Report Preview</span>
+    <span class="conf conf-g">85%</span>
+    <span class="wh"><strong>Stärke:</strong> Sieht aus wie ein echtes Report-Dokument. Header, Body, Footer. Premium.</span>
+    <span class="rk"><strong>Risk:</strong> Könnte zu "document-like" wirken statt "website".</span>
+  </div>
+  <div class="pv">
+    <div class="v2">
+      <div class="report-card">
+        <div class="report-header">
+          <div>
+            <div class="report-title">State of AI Agent Trust 2026</div>
+            <div style="font-family:var(--mono);font-size:0.65rem;color:var(--muted);margin-top:4px;">AR-001 · February 2026 · Confidence: 73%</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <div class="conf-ring">
+              <svg width="56" height="56" viewBox="0 0 56 56"><circle cx="28" cy="28" r="24" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="4"/><circle cx="28" cy="28" r="24" fill="none" stroke="#c8aa50" stroke-width="4" stroke-dasharray="110 41" stroke-linecap="round"/></svg>
+              <span class="conf-ring-val">73%</span>
+            </div>
+          </div>
+        </div>
+        <div class="report-body">
+          <div>
+            <div class="exec-label">Executive Summary</div>
+            <div class="exec" style="margin-bottom:16px;">57% of enterprises deploy AI agents, yet only 6% trust them for critical decisions — a 51-point chasm that Gartner predicts will cause 40% of agentic AI projects to be canceled by 2027.</div>
+            <div class="kpi-row" style="margin:0;">
+              <div class="kpi"><div class="kpi-num" style="font-size:1.2rem;">51pt</div><div class="kpi-label">Trust Gap</div></div>
+              <div class="kpi"><div class="kpi-num" style="font-size:1.2rem;">40%</div><div class="kpi-label">Canceled '27</div></div>
+              <div class="kpi"><div class="kpi-num" style="font-size:1.2rem;">7mo</div><div class="kpi-label">Doubling</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="exec-label">Key Findings</div>
+            <div class="finding"><div class="finding-title">Cancellation Wave</div><div class="finding-desc">40% of agentic AI projects canceled by 2027. Trust infrastructure = survival selection.</div><div class="finding-source">Gartner, 2024</div></div>
+            <div class="finding"><div class="finding-title">Trust Race</div><div class="finding-desc">Capability doubles every 7 months. Governance updates annually.</div><div class="finding-source">Anthropic, 2025</div></div>
+            <div class="finding"><div class="finding-title">Unproven Stack</div><div class="finding-desc">Multi-agent orchestration = unproven architecture on benchmarks.</div><div class="finding-source">AR-001 Analysis</div></div>
+            <div style="margin-top:16px;">
+              <div class="exec-label">Claim Transparency</div>
+              <div class="ct-bar"><div class="ct-e" style="width:62%;"></div><div class="ct-i" style="width:24%;"></div><div class="ct-j" style="width:14%;"></div></div>
+              <div class="ct-legend"><span class="ct-leg"><span class="ct-dot" style="background:var(--success);"></span> 62% Evidence</span><span class="ct-leg"><span class="ct-dot" style="background:var(--warning);"></span> 24% Interpreted</span><span class="ct-leg"><span class="ct-dot" style="background:var(--accent);"></span> 14% Judgment</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="report-footer">
+          <span class="footer-meta">47 pages · 5 agents · 3 synthesis rounds · generated in &lt;10 min</span>
+          <div class="urgency-bar" style="padding:8px 12px;margin:0;">
+            <span class="date" style="font-size:0.65rem;">EU AI Act: Aug 2, 2026</span>
+            <span class="penalty" style="font-size:0.6rem;">€35M penalties</span>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:20px;"><a href="/research/state-of-agent-trust-2026/" class="cta-link">Read the full report →</a></div>
+    </div>
+  </div>
+  <div class="cm"><textarea placeholder="Your comment..."></textarea></div>
+  <div class="pk"><button>Pick This Layout</button></div>
+</div>
+
+<!-- === V3: DATA STORY === -->
+<div class="sec" id="s-v3">
+  <div class="meta">
+    <span class="nm">3. Data Story</span>
+    <span class="conf conf-b">80%</span>
+    <span class="wh"><strong>Stärke:</strong> Narrative Kraft. Jede Zahl erzählt einen Teil der Geschichte. Scrollt vertikal, emotional.</span>
+    <span class="rk"><strong>Risk:</strong> Braucht vertikalen Raum. Nicht ideal als Tab-Content.</span>
+  </div>
+  <div class="pv">
+    <div class="v3">
+      <div style="text-align:center;margin-bottom:8px;"><span class="report-label">AR-001 · Feb 2026</span></div>
+      <div class="hero-stat">
+        <div class="hero-num"><span style="color:var(--success);">57%</span> <span style="color:var(--muted);font-size:1.5rem;">deploy</span> <span style="color:var(--error);">6%</span> <span style="color:var(--muted);font-size:1.5rem;">trust</span></div>
+        <div class="hero-label">The 51-point chasm in enterprise AI.</div>
+      </div>
+
+      <div class="story-block">
+        <div class="story-num" style="color:var(--error);">40%</div>
+        <div class="story-title">The Cancellation Wave</div>
+        <div class="story-text">Gartner predicts 40% of agentic AI projects will be canceled by 2027. The projects that survive will be the ones with trust infrastructure. The rest paid for capability they couldn't use.</div>
+        <div class="story-bar" style="background:linear-gradient(90deg,var(--error) 40%,rgba(255,255,255,0.04) 40%);"></div>
+      </div>
+
+      <div class="story-block">
+        <div class="story-num" style="color:var(--warning);">7 months</div>
+        <div class="story-title">The Trust Race</div>
+        <div class="story-text">Agent capability doubles every 7 months. Governance capability updates annually. This isn't a gap — it's a structural divergence that compounds every quarter.</div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <div style="flex:1;"><div style="font-family:var(--mono);font-size:0.6rem;color:var(--muted);margin-bottom:4px;">Capability</div><div style="height:4px;border-radius:2px;background:var(--success);width:100%;"></div></div>
+          <div style="flex:1;"><div style="font-family:var(--mono);font-size:0.6rem;color:var(--muted);margin-bottom:4px;">Governance</div><div style="height:4px;border-radius:2px;background:var(--error);width:35%;"></div></div>
+        </div>
+      </div>
+
+      <div class="story-block">
+        <div class="story-num" style="color:var(--accent-h);">Unproven</div>
+        <div class="story-title">The Multi-Agent Myth</div>
+        <div class="story-text">Multi-agent systems show minimal performance gains over single-agent on popular benchmarks. The entire orchestration narrative — driving billions in investment — rests on architecture that academic evidence can't validate.</div>
+      </div>
+
+      <div class="urgency-bar" style="margin-bottom:24px;">
+        <span class="date">EU AI Act: August 2, 2026</span>
+        <span class="penalty">Up to €35M penalties</span>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div class="exec-label">Claim Transparency</div>
+          <div class="ct-bar" style="width:200px;"><div class="ct-e" style="width:62%;"></div><div class="ct-i" style="width:24%;"></div><div class="ct-j" style="width:14%;"></div></div>
+          <div class="ct-legend"><span class="ct-leg"><span class="ct-dot" style="background:var(--success);"></span> 62%</span><span class="ct-leg"><span class="ct-dot" style="background:var(--warning);"></span> 24%</span><span class="ct-leg"><span class="ct-dot" style="background:var(--accent);"></span> 14%</span></div>
+        </div>
+        <a href="/research/state-of-agent-trust-2026/" class="cta-link">Read full report →</a>
+      </div>
+      <div style="text-align:center;margin-top:16px;"><span class="footer-meta">47 pages · 5 agents · 3 rounds · confidence 73%</span></div>
+    </div>
+  </div>
+  <div class="cm"><textarea placeholder="Your comment..."></textarea></div>
+  <div class="pk"><button>Pick This Layout</button></div>
+</div>
+
+<!-- === V4: SPLIT MAGAZINE === -->
+<div class="sec" id="s-v4">
+  <div class="meta">
+    <span class="nm">4. Split Magazine</span>
+    <span class="conf conf-g">86%</span>
+    <span class="wh"><strong>Stärke:</strong> Pull-Quote links = maximaler Impact. Rechts = alle Details. Wie ein Bloomberg Feature.</span>
+    <span class="rk"><strong>Risk:</strong> Linksseitige Quote muss stark genug sein um allein zu stehen.</span>
+  </div>
+  <div class="pv">
+    <div class="v4">
+      <div class="left">
+        <span class="report-label" style="margin-bottom:20px;">AR-001</span>
+        <div class="pull-quote">57% deploy.<br>6% trust.<br><span style="color:var(--gold);">The 51-point chasm.</span></div>
+        <div class="pull-source">Ainary Research · February 2026</div>
+        <div style="margin-top:24px;">
+          <div class="conf-ring">
+            <svg width="72" height="72" viewBox="0 0 72 72"><circle cx="36" cy="36" r="30" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="5"/><circle cx="36" cy="36" r="30" fill="none" stroke="#c8aa50" stroke-width="5" stroke-dasharray="138 50" stroke-linecap="round"/></svg>
+            <span class="conf-ring-val" style="font-size:1.2rem;">73%</span>
+          </div>
+          <div style="font-family:var(--mono);font-size:0.65rem;color:var(--muted);margin-top:6px;">Confidence Score</div>
+        </div>
+        <div style="margin-top:20px;">
+          <div class="ct-bar" style="width:180px;"><div class="ct-e" style="width:62%;"></div><div class="ct-i" style="width:24%;"></div><div class="ct-j" style="width:14%;"></div></div>
+          <div class="ct-legend"><span class="ct-leg"><span class="ct-dot" style="background:var(--success);"></span> 62% E</span><span class="ct-leg"><span class="ct-dot" style="background:var(--warning);"></span> 24% I</span><span class="ct-leg"><span class="ct-dot" style="background:var(--accent);"></span> 14% J</span></div>
+        </div>
+      </div>
+      <div class="right">
+        <div class="exec-label">Executive Summary</div>
+        <div class="exec" style="margin-bottom:20px;">Enterprise AI adoption has hit an inflection point: deployment outpaces trust by 51 points. Gartner projects 40% of agentic AI projects canceled by 2027 as capability outstrips governance by a factor of 6x.</div>
+
+        <div class="kpi-row" style="margin-top:0;">
+          <div class="kpi"><div class="kpi-num" style="font-size:1.2rem;">40%</div><div class="kpi-label">Canceled '27</div></div>
+          <div class="kpi"><div class="kpi-num" style="font-size:1.2rem;">7mo</div><div class="kpi-label">Doubling</div></div>
+          <div class="kpi"><div class="kpi-num" style="font-size:1.2rem;">47</div><div class="kpi-label">Sources</div></div>
+        </div>
+
+        <div class="exec-label" style="margin-top:16px;">Key Findings</div>
+        <div class="finding"><div class="finding-title">Cancellation Wave</div><div class="finding-desc">Trust infrastructure = survival selection. 40% won't make it.</div><div class="finding-source">Gartner, 2024</div></div>
+        <div class="finding"><div class="finding-title">Trust Race</div><div class="finding-desc">Capability 7mo doubling vs. annual governance. Structural divergence.</div><div class="finding-source">Anthropic, 2025</div></div>
+        <div class="finding"><div class="finding-title">Unproven Stack</div><div class="finding-desc">Multi-agent = billions invested in architecture benchmarks can't validate.</div><div class="finding-source">AR-001</div></div>
+
+        <div class="urgency-bar" style="margin-top:16px;">
+          <span class="date" style="font-size:0.65rem;">EU AI Act: Aug 2, 2026</span>
+          <span class="penalty" style="font-size:0.6rem;">€35M penalties</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;">
+          <a href="/research/state-of-agent-trust-2026/" class="cta-link">Read full report →</a>
+          <span class="footer-meta">5 agents · 3 rounds · &lt;10 min</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cm"><textarea placeholder="Your comment..."></textarea></div>
+  <div class="pk"><button>Pick This Layout</button></div>
+</div>
+
+<!-- === V5: DASHBOARD HYBRID === -->
+<div class="sec" id="s-v5">
+  <div class="meta">
+    <span class="nm">5. Dashboard Hybrid</span>
+    <span class="conf conf-b">78%</span>
+    <span class="wh"><strong>Stärke:</strong> Alles auf einen Blick. KPIs oben, Details unten. Wie ein Bloomberg/Notion Dashboard.</span>
+    <span class="rk"><strong>Risk:</strong> Kann "dashboard-y" statt "editorial" wirken. Weniger Story.</span>
+  </div>
+  <div class="pv">
+    <div class="v5">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <span class="report-label">AR-001 · State of AI Agent Trust 2026</span>
+        <span class="footer-meta">73% confidence · 47 pages · 5 agents</span>
+      </div>
+      <div class="top-row">
+        <div class="stat-card"><div class="stat-num" style="color:var(--error);">51pt</div><div class="stat-label">Trust–Deploy Gap</div><div style="font-family:var(--mono);font-size:0.6rem;color:var(--text2);margin-top:8px;">57% deploy → 6% trust</div></div>
+        <div class="stat-card"><div class="stat-num" style="color:var(--warning);">40%</div><div class="stat-label">Projects Canceled</div><div style="font-family:var(--mono);font-size:0.6rem;color:var(--text2);margin-top:8px;">By 2027 — Gartner</div></div>
+        <div class="stat-card"><div class="stat-num" style="color:var(--success);">7mo</div><div class="stat-label">Capability Doubling</div><div style="font-family:var(--mono);font-size:0.6rem;color:var(--text2);margin-top:8px;">Governance: annually</div></div>
+        <div class="stat-card" style="display:flex;align-items:center;justify-content:center;">
+          <div class="conf-ring">
+            <svg width="64" height="64" viewBox="0 0 64 64"><circle cx="32" cy="32" r="27" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="4"/><circle cx="32" cy="32" r="27" fill="none" stroke="#c8aa50" stroke-width="4" stroke-dasharray="124 46" stroke-linecap="round"/></svg>
+            <span class="conf-ring-val">73%</span>
+          </div>
+        </div>
+      </div>
+      <div class="bottom-row">
+        <div class="exec-card">
+          <div class="exec-label">Executive Summary</div>
+          <div class="exec">57% of enterprises deploy AI agents, yet only 6% trust them. This 51-point chasm is widening. Gartner projects 40% of agentic projects canceled by 2027 as capability outstrips governance by 6x.</div>
+          <div style="margin-top:16px;">
+            <div class="exec-label">Claim Transparency</div>
+            <div class="ct-bar"><div class="ct-e" style="width:62%;"></div><div class="ct-i" style="width:24%;"></div><div class="ct-j" style="width:14%;"></div></div>
+            <div class="ct-legend"><span class="ct-leg"><span class="ct-dot" style="background:var(--success);"></span> 62% E</span><span class="ct-leg"><span class="ct-dot" style="background:var(--warning);"></span> 24% I</span><span class="ct-leg"><span class="ct-dot" style="background:var(--accent);"></span> 14% J</span></div>
+          </div>
+          <div class="urgency-bar" style="margin-top:16px;">
+            <span class="date" style="font-size:0.65rem;">EU AI Act: Aug 2, 2026</span>
+            <span class="penalty" style="font-size:0.6rem;">€35M</span>
+          </div>
+        </div>
+        <div class="findings-card">
+          <div class="exec-label">Key Findings</div>
+          <div class="finding"><div class="finding-title">Cancellation Wave</div><div class="finding-desc">40% of agentic AI projects canceled by 2027. Trust infrastructure = survival selection.</div><div class="finding-source">Gartner, 2024</div></div>
+          <div class="finding"><div class="finding-title">Trust Race</div><div class="finding-desc">Capability doubles every 7 months. Governance updates annually. Structural divergence.</div><div class="finding-source">Anthropic, 2025</div></div>
+          <div class="finding"><div class="finding-title">Unproven Stack</div><div class="finding-desc">Multi-agent orchestration: billions invested in architecture benchmarks can't validate.</div><div class="finding-source">AR-001 Analysis</div></div>
+          <div style="margin-top:12px;"><a href="/research/state-of-agent-trust-2026/" class="cta-link">Read full report →</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cm"><textarea placeholder="Your comment..."></textarea></div>
+  <div class="pk"><button>Pick This Layout</button></div>
+</div>
+
+<script>
+function sw(id,btn){document.querySelectorAll('.sec').forEach(s=>s.classList.remove('a'));document.querySelectorAll('.tb').forEach(b=>b.classList.remove('a'));document.getElementById('s-'+id).classList.add('a');btn.classList.add('a');}
+</script>
+</body>
+</html>

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Solutions (CNC) — 5 Layouts</title>
+<link href="https://cdn.jsdelivr.net/npm/geist@1.0.0/dist/fonts/geist-sans/style.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/geist@1.0.0/dist/fonts/geist-mono/style.css" rel="stylesheet">
+<style>
+  :root{--bg:#08080c;--surface:#111116;--card:#16161b;--text:#ededf0;--text2:#8b8b95;--muted:#55555e;--gold:#c8aa50;--green:#4ade80;--red:#f87171;--blue:#60a5fa;--purple:#c084fc;--border:rgba(255,255,255,0.06);--font:'Geist',-apple-system,sans-serif;--mono:'Geist Mono',monospace;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#0a0a0e;color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased;}
+  .nav{position:sticky;top:0;z-index:100;background:rgba(10,10,14,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:12px;}
+  .nav h1{font-size:0.85rem;font-weight:600;margin-right:auto;}
+  .nb{padding:6px 14px;font-family:var(--mono);font-size:0.6rem;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--text2);cursor:pointer;transition:all 0.2s;}
+  .nb:hover,.nb.a{border-color:rgba(200,170,80,0.3);background:rgba(200,170,80,0.08);color:var(--gold);}
+  .sec{display:none;padding:24px;max-width:1100px;margin:0 auto;}
+  .sec.a{display:block;}
+  .meta{display:flex;gap:16px;margin-bottom:16px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;align-items:center;flex-wrap:wrap;}
+  .meta .name{font-size:0.9rem;font-weight:600;margin-right:auto;}
+  .conf{font-family:var(--mono);font-size:0.6rem;padding:3px 8px;border-radius:4px;}
+  .c88{background:rgba(74,222,128,0.08);color:#4ade80;border:1px solid rgba(74,222,128,0.15);}
+  .c85{background:rgba(74,222,128,0.08);color:#4ade80;border:1px solid rgba(74,222,128,0.15);}
+  .c84{background:rgba(74,222,128,0.08);color:#4ade80;border:1px solid rgba(74,222,128,0.15);}
+  .c82{background:rgba(96,165,250,0.08);color:#60a5fa;border:1px solid rgba(96,165,250,0.15);}
+  .c72{background:rgba(251,191,36,0.08);color:#fbbf24;border:1px solid rgba(251,191,36,0.15);}
+  .why{font-size:0.6rem;color:var(--text2);line-height:1.5;}
+  .risk{font-size:0.6rem;color:var(--muted);line-height:1.5;}
+  .preview{border:1px solid var(--border);border-radius:16px;overflow:hidden;background:var(--bg);min-height:460px;}
+  .cmt{margin-top:12px;}
+  .cmt textarea{width:100%;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:var(--font);font-size:0.75rem;resize:vertical;min-height:36px;}
+  .cmt textarea::placeholder{color:var(--muted);}
+  .pr{display:flex;justify-content:center;margin-top:14px;}
+  .pb{padding:10px 32px;background:var(--gold);color:#fff;border:none;border-radius:8px;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:var(--font);}
+
+  /* ===== 1. BEFORE/AFTER ===== */
+  .ba-wrap{display:grid;grid-template-columns:1fr 1fr;min-height:460px;}
+  .ba-side{padding:48px 32px;display:flex;flex-direction:column;justify-content:center;}
+  .ba-before{background:rgba(248,113,113,0.03);border-right:3px solid var(--red);}
+  .ba-after{background:rgba(74,222,128,0.03);}
+  .ba-label{font-family:var(--mono);font-size:0.55rem;letter-spacing:0.15em;margin-bottom:20px;}
+  .ba-big{font-family:var(--mono);font-size:3rem;font-weight:700;margin-bottom:8px;}
+  .ba-desc{font-size:0.8rem;color:var(--text2);line-height:1.7;margin-bottom:24px;}
+  .ba-items{display:flex;flex-direction:column;gap:8px;}
+  .ba-item{display:flex;gap:8px;align-items:center;font-size:0.72rem;color:var(--text2);}
+  .ba-icon{font-size:0.65rem;}
+  .ba-metrics{display:flex;justify-content:center;gap:24px;padding:20px;background:rgba(255,255,255,0.015);border-top:1px solid var(--border);}
+  .ba-metric{text-align:center;padding:12px 20px;}
+  .ba-metric-num{font-family:var(--mono);font-size:1.4rem;font-weight:600;}
+  .ba-metric-label{font-size:0.6rem;color:var(--muted);margin-top:4px;}
+
+  /* ===== 2. AGENT PIPELINE ===== */
+  .ap-wrap{padding:48px 24px;}
+  .ap-headline{font-size:1.1rem;font-weight:600;text-align:center;margin-bottom:32px;}
+  .ap-pipe{display:flex;align-items:center;gap:0;justify-content:center;margin-bottom:32px;}
+  .ap-node{text-align:center;width:160px;padding:20px 12px;border:1px solid var(--border);border-radius:12px;background:var(--surface);position:relative;transition:all 0.3s;}
+  .ap-node:hover{border-color:rgba(200,170,80,0.3);background:rgba(200,170,80,0.03);}
+  .ap-node-icon{font-size:1.5rem;margin-bottom:8px;}
+  .ap-node-name{font-size:0.7rem;font-weight:600;margin-bottom:4px;}
+  .ap-node-out{font-size:0.55rem;color:var(--muted);line-height:1.5;}
+  .ap-arrow{color:var(--gold);font-size:1.2rem;margin:0 4px;opacity:0.4;}
+  .ap-input{padding:12px 16px;border:1px dashed var(--border);border-radius:8px;font-family:var(--mono);font-size:0.6rem;color:var(--muted);text-align:center;width:100px;}
+  .ap-output{padding:12px 16px;border:2px solid rgba(74,222,128,0.2);border-radius:8px;background:rgba(74,222,128,0.03);text-align:center;width:120px;}
+  .ap-output-time{font-family:var(--mono);font-size:1rem;font-weight:600;color:var(--green);}
+  .ap-output-label{font-size:0.55rem;color:var(--muted);margin-top:2px;}
+  .ap-kpis{display:flex;justify-content:center;gap:40px;padding:20px;border-top:1px solid var(--border);}
+  .ap-kpi{text-align:center;}
+  .ap-kpi-num{font-family:var(--mono);font-size:1.3rem;font-weight:600;}
+  .ap-kpi-label{font-size:0.6rem;color:var(--muted);margin-top:2px;}
+
+  /* ===== 3. COUNTDOWN TERMINAL ===== */
+  .ct-wrap{display:grid;grid-template-columns:1fr 200px;min-height:460px;}
+  .ct-main{padding:48px 32px;display:flex;flex-direction:column;justify-content:center;}
+  .ct-status{font-family:var(--mono);font-size:0.65rem;color:var(--gold);margin-bottom:20px;}
+  .ct-blink{animation:blink 1s infinite;}
+  @keyframes blink{0%,50%{opacity:1;}51%,100%{opacity:0;}}
+  .ct-lines{display:flex;flex-direction:column;gap:10px;margin-bottom:32px;min-height:200px;}
+  .ct-line{font-family:var(--mono);font-size:0.75rem;color:var(--text2);opacity:0;transform:translateX(-8px);transition:all 0.5s;}
+  .ct-line.show{opacity:1;transform:translateX(0);}
+  .ct-line .check{color:var(--green);}
+  .ct-result{text-align:center;padding:20px;border:2px solid rgba(200,170,80,0.2);border-radius:12px;background:rgba(200,170,80,0.03);opacity:0;transition:opacity 0.5s;}
+  .ct-result.show{opacity:1;}
+  .ct-result-time{font-family:var(--mono);font-size:2.5rem;font-weight:700;color:var(--gold);}
+  .ct-result-old{font-family:var(--mono);font-size:0.8rem;color:var(--red);text-decoration:line-through;margin-top:4px;}
+  .ct-sidebar{border-left:1px solid var(--border);padding:32px 20px;display:flex;flex-direction:column;gap:20px;justify-content:center;}
+  .ct-kpi{text-align:center;}
+  .ct-kpi-num{font-family:var(--mono);font-size:1.5rem;font-weight:600;}
+  .ct-kpi-label{font-size:0.6rem;color:var(--muted);margin-top:4px;}
+
+  /* ===== 4. METRIC CARDS ===== */
+  .mc-wrap{padding:48px 40px;}
+  .mc-headline{font-size:1.1rem;font-weight:600;margin-bottom:8px;}
+  .mc-sub{font-size:0.75rem;color:var(--text2);margin-bottom:32px;}
+  .mc-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
+  .mc-card{padding:32px 24px;border:1px solid var(--border);border-radius:14px;background:var(--surface);text-align:center;}
+  .mc-card-num{font-family:var(--mono);font-size:2.5rem;font-weight:700;margin-bottom:6px;}
+  .mc-card-label{font-size:0.8rem;color:var(--text);font-weight:500;margin-bottom:4px;}
+  .mc-card-desc{font-size:0.65rem;color:var(--muted);line-height:1.5;}
+  .mc-details{padding:20px;border:1px solid var(--border);border-radius:12px;background:var(--surface);}
+  .mc-details summary{font-size:0.8rem;cursor:pointer;color:var(--gold);font-weight:500;}
+  .mc-steps{margin-top:16px;display:flex;flex-direction:column;gap:10px;}
+  .mc-step{display:flex;gap:12px;align-items:flex-start;font-size:0.72rem;color:var(--text2);}
+  .mc-step-num{font-family:var(--mono);font-size:0.65rem;color:var(--gold);min-width:20px;font-weight:600;}
+  .mc-context{text-align:center;font-family:var(--mono);font-size:0.55rem;color:var(--muted);margin-top:16px;}
+
+  /* ===== 5. NARRATIVE SCROLL ===== */
+  .ns-wrap{max-width:640px;margin:0 auto;padding:60px 32px;}
+  .ns-act{margin-bottom:48px;}
+  .ns-act-label{font-family:var(--mono);font-size:0.55rem;color:var(--muted);letter-spacing:0.15em;margin-bottom:12px;}
+  .ns-act-big{font-family:var(--mono);font-size:3rem;font-weight:700;margin-bottom:8px;}
+  .ns-act-desc{font-size:0.85rem;color:var(--text2);line-height:1.8;}
+  .ns-steps{display:flex;flex-direction:column;gap:14px;margin-top:8px;}
+  .ns-step{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);}
+  .ns-step-num{font-family:var(--mono);font-size:0.8rem;color:var(--gold);font-weight:600;min-width:24px;}
+  .ns-step-text{font-size:0.78rem;color:var(--text2);line-height:1.6;}
+  .ns-results{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:8px;}
+  .ns-result{text-align:center;padding:20px;border:1px solid var(--border);border-radius:10px;}
+  .ns-result-num{font-family:var(--mono);font-size:2rem;font-weight:700;}
+  .ns-result-label{font-size:0.65rem;color:var(--muted);margin-top:4px;}
+  .ns-cta{margin-top:32px;text-align:center;}
+  .ns-cta a{padding:12px 28px;border:1px solid var(--gold);color:var(--gold);border-radius:8px;text-decoration:none;font-size:0.8rem;font-weight:500;transition:all 0.2s;}
+  .ns-cta a:hover{background:var(--gold);color:#fff;}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <h1>⚙️ AI Solutions (CNC) — 5 Layouts</h1>
+  <button class="nb a" onclick="sw('ba',this)">1. Before/After</button>
+  <button class="nb" onclick="sw('ap',this)">2. Pipeline</button>
+  <button class="nb" onclick="sw('ct',this)">3. Terminal</button>
+  <button class="nb" onclick="sw('mc',this)">4. Metrics</button>
+  <button class="nb" onclick="sw('ns',this)">5. Narrative</button>
+</div>
+
+<!-- 1. BEFORE/AFTER -->
+<div class="sec a" id="s-ba">
+  <div class="meta">
+    <span class="name">1. Before/After Split</span>
+    <span class="conf c88">88%</span>
+    <span class="why"><b>Why:</b> Sofort verständlich. Before/After = stärkster psychologischer Hook.</span>
+    <span class="risk"><b>Risk:</b> Slider-Pattern bekannt. 5 Agents kommen zu kurz.</span>
+  </div>
+  <div class="preview">
+    <div class="ba-wrap">
+      <div class="ba-side ba-before">
+        <div class="ba-label" style="color:var(--red);">BEFORE</div>
+        <div class="ba-big" style="color:var(--red);">2-4h</div>
+        <div class="ba-desc">Pro Angebotskalkulation. Manuell. Fehleranfällig.</div>
+        <div class="ba-items">
+          <div class="ba-item"><span class="ba-icon" style="color:var(--red);">✗</span> Zeichnungen manuell lesen</div>
+          <div class="ba-item"><span class="ba-icon" style="color:var(--red);">✗</span> REFA-Zeiten aus Tabellen</div>
+          <div class="ba-item"><span class="ba-icon" style="color:var(--red);">✗</span> Materialpreise googlen</div>
+          <div class="ba-item"><span class="ba-icon" style="color:var(--red);">✗</span> Angebot in Word tippen</div>
+          <div class="ba-item"><span class="ba-icon" style="color:var(--red);">✗</span> Chef prüft → Korrekturrunde</div>
+        </div>
+      </div>
+      <div class="ba-side ba-after">
+        <div class="ba-label" style="color:var(--green);">AFTER</div>
+        <div class="ba-big" style="color:var(--green);">~10 min</div>
+        <div class="ba-desc">5 AI Agents. Automatisch. Geprüft.</div>
+        <div class="ba-items">
+          <div class="ba-item"><span class="ba-icon" style="color:var(--green);">✓</span> PDF → Bauteile, Toleranzen, Material</div>
+          <div class="ba-item"><span class="ba-icon" style="color:var(--green);">✓</span> REFA automatisch kalkuliert</div>
+          <div class="ba-item"><span class="ba-icon" style="color:var(--green);">✓</span> Echtzeit-Marktpreise</div>
+          <div class="ba-item"><span class="ba-icon" style="color:var(--green);">✓</span> Professionelles PDF-Angebot</div>
+          <div class="ba-item"><span class="ba-icon" style="color:var(--green);">✓</span> QA: Plausibilität + Marge geprüft</div>
+        </div>
+      </div>
+    </div>
+    <div class="ba-metrics">
+      <div class="ba-metric"><div class="ba-metric-num" style="color:var(--green);">95%↓</div><div class="ba-metric-label">Processing Time</div></div>
+      <div class="ba-metric"><div class="ba-metric-num" style="color:var(--green);">80%↓</div><div class="ba-metric-label">Error Rate</div></div>
+      <div class="ba-metric"><div class="ba-metric-num" style="color:var(--gold);">€50K+</div><div class="ba-metric-label">Annual Savings</div></div>
+    </div>
+  </div>
+  <div class="cmt"><textarea placeholder="Comment..."></textarea></div>
+  <div class="pr"><button class="pb">Pick This</button></div>
+</div>
+
+<!-- 2. AGENT PIPELINE -->
+<div class="sec" id="s-ap">
+  <div class="meta">
+    <span class="name">2. Agent Pipeline</span>
+    <span class="conf c82">82%</span>
+    <span class="why"><b>Why:</b> Macht Agents greifbar. Zeigt Systematik. Skaliert visuell auf andere Use Cases.</span>
+    <span class="risk"><b>Risk:</b> Horizontal-Problem auf Mobile. Kann technisch wirken.</span>
+  </div>
+  <div class="preview">
+    <div class="ap-wrap">
+      <div class="ap-headline">5 AI Agents. 1 Process. 10 Minutes.</div>
+      <div class="ap-pipe">
+        <div class="ap-input">📄 PDF<br>Upload</div>
+        <span class="ap-arrow">→</span>
+        <div class="ap-node"><div class="ap-node-icon">🔍</div><div class="ap-node-name">Drawing Analysis</div><div class="ap-node-out">3 parts · tolerances · material</div></div>
+        <span class="ap-arrow">→</span>
+        <div class="ap-node"><div class="ap-node-icon">⏱️</div><div class="ap-node-name">REFA Calc</div><div class="ap-node-out">47 operations · auto-timed</div></div>
+        <span class="ap-arrow">→</span>
+        <div class="ap-node"><div class="ap-node-icon">💰</div><div class="ap-node-name">Pricing</div><div class="ap-node-out">Live market · €3.20/kg</div></div>
+        <span class="ap-arrow">→</span>
+        <div class="ap-node"><div class="ap-node-icon">📋</div><div class="ap-node-name">Quote Gen</div><div class="ap-node-out">12-page PDF · branded</div></div>
+        <span class="ap-arrow">→</span>
+        <div class="ap-node"><div class="ap-node-icon">✅</div><div class="ap-node-name">QA Check</div><div class="ap-node-out">Margin 23.4% ✓</div></div>
+        <span class="ap-arrow">→</span>
+        <div class="ap-output"><div class="ap-output-time">9:42</div><div class="ap-output-label">minutes</div></div>
+      </div>
+      <div class="ap-kpis">
+        <div class="ap-kpi"><div class="ap-kpi-num" style="color:var(--green);">95%↓</div><div class="ap-kpi-label">Time</div></div>
+        <div class="ap-kpi"><div class="ap-kpi-num" style="color:var(--green);">80%↓</div><div class="ap-kpi-label">Errors</div></div>
+        <div class="ap-kpi"><div class="ap-kpi-num" style="color:var(--gold);">€50K+</div><div class="ap-kpi-label">Saved/Year</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="cmt"><textarea placeholder="Comment..."></textarea></div>
+  <div class="pr"><button class="pb">Pick This</button></div>
+</div>
+
+<!-- 3. COUNTDOWN TERMINAL -->
+<div class="sec" id="s-ct">
+  <div class="meta">
+    <span class="name">3. Countdown Terminal ⚡</span>
+    <span class="conf c72">72%</span>
+    <span class="why"><b>Why:</b> Extrem engaging. "Wow"-Moment. Zeigt Speed erlebbar.</span>
+    <span class="risk"><b>Risk:</b> Gimmicky. Late-scroller sehen nur Ende. Braucht Replay.</span>
+  </div>
+  <div class="preview">
+    <div class="ct-wrap">
+      <div class="ct-main">
+        <div class="ct-status">Angebotskalulation läuft...<span class="ct-blink"> ▋</span></div>
+        <div class="ct-lines" id="ctLines">
+          <div class="ct-line" id="ct1"><span class="check">✓</span> Zeichnung analysiert — 3 Bauteile erkannt</div>
+          <div class="ct-line" id="ct2"><span class="check">✓</span> REFA-Zeiten kalkuliert — 47 Arbeitsgänge</div>
+          <div class="ct-line" id="ct3"><span class="check">✓</span> Materialpreise abgerufen — Edelstahl 1.4301 @ €3.20/kg</div>
+          <div class="ct-line" id="ct4"><span class="check">✓</span> Angebot erstellt — 12 Seiten PDF</div>
+          <div class="ct-line" id="ct5"><span class="check">✓</span> QA bestanden — Marge 23.4% ✓</div>
+        </div>
+        <div class="ct-result" id="ctResult">
+          <div class="ct-result-time">9:42</div>
+          <div style="font-size:0.75rem;color:var(--text2);margin-top:4px;">minutes total</div>
+          <div class="ct-result-old">Manual: 2-4 hours</div>
+        </div>
+        <div style="text-align:center;margin-top:16px;"><button onclick="replayTerminal()" style="background:transparent;border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:6px;font-family:var(--mono);font-size:0.6rem;cursor:pointer;">↻ Replay</button></div>
+      </div>
+      <div class="ct-sidebar">
+        <div class="ct-kpi"><div class="ct-kpi-num" style="color:var(--green);">95%↓</div><div class="ct-kpi-label">Processing Time</div></div>
+        <div class="ct-kpi"><div class="ct-kpi-num" style="color:var(--green);">80%↓</div><div class="ct-kpi-label">Error Rate</div></div>
+        <div class="ct-kpi"><div class="ct-kpi-num" style="color:var(--gold);">€50K+</div><div class="ct-kpi-label">Annual Savings</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="cmt"><textarea placeholder="Comment..."></textarea></div>
+  <div class="pr"><button class="pb">Pick This</button></div>
+</div>
+
+<!-- 4. METRIC CARDS -->
+<div class="sec" id="s-mc">
+  <div class="meta">
+    <span class="name">4. Metric Cards Grid</span>
+    <span class="conf c85">85%</span>
+    <span class="why"><b>Why:</b> C-Level-optimiert. Zahlen zuerst, Details on demand. Scannt in 3 Sekunden.</span>
+    <span class="risk"><b>Risk:</b> Generisch. Sieht aus wie jede SaaS-Metrics-Section. Wenig Story.</span>
+  </div>
+  <div class="preview">
+    <div class="mc-wrap">
+      <div class="mc-headline">Real Results. Real Client.</div>
+      <div class="mc-sub">CNC manufacturer · 50 employees · quoting automation</div>
+      <div class="mc-cards">
+        <div class="mc-card">
+          <div class="mc-card-num" style="color:var(--gold);">2-4h → 10min</div>
+          <div class="mc-card-label">Processing Time</div>
+          <div class="mc-card-desc">Per quote. From manual calculation to automated pipeline.</div>
+        </div>
+        <div class="mc-card">
+          <div class="mc-card-num" style="color:var(--green);">-80%</div>
+          <div class="mc-card-label">Error Rate</div>
+          <div class="mc-card-desc">AI-verified calculations. Margin checks. Plausibility QA.</div>
+        </div>
+        <div class="mc-card">
+          <div class="mc-card-num" style="color:var(--gold);">€50K+</div>
+          <div class="mc-card-label">Annual Savings</div>
+          <div class="mc-card-desc">Time recovered + errors prevented + faster deal cycles.</div>
+        </div>
+      </div>
+      <div class="mc-details">
+        <details>
+          <summary>How it works — 5 Agent Pipeline →</summary>
+          <div class="mc-steps">
+            <div class="mc-step"><span class="mc-step-num">①</span> Drawing Analysis — PDF → parts, tolerances, material identification</div>
+            <div class="mc-step"><span class="mc-step-num">②</span> REFA Calculation — Automated manufacturing time estimation (47 operations)</div>
+            <div class="mc-step"><span class="mc-step-num">③</span> Material Pricing — Real-time market prices (Stainless 1.4301 @ €3.20/kg)</div>
+            <div class="mc-step"><span class="mc-step-num">④</span> Quote Generation — Professional 12-page PDF, branded and formatted</div>
+            <div class="mc-step"><span class="mc-step-num">⑤</span> QA Check — Plausibility verification, margin analysis (23.4% ✓)</div>
+          </div>
+        </details>
+      </div>
+      <div class="mc-context">Mittelständischer Fertiger · 50 Mitarbeiter · CNC-Branche</div>
+    </div>
+  </div>
+  <div class="cmt"><textarea placeholder="Comment..."></textarea></div>
+  <div class="pr"><button class="pb">Pick This</button></div>
+</div>
+
+<!-- 5. NARRATIVE SCROLL -->
+<div class="sec" id="s-ns">
+  <div class="meta">
+    <span class="name">5. Narrative Scroll</span>
+    <span class="conf c84">84%</span>
+    <span class="why"><b>Why:</b> Storytelling. Emotional. Perfekt auf Mobile. Premium Feel.</span>
+    <span class="risk"><b>Risk:</b> Braucht Scroll-Commitment. Nicht ideal wenn Tab nur kleiner Bereich.</span>
+  </div>
+  <div class="preview">
+    <div class="ns-wrap">
+      <div class="ns-act">
+        <div class="ns-act-label" style="color:var(--red);">THE PROBLEM</div>
+        <div class="ns-act-big" style="color:var(--red);">2-4 hours</div>
+        <div class="ns-act-desc">For every quote. Manually calculated. Reading technical drawings, looking up REFA times in tables, googling material prices, typing offers in Word. Error-prone. Slow. Expensive.</div>
+      </div>
+      <div class="ns-act">
+        <div class="ns-act-label" style="color:var(--gold);">THE SOLUTION</div>
+        <div class="ns-steps">
+          <div class="ns-step"><span class="ns-step-num">①</span><span class="ns-step-text">Drawing Analysis — PDF uploaded, 3 parts identified, tolerances extracted, material classified. <span style="color:var(--green);">2 seconds.</span></span></div>
+          <div class="ns-step"><span class="ns-step-num">②</span><span class="ns-step-text">REFA Calculation — 47 manufacturing operations timed automatically. <span style="color:var(--green);">45 seconds.</span></span></div>
+          <div class="ns-step"><span class="ns-step-num">③</span><span class="ns-step-text">Material Pricing — Real-time market prices pulled. Stainless 1.4301 @ €3.20/kg. <span style="color:var(--green);">3 seconds.</span></span></div>
+          <div class="ns-step"><span class="ns-step-num">④</span><span class="ns-step-text">Quote Generation — Professional 12-page PDF, branded, all line items calculated. <span style="color:var(--green);">2 minutes.</span></span></div>
+          <div class="ns-step"><span class="ns-step-num">⑤</span><span class="ns-step-text">QA Check — Plausibility verified. Margin: 23.4% ✓. No manual review needed. <span style="color:var(--green);">15 seconds.</span></span></div>
+        </div>
+      </div>
+      <div class="ns-act">
+        <div class="ns-act-label" style="color:var(--green);">THE RESULT</div>
+        <div class="ns-results">
+          <div class="ns-result"><div class="ns-result-num" style="color:var(--green);">95%↓</div><div class="ns-result-label">Processing Time</div></div>
+          <div class="ns-result"><div class="ns-result-num" style="color:var(--green);">80%↓</div><div class="ns-result-label">Error Rate</div></div>
+          <div class="ns-result"><div class="ns-result-num" style="color:var(--gold);">€50K+</div><div class="ns-result-label">Annual Savings</div></div>
+        </div>
+      </div>
+      <div class="ns-cta"><a href="#">Let's find your 10-minute process →</a></div>
+    </div>
+  </div>
+  <div class="cmt"><textarea placeholder="Comment..."></textarea></div>
+  <div class="pr"><button class="pb">Pick This</button></div>
+</div>
+
+<script>
+function sw(id,btn){document.querySelectorAll('.sec').forEach(s=>s.classList.remove('a'));document.querySelectorAll('.nb').forEach(b=>b.classList.remove('a'));document.getElementById('s-'+id).classList.add('a');btn.classList.add('a');if(id==='ct')playTerminal();}
+
+// Terminal animation
+let ctPlayed=false;
+function playTerminal(){
+  document.querySelectorAll('.ct-line').forEach(l=>l.classList.remove('show'));
+  document.getElementById('ctResult').classList.remove('show');
+  ctPlayed=true;
+  setTimeout(()=>document.getElementById('ct1').classList.add('show'),600);
+  setTimeout(()=>document.getElementById('ct2').classList.add('show'),2000);
+  setTimeout(()=>document.getElementById('ct3').classList.add('show'),3400);
+  setTimeout(()=>document.getElementById('ct4').classList.add('show'),4800);
+  setTimeout(()=>document.getElementById('ct5').classList.add('show'),6200);
+  setTimeout(()=>document.getElementById('ctResult').classList.add('show'),7600);
+}
+function replayTerminal(){playTerminal();}
+</script>
+</body>
+</html>
