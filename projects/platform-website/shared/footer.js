@@ -28,6 +28,7 @@
           <div style="display:flex;flex-direction:column;gap:10px;">
             <a href="blog.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Building in Public</a>
             <a href="index.html#showcase-research" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Research</a>
+            <a href="about.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">About</a>
           </div>
         </div>
         <div>
