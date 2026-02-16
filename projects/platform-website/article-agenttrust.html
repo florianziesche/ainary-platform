@@ -12,6 +12,20 @@
   <link rel="canonical" href="https://ainaryventures.com/article-agenttrust.html">
   
   <style>
+    :root {
+      --bg-page: #08080c;
+      --bg-surface: #111116;
+      --text-primary: #ededf0;
+      --text-secondary: #8b8b95;
+      --text-muted: #55555e;
+      --border-default: rgba(255,255,255,0.06);
+      --accent: #c8aa50;
+      --font-body: 'Inter', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:var(--font-body); background:var(--bg-page); color:var(--text-primary); -webkit-font-smoothing:antialiased; }
+
     .container { max-width:720px; margin:0 auto; padding:0 24px; }
     .article-header { padding:120px 0 48px; }
     .article-header .badge { font-family:var(--font-mono); font-size:0.7rem; font-weight:500; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-secondary); padding:4px 10px; border:1px solid rgba(255,255,255,0.08); border-radius:6px; margin-bottom:16px; display:inline-block; }
@@ -20,22 +34,62 @@
     .article-body { padding-bottom:80px; }
     .article-body p { color:var(--text-secondary); font-size:1rem; line-height:1.8; margin-bottom:24px; }
     .article-body h2 { font-family:var(--font-body); font-size:1.5rem; font-weight:600; letter-spacing:-0.02em; margin:48px 0 16px; color:var(--text-primary); }
-    .article-body h3 { font-family:var(--font-body); font-size:1.15rem; font-weight:600; margin:32px 0 12px; color:var(--text-primary); }
     .article-body blockquote { border-left:2px solid rgba(200,170,80,0.4); padding:12px 20px; margin:24px 0; background:rgba(255,255,255,0.03); }
     .article-body blockquote p { color:var(--text-primary); font-size:1rem; margin-bottom:0; }
     .article-body ul { color:var(--text-secondary); font-size:1rem; line-height:1.8; margin-bottom:24px; padding-left:20px; }
     .article-body li { margin-bottom:8px; }
-    .stat-row { display:flex; gap:24px; margin:32px 0; }
-    .stat-box { flex:1; padding:20px; border:1px solid rgba(255,255,255,0.08); border-radius:12px; text-align:center; }
+
+    /* Confidence Badges — matching AR-001 report */
+    .cb { font-family:var(--font-mono); font-size:0.6rem; font-weight:600; padding:2px 6px; border-radius:3px; margin-left:6px; vertical-align:middle; letter-spacing:0.03em; }
+    .cb-e { background:rgba(255,255,255,0.10); color:var(--text-primary); }
+    .cb-i { background:rgba(255,255,255,0.06); color:var(--text-secondary); }
+    .cb-j { background:rgba(200,170,80,0.15); color:var(--accent); }
+    .cb-a { background:rgba(255,255,255,0.04); color:var(--text-muted); }
+
+    /* Source refs */
+    .src { font-family:var(--font-mono); font-size:0.65rem; color:var(--text-muted); vertical-align:super; margin-left:2px; }
+
+    /* Stat cards */
+    .stat-row { display:flex; gap:16px; margin:32px 0; }
+    .stat-box { flex:1; padding:24px; border:1px solid rgba(255,255,255,0.12); border-radius:16px; background:var(--bg-page); }
     .stat-box .num { font-family:var(--font-mono); font-size:2rem; font-weight:600; color:var(--text-primary); }
-    .stat-box .label { font-size:0.75rem; color:var(--text-muted); margin-top:6px; }
+    .stat-box .label { font-size:0.8rem; color:var(--text-muted); margin-top:6px; line-height:1.4; }
+    .stat-box .source { font-family:var(--font-mono); font-size:0.6rem; color:var(--text-muted); margin-top:8px; opacity:0.7; }
+
+    /* Confidence breakdown */
+    .confidence-card { border:1px solid rgba(255,255,255,0.12); border-radius:16px; padding:24px; background:var(--bg-page); margin:32px 0; }
+    .confidence-header { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+    .confidence-score { font-family:var(--font-mono); font-size:2.5rem; font-weight:600; color:var(--text-primary); }
+    .confidence-label { font-size:0.875rem; color:var(--text-muted); line-height:1.4; }
+    .confidence-factors { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+    .confidence-factor { padding:12px; border:1px solid rgba(255,255,255,0.06); border-radius:8px; }
+    .confidence-factor .name { font-family:var(--font-mono); font-size:0.7rem; color:var(--text-secondary); font-weight:500; margin-bottom:4px; }
+    .confidence-factor .value { font-size:0.8rem; color:var(--text-muted); }
+
+    /* Agent pipeline */
+    .pipeline { font-family:var(--font-mono); font-size:0.875rem; line-height:2.2; color:var(--text-muted); margin:24px 0; padding:20px 24px; border:1px solid rgba(255,255,255,0.12); border-radius:16px; background:var(--bg-page); }
+    .pipeline .agent { color:var(--accent); }
+    .pipeline .tree { color:var(--text-muted); }
+
+    /* Badge legend — compact */
+    .badge-legend { display:flex; gap:16px; flex-wrap:wrap; margin:16px 0 24px; }
+    .badge-legend-item { display:flex; align-items:center; gap:6px; font-size:0.8rem; color:var(--text-muted); }
+
+    /* CTA */
     .cta-section { padding:48px 0; border-top:1px solid rgba(255,255,255,0.06); margin-top:48px; }
     .cta-section h3 { font-size:1.25rem; font-weight:500; margin-bottom:12px; }
     .link-row { display:flex; gap:24px; flex-wrap:wrap; margin-top:20px; }
     .link-row a { color:#c8aa50; font-size:1rem; text-decoration:none; font-weight:500; }
+
+    /* Scroll Fade-In */
+    .fade-in { opacity:0; transform:translateY(24px); transition:opacity 0.7s ease-out, transform 0.7s ease-out; }
+    .fade-in.visible { opacity:1; transform:translateY(0); }
+
     @media (max-width:640px) {
       .article-header h1 { font-size:1.75rem; }
       .stat-row { flex-direction:column; gap:12px; }
+      .confidence-factors { grid-template-columns:1fr; }
+      .container { padding-left:16px !important; padding-right:16px !important; }
     }
   </style>
 
@@ -59,9 +113,15 @@
   <article>
     <div class="container">
       <header class="article-header">
-        <span class="badge">AI Strategy · AR-001</span>
+        <span class="badge">AI Strategy · AR-001 · v2.3</span>
         <h1>State of AI Agent Trust 2026 — Why We Published Our Research Open Source</h1>
         <div class="meta">Florian Ziesche · Feb 16, 2026 · 5 min read</div>
+        <div class="badge-legend">
+          <span class="badge-legend-item"><span class="cb cb-e">E</span> Evidenced</span>
+          <span class="badge-legend-item"><span class="cb cb-i">I</span> Interpretation</span>
+          <span class="badge-legend-item"><span class="cb cb-j">J</span> Judgment</span>
+          <span class="badge-legend-item"><span class="cb cb-a">A</span> Assumption</span>
+        </div>
       </header>
 
       <div class="article-body">
@@ -74,30 +134,52 @@
 
         <p>The report — AR-001, "State of AI Agent Trust 2026" — synthesized 24 independent sources, from HBR surveys to academic benchmarks. Five AI agents worked in parallel: researching, analyzing, cross-verifying, challenging, and synthesizing. The full report took under 10 minutes to generate.</p>
 
-        <div class="stat-row">
+        <div class="stat-row fade-in">
           <div class="stat-box">
             <div class="num">6%</div>
-            <div class="label">of companies fully trust AI agents</div>
+            <div class="label">of companies fully trust AI agents<span class="cb cb-e">E</span></div>
+            <div class="source">HBR survey, n=603</div>
           </div>
           <div class="stat-box">
             <div class="num">25%</div>
-            <div class="label">multi-agent correctness on benchmarks</div>
+            <div class="label">multi-agent correctness on benchmarks<span class="cb cb-e">E</span></div>
+            <div class="source">Academic benchmark, 14 failure modes</div>
           </div>
           <div class="stat-box">
             <div class="num">>40%</div>
-            <div class="label">of agentic AI projects canceled by 2027</div>
+            <div class="label">of agentic AI projects canceled by 2027<span class="cb cb-i">I</span></div>
+            <div class="source">Gartner + industry analysis</div>
           </div>
         </div>
 
-        <p>AI agent capability doubles every seven months. Enterprise governance updates annually. That gap isn't closing — it's accelerating. We call it the Trust Race.</p>
+        <p>AI agent capability doubles every seven months.<span class="cb cb-e">E</span> Enterprise governance updates annually.<span class="cb cb-e">E</span> That gap isn't closing — it's accelerating. We call it the Trust Race.<span class="cb cb-j">J</span></p>
 
         <h2>Why we published it open source</h2>
 
-        <p>If trust is the problem, you can't solve it behind closed doors.</p>
+        <p>If trust is the problem, you can't solve it behind closed doors.<span class="cb cb-j">J</span></p>
 
-        <p>Every claim in the report carries a confidence label — Evidenced, Interpretation, Judgment, or Assumption. The overall report confidence is 73%. Not because the research is weak, but because our central framework (the Trust Race Model) is original and hasn't been externally validated yet. We flag that openly.</p>
+        <p>Every claim in the report carries a confidence label — Evidenced, Interpretation, Judgment, or Assumption. The same badges you see in this article. They exist because a system that asks you to trust its output should be willing to show how it got there.</p>
 
-        <blockquote><p>A system that asks you to trust its output should be willing to show how it got there.</p></blockquote>
+        <div class="confidence-card fade-in">
+          <div class="confidence-header">
+            <div class="confidence-score">73%</div>
+            <div class="confidence-label">Overall report confidence<br><span style="font-size:0.75rem;">Not a weakness — an honest signal</span></div>
+          </div>
+          <div class="confidence-factors">
+            <div class="confidence-factor">
+              <div class="name">Evidence Strength</div>
+              <div class="value">Strong. 24 sources, 100% within 12-month freshness window.</div>
+            </div>
+            <div class="confidence-factor">
+              <div class="name">Source Quality</div>
+              <div class="value">Mixed. 8 industry reports, 3 peer-reviewed, 9 trade publications.</div>
+            </div>
+            <div class="confidence-factor">
+              <div class="name">Framework Originality</div>
+              <div class="value">The Trust Race Model is original and has not been externally validated. We flag this openly.</div>
+            </div>
+          </div>
+        </div>
 
         <p>The full methodology, all sources, and the confidence framework are in the report. The code and data pipeline are on GitHub. Anyone can verify, critique, or build on it.</p>
 
@@ -105,23 +187,26 @@
 
         <p>AR-001 wasn't written by one model answering one prompt. It was produced by a pipeline of specialized agents:</p>
 
-        <ul>
-          <li><strong>Researcher</strong> — scans and extracts from primary sources</li>
-          <li><strong>Analyst</strong> — structures findings into frameworks</li>
-          <li><strong>Strategist</strong> — generates recommendations</li>
-          <li><strong>Critic</strong> — cross-verifies claims, flags contradictions</li>
-          <li><strong>Synthesizer</strong> — compiles the final report with confidence labels</li>
-        </ul>
+        <div class="pipeline fade-in">
+          <div><span class="tree">├</span> <span class="agent">Researcher</span> — scans and extracts from 24 primary sources</div>
+          <div><span class="tree">├</span> <span class="agent">Analyst</span> — structures findings into frameworks</div>
+          <div><span class="tree">├</span> <span class="agent">Strategist</span> — generates recommendations</div>
+          <div><span class="tree">├</span> <span class="agent">Critic</span> — cross-verifies claims, flags contradictions</div>
+          <div><span class="tree">└</span> <span class="agent">Synthesizer</span> — compiles final report with confidence labels</div>
+          <div style="margin-top:12px;color:var(--text-muted);font-size:0.75rem;">3 synthesis rounds · cross-verification against source material · < 10 min total</div>
+        </div>
 
-        <p>Three synthesis rounds. Cross-verification against source material. Confidence scoring on every claim. The output is a 47-page report that would take a research team days to produce manually.</p>
+        <p>The output is a 47-page report that would take a research team days to produce manually. Not by cutting corners — by running five specialized agents in parallel instead of one generalist sequentially.</p>
 
         <h2>What this means for enterprises</h2>
 
-        <p>The trust problem isn't going away by waiting. Companies that build trust infrastructure now — confidence frameworks, verification pipelines, transparent reporting — will have a structural advantage over those that don't.</p>
+        <p>The trust problem isn't going away by waiting.<span class="cb cb-j">J</span> Companies that build trust infrastructure now — confidence frameworks, verification pipelines, transparent reporting — will have a structural advantage over those that don't.<span class="cb cb-i">I</span></p>
+
+        <p>EU AI Act enforcement begins August 2026 with penalties up to €35M or 7% of global revenue.<span class="cb cb-e">E</span> The regulatory clock is ticking. The companies that treat AI governance as a cost center will be the ones paying fines. The ones that treat it as infrastructure will be the ones winning deals.<span class="cb cb-j">J</span></p>
 
         <p>That's what we're building at Ainary. Not another chatbot. A system that does the research, shows its work, and tells you where it's uncertain.</p>
 
-        <div class="cta-section">
+        <div class="cta-section fade-in">
           <h3>Read the full report. Check the code.</h3>
           <p style="color:var(--text-secondary);font-size:1rem;">Judge for yourself.</p>
           <div class="link-row">
@@ -136,6 +221,17 @@
   </article>
 
   <div id="site-footer"></div>
+
+  <!-- Scroll Fade-In Observer -->
+  <script>
+    document.addEventListener('DOMContentLoaded',()=>{
+      const obs=new IntersectionObserver((entries)=>{
+        entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});
+      },{threshold:0.1,rootMargin:'0px 0px -40px 0px'});
+      document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
+    });
+  </script>
+
   <script src="shared/nav.js"></script>
   <script src="shared/footer.js"></script>
 </body>
