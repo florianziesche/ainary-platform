@@ -15,6 +15,7 @@
   
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="binary-star-v3.css">
   <!-- Geist font removed — not used, Inter everywhere -->
   
   <style>
@@ -187,9 +188,22 @@
   <!-- Navigation -->
   <div id="site-nav"></div>
 
-  <!-- Hero -->
-  <section class="hero">
-    <div class="container">
+  <!-- Hero with Binary Star v3 -->
+  <section class="hero" style="position:relative;overflow:hidden;">
+    <!-- Binary Star Scene -->
+    <div class="binary-star-scene" id="scene">
+      <div class="orb orb--gold" id="orb-gold"></div>
+      <div class="orb orb--silver" id="orb-silver"></div>
+      <div class="bridge" id="bridge">
+        <div class="bridge__core"></div>
+        <div class="bridge__halo"></div>
+      </div>
+      <div class="ambient-stars" id="ambient-stars"></div>
+      <div class="grain" id="grain"></div>
+      <div class="vignette"></div>
+    </div>
+
+    <div class="container" style="position:relative;z-index:10;">
       <div class="hero-content">
         <h1 style="font-family:var(--font-body);font-size:4.5rem;font-weight:600;letter-spacing:-0.035em;line-height:1.05;color:#ffffff;">Multiply your team.</h1>
         <p class="hero-subtitle" style="font-family:var(--font-body);font-size:1.75rem;margin-top:20px;color:var(--text-secondary);font-weight:400;letter-spacing:-0.01em;line-height:1.4;">
@@ -685,5 +699,57 @@
     });
   </script>
 
+  <!-- Binary Star v3 Animation -->
+  <script>
+  (function() {
+    'use strict';
+    // Film Grain
+    const grainEl = document.getElementById('grain');
+    if (!grainEl) return;
+    const gc = document.createElement('canvas');
+    gc.width = gc.height = 256;
+    const gx = gc.getContext('2d');
+    const id = gx.createImageData(256, 256);
+    for (let i = 0; i < id.data.length; i += 4) {
+      const v = Math.random() * 255 | 0;
+      id.data[i] = id.data[i+1] = id.data[i+2] = v;
+      id.data[i+3] = 255;
+    }
+    gx.putImageData(id, 0, 0);
+    grainEl.style.backgroundImage = `url(${gc.toDataURL()})`;
+    grainEl.style.backgroundSize = '256px 256px';
+
+    // Ambient Stars
+    const sc = document.getElementById('ambient-stars');
+    [{x:12,y:18,b:1,d:7},{x:85,y:8,b:1,d:9},{x:92,y:72,b:0,d:11},{x:7,y:65,b:0,d:8},{x:35,y:5,b:1,d:12},{x:68,y:92,b:0,d:10},{x:22,y:88,b:1,d:7.5},{x:78,y:22,b:0,d:9.5},{x:50,y:95,b:0,d:13},{x:95,y:45,b:1,d:8.5}].forEach(s => {
+      const el = document.createElement('div');
+      el.className = `star star--${s.b ? 'bright' : 'dim'}`;
+      el.style.cssText = `left:${s.x}%;top:${s.y}%;--star-base:${s.b?0.5:0.15};--star-peak:${s.b?0.9:0.35};animation:twinkle ${s.d}s ease-in-out infinite ${(Math.random()*5).toFixed(1)}s`;
+      sc.appendChild(el);
+    });
+
+    // Mouse Parallax
+    const og = document.getElementById('orb-gold');
+    const os = document.getElementById('orb-silver');
+    const br = document.getElementById('bridge');
+    let mx = 0, my = 0, cx = 0, cy = 0;
+    document.addEventListener('mousemove', e => {
+      mx = (e.clientX / window.innerWidth - 0.5) * 2;
+      my = (e.clientY / window.innerHeight - 0.5) * 2;
+    });
+    function tick() {
+      cx += (mx - cx) * 0.03;
+      cy += (my - cy) * 0.03;
+      og.style.marginLeft = cx * 8 + 'px';
+      og.style.marginTop = cy * 6 + 'px';
+      os.style.marginLeft = cx * -6 + 'px';
+      os.style.marginTop = cy * -5 + 'px';
+      br.style.marginLeft = (cx * 8 + cx * -6) * 0.5 + 'px';
+      br.style.marginTop = (cy * 6 + cy * -5) * 0.5 + 'px';
+      requestAnimationFrame(tick);
+    }
+    tick();
+  })();
+  </script>
 </body>
 </html>
