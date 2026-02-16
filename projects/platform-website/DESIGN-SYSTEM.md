@@ -55,12 +55,15 @@
 | Button | Inter | `0.875rem` (14px) | 500 | — | — |
 | Footer link | Inter | `0.875rem` (14px) | 400 | — | — |
 
-### 5-Step Scale (simplified)
-1. **Hero** — 3.75rem (60px)
-2. **Section Header** — 2.5rem (40px)
-3. **Subtitle / Card Title** — 1.25-1.6rem (20-25px)
-4. **Body** — 1.0625rem (17px) — ONE size for all body text
-5. **Small / Mono** — 0.75rem (12px) — ONE size for all small text
+### 6-Step Scale
+1. **Hero** — 4.5rem (72px)
+2. **Section Header** — 3rem (48px)
+3. **Subtitle / Card Title** — 1.25rem (20px)
+4. **Body** — 1rem (16px) — all readable text
+5. **Secondary** — 0.875rem (14px) — nav, buttons, card details
+6. **Small / Mono** — 0.75rem (12px) — ABSOLUTE minimum. Timestamps, badges, footnotes.
+
+**Rule: Nothing below 0.75rem (12px). Ever.**
 
 ### Rules
 1. **Headlines always Geist**, body always Inter, data always JetBrains Mono

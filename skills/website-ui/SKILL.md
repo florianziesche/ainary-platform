@@ -28,9 +28,12 @@ metadata:
 |-------|------|------|--------|---------|
 | Hero | 4.5rem (72px) | Geist | 600 | -0.035em |
 | Section Header | 3rem (48px) | Geist | 500 | -0.035em |
-| Subtitle/Card Title | 1.25-1.5rem | Geist | 400-500 | -0.01em |
-| Body | 1.0625rem (17px) | Inter | 400 | — |
+| Subtitle/Card Title | 1.25rem (20px) | Geist | 400-500 | -0.01em |
+| Body | 1rem (16px) | Inter | 400 | — |
+| Secondary | 0.875rem (14px) | Inter | 400-500 | — |
 | Small/Mono | 0.75rem (12px) | JetBrains Mono | 400-500 | — |
+
+**Nothing below 0.75rem (12px). Ever.**
 
 ### Colors
 - Page bg: `#08080c` — Surface: `#111116`
