@@ -48,8 +48,12 @@
           </div>
         </div>
       </div>
-      <div style="max-width:1200px;margin:0 auto;padding:16px 24px 0;border-top:1px solid rgba(255,255,255,0.06);text-align:left;">
+      <div style="max-width:1200px;margin:0 auto;padding:16px 24px 0;border-top:1px solid rgba(255,255,255,0.06);display:flex;justify-content:space-between;align-items:center;">
         <p style="color:#55555e;font-size:0.7rem;">© 2026 Ainary. All rights reserved.</p>
+        <div style="display:flex;gap:12px;font-size:0.7rem;">
+          <span style="color:#ededf0;font-weight:500;">EN</span>
+          <a href="de/index.html" style="color:#55555e;text-decoration:none;">DE</a>
+        </div>
       </div>
     </footer>
   `;
