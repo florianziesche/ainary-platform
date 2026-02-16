@@ -208,8 +208,8 @@ This article is the gold standard for all future blog/article pages. Document ev
 - "Building in Public" = Florian's story: solo founder, open source reports, transparent confidence scores.
 - The name IS the positioning.
 
-## Article Template (⭐ REFERENCE = article-agenttrust.html)
-*All articles derive from this. Updated Feb 16 15:55.*
+## Article Template (⭐ REFERENCE v2 = article-agenttrust.html)
+*All articles derive from this. Updated Feb 16 16:05. v2 = centered editorial layout.*
 
 ### Structure
 1. **Badge** — grey pill (Mono 0.7rem, border rgba(255,255,255,0.08), text-secondary)
