@@ -18,7 +18,7 @@
     <footer style="padding:60px 0 30px;border-top:1px solid rgba(255,255,255,0.06);">
       <div style="max-width:1200px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:1fr repeat(3,auto);gap:60px;margin-bottom:60px;">
         <div>
-          <a href="index.html" style="text-decoration:none;color:#ededf0;font-weight:600;font-size:0.95rem;display:flex;align-items:center;">
+          <a href="/" style="text-decoration:none;color:#ededf0;font-weight:600;font-size:0.95rem;display:flex;align-items:center;">
             <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#c8aa50;margin-right:6px;"></span>Ainary
           </a>
           <p style="color:#55555e;font-size:0.7rem;margin-top:12px;letter-spacing:0.02em;">HUMAN × AI SYSTEMS = LEVERAGE</p>
@@ -27,7 +27,7 @@
           <h4 style="font-size:0.75rem;font-weight:500;margin-bottom:16px;letter-spacing:0.04em;color:#ededf0;">Explore</h4>
           <div style="display:flex;flex-direction:column;gap:10px;">
             <a href="blog.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Building in Public</a>
-            <a href="index.html#showcase-research" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Research</a>
+            <a href="/#showcase-research" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Research</a>
             <a href="about.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">About</a>
           </div>
         </div>
