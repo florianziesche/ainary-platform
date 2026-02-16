@@ -52,11 +52,11 @@ function initBinaryStarAnimation(canvasId, config = {}) {
       ai: isMobile ? 50 : (config.glowRadiusAI || 85)
     },
     
-    // Particle systems
+    // Particle systems (v2: drastically reduced — bridge is the hero, not particles)
     particles: {
-      stream: isMobile ? 120 : (config.particlesStream || 250),
-      orbit: isMobile ? 60 : (config.particlesOrbit || 120),
-      ambient: isMobile ? 30 : (config.particlesAmbient || 60)
+      stream: isMobile ? 15 : (config.particlesStream || 30),
+      orbit: isMobile ? 25 : (config.particlesOrbit || 50),
+      ambient: isMobile ? 15 : (config.particlesAmbient || 30)
     },
     
     // Visual quality
@@ -84,10 +84,10 @@ function initBinaryStarAnimation(canvasId, config = {}) {
       this.maxLife = 1;
       
       if (type === 'stream') {
-        this.speed = 0.3 + Math.random() * 0.4;
-        this.size = 0.8 + Math.random() * 1.2;
+        this.speed = 0.15 + Math.random() * 0.2;
+        this.size = 0.4 + Math.random() * 0.6;
         this.color = CONFIG.colorStream;
-        this.alpha = 0.3 + Math.random() * 0.4;
+        this.alpha = 0.1 + Math.random() * 0.15;
         this.angle = Math.random() * Math.PI * 2;
       } else if (type === 'orbit') {
         this.speed = 0.1 + Math.random() * 0.2;
@@ -339,33 +339,101 @@ function initBinaryStarAnimation(canvasId, config = {}) {
   }
   
   function drawGravitationalBridge() {
+    const s1 = stars[0], s2 = stars[1];
+    const midX = (s1.x + s2.x) / 2;
+    const midY = (s1.y + s2.y) / 2;
+    const dx = s2.x - s1.x;
+    const dy = s2.y - s1.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const perpX = -dy / dist;
+    const perpY = dx / dist;
+    
+    // Breathing pulse
+    const pulse = 0.7 + Math.sin(time * 0.3) * 0.3;
+    
+    // Layer 1: Wide soft glow (outer atmosphere)
     ctx.save();
     ctx.globalCompositeOperation = 'screen';
-    ctx.globalAlpha = 0.08;
-    
-    const gradient = ctx.createLinearGradient(
-      stars[0].x, stars[0].y,
-      stars[1].x, stars[1].y
-    );
-    gradient.addColorStop(0, CONFIG.colorHuman);
-    gradient.addColorStop(0.5, CONFIG.colorStream);
-    gradient.addColorStop(1, CONFIG.colorAI);
-    
-    ctx.strokeStyle = gradient;
-    ctx.lineWidth = 2;
+    ctx.globalAlpha = 0.025 * pulse;
+    ctx.shadowColor = '#ffffff';
+    ctx.shadowBlur = 40;
+    const grad1 = ctx.createLinearGradient(s1.x, s1.y, s2.x, s2.y);
+    grad1.addColorStop(0, CONFIG.colorHuman);
+    grad1.addColorStop(0.5, 'rgba(255,255,255,0.6)');
+    grad1.addColorStop(1, CONFIG.colorAI);
+    ctx.strokeStyle = grad1;
+    ctx.lineWidth = 12;
     ctx.beginPath();
-    ctx.moveTo(stars[0].x, stars[0].y);
-    
-    const midX = (stars[0].x + stars[1].x) / 2;
-    const midY = (stars[0].y + stars[1].y) / 2;
-    const curve = 20;
-    ctx.quadraticCurveTo(
-      midX + Math.sin(time * 0.5) * curve,
-      midY + Math.cos(time * 0.5) * curve,
-      stars[1].x, stars[1].y
+    ctx.moveTo(s1.x, s1.y);
+    const wave1 = Math.sin(time * 0.2) * 15;
+    ctx.bezierCurveTo(
+      midX + perpX * wave1 - dx * 0.15, midY + perpY * wave1 - dy * 0.15,
+      midX - perpX * wave1 + dx * 0.15, midY - perpY * wave1 + dy * 0.15,
+      s2.x, s2.y
     );
     ctx.stroke();
+    ctx.restore();
     
+    // Layer 2: Medium glow (main bridge)
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    ctx.globalAlpha = 0.04 * pulse;
+    ctx.shadowColor = '#ffffff';
+    ctx.shadowBlur = 20;
+    const grad2 = ctx.createLinearGradient(s1.x, s1.y, s2.x, s2.y);
+    grad2.addColorStop(0, CONFIG.colorHuman);
+    grad2.addColorStop(0.35, 'rgba(255,255,255,0.4)');
+    grad2.addColorStop(0.65, 'rgba(255,255,255,0.4)');
+    grad2.addColorStop(1, CONFIG.colorAI);
+    ctx.strokeStyle = grad2;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(s1.x, s1.y);
+    const wave2 = Math.sin(time * 0.25 + 0.5) * 10;
+    ctx.bezierCurveTo(
+      midX + perpX * wave2 - dx * 0.1, midY + perpY * wave2 - dy * 0.1,
+      midX - perpX * wave2 + dx * 0.1, midY - perpY * wave2 + dy * 0.1,
+      s2.x, s2.y
+    );
+    ctx.stroke();
+    ctx.restore();
+    
+    // Layer 3: Thin bright core
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    ctx.globalAlpha = 0.06 * pulse;
+    const grad3 = ctx.createLinearGradient(s1.x, s1.y, s2.x, s2.y);
+    grad3.addColorStop(0, CONFIG.colorHuman);
+    grad3.addColorStop(0.5, '#ffffff');
+    grad3.addColorStop(1, CONFIG.colorAI);
+    ctx.strokeStyle = grad3;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(s1.x, s1.y);
+    const wave3 = Math.sin(time * 0.3 + 1) * 6;
+    ctx.bezierCurveTo(
+      midX + perpX * wave3, midY + perpY * wave3,
+      midX - perpX * wave3, midY - perpY * wave3,
+      s2.x, s2.y
+    );
+    ctx.stroke();
+    ctx.restore();
+    
+    // Layer 4: Secondary stream (offset, very subtle)
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    ctx.globalAlpha = 0.02 * pulse;
+    ctx.strokeStyle = grad2;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(s1.x, s1.y);
+    const wave4 = Math.sin(time * 0.15 + 2) * 25;
+    ctx.bezierCurveTo(
+      midX + perpX * wave4, midY + perpY * wave4,
+      midX - perpX * (wave4 * 0.5), midY - perpY * (wave4 * 0.5),
+      s2.x, s2.y
+    );
+    ctx.stroke();
     ctx.restore();
   }
   

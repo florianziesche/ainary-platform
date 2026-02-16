@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Binary Star - Minimal Symbolic Animation</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0b;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    }
+    #canvas {
+      display: block;
+      width: 100%;
+      height: 100vh;
+    }
+    .overlay-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #ffffff;
+      font-size: 4.5rem;
+      font-weight: 600;
+      letter-spacing: -0.035em;
+      line-height: 1.05;
+      text-align: center;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .subtitle {
+      position: absolute;
+      top: calc(50% + 120px);
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.6);
+      font-size: 1.75rem;
+      font-weight: 400;
+      text-align: center;
+      pointer-events: none;
+      z-index: 10;
+      max-width: 700px;
+      letter-spacing: -0.01em;
+      line-height: 1.4;
+    }
+    @media (max-width: 768px) {
+      .overlay-text { font-size: 2.5rem; }
+      .subtitle { font-size: 1rem; top: calc(50% + 80px); padding: 0 20px; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <div class="overlay-text">Multiply your team.</div>
+  <div class="subtitle">We do 80% of the work. You do the 20% that matters.</div>
+
+  <script>
+    // ============================================================================
+    // MINIMAL SYMBOLIC BINARY STAR ANIMATION
+    // ============================================================================
+    // Premium minimalism: Linear/Palantir/McKinsey aesthetic
+    // Two elegant circles with subtle connection. Clean, geometric, restrained.
+    // ============================================================================
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d', { alpha: true });
+    
+    let width, height, centerX, centerY;
+    let animationId;
+    let time = 0;
+    
+    const isMobile = window.innerWidth < 768;
+    
+    // ============================================================================
+    // CONFIGURATION - MINIMAL & SYMBOLIC
+    // ============================================================================
+    
+    const CONFIG = {
+      // Colors
+      colorHuman: '#c8aa50',      // Gold
+      colorAI: '#e8f0ff',         // Silver-white
+      
+      // Orbit
+      orbitRadius: isMobile ? 80 : 140,
+      orbitSpeed: 0.3,            // Slow, deliberate
+      
+      // Circles
+      circleRadius: {
+        human: isMobile ? 6 : 8,
+        ai: isMobile ? 5 : 7
+      },
+      glowRadius: {
+        human: isMobile ? 24 : 32,
+        ai: isMobile ? 20 : 28
+      },
+      
+      // Minimal particles (connecting flow)
+      particleCount: isMobile ? 8 : 12,  // VERY minimal
+      
+      // Visual
+      glowIntensity: 0.25,
+      lineOpacity: 0.12,
+      
+      // Performance
+      pixelRatio: Math.min(window.devicePixelRatio, 2)
+    };
+    
+    // ============================================================================
+    // MINIMAL PARTICLE (connecting the two circles)
+    // ============================================================================
+    
+    class ConnectingParticle {
+      constructor() {
+        this.reset();
+      }
+      
+      reset() {
+        this.progress = Math.random();
+        this.speed = 0.002 + Math.random() * 0.003;
+        this.size = 1 + Math.random() * 1.5;
+        this.opacity = 0.3 + Math.random() * 0.4;
+      }
+      
+      update() {
+        this.progress += this.speed;
+        if (this.progress > 1) {
+          this.reset();
+        }
+      }
+      
+      draw(x1, y1, x2, y2) {
+        // Interpolate position between two stars
+        const x = x1 + (x2 - x1) * this.progress;
+        const y = y1 + (y2 - y1) * this.progress;
+        
+        // Fade in/out at ends
+        let alpha = this.opacity;
+        if (this.progress < 0.1) alpha *= this.progress / 0.1;
+        if (this.progress > 0.9) alpha *= (1 - this.progress) / 0.1;
+        
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        
+        // Simple glow
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, this.size * 4);
+        gradient.addColorStop(0, '#ffffff');
+        gradient.addColorStop(1, 'rgba(255,255,255,0)');
+        
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(x, y, this.size * 4, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.restore();
+      }
+    }
+    
+    // ============================================================================
+    // STAR CIRCLE (simple, elegant)
+    // ============================================================================
+    
+    class StarCircle {
+      constructor(name, color, radius, phase) {
+        this.name = name;
+        this.color = color;
+        this.radius = radius;
+        this.phase = phase;
+        this.x = 0;
+        this.y = 0;
+      }
+      
+      update(time, centerX, centerY) {
+        const angle = time * CONFIG.orbitSpeed + this.phase;
+        this.x = centerX + Math.cos(angle) * CONFIG.orbitRadius;
+        this.y = centerY + Math.sin(angle) * CONFIG.orbitRadius;
+      }
+      
+      draw() {
+        // Single subtle glow
+        ctx.save();
+        ctx.globalAlpha = CONFIG.glowIntensity;
+        
+        const glowRadius = this.name === 'Human' 
+          ? CONFIG.glowRadius.human 
+          : CONFIG.glowRadius.ai;
+        
+        const glow = ctx.createRadialGradient(
+          this.x, this.y, 0,
+          this.x, this.y, glowRadius
+        );
+        glow.addColorStop(0, this.color);
+        glow.addColorStop(0.5, this.color);
+        glow.addColorStop(1, 'rgba(0,0,0,0)');
+        
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, glowRadius, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.restore();
+        
+        // Solid circle
+        ctx.save();
+        ctx.fillStyle = this.color;
+        ctx.shadowColor = this.color;
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+    
+    // ============================================================================
+    // SYSTEM
+    // ============================================================================
+    
+    let stars = [];
+    let particles = [];
+    
+    function init() {
+      resizeCanvas();
+      
+      // Two stars orbiting in opposite directions
+      stars = [
+        new StarCircle('Human', CONFIG.colorHuman, CONFIG.circleRadius.human, 0),
+        new StarCircle('AI', CONFIG.colorAI, CONFIG.circleRadius.ai, Math.PI)
+      ];
+      
+      // Minimal connecting particles
+      particles = [];
+      for (let i = 0; i < CONFIG.particleCount; i++) {
+        particles.push(new ConnectingParticle());
+      }
+      
+      animate();
+    }
+    
+    function resizeCanvas() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      centerX = width / 2;
+      centerY = height / 2;
+      
+      canvas.width = width * CONFIG.pixelRatio;
+      canvas.height = height * CONFIG.pixelRatio;
+      canvas.style.width = width + 'px';
+      canvas.style.height = height + 'px';
+      
+      ctx.scale(CONFIG.pixelRatio, CONFIG.pixelRatio);
+    }
+    
+    function animate() {
+      time += 0.016;
+      
+      // Clear (no trail - clean)
+      ctx.fillStyle = '#0a0a0b';
+      ctx.fillRect(0, 0, width, height);
+      
+      // Update star positions
+      stars.forEach(star => star.update(time, centerX, centerY));
+      
+      // Draw subtle connecting line
+      ctx.save();
+      ctx.globalAlpha = CONFIG.lineOpacity;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(stars[0].x, stars[0].y);
+      ctx.lineTo(stars[1].x, stars[1].y);
+      ctx.stroke();
+      ctx.restore();
+      
+      // Draw minimal connecting particles
+      particles.forEach(particle => {
+        particle.update();
+        particle.draw(stars[0].x, stars[0].y, stars[1].x, stars[1].y);
+      });
+      
+      // Draw stars (on top)
+      stars.forEach(star => star.draw());
+      
+      animationId = requestAnimationFrame(animate);
+    }
+    
+    window.addEventListener('resize', () => {
+      cancelAnimationFrame(animationId);
+      resizeCanvas();
+      animate();
+    });
+    
+    init();
+  </script>
+</body>
+</html>
