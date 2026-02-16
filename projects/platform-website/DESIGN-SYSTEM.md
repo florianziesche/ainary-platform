@@ -66,7 +66,10 @@
 1. **Headlines always Geist**, body always Inter, data always JetBrains Mono
 2. **Letter-spacing on large text**: Always `-0.02em` or tighter on anything >1.5rem
 3. **No font mixing within a block** — pick one family per element
-4. Mobile: Hero shrinks to `2rem`, section heads stay `2rem`
+4. Mobile: Hero shrinks to `2.5rem`, section heads stay `3rem`
+5. **Box header labels** (e.g. "AI Readiness Report · Feb 12, 2026", "Enter a task:") = `JetBrains Mono, 1.0625rem (17px)` — same as body text
+6. **Box meta/footer** (e.g. "47 pages · 5 agents · < 5 min") = `JetBrains Mono, 0.75rem (12px)` — Small/Mono size
+7. **Consistency**: Same visual role = same font + size. Always.
 
 ---
 
