@@ -205,6 +205,21 @@ Applied via `IntersectionObserver` with `threshold: 0.1`.
 
 ---
 
+## Alignment Rules
+| Element | Alignment |
+|---------|-----------|
+| Hero (headline, subtitle, CTAs) | **Centered** |
+| Section headers | **Left** |
+| Section subtitles | **Left** |
+| Tabs / toggles | **Left** |
+| CTAs below sections | **Left** |
+| KPIs (metrics row) | **Centered** |
+| KPI sources (footnotes) | **Centered** |
+| Card content | **Left** |
+| Footer | **Left** |
+
+**Rule:** Everything is left-aligned except Hero and KPI metrics.
+
 ## Don'ts
 - ❌ No white sections/backgrounds — everything is dark
 - ❌ No parallax — it's dated
