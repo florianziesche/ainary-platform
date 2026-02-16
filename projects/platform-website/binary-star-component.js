@@ -98,9 +98,11 @@ function initBinaryStarAnimation(canvasId, config = {}) {
       } else if (type === 'ambient') {
         this.x = Math.random() * width;
         this.y = Math.random() * height;
-        this.size = 0.3 + Math.random() * 0.7;
-        this.alpha = 0.1 + Math.random() * 0.2;
-        this.twinkleSpeed = 0.01 + Math.random() * 0.02;
+        // Mix of bright and dim stars, mostly dim
+        const isBright = Math.random() < 0.15; // 15% bright, 85% dim
+        this.size = isBright ? (0.8 + Math.random() * 0.5) : (0.2 + Math.random() * 0.4);
+        this.alpha = isBright ? (0.15 + Math.random() * 0.2) : (0.03 + Math.random() * 0.06);
+        this.twinkleSpeed = 0.005 + Math.random() * 0.01;
         this.twinklePhase = Math.random() * Math.PI * 2;
       }
     }
