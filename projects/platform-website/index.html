@@ -467,12 +467,14 @@
       <script>
         let idxReportType='custom';
         function idxSetTask(text,type){document.getElementById('idx-task-input').value=text;idxReportType=type||'custom';idxRunSim();}
-        document.getElementById('idx-task-input').addEventListener('keydown',function(e){if(e.key==='Enter'){idxReportType='custom';idxRunSim();}});
+        let idxRunning=false;
+        document.getElementById('idx-task-input').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();idxReportType='custom';idxRunSim();}});
         function idxRunSim(){
+          if(idxRunning)return;idxRunning=true;setTimeout(()=>idxRunning=false,300);
           const task=document.getElementById('idx-task-input').value||'Research task';
           const output=document.getElementById('idx-sim-output');
           const report=document.getElementById('idx-sim-report');
-          report.style.display='none';
+          report.style.display='none';document.getElementById('idx-sim-cta').style.display='inline';
           const fname=idxReportType==='research'?'State-of-AI-Agent-Trust-2026.pdf':task.split(/[\s—,]+/).slice(0,4).map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join('-').replace(/[^a-zA-Z0-9-]/g,'')+'.pdf';
           const pages=Math.floor(Math.random()*15)+40;const sources=47;const time=Math.floor(Math.random()*4)+4;const secs=Math.floor(Math.random()*50)+10;
           output.innerHTML='';
@@ -492,6 +494,7 @@
               {delay:6500,html:'<span style="color:var(--text-primary)">✓ You found the easter egg. We like curious people.</span>'}
             ];
             eggLines.forEach((line,i)=>{setTimeout(()=>{const div=document.createElement('div');div.innerHTML=line.html;div.style.opacity='0';div.style.transition='opacity 0.3s';output.appendChild(div);requestAnimationFrame(()=>div.style.opacity='1');},line.delay);});
+            setTimeout(()=>{document.getElementById('idx-sim-filename').textContent='State-of-AI-Agent-Trust-2026.pdf';document.getElementById('idx-sim-filemeta').textContent='The full report — open source on GitHub';document.getElementById('idx-sim-download').style.display='inline';document.getElementById('idx-sim-download').href='https://fziescheus-alt.github.io/agenttrust/research/';document.getElementById('idx-sim-cta').style.display='none';report.style.display='flex';},7500);
             return;
           }
           const agents=['Researcher','Analyst','Strategist','Critic','Synthesizer'];
