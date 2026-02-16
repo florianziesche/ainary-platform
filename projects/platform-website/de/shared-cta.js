@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <!-- CTA Section -->
     <section style="padding:100px 0 80px;text-align:center;border-top:1px solid rgba(255,255,255,0.06);">
       <div style="max-width:800px;margin:0 auto;padding:0 24px;">
-        <h2 style="font-size:2rem;font-weight:600;letter-spacing:-0.02em;color:#ededf0;margin-bottom:40px;">Bessere Entscheidungen beginnen hier.</h2>
+        <h2 style="font-size:2rem;font-weight:600;letter-spacing:-0.02em;color:#ededf0;margin-bottom:40px;">Bessere Entscheidungen fangen hier an.</h2>
         <div style="display:flex;gap:16px;justify-content:center;">
           <a href="https://calendly.com/florian-ainaryventures/15-minutes-chat" target="_blank" style="display:inline-flex;align-items:center;justify-content:center;padding:14px 36px;border-radius:8px;font-size:0.9rem;font-weight:500;text-decoration:none;background:transparent;color:#ededf0;border:1px solid rgba(255,255,255,0.5);transition:border-color 0.15s;min-width:170px;">Kontakt</a>
           <a href="../signup.html" style="display:inline-flex;align-items:center;justify-content:center;padding:14px 36px;border-radius:8px;font-size:0.9rem;font-weight:500;text-decoration:none;background:#c8aa50;color:#ffffff;transition:opacity 0.15s;min-width:170px;animation:subtle-pulse 4s ease-in-out infinite;">Registrieren</a>
@@ -48,15 +48,15 @@ document.addEventListener('DOMContentLoaded', function() {
         <div>
           <h4 style="font-size:0.75rem;font-weight:500;margin-bottom:16px;letter-spacing:0.04em;color:#ededf0;">Unternehmen</h4>
           <div style="display:flex;flex-direction:column;gap:10px;">
-            <a href="../about.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Über uns</a>
+            <a href="about.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Über uns</a>
           </div>
         </div>
         <div>
           <h4 style="font-size:0.75rem;font-weight:500;margin-bottom:16px;letter-spacing:0.04em;color:#ededf0;">Rechtliches</h4>
           <div style="display:flex;flex-direction:column;gap:10px;">
-            <a href="../privacy.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Datenschutz</a>
-            <a href="../terms.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">AGB</a>
-            <a href="../imprint.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Impressum</a>
+            <a href="privacy.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Datenschutz</a>
+            <a href="terms.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">AGB</a>
+            <a href="imprint.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Impressum</a>
           </div>
         </div>
       </div>
