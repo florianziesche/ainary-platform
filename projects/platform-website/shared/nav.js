@@ -18,7 +18,7 @@
         <a href="index.html" class="nav-logo"><span class="logo-dot-wrap"><span class="logo-dot-ring2"></span><span class="logo-dot-ring1"></span><span class="logo-dot"></span></span>Ainary</a>
         <div class="nav-links">
           <a href="daily-brief.html" class="nav-link${activeClass('daily-brief.html')}">Daily Briefing</a>
-          <a href="blog.html" class="nav-link${activeClass('blog.html')}">Blog</a>
+          <a href="blog.html" class="nav-link${activeClass('blog.html')}">Now</a>
         </div>
         <div class="nav-auth" style="display:flex;align-items:center;gap:16px;">
           <a href="https://calendly.com/florian-ainaryventures/15-minutes-chat" class="btn-primary" style="padding:8px 16px;font-size:0.875rem;">Get in touch</a>
@@ -30,7 +30,7 @@
     </nav>
     <div class="mobile-menu">
       <a href="daily-brief.html">Daily Briefing</a>
-      <a href="blog.html">Blog</a>
+      <a href="blog.html">Now</a>
       <a href="https://calendly.com/florian-ainaryventures/15-minutes-chat" class="btn-primary">Get in touch</a>
     </div>
   `;
