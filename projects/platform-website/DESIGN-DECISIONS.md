@@ -154,8 +154,45 @@ Check these first when unsure: **Palantir, Linear, McKinsey**
 - Demo keyword "trust": agents discuss trust → shows report PDF link
 - No hints anywhere. Rewards curiosity.
 
+## Article Template (article-agenttrust.html = REFERENCE)
+This article is the gold standard for all future blog/article pages. Document every element:
+
+### Structure
+1. **Badge** — `AI Strategy · AR-001 · v2.3` — grey pill (Mono 0.7rem, border rgba(255,255,255,0.08), text-secondary)
+2. **H1** — Inter 2.5rem/600/-0.025em, line-height 1.15
+3. **Meta line** — Mono 0.75rem, text-muted ("Florian Ziesche · Feb 16, 2026 · 5 min read")
+4. **Badge legend** — Compact row of E/I/J/A badges with labels, flex-wrap, gap 16px
+5. **Body paragraphs** — Inter 1rem, text-secondary, line-height 1.8, margin-bottom 24px
+6. **H2** — Inter 1.5rem/600/-0.02em, margin 48px 0 16px
+7. **Stat boxes** — flex row, black bg (#08080c), white border (0.12), 16px radius, 24px padding. Num = Mono 2rem/600. Label = 0.8rem text-muted. Source = Mono 0.6rem text-muted opacity 0.7. Each stat has an E/I/J badge.
+8. **Inline confidence badges** — `<span class="cb cb-e">E</span>` — Mono 0.6rem/600, 2px 6px padding, 3px radius. Colors: E=white on 10% white bg, I=secondary on 6% bg, J=gold on 15% gold bg, A=muted on 4% bg
+9. **Confidence card** — black bg, white border, 16px radius. Score = Mono 2.5rem/600. 3-column grid of factors (name=Mono 0.7rem secondary, value=0.8rem muted)
+10. **Blockquote** — gold border-left (rgba(200,170,80,0.4)), 12px 20px padding, rgba(255,255,255,0.03) bg
+11. **Pipeline/agent tree** — Mono 0.875rem, line-height 2.2, black bg card. Tree chars (├/└) in muted, agent names in gold. Footer meta: Mono 0.75rem muted.
+12. **CTA section** — border-top separator, H3 1.25rem/500, link-row flex gap 24px, gold links Inter 1rem/500
+13. **Fade-in animations** — on stat-row, confidence-card, pipeline, cta-section
+
+### What Makes It Work
+- **Report DNA in blog format** — E/I/J/A badges show "we eat our own cooking"
+- **Source attribution on every stat** — not just numbers, but WHERE they come from
+- **73% confidence explained** — transparency IS the trust argument
+- **Pipeline as terminal tree** — visual echo of landing page demo
+- **Narrative flow preserved** — reads like a story, not a paper
+- **No table of contents** — blog, not report (link to full report for that)
+
+### CSS Classes (reusable for future articles)
+```css
+.cb .cb-e .cb-i .cb-j .cb-a  /* confidence badges */
+.src                          /* source references */
+.stat-row .stat-box           /* stat cards */
+.confidence-card              /* confidence breakdown */
+.pipeline .agent .tree        /* agent pipeline */
+.badge-legend                 /* E/I/J/A legend row */
+```
+
 ## Page-Specific Notes
 - **index.html**: Inline CSS (has own nav/typography styles) + shared/nav.js + shared/footer.js
 - **daily-brief.html**: Inline CSS + shared/nav.js + shared/footer.js + shared/styles.css
 - **blog.html**: shared/styles.css + shared/nav.js + shared/footer.js (minimal inline)
+- **article-agenttrust.html**: ⭐ REFERENCE ARTICLE — all future articles should follow this template. Inline CSS + shared nav/footer. Report DNA (E/I/J/A badges, confidence card, pipeline tree) + website character (dark theme, cards, gold accents, fade-in).
 - **DE pages**: Outdated — do not update until EN is stable
