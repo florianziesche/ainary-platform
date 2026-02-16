@@ -27,7 +27,7 @@
           <h4 style="font-size:0.75rem;font-weight:500;margin-bottom:16px;letter-spacing:0.04em;color:#ededf0;">Explore</h4>
           <div style="display:flex;flex-direction:column;gap:10px;">
             <a href="blog.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Building in Public</a>
-            <a href="https://fziescheus-alt.github.io/agenttrust/research/" target="_blank" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Research</a>
+            <a href="index.html#showcase-research" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Research</a>
           </div>
         </div>
         <div>
