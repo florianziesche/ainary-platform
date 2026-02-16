@@ -36,6 +36,7 @@ metadata:
 - Page bg: `#08080c` — Surface: `#111116`
 - Text: `#ededf0` (primary) / `#8b8b95` (secondary) / `#55555e` (muted)
 - Gold: `#c8aa50` — ONLY for CTAs, key metrics, hover states
+- Active/selected tabs: `bg:#ffffff, color:#08080c` (white bg + black text, NOT gold)
 - Borders: `rgba(255,255,255,0.06-0.12)`
 
 ### Layout

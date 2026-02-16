@@ -102,6 +102,14 @@
 | Secondary | transparent | `1px solid var(--border-default)` | `--text-primary` | `10px 20px` | `8px` |
 | Nav CTA | `#c8aa50` | none | `#fff` | `8px 16px` | `8px` |
 
+### Tab / Toggle Selection
+| State | Background | Border | Text Color |
+|-------|-----------|--------|------------|
+| **Active** | `#ffffff` | `rgba(255,255,255,0.9)` | `#08080c` (black) |
+| Inactive | `transparent` | `rgba(255,255,255,0.08)` | `#8b8b95` |
+
+**Rule:** Selected/active elements use **white bg + black text**. Never gold background for selection state.
+
 ### Cards
 - Background: `var(--bg-surface)` or `#08080c`
 - Border: `1px solid rgba(255,255,255,0.08-0.12)`
