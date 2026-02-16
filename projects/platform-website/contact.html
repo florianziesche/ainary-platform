@@ -156,7 +156,7 @@
     <h1>Get in Touch</h1>
     <p class="subtitle">Whether you want beta access, have a research question, or want to explore working together — I'd like to hear from you.</p>
 
-    <form id="contact-form" action="https://formspree.io/f/florian@ainaryventures.com" method="POST">
+    <form id="contact-form">
 
       <div class="form-group">
         <label class="form-label" for="topic">Topic</label>
@@ -239,6 +239,57 @@
     }
 
     topicSelect.addEventListener('change', handleTopicChange);
+
+    // Form submission
+    document.getElementById('contact-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const btn = this.querySelector('.form-submit');
+      const origText = btn.textContent;
+      btn.textContent = 'Sending...';
+      btn.disabled = true;
+
+      const data = {
+        topic: document.getElementById('topic').value,
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        message: document.getElementById('message').value
+      };
+
+      try {
+        const res = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            access_key: 'YOUR_ACCESS_KEY',
+            subject: `[Ainary] ${data.topic} from ${data.name}`,
+            from_name: data.name,
+            email: data.email,
+            topic: data.topic,
+            message: data.message || '(no message)'
+          })
+        });
+
+        if (res.ok) {
+          btn.textContent = '✓ Sent';
+          btn.style.background = '#2a7a2a';
+          setTimeout(() => {
+            this.reset();
+            btn.textContent = origText;
+            btn.style.background = '';
+            btn.disabled = false;
+          }, 3000);
+        } else {
+          throw new Error('Failed');
+        }
+      } catch(err) {
+        // Fallback: mailto
+        const subject = encodeURIComponent(`[Ainary] ${data.topic}`);
+        const body = encodeURIComponent(`Name: ${data.name}\nEmail: ${data.email}\nTopic: ${data.topic}\n\n${data.message}`);
+        window.location.href = `mailto:florian@ainaryventures.com?subject=${subject}&body=${body}`;
+        btn.textContent = origText;
+        btn.disabled = false;
+      }
+    });
   </script>
 </body>
 </html>
