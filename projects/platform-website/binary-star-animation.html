@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Binary Star Animation - Ainary</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0b;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    }
+    #canvas {
+      display: block;
+      width: 100%;
+      height: 100vh;
+    }
+    .overlay-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #ffffff;
+      font-size: 4.5rem;
+      font-weight: 600;
+      letter-spacing: -0.035em;
+      line-height: 1.05;
+      text-align: center;
+      pointer-events: none;
+      z-index: 10;
+      text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+    }
+    .subtitle {
+      position: absolute;
+      top: calc(50% + 120px);
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.6);
+      font-size: 1.75rem;
+      font-weight: 400;
+      text-align: center;
+      pointer-events: none;
+      z-index: 10;
+      max-width: 700px;
+      letter-spacing: -0.01em;
+      line-height: 1.4;
+    }
+    .info {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.3);
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      letter-spacing: 0.04em;
+      z-index: 10;
+      text-align: center;
+    }
+    @media (max-width: 768px) {
+      .overlay-text { font-size: 2.5rem; }
+      .subtitle { font-size: 1rem; top: calc(50% + 80px); padding: 0 20px; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <div class="overlay-text">Multiply your team.</div>
+  <div class="subtitle">We do 80% of the work. You do the 20% that matters.</div>
+  <div class="info">Ainary = AI + Binary Star · Two bodies in gravitational orbit, co-evolving</div>
+
+  <script>
+    // ============================================================================
+    // BINARY STAR CANVAS ANIMATION
+    // ============================================================================
+    // Quality-first implementation: Realistic astrophysics, subtle aesthetics,
+    // professional polish. Inspired by Stripe's gradient mesh and real binary
+    // star systems (Roche lobes, accretion streams, orbital mechanics).
+    // ============================================================================
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d', { alpha: true });
+    
+    let width, height, centerX, centerY;
+    let animationId;
+    let time = 0;
+    
+    // Performance scaling based on device capabilities
+    const isMobile = window.innerWidth < 768;
+    const isHighPerf = !isMobile && window.devicePixelRatio <= 2;
+    
+    // ============================================================================
+    // CONFIGURATION
+    // ============================================================================
+    
+    const CONFIG = {
+      // Colors (brand-aligned)
+      colorHuman: '#c8aa50',      // Gold - Human
+      colorAI: '#e8f0ff',         // Silver-white - AI
+      colorStream: '#ffffff',     // Particle streams
+      
+      // Orbital mechanics
+      orbitScale: 0.22,           // Orbit size relative to canvas
+      orbitSpeed: 0.08,           // Slow, hypnotic rotation
+      eccentricity: 0.15,         // Slight ellipse (more interesting than circle)
+      
+      // Star properties
+      starRadius: {
+        human: isMobile ? 8 : 12,
+        ai: isMobile ? 7 : 10
+      },
+      glowRadius: {
+        human: isMobile ? 60 : 100,
+        ai: isMobile ? 50 : 85
+      },
+      
+      // Particle systems
+      particles: {
+        stream: isMobile ? 120 : 250,      // Gravitational streams between stars
+        orbit: isMobile ? 60 : 120,        // Orbital trails
+        ambient: isMobile ? 30 : 60        // Background star field
+      },
+      
+      // Visual quality
+      glowIntensity: 0.15,
+      trailFade: 0.03,
+      particleSpeed: 0.4,
+      
+      // Performance
+      pixelRatio: Math.min(window.devicePixelRatio, 2)
+    };
+    
+    // ============================================================================
+    // PARTICLE SYSTEMS
+    // ============================================================================
+    
+    class Particle {
+      constructor(x, y, type) {
+        this.x = x;
+        this.y = y;
+        this.type = type;
+        this.life = 1;
+        this.maxLife = 1;
+        
+        if (type === 'stream') {
+          // Particles flowing between stars (accretion stream)
+          this.speed = 0.3 + Math.random() * 0.4;
+          this.size = 0.8 + Math.random() * 1.2;
+          this.color = CONFIG.colorStream;
+          this.alpha = 0.3 + Math.random() * 0.4;
+          this.angle = Math.random() * Math.PI * 2;
+        } else if (type === 'orbit') {
+          // Particles in orbital trails
+          this.speed = 0.1 + Math.random() * 0.2;
+          this.size = 0.5 + Math.random() * 0.8;
+          this.alpha = 0.2 + Math.random() * 0.3;
+          this.angle = Math.random() * Math.PI * 2;
+          this.orbitRadius = Math.random() * 50 + 20;
+        } else if (type === 'ambient') {
+          // Background star field (subtle depth)
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+          this.size = 0.3 + Math.random() * 0.7;
+          this.alpha = 0.1 + Math.random() * 0.2;
+          this.twinkleSpeed = 0.01 + Math.random() * 0.02;
+          this.twinklePhase = Math.random() * Math.PI * 2;
+        }
+      }
+      
+      update(star1, star2, deltaTime) {
+        if (this.type === 'stream') {
+          // Flow from one star to the other (gravitational attraction simulation)
+          const targetStar = Math.random() > 0.5 ? star1 : star2;
+          const dx = targetStar.x - this.x;
+          const dy = targetStar.y - this.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          if (dist > 5) {
+            const force = this.speed / (dist * 0.01);
+            this.x += (dx / dist) * force;
+            this.y += (dy / dist) * force;
+          }
+          
+          // Add some orbital curve (not straight line)
+          this.angle += 0.02;
+          this.x += Math.cos(this.angle) * 0.3;
+          this.y += Math.sin(this.angle) * 0.3;
+          
+          // Fade and respawn
+          this.life -= 0.003;
+          if (this.life <= 0) {
+            this.respawn(star1, star2);
+          }
+        } else if (this.type === 'orbit') {
+          // Orbit around stars
+          this.angle += this.speed * 0.01;
+          const baseStar = Math.random() > 0.5 ? star1 : star2;
+          this.x = baseStar.x + Math.cos(this.angle) * this.orbitRadius;
+          this.y = baseStar.y + Math.sin(this.angle) * this.orbitRadius;
+          
+          this.life -= 0.002;
+          if (this.life <= 0) {
+            this.life = 1;
+            this.orbitRadius = Math.random() * 50 + 20;
+          }
+        } else if (this.type === 'ambient') {
+          // Subtle twinkle effect
+          this.twinklePhase += this.twinkleSpeed;
+          this.alpha = 0.1 + Math.sin(this.twinklePhase) * 0.15;
+        }
+      }
+      
+      respawn(star1, star2) {
+        // Respawn along the L1 Lagrangian point (between stars)
+        const t = Math.random();
+        this.x = star1.x * t + star2.x * (1 - t);
+        this.y = star1.y * t + star2.y * (1 - t);
+        this.life = 1;
+        this.angle = Math.random() * Math.PI * 2;
+      }
+      
+      draw(ctx) {
+        const alpha = this.alpha * this.life;
+        if (alpha < 0.01) return;
+        
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        
+        if (this.type === 'ambient') {
+          // Simple dots
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(this.x, this.y, this.size, this.size);
+        } else {
+          // Glowing particles
+          const gradient = ctx.createRadialGradient(
+            this.x, this.y, 0,
+            this.x, this.y, this.size * 3
+          );
+          gradient.addColorStop(0, this.type === 'stream' ? CONFIG.colorStream : '#ffffff');
+          gradient.addColorStop(1, 'rgba(255,255,255,0)');
+          
+          ctx.fillStyle = gradient;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size * 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        
+        ctx.restore();
+      }
+    }
+    
+    // ============================================================================
+    // BINARY STAR SYSTEM
+    // ============================================================================
+    
+    class Star {
+      constructor(name, color, radius, mass) {
+        this.name = name;
+        this.color = color;
+        this.radius = radius;
+        this.mass = mass;
+        this.x = 0;
+        this.y = 0;
+        this.angle = name === 'Human' ? 0 : Math.PI;
+      }
+      
+      update(time, barycenterX, barycenterY) {
+        // Calculate position based on orbital mechanics
+        // Both stars orbit their common center of mass (barycenter)
+        const orbitRadius = CONFIG.orbitScale * Math.min(width, height);
+        
+        // Apply mass ratio for realistic orbits
+        const massRatio = this.name === 'Human' ? 0.55 : 0.45;
+        const r = orbitRadius * massRatio;
+        
+        // Elliptical orbit (not perfect circle)
+        const ecc = CONFIG.eccentricity;
+        const theta = this.angle;
+        const effectiveRadius = r * (1 - ecc * ecc) / (1 + ecc * Math.cos(theta));
+        
+        this.x = barycenterX + effectiveRadius * Math.cos(theta);
+        this.y = barycenterY + effectiveRadius * Math.sin(theta);
+        
+        // Update angle (orbit speed)
+        this.angle += CONFIG.orbitSpeed * 0.01;
+      }
+      
+      draw(ctx) {
+        // Draw glow (multiple layers for depth)
+        const glowRadius = this.name === 'Human' 
+          ? CONFIG.glowRadius.human 
+          : CONFIG.glowRadius.ai;
+        
+        // Outer glow (very subtle)
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        ctx.globalAlpha = CONFIG.glowIntensity * 0.3;
+        const outerGlow = ctx.createRadialGradient(
+          this.x, this.y, 0,
+          this.x, this.y, glowRadius * 1.5
+        );
+        outerGlow.addColorStop(0, this.color);
+        outerGlow.addColorStop(0.3, this.color);
+        outerGlow.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = outerGlow;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, glowRadius * 1.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+        
+        // Middle glow
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        ctx.globalAlpha = CONFIG.glowIntensity * 0.6;
+        const midGlow = ctx.createRadialGradient(
+          this.x, this.y, 0,
+          this.x, this.y, glowRadius
+        );
+        midGlow.addColorStop(0, this.color);
+        midGlow.addColorStop(0.5, this.color);
+        midGlow.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = midGlow;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, glowRadius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+        
+        // Inner glow (brightest)
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        ctx.globalAlpha = CONFIG.glowIntensity * 1.0;
+        const innerGlow = ctx.createRadialGradient(
+          this.x, this.y, 0,
+          this.x, this.y, glowRadius * 0.5
+        );
+        innerGlow.addColorStop(0, this.color);
+        innerGlow.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = innerGlow;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, glowRadius * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+        
+        // Core (solid star)
+        ctx.save();
+        ctx.shadowColor = this.color;
+        ctx.shadowBlur = 20;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+    
+    // ============================================================================
+    // INITIALIZATION
+    // ============================================================================
+    
+    let stars = [];
+    let particles = [];
+    
+    function init() {
+      resizeCanvas();
+      
+      // Create binary star system
+      stars = [
+        new Star('Human', CONFIG.colorHuman, CONFIG.starRadius.human, 1.0),
+        new Star('AI', CONFIG.colorAI, CONFIG.starRadius.ai, 0.9)
+      ];
+      
+      // Initialize particle systems
+      particles = [];
+      
+      // Stream particles (flowing between stars)
+      for (let i = 0; i < CONFIG.particles.stream; i++) {
+        particles.push(new Particle(centerX, centerY, 'stream'));
+      }
+      
+      // Orbital trail particles
+      for (let i = 0; i < CONFIG.particles.orbit; i++) {
+        particles.push(new Particle(centerX, centerY, 'orbit'));
+      }
+      
+      // Ambient star field
+      for (let i = 0; i < CONFIG.particles.ambient; i++) {
+        particles.push(new Particle(0, 0, 'ambient'));
+      }
+      
+      // Start animation
+      animate();
+    }
+    
+    function resizeCanvas() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      centerX = width / 2;
+      centerY = height / 2;
+      
+      canvas.width = width * CONFIG.pixelRatio;
+      canvas.height = height * CONFIG.pixelRatio;
+      canvas.style.width = width + 'px';
+      canvas.style.height = height + 'px';
+      
+      ctx.scale(CONFIG.pixelRatio, CONFIG.pixelRatio);
+    }
+    
+    // ============================================================================
+    // ANIMATION LOOP
+    // ============================================================================
+    
+    function animate() {
+      time += 0.016; // ~60fps
+      
+      // Clear with subtle trail fade (motion blur effect)
+      ctx.fillStyle = `rgba(10, 10, 11, ${CONFIG.trailFade})`;
+      ctx.fillRect(0, 0, width, height);
+      
+      // Update star positions
+      stars.forEach(star => star.update(time, centerX, centerY));
+      
+      // Update and draw particles
+      particles.forEach(particle => {
+        particle.update(stars[0], stars[1], 0.016);
+        particle.draw(ctx);
+      });
+      
+      // Draw stars (on top of particles)
+      stars.forEach(star => star.draw(ctx));
+      
+      // Draw gravitational bridge (subtle connection)
+      drawGravitationalBridge();
+      
+      animationId = requestAnimationFrame(animate);
+    }
+    
+    function drawGravitationalBridge() {
+      // Subtle gradient line connecting the stars (Roche lobe connection)
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = 0.08;
+      
+      const gradient = ctx.createLinearGradient(
+        stars[0].x, stars[0].y,
+        stars[1].x, stars[1].y
+      );
+      gradient.addColorStop(0, CONFIG.colorHuman);
+      gradient.addColorStop(0.5, CONFIG.colorStream);
+      gradient.addColorStop(1, CONFIG.colorAI);
+      
+      ctx.strokeStyle = gradient;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(stars[0].x, stars[0].y);
+      
+      // Curved path (not straight - gravitational influence)
+      const midX = (stars[0].x + stars[1].x) / 2;
+      const midY = (stars[0].y + stars[1].y) / 2;
+      const curve = 20;
+      ctx.quadraticCurveTo(
+        midX + Math.sin(time * 0.5) * curve,
+        midY + Math.cos(time * 0.5) * curve,
+        stars[1].x, stars[1].y
+      );
+      ctx.stroke();
+      
+      ctx.restore();
+    }
+    
+    // ============================================================================
+    // EVENT LISTENERS
+    // ============================================================================
+    
+    window.addEventListener('resize', () => {
+      cancelAnimationFrame(animationId);
+      resizeCanvas();
+      animate();
+    });
+    
+    // ============================================================================
+    // START
+    // ============================================================================
+    
+    init();
+  </script>
+</body>
+</html>
