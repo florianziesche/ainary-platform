@@ -211,6 +211,11 @@ This article is the gold standard for all future blog/article pages. Document ev
 ## Article Template (⭐ REFERENCE v2 = article-agenttrust.html)
 *All articles derive from this. Updated Feb 16 16:05. v2 = centered editorial layout.*
 
+### Navigation Elements (all articles)
+- **Breadcrumb**: `← Building in Public` — Mono 0.75rem, text-muted, links to blog.html. Above header, padding 24px top.
+- **Copy link button**: After CTA section. Pill (border-radius 100px), Mono 0.75rem, muted. On click: copies URL, shows "Copied ✓" in gold, resets after 2s.
+- **Why**: Breadcrumb = navigation context (Linear pattern). Copy link = only share action needed (Linear has nothing else). No Home/Blog/Substack links in article body — already in nav + footer.
+
 ### Structure
 1. **Badge** — grey pill (Mono 0.7rem, border rgba(255,255,255,0.08), text-secondary)
 2. **H1** — Inter 2.5rem/600/-0.025em, line-height 1.15, **centered**, max-width 640px
