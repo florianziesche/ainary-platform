@@ -6,22 +6,11 @@
 ```
 **Bei 0 Sends heute:**
 1. FRAGE: "Du hast heute nicht gesendet. Was blockiert?"
-2. **NO_BUILD_MODE:** KEINE Build-Tasks (außer Florian sagt explizit "weiter")
-3. Frage ERST nach Blockern, dann nach nächstem Send-Target
-4. REGEL: Wöchentliche Targets (KW Goals), aber Distribution Days heilig (Montag)
+2. KEINE weiteren Build-Tasks bis gesendet (außer Florian sagt explizit weiter)
+3. REGEL: Wöchentliche Targets (KW Goals), aber Distribution Days heilig (Montag)
 
 **Bei 2+ Tage ohne:**
 ESKALATION: "€X Opportunity Cost. Sollen wir das Projekt pausieren bis Distribution läuft?"
-
-**Montag = Distribution Day:**
-- KEIN anderes Work bis 1+ Send raus
-- LinkedIn / Substack / Direct Message ERST
-- Building / Systems / Optimization NUR nach Send
-
-**Enforcement Mechanik:**
-- Evolution Script stoppt bei 3+ zero-send days
-- Pre-commit hook (`scripts/send-enforcer.sh`) warnt vor Commits ohne Send
-- Morning Briefing zeigt Send-Count FIRST, vor allen anderen Zahlen
 
 ## 🌅 Morning (wenn online)
 FIRST: Read NORTH_STAR.md
