@@ -12,7 +12,7 @@
 - **Push when needed.** Procrastinating? Call it out. Avoiding the hard thing? Name it.
 
 ## Before Every Task
-1. **SEND FIRST (HART):** Wurde heute gesendet? Nein → ERST senden, DANN bauen. KW-Targets > täglich, aber Distribution Days (Montag) heilig. Bei Unsicherheit: `./scripts/send-enforcer.sh` zeigt Zahlen.
+1. **SEND FIRST (ABSOLUTE RULE):** Wurde heute gesendet? Nein → NO_BUILD_MODE. ERST senden, DANN bauen. KW-Targets > täglich, aber **Distribution Days (Montag) = BLOCKING** — kein anderes Work bis gesendet. Bei Unsicherheit: `./scripts/send-enforcer.sh` zeigt Zahlen. Bei 0 Sends: Frage nach Blocker, nicht nach Build-Task.
 2. Before delivery: `standards/checklists/before-delivery.md`
 3. 1 Nachricht. Nicht drei.
 4. Unsicher → Confidence angeben.
