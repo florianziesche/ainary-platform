@@ -20,7 +20,7 @@
           <a href="blog.html" class="nav-link${activeClass('blog.html')}">Building in Public</a>
         </div>
         <div class="nav-auth" style="display:flex;align-items:center;gap:16px;">
-          <a href="https://calendly.com/florian-ainaryventures/15-minutes-chat" class="btn-primary" style="padding:8px 16px;font-size:0.875rem;">Get in touch</a>
+          <a href="contact.html" class="btn-primary" style="padding:8px 16px;font-size:0.875rem;">Get in touch</a>
         </div>
         <div class="hamburger" style="display:none;" onclick="this.classList.toggle('active');document.querySelector('.mobile-menu').classList.toggle('open');">
           <span></span><span></span><span></span>
@@ -29,7 +29,7 @@
     </nav>
     <div class="mobile-menu">
       <a href="blog.html">Building in Public</a>
-      <a href="https://calendly.com/florian-ainaryventures/15-minutes-chat" class="btn-primary">Get in touch</a>
+      <a href="contact.html" class="btn-primary">Get in touch</a>
     </div>
   `;
 })();
