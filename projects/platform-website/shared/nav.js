@@ -35,7 +35,7 @@
   el.innerHTML = `
     <nav class="nav">
       <div class="nav-container">
-        <a href="${prefix}index.html" class="nav-logo"><span class="logo-dot-wrap"><span class="logo-dot-ring2"></span><span class="logo-dot-ring1"></span><span class="logo-dot"></span></span>Ainary</a>
+        <a href="${prefix}index.html" class="nav-logo" style="text-decoration:none"><span class="logo-dot-wrap"><span class="logo-dot-ring2"></span><span class="logo-dot-ring1"></span><span class="logo-dot"></span></span>Ainary</a>
         <div class="nav-links">
           <a href="${blogLink}" class="nav-link${activeClass('blog.html')}">${t.blog}</a>
         </div>
