@@ -29,6 +29,7 @@
             <a href="blog.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Building in Public</a>
             <a href="/#showcase-research" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Research</a>
             <a href="about.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">About</a>
+            <a href="resources.html" style="color:#55555e;text-decoration:none;font-size:0.8rem;">Resources</a>
           </div>
         </div>
         <div>
