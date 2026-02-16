@@ -98,7 +98,11 @@ Tell user to `Cmd + Shift + R` to see changes.
 - Scroll fade-in: IntersectionObserver, 0.7s ease-out
 - Card hover: border brightens to rgba(255,255,255,0.25)
 
-## References
-- Linear (linear.app) — left-aligned headers, tight letter-spacing, product-in-hero
-- Vercel (vercel.com) — pure black, minimal color, wide spacing
-- ElevenLabs (elevenlabs.io) — clean dark theme, readable body text
+## References (check when unsure)
+1. **Palantir** (palantir.com) — dark, minimal, enterprise-grade
+2. **Linear** (linear.app) — left-aligned headers, tight letter-spacing, product-in-hero
+3. **McKinsey** (mckinsey.com) — content hierarchy, credibility signals
+4. Vercel (vercel.com) — pure black, minimal color, wide spacing
+5. ElevenLabs (elevenlabs.io) — clean dark theme, readable body text
+
+**Rule: When unsure about any design decision → check these 3 first, then decide.**
