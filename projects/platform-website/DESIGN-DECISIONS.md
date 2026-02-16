@@ -1,5 +1,5 @@
 # DESIGN-DECISIONS.md — Ainary Website
-*Updated: 2026-02-16 14:50 CET*
+*Updated: 2026-02-16 16:00 CET*
 
 ## Reference Sites
 Check these first when unsure: **Palantir, Linear, McKinsey**
@@ -91,7 +91,7 @@ Check these first when unsure: **Palantir, Linear, McKinsey**
 - Logo left (dot + "Ainary"), links center, CTA right
 - **No language switcher in nav** (moved to footer, like Palantir)
 - **No Use Cases** (page quality gap — re-add when updated)
-- Links: Daily Briefing · Blog
+- Links: Daily Briefing · Building in Public
 - CTA: "Get in touch" btn-primary
 - Responsive: hide links + auth at ≤768px, show hamburger
 - Mobile menu: CSS class toggle (.open), not inline styles
@@ -190,9 +190,59 @@ This article is the gold standard for all future blog/article pages. Document ev
 .badge-legend                 /* E/I/J/A legend row */
 ```
 
+## Blog Page (blog.html = "Building in Public")
+*Linear-inspired layout. NOT called "Blog" or "Now".*
+
+### Layout (Linear concept adapted)
+- **H1**: "Building in Public" — 3.5rem/600/-0.04em. Statement, nothing else. No subtitle.
+- **Tabs**: Full pill (border-radius 100px). Active=white/black. Mono 0.8rem. Resources tab = disabled (opacity 0.35).
+- **Featured article**: Flat (no card border). Title 2rem/600, excerpt 1rem, meta with "Human + AI" pill badge. Separator line below.
+- **Article rows**: CSS Grid (100px date | content). Border-bottom 0.04. Hover: bg 0.015 + negative margin expand + border-radius 8px + gold title.
+- **Section dividers**: H2 1.15rem/500 + "See all →" Mono 0.7rem link. Border-bottom 0.06.
+- **3 sections**: Featured+Articles → Published Research (confidence scores) → From the Daily Brief (headlines as content)
+- **Research rows**: 3-column grid (date | title | confidence right-aligned)
+- **Bottom spacer**: 96px before footer
+
+### Why "Building in Public" (not "Blog" or "Now")
+- "Blog" = generic. "Now" = Linear's brand (copying = obvious).
+- "Building in Public" = Florian's story: solo founder, open source reports, transparent confidence scores.
+- The name IS the positioning.
+
+## Article Template (⭐ REFERENCE = article-agenttrust.html)
+*All articles derive from this. Updated Feb 16 15:55.*
+
+### Structure
+1. **Badge** — grey pill (Mono 0.7rem, border rgba(255,255,255,0.08), text-secondary)
+2. **H1** — Inter 2.5rem/600/-0.025em, line-height 1.15, **centered**, max-width 640px
+3. **Subtitle** — Inter 1.1rem, text-secondary, centered, max-width 560px
+4. **Meta line** — Mono 0.75rem, text-muted, centered. "Human + AI generated" as **pill badge** (border + border-radius 4px)
+5. **Badge legend** — E/I/J/A, centered, flex-wrap, gap 16px
+6. **Header separator** — border-bottom on header section → visual break before body
+7. **Body paragraphs** — Inter **1.05rem** (not 1rem), text-secondary, line-height 1.8
+8. **H2** — Inter 1.5rem/600/-0.02em, margin **56px** 0 16px (more breathing room)
+9. **Stat boxes** — flex row, black bg, white border 0.12, 16px radius. Num=Mono 2rem. Source=Mono 0.6rem opacity 0.7. Each has E/I/J badge.
+10. **Inline confidence badges** — `<span class="cb cb-e">E</span>` — E=white, I=secondary, J=gold, A=muted
+11. **Confidence card** — 73% score, 3-column factor grid
+12. **Blockquote** — gold border-left, padding 16px 24px, border-radius 0 8px 8px 0
+13. **Pipeline/agent tree** — Mono, gold agent names, muted tree chars
+14. **CTA section** — **centered**, border-top, H3 + subtitle + gold link-row
+15. **"More from Ainary" section** — 3 article rows (Linear-style: date | tag + title), hover → gold
+
+### Header = Centered (editorial/magazine feel)
+Old version was left-aligned → felt sparse. Centered creates visual weight without adding clutter.
+
+### What Makes It Work
+- Report DNA in blog format (E/I/J/A = "we eat our own cooking")
+- Source attribution on every stat
+- 73% confidence explained (transparency IS the trust argument)
+- "More from Ainary" bottom section (full page experience, not abrupt end)
+- Narrative flow (reads like a story, not a paper)
+
 ## Page-Specific Notes
-- **index.html**: Inline CSS (has own nav/typography styles) + shared/nav.js + shared/footer.js
+- **index.html**: Inline CSS + shared/nav.js + shared/footer.js
 - **daily-brief.html**: Inline CSS + shared/nav.js + shared/footer.js + shared/styles.css
-- **blog.html**: shared/styles.css + shared/nav.js + shared/footer.js (minimal inline)
-- **article-agenttrust.html**: ⭐ REFERENCE ARTICLE — all future articles should follow this template. Inline CSS + shared nav/footer. Report DNA (E/I/J/A badges, confidence card, pipeline tree) + website character (dark theme, cards, gold accents, fade-in).
+- **blog.html**: "Building in Public" — Linear-inspired, pill tabs, sections. shared/styles.css + shared/nav.js + shared/footer.js
+- **article-agenttrust.html**: ⭐ REFERENCE ARTICLE — centered header, 1.05rem body, E/I/J/A, "More from Ainary" bottom
+- **article-100-agents.html**: Reference Template. Pipeline tree (10 strategies), stat boxes, E/I/J/A on claims
+- **article-one-person-company.html**: Reference Template. Stat boxes (3500/5/18), E/I/J/A on claims
 - **DE pages**: Outdated — do not update until EN is stable
