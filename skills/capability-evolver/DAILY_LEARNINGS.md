@@ -120,3 +120,72 @@
 1. **Telegram Poll-Feature** für Quick Decisions nutzen (z.B. "Welchen Report zuerst senden?")
 2. **Content-Pitch:** Anthropic Enterprise Agent Survey als Hook für LinkedIn Post
 3. **Send-Tracker:** Gestern 9 Reports gebaut — wie viele davon raus? Heute enforced
+
+---
+
+## 2026-02-17 (Montag, 00:52)
+
+### 🚀 OpenClaw v2026.2.15 — NESTED SUB-AGENTS (Game Changer)
+**Release:** 2026-02-15
+
+**Key Features:**
+- **Nested sub-agents (sub-sub-agents):** `agents.defaults.subagents.maxSpawnDepth: 2` = Sub-Agents können eigene Children spawnen
+- **maxChildrenPerAgent: 5** (default) — verhindert Spawn-Explosion
+- **Depth-aware tool policy** + proper announce chain routing
+- **Use Case für uns:** Komplexe Research-Tasks können jetzt hierarchisch delegieren (Main → Research Lead → 3 Specialist Agents)
+
+**Weitere relevante Features:**
+- **Discord Components v2:** Buttons, selects, modals, file blocks — native interaction
+- **Cron webhook delivery toggle + auth token:** `cron.webhookToken` für outbound webhook posts
+- **Plugins: llm_input/llm_output hooks:** Extensions können Prompts + Output observieren
+
+**Massive Security Hardening:**
+- SHA-1 → SHA-256 für Sandbox-Hashing
+- Telegram bot tokens redacted in logs
+- Sandbox Docker config injection geblockt (bind mounts, host networking, unconfined seccomp)
+- Skills download installer restricted to per-skill tools/ directory
+
+**ACTION:**
+1. **Nested Sub-Agents testen:** Nächster komplexer Research Task (z.B. Multi-Report Synthesis) mit hierarchischer Delegation
+2. **Config Update:** `maxSpawnDepth: 2` in config wenn wir hierarchische Workflows brauchen
+3. **Security Audit:** Skills directory permissions prüfen
+
+### AI Workflow Patterns 2026 — External Validation
+**Quellen:** Stack-AI, Vellum, Beam, Dextralabs
+
+**Konsens:**
+1. **"Start with clarity on outcome, pick simplest workflow"** — Simplicity > Komplexität
+2. **"Tool design, grounding, observability"** = wichtiger als Workflow-Komplexität
+3. **9 Standard Patterns:** ReAct, Plan-Execute, Reflection, Hierarchical, Multi-Agent, Router, Parallelization, Orchestrator-Worker, Evaluator-Optimizer
+
+**Validiert unsere Research:**
+- AR-007 (Build vs Buy): "Simple composable patterns > komplexe Frameworks" ✅
+- AR-010 (Agent Failure): "Planning, tool use, reflection, iteration" als Core Pattern ✅
+- AR-018 (Observability): "Observability = critical" bestätigt ✅
+
+**Key Quote (Stack-AI):**
+> "Start with clarity on the outcome you want. Pick the simplest workflow shape that can achieve it safely. Then put your effort into tool design, grounding, explicit state, and observability. That is what makes agents dependable in 2026."
+
+**Kein neues Insight** — aber starke externe Bestätigung dass unsere Pipeline-Philosophie (simple, observable, grounded) richtig ist.
+
+### ClawHub Status
+- **500+ Skills** verfügbar
+- **Security:** 341 malicious skills gefunden (known, dokumentiert 2026-02-15)
+- **Community-Kuratierung:** Reddit "Best Skills" Post aktiv
+- **ACTION:** Florian bitten ClawHub zu browsen für neue verified Skills (browser tool nutzen)
+
+### Send Enforcement — KEIN Update
+Evolver hat keine neuen Erkenntnisse gebracht. Problem bekannt seit 2026-02-15 05:00 CET.
+- 3 Tage zero sends
+- €1263 opportunity cost (heute)
+- Enforcement-Mechanismen existieren aber werden übersprungen
+
+**Nächste Actions (aus DAILY_LEARNINGS 2026-02-15):**
+1. Heartbeat ruft send-enforcer.sh auf
+2. Git pre-commit hook blockiert commits bis gesendet
+3. SOUL.md Update: "Bei 0 Sends heute: ERST senden, DANN bauen"
+
+### Sofort umsetzbar
+1. **Nested Sub-Agents:** Nächster komplexer Task hierarchisch delegieren (test maxSpawnDepth: 2)
+2. **External Validation:** Stack-AI/Vellum Quotes in AR-007/AR-010 Updates nutzen
+3. **Security:** Skills directory audit (sind alle Skills verified?)

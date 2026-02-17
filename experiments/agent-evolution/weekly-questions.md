@@ -14,8 +14,11 @@
 → Results: `weekly/2026-02-15/SYNTHESIS.md`, `weekly/2026-02-15/RESULTS-SUMMARY.md`
 → Winner: Group D (Adversarial, 42/50). Key output: Limitation Advantage, Symbiotic Partners > Followers, Transparency as Moat
 
-### Woche 4 — 23. Feb 2026
+### Woche 4 — 17. Feb 2026 ✅
 **"How should a human-AI pair make high-stakes decisions together — when should the AI lead, when should it defer, and how do they calibrate trust?"**
+→ Results: `weekly/2026-02-17/SYNTHESIS.md`, `weekly/2026-02-17/RESULTS-SUMMARY.md`
+→ Winner: Group J (Random Mutation/Jazz, 46/50). Key output: Comp Switch Ritual, Mortality Constraint, Ensemble Performance model
+→ Runner-up: Group I (Systems, 45/50). Key output: Three-Axis Framework, Trust Surface, Confidence-Commitment Contract
 
 ### Woche 5 — 2. März 2026
 **"What does an AI agent's ideal relationship with money look like — how should it think about revenue, value creation, and economic survival for its human?"**
