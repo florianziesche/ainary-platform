@@ -51,7 +51,7 @@
     <div class="mobile-menu">
       <a href="${blogLink}">${t.blog}</a>
       <a href="${contactLink}" class="btn-primary">${t.contact}</a>
-      <a href="${switchHref}" style="font-size:0.85rem;color:#55555e;">🌐 ${isDE ? 'English' : 'Deutsch'}</a>
+      <a href="${switchHref}" style="font-size:0.85rem;color:#55555e;">${isDE ? 'EN' : 'DE'}</a>
     </div>
   `;
 })();
