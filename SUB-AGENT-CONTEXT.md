@@ -34,6 +34,13 @@ Every claim in every report gets an evidence badge:
 - **A** (red) = Anecdotal: case studies, interviews, estimates
 Trust isn't a feature — it's the product. No unbadged claims.
 
+## Beipackzettel (NON-NEGOTIABLE for every report)
+Every report MUST include:
+1. **Confidence Framework** (after TOC, before main content): E/I/J/A badge legend + Confidence Levels table (High/Medium/Low) + Overall Report Confidence % with explanation
+2. **Transparency Note** (last section before back cover): full methodology, known limitations, conflict of interest disclosure
+- Confidence scores must be INDIVIDUAL per report (based on actual sources/claims)
+- Reference template: AR-001 (`research/state-of-agent-trust-2026/index.html`)
+
 ## Quality Standard
 - Confidence score per section
 - Sources cited with URLs
