@@ -1921,26 +1921,29 @@ function renderStageFindingCard(f, stage, stageColor) {
   // Stage-specific actions
   let actions = '';
   if (stage === 'research') {
+    const verifyBtn = f.verified 
+      ? `<button class="stage-action-btn" style="color:#4aa088;pointer-events:none;opacity:0.7" disabled>✓ Verified${f.verified_at ? ' · ' + new Date(f.verified_at).toLocaleDateString('de-DE') : ''}</button>`
+      : `<button class="stage-action-btn" id="verify-btn-${f.id}" onclick="event.stopPropagation();verifyFindingInline('${f.id}',this)" title="Bestätigt: Ich habe dieses Finding geprüft und es ist korrekt.">✓ Bestätigen</button>`;
     actions = `
-      <button class="stage-action-btn" onclick="event.stopPropagation();verifyFindingInline('${f.id}')">Verify</button>
-      <button class="stage-action-btn primary" onclick="event.stopPropagation();promoteFinding('${f.id}','systems')">Promote to Systems</button>
-      <button class="stage-action-btn danger" onclick="event.stopPropagation();contestFinding('${f.id}')">Contest</button>
+      ${verifyBtn}
+      <button class="stage-action-btn primary" id="promote-btn-${f.id}" onclick="event.stopPropagation();promoteFinding('${f.id}','systems')" title="Dieses Finding ist validiert und wird zur Umsetzung in Systems weitergeleitet. Erfordert: Evidence-Type, Quelle, und 'So What'.">→ Weiter zu Systems</button>
+      <button class="stage-action-btn danger" id="contest-btn-${f.id}" onclick="event.stopPropagation();contestFinding('${f.id}')" title="Ich bezweifle dieses Finding. Es wird als 'angefochten' markiert und du wirst nach dem Grund gefragt.">Anfechten</button>
     `;
   } else if (stage === 'systems') {
     actions = `
-      <button class="stage-action-btn" onclick="event.stopPropagation();markImplemented('${f.id}')">Mark Implemented</button>
-      <button class="stage-action-btn primary" onclick="event.stopPropagation();promoteFinding('${f.id}','content')">Promote to Content</button>
+      <button class="stage-action-btn" onclick="event.stopPropagation();markImplemented('${f.id}')" title="Dieses Finding wurde in ein System/Feature umgesetzt. Markiert es als implementiert.">✓ Implementiert</button>
+      <button class="stage-action-btn primary" onclick="event.stopPropagation();promoteFinding('${f.id}','content')" title="Dieses System-Finding ist bereit für Veröffentlichung als Artikel, Post oder Dokumentation.">→ Weiter zu Content</button>
     `;
   } else if (stage === 'content') {
     actions = `
-      <button class="stage-action-btn" onclick="event.stopPropagation();writeDraft('${f.id}')">Write Draft</button>
-      <button class="stage-action-btn" onclick="event.stopPropagation();markPublished('${f.id}')">Mark Published</button>
-      <button class="stage-action-btn primary" onclick="event.stopPropagation();promoteFinding('${f.id}','revenue')">Promote to Revenue</button>
+      <button class="stage-action-btn" onclick="event.stopPropagation();writeDraft('${f.id}')" title="Erstellt einen Content-Entwurf basierend auf diesem Finding.">Entwurf schreiben</button>
+      <button class="stage-action-btn" onclick="event.stopPropagation();markPublished('${f.id}')" title="Dieses Finding wurde als Artikel/Post veröffentlicht.">✓ Veröffentlicht</button>
+      <button class="stage-action-btn primary" onclick="event.stopPropagation();promoteFinding('${f.id}','revenue')" title="Dieser Content hat messbar zu Revenue beigetragen (Lead, Sale, Anfrage).">→ Weiter zu Revenue</button>
     `;
   } else if (stage === 'revenue') {
     actions = `
-      <button class="stage-action-btn" onclick="event.stopPropagation();logRevenue('${f.id}')">Log Revenue</button>
-      <button class="stage-action-btn" onclick="event.stopPropagation();attributeFinding('${f.id}')">Attribute to Finding</button>
+      <button class="stage-action-btn" onclick="event.stopPropagation();logRevenue('${f.id}')" title="Erfasse den konkreten Umsatz der durch dieses Finding generiert wurde.">€ Umsatz erfassen</button>
+      <button class="stage-action-btn" onclick="event.stopPropagation();attributeFinding('${f.id}')" title="Verknüpfe diesen Umsatz mit dem ursprünglichen Finding.">Zuordnen</button>
     `;
   }
   
@@ -1949,6 +1952,7 @@ function renderStageFindingCard(f, stage, stageColor) {
       <div class="stage-finding-left">
         <div class="stage-finding-id">#${f.id}</div>
         <div class="stage-finding-claim">${esc(claimPreview)}</div>
+        ${f.so_what ? `<div style="font-size:10px;color:var(--text-muted);margin-top:2px">→ ${f.so_what.substring(0,100)}${f.so_what.length>100?'...':''}</div>` : ''}
         <div class="stage-finding-meta">
           <span class="stage-tag" style="border-color:${stageColor}30;color:${stageColor}">${f.source_type || 'unknown'}</span>
           <span>${date}</span>
@@ -1965,26 +1969,38 @@ function renderStageFindingCard(f, stage, stageColor) {
         <span class="impact-badge impact-${f.impact || 'MEDIUM'}">${f.impact || 'MEDIUM'}</span>
       </div>
     </div>
-    <div class="stage-finding-detail" id="stage-finding-detail-${f.id}">
-      <div><strong>Full Claim:</strong><br>${esc(f.claim)}</div>
-      ${f.context ? `<div style="margin-top:8px"><strong>Evidence:</strong><br>${esc(f.context)}</div>` : ''}
-      ${f.research_line ? `<div style="margin-top:8px"><strong>Research Line:</strong> ${f.research_line.replace(/-/g, ' ')}</div>` : ''}
-      <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
-        <select style="font-size:10px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:3px;padding:2px 4px" onchange="updateFindingField('${f.id}','evidence_type',this.value)">
-          <option value="">Evidence...</option>
-          <option value="E" ${f.evidence_type==='E'?'selected':''}>E — Empirical</option>
-          <option value="I" ${f.evidence_type==='I'?'selected':''}>I — Industry</option>
-          <option value="J" ${f.evidence_type==='J'?'selected':''}>J — Journalistic</option>
-          <option value="A" ${f.evidence_type==='A'?'selected':''}>A — Anecdotal</option>
-        </select>
-        <select style="font-size:10px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:3px;padding:2px 4px" onchange="updateFindingField('${f.id}','impact',this.value)">
-          <option value="LOW" ${f.impact==='LOW'?'selected':''}>LOW</option>
-          <option value="MEDIUM" ${(f.impact||'MEDIUM')==='MEDIUM'?'selected':''}>MEDIUM</option>
-          <option value="HIGH" ${f.impact==='HIGH'?'selected':''}>HIGH</option>
-          <option value="CRITICAL" ${f.impact==='CRITICAL'?'selected':''}>CRITICAL</option>
-        </select>
+    <div class="stage-finding-detail" id="stage-finding-detail-${f.id}" onclick="event.stopPropagation()">
+      <div><strong>Vollständig:</strong><br>${esc(f.claim)}</div>
+      ${f.context ? `<div style="margin-top:8px"><strong>Belege:</strong><br>${esc(f.context)}</div>` : ''}
+      ${f.research_line ? `<div style="margin-top:8px"><strong>Forschungslinie:</strong> ${f.research_line.replace(/-/g, ' ')}</div>` : ''}
+      <div style="margin-top:12px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <label style="font-size:9px;color:var(--text-dim)">Evidenz:
+          <select style="font-size:11px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:4px 8px;cursor:pointer;min-width:180px" onchange="updateFindingField('${f.id}','evidence_type',this.value)">
+            <option value="">— Auswählen —</option>
+            <option value="E" ${f.evidence_type==='E'?'selected':''}>E — Studien, Benchmarks</option>
+            <option value="I" ${f.evidence_type==='I'?'selected':''}>I — Analysten, Marktdaten</option>
+            <option value="J" ${f.evidence_type==='J'?'selected':''}>J — Berichterstattung, Quellen</option>
+            <option value="A" ${f.evidence_type==='A'?'selected':''}>A — Erfahrung, Schätzung</option>
+          </select>
+        </label>
+        <label style="font-size:9px;color:var(--text-dim)">Impact:
+          <select style="font-size:11px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:4px 8px;cursor:pointer;min-width:120px" onchange="updateFindingField('${f.id}','impact',this.value)">
+            <option value="LOW" ${f.impact==='LOW'?'selected':''}>Niedrig</option>
+            <option value="MEDIUM" ${(f.impact||'MEDIUM')==='MEDIUM'?'selected':''}>Mittel</option>
+            <option value="HIGH" ${f.impact==='HIGH'?'selected':''}>Hoch</option>
+            <option value="CRITICAL" ${f.impact==='CRITICAL'?'selected':''}>Kritisch</option>
+          </select>
+        </label>
       </div>
-      <div class="stage-finding-actions">${actions}</div>
+      <div style="margin-top:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-size:9px;color:var(--text-dim)">BEDEUTUNG (Was folgt daraus?)</span>
+          ${!f.so_what ? `<button style="font-size:9px;background:transparent;border:1px solid var(--border);border-radius:3px;color:var(--warm);padding:2px 8px;cursor:pointer" onclick="generateSoWhat('${f.id}')">AI: Generieren</button>` : ''}
+        </div>
+        <div id="so-what-${f.id}" style="font-size:11px;color:var(--text-muted);padding:6px 8px;background:var(--surface);border:1px solid var(--border);border-radius:4px;min-height:30px">${f.so_what ? esc(f.so_what) : '<span style="color:var(--text-dim);font-style:italic">Noch nicht analysiert</span>'}</div>
+      </div>
+      ${f.topic_id ? `<div style="margin-top:8px"><a href="#" onclick="event.stopPropagation();event.preventDefault();hideStageView();selectTopic('${f.topic_id}');toggleCtx()" style="font-size:10px;color:var(--warm);text-decoration:none">→ Zum Topic (Dokumente, Referenzen, Details)</a></div>` : ''}
+      <div class="stage-finding-actions" style="margin-top:12px">${actions}</div>
     </div>
   </div>`;
 }
@@ -2028,20 +2044,74 @@ function setStageFilterTag(tag, stage) {
   renderStageView(stage);
 }
 
+async function generateSoWhat(findingId) {
+  const el = document.getElementById('so-what-' + findingId);
+  if (!el) return;
+  el.innerHTML = '<span style="color:var(--warm)">Analysiere...</span>';
+  try {
+    const finding = await fetch(API + '/findings/' + findingId).then(r => r.json());
+    const prompt = `Analysiere dieses Finding und beantworte in 1-2 Sätzen: Was bedeutet das konkret? Welche Handlung folgt daraus?\n\nFinding: ${finding.claim}\nConfidence: ${Math.round((finding.confidence||0)*100)}%\nTags: ${(finding.tags||[]).join(', ')}`;
+    const res = await fetch(API + '/mia/execute', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({message: prompt, topic_id: null})
+    });
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let soWhat = '';
+    while (true) {
+      const {done, value: chunk} = await reader.read();
+      if (done) break;
+      const text = decoder.decode(chunk);
+      const lines = text.split('\n');
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          try {
+            const d = JSON.parse(line.slice(6));
+            if (d.token) soWhat += d.token;
+            if (d.content) soWhat = d.content;
+          } catch(e) {}
+        }
+      }
+    }
+    soWhat = soWhat.trim();
+    if (soWhat) {
+      el.textContent = soWhat;
+      await fetch(API + '/findings/' + findingId, {
+        method: 'PUT',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({so_what: soWhat})
+      });
+      showSystemMsg('Bedeutung generiert für ' + findingId);
+    } else {
+      el.innerHTML = '<span style="color:var(--text-dim);font-style:italic">Konnte nicht generiert werden</span>';
+    }
+  } catch(e) {
+    el.innerHTML = '<span style="color:var(--danger)">Fehler: ' + e.message + '</span>';
+  }
+}
+
 async function updateFindingField(id, field, value) {
   await fetch(API + '/findings/' + id, {
     method: 'PUT',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({[field]: value})
   });
-  if (activeStageFilter) renderStageView(activeStageFilter);
+  showSystemMsg(`${field} updated to "${value}"`);
+  // Don't re-render — would collapse the expanded card
 }
 
-async function verifyFindingInline(findingId) {
+async function verifyFindingInline(findingId, btn) {
   try {
-    await fetch(API + '/findings/' + findingId + '/verify', { method: 'POST' });
+    const res = await fetch(API + '/findings/' + findingId + '/verify', { method: 'POST' });
+    const data = await res.json();
     showSystemMsg(`Finding ${findingId} verified`);
-    if (activeStageFilter) renderStageView(activeStageFilter);
+    if (btn) {
+      btn.textContent = '✓ Verified' + (data.verified_at ? ' · ' + new Date(data.verified_at).toLocaleDateString('de-DE') : '');
+      btn.style.color = '#4aa088';
+      btn.style.pointerEvents = 'none';
+      btn.style.opacity = '0.7';
+    }
   } catch (e) {
     showSystemMsg('Error: ' + e.message);
   }
@@ -2069,16 +2139,40 @@ async function promoteFinding(findingId, targetStage) {
 }
 
 async function contestFinding(findingId) {
-  const reason = prompt('Why do you contest this finding?');
+  const reason = prompt('Why are you contesting this finding?');
   if (!reason) return;
   try {
     await fetch(API + '/findings/' + findingId + '/validate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ direction: 'contradict', reason, source_type: 'own_data' })
+      body: JSON.stringify({ direction: 'contradict', reason, source_type: 'own_data', killed_by: reason })
+    });
+    // Also update status with killed_by
+    await fetch(API + '/findings/' + findingId, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'contested', killed_by: reason })
     });
     showSystemMsg(`Finding ${findingId} contested`);
-    if (activeStageFilter) renderStageView(activeStageFilter);
+    // Visual feedback without reload
+    const card = document.querySelector(`[onclick*="'${findingId}'"]`);
+    if (card) {
+      card.style.borderLeftColor = '#c47070';
+      const claim = card.querySelector('.stage-finding-claim');
+      if (claim) {
+        const contestDiv = document.createElement('div');
+        contestDiv.style.cssText = 'font-size:10px;color:#c47070;margin-top:4px';
+        contestDiv.textContent = 'Contested: ' + reason;
+        claim.after(contestDiv);
+      }
+      // Disable verify and promote buttons
+      const verifyBtn = document.getElementById('verify-btn-' + findingId);
+      const promoteBtn = document.getElementById('promote-btn-' + findingId);
+      const contestBtn = document.getElementById('contest-btn-' + findingId);
+      if (verifyBtn) { verifyBtn.disabled = true; verifyBtn.style.opacity = '0.3'; verifyBtn.style.pointerEvents = 'none'; }
+      if (promoteBtn) { promoteBtn.disabled = true; promoteBtn.style.opacity = '0.3'; promoteBtn.style.pointerEvents = 'none'; }
+      if (contestBtn) { contestBtn.disabled = true; contestBtn.style.opacity = '0.3'; contestBtn.style.pointerEvents = 'none'; }
+    }
   } catch (e) {
     showSystemMsg('Error: ' + e.message);
   }

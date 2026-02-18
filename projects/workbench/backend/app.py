@@ -415,6 +415,12 @@ def init_db():
     try:
         db.execute("ALTER TABLE findings ADD COLUMN sources_count INTEGER DEFAULT 0")
     except: pass
+    try:
+        db.execute("ALTER TABLE findings ADD COLUMN so_what TEXT")
+    except: pass
+    try:
+        db.execute("ALTER TABLE findings ADD COLUMN verified_at TEXT")
+    except: pass
     
     # Seed default folders
     default_folders = [
@@ -3411,8 +3417,8 @@ def create_finding(body: dict):
         (id, claim, context, confidence, status, source_type, source_detail, source_url, extracted_from,
          tags, research_line, used_in_systems, used_in_content, used_in_revenue,
          supports, contradicts, derived_from, topic_id, verified,
-         evidence_type, impact, impact_estimate, sources_count)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+         evidence_type, impact, impact_estimate, sources_count, so_what)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
         (finding_id, claim, body.get('context'),
          confidence, 'alive',
          body.get('source_type', 'conversation'), body.get('source_detail'),
@@ -3427,7 +3433,8 @@ def create_finding(body: dict):
          body.get('topic_id'),
          1 if body.get('verified') else 0,
          body.get('evidence_type'), body.get('impact', 'MEDIUM'),
-         body.get('impact_estimate'), body.get('sources_count', 0)))
+         body.get('impact_estimate'), body.get('sources_count', 0),
+         body.get('so_what')))
     
     # Log initial confidence
     db.execute("INSERT INTO confidence_history (finding_id, old_confidence, new_confidence, reason, source) VALUES (?,?,?,?,?)",
@@ -3473,7 +3480,7 @@ def update_finding(finding_id: str, body: dict):
     updatable = ['claim', 'context', 'confidence', 'status', 'killed_by', 'source_type',
                  'source_detail', 'tags', 'research_line', 'stage', 'used_in_systems', 'used_in_content',
                  'used_in_revenue', 'supports', 'contradicts', 'derived_from', 'topic_id',
-                 'evidence_type', 'impact', 'impact_estimate', 'sources_count']
+                 'evidence_type', 'impact', 'impact_estimate', 'sources_count', 'so_what']
     
     sets = ["updated_at = CURRENT_TIMESTAMP"]
     params = []
@@ -3758,8 +3765,9 @@ def verify_finding(finding_id: str):
     new_conf = round((p_e_h * p_h) / (p_e_h * p_h + p_e_not_h * (1 - p_h)), 4)
     new_conf = min(new_conf, 0.98)  # Cap
     
-    db.execute("UPDATE findings SET verified = 1, confidence = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
-               (new_conf, finding_id))
+    verified_at = datetime.now().strftime('%Y-%m-%d %H:%M')
+    db.execute("UPDATE findings SET verified = 1, verified_at = ?, confidence = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+               (verified_at, new_conf, finding_id))
     db.execute("INSERT INTO confidence_history (finding_id, old_confidence, new_confidence, reason, source) VALUES (?,?,?,?,?)",
                (finding_id, old_conf, new_conf, "human verified", "human_verified"))
     
@@ -3769,7 +3777,7 @@ def verify_finding(finding_id: str):
     db.commit()
     db.close()
     notify("finding_verified", {"finding_id": finding_id, "confidence": new_conf})
-    return {"id": finding_id, "old_confidence": old_conf, "new_confidence": new_conf, "verified": True}
+    return {"id": finding_id, "old_confidence": old_conf, "new_confidence": new_conf, "verified": True, "verified_at": verified_at}
 
 
 @app.get("/api/findings/{finding_id}/gate")
@@ -3801,6 +3809,11 @@ def check_promotion_gate(finding_id: str):
     checks.append({"name": "confidence", "required": f"\u2265{int(gate['min_confidence']*100)}%", "actual": f"{int(confidence*100)}%", "passed": confidence >= gate['min_confidence']})
     checks.append({"name": "evidence", "required": f"Type {' or '.join(gate['min_evidence'])}", "actual": evidence or "none", "passed": evidence in gate['min_evidence'] if evidence else False})
     checks.append({"name": "sources", "required": f"\u2265{gate['min_sources']}", "actual": str(sources), "passed": sources >= gate['min_sources']})
+    
+    # so_what check only for research→systems
+    if stage == 'research':
+        has_so_what = bool(f.get('so_what') and f['so_what'].strip())
+        checks.append({"name": "so_what", "required": "Must answer 'So what?'", "actual": "yes" if has_so_what else "missing", "passed": has_so_what})
     
     can_promote = all(c['passed'] for c in checks)
     db.close()

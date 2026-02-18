@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ainary — Gemeinde Glashütte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,sans-serif;background:#0a0a0a;background-image:radial-gradient(circle,rgba(212,168,83,0.04) 1px,transparent 1px);background-size:20px 20px;background-position:10px 10px;color:#e0e0e0;-webkit-font-smoothing:antialiased;line-height:1.5}
+
+/* Header */
+.header{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;border-bottom:1px solid #2a2a2a;background:#141414;position:sticky;top:0;z-index:10}
+.logo{font-size:13px;font-weight:700;letter-spacing:4px;color:#d4a853}
+.workspace-name{font-size:15px;font-weight:600;color:#e0e0e0}
+.stages{display:flex;gap:4px}
+.stage{padding:6px 14px;font-size:11px;font-weight:600;color:#5a5a5a;border:1px solid #2a2a2a;border-radius:4px;cursor:default;transition:all .15s}
+.stage.active{color:#d4a853;border-color:#d4a853;background:rgba(212,168,83,0.08)}
+
+/* Layout */
+.content{max-width:1000px;margin:0 auto;padding:32px 24px 64px}
+.section{margin-bottom:40px}
+.section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:#5a5a5a;margin-bottom:16px}
+
+/* KPI Cards */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kpi{background:#141414;border:1px solid #2a2a2a;border-radius:6px;padding:16px}
+.kpi-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#8e8e8e;margin-bottom:8px}
+.kpi-value{font-size:24px;font-weight:700;margin-bottom:4px}
+.kpi-target{font-size:10px;color:#5a5a5a}
+.kpi-bar{height:4px;background:#2a2a2a;border-radius:2px;margin-top:10px;overflow:hidden}
+.kpi-bar-fill{height:100%;border-radius:2px}
+.kpi.red .kpi-value{color:#c47070}
+.kpi.red .kpi-bar-fill{background:#c47070}
+.kpi.yellow .kpi-value{color:#d4a853}
+.kpi.yellow .kpi-bar-fill{background:#d4a853}
+.kpi.gray .kpi-value{color:#5a5a5a;font-size:14px}
+
+/* Goals */
+.goals-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.goal{background:#141414;border:1px solid #2a2a2a;border-radius:6px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+.goal-info{flex:1}
+.goal-name{font-size:13px;font-weight:500}
+.goal-progress{font-size:11px;color:#8e8e8e;margin-top:2px}
+.goal-status{font-size:9px;font-weight:700;letter-spacing:1px;padding:3px 8px;border-radius:3px;white-space:nowrap}
+.goal-status.behind{color:#c47070;background:rgba(196,112,112,0.1);border:1px solid rgba(196,112,112,0.2)}
+.goal-status.at-risk{color:#d4a853;background:rgba(212,168,83,0.1);border:1px solid rgba(212,168,83,0.2)}
+.goal-status.on-track{color:#4aa088;background:rgba(74,160,136,0.1);border:1px solid rgba(74,160,136,0.2)}
+
+/* Findings */
+.findings-group{margin-bottom:20px}
+.findings-group-title{font-size:11px;font-weight:600;color:#8e8e8e;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #1e1e1e}
+.finding{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-left:2px solid #2a2a2a;margin-bottom:6px;background:rgba(20,20,20,0.5);border-radius:0 4px 4px 0}
+.finding-badge{width:22px;height:22px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px}
+.badge-E{background:rgba(74,160,136,0.15);color:#4aa088;border:1px solid rgba(74,160,136,0.3)}
+.badge-I{background:rgba(212,168,83,0.15);color:#d4a853;border:1px solid rgba(212,168,83,0.3)}
+.badge-J{background:rgba(130,160,220,0.15);color:#82a0dc;border:1px solid rgba(130,160,220,0.3)}
+.badge-A{background:rgba(180,130,200,0.15);color:#b482c8;border:1px solid rgba(180,130,200,0.3)}
+.finding-text{font-size:12px;color:#e0e0e0;flex:1;line-height:1.5}
+.finding-conf{font-size:10px;color:#5a5a5a;white-space:nowrap;margin-top:2px}
+
+/* Impact */
+.impact-box{background:#141414;border:1px solid #2a2a2a;border-radius:6px;padding:24px;font-size:13px}
+.impact-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:#d4a853;margin-bottom:4px}
+.impact-line{color:#d4a853;margin-bottom:16px;font-size:11px}
+.impact-row{display:flex;align-items:baseline;margin-bottom:10px;gap:16px}
+.impact-label{width:140px;color:#8e8e8e;font-size:12px;flex-shrink:0}
+.impact-value{font-size:16px;font-weight:600;color:#e0e0e0;width:100px;flex-shrink:0}
+.impact-detail{font-size:11px;color:#5a5a5a}
+.impact-note{font-size:10px;color:#5a5a5a;margin-top:16px;padding-top:12px;border-top:1px solid #2a2a2a;font-style:italic}
+
+/* Steps */
+.steps{background:#141414;border:1px solid #2a2a2a;border-radius:6px;padding:20px 24px}
+.step{display:flex;gap:12px;margin-bottom:12px;font-size:13px}
+.step:last-child{margin-bottom:0}
+.step-num{color:#d4a853;font-weight:700;font-size:12px;margin-top:1px}
+.step-text{color:#e0e0e0}
+.step-meta{color:#5a5a5a;font-size:11px}
+
+/* Footer */
+.footer{text-align:center;padding:32px;font-size:10px;color:#5a5a5a;border-top:1px solid #1e1e1e}
+.footer-brand{color:#8e8e8e;margin-bottom:4px}
+
+@media(max-width:768px){
+  .kpi-grid,.goals-grid{grid-template-columns:1fr 1fr}
+  .header{flex-wrap:wrap;gap:8px}
+  .stages{width:100%;justify-content:center}
+}
+@media(max-width:500px){
+  .kpi-grid,.goals-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">AINARY</div>
+  <div class="workspace-name">Gemeinde Glashütte</div>
+  <div class="stages">
+    <div class="stage active">Analyse</div>
+    <div class="stage">Lösung</div>
+    <div class="stage">Pilot</div>
+    <div class="stage">Ergebnis</div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- KPIs -->
+  <div class="section">
+    <div class="section-title">Executive Dashboard</div>
+    <div class="kpi-grid">
+      <div class="kpi red">
+        <div class="kpi-label">Digitalisierungsgrad</div>
+        <div class="kpi-value">12%</div>
+        <div class="kpi-target">Ziel: 50%</div>
+        <div class="kpi-bar"><div class="kpi-bar-fill" style="width:24%"></div></div>
+      </div>
+      <div class="kpi red">
+        <div class="kpi-label">OZG-Leistungen Online</div>
+        <div class="kpi-value">3 / 58</div>
+        <div class="kpi-target">5% umgesetzt</div>
+        <div class="kpi-bar"><div class="kpi-bar-fill" style="width:5%"></div></div>
+      </div>
+      <div class="kpi yellow">
+        <div class="kpi-label">Ø Bearbeitungszeit</div>
+        <div class="kpi-value">12 min</div>
+        <div class="kpi-target">Ziel: 4 min</div>
+        <div class="kpi-bar"><div class="kpi-bar-fill" style="width:33%"></div></div>
+      </div>
+      <div class="kpi gray">
+        <div class="kpi-label">Bürger-Zufriedenheit</div>
+        <div class="kpi-value">noch nicht gemessen</div>
+        <div class="kpi-target">Messung in Phase 1 geplant</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Goals -->
+  <div class="section">
+    <div class="section-title">Pilot-Ziele</div>
+    <div class="goals-grid">
+      <div class="goal">
+        <div class="goal-info">
+          <div class="goal-name">OZG Online-Formulare</div>
+          <div class="goal-progress">3 von 15 digitalisiert</div>
+        </div>
+        <div class="goal-status behind">BEHIND</div>
+      </div>
+      <div class="goal">
+        <div class="goal-info">
+          <div class="goal-name">Digitale Terminbuchung</div>
+          <div class="goal-progress">0 von 1 eingeführt</div>
+        </div>
+        <div class="goal-status at-risk">AT RISK</div>
+      </div>
+      <div class="goal">
+        <div class="goal-info">
+          <div class="goal-name">Bearbeitungszeit senken</div>
+          <div class="goal-progress">12 min / Ziel 4 min</div>
+        </div>
+        <div class="goal-status behind">BEHIND</div>
+      </div>
+      <div class="goal">
+        <div class="goal-info">
+          <div class="goal-name">Pilotphase abschließen</div>
+          <div class="goal-progress">0% — gerade gestartet</div>
+        </div>
+        <div class="goal-status on-track">ON TRACK</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Findings -->
+  <div class="section">
+    <div class="section-title">Findings Pipeline</div>
+
+    <div class="findings-group">
+      <div class="findings-group-title">Analyse — 3 Findings</div>
+      <div class="finding">
+        <div class="finding-badge badge-I">I</div>
+        <div class="finding-text">OZG-Umsetzung Sachsen unter 30% — strukturelles Problem, nicht technisches<br><span class="finding-conf">82% Confidence · Inference</span></div>
+      </div>
+      <div class="finding">
+        <div class="finding-badge badge-J">J</div>
+        <div class="finding-text">Dippoldiswalde bietet Online-Terminbuchung, Glashütte nicht<br><span class="finding-conf">90% Confidence · Judgement</span></div>
+      </div>
+      <div class="finding">
+        <div class="finding-badge badge-E">E</div>
+        <div class="finding-text">Bürger erwarten digitale Services — 73% bevorzugen Online<br><span class="finding-conf">78% Confidence · Evidence</span></div>
+      </div>
+    </div>
+
+    <div class="findings-group">
+      <div class="findings-group-title">Lösung — 2 Findings</div>
+      <div class="finding">
+        <div class="finding-badge badge-I">I</div>
+        <div class="finding-text">Browser-basierte AI Agents können Standard-Formulare automatisch ausfüllen<br><span class="finding-conf">75% Confidence · Inference</span></div>
+      </div>
+      <div class="finding">
+        <div class="finding-badge badge-A">A</div>
+        <div class="finding-text">Gestaffelter Pilot in 3 Phasen reduziert Risiko auf 6.000 EUR pro Phase<br><span class="finding-conf">70% Confidence · Assumption</span></div>
+      </div>
+    </div>
+
+    <div class="findings-group">
+      <div class="findings-group-title">Pilot — 1 Finding</div>
+      <div class="finding">
+        <div class="finding-badge badge-A">A</div>
+        <div class="finding-text">Phase 1: Online-Terminbuchung + 3 OZG-Formulare — 8 Wochen, 6.000 EUR<br><span class="finding-conf">65% Confidence · Assumption</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Impact -->
+  <div class="section">
+    <div class="impact-box">
+      <div class="impact-title">Erwarteter Impact</div>
+      <div class="impact-line">bei erfolgreicher Umsetzung</div>
+      <div class="impact-row">
+        <div class="impact-label">Zeitersparnis</div>
+        <div class="impact-value">~320h/Jahr</div>
+        <div class="impact-detail">Bearbeitungszeit 12 → 4 min x ~2.400 Vorgänge</div>
+      </div>
+      <div class="impact-row">
+        <div class="impact-label">Kostenersparnis</div>
+        <div class="impact-value">~18.000 EUR/Jahr</div>
+        <div class="impact-detail">Personalkosten bei Ø 55 EUR/h</div>
+      </div>
+      <div class="impact-row">
+        <div class="impact-label">Bürger-Zugang</div>
+        <div class="impact-value">24/7</div>
+        <div class="impact-detail">statt Mo-Fr 9-12, Di 14-18</div>
+      </div>
+      <div class="impact-note">Hinweis: Schätzungen basierend auf Vergleichsgemeinden. Tatsächliche Ergebnisse können abweichen.</div>
+    </div>
+  </div>
+
+  <!-- Next Steps -->
+  <div class="section">
+    <div class="section-title">Nächste Schritte</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-text">Fördermittel-Antrag stellen <span class="step-meta">— EFRE Sachsen, bis 60% Förderquote</span></div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-text">Phase 1 starten: Online-Terminbuchung <span class="step-meta">— 8 Wochen, 6.000 EUR</span></div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-text">Ergebnisse messen und Phase 2 evaluieren <span class="step-meta">— Go/No-Go Entscheidung</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <div class="footer-brand">Ainary Ventures · AI Intelligence Tools for Strategic Decisions</div>
+  <div>Vertraulich · Erstellt am 19.02.2026</div>
+</div>
+
+</body>
+</html>
