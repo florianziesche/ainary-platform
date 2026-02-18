@@ -2815,7 +2815,7 @@ def health():
         "error_topics": error_topics,
         "pending_actions": pending_actions,
         "failed_actions": failed_actions,
-        "version": "0.10.0"
+        "version": "0.12.2"
     }
 
 # ── Email Send (via gog CLI) ──
