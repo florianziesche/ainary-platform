@@ -1,6 +1,69 @@
-# Changelog — Execution Platform
+# Changelog — Ainary Execution Platform
 
-All notable changes to the Execution Platform. Format: [ISO 8601 Date] [Version] [Category].
+All notable changes. Format: [ISO 8601 Date] [Version] [Category].
+
+---
+
+## [0.12.5] — 2026-02-19
+
+### Added
+- **Impact Summary** (Executive Board): `GET /api/executive/impact` — aggregated impact by type with 7-day breakdown
+- **Evidence Gates**: `GET /api/findings/{id}/gate` — stage promotion requirements (confidence, evidence type, source count) per pipeline stage
+- **Dot-Grid CI**: Consistent brand dot-grid pattern across all views
+- **Folder References in Goals**: Monthly goals now support folder-level organization
+- **Full Documentation Suite**: DOCUMENTATION.md (84 endpoints), DB-SCHEMA.md (27 tables), FORMULAS.md (7 algorithms), DEPENDENCIES.md
+
+### Fixed
+- **Confidence Normalization**: Values >1 (e.g. 85) now auto-normalized to 0.0–1.0 range in create/update finding endpoints
+- **Clamping**: Bayesian confidence updates clamped to [0.02, 0.98] to prevent certainty traps
+
+---
+
+## [0.12.4] — 2026-02-18
+
+### Added
+- **Executive Board**: Full CEO/COO dashboard with strategic + operational KPIs
+  - `GET /api/executive/kpis` — revenue YTD, sends/week, commitments kept, team health, pipeline flow, system health
+  - `POST /api/executive/revenue` — manual revenue event logging
+  - `POST /api/executive/goals` + `PUT /api/executive/goals/{id}` — monthly goal tracking
+- **Operations Tab**: Daily standup system with scoring
+  - `GET /api/standup/today` — today's score + tasks
+  - `POST /api/standup/tasks` — commit daily tasks
+  - `PUT /api/standup/tasks/{id}` — mark tasks done/missed
+  - `POST /api/standup/extra` — log bonus tasks
+  - `GET /api/standup/history` — 14-day score trend
+  - `PUT /api/standup/recalc` — recalculate daily score with EMA
+- **Topic Priorities**: Auto-prioritization engine with 5-factor scoring
+  - `PUT /api/topics/{id}/priority` — manual priority update
+  - `POST /api/topics/auto-prioritize` — batch auto-calculate
+- **Activity Feed**: Agent activity tracking + digest + graph
+  - `GET /api/activity/feed` — last 50 activities
+  - `POST /api/activity/log` — log agent activity
+  - `GET /api/activity/digest` — daily digest with alerts
+  - `GET /api/activity/graph` — 14-day activity chart data
+- **Decisions + Backlog**: Decision log + prioritized backlog
+  - `GET/POST /api/decisions` — decision tracking
+  - `GET/POST/PUT/DELETE /api/backlog` — backlog CRUD
+- **CEO/COO Tabs**: Separate strategic (CEO) and operational (COO) views in Executive Board
+
+---
+
+## [0.12.3] — 2026-02-18
+
+### Added
+- **Ainary Branding**: Renamed from "Execution Platform" to "Ainary Execution Platform"
+- **DESIGN-DOC.md**: Design document following Google Design Doc pattern (Malte Ubl)
+- **4 Stage Detail Views**: `GET /api/pipeline/detail` — full cross-stage pipeline with connections, findings per topic
+- **101 Findings Organized**: Compound Knowledge Engine with Bayesian confidence tracking
+  - `GET/POST /api/findings` — CRUD with filters (status, research_line, tag)
+  - `GET/PUT /api/findings/{id}` — single finding with confidence history
+  - `POST /api/findings/{id}/validate` — Bayesian confidence update with source weights
+  - `POST /api/findings/{id}/verify` — human verification boost
+  - `GET /api/findings/{id}/related` — find related by shared tags
+  - `GET /api/findings/{id}/gate` — evidence gate checks
+  - `GET /api/findings-stats` — aggregate stats
+  - `GET /api/topics/{id}/findings` — per-topic findings
+  - `POST /api/import/obsidian-claims` — bulk import from Obsidian
 
 ---
 
@@ -33,28 +96,20 @@ All notable changes to the Execution Platform. Format: [ISO 8601 Date] [Version]
 ## [0.7.0] — 2026-02-18
 
 ### Added
-- **Correction Engine** (R-010): 29 corrections imported from corrections.md, 5 categories (design, content, process, tone, facts), 3 severity levels
-- **Quality Standards** (R-011): 18 standards imported from quality-standards.md, per output-type (email, linkedin, blog, report, website, general)
-- **Trust per Skill** (R-012): 9 skills with scores (research:70, cv:45, linkedin:15, financial:5), color-coded bars in sidebar
-- **Pre-Flight API** (R-011): `/api/preflight/{topic_id}` returns all applicable checks
-- **Event/Audit Log** (R-018): `/api/events/{topic_id}`, logs file uploads, trust feedback, correction violations
-- **Folder Sidebar** (R-001): 7 default folders (Heute, Wichtig, VC Applications, Consulting, Content, Admin/Legal, Später), drag & drop, collapse/expand, rename, delete
+- **Correction Engine** (R-010): 29 corrections imported, 5 categories (design, content, process, tone, facts), 3 severity levels
+- **Quality Standards** (R-011): 18 standards per output-type (email, linkedin, blog, report, website, general)
+- **Trust per Skill** (R-012): 9 skills with Bayesian scores, color-coded bars
+- **Pre-Flight API** (R-011): 3-layer engine (L1 regex, L2 structural, L3 LLM placeholder)
+- **Event/Audit Log** (R-018): Full event logging
+- **Folder Sidebar** (R-001): 7 default folders, drag & drop, collapse/expand
 - **New Topic Creation**: Modal with name, stage, folder, output-type, contact, email
-- **File Upload**: Upload documents and references per topic, stored in uploads/{topic_id}/
-- **Add Reference**: URL or file path as reference with gold-border styling
-- **Context Panel**: Documents, References, Quality Gate checklist, Active Corrections, Connected Topics, Activity Log
-- **Pre-Flight Badge**: Shows check count in topic header
-- **Preferences Table**: Schema ready for preference learning (R-014)
+- **File Upload**: Upload documents and references per topic
+- **Context Panel**: Documents, References, Quality Gate, Active Corrections, Connected Topics, Activity Log
+- **Preferences Table**: Schema for preference learning (R-014)
 
 ### Fixed
-- FastAPI Static Mount routing conflict (old processes on port 8080 not killed)
-- Duplicate seed data on restart (changed to existence-check before insert)
-- Installed python-multipart for file upload support
-
-### Architecture
-- Backend: FastAPI + SQLite (workbench.db), 8 new tables
-- Frontend: Single HTML + Vanilla JS, WebSocket live updates
-- Design System: Inter font, #0a0a0a bg, #d4a853 warm accent, #c47070 danger
+- FastAPI Static Mount routing conflict
+- Duplicate seed data on restart
 
 ---
 
@@ -66,11 +121,9 @@ All notable changes to the Execution Platform. Format: [ISO 8601 Date] [Version]
 - Proposals with A/B options, confidence scores, voting
 - Step tracking with progress calculation
 - CV Generator integration (7 fund configs)
-- WebSocket real-time updates (debounced, scroll-aware)
-- File viewer overlay
+- WebSocket real-time updates
 - Trust scores (agent-level)
 - Connection graph between topics
-- 20 seeded topics with messages, proposals, steps
 
 ---
 
@@ -78,5 +131,9 @@ All notable changes to the Execution Platform. Format: [ISO 8601 Date] [Version]
 
 | Version | Date | Summary |
 |---------|------|---------|
-| 0.7.0 | 2026-02-18 | Correction Engine, Trust per Skill, Folders, Upload, New Topics |
+| 0.12.5 | 2026-02-19 | Impact Summary, Evidence Gates, Documentation Suite, Confidence Fix |
+| 0.12.4 | 2026-02-18 | Executive Board, Operations, Priorities, Activity Feed, Decisions+Backlog |
+| 0.12.3 | 2026-02-18 | Ainary Branding, DESIGN-DOC, Stage Detail Views, 101 Findings |
+| 0.8.0 | 2026-02-18 | AI Integration, Guardrails, Action Queue, Command Palette, Streaming |
+| 0.7.0 | 2026-02-18 | Correction Engine, Trust per Skill, Folders, Upload |
 | 0.6.0 | 2026-02-17 | Initial platform: conversations, proposals, CV generator |

@@ -403,6 +403,18 @@ def init_db():
     try:
         db.execute("ALTER TABLE topics ADD COLUMN priority_confidence INTEGER DEFAULT 50")
     except: pass
+    try:
+        db.execute("ALTER TABLE findings ADD COLUMN evidence_type TEXT")
+    except: pass
+    try:
+        db.execute("ALTER TABLE findings ADD COLUMN impact TEXT DEFAULT 'MEDIUM'")
+    except: pass
+    try:
+        db.execute("ALTER TABLE findings ADD COLUMN impact_estimate TEXT")
+    except: pass
+    try:
+        db.execute("ALTER TABLE findings ADD COLUMN sources_count INTEGER DEFAULT 0")
+    except: pass
     
     # Seed default folders
     default_folders = [
@@ -1256,6 +1268,23 @@ def recalc_standup_score():
     return {"score": score, "ema": round(ema, 1)}
 
 # ── Executive Board ──
+
+@app.get("/api/executive/impact")
+def get_impact_summary():
+    db = get_db()
+    totals = db.execute("""
+        SELECT impact_type, SUM(impact_value) as total, COUNT(*) as count
+        FROM activity_feed WHERE impact_type IS NOT NULL AND result='success'
+        GROUP BY impact_type
+    """).fetchall()
+    week = db.execute("""
+        SELECT impact_type, SUM(impact_value) as total
+        FROM activity_feed WHERE impact_type IS NOT NULL AND result='success'
+        AND date >= date('now', '-7 days')
+        GROUP BY impact_type
+    """).fetchall()
+    db.close()
+    return {"totals": [dict(r) for r in totals], "week": [dict(r) for r in week]}
 
 @app.get("/api/executive/kpis")
 def get_executive_kpis():
@@ -3374,12 +3403,16 @@ def create_finding(body: dict):
                 contradictions.append({"id": ex['id'], "claim": ex['claim'], "shared_tags": list(shared)})
     
     confidence = body.get('confidence', 0.50)
+    # Normalize: if confidence > 1, assume it's a percentage (e.g. 85 → 0.85)
+    if isinstance(confidence, (int, float)) and confidence > 1:
+        confidence = confidence / 100.0
     
     db.execute("""INSERT INTO findings 
         (id, claim, context, confidence, status, source_type, source_detail, source_url, extracted_from,
          tags, research_line, used_in_systems, used_in_content, used_in_revenue,
-         supports, contradicts, derived_from, topic_id, verified)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+         supports, contradicts, derived_from, topic_id, verified,
+         evidence_type, impact, impact_estimate, sources_count)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
         (finding_id, claim, body.get('context'),
          confidence, 'alive',
          body.get('source_type', 'conversation'), body.get('source_detail'),
@@ -3392,7 +3425,9 @@ def create_finding(body: dict):
          json.dumps(body.get('contradicts', [])),
          json.dumps(body.get('derived_from', [])),
          body.get('topic_id'),
-         1 if body.get('verified') else 0))
+         1 if body.get('verified') else 0,
+         body.get('evidence_type'), body.get('impact', 'MEDIUM'),
+         body.get('impact_estimate'), body.get('sources_count', 0)))
     
     # Log initial confidence
     db.execute("INSERT INTO confidence_history (finding_id, old_confidence, new_confidence, reason, source) VALUES (?,?,?,?,?)",
@@ -3424,6 +3459,10 @@ def update_finding(finding_id: str, body: dict):
     
     # Track confidence change
     new_confidence = body.get('confidence')
+    # Normalize: if confidence > 1, assume percentage
+    if new_confidence is not None and isinstance(new_confidence, (int, float)) and new_confidence > 1:
+        new_confidence = new_confidence / 100.0
+        body['confidence'] = new_confidence
     if new_confidence is not None and float(new_confidence) != float(existing['confidence']):
         db.execute("INSERT INTO confidence_history (finding_id, old_confidence, new_confidence, reason, source) VALUES (?,?,?,?,?)",
                    (finding_id, existing['confidence'], new_confidence,
@@ -3433,7 +3472,8 @@ def update_finding(finding_id: str, body: dict):
     # Build update query dynamically
     updatable = ['claim', 'context', 'confidence', 'status', 'killed_by', 'source_type',
                  'source_detail', 'tags', 'research_line', 'stage', 'used_in_systems', 'used_in_content',
-                 'used_in_revenue', 'supports', 'contradicts', 'derived_from', 'topic_id']
+                 'used_in_revenue', 'supports', 'contradicts', 'derived_from', 'topic_id',
+                 'evidence_type', 'impact', 'impact_estimate', 'sources_count']
     
     sets = ["updated_at = CURRENT_TIMESTAMP"]
     params = []
@@ -3730,6 +3770,41 @@ def verify_finding(finding_id: str):
     db.close()
     notify("finding_verified", {"finding_id": finding_id, "confidence": new_conf})
     return {"id": finding_id, "old_confidence": old_conf, "new_confidence": new_conf, "verified": True}
+
+
+@app.get("/api/findings/{finding_id}/gate")
+def check_promotion_gate(finding_id: str):
+    db = get_db()
+    f = db.execute("SELECT * FROM findings WHERE id=?", (finding_id,)).fetchone()
+    if not f:
+        db.close()
+        raise HTTPException(404, "Finding not found")
+    f = dict(f)
+    
+    stage = f.get('stage', 'research')
+    confidence = f.get('confidence', 0) or 0
+    evidence = f.get('evidence_type')
+    sources = f.get('sources_count', 0) or 0
+    
+    gates = {
+        'research': {'min_confidence': 0.60, 'min_evidence': ['E','I','J','A'], 'min_sources': 1, 'next': 'systems'},
+        'systems': {'min_confidence': 0.70, 'min_evidence': ['E','I'], 'min_sources': 2, 'next': 'content'},
+        'content': {'min_confidence': 0.80, 'min_evidence': ['E','I'], 'min_sources': 2, 'next': 'revenue'}
+    }
+    
+    gate = gates.get(stage)
+    if not gate:
+        db.close()
+        return {"can_promote": False, "reason": "Already at final stage", "checks": []}
+    
+    checks = []
+    checks.append({"name": "confidence", "required": f"\u2265{int(gate['min_confidence']*100)}%", "actual": f"{int(confidence*100)}%", "passed": confidence >= gate['min_confidence']})
+    checks.append({"name": "evidence", "required": f"Type {' or '.join(gate['min_evidence'])}", "actual": evidence or "none", "passed": evidence in gate['min_evidence'] if evidence else False})
+    checks.append({"name": "sources", "required": f"\u2265{gate['min_sources']}", "actual": str(sources), "passed": sources >= gate['min_sources']})
+    
+    can_promote = all(c['passed'] for c in checks)
+    db.close()
+    return {"can_promote": can_promote, "next_stage": gate['next'], "checks": checks}
 
 
 # ── Health + Error Info ──

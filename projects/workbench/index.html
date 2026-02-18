@@ -9,7 +9,7 @@
 <style>
 :root{--bg:#0a0a0a;--surface:#141414;--surface-2:#1a1a1a;--border:#1e1e1e;--border-light:#2a2a2a;--text:#ececec;--text-muted:#8e8e8e;--text-dim:#555;--warm:#d4a853;--danger:#c47070}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;height:100vh;display:flex;overflow:hidden}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);background-image:radial-gradient(circle,rgba(212,168,83,0.04) 1px,transparent 1px);background-size:20px 20px;background-position:10px 10px;color:var(--text);-webkit-font-smoothing:antialiased;height:100vh;display:flex;overflow:hidden}
 
 /* Left */
 .left{width:280px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
@@ -208,6 +208,23 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var
 .stage-sort:hover,.stage-filter:hover{border-color:var(--text-dim);color:var(--text)}
 .stage-sort.active,.stage-filter.active{background:var(--warm);color:var(--bg);border-color:var(--warm)}
 .stage-findings{display:flex;flex-direction:column;gap:8px}
+.evidence-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;letter-spacing:0.5px;display:inline-block}
+.evidence-E{background:rgba(74,160,136,0.15);color:#4aa088}
+.evidence-I{background:rgba(107,138,171,0.15);color:#6b8aab}
+.evidence-J{background:rgba(155,142,196,0.15);color:#9b8ec4}
+.evidence-A{background:rgba(212,168,83,0.15);color:#d4a853}
+.evidence-none{background:rgba(255,255,255,0.05);color:var(--text-dim)}
+.impact-badge{font-size:9px;font-weight:600;padding:2px 6px;border-radius:3px;letter-spacing:0.5px}
+.impact-CRITICAL{background:rgba(196,112,112,0.15);color:#c47070}
+.impact-HIGH{background:rgba(212,168,83,0.15);color:#d4a853}
+.impact-MEDIUM{background:rgba(255,255,255,0.05);color:var(--text-muted)}
+.impact-LOW{background:rgba(255,255,255,0.03);color:var(--text-dim)}
+.gate-check{display:flex;align-items:center;gap:6px;font-size:10px;padding:3px 0}
+.gate-pass{color:#4aa088}
+.gate-fail{color:#c47070}
+.gate-status{margin-top:8px;padding:8px 12px;border-radius:4px;font-size:10px}
+.gate-ready{background:rgba(74,160,136,0.1);border:1px solid rgba(74,160,136,0.2)}
+.gate-blocked{background:rgba(196,112,112,0.05);border:1px solid rgba(196,112,112,0.15)}
 .stage-finding-card{padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all 0.12s;border-left:3px solid var(--border-light)}
 .stage-finding-card:hover{background:var(--surface-2);border-color:var(--border-light)}
 .stage-finding-card.expanded{background:var(--surface-2);border-left-color:var(--warm)}
@@ -881,6 +898,7 @@ function showStageView(stage) {
   // Hide other views
   if (pipelineViewOpen) { pipelineViewOpen = false; document.getElementById('pipelineView').style.display = 'none'; }
   if (principlesViewOpen) { principlesViewOpen = false; document.getElementById('principlesView').style.display = 'none'; }
+  if (operationsViewOpen) { operationsViewOpen = false; document.getElementById('operationsView').style.display = 'none'; }
   
   const conv = document.getElementById('conv');
   const stageView = document.getElementById('stageView');
@@ -967,6 +985,7 @@ async function renderOperationsView() {
     const kpiData = await fetch(API + '/executive/kpis').then(r => r.json());
     const standupData = await fetch(API + '/standup/today').then(r => r.json());
     const history = await fetch(API + '/standup/history?days=14').then(r => r.json());
+    const impactData = await fetch(API + '/executive/impact').then(r => r.json()).catch(() => ({totals:[], week:[]}));
     
     const strategic = kpiData.strategic;
     const operational = kpiData.operational;
@@ -1084,16 +1103,19 @@ async function renderOperationsView() {
             const status = goalStatus(goal);
             const progress = goal.target_value > 0 ? (goal.current_value / goal.target_value) * 100 : 0;
             const progressLabel = `${goal.current_value}/${goal.target_value}`;
+            const folderMap = {'Send 8 VC Emails':'job-applications/','Platform v1.0':'projects/workbench/','Build 5 Standards':'standards/'};
+            const folder = Object.entries(folderMap).find(([k]) => goal.description.includes(k));
             return `
-              <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px">
-                <div style="flex:1">${goal.description}</div>
+              <div style="display:grid;grid-template-columns:1fr 18px 40px 18px 80px 80px 120px;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px">
+                <div>${goal.description}</div>
                 <button class="goal-val-btn" onclick="updateGoalValue(${goal.id},${goal.current_value - 1})">−</button>
-                <div style="font-size:11px;font-weight:600;color:var(--text-muted);width:40px;text-align:center">${progressLabel}</div>
+                <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-align:center">${progressLabel}</div>
                 <button class="goal-val-btn" onclick="updateGoalValue(${goal.id},${goal.current_value + 1})">+</button>
-                <div style="font-size:9px;font-weight:600;padding:2px 8px;border-radius:3px;background:${status.color}20;color:${status.color};width:80px;text-align:center">${status.label}</div>
-                <div style="width:80px;height:3px;background:var(--surface-2);border-radius:2px;overflow:hidden">
+                <div style="font-size:9px;font-weight:600;padding:2px 8px;border-radius:3px;background:${status.color}20;color:${status.color};text-align:center">${status.label}</div>
+                <div style="height:3px;background:var(--surface-2);border-radius:2px;overflow:hidden">
                   <div style="height:100%;width:${Math.min(progress, 100)}%;background:${status.color};border-radius:2px"></div>
                 </div>
+                <span style="font-size:9px;color:var(--text-dim)">${folder ? '→ ' + folder[1] : ''}</span>
               </div>
             `;
           }).join('') : '<div style="text-align:center;padding:20px;color:var(--text-dim)">No goals set for this month</div>'}
@@ -1117,6 +1139,33 @@ async function renderOperationsView() {
               </div>`;
           }).join('')}
         </div>
+        
+        <!-- Section 5: Impact Summary -->
+        ${(() => {
+          const types = [
+            {key:'time_saved', label:'Time Saved', fmt: v => (v/60).toFixed(1)+'h', desc:'vs. manual execution, standard tasks'},
+            {key:'knowledge', label:'Knowledge', fmt: v => '+'+Math.round(v), desc:'findings, connections, research items'},
+            {key:'revenue', label:'Revenue', fmt: v => '€'+Math.round(v), desc:'logged revenue events'}
+          ];
+          const tMap = {}; impactData.totals.forEach(r => tMap[r.impact_type] = r.total || 0);
+          const wMap = {}; impactData.week.forEach(r => wMap[r.impact_type] = r.total || 0);
+          const rows = types.map(t => {
+            const total = tMap[t.key] || 0;
+            const week = wMap[t.key] || 0;
+            return `<div style="display:flex;align-items:baseline;gap:16px;padding:6px 0;font-size:12px">
+              <div style="width:100px;color:var(--text-dim);font-weight:600">${t.label}</div>
+              <div style="width:60px;font-weight:700;color:var(--text)">${t.fmt(total)}</div>
+              <div style="width:130px;color:var(--text-muted)">this week: ${t.fmt(week)}</div>
+              <div style="color:var(--text-dim);font-size:10px">(${t.desc})</div>
+            </div>`;
+          }).join('');
+          return `
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:12px">IMPACT SUMMARY</div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin-bottom:32px">
+            ${rows}
+            <div style="margin-top:10px;font-size:9px;color:var(--text-dim);font-style:italic">Disclaimer: Estimates based on task-type benchmarks. ~70-85% quality vs. senior professional. Human review required.</div>
+          </div>`;
+        })()}
         
         <!-- Executive Tabs -->
         <div class="exec-tabs">
@@ -1912,24 +1961,61 @@ function renderStageFindingCard(f, stage, stageColor) {
           <div class="stage-conf-fill" style="width:${confPct}%;background:${confColor}"></div>
         </div>
         <span style="font-size:10px;font-weight:600;color:${confColor}">${confPct}%</span>
-        ${f.compound_score > 0 ? `<span style="font-size:9px;color:var(--warm)">Compound: ${f.compound_score.toFixed(1)}</span>` : ''}
+        <span class="evidence-badge evidence-${f.evidence_type || 'none'}">${f.evidence_type || '?'}</span>
+        <span class="impact-badge impact-${f.impact || 'MEDIUM'}">${f.impact || 'MEDIUM'}</span>
       </div>
     </div>
     <div class="stage-finding-detail" id="stage-finding-detail-${f.id}">
       <div><strong>Full Claim:</strong><br>${esc(f.claim)}</div>
       ${f.context ? `<div style="margin-top:8px"><strong>Evidence:</strong><br>${esc(f.context)}</div>` : ''}
       ${f.research_line ? `<div style="margin-top:8px"><strong>Research Line:</strong> ${f.research_line.replace(/-/g, ' ')}</div>` : ''}
+      <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+        <select style="font-size:10px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:3px;padding:2px 4px" onchange="updateFindingField('${f.id}','evidence_type',this.value)">
+          <option value="">Evidence...</option>
+          <option value="E" ${f.evidence_type==='E'?'selected':''}>E — Empirical</option>
+          <option value="I" ${f.evidence_type==='I'?'selected':''}>I — Industry</option>
+          <option value="J" ${f.evidence_type==='J'?'selected':''}>J — Journalistic</option>
+          <option value="A" ${f.evidence_type==='A'?'selected':''}>A — Anecdotal</option>
+        </select>
+        <select style="font-size:10px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:3px;padding:2px 4px" onchange="updateFindingField('${f.id}','impact',this.value)">
+          <option value="LOW" ${f.impact==='LOW'?'selected':''}>LOW</option>
+          <option value="MEDIUM" ${(f.impact||'MEDIUM')==='MEDIUM'?'selected':''}>MEDIUM</option>
+          <option value="HIGH" ${f.impact==='HIGH'?'selected':''}>HIGH</option>
+          <option value="CRITICAL" ${f.impact==='CRITICAL'?'selected':''}>CRITICAL</option>
+        </select>
+      </div>
       <div class="stage-finding-actions">${actions}</div>
     </div>
   </div>`;
 }
 
-function toggleStageFinding(el, findingId) {
+async function toggleStageFinding(el, findingId) {
   // Collapse all others
   document.querySelectorAll('.stage-finding-card.expanded').forEach(c => {
     if (c !== el) c.classList.remove('expanded');
   });
   el.classList.toggle('expanded');
+  // Show gate status when expanding
+  if (el.classList.contains('expanded')) {
+    try {
+      const gateRes = await fetch(API + '/findings/' + findingId + '/gate').then(r => r.json());
+      const detail = el.querySelector('.stage-finding-detail');
+      if (detail && !detail.querySelector('.gate-status')) {
+        let gateHtml = '<div class="gate-status ' + (gateRes.can_promote ? 'gate-ready' : 'gate-blocked') + '">';
+        if (gateRes.checks && gateRes.checks.length) {
+          gateRes.checks.forEach(c => {
+            gateHtml += '<div class="gate-check ' + (c.passed ? 'gate-pass' : 'gate-fail') + '">' +
+              (c.passed ? '✓' : '✗') + ' ' + c.name + ': ' + c.actual + ' (need ' + c.required + ')</div>';
+          });
+        } else {
+          gateHtml += '<div class="gate-check" style="color:var(--text-dim)">Final stage — no promotion gate</div>';
+        }
+        gateHtml += '</div>';
+        const actionsDiv = detail.querySelector('.stage-finding-actions');
+        if (actionsDiv) actionsDiv.insertAdjacentHTML('beforebegin', gateHtml);
+      }
+    } catch(e) {}
+  }
 }
 
 function setStageSortBy(sortBy, stage) {
@@ -1940,6 +2026,15 @@ function setStageSortBy(sortBy, stage) {
 function setStageFilterTag(tag, stage) {
   stageFilterTag = tag;
   renderStageView(stage);
+}
+
+async function updateFindingField(id, field, value) {
+  await fetch(API + '/findings/' + id, {
+    method: 'PUT',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({[field]: value})
+  });
+  if (activeStageFilter) renderStageView(activeStageFilter);
 }
 
 async function verifyFindingInline(findingId) {
@@ -1954,6 +2049,13 @@ async function verifyFindingInline(findingId) {
 
 async function promoteFinding(findingId, targetStage) {
   try {
+    // Check gate first
+    const gateRes = await fetch(API + '/findings/' + findingId + '/gate').then(r => r.json());
+    if (!gateRes.can_promote) {
+      const fails = (gateRes.checks || []).filter(c => !c.passed).map(c => `${c.name}: ${c.actual} (need ${c.required})`).join(', ');
+      showSystemMsg(`Gate blocked for ${findingId}: ${fails}`);
+      return;
+    }
     await fetch(API + '/findings/' + findingId, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

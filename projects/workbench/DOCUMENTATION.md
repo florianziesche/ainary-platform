@@ -1,6 +1,8 @@
-# Execution Platform — Technical Documentation
+# Ainary Execution Platform — Technical Documentation
 
-**Version:** 0.10.1 | **Date:** 2026-02-18 | **Author:** Florian Ziesche + Mia
+**Version:** 0.12.5 | **Date:** 2026-02-19 | **Author:** Florian Ziesche + Mia
+
+> Reference documentation (Diataxis). For formulas see [FORMULAS.md](FORMULAS.md). For schema see [DB-SCHEMA.md](DB-SCHEMA.md). For architecture see [ARCHITECTURE.md](ARCHITECTURE.md). For changelog see [CHANGELOG.md](CHANGELOG.md). For dependencies see [DEPENDENCIES.md](DEPENDENCIES.md).
 
 ---
 
@@ -23,7 +25,7 @@ The insight: Building for N=1 (one user) makes things possible that are impossib
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                    Frontend (Vanilla JS)                  │
-│                     index.html (1,787 LOC)               │
+│                     index.html (~40KB)                    │
 │                                                          │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌─────────┐ │
 │  │  Topics   │  │   Chat   │  │ Context  │  │ Command │ │
@@ -37,8 +39,8 @@ The insight: Building for N=1 (one user) makes things possible that are impossib
                   │ REST + WebSocket + SSE
                   ▼
 ┌─────────────────────────────────────────────────────────┐
-│               Backend (FastAPI + SQLite)                  │
-│                app.py (2,259 LOC) + cv_generator.py      │
+│              Backend (FastAPI + SQLite)                   │
+│               app.py (~3900 LOC) + cv_generator.py       │
 │                                                          │
 │  ┌──────────────────────────────────────────────────┐   │
 │  │              3-Layer Pre-Flight Engine             │   │
@@ -62,8 +64,7 @@ The insight: Building for N=1 (one user) makes things possible that are impossib
                   ▼
 ┌─────────────────────────────────────────────────────────┐
 │                SQLite (workbench.db)                      │
-│  15 tables, ~800 rows                                    │
-│  21 topics · 329 messages · 42 corrections · 9 skills    │
+│  27 tables — see DB-SCHEMA.md                            │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -71,21 +72,13 @@ The insight: Building for N=1 (one user) makes things possible that are impossib
 
 | Layer | Technology | Why |
 |---|---|---|
-| Frontend | Vanilla JS + CSS | Zero dependencies. One HTML file. No build step. Instant iteration. |
-| Backend | Python FastAPI | Async, fast, auto-docs at /docs, SSE streaming native |
-| Database | SQLite | Single file, zero config, JSON functions built-in, good enough for N=1 |
-| AI | OpenAI gpt-4o-mini (configurable) | Cheap ($0.15/1M input), fast, good enough for corrections-aware output |
-| Email | gog CLI → Gmail API | CLI wrapper, no OAuth dance in backend |
-| CV Gen | Headless Chrome → PDF | HTML-first workflow, PDF only for send |
-| Real-time | WebSocket | Instant UI updates on state changes, messages, actions |
-
-### Why Vanilla JS (No React, No Framework)
-
-1. **One file** — `index.html` is the entire frontend. Open it, it works.
-2. **No build step** — Change a line, refresh browser. Iteration speed matters more than abstraction.
-3. **1,787 LOC** — Small enough to hold in your head. React would be 3x the code for the same functionality.
-4. **Offline-capable** — No CDN dependencies for core navigation. AI features need connection.
-5. **This is a tool for one person** — Reusable components and state management are overkill.
+| Frontend | Vanilla JS + CSS | Zero dependencies. One HTML file. No build step. |
+| Backend | Python FastAPI | Async, auto-docs, Pydantic validation, SSE streaming |
+| Database | SQLite 3.51.2 | Single file, WAL mode, JSON functions, good for N=1 |
+| AI | OpenAI gpt-4o-mini / Anthropic claude-sonnet | Configurable dual-provider |
+| Email | gog CLI → Gmail API | CLI wrapper |
+| CV Gen | Headless Chrome → PDF | HTML-first, PDF for send |
+| Real-time | WebSocket | Instant UI updates |
 
 ---
 
@@ -93,91 +86,38 @@ The insight: Building for N=1 (one user) makes things possible that are impossib
 
 ### 1. Pre-Flight Engine (3-Layer Output Quality Check)
 
-Every AI response is automatically checked before the user sees results.
+Every AI response is automatically checked before the user sees results. See [FORMULAS.md](FORMULAS.md#3-pre-flight-scoring-3-layer-engine) for full algorithm.
 
-**Layer 1: Regex Pattern Matching (<50ms)**
-- 42 corrections, 11 with regex patterns (19 unique patterns)
-- Categories: tone, content, design, process, facts
-- Example: `\bgreat question\b` catches LLM phrases
-- Example: `#(?!0a0a0a|d4a853|...)` catches non-brand colors in CSS
-- Output-type filtering: patterns apply only to relevant types (email, linkedin, website, etc.)
-
-**Layer 2: Structural Validators (<100ms)**
-- Email: Has greeting? Has sign-off? Length 20-500 words?
-- LinkedIn: Under 3000 chars? Has CTA?
-- Blog: Has headings at >200 words? Over 300 words?
-- Report: Sources cited? Percentages with sources?
-- Website: Only brand colors used?
-
-**Layer 3: LLM-as-Judge (2-3s, planned)**
-- Only activated for REVIEW/CONFIRM guardrail levels
-- LLM checks output against top corrections semantically
-- Catches what regex can't: "That's a wonderful question" = LLM phrase variant
-
-**Why 3 layers:** Layer 1 is free and instant — catches 80% of issues. Layer 2 catches structural problems regex can't see. Layer 3 is expensive and slow — only used when trust is low.
+- **Layer 1:** Regex Pattern Matching (<50ms) — 42 corrections, 19 unique regex patterns
+- **Layer 2:** Structural Validators (<100ms) — per output type (email, linkedin, blog, report, website)
+- **Layer 3:** LLM-as-Judge (2-3s) — planned, for REVIEW/CONFIRM guardrail levels only
 
 ### 2. Bayesian Trust Engine
 
-Trust per skill domain, earned through feedback, not assigned.
+Trust per skill domain, earned through feedback. See [FORMULAS.md](FORMULAS.md#1-bayesian-trust-update-per-skill) for formula.
 
-**Formula:**
 ```
-observed_score = 100 × (up / (up + down × 1.5))    # Asymmetric: mistakes cost 50% more
+observed_score = 100 × (up / (up + down × 1.5))
 bayesian_score = (C × prior + observed × n) / (C + n)   # C=10, prior=50
 ```
-
-**Why Bayesian, not linear (+2/-3):**
-- Linear: 10 ups then 1 down = score jumps erratically
-- Bayesian: 10 ups then 1 down = score barely moves (high confidence in quality)
-- Prior of 50: new skills start neutral, not at zero
-- Asymmetric downs (1.5x): mistakes should cost more than successes earn
-- More data points → score converges to real quality
 
 **9 Skills:** Research (74), Report (60), Website (55), Translation (50), CV (45), Email (30), Consulting (25), LinkedIn (15), Financial (5)
 
 **Graduated Autonomy:**
 | Score | Level | Behavior |
 |---|---|---|
-| 0-29 | CONFIRM | Output hidden until pre-flight passes. Every action needs explicit confirmation. |
-| 30-59 | REVIEW | Output visible with pre-flight badges inline. Actions need 1-click confirmation. |
-| 60-79 | AUTO | Output shown directly. Pre-flight runs in background. Actions execute immediately. |
-| 80+ | DELEGATED | Multi-step workflows without confirmation. User informed, not asked. |
+| 0-29 | CONFIRM | Output hidden until pre-flight passes |
+| 30-59 | REVIEW | Output visible with pre-flight badges |
+| 60-79 | AUTO | Direct output, background pre-flight |
+| 80+ | DELEGATED | Multi-step without confirmation |
 
 ### 3. Correction Propagation
 
-Every correction becomes a permanent rule that prevents the same mistake.
-
-**Flow:**
-```
-User corrects output ("€5.0M not €5.5M")
-    → Correction stored with regex pattern: 5[.,]5\s*M
-        → Pre-Flight checks ALL future outputs against this pattern
-            → Fewer corrections needed → Trust increases
-                → More autonomy → Less user time per task
-```
-
-**Correction Schema:**
-```json
-{
-  "rule": "Fundraising = €5.0M (€3.5M equity + €1.5M grants). NOT €5.5M.",
-  "category": "facts",
-  "wrong": "5.5M",
-  "right": "5.0M",
-  "severity": 3,
-  "patterns": ["5[.,]5\\s*M", "€5[.,]5", "5\\.5\\s*million"],
-  "output_types": ["all"],
-  "active": true,
-  "violation_count": 0
-}
-```
-
-**Categories:** tone (LLM phrases, voice), content (fake numbers, sources), design (colors, fonts), process (workflow rules), facts (verified data)
+Every correction becomes a permanent rule. See [FORMULAS.md](FORMULAS.md) for scoring details.
 
 ---
 
 ## State Machine
-
-Topics have lifecycle states with validated transitions:
 
 ```
         ┌──────────┐
@@ -196,167 +136,611 @@ Topics have lifecycle states with validated transitions:
 └────────┘
 ```
 
-Invalid transitions return HTTP 409. Every transition is logged as an event.
+Valid transitions: `active→{running,blocked,done,archived}`, `running→{active,done,error,blocked}`, `blocked→{active,running}`, `done→{active,archived}`, `error→{active,running,archived}`, `archived→{active}`
 
 ---
 
-## Error Recovery
+## API Reference (84 Endpoints)
 
-| Failure | Detection | Recovery |
-|---|---|---|
-| AI timeout (>60s/120s) | httpx.TimeoutException | SSE error message + event log + system message visible in chat |
-| AI connection refused | httpx.ConnectError | HTTP 502 + event log |
-| Email send failure | subprocess returncode ≠ 0 | Topic state → error, stderr logged, retry available |
-| Email timeout | subprocess.TimeoutExpired | Topic state → error, retry available |
-| DB error | sqlite3.OperationalError | Global handler → HTTP 503 |
-| Constraint violation | sqlite3.IntegrityError | Global handler → HTTP 409 |
-| Action failure | error field in /complete | Topic state → error, retry with counter (max 3) |
-| Unknown error | Exception base class | Global handler → HTTP 500 + traceback to stderr |
+Base URL: `http://localhost:8080`
 
-**Retry Pattern:**
+---
+
+### 1. Topics
+
+#### GET /api/topics
+
+**Purpose:** List all topics, optionally filtered by stage.
+**Parameters:** `?stage=` (optional) — filter by pipeline stage (research, systems, content, revenue)
+**Returns:** `[{id, name, stage, parent_id, progress, meta, folder_id, folder_position, state, priority, priority_reason, priority_confidence, created_at, updated_at}]`
+
+#### POST /api/topics
+
+**Purpose:** Create a new topic.
+**Body:** `{id: string, name: string, stage?: string, parent_id?: string, meta?: object}`
+**Returns:** `{id, status: "created"}`
+
+#### GET /api/topics/{topic_id}
+
+**Purpose:** Get a single topic with all related data (messages, steps, docs, refs, connections, proposals, votes).
+**Returns:** `{...topic, steps: [...], messages: [{...msg, proposals: [{...prop, votes: {up: N, down: N}, options: [...]}]}], documents: [...], references: [...], connections: [...]}`
+
+#### PATCH /api/topics/{topic_id}
+
+**Purpose:** Update topic fields.
+**Body:** `{name?, stage?, folder_id?, progress?, state?, meta?}` — all optional
+**Returns:** `{status: "updated"}`
+
+#### DELETE /api/topics/{topic_id}
+
+**Purpose:** Delete topic and cascade (messages, steps, documents, connections, events).
+**Returns:** `{status: "deleted"}`
+
+#### POST /api/topics/{topic_id}/state
+
+**Purpose:** Transition topic state with validation. Invalid transitions return HTTP 409.
+**Body:** `{state: "active"|"running"|"blocked"|"done"|"error"|"archived"}`
+**Returns:** `{status: "ok", from: string, to: string}`
+
+#### PUT /api/topics/{topic_id}/priority
+
+**Purpose:** Set priority for a single topic.
+**Body:** `{priority: "NOW"|"HIGH"|"NORMAL"|"LOW", reason: string, confidence: 0-100}`
+**Returns:** `{status: "updated", priority, confidence}`
+
+#### POST /api/topics/auto-prioritize
+
+**Purpose:** Auto-calculate priority for all topics using 5-factor scoring. See [FORMULAS.md](FORMULAS.md#5-topic-auto-prioritization).
+**Body:** None
+**Returns:** `{status: "completed", summary: {total, NOW, HIGH, NORMAL, LOW}, updates: [{id, name, priority, confidence, score}]}`
+
+#### POST /api/topics/{topic_id}/move
+
+**Purpose:** Move topic to a folder.
+**Body:** `{folder_id: string|null, position?: number}`
+**Returns:** `{status: "moved"}`
+
+---
+
+### 2. Messages & Proposals
+
+#### POST /api/topics/{topic_id}/messages
+
+**Purpose:** Post a message. If sender is "human", auto-generates Mia response with keyword-matching.
+**Body:** `{sender: "human"|"mia"|"system", content: string, msg_type?: string, meta?: object}`
+**Returns:** `{id: number, status: "created"}`
+
+#### POST /api/messages/{message_id}/proposals
+
+**Purpose:** Attach a proposal to a message.
+**Body:** `{proposal_type: string, content: string, confidence?: number, confidence_reason?: string, options?: [{title, recommended, description, draft?}]}`
+**Returns:** `{id: number, status: "created"}`
+
+#### POST /api/proposals/{proposal_id}/choose
+
+**Purpose:** Choose an option on a proposal. Generates contextual Mia response and may advance steps.
+**Body:** `{option: "A"|"B"|"C"}`
+**Returns:** `{status: "chosen"}`
+
+#### POST /api/proposals/{proposal_id}/vote
+
+**Purpose:** Vote on a proposal (up/down). Updates agent-level trust scores.
+**Body:** `{direction: "up"|"down"}`
+**Returns:** `{status: "voted"}`
+
+---
+
+### 3. Steps
+
+#### POST /api/topics/{topic_id}/steps
+
+**Purpose:** Add a step to a topic. Auto-recalculates topic progress.
+**Body:** `{label: string, done?: boolean}`
+**Returns:** `{id: number}`
+
+#### PATCH /api/steps/{step_id}
+
+**Purpose:** Toggle step done/undone. Auto-recalculates topic progress.
+**Returns:** `{status: "toggled"}`
+
+---
+
+### 4. Findings (Compound Knowledge Engine)
+
+#### GET /api/findings
+
+**Purpose:** List all findings with optional filters. Compound score calculated live.
+**Parameters:** `?status=` (alive|contested|dead), `?research_line=`, `?tag=`
+**Returns:** `[{id, claim, confidence, status, compound_score, tags: [], used_in_systems: [], used_in_content: [], used_in_revenue: [], supports: [], contradicts: [], derived_from: [], ...}]`
+
+#### GET /api/findings/{finding_id}
+
+**Purpose:** Get single finding with full confidence history.
+**Returns:** `{...finding, confidence_history: [{old_confidence, new_confidence, reason, source, created_at}]}`
+
+#### POST /api/findings
+
+**Purpose:** Create a finding. Auto-detects potential contradictions by shared tags. Confidence >1 auto-normalized to 0.0–1.0.
+**Body:** `{claim: string, confidence?: number, source_type?, source_detail?, source_url?, tags?: [], research_line?, topic_id?, evidence_type?, impact?, ...}`
+**Returns:** `{id: "RF-XXX", status: "created", confidence, potential_contradictions?: [...]}`
+
+#### PUT /api/findings/{finding_id}
+
+**Purpose:** Update finding fields. Tracks confidence changes in history. Recalculates compound score.
+**Body:** Any finding field — `{claim?, confidence?, status?, tags?, stage?, ...}`
+**Returns:** `{status: "updated", compound_score}`
+
+#### POST /api/findings/{finding_id}/validate
+
+**Purpose:** Bayesian confidence update using source reliability weights. See [FORMULAS.md](FORMULAS.md#6-finding-confidence-bayesian-updating-with-source-weights).
+**Body:** `{direction: "support"|"contradict", source_type: string, reason?: string}`
+**Returns:** `{status: "validated", old_confidence, new_confidence, direction, finding_status, compound_score}`
+
+#### POST /api/findings/{finding_id}/verify
+
+**Purpose:** Human-verify a finding. Applies Bayesian boost with reliability=0.90.
+**Returns:** `{id, old_confidence, new_confidence, verified: true}`
+
+#### GET /api/findings/{finding_id}/related
+
+**Purpose:** Find related findings by shared tags.
+**Returns:** `[{id, claim, confidence, status, shared_tags: [], relevance: 0.0-1.0}]` (max 10)
+
+#### GET /api/findings/{finding_id}/gate
+
+**Purpose:** Check if finding meets promotion gate requirements for its current stage.
+**Returns:** `{can_promote: bool, next_stage?, checks: [{name, required, actual, passed}]}`
+
+#### GET /api/findings-stats
+
+**Purpose:** Aggregate knowledge engine statistics.
+**Returns:** `{total, alive, contested, dead, orphans, research_lines: [{line, count, avg_confidence, total_score}]}`
+
+#### GET /api/topics/{topic_id}/findings
+
+**Purpose:** Get all findings associated with a topic.
+**Returns:** `[{...finding, compound_score, tags: [...]}]`
+
+#### POST /api/import/obsidian-claims
+
+**Purpose:** Bulk import claims from Obsidian vault as findings.
+**Body:** `{claims: [{id, claim, confidence, source, source_url, tags, research_line, used_in, context, status, killed_by}]}`
+**Returns:** `{imported: number, skipped: number, details: {imported: [...], skipped: [...]}}`
+
+---
+
+### 5. Executive Board
+
+#### GET /api/executive/kpis
+
+**Purpose:** All KPI data in one call for the Executive Board dashboard.
+**Returns:**
+```json
+{
+  "strategic": {
+    "revenue": {current, target, label},
+    "sends": {current, target, label},
+    "commitments": {current, target, label},
+    "team_health": {current, target, label}
+  },
+  "operational": {
+    "findings_week", "pipeline": {research, systems, content, revenue},
+    "outcomes_month", "active_agents", "total_agents"
+  },
+  "agents": [{name, role, score, last_active}],
+  "goals": [{id, month, description, target_value, current_value, status}],
+  "health": {checks: [{name, value, status}], issues: number}
+}
 ```
-Queue action → Execute → Fail → Retry (counter +1) → Execute → Fail → Retry (counter +2) → ... → Max 3 → Stop
+
+#### GET /api/executive/impact
+
+**Purpose:** Impact summary — totals and 7-day breakdown by impact type.
+**Returns:** `{totals: [{impact_type, total, count}], week: [{impact_type, total}]}`
+
+#### POST /api/executive/revenue
+
+**Purpose:** Log a revenue event.
+**Body:** `{amount: number, source?: string, description?: string, date?: "YYYY-MM-DD"}`
+**Returns:** `{id, status: "created", amount}`
+**Errors:** 400 if amount ≤ 0
+
+#### POST /api/executive/goals
+
+**Purpose:** Add a monthly goal.
+**Body:** `{description: string, target_value?: number, current_value?: number}`
+**Returns:** `{id, status: "created"}`
+
+#### PUT /api/executive/goals/{goal_id}
+
+**Purpose:** Update goal progress or status.
+**Body:** `{current_value?: number, status?: string}`
+**Returns:** `{status: "updated"}`
+
+---
+
+### 6. Daily Standup (Operations)
+
+#### GET /api/standup/today
+
+**Purpose:** Get today's score and tasks. Creates today's entry if not exists.
+**Returns:** `{score: {date, score_reset, score_current, score_ema, tasks_committed, tasks_completed, tasks_extra, sends}, tasks: [...]}`
+
+#### POST /api/standup/tasks
+
+**Purpose:** Add a committed task for today.
+**Body:** `{description: string, is_send?: 0|1}`
+**Returns:** `{id, status: "created"}`
+**Errors:** 400 if description empty
+
+#### PUT /api/standup/tasks/{task_id}
+
+**Purpose:** Update task status.
+**Body:** `{status: "done"|"missed"|"pending"}`
+**Returns:** `{status: "updated"}`
+
+#### POST /api/standup/extra
+
+**Purpose:** Add a bonus (extra) task already completed.
+**Body:** `{description: string, is_send?: 0|1}`
+**Returns:** `{id, status: "created"}`
+
+#### GET /api/standup/history
+
+**Purpose:** Get score history for chart.
+**Parameters:** `?days=14` (default)
+**Returns:** `[{date, score_reset, score_current, score_ema, ...}]` in chronological order
+
+#### PUT /api/standup/recalc
+
+**Purpose:** Recalculate today's score based on all tasks. See [FORMULAS.md](FORMULAS.md#4-daily-standup-scoring).
+**Returns:** `{score: number, ema: number}`
+
+---
+
+### 7. Activity Feed
+
+#### GET /api/activity/feed
+
+**Purpose:** Last 50 activities, newest first.
+**Returns:** `[{id, agent, action, detail, result, impact_type, impact_value, date, created_at}]`
+
+#### POST /api/activity/log
+
+**Purpose:** Log an agent activity.
+**Body:** `{agent: string, action: string, detail?: string, result?: string, impact_type?: string, impact_value?: number, date?: string}`
+**Returns:** `{status: "logged"}`
+
+#### GET /api/activity/digest
+
+**Purpose:** Today's agent digest with alerts for inactive agents and failures.
+**Returns:** `{date, agents_today: [{agent, actions, successes, failures, total_impact, impact_types}], agents_week: [...], impact: [...], inactive: [...], alerts: [{agent, type, message}]}`
+
+#### GET /api/activity/graph
+
+**Purpose:** 14-day activity data for visualization.
+**Returns:** `{by_agent: [{date, agent, actions, successes}], totals: [{date, total, impact}]}`
+
+---
+
+### 8. Decisions & Backlog
+
+#### GET /api/decisions
+
+**Purpose:** Recent decisions, newest first (max 20).
+**Returns:** `[{id, decision_id, date, question, options, mia_recommendation, florian_decision, recommendation_followed, reason}]`
+
+#### POST /api/decisions
+
+**Purpose:** Log a decision.
+**Body:** `{decision_id: string, question: string, date?, options?, mia_recommendation?, florian_decision?, recommendation_followed?: 0|1, reason?}`
+**Returns:** `{status: "logged"}`
+
+#### GET /api/backlog
+
+**Purpose:** Backlog items with status='backlog', priority-sorted.
+**Returns:** `[{id, description, source, priority, status, assigned_to, created_at}]`
+
+#### POST /api/backlog
+
+**Purpose:** Add item to backlog.
+**Body:** `{description: string, source?: string, priority?: "NOW"|"HIGH"|"NORMAL"|"LOW", assigned_to?: string}`
+**Returns:** `{status: "added"}`
+
+#### PUT /api/backlog/{item_id}
+
+**Purpose:** Update backlog item.
+**Body:** `{status?, priority?, assigned_to?, description?}` — any subset
+**Returns:** `{status: "updated"}`
+
+#### DELETE /api/backlog/{item_id}
+
+**Purpose:** Remove backlog item.
+**Returns:** `{status: "deleted"}`
+
+---
+
+### 9. Documents & Files
+
+#### GET /api/topics/{topic_id}/documents
+
+**Purpose:** List all documents/references for a topic.
+**Returns:** `[{id, topic_id, name, path, url, doc_type, kind}]`
+
+#### POST /api/topics/{topic_id}/documents
+
+**Purpose:** Add a document reference (metadata only, no file upload).
+**Body:** `{name: string, path?: string, url?: string, doc_type?: string}`
+**Returns:** `{status: "added"}`
+
+#### POST /api/topics/{topic_id}/upload
+
+**Purpose:** Upload a file and attach to topic. Saves to `uploads/{topic_id}/`.
+**Body:** Multipart form — `file: File, kind: "doc"|"ref"`
+**Returns:** `{status: "uploaded", name, path, size}`
+
+#### POST /api/topics/{topic_id}/add-reference
+
+**Purpose:** Add a URL or path as a reference document.
+**Body:** `{name?: string, url?: string, path?: string, doc_type?: string}`
+**Returns:** `{status: "added"}`
+
+#### DELETE /api/topics/{topic_id}/documents/{doc_id}
+
+**Purpose:** Remove a document. Optionally deletes file from disk.
+**Parameters:** `?delete_file=true` (default true)
+**Returns:** `{status: "deleted", name, file_deleted: bool}`
+
+#### GET /api/file
+
+**Purpose:** Read a workspace file (text content).
+**Parameters:** `?path=` — relative path from workspace root
+**Returns:** `{path, content, truncated: bool}`
+**Errors:** 403 if outside workspace, 404 if not found
+
+#### GET /view/{path:path}
+
+**Purpose:** Serve workspace files directly in browser. PDFs/images/HTML served as-is. Text files rendered in dark viewer.
+**Returns:** File content with appropriate MIME type
+
+---
+
+### 10. Folders
+
+#### GET /api/folders
+
+**Purpose:** List all folders.
+**Returns:** `[{id, name, parent_id, position, color, icon, collapsed, created_at}]`
+
+#### POST /api/folders
+
+**Purpose:** Create a folder.
+**Body:** `{id: string, name: string, parent_id?: string, color?: string, icon?: string}`
+**Returns:** `{id, status: "created"}`
+
+#### PATCH /api/folders/{folder_id}
+
+**Purpose:** Update folder properties.
+**Body:** `{name?, parent_id?, color?, icon?, position?, collapsed?}` — any subset
+**Returns:** `{status: "updated"}`
+
+#### DELETE /api/folders/{folder_id}
+
+**Purpose:** Delete folder. Topics become unfiled, child folders move to parent.
+**Returns:** `{status: "deleted"}`
+
+#### POST /api/folders/reorder
+
+**Purpose:** Batch reorder folders.
+**Body:** `{order: [{id, position, parent_id}]}`
+**Returns:** `{status: "reordered"}`
+
+---
+
+### 11. Connections
+
+#### POST /api/connections
+
+**Purpose:** Create a directed connection between two topics.
+**Body:** `{from: string, to: string, relation?: string}`
+**Returns:** `{status: "connected"}`
+
+---
+
+### 12. Mia Bridge (AI Integration)
+
+#### POST /api/ai/chat
+
+**Purpose:** Non-streaming AI chat. Builds context-rich system prompt from topic data. Auto-runs pre-flight on response.
+**Body:** `{message: string, topic_id: string}`
+**Returns:** `{response: string, usage: {}, preflight: {...}}`
+**Errors:** 504 timeout, 502 connection error, 503 no API key
+
+#### POST /api/ai/stream
+
+**Purpose:** Streaming AI chat via SSE. Same context building as /ai/chat. Auto pre-flight after stream completes.
+**Body:** `{message: string, topic_id: string}`
+**Returns:** SSE stream — `data: {"text": "..."}\n\n` ... `data: {"preflight": {...}}\n\n` ... `data: {"done": true}\n\n`
+
+#### POST /api/mia/execute
+
+**Purpose:** Direct Mia bridge with full topic context + trust + corrections. Supports self-refine (RF-079).
+**Body:** `{task: string, topic_id?: string, context?: {}, refine?: bool}`
+**Returns:** SSE stream — `data: {"chunk": "..."}\n\n` ... `data: {"refine_status": "..."}\n\n` ... `data: {"preflight": {...}}\n\n` ... `data: {"done": true}\n\n`
+
+---
+
+### 13. Quality (Corrections, Trust, Pre-Flight, Standards)
+
+#### GET /api/corrections
+
+**Purpose:** List corrections with optional filters.
+**Parameters:** `?category=` (design|content|process|tone|facts), `?active=true` (default)
+**Returns:** `[{id, rule, category, wrong, rght, severity, patterns: "[]", output_types: "[]", violation_count, ...}]`
+
+#### POST /api/corrections
+
+**Purpose:** Create a correction rule.
+**Body:** `{rule: string, category?: string, wrong?: string, right?: string, source_topic?: string, severity?: 1|2|3}`
+**Returns:** `{id, status: "created"}`
+
+#### POST /api/corrections/{correction_id}/violation
+
+**Purpose:** Record that a correction was violated. Increments violation_count.
+**Body:** `{topic_id?: string}`
+**Returns:** `{status: "recorded"}`
+
+#### GET /api/preflight/{topic_id}
+
+**Purpose:** Run 3-layer pre-flight check on topic's last Mia output. See [FORMULAS.md](FORMULAS.md#3-pre-flight-scoring-3-layer-engine).
+**Returns:** `{topic_id, output_type, total_checks, skipped, passed, warned, failed, overall: "pass"|"warn"|"fail", has_output, layers_run: [1,2], checks: [{id, type, rule, category, severity, status, layer, matches?}]}`
+
+#### GET /api/trust
+
+**Purpose:** Get agent-level trust scores (legacy).
+**Returns:** `[{agent, score, total_votes, up_votes, down_votes}]`
+
+#### GET /api/trust/skills
+
+**Purpose:** Get per-skill Bayesian trust scores.
+**Returns:** `[{skill, score, total, up, down, updated_at}]`
+
+#### POST /api/trust/skills/{skill}/feedback
+
+**Purpose:** Record trust feedback. Triggers Bayesian recalculation. See [FORMULAS.md](FORMULAS.md#1-bayesian-trust-update-per-skill).
+**Body:** `{direction: "up"|"down", weight?: 1-3, detail?: string, topic_id?: string}`
+**Returns:** `{status: "recorded"}`
+
+---
+
+### 14. Events & Preferences
+
+#### GET /api/events/{topic_id}
+
+**Purpose:** Get topic event log.
+**Parameters:** `?limit=50` (default)
+**Returns:** `[{id, topic_id, event_type, detail: "{}", created_at}]`
+
+#### POST /api/events
+
+**Purpose:** Create an event.
+**Body:** `{topic_id: string, event_type: string, detail?: object}`
+**Returns:** `{status: "created"}`
+
+---
+
+### 15. Eval
+
+#### POST /api/eval
+
+**Purpose:** Submit evaluation responses.
+**Body:** `[{question_id: number, answers: [string]}]`
+**Returns:** `{status: "saved", date}`
+
+#### GET /api/eval/history
+
+**Purpose:** Get evaluation history.
+**Parameters:** `?days=7` (default)
+**Returns:** `[{id, question_id, answers, session_date, created_at}]`
+
+---
+
+### 16. Pipeline
+
+#### GET /api/pipeline
+
+**Purpose:** Pipeline stage stats with cross-stage flows, research lines, and orphan detection.
+**Returns:**
+```json
+{
+  "stages": {"research": {count, avg_progress}, ...},
+  "total_items": number,
+  "outcomes": number,
+  "total_votes": number,
+  "flows": {"research_to_systems": {connected, source_count, conversion_pct}, ...},
+  "research_lines": [{research_line, count, avg_conf, total_score}],
+  "orphans": [{id, name, stage}]
+}
 ```
 
----
+#### GET /api/pipeline/detail
 
-## API Surface (47 Endpoints)
-
-### Core
-| Method | Endpoint | Purpose |
-|---|---|---|
-| GET | `/api/topics` | List all topics |
-| GET | `/api/topics/{id}` | Get single topic |
-| POST | `/api/topics` | Create topic |
-| DELETE | `/api/topics/{id}` | Delete topic |
-| POST | `/api/topics/{id}/messages` | Post message |
-| POST | `/api/topics/{id}/state` | Transition state (validated) |
-| POST | `/api/topics/{id}/steps` | Add step |
-| POST | `/api/topics/{id}/move` | Move to folder |
-
-### Pre-Flight & Trust
-| Method | Endpoint | Purpose |
-|---|---|---|
-| GET | `/api/preflight/{id}` | Run 3-layer pre-flight check |
-| GET | `/api/trust/skills` | List all trust skills with scores |
-| POST | `/api/trust/skills/{skill}/feedback` | Bayesian trust update (up/down) |
-| GET | `/api/corrections` | List all corrections |
-| POST | `/api/corrections` | Create correction with patterns |
-
-### AI
-| Method | Endpoint | Purpose |
-|---|---|---|
-| POST | `/api/ai/chat` | Non-streaming AI + auto pre-flight |
-| POST | `/api/ai/stream` | SSE streaming AI + auto pre-flight |
-| POST | `/api/mia/execute` | Mia bridge with full topic context |
-
-### Actions
-| Method | Endpoint | Purpose |
-|---|---|---|
-| POST | `/api/actions/queue` | Queue action for execution |
-| GET | `/api/actions/pending` | Poll pending actions (for OpenClaw) |
-| POST | `/api/actions/complete` | Mark action done/failed |
-| POST | `/api/actions/retry` | Retry failed action (max 3) |
-| POST | `/api/actions/send-email` | Send email via gog CLI |
-| POST | `/api/actions/generate-cv/{fund}` | Generate CV PDF |
-
-### Documents & Files
-| Method | Endpoint | Purpose |
-|---|---|---|
-| GET | `/api/topics/{id}/documents` | List documents |
-| POST | `/api/topics/{id}/upload` | Upload file |
-| POST | `/api/topics/{id}/add-reference` | Add URL/path reference |
-| DELETE | `/api/topics/{id}/documents/{doc_id}` | Delete document + optional file |
-
-### System
-| Method | Endpoint | Purpose |
-|---|---|---|
-| GET | `/api/health` | Health check with error counts |
-| GET | `/api/pipeline` | Stage-level stats |
-| WS | `/ws` | Real-time updates |
+**Purpose:** Full pipeline data with topics, connections, and findings per stage.
+**Returns:** `{"research": [{id, name, stage, progress, state, connections_out: [...], connections_in: [...], findings_total, findings_alive}], ...}`
 
 ---
 
-## Database Schema (15 Tables)
+### 17. Actions Engine
 
-```sql
-topics (21 rows)
-  id TEXT PK, name, stage, parent_id, progress, meta JSON,
-  folder_id, folder_position, state TEXT
+#### POST /api/actions/queue
 
-messages (329 rows)
-  id INTEGER PK, topic_id FK, sender, content, msg_type, meta JSON
+**Purpose:** Queue an action for Mia/OpenClaw to execute.
+**Body:** `{topic_id: string, action_type: "send_email"|"generate_cv"|"publish", params?: {}}`
+**Returns:** `{status: "queued", action_type}`
 
-corrections (42 rows)
-  id INTEGER PK, rule, category, wrong, rght, severity,
-  patterns JSON, output_types JSON, active, violation_count
+#### GET /api/actions/pending
 
-trust_skills (9 rows)
-  skill TEXT PK, score, total, up, down
+**Purpose:** Get all pending actions (polled by Mia/OpenClaw).
+**Returns:** `[{topic_id, detail: {action_type, params, status}, created_at}]`
 
-quality_standards (18 rows)
-  id INTEGER PK, rule, category, output_type, active
+#### POST /api/actions/complete
 
-events (92 rows)
-  id INTEGER PK, topic_id, event_type, detail JSON
+**Purpose:** Mark an action completed or failed.
+**Body:** `{topic_id: string, action_type: string, result?: string, error?: string}`
+**Returns:** `{status: "completed"|"failed"}`
 
-folders (7 rows)
-  id TEXT PK, name, parent_id, position, color, icon, collapsed
+#### POST /api/actions/retry
 
-documents (71 rows)
-  id INTEGER PK, topic_id, name, path, url, doc_type, kind
+**Purpose:** Retry a failed action (max 3 retries). Resets topic state from error.
+**Body:** `{topic_id: string, action_type: string, max_retries?: 3}`
+**Returns:** `{status: "retrying", retry: number}`
+**Errors:** 404 if no failed action, 429 if max retries exceeded
 
-steps (50 rows)
-  id INTEGER PK, topic_id, label, done, position
+#### POST /api/actions/generate-cv/{fund_id}
 
-proposals (166 rows)
-  id INTEGER PK, message_id, proposal_type, content,
-  confidence, confidence_reason, options JSON
+**Purpose:** Generate CV PDF for a fund. Adds files as topic documents, posts Mia message, advances steps.
+**Returns:** `{pdf: path, html: path, subtitle: string, size: number, ...}`
 
-connections (6 rows)
-  id INTEGER PK, from_topic, to_topic, relation
+#### GET /api/actions/available-funds
 
-votes (1 row)
-  id INTEGER PK, proposal_id, direction
-```
+**Purpose:** List funds with CV configurations.
+**Returns:** `["fund_id_1", "fund_id_2", ...]`
 
----
+#### POST /api/actions/send-email
 
-## What Makes This Different
-
-1. **Corrections compound.** Every mistake becomes a permanent regex rule. The system gets better with every interaction, not just within a session, but across all future sessions.
-
-2. **Trust is earned, not configured.** Bayesian scoring means the system starts cautious and earns autonomy through demonstrated quality. Bad outputs in one skill don't affect other skills.
-
-3. **Pre-Flight is deterministic.** Layer 1 and 2 don't use AI — they're regex and structural checks. Reproducible, instant, free, offline-capable. AI (Layer 3) is only invoked when trust is low.
-
-4. **N=1 advantage.** 42 corrections tailored to one person's standards. 18 quality standards per output type. 9 skill-specific trust scores. This personalization is impossible at scale — and that's the point.
-
-5. **Error recovery is visible.** Failed actions don't silently disappear. They set topic state to error, log the failure, show it in chat, and offer retry with backoff. The user always knows what happened.
+**Purpose:** Send email via gog CLI. Logs event, updates topic state on failure.
+**Body:** `{to: string, subject: string, body: string, account?: string, attachments?: [string], topic_id?: string}`
+**Returns:** `{status: "sent", to, subject}`
+**Errors:** 400 (invalid email, short subject/body), 500 (gog error), 504 (timeout)
 
 ---
 
-## Test Coverage
+### 18. Health & System
 
-**44 tests, 0 failures.** Categories:
+#### GET /api/health
 
-| Category | Tests | What's Covered |
-|---|---|---|
-| Topics CRUD | 5 | List, get, 404, create/delete, update |
-| Messages | 1 | Post message |
-| Corrections | 3 | List, create, filter by category |
-| Pre-Flight | 5 | Basic check, 404, layer info, clean pass, LLM slop detection |
-| Trust | 3 | List skills, feedback, Bayesian scoring math |
-| Folders | 1 | List |
-| Events | 1 | Get events |
-| Actions | 4 | Queue, pending, email validation (bad address + short body) |
-| AI | 1 | Chat endpoint exists |
-| Pipeline | 1 | Stats |
-| Health | 2 | Endpoint, counts |
-| State Machine | 4 | Valid transition, invalid blocked, bad value, error recovery |
-| Retry | 2 | 404 on non-failed, fail+retry cycle |
-| Mia Bridge | 2 | Empty task rejected, SSE streaming |
-| Error Handling | 9 | Auto pre-flight, malformed JSON, empty body, XSS, long message, nonexistent topic, empty topic pre-flight, double complete, concurrent access |
+**Purpose:** Health check with error summary.
+**Returns:** `{status: "healthy"|"degraded", topics, error_topics, pending_actions, failed_actions, version: "0.12.3"}`
+
+#### WebSocket /ws
+
+**Purpose:** Real-time updates. Send "ping" to receive `{type: "pong"}`. Server broadcasts events: `topic_update`, `message`, `trust_update`, `standup_update`, `folder_update`, `activity_logged`, `finding_created`, `finding_updated`, `revenue_logged`, `goal_added`, `goal_updated`, `decision_logged`, `backlog_updated`, `priority_update`, `action_queued`, `findings_imported`, `finding_verified`.
+
+---
+
+## Error Handling
+
+| Failure | Detection | HTTP | Recovery |
+|---|---|---|---|
+| AI timeout (>60s/120s) | httpx.TimeoutException | 504 | SSE error + event log |
+| AI connection refused | httpx.ConnectError | 502 | Event log |
+| Email send failure | subprocess returncode ≠ 0 | 500 | Topic → error, retry available |
+| Email timeout | subprocess.TimeoutExpired | 504 | Topic → error |
+| DB error | sqlite3.OperationalError | 503 | Global handler |
+| Constraint violation | sqlite3.IntegrityError | 409 | Global handler |
+| Action failure | error in /complete | — | Topic → error, retry (max 3) |
+| Invalid state transition | — | 409 | Blocked |
+| Unknown error | Exception | 500 | Traceback to stderr |
 
 ---
 
@@ -364,21 +748,17 @@ votes (1 row)
 
 | Metric | Value |
 |---|---|
-| Total LOC | 4,498 (backend 2,259 + frontend 1,787 + tests 452) |
-| API endpoints | 47 |
-| DB tables | 15 |
-| Corrections | 42 (11 with regex patterns, 19 unique patterns) |
+| Total LOC | ~5,700 (backend ~3,900 + frontend ~1,800) |
+| API endpoints | 84 |
+| DB tables | 27 |
+| Corrections | 42 (11 with regex, 19 unique patterns) |
 | Trust skills | 9 |
 | Quality standards | 18 |
 | Tests | 44/44 passing |
-| Topics | 21 |
-| Messages | 329 |
-| Git commits | 6 |
-| Dependencies | FastAPI, uvicorn, httpx, sqlite3 (stdlib) |
-| External services | OpenAI API, Gmail (via gog CLI) |
+| Dependencies (pip) | 4 (fastapi, uvicorn, httpx, python-multipart) |
 | Build step | None |
 | Deploy | `python3 app.py` |
 
 ---
 
-*Built in 3 days. Documented in 10 minutes. Ships with `python3 app.py`.*
+*Built in 3 days. Documented thoroughly on day 3. Ships with `python3 app.py`.*
