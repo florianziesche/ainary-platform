@@ -34,3 +34,13 @@
 | T-029 | Asepha: CEO Eunice Wu (PharmD), CTO Can Uncu (AMD MI300X engineer); $4M Seed July 2025 (Glasswing lead); Fortune 50 customers; 96% OCR accuracy, 71% preference vs human pharmacist | BusinessWire 2025-07-14 | 2026-02-18 | 2026-08-18 | 95% |
 | T-030 | LangSmith Plus: $39/seat/mo, 10K base traces/mo; $2.50/1K traces (14d retention) or $5/1K (400d); LangGraph $0.005/run | langchain.com/pricing 2026-02-18 | 2026-02-18 | 2026-08-18 | 98% |
 | T-031 | Arize Phoenix: FREE self-hosted unlimited; Cloud Free 25K spans/mo; Pro $50/mo (50K spans, 15d retention); Overage $10/M spans, $3/GB | phoenix.arize.com/pricing 2026-02-18 | 2026-02-18 | 2026-08-18 | 98% |
+| T-032 | Glashütte: ~7.000 Einwohner, Uhrenindustrie, Bürgermeister Gleißberg (seit 2021) | glashuette.de + R2 Report 2026-02-19 | 2026-02-19 | 2027-02-19 | 85% |
+| T-033 | OZG-Umsetzung Sachsen unter 30%, strukturelles Problem (Budget + IT-Kapazität) | R2 Glashütte Report, OZG-Portal | 2026-02-19 | 2026-08-19 | 80% |
+| T-034 | Dippoldiswalde (Nachbargemeinde) bietet Online-Terminbuchung, Glashütte nicht | R2 Report, Websites verglichen | 2026-02-19 | 2026-08-19 | 90% |
+| T-035 | EFRE Sachsen: Förderung bis 60% (max €10K), primär KMU — Antragsberechtigung für Kommunen klären! | R2 Report, sachsen.de | 2026-02-19 | 2026-08-19 | 70% |
+| T-036 | Bayern Digital: Digitalbonus bis €50K, Top-34 Plätze bundesweit — massiv besser als Sachsen | R2 Report | 2026-02-19 | 2026-08-19 | 75% |
+| T-037 | Realistische Automatisierung Verwaltung: 20-40% (nicht 60-80% wie initial hypothetisiert) | R2 Report, Gegenrecherche | 2026-02-19 | 2026-08-19 | 82% |
+| T-038 | Ainary Platform Tech Stack für Piloten: OpenClaw + Obsidian + Dashboard | Florian Entscheidung 2026-02-19 | 2026-02-19 | 2026-08-19 | 85% |
+| T-039 | Platform ist eine Firma, nicht nur ein Tool. AI Workforce Management System. | Florian Entscheidung 2026-02-19 | 2026-02-19 | 2027-02-19 | 80% |
+| T-040 | Revenue Target €100K (ALG1 zählt NICHT). 40-50% erreichbar = Motivations-Sweet-Spot (Locke & Latham) | Research + Florian Decision D-173 | 2026-02-18 | 2027-02-18 | 88% |
+| T-041 | HUNTER = BDR: sucht Kunden nach ICP UND Jobs (nicht nur VC-Bewerbungen) | Florian Entscheidung D-182 | 2026-02-19 | 2027-02-19 | 95% |

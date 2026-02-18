@@ -13,15 +13,19 @@
 - Research bestätigt: KEINE Konkurrenz in Production
 - Content Flywheel: 5 Artikel → Repo → Credibility → Repeat
 
-### Execution Platform / CKE (NEU 2026-02-18)
-- **Version:** v0.11.5, 57+ API endpoints, 18 DB tables
-- **GitHub:** github.com/florianziesche/execution-platform
-- **Stack:** FastAPI + SQLite + vanilla JS, localhost:8080
-- **Features:** Correction Engine (29 corrections, 18 quality standards), Pre-Flight Gate, Trust per Skill (9 skills), Pipeline View, Finding Detail, Memory Sync, File Upload, Command Palette (Cmd+K)
-- **Decisions:** D-151 to D-158 (see decisions.md)
+### Execution Platform / CKE (v0.12.7, 2026-02-19)
+- **Version:** v0.12.7, 85 API endpoints, 27 DB tables, 56 tests
+- **GitHub:** github.com/florianziesche/ainary-platform (PRIVATE)
+- **Stack:** Bottle + SQLite + vanilla JS, localhost:8080, launchctl auto-restart
+- **Features:** Executive Board (CEO/COO Tabs, KPIs, Impact Summary), Pipeline View (Kanban), Evidence Gates (E/I/J/A), Stage Views (Research/Systems/Content/Revenue), Activity Feed (14-day chart), Backlog, Decisions Log, Daily Standup Scoring, Mia Bridge (SSE), Pre-Flight Gate, Trust per Skill (9 skills), Quality Gate, So What AI-generation, Command Palette (Cmd+K), Principles View (Cmd+I)
+- **Documentation:** 13 docs (README, ARCHITECTURE, DOCUMENTATION, DB-SCHEMA, FORMULAS, CHANGELOG, DEPENDENCIES, DESIGN-DOC, ROADMAP, PLATFORM-SPEC, SECURITY, TESTING, RUNBOOK)
+- **Standards:** R2 Deep Dive Research, S1 Ersttermin-Prep, Agent Context Package
+- **Decisions:** D-151 to D-187
 - **Done-Def v1:** Fehlerfrei + Live AI + Trust System + 5 VC Emails durch Platform gesendet
-- **Next:** Phase 2 — OpenClaw Integration (sessions_send → real AI)
-- **Issue:** main.sqlite = 14 GB (embeddings), disk tight
+- **Key Insight:** Platform IST das Produkt. AI Workforce Management System. Dogfooding → Pilot → Scale.
+- **Pilot-Kunden:** Bürgermeister Glashütte (Mo 23.02), Andreas (Maschinenbau)
+- **Tech Stack für Piloten:** OpenClaw + Obsidian + Dashboard
+- **Issue:** main.sqlite = 14 GB, disk 6.1 GB free
 
 ### Ainary Platform Website
 - **Status:** LIVE https://platform-website-lilac.vercel.app

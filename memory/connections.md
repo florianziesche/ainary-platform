@@ -60,3 +60,18 @@
 - **Intro Path:** Glasswing Portfolio → Rudina Seseri (Glasswing Partner, Asepha Lead Investor) → Warm Intro zu Eunice/Can
 - **Pitch Angle:** "You automated 96% of pharmacy data entry. AgentTrust calibrates the trust boundary for the other 4% — so you know WHEN to escalate to a human pharmacist vs when the agent is confident enough."
 - **Next:** Florian VC application → Glasswing → Name-drop Asepha in cover letter → Get intro after hire
+
+## C-010: Platform als Produkt × Consulting Pilots
+- **Fakten:** T-038 (Tech Stack: OpenClaw+Obsidian+Dashboard), T-039 (Platform = Firma), D-180 (Multi-Path Revenue)
+- **Insight:** Jeder Consulting-Pilot ist gleichzeitig ein Platform-Pilot. Der Bürgermeister kauft nicht "Beratung", er kauft ein Dashboard das seine Verwaltung transparenter macht. Andreas kauft nicht "AI-Beratung", er kauft ein System das Angebote automatisiert. Das Produkt verkauft sich über den Pilot, nicht über einen Sales-Pitch.
+- **Implikation:** Pricing = Pilot-Gebühr (€15-30K) + laufende Platform-Lizenz (€49-499/mo). Pilot refinanziert sich über Förderung, Platform wird recurring revenue.
+
+## C-011: Bürgermeister × OZG × Förderung = Triple Fit
+- **Fakten:** T-032 (Glashütte 7K EW), T-033 (OZG <30%), T-034 (Dippoldiswalde weiter), T-035 (EFRE bis 60%), T-037 (20-40% realistisch)
+- **Insight:** OZG-Deadline zwingt Kommunen zu handeln. Förderung senkt Risiko auf ~40% Eigenanteil. Dippoldiswalde-Vergleich erzeugt sozialen Druck. Triple Fit: regulatorischer Druck + finanzielle Unterstützung + Wettbewerbsvergleich = idealer Pilot-Kontext.
+- **Implikation:** Pitch-Struktur: "Das Gesetz fordert es (OZG), das Land fördert es (EFRE), die Nachbarn machen es schon (Dippoldiswalde). Wir helfen Ihnen dabei."
+
+## C-012: Evidence System (E/I/J/A) × Landing Page × Trust as Currency
+- **Fakten:** D-184 (Ehrliche Impact-Metriken), D-187 (50-Jähriger MacBook Test), Landing Page ainaryventures.com
+- **Insight:** Das Evidence System (E/I/J/A) ist gleichzeitig internes Qualitäts-Tool UND externes Verkaufsargument. "Jeder Claim ist nach Evidenz-Typ getaggt" differenziert von jeder normalen Beratung. Kunden sehen: diese Leute quantifizieren Unsicherheit statt sie zu verstecken. Das IST das Produkt.
+- **Implikation:** E/I/J/A muss in der Demo-Ansicht für Kunden prominent sichtbar sein (wie auf der Landing Page).
