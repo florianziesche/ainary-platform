@@ -2247,38 +2247,106 @@ Recent conversation:
 """
     
     # Use streaming for real-time response
+    refine = body.get("refine", False)
     api_key = os.environ.get("OPENAI_API_KEY", "")
     if not api_key:
         raise HTTPException(503, "No AI provider configured")
     
+    async def _call_openai(messages, stream=True, max_tokens=2000):
+        """Helper for OpenAI API calls."""
+        timeout = httpx.Timeout(60.0, connect=10.0, read=60.0)
+        client = httpx.AsyncClient(timeout=timeout)
+        try:
+            return await client.post(
+                "https://api.openai.com/v1/chat/completions",
+                headers={"Authorization": f"Bearer {api_key}"},
+                json={
+                    "model": "gpt-4o-mini",
+                    "messages": messages,
+                    "stream": stream,
+                    "max_tokens": max_tokens,
+                    "temperature": 0.7
+                }
+            )
+        finally:
+            if not stream:
+                await client.aclose()
+    
+    async def _refine_pass(draft: str, original_task: str) -> str:
+        """Self-Refine (RF-079): Generate → Critique → Refine. Max 1 iteration."""
+        critique_prompt = f"""Bewerte diesen Draft kritisch. Prüfe:
+1. Beantwortet es die Aufgabe vollständig?
+2. Sind Zahlen/Claims belegt oder als "unverified" markiert?
+3. Ist es direkt nutzbar (nicht vage)?
+4. Gibt es Widersprüche oder Lücken?
+5. Ist der Ton direkt und ohne Filler?
+
+Aufgabe war: {original_task[:500]}
+
+Draft:
+{draft[:3000]}
+
+Antworte NUR mit konkreten Verbesserungsvorschlägen. Wenn der Draft gut ist, sage "PASS — keine Änderungen nötig."
+"""
+        resp = await _call_openai([
+            {"role": "system", "content": "Du bist ein Quality Reviewer. Kurz, präzise, konstruktiv."},
+            {"role": "user", "content": critique_prompt}
+        ], stream=False, max_tokens=500)
+        critique_data = resp.json()
+        critique = critique_data["choices"][0]["message"]["content"]
+        
+        if "PASS" in critique[:20]:
+            return draft  # No refinement needed
+        
+        refine_prompt = f"""Verbessere diesen Draft basierend auf dem Feedback.
+Behalte den Stil (direkt, keine Floskeln, ♔ am Ende).
+
+Original-Aufgabe: {original_task[:500]}
+
+Draft:
+{draft[:3000]}
+
+Feedback:
+{critique[:500]}
+
+Schreibe die VERBESSERTE Version:"""
+        resp2 = await _call_openai([
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": refine_prompt}
+        ], stream=False, max_tokens=2000)
+        refined_data = resp2.json()
+        return refined_data["choices"][0]["message"]["content"]
+    
     async def stream_mia():
         full_response = ""
         try:
-            async with httpx.AsyncClient(timeout=60.0) as client:
-                resp = await client.post(
-                    "https://api.openai.com/v1/chat/completions",
-                    headers={"Authorization": f"Bearer {api_key}"},
-                    json={
-                        "model": "gpt-4o-mini",
-                        "messages": [
-                            {"role": "system", "content": system_prompt},
-                            {"role": "user", "content": task}
-                        ],
-                        "stream": True,
-                        "max_tokens": 2000,
-                        "temperature": 0.7
-                    }
-                )
-                async for line in resp.aiter_lines():
-                    if line.startswith("data: ") and line != "data: [DONE]":
-                        try:
-                            chunk = json.loads(line[6:])
-                            delta = chunk["choices"][0].get("delta", {}).get("content", "")
-                            if delta:
-                                full_response += delta
-                                yield f"data: {json.dumps({'chunk': delta})}\n\n"
-                        except (json.JSONDecodeError, KeyError, IndexError):
-                            continue
+            resp = await _call_openai([
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": task}
+            ])
+            async for line in resp.aiter_lines():
+                if line.startswith("data: ") and line != "data: [DONE]":
+                    try:
+                        chunk = json.loads(line[6:])
+                        delta = chunk["choices"][0].get("delta", {}).get("content", "")
+                        if delta:
+                            full_response += delta
+                            yield f"data: {json.dumps({'chunk': delta})}\n\n"
+                    except (json.JSONDecodeError, KeyError, IndexError):
+                        continue
+            
+            # Self-Refine pass (RF-079): critique + refine if enabled
+            if refine and full_response and len(full_response) > 200:
+                yield f"data: {json.dumps({'refine_status': 'critiquing'})}\n\n"
+                try:
+                    refined = await _refine_pass(full_response, task)
+                    if refined != full_response:
+                        yield f"data: {json.dumps({'refine_status': 'refined', 'refined_response': refined})}\n\n"
+                        full_response = refined
+                    else:
+                        yield f"data: {json.dumps({'refine_status': 'pass'})}\n\n"
+                except Exception as refine_err:
+                    yield f"data: {json.dumps({'refine_status': 'error', 'refine_error': str(refine_err)})}\n\n"
             
             # After streaming: run pre-flight on the response
             if topic_id and full_response:
@@ -2490,7 +2558,7 @@ def update_finding(finding_id: str, body: dict):
     
     # Build update query dynamically
     updatable = ['claim', 'context', 'confidence', 'status', 'killed_by', 'source_type',
-                 'source_detail', 'tags', 'research_line', 'used_in_systems', 'used_in_content',
+                 'source_detail', 'tags', 'research_line', 'stage', 'used_in_systems', 'used_in_content',
                  'used_in_revenue', 'supports', 'contradicts', 'derived_from', 'topic_id']
     
     sets = ["updated_at = CURRENT_TIMESTAMP"]
@@ -2815,7 +2883,7 @@ def health():
         "error_topics": error_topics,
         "pending_actions": pending_actions,
         "failed_actions": failed_actions,
-        "version": "0.12.2"
+        "version": "0.12.3"
     }
 
 # ── Email Send (via gog CLI) ──

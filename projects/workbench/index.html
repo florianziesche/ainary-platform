@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Execution Platform</title>
+<title>Ainary Platform</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -191,6 +191,52 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var
 .finding-related-item:hover{color:var(--text-muted)}
 .save-finding-btn{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border:1px solid var(--border);background:none;color:var(--text-dim);border-radius:3px;cursor:pointer;font-size:9px;font-family:inherit;margin-top:4px;transition:all 0.1s}
 .save-finding-btn:hover{border-color:var(--warm);color:var(--warm)}
+
+/* Stage Detail View */
+.stage-view{display:none;flex:1;overflow:auto;padding:24px;flex-direction:column}
+.stage-view.open{display:flex}
+.stage-header{margin-bottom:24px}
+.stage-header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.stage-title{font-size:20px;font-weight:700;display:flex;align-items:center;gap:12px}
+.stage-icon{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;border:2px solid}
+.stage-metrics{display:flex;gap:20px}
+.stage-metric{text-align:center}
+.stage-metric-val{font-size:24px;font-weight:700}
+.stage-metric-label{font-size:9px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-dim);margin-top:2px}
+.stage-controls{display:flex;gap:8px;align-items:center;margin-bottom:16px}
+.stage-sort,.stage-filter{padding:6px 12px;border:1px solid var(--border);background:var(--surface-2);color:var(--text-muted);border-radius:4px;font-size:11px;font-family:inherit;cursor:pointer;transition:all 0.1s}
+.stage-sort:hover,.stage-filter:hover{border-color:var(--text-dim);color:var(--text)}
+.stage-sort.active,.stage-filter.active{background:var(--warm);color:var(--bg);border-color:var(--warm)}
+.stage-findings{display:flex;flex-direction:column;gap:8px}
+.stage-finding-card{padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all 0.12s;border-left:3px solid var(--border-light)}
+.stage-finding-card:hover{background:var(--surface-2);border-color:var(--border-light)}
+.stage-finding-card.expanded{background:var(--surface-2);border-left-color:var(--warm)}
+.stage-finding-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.stage-finding-left{flex:1;min-width:0}
+.stage-finding-id{font-family:monospace;font-size:9px;color:var(--text-dim);margin-bottom:4px}
+.stage-finding-claim{font-size:12px;color:var(--text);line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.stage-finding-card.expanded .stage-finding-claim{-webkit-line-clamp:unset;display:block}
+.stage-finding-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.stage-conf-bar{width:60px;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.stage-conf-fill{height:100%;border-radius:2px}
+.stage-finding-meta{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:9px;color:var(--text-dim);flex-wrap:wrap}
+.stage-tag{padding:2px 6px;border-radius:2px;background:rgba(255,255,255,0.05);border:1px solid var(--border)}
+.stage-finding-detail{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--text-muted);line-height:1.6}
+.stage-finding-card.expanded .stage-finding-detail{display:block}
+.stage-finding-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.stage-action-btn{padding:5px 12px;border:1px solid var(--border);background:none;color:var(--text-muted);border-radius:4px;font-size:10px;font-family:inherit;cursor:pointer;transition:all 0.1s}
+.stage-action-btn:hover{border-color:var(--text-dim);color:var(--text)}
+.stage-action-btn.primary{background:var(--warm);color:var(--bg);border-color:var(--warm)}
+.stage-action-btn.danger{border-color:var(--danger);color:var(--danger)}
+.stage-empty{text-align:center;padding:60px 20px;color:var(--text-dim)}
+.stage-empty-icon{font-size:32px;opacity:0.15;margin-bottom:12px}
+.stage-empty-text{font-size:13px;line-height:1.7}
+.stage-rl-group{margin-bottom:16px}
+.stage-rl-header{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--surface-2);border-radius:6px;cursor:pointer;margin-bottom:8px}
+.stage-rl-name{font-size:12px;font-weight:600;text-transform:capitalize}
+.stage-rl-count{font-size:10px;color:var(--text-dim)}
+.stage-rl-body{padding-left:12px}
+.stage-rl-group.collapsed .stage-rl-body{display:none}
 
 /* Principles View */
 .prin{display:flex;flex-direction:column;gap:24px;max-width:860px;margin:0 auto;width:100%}
@@ -442,8 +488,9 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var
 
 <div class="left">
   <div class="left-header">
-    <h1 style="cursor:pointer" onclick="togglePipelineView()">Execution Platform <span id="wsStatus" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--danger);margin-left:6px;vertical-align:middle;transition:background 0.3s"></span></h1>
-    <p>Research → Systems → Content → Revenue</p>
+    <div style="font-size:13px;font-weight:700;letter-spacing:3px;color:#d4a853;font-variant:small-caps;margin-bottom:4px">AINARY</div>
+    <h1 style="cursor:pointer;font-size:11px;font-weight:500;color:var(--text-dim);margin-bottom:8px" onclick="togglePipelineView()">Execution Platform v0.12.3 <span id="wsStatus" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--danger);margin-left:6px;vertical-align:middle;transition:background 0.3s"></span></h1>
+    <p style="font-size:10px">Research → Systems → Content → Revenue</p>
   </div>
   <div class="pipeline" id="pipeline"></div>
   <div class="folder-tree" id="folderTree"><div class="loading">Loading...</div></div>
@@ -471,6 +518,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var
   <div class="conv" id="conv"><div class="loading">Select a topic to start</div></div>
   <div id="pipelineView" style="display:none;flex:1;overflow:auto;padding:24px"></div>
   <div id="principlesView" style="display:none;flex:1;overflow:auto;padding:32px 24px"></div>
+  <div id="stageView" class="stage-view"></div>
   <div class="action-bar" id="actionBar" style="display:none"></div>
   <div class="input-area">
     <textarea class="input-field" id="inputField" placeholder="Add context, decide, give feedback..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
@@ -677,13 +725,447 @@ async function loadPipeline() {
 }
 
 let activeStageFilter = null;
+let stageViewOpen = false;
 
 function filterStage(stage, el) {
   const wasActive = el.classList.contains('active');
   document.querySelectorAll('.pipe-stage').forEach(s=>s.classList.remove('active'));
-  if (wasActive) { activeStageFilter = null; } 
-  else { el.classList.add('active'); activeStageFilter = stage; }
-  loadFolderTree();
+  
+  if (wasActive) {
+    // Deselect: hide stage view, show topic content
+    activeStageFilter = null;
+    stageViewOpen = false;
+    hideStageView();
+  } else {
+    // Select: show stage view for this stage
+    el.classList.add('active');
+    activeStageFilter = stage;
+    stageViewOpen = true;
+    showStageView(stage);
+  }
+  
+  loadFolderTree(); // This will filter topics in sidebar
+}
+
+function showStageView(stage) {
+  // Hide other views
+  if (pipelineViewOpen) { pipelineViewOpen = false; document.getElementById('pipelineView').style.display = 'none'; }
+  if (principlesViewOpen) { principlesViewOpen = false; document.getElementById('principlesView').style.display = 'none'; }
+  
+  const conv = document.getElementById('conv');
+  const stageView = document.getElementById('stageView');
+  const steps = document.getElementById('stepsBar');
+  const actionBar = document.getElementById('actionBar');
+  const input = document.querySelector('.input-area');
+  const ctx = document.getElementById('ctxPanel');
+  
+  conv.style.display = 'none';
+  if (steps) steps.style.display = 'none';
+  if (actionBar) actionBar.style.display = 'none';
+  if (input) input.style.display = 'none';
+  ctx.style.display = 'none';
+  stageView.classList.add('open');
+  
+  renderStageView(stage);
+}
+
+function hideStageView() {
+  const conv = document.getElementById('conv');
+  const stageView = document.getElementById('stageView');
+  const steps = document.getElementById('stepsBar');
+  const input = document.querySelector('.input-area');
+  const ctx = document.getElementById('ctxPanel');
+  
+  stageView.classList.remove('open');
+  conv.style.display = '';
+  if (steps) steps.style.display = '';
+  if (input) input.style.display = '';
+  ctx.style.display = '';
+  
+  if (currentTopic) selectTopic(currentTopic);
+}
+
+// ── STAGE DETAIL VIEW ──
+let stageSortBy = 'confidence'; // confidence | date | compound
+let stageFilterTag = null;
+
+async function renderStageView(stage) {
+  const stageView = document.getElementById('stageView');
+  stageView.innerHTML = '<div class="loading">Loading findings...</div>';
+  
+  try {
+    const findings = await fetch(API + '/findings?status=alive').then(r => r.json());
+    const stageFindings = findings.filter(f => f.stage === stage);
+    
+    // Stage config
+    const stageConfig = {
+      research: {
+        name: 'Research',
+        icon: 'R',
+        color: '#8e8e8e',
+        emptyText: 'No research findings yet. Start by capturing hypotheses and learnings.'
+      },
+      systems: {
+        name: 'Systems',
+        icon: 'S',
+        color: '#6b8aab',
+        emptyText: 'No systems findings yet. Promote validated research findings here.'
+      },
+      content: {
+        name: 'Content',
+        icon: 'C',
+        color: '#9b8ec4',
+        emptyText: 'No content findings yet. Promote system insights ready for publication.'
+      },
+      revenue: {
+        name: 'Revenue',
+        icon: '€',
+        color: '#d4a853',
+        emptyText: 'No revenue-linked findings yet. Promote content findings here when they generate value.'
+      }
+    };
+    
+    const config = stageConfig[stage] || stageConfig.research;
+    
+    // Calculate metrics
+    const totalCount = stageFindings.length;
+    const avgConf = totalCount > 0 ? stageFindings.reduce((s, f) => s + f.confidence, 0) / totalCount : 0;
+    const unverifiedCount = stageFindings.filter(f => !f.verified).length;
+    
+    // Stage-specific metrics
+    let metric3Val = 0, metric3Label = '';
+    if (stage === 'research') {
+      metric3Val = stageFindings.filter(f => (f.tags || []).includes('hypothesis')).length;
+      metric3Label = 'Hypotheses';
+    } else if (stage === 'systems') {
+      metric3Val = stageFindings.filter(f => (f.tags || []).includes('implemented')).length;
+      metric3Label = 'Implemented';
+    } else if (stage === 'content') {
+      metric3Val = stageFindings.filter(f => (f.tags || []).includes('published')).length;
+      metric3Label = 'Published';
+    } else if (stage === 'revenue') {
+      metric3Val = stageFindings.filter(f => (f.tags || []).includes('revenue')).length;
+      metric3Label = 'Revenue Linked';
+    }
+    
+    // Collect all tags
+    const allTags = new Set();
+    stageFindings.forEach(f => (f.tags || []).forEach(t => allTags.add(t)));
+    
+    // Sort findings
+    let sortedFindings = [...stageFindings];
+    if (stageSortBy === 'confidence') {
+      sortedFindings.sort((a, b) => b.confidence - a.confidence);
+    } else if (stageSortBy === 'date') {
+      sortedFindings.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    } else if (stageSortBy === 'compound') {
+      sortedFindings.sort((a, b) => (b.compound_score || 0) - (a.compound_score || 0));
+    }
+    
+    // Filter by tag
+    if (stageFilterTag) {
+      sortedFindings = sortedFindings.filter(f => (f.tags || []).includes(stageFilterTag));
+    }
+    
+    // Group by research_line for Systems stage
+    let groupedFindings = {};
+    if (stage === 'systems') {
+      sortedFindings.forEach(f => {
+        const line = f.research_line || 'uncategorized';
+        if (!groupedFindings[line]) groupedFindings[line] = [];
+        groupedFindings[line].push(f);
+      });
+    }
+    
+    // Build HTML
+    let html = `<div class="stage-header">
+      <div class="stage-header-top">
+        <div class="stage-title">
+          <div class="stage-icon" style="border-color:${config.color};color:${config.color}">${config.icon}</div>
+          <span>${config.name} Stage</span>
+        </div>
+        <div class="stage-metrics">
+          <div class="stage-metric">
+            <div class="stage-metric-val" style="color:${config.color}">${totalCount}</div>
+            <div class="stage-metric-label">Total</div>
+          </div>
+          <div class="stage-metric">
+            <div class="stage-metric-val">${Math.round(avgConf * 100)}%</div>
+            <div class="stage-metric-label">Avg Confidence</div>
+          </div>
+          <div class="stage-metric">
+            <div class="stage-metric-val">${unverifiedCount}</div>
+            <div class="stage-metric-label">Unverified</div>
+          </div>
+          <div class="stage-metric">
+            <div class="stage-metric-val">${metric3Val}</div>
+            <div class="stage-metric-label">${metric3Label}</div>
+          </div>
+        </div>
+      </div>
+      <div class="stage-controls">
+        <span style="font-size:10px;color:var(--text-dim);margin-right:4px">Sort:</span>
+        <button class="stage-sort ${stageSortBy === 'confidence' ? 'active' : ''}" onclick="setStageSortBy('confidence','${stage}')">Confidence</button>
+        <button class="stage-sort ${stageSortBy === 'date' ? 'active' : ''}" onclick="setStageSortBy('date','${stage}')">Date</button>
+        <button class="stage-sort ${stageSortBy === 'compound' ? 'active' : ''}" onclick="setStageSortBy('compound','${stage}')">Compound</button>
+        ${allTags.size > 0 ? `<span style="margin-left:12px;font-size:10px;color:var(--text-dim);margin-right:4px">Filter:</span>` : ''}
+        ${Array.from(allTags).slice(0, 8).map(tag => 
+          `<button class="stage-filter ${stageFilterTag === tag ? 'active' : ''}" onclick="setStageFilterTag('${tag}','${stage}')">${tag}</button>`
+        ).join('')}
+        ${stageFilterTag ? `<button class="stage-filter" onclick="setStageFilterTag(null,'${stage}')" style="color:var(--danger)">Clear</button>` : ''}
+      </div>
+    </div>`;
+    
+    // Empty state
+    if (sortedFindings.length === 0) {
+      html += `<div class="stage-empty">
+        <div class="stage-empty-icon">◇</div>
+        <div class="stage-empty-text">${config.emptyText}</div>
+      </div>`;
+      stageView.innerHTML = html;
+      return;
+    }
+    
+    // Findings list (grouped for Systems, flat for others)
+    html += '<div class="stage-findings">';
+    
+    if (stage === 'systems' && Object.keys(groupedFindings).length > 1) {
+      // Systems: grouped by research_line
+      Object.entries(groupedFindings).sort((a, b) => b[1].length - a[1].length).forEach(([line, lineFindings]) => {
+        const lineName = line.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        html += `<div class="stage-rl-group">
+          <div class="stage-rl-header" onclick="this.parentElement.classList.toggle('collapsed')">
+            <span class="stage-rl-name">${lineName}</span>
+            <span class="stage-rl-count">${lineFindings.length} findings</span>
+          </div>
+          <div class="stage-rl-body">`;
+        lineFindings.forEach(f => { html += renderStageFindingCard(f, stage, config.color); });
+        html += `</div></div>`;
+      });
+    } else {
+      // Flat list
+      sortedFindings.forEach(f => { html += renderStageFindingCard(f, stage, config.color); });
+    }
+    
+    html += '</div>';
+    
+    stageView.innerHTML = html;
+    
+  } catch (e) {
+    stageView.innerHTML = `<div style="padding:40px;text-align:center;color:var(--danger)">Error loading findings: ${e.message}</div>`;
+  }
+}
+
+function renderStageFindingCard(f, stage, stageColor) {
+  const confPct = Math.round(f.confidence * 100);
+  const confColor = confPct >= 70 ? '#4aa088' : confPct >= 30 ? 'var(--warm)' : 'var(--danger)';
+  const claimPreview = f.claim.length > 100 ? f.claim.substring(0, 100) + '...' : f.claim;
+  const date = new Date(f.created_at).toLocaleDateString('de-DE', {month: 'short', day: 'numeric', year: 'numeric'});
+  
+  // Stage-specific actions
+  let actions = '';
+  if (stage === 'research') {
+    actions = `
+      <button class="stage-action-btn" onclick="event.stopPropagation();verifyFindingInline('${f.id}')">Verify</button>
+      <button class="stage-action-btn primary" onclick="event.stopPropagation();promoteFinding('${f.id}','systems')">Promote to Systems</button>
+      <button class="stage-action-btn danger" onclick="event.stopPropagation();contestFinding('${f.id}')">Contest</button>
+    `;
+  } else if (stage === 'systems') {
+    actions = `
+      <button class="stage-action-btn" onclick="event.stopPropagation();markImplemented('${f.id}')">Mark Implemented</button>
+      <button class="stage-action-btn primary" onclick="event.stopPropagation();promoteFinding('${f.id}','content')">Promote to Content</button>
+    `;
+  } else if (stage === 'content') {
+    actions = `
+      <button class="stage-action-btn" onclick="event.stopPropagation();writeDraft('${f.id}')">Write Draft</button>
+      <button class="stage-action-btn" onclick="event.stopPropagation();markPublished('${f.id}')">Mark Published</button>
+      <button class="stage-action-btn primary" onclick="event.stopPropagation();promoteFinding('${f.id}','revenue')">Promote to Revenue</button>
+    `;
+  } else if (stage === 'revenue') {
+    actions = `
+      <button class="stage-action-btn" onclick="event.stopPropagation();logRevenue('${f.id}')">Log Revenue</button>
+      <button class="stage-action-btn" onclick="event.stopPropagation();attributeFinding('${f.id}')">Attribute to Finding</button>
+    `;
+  }
+  
+  return `<div class="stage-finding-card" onclick="toggleStageFinding(this,'${f.id}')">
+    <div class="stage-finding-header">
+      <div class="stage-finding-left">
+        <div class="stage-finding-id">#${f.id}</div>
+        <div class="stage-finding-claim">${esc(claimPreview)}</div>
+        <div class="stage-finding-meta">
+          <span class="stage-tag" style="border-color:${stageColor}30;color:${stageColor}">${f.source_type || 'unknown'}</span>
+          <span>${date}</span>
+          ${f.verified ? '<span style="color:#4aa088">✓ Verified</span>' : ''}
+          ${(f.tags || []).slice(0, 3).map(t => `<span class="stage-tag">${t}</span>`).join('')}
+        </div>
+      </div>
+      <div class="stage-finding-right">
+        <div class="stage-conf-bar">
+          <div class="stage-conf-fill" style="width:${confPct}%;background:${confColor}"></div>
+        </div>
+        <span style="font-size:10px;font-weight:600;color:${confColor}">${confPct}%</span>
+        ${f.compound_score > 0 ? `<span style="font-size:9px;color:var(--warm)">Compound: ${f.compound_score.toFixed(1)}</span>` : ''}
+      </div>
+    </div>
+    <div class="stage-finding-detail" id="stage-finding-detail-${f.id}">
+      <div><strong>Full Claim:</strong><br>${esc(f.claim)}</div>
+      ${f.context ? `<div style="margin-top:8px"><strong>Evidence:</strong><br>${esc(f.context)}</div>` : ''}
+      ${f.research_line ? `<div style="margin-top:8px"><strong>Research Line:</strong> ${f.research_line.replace(/-/g, ' ')}</div>` : ''}
+      <div class="stage-finding-actions">${actions}</div>
+    </div>
+  </div>`;
+}
+
+function toggleStageFinding(el, findingId) {
+  // Collapse all others
+  document.querySelectorAll('.stage-finding-card.expanded').forEach(c => {
+    if (c !== el) c.classList.remove('expanded');
+  });
+  el.classList.toggle('expanded');
+}
+
+function setStageSortBy(sortBy, stage) {
+  stageSortBy = sortBy;
+  renderStageView(stage);
+}
+
+function setStageFilterTag(tag, stage) {
+  stageFilterTag = tag;
+  renderStageView(stage);
+}
+
+async function verifyFindingInline(findingId) {
+  try {
+    await fetch(API + '/findings/' + findingId + '/verify', { method: 'POST' });
+    showSystemMsg(`Finding ${findingId} verified`);
+    if (activeStageFilter) renderStageView(activeStageFilter);
+  } catch (e) {
+    showSystemMsg('Error: ' + e.message);
+  }
+}
+
+async function promoteFinding(findingId, targetStage) {
+  try {
+    await fetch(API + '/findings/' + findingId, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stage: targetStage })
+    });
+    showSystemMsg(`Finding ${findingId} promoted to ${targetStage}`);
+    if (activeStageFilter) renderStageView(activeStageFilter);
+  } catch (e) {
+    showSystemMsg('Error: ' + e.message);
+  }
+}
+
+async function contestFinding(findingId) {
+  const reason = prompt('Why do you contest this finding?');
+  if (!reason) return;
+  try {
+    await fetch(API + '/findings/' + findingId + '/validate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ direction: 'contradict', reason, source_type: 'own_data' })
+    });
+    showSystemMsg(`Finding ${findingId} contested`);
+    if (activeStageFilter) renderStageView(activeStageFilter);
+  } catch (e) {
+    showSystemMsg('Error: ' + e.message);
+  }
+}
+
+async function markImplemented(findingId) {
+  try {
+    const finding = await fetch(API + '/findings/' + findingId).then(r => r.json());
+    const tags = [...(finding.tags || [])];
+    if (!tags.includes('implemented')) tags.push('implemented');
+    await fetch(API + '/findings/' + findingId, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tags })
+    });
+    showSystemMsg(`Finding ${findingId} marked as implemented`);
+    if (activeStageFilter) renderStageView(activeStageFilter);
+  } catch (e) {
+    showSystemMsg('Error: ' + e.message);
+  }
+}
+
+async function writeDraft(findingId) {
+  try {
+    const finding = await fetch(API + '/findings/' + findingId).then(r => r.json());
+    const resp = await fetch(API + '/mia/execute', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        task: 'write_content_draft',
+        context: { finding_id: findingId, claim: finding.claim, context: finding.context }
+      })
+    });
+    if (resp.ok) {
+      showSystemMsg(`Draft request queued for finding ${findingId}`);
+    } else {
+      showSystemMsg('Draft generation failed');
+    }
+  } catch (e) {
+    showSystemMsg('Error: ' + e.message);
+  }
+}
+
+async function markPublished(findingId) {
+  try {
+    const finding = await fetch(API + '/findings/' + findingId).then(r => r.json());
+    const tags = [...(finding.tags || [])];
+    if (!tags.includes('published')) tags.push('published');
+    await fetch(API + '/findings/' + findingId, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tags })
+    });
+    showSystemMsg(`Finding ${findingId} marked as published`);
+    if (activeStageFilter) renderStageView(activeStageFilter);
+  } catch (e) {
+    showSystemMsg('Error: ' + e.message);
+  }
+}
+
+async function logRevenue(findingId) {
+  const amount = prompt('Revenue amount (EUR):');
+  if (!amount) return;
+  try {
+    const finding = await fetch(API + '/findings/' + findingId).then(r => r.json());
+    const tags = [...(finding.tags || [])];
+    if (!tags.includes('revenue')) tags.push('revenue');
+    const context = (finding.context || '') + `\n\n[Revenue logged: €${amount} on ${new Date().toISOString().split('T')[0]}]`;
+    await fetch(API + '/findings/' + findingId, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tags, context })
+    });
+    showSystemMsg(`Revenue €${amount} logged for finding ${findingId}`);
+    if (activeStageFilter) renderStageView(activeStageFilter);
+  } catch (e) {
+    showSystemMsg('Error: ' + e.message);
+  }
+}
+
+async function attributeFinding(findingId) {
+  const attribution = prompt('Attribute to (e.g., client name, project):');
+  if (!attribution) return;
+  try {
+    const finding = await fetch(API + '/findings/' + findingId).then(r => r.json());
+    const context = (finding.context || '') + `\n\n[Attributed to: ${attribution}]`;
+    await fetch(API + '/findings/' + findingId, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ context })
+    });
+    showSystemMsg(`Finding ${findingId} attributed to ${attribution}`);
+    if (activeStageFilter) renderStageView(activeStageFilter);
+  } catch (e) {
+    showSystemMsg('Error: ' + e.message);
+  }
 }
 
 // ── FOLDER TREE ──
@@ -865,6 +1347,7 @@ async function selectTopic(id) {
   currentTopic = id;
   // Close special views
   if (principlesViewOpen) { principlesViewOpen = false; const prv = document.getElementById('principlesView'); if(prv) prv.style.display = 'none'; document.querySelector('.input-area').style.display = ''; document.getElementById('conv').style.display = ''; document.getElementById('ctxPanel').style.display = ''; }
+  if (stageViewOpen) { stageViewOpen = false; hideStageView(); document.querySelectorAll('.pipe-stage').forEach(s=>s.classList.remove('active')); activeStageFilter = null; }
   // Highlight in list
   document.querySelectorAll('.topic-item').forEach(t=>t.classList.remove('active'));
   const items = document.querySelectorAll('.topic-item');
@@ -1930,6 +2413,7 @@ let principlesViewOpen = false;
 function togglePrinciplesView() {
   principlesViewOpen = !principlesViewOpen;
   if (pipelineViewOpen) { pipelineViewOpen = false; document.getElementById('pipelineView').style.display = 'none'; }
+  if (stageViewOpen) { stageViewOpen = false; hideStageView(); document.querySelectorAll('.pipe-stage').forEach(s=>s.classList.remove('active')); activeStageFilter = null; }
   
   const conv = document.getElementById('conv');
   const pv = document.getElementById('principlesView');
@@ -2116,6 +2600,7 @@ let connectMode = null; // null or {from: topicId, fromName: string}
 async function togglePipelineView() {
   pipelineViewOpen = !pipelineViewOpen;
   if (principlesViewOpen) { principlesViewOpen = false; document.getElementById('principlesView').style.display = 'none'; }
+  if (stageViewOpen) { stageViewOpen = false; hideStageView(); document.querySelectorAll('.pipe-stage').forEach(s=>s.classList.remove('active')); activeStageFilter = null; }
   const conv = document.getElementById('conv');
   const pv = document.getElementById('pipelineView');
   const steps = document.getElementById('stepsBar');
