@@ -192,6 +192,43 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var
 .save-finding-btn{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border:1px solid var(--border);background:none;color:var(--text-dim);border-radius:3px;cursor:pointer;font-size:9px;font-family:inherit;margin-top:4px;transition:all 0.1s}
 .save-finding-btn:hover{border-color:var(--warm);color:var(--warm)}
 
+/* Principles View */
+.prin{display:flex;flex-direction:column;gap:24px;max-width:860px;margin:0 auto;width:100%}
+.prin-header{display:flex;justify-content:space-between;align-items:flex-end}
+.prin-header h2{font-size:20px;font-weight:700;letter-spacing:-0.3px}
+.prin-header-sub{font-size:11px;color:var(--text-dim);margin-top:4px}
+.prin-header-meta{text-align:right;font-size:10px;color:var(--text-dim);line-height:1.6}
+.prin-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);padding-bottom:8px;border-bottom:1px solid var(--border)}
+.prin-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:700px){.prin-grid{grid-template-columns:1fr}}
+.prin-card{padding:16px 18px;border-radius:8px;background:var(--surface);border:1px solid var(--border);transition:all 0.15s;cursor:default;position:relative;overflow:hidden}
+.prin-card:hover{border-color:var(--border-light);background:var(--surface-2)}
+.prin-card-num{position:absolute;top:14px;right:16px;font-size:28px;font-weight:800;color:rgba(255,255,255,0.03);line-height:1;pointer-events:none}
+.prin-card-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.prin-card-title .approved{width:6px;height:6px;border-radius:50%;background:var(--warm);flex-shrink:0}
+.prin-card-desc{font-size:11px;color:var(--text-muted);line-height:1.65}
+.prin-card-footer{display:flex;align-items:center;gap:8px;margin-top:10px}
+.prin-card-tag{font-size:9px;padding:2px 6px;border-radius:3px;background:rgba(212,168,83,0.08);color:var(--warm);border:1px solid rgba(212,168,83,0.15)}
+.prin-card-conf{font-size:9px;color:var(--text-dim);font-weight:600}
+.prin-card-source{font-size:9px;color:var(--text-dim);font-family:'SF Mono',Menlo,monospace}
+.prin-card.full-width{grid-column:1/-1}
+.prin-workflow{padding:20px;border-radius:8px;background:var(--surface);border:1px solid var(--border)}
+.prin-wf-title{font-size:12px;font-weight:700;margin-bottom:16px;color:var(--text)}
+.prin-wf-flow{display:flex;align-items:center;gap:0;flex-wrap:wrap;justify-content:center}
+.prin-wf-node{padding:8px 14px;border-radius:6px;font-size:10px;font-weight:600;border:1px solid var(--border);background:var(--surface-2);text-align:center;min-width:100px}
+.prin-wf-node.active{border-color:var(--warm);color:var(--warm)}
+.prin-wf-arrow{color:var(--text-dim);font-size:14px;padding:0 4px;flex-shrink:0}
+.prin-wf-desc{font-size:10px;color:var(--text-dim);line-height:1.7;margin-top:16px}
+.prin-wf-layers{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px}
+.prin-wf-layer{padding:10px;border-radius:6px;border:1px solid var(--border);text-align:center;font-size:10px;line-height:1.5}
+.prin-wf-layer-num{font-size:16px;font-weight:800;color:var(--text-dim);margin-bottom:4px}
+.prin-wf-layer-name{font-weight:600;color:var(--text);margin-bottom:2px}
+.prin-wf-layer-desc{color:var(--text-dim);font-size:9px}
+.prin-wf-layer.l0{border-color:var(--text-dim)}
+.prin-wf-layer.l1{border-color:var(--warm)}
+.prin-wf-layer.l2{border-color:#6b8aab}
+.prin-wf-layer.l3{border-color:#9b8ec4}
+
 /* Finding Inline Form */
 .finding-form-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:250;align-items:center;justify-content:center}
 .finding-form-overlay.open{display:flex}
@@ -433,6 +470,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var
   <div class="steps-bar" id="stepsBar"></div>
   <div class="conv" id="conv"><div class="loading">Select a topic to start</div></div>
   <div id="pipelineView" style="display:none;flex:1;overflow:auto;padding:24px"></div>
+  <div id="principlesView" style="display:none;flex:1;overflow:auto;padding:32px 24px"></div>
   <div class="action-bar" id="actionBar" style="display:none"></div>
   <div class="input-area">
     <textarea class="input-field" id="inputField" placeholder="Add context, decide, give feedback..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
@@ -825,6 +863,8 @@ async function zoneDrop(e, folderId) {
 // ── SELECT TOPIC ──
 async function selectTopic(id) {
   currentTopic = id;
+  // Close special views
+  if (principlesViewOpen) { principlesViewOpen = false; const prv = document.getElementById('principlesView'); if(prv) prv.style.display = 'none'; document.querySelector('.input-area').style.display = ''; document.getElementById('conv').style.display = ''; document.getElementById('ctxPanel').style.display = ''; }
   // Highlight in list
   document.querySelectorAll('.topic-item').forEach(t=>t.classList.remove('active'));
   const items = document.querySelectorAll('.topic-item');
@@ -1321,6 +1361,7 @@ function buildCmdItems() {
   cmdItems.push({type:'action', id:'new-folder', title:'Neuer Ordner', sub:'', icon:'+', action:() => { closeCmd(); startAddFolder(); }});
   cmdItems.push({type:'action', id:'toggle-ctx', title:'Context Panel toggle', sub:'Cmd+.', icon:'◨', action:() => { closeCmd(); toggleCtx(); }});
   cmdItems.push({type:'action', id:'pipeline', title:'Pipeline Overview', sub:'Cmd+P', icon:'◈', action:() => { closeCmd(); togglePipelineView(); }});
+  cmdItems.push({type:'action', id:'principles', title:'Principles & Workflow', sub:'Cmd+I', icon:'◆', action:() => { closeCmd(); togglePrinciplesView(); }});
 }
 
 function filterCmd(query) {
@@ -1842,6 +1883,9 @@ document.addEventListener('keydown', e => {
   // Cmd+P: Pipeline View
   if ((e.metaKey || e.ctrlKey) && e.key === 'p') { e.preventDefault(); togglePipelineView(); return; }
   
+  // Cmd+I: Principles View
+  if ((e.metaKey || e.ctrlKey) && e.key === 'i') { e.preventDefault(); togglePrinciplesView(); return; }
+  
   // Cmd+N: New Topic
   if ((e.metaKey || e.ctrlKey) && e.key === 'n') { e.preventDefault(); startAddTopic(); return; }
   
@@ -1880,12 +1924,198 @@ document.getElementById('inputField').addEventListener('input', function() {
   this.style.height=Math.min(this.scrollHeight,120)+'px';
 });
 
+// ── PRINCIPLES VIEW ──
+let principlesViewOpen = false;
+
+function togglePrinciplesView() {
+  principlesViewOpen = !principlesViewOpen;
+  if (pipelineViewOpen) { pipelineViewOpen = false; document.getElementById('pipelineView').style.display = 'none'; }
+  
+  const conv = document.getElementById('conv');
+  const pv = document.getElementById('principlesView');
+  const steps = document.getElementById('stepsBar');
+  const actionBar = document.getElementById('actionBar');
+  const input = document.querySelector('.input-area');
+  
+  if (principlesViewOpen) {
+    conv.style.display = 'none';
+    if (steps) steps.style.display = 'none';
+    if (actionBar) actionBar.style.display = 'none';
+    if (input) input.style.display = 'none';
+    pv.style.display = 'flex';
+    pv.style.flexDirection = 'column';
+    document.getElementById('ctxPanel').style.display = 'none';
+    renderPrinciplesView();
+  } else {
+    conv.style.display = '';
+    if (steps) steps.style.display = '';
+    if (input) input.style.display = '';
+    pv.style.display = 'none';
+    document.getElementById('ctxPanel').style.display = '';
+    if (currentTopic) selectTopic(currentTopic);
+  }
+}
+
+function renderPrinciplesView() {
+  const pv = document.getElementById('principlesView');
+  
+  const principles = [
+    { num: 1, title: 'Research First', desc: 'Research VOR Implementation. 15min Research spart 40min Rework \u2014 bei wichtigen Entscheidungen auch Stunden, Tage oder Wochen. Wichtige Entscheidungen compounden. Ausnahme: Confidence >90%.', conf: '90%', source: 'RF-029', category: 'engineering', tags: ['process'] },
+    { num: 2, title: 'Echte Mathematik', desc: 'Wenn es eine echte Formel gibt, die echte Formel benutzen. Keine Shortcuts \u2014 sie f\u00fchren zu Nacharbeit und kosten ein Vielfaches an Zeit und Aufwand.', conf: '95%', source: 'RF-026', category: 'engineering', tags: ['quality'] },
+    { num: 3, title: 'Professional Patterns', desc: 'Native Browser-APIs (prompt(), alert()) = Amateur. Immer recherchieren wie der Marktf\u00fchrer der jeweiligen Kategorie es l\u00f6st \u2014 nicht raten, nachschauen.', conf: '90%', source: 'RF-025', category: 'engineering', tags: ['ux'] },
+    { num: 4, title: 'Cheapest Check First', desc: 'Pre-Flight mit Regex f\u00e4ngt 80% der Fehler bei 0 Kosten und <50ms. Teure Checks (LLM) nur f\u00fcr was Regex nicht kann.', conf: '90%', source: 'RF-001', category: 'engineering', tags: ['efficiency'] },
+    { num: 5, title: 'Beide Richtungen modellieren', desc: 'Unidirektionale Verbindungen verstecken die H\u00e4lfte der Information. Upstream + Downstream immer sichtbar.', conf: '85%', source: 'RF-027', category: 'engineering', tags: ['systems'] },
+    { num: 6, title: 'Dogfooding', desc: 'Ein System das vom Erbauer nicht benutzt wird, wird von niemandem benutzt. Erster Test: benutze ich es selbst?', conf: '90%', source: 'RF-031', category: 'process', tags: ['validation'] },
+    { num: 7, title: 'AI Output ist overconfident', desc: '84% der LLM-Outputs zeigen h\u00f6here Confidence als tats\u00e4chliche Accuracy (PMC, 9 Modelle, 351 Szenarien). Immer kalibrieren.', conf: '85%', source: 'C002', category: 'process', tags: ['ai', 'calibration'] },
+    { num: 8, title: 'Personal > General Intelligence', desc: 'Deep Context f\u00fcr einen Menschen schl\u00e4gt breites Wissen f\u00fcr alle. Unser Moat: Tiefe, nicht Breite.', conf: '\u2014', source: 'Architecture', category: 'strategy', tags: ['moat'] },
+    { num: 9, title: 'Ship vs Perfect', desc: 'Reversible Entscheidungen: >80% Confidence \u2192 handeln. Irreversible: >92%. Perfekt nur wenn es sein muss.', conf: '\u2014', source: 'Experience', category: 'strategy', tags: ['decisions'] },
+  ];
+  
+  const engineering = principles.filter(p => p.category === 'engineering');
+  const process = principles.filter(p => p.category === 'process');
+  const strategy = principles.filter(p => p.category === 'strategy');
+  
+  let html = `<div class="prin">`;
+  
+  // Header
+  html += `<div class="prin-header">
+    <div>
+      <h2>Principles</h2>
+      <div class="prin-header-sub">L1 Memory \u2014 Florian-approved, highest authority. 9 active principles.</div>
+    </div>
+    <div class="prin-header-meta">
+      Approved: 2026-02-18<br>
+      Next review: 2026-03-18<br>
+      <span style="color:var(--warm)">Cmd+I</span> to toggle
+    </div>
+  </div>`;
+  
+  // Engineering Section
+  html += `<div>
+    <div class="prin-section-title">Engineering</div>
+    <div class="prin-grid" style="margin-top:12px">`;
+  engineering.forEach(p => {
+    html += renderPrincipleCard(p);
+  });
+  html += `</div></div>`;
+  
+  // Process Section
+  html += `<div>
+    <div class="prin-section-title">Process</div>
+    <div class="prin-grid" style="margin-top:12px">`;
+  process.forEach(p => {
+    html += renderPrincipleCard(p);
+  });
+  html += `</div></div>`;
+  
+  // Strategy Section
+  html += `<div>
+    <div class="prin-section-title">Strategy</div>
+    <div class="prin-grid" style="margin-top:12px">`;
+  strategy.forEach(p => {
+    html += renderPrincipleCard(p);
+  });
+  html += `</div></div>`;
+  
+  // Workflow Documentation
+  html += `<div>
+    <div class="prin-section-title">Knowledge Architecture</div>
+    <div class="prin-workflow" style="margin-top:12px">
+      <div class="prin-wf-title">4-Layer Hierarchical Memory</div>
+      <div class="prin-wf-layers">
+        <div class="prin-wf-layer l0">
+          <div class="prin-wf-layer-num">L0</div>
+          <div class="prin-wf-layer-name">System</div>
+          <div class="prin-wf-layer-desc">SOUL.md, USER.md, AGENTS.md<br>Always loaded</div>
+        </div>
+        <div class="prin-wf-layer l1">
+          <div class="prin-wf-layer-num" style="color:var(--warm)">L1</div>
+          <div class="prin-wf-layer-name" style="color:var(--warm)">Principles</div>
+          <div class="prin-wf-layer-desc">9 rules, Florian-approved<br>Overrides everything below</div>
+        </div>
+        <div class="prin-wf-layer l2">
+          <div class="prin-wf-layer-num" style="color:#6b8aab">L2</div>
+          <div class="prin-wf-layer-name">Domain Knowledge</div>
+          <div class="prin-wf-layer-desc">Platform Findings (conf>70%)<br>Auto-consolidated weekly</div>
+        </div>
+        <div class="prin-wf-layer l3">
+          <div class="prin-wf-layer-num" style="color:#9b8ec4">L3</div>
+          <div class="prin-wf-layer-name">Episodic</div>
+          <div class="prin-wf-layer-desc">Daily summaries<br>Decay after 30 days</div>
+        </div>
+      </div>
+    </div>`;
+  
+  // Consolidation Workflow
+  html += `<div class="prin-workflow" style="margin-top:12px">
+      <div class="prin-wf-title">Consolidation Pipeline</div>
+      <div class="prin-wf-flow">
+        <div class="prin-wf-node">Platform DB<div style="font-size:8px;color:var(--text-dim);margin-top:2px">Source of Truth</div></div>
+        <div class="prin-wf-arrow">\u2192</div>
+        <div class="prin-wf-node active">Consolidation<div style="font-size:8px;color:var(--text-dim);margin-top:2px">Weekly Cron</div></div>
+        <div class="prin-wf-arrow">\u2192</div>
+        <div class="prin-wf-node">memory/semantic/*<div style="font-size:8px;color:var(--text-dim);margin-top:2px">Retrieval Cache</div></div>
+        <div class="prin-wf-arrow">\u2192</div>
+        <div class="prin-wf-node">memory_search<div style="font-size:8px;color:var(--text-dim);margin-top:2px">AI Retrieval</div></div>
+      </div>
+      <div class="prin-wf-desc" style="margin-top:16px">
+        <strong>Authoring Layer</strong> (Platform) \u2192 Findings CRUD, Bayesian Updates, Verify/Kill<br>
+        <strong>Retrieval Layer</strong> (Memory Files) \u2192 Generated cache, optimized for semantic search<br>
+        <strong>Consolidation</strong> \u2192 Runs every Sunday 10:00 CET. Groups by research line, detects clusters, generates prose-style domain files.<br>
+        <strong>Fallback</strong> \u2192 If server down, memory files are max 7 days stale but always available.
+      </div>
+    </div>`;
+  
+  // Finding Lifecycle
+  html += `<div class="prin-workflow" style="margin-top:12px">
+      <div class="prin-wf-title">Finding Lifecycle</div>
+      <div class="prin-wf-flow">
+        <div class="prin-wf-node">Raw Claim<div style="font-size:8px;color:var(--text-dim);margin-top:2px">conf 40-60%</div></div>
+        <div class="prin-wf-arrow">\u2192</div>
+        <div class="prin-wf-node">Verified<div style="font-size:8px;color:var(--text-dim);margin-top:2px">Bayesian update</div></div>
+        <div class="prin-wf-arrow">\u2192</div>
+        <div class="prin-wf-node active">Principle<div style="font-size:8px;color:var(--text-dim);margin-top:2px">conf >85% + Florian OK</div></div>
+      </div>
+      <div class="prin-wf-flow" style="margin-top:8px">
+        <div class="prin-wf-node" style="border-color:var(--danger);color:var(--danger)">Contested<div style="font-size:8px;margin-top:2px">contradicted</div></div>
+        <div class="prin-wf-arrow">\u2192</div>
+        <div class="prin-wf-node" style="border-color:var(--danger);opacity:0.5">Dead<div style="font-size:8px;margin-top:2px">killed_by reason</div></div>
+      </div>
+      <div class="prin-wf-desc" style="margin-top:12px">
+        Findings never delete, only die. Status: alive \u2192 contested \u2192 dead with killed_by explanation.<br>
+        Confidence is Bayesian with source reliability weights (own_hypothesis 0.40 \u2026 revenue_validated 0.90).<br>
+        Promotion to Principle requires: conf >85%, used 3+ times, explicit Florian approval.
+      </div>
+    </div>`;
+  
+  html += `</div></div>`;
+  
+  pv.innerHTML = html;
+}
+
+function renderPrincipleCard(p) {
+  return `<div class="prin-card">
+    <div class="prin-card-num">P${p.num}</div>
+    <div class="prin-card-title">
+      <span class="approved"></span>
+      P${p.num}: ${esc(p.title)}
+    </div>
+    <div class="prin-card-desc">${esc(p.desc)}</div>
+    <div class="prin-card-footer">
+      ${p.tags.map(t => `<span class="prin-card-tag">${t}</span>`).join('')}
+      ${p.conf !== '\u2014' ? `<span class="prin-card-conf">${p.conf}</span>` : ''}
+      <span class="prin-card-source">${esc(p.source)}</span>
+    </div>
+  </div>`;
+}
+
 // ── PIPELINE VIEW ──
 let pipelineViewOpen = false;
 let connectMode = null; // null or {from: topicId, fromName: string}
 
 async function togglePipelineView() {
   pipelineViewOpen = !pipelineViewOpen;
+  if (principlesViewOpen) { principlesViewOpen = false; document.getElementById('principlesView').style.display = 'none'; }
   const conv = document.getElementById('conv');
   const pv = document.getElementById('pipelineView');
   const steps = document.getElementById('stepsBar');
