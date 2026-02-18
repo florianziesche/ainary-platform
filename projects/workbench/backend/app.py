@@ -337,6 +337,48 @@ def init_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
+        CREATE TABLE IF NOT EXISTS activity_feed (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            agent TEXT NOT NULL,
+            action TEXT NOT NULL,
+            detail TEXT,
+            result TEXT DEFAULT 'success',
+            impact_type TEXT,
+            impact_value REAL DEFAULT 0,
+            date TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS decisions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            decision_id TEXT NOT NULL,
+            date TEXT NOT NULL,
+            question TEXT NOT NULL,
+            options TEXT,
+            mia_recommendation TEXT,
+            florian_decision TEXT,
+            recommendation_followed INTEGER DEFAULT 1,
+            reason TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS backlog (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            description TEXT NOT NULL,
+            source TEXT DEFAULT 'florian',
+            priority TEXT DEFAULT 'NORMAL',
+            status TEXT DEFAULT 'backlog',
+            assigned_to TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS running_tasks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            description TEXT NOT NULL,
+            agent TEXT NOT NULL,
+            status TEXT DEFAULT 'running',
+            started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            completed_at TIMESTAMP,
+            result TEXT
+        );
     """)
     
     # Migrations for existing DBs
@@ -1402,6 +1444,211 @@ def update_monthly_goal(goal_id: int, body: dict):
     
     notify("goal_updated", {"id": goal_id})
     return {"status": "updated"}
+
+# ── Activity Feed ──
+
+@app.get("/api/activity/feed")
+def get_activity_feed():
+    """Returns last 50 activities, newest first."""
+    db = get_db()
+    rows = db.execute("SELECT * FROM activity_feed ORDER BY created_at DESC LIMIT 50").fetchall()
+    db.close()
+    return [dict(r) for r in rows]
+
+@app.post("/api/activity/log")
+def log_activity(body: dict):
+    """Log an activity. Body: {agent, action, detail?, result?, impact_type?, impact_value?, date?}"""
+    db = get_db()
+    today = datetime.now().strftime('%Y-%m-%d')
+    
+    agent = body.get('agent')
+    action = body.get('action')
+    
+    if not agent or not action:
+        db.close()
+        raise HTTPException(400, "agent and action required")
+    
+    db.execute(
+        "INSERT INTO activity_feed (agent, action, detail, result, impact_type, impact_value, date) VALUES (?,?,?,?,?,?,?)",
+        (agent, action, body.get('detail', ''), body.get('result', 'success'),
+         body.get('impact_type'), body.get('impact_value', 0), body.get('date', today))
+    )
+    db.commit()
+    db.close()
+    
+    notify("activity_logged", {"agent": agent, "action": action})
+    return {"status": "logged"}
+
+@app.get("/api/activity/digest")
+def get_activity_digest():
+    """Returns today's agent digest summary."""
+    db = get_db()
+    today = datetime.now().strftime('%Y-%m-%d')
+    
+    # Activities per agent today
+    agents_today = db.execute("""
+        SELECT agent, COUNT(*) as actions, 
+               SUM(CASE WHEN result='success' THEN 1 ELSE 0 END) as successes,
+               SUM(CASE WHEN result='failed' THEN 1 ELSE 0 END) as failures,
+               SUM(COALESCE(impact_value, 0)) as total_impact,
+               GROUP_CONCAT(DISTINCT impact_type) as impact_types
+        FROM activity_feed WHERE date=? GROUP BY agent ORDER BY actions DESC
+    """, (today,)).fetchall()
+    
+    # 7-day trend per agent
+    agents_week = db.execute("""
+        SELECT agent, date, COUNT(*) as actions
+        FROM activity_feed WHERE date >= date('now', '-7 days')
+        GROUP BY agent, date ORDER BY date
+    """).fetchall()
+    
+    # Impact totals
+    impact = db.execute("""
+        SELECT impact_type, SUM(impact_value) as total
+        FROM activity_feed WHERE date >= date('now', '-7 days') AND impact_type IS NOT NULL
+        GROUP BY impact_type
+    """).fetchall()
+    
+    # Inactive agents (no activity today)
+    all_agents = ['HUNTER','WRITER','RESEARCHER','OPERATOR','DEALMAKER']
+    active_today = [r['agent'] for r in agents_today]
+    inactive = [a for a in all_agents if a not in active_today]
+    
+    # Alerts
+    alerts = []
+    for a in inactive:
+        # Check how many days inactive
+        last = db.execute("SELECT MAX(date) as last_date FROM activity_feed WHERE agent=?", (a,)).fetchone()
+        last_date = last['last_date'] if last and last['last_date'] else 'never'
+        alerts.append({"agent": a, "type": "inactive", "message": f"{a} has no activity today (last: {last_date})"})
+    
+    # Check for failures
+    failures = db.execute("SELECT agent, detail FROM activity_feed WHERE date=? AND result='failed'", (today,)).fetchall()
+    for f in failures:
+        alerts.append({"agent": f['agent'], "type": "failure", "message": f"{f['agent']} failed: {f['detail']}"})
+    
+    db.close()
+    return {
+        "date": today,
+        "agents_today": [dict(r) for r in agents_today],
+        "agents_week": [dict(r) for r in agents_week],
+        "impact": [dict(r) for r in impact],
+        "inactive": inactive,
+        "alerts": alerts
+    }
+
+@app.get("/api/activity/graph")
+def get_activity_graph():
+    """Returns 14-day activity data for graph."""
+    db = get_db()
+    rows = db.execute("""
+        SELECT date, agent, COUNT(*) as actions, 
+               SUM(CASE WHEN result='success' THEN 1 ELSE 0 END) as successes
+        FROM activity_feed 
+        WHERE date >= date('now', '-14 days')
+        GROUP BY date, agent ORDER BY date
+    """).fetchall()
+    
+    # Also total per day
+    totals = db.execute("""
+        SELECT date, COUNT(*) as total, 
+               SUM(COALESCE(impact_value,0)) as impact
+        FROM activity_feed 
+        WHERE date >= date('now', '-14 days')
+        GROUP BY date ORDER BY date
+    """).fetchall()
+    
+    db.close()
+    return {
+        "by_agent": [dict(r) for r in rows],
+        "totals": [dict(r) for r in totals]
+    }
+
+# ── Decisions ──
+
+@app.get("/api/decisions")
+def get_decisions():
+    """Returns recent decisions, newest first."""
+    db = get_db()
+    rows = db.execute("SELECT * FROM decisions ORDER BY created_at DESC LIMIT 20").fetchall()
+    db.close()
+    return [dict(r) for r in rows]
+
+@app.post("/api/decisions")
+def log_decision(body: dict):
+    """Log a new decision."""
+    db = get_db()
+    today = datetime.now().strftime('%Y-%m-%d')
+    db.execute("""INSERT INTO decisions 
+                  (decision_id, date, question, options, mia_recommendation, florian_decision, 
+                   recommendation_followed, reason) 
+                  VALUES (?,?,?,?,?,?,?,?)""",
+               (body['decision_id'], body.get('date', today), body['question'], 
+                body.get('options',''), body.get('mia_recommendation',''), 
+                body.get('florian_decision',''), body.get('recommendation_followed', 1), 
+                body.get('reason','')))
+    db.commit()
+    db.close()
+    notify('decision_logged', {'decision_id': body['decision_id']})
+    return {"status": "logged"}
+
+# ── Backlog ──
+
+@app.get("/api/backlog")
+def get_backlog():
+    """Returns backlog items, prioritized."""
+    db = get_db()
+    rows = db.execute("""SELECT * FROM backlog WHERE status='backlog' 
+                         ORDER BY CASE priority 
+                             WHEN 'NOW' THEN 0 
+                             WHEN 'HIGH' THEN 1 
+                             WHEN 'NORMAL' THEN 2 
+                             WHEN 'LOW' THEN 3 
+                         END, created_at DESC""").fetchall()
+    db.close()
+    return [dict(r) for r in rows]
+
+@app.post("/api/backlog")
+def add_backlog(body: dict):
+    """Add item to backlog."""
+    db = get_db()
+    db.execute("""INSERT INTO backlog (description, source, priority, assigned_to) 
+                  VALUES (?,?,?,?)""",
+               (body['description'], body.get('source','florian'), 
+                body.get('priority','NORMAL'), body.get('assigned_to')))
+    db.commit()
+    db.close()
+    notify('backlog_updated', {})
+    return {"status": "added"}
+
+@app.put("/api/backlog/{item_id}")
+def update_backlog(item_id: int, body: dict):
+    """Update backlog item."""
+    db = get_db()
+    updates = []
+    params = []
+    for field in ['status', 'priority', 'assigned_to', 'description']:
+        if field in body:
+            updates.append(f"{field}=?")
+            params.append(body[field])
+    if updates:
+        updates.append("updated_at=CURRENT_TIMESTAMP")
+        params.append(item_id)
+        db.execute(f"UPDATE backlog SET {','.join(updates)} WHERE id=?", params)
+        db.commit()
+    db.close()
+    notify('backlog_updated', {'item_id': item_id})
+    return {"status": "updated"}
+
+@app.delete("/api/backlog/{item_id}")
+def delete_backlog(item_id: int):
+    """Remove from backlog."""
+    db = get_db()
+    db.execute("DELETE FROM backlog WHERE id=?", (item_id,))
+    db.commit()
+    db.close()
+    notify('backlog_updated', {'deleted': item_id})
+    return {"status": "deleted"}
 
 # ── Pipeline Stats ──
 

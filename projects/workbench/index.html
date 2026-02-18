@@ -510,6 +510,64 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var
 .goal-val-btn:hover{background:var(--surface-2)}
 .goal-add-input{background:transparent;border:none;color:var(--text-muted);font-size:11px;width:100%;outline:none;font-family:Inter,sans-serif}
 .goal-add-input::placeholder{color:var(--text-dim)}
+.feed-section{margin-bottom:32px}
+.feed-item{display:flex;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:11px;align-items:flex-start}
+.feed-item:last-child{border-bottom:none}
+.feed-agent{font-weight:600;width:90px;flex-shrink:0}
+.feed-action{color:var(--text-muted);flex:1}
+.feed-time{color:var(--text-dim);font-size:10px;flex-shrink:0}
+.feed-result{font-size:9px;padding:1px 5px;border-radius:2px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+.feed-impact{font-size:10px;color:var(--warm);margin-left:8px}
+.activity-graph{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:16px}
+.graph-row{display:flex;align-items:flex-end;gap:3px;height:80px;padding:0 4px}
+.graph-bar-group{display:flex;flex-direction:column;align-items:center;flex:1;gap:2px}
+.graph-bar{border-radius:2px 2px 0 0;min-width:8px;transition:height 0.3s}
+.graph-stacked{display:flex;flex-direction:column-reverse;align-items:center;width:100%;gap:1px}
+.graph-label{font-size:8px;color:var(--text-dim);margin-top:4px;text-align:center}
+.graph-legend{display:flex;gap:12px;margin-top:8px;font-size:9px;color:var(--text-dim)}
+.graph-legend-dot{width:8px;height:8px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:middle}
+.alert-item{display:flex;align-items:center;gap:8px;padding:6px 12px;font-size:11px;border-radius:4px;margin-bottom:4px}
+.alert-inactive{background:rgba(212,168,83,0.1);color:#d4a853}
+.alert-failure{background:rgba(196,112,112,0.1);color:#c47070}
+
+/* Executive Tabs */
+.exec-tabs{display:flex;gap:0;margin-bottom:24px;border-bottom:1px solid var(--border)}
+.exec-tab{padding:10px 20px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s}
+.exec-tab:hover{color:var(--text-muted)}
+.exec-tab.active{color:#d4a853;border-bottom-color:#d4a853}
+
+/* Decisions */
+.decision-item{padding:12px 16px;border-bottom:1px solid var(--border);font-size:11px}
+.decision-item:last-child{border-bottom:none}
+.decision-id{font-weight:600;color:#d4a853;margin-right:8px}
+.decision-question{color:var(--text)}
+.decision-meta{margin-top:4px;color:var(--text-dim);font-size:10px}
+.decision-followed{font-size:9px;padding:1px 5px;border-radius:2px;font-weight:600;text-transform:uppercase}
+.decision-yes{background:rgba(74,160,136,0.15);color:#4aa088}
+.decision-no{background:rgba(212,168,83,0.15);color:#d4a853}
+.decision-partial{background:rgba(155,142,196,0.15);color:#9b8ec4}
+
+/* Backlog */
+.backlog-item{display:flex;align-items:center;gap:10px;padding:8px 16px;border-bottom:1px solid var(--border);font-size:11px}
+.backlog-item:last-child{border-bottom:none}
+.backlog-desc{flex:1;color:var(--text)}
+.backlog-priority{font-size:9px;padding:1px 5px;border-radius:2px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+.backlog-actions{display:flex;gap:4px}
+.backlog-btn{padding:2px 6px;font-size:9px;border:1px solid var(--border);border-radius:3px;background:transparent;color:var(--text-muted);cursor:pointer}
+.backlog-btn:hover{background:var(--surface-2)}
+.backlog-add{padding:8px 16px;border-top:1px solid var(--border)}
+.backlog-input{background:transparent;border:none;color:var(--text-muted);font-size:11px;width:100%;outline:none;font-family:Inter,sans-serif}
+
+/* Running Tasks */
+.running-item{display:flex;align-items:center;gap:10px;padding:8px 16px;border-bottom:1px solid var(--border);font-size:11px}
+.running-status{width:6px;height:6px;border-radius:50%;background:#4aa088;flex-shrink:0;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+/* Stats Row */
+.stats-row{display:flex;gap:24px;padding:12px 16px;font-size:11px;color:var(--text-muted)}
+.stats-item{display:flex;flex-direction:column;gap:2px}
+.stats-value{font-size:18px;font-weight:700;color:var(--text)}
+.stats-label{font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px}
 </style>
 </head>
 <body>
@@ -700,6 +758,14 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var
 
 <script>
 const API = 'http://localhost:8080/api';
+const AGENT_COLORS = {
+  'HUNTER': '#c47070',
+  'WRITER': '#9b8ec4',
+  'RESEARCHER': '#6b8aab',
+  'OPERATOR': '#4aa088',
+  'DEALMAKER': '#d4a853',
+  'FLORIAN': '#ffffff'
+};
 let currentTopic = null;
 let currentFolder = null;
 let topicsCache = {};
@@ -1036,32 +1102,7 @@ async function renderOperationsView() {
           </div>
         </div>
         
-        <!-- Section 4: Team Performance -->
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:12px">TEAM</div>
-        <div style="border-top:2px solid var(--border);margin-bottom:8px"></div>
-        <div style="margin-bottom:32px">
-          ${agents.sort((a,b) => b.score - a.score).map(agent => {
-            const barColor = agent.score >= 60 ? '#4aa088' : agent.score >= 30 ? '#d4a853' : '#c47070';
-            const lastActive = formatLastActive(agent.last_active);
-            const isActive = agent.last_active && (new Date() - new Date(agent.last_active)) < 7 * 24 * 60 * 60 * 1000;
-            const statusColor = isActive ? 'var(--text-muted)' : '#c47070';
-            const statusText = isActive ? 'Active' : 'Inactive';
-            return `
-              <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
-                <div style="width:100px;font-size:11px;font-weight:600">${agent.name}</div>
-                <div style="flex:1;font-size:10px;color:var(--text-dim)">${agent.role}</div>
-                <div style="width:40px;font-size:11px;font-weight:600;text-align:right">${agent.score}</div>
-                <div style="width:80px;font-size:10px;color:var(--text-dim);text-align:right">${lastActive}</div>
-                <div style="width:150px;height:3px;background:var(--surface-2);border-radius:2px;overflow:hidden">
-                  <div style="height:100%;width:${agent.score}%;background:${barColor};border-radius:2px"></div>
-                </div>
-                <div style="width:60px;font-size:10px;color:${statusColor};text-align:right">${statusText}</div>
-              </div>
-            `;
-          }).join('')}
-        </div>
-        
-        <!-- Section 5: System Health -->
+        <!-- Section 4: System Health -->
         <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:12px">SYSTEM HEALTH</div>
         <div class="exec-health" style="margin-bottom:32px">
           ${(kpiData.health ? kpiData.health.checks : []).map(h => {
@@ -1077,54 +1118,475 @@ async function renderOperationsView() {
           }).join('')}
         </div>
         
-        <!-- Section 6: Daily Standup (existing) -->
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:12px">TODAY</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px">
-          <div>
-            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)">Committed Tasks</div>
-            <div id="committedTasksList" style="display:flex;flex-direction:column;gap:8px">
-              ${tasks.filter(t => t.type === 'committed').map(t => `
-                <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:6px">
-                  <input type="checkbox" ${t.status === 'done' ? 'checked' : ''} 
-                         onchange="toggleTaskStatus(${t.id}, this.checked ? 'done' : 'pending')"
-                         style="width:16px;height:16px;cursor:pointer">
-                  <div style="flex:1;font-size:12px;${t.status === 'done' ? 'text-decoration:line-through;color:var(--text-dim)' : ''}">${t.description}</div>
-                  ${t.is_send ? '<span style="font-size:9px;padding:2px 6px;background:rgba(212,168,83,0.15);color:var(--warm);border-radius:3px;font-weight:600">SEND</span>' : ''}
-                </div>
-              `).join('')}
+        <!-- Executive Tabs -->
+        <div class="exec-tabs">
+          <div class="exec-tab active" onclick="switchExecTab('florian')">Florian</div>
+          <div class="exec-tab" onclick="switchExecTab('mia')">Mia + Team</div>
+        </div>
+        
+        <!-- Florian Tab -->
+        <div id="execFlorian">
+          
+          <!-- Decision Stats -->
+          <div id="decisionStats" style="margin-bottom:24px"></div>
+          
+          <!-- Daily Standup -->
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:12px">TODAY</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px">
+            <div>
+              <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)">Committed Tasks</div>
+              <div id="committedTasksList" style="display:flex;flex-direction:column;gap:8px">
+                ${tasks.filter(t => t.type === 'committed').map(t => `
+                  <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:6px">
+                    <input type="checkbox" ${t.status === 'done' ? 'checked' : ''} 
+                           onchange="toggleTaskStatus(${t.id}, this.checked ? 'done' : 'pending')"
+                           style="width:16px;height:16px;cursor:pointer">
+                    <div style="flex:1;font-size:12px;${t.status === 'done' ? 'text-decoration:line-through;color:var(--text-dim)' : ''}">${t.description}</div>
+                    ${t.is_send ? '<span style="font-size:9px;padding:2px 6px;background:rgba(212,168,83,0.15);color:var(--warm);border-radius:3px;font-weight:600">SEND</span>' : ''}
+                  </div>
+                `).join('')}
+              </div>
+              <div style="margin-top:12px">
+                <input type="text" id="newTaskInput" placeholder="Add committed task..." 
+                       style="width:100%;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--text);font-family:inherit"
+                       onkeydown="if(event.key==='Enter')addTask()">
+              </div>
             </div>
-            <div style="margin-top:12px">
-              <input type="text" id="newTaskInput" placeholder="Add committed task..." 
-                     style="width:100%;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--text);font-family:inherit"
-                     onkeydown="if(event.key==='Enter')addTask()">
+            
+            <div>
+              <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)">Score: ${score.score_current}</div>
+              <div style="display:flex;gap:8px;align-items:flex-end;height:140px;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:6px">
+                ${history.slice(-7).map(day => {
+                  const barColor = day.score_current >= 100 ? '#4aa088' : day.score_current >= 70 ? '#d4a853' : '#c47070';
+                  const height = Math.max(5, (day.score_current / 120) * 100);
+                  const date = new Date(day.date).toLocaleDateString('de-DE', { weekday: 'short' });
+                  return `
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+                      <div style="font-size:9px;font-weight:600;color:var(--text-muted)">${day.score_current}</div>
+                      <div style="width:100%;background:${barColor};border-radius:3px 3px 0 0;height:${height}%"></div>
+                      <div style="font-size:8px;color:var(--text-dim)">${date}</div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
             </div>
           </div>
           
-          <div>
-            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)">Score: ${score.score_current}</div>
-            <div style="display:flex;gap:8px;align-items:flex-end;height:140px;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:6px">
-              ${history.slice(-7).map(day => {
-                const barColor = day.score_current >= 100 ? '#4aa088' : day.score_current >= 70 ? '#d4a853' : '#c47070';
-                const height = Math.max(5, (day.score_current / 120) * 100);
-                const date = new Date(day.date).toLocaleDateString('de-DE', { weekday: 'short' });
-                return `
-                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
-                    <div style="font-size:9px;font-weight:600;color:var(--text-muted)">${day.score_current}</div>
-                    <div style="width:100%;background:${barColor};border-radius:3px 3px 0 0;height:${height}%"></div>
-                    <div style="font-size:8px;color:var(--text-dim)">${date}</div>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-          </div>
+          <!-- Recent Decisions -->
+          <div id="recentDecisions"></div>
+          
         </div>
+        
+        <!-- Mia Tab -->
+        <div id="execMia" style="display:none">
+          
+          <!-- Running Tasks -->
+          <div id="runningTasks" style="margin-bottom:32px"></div>
+          
+          <!-- Team Performance -->
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:12px">TEAM</div>
+          <div style="border-top:2px solid var(--border);margin-bottom:8px"></div>
+          <div style="margin-bottom:32px">
+            ${agents.sort((a,b) => b.score - a.score).map(agent => {
+              const barColor = agent.score >= 60 ? '#4aa088' : agent.score >= 30 ? '#d4a853' : '#c47070';
+              const lastActive = formatLastActive(agent.last_active);
+              const isActive = agent.last_active && (new Date() - new Date(agent.last_active)) < 7 * 24 * 60 * 60 * 1000;
+              const statusColor = isActive ? 'var(--text-muted)' : '#c47070';
+              const statusText = isActive ? 'Active' : 'Inactive';
+              return `
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+                  <div style="width:100px;font-size:11px;font-weight:600">${agent.name}</div>
+                  <div style="flex:1;font-size:10px;color:var(--text-dim)">${agent.role}</div>
+                  <div style="width:40px;font-size:11px;font-weight:600;text-align:right">${agent.score}</div>
+                  <div style="width:80px;font-size:10px;color:var(--text-dim);text-align:right">${lastActive}</div>
+                  <div style="width:150px;height:3px;background:var(--surface-2);border-radius:2px;overflow:hidden">
+                    <div style="height:100%;width:${agent.score}%;background:${barColor};border-radius:2px"></div>
+                  </div>
+                  <div style="width:60px;font-size:10px;color:${statusColor};text-align:right">${statusText}</div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+          
+          <!-- Activity Graph -->
+          <div id="activityGraphSection"></div>
+          
+          <!-- Alerts -->
+          <div id="alertsSection"></div>
+          
+          <!-- Activity Feed -->
+          <div id="activityFeedSection"></div>
+          
+          <!-- Backlog -->
+          <div id="backlogSection"></div>
+          
+        </div>
+        
       </div>
     `;
+    
+    // Render Activity Graph, Alerts, and Feed
+    await renderActivitySections();
+    
   } catch (e) {
     console.error('Failed to load executive board:', e);
     view.innerHTML = `<div style="text-align:center;padding:60px;color:var(--danger)">Failed to load executive board data</div>`;
   }
 }
+
+async function renderActivitySections() {
+  try {
+    // Fetch all activity data
+    const [graphData, digestData, feedData, decisionsData, backlogData] = await Promise.all([
+      fetch(API + '/activity/graph').then(r => r.json()),
+      fetch(API + '/activity/digest').then(r => r.json()),
+      fetch(API + '/activity/feed').then(r => r.json()),
+      fetch(API + '/decisions').then(r => r.json()),
+      fetch(API + '/backlog').then(r => r.json())
+    ]);
+    
+    // Render Activity Graph
+    renderActivityGraph(graphData);
+    
+    // Render Alerts
+    renderAlerts(digestData);
+    
+    // Render Activity Feed
+    renderActivityFeed(feedData);
+    
+    // Render Decisions
+    renderDecisions(decisionsData);
+    
+    // Render Backlog
+    renderBacklog(backlogData);
+    
+  } catch (e) {
+    console.error('Failed to load activity sections:', e);
+  }
+}
+
+function renderActivityGraph(data) {
+  const section = document.getElementById('activityGraphSection');
+  if (!section) return;
+  
+  const totals = data.totals || [];
+  const byAgent = data.by_agent || [];
+  
+  if (totals.length === 0) {
+    section.innerHTML = '';
+    return;
+  }
+  
+  // Build a map of date -> agent -> count
+  const dateMap = {};
+  totals.forEach(t => {
+    dateMap[t.date] = { total: t.total, agents: {} };
+  });
+  byAgent.forEach(row => {
+    if (dateMap[row.date]) {
+      dateMap[row.date].agents[row.agent] = row.actions;
+    }
+  });
+  
+  // Find max for scaling
+  const maxTotal = Math.max(...totals.map(t => t.total), 1);
+  
+  // Agent order for stacking
+  const agentOrder = ['HUNTER', 'WRITER', 'RESEARCHER', 'OPERATOR', 'DEALMAKER'];
+  
+  // Generate bars
+  const bars = totals.map(day => {
+    const dateObj = new Date(day.date);
+    const label = dateObj.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+    const dayData = dateMap[day.date];
+    
+    // Stack bars for each agent
+    const stacked = agentOrder.map(agent => {
+      const count = dayData.agents[agent] || 0;
+      const height = (count / maxTotal) * 100;
+      const color = AGENT_COLORS[agent];
+      return `<div class="graph-bar" style="background:${color};height:${height}%;width:100%"></div>`;
+    }).join('');
+    
+    return `
+      <div class="graph-bar-group">
+        <div class="graph-stacked" style="height:80px">
+          ${stacked}
+        </div>
+        <div class="graph-label">${label}</div>
+      </div>
+    `;
+  }).join('');
+  
+  const legend = agentOrder.map(agent => {
+    const color = AGENT_COLORS[agent];
+    return `<span><span class="graph-legend-dot" style="background:${color}"></span>${agent}</span>`;
+  }).join('');
+  
+  section.innerHTML = `
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:12px">ACTIVITY (14 DAYS)</div>
+    <div class="activity-graph">
+      <div class="graph-row">${bars}</div>
+      <div class="graph-legend">${legend}</div>
+    </div>
+  `;
+}
+
+function renderAlerts(data) {
+  const section = document.getElementById('alertsSection');
+  if (!section) return;
+  
+  const alerts = data.alerts || [];
+  
+  if (alerts.length === 0) {
+    section.innerHTML = '';
+    return;
+  }
+  
+  const alertItems = alerts.map(alert => {
+    const cssClass = alert.type === 'inactive' ? 'alert-inactive' : 'alert-failure';
+    return `<div class="alert-item ${cssClass}">${alert.message}</div>`;
+  }).join('');
+  
+  section.innerHTML = `
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:12px">ALERTS</div>
+    <div style="margin-bottom:32px">${alertItems}</div>
+  `;
+}
+
+function renderActivityFeed(activities) {
+  const section = document.getElementById('activityFeedSection');
+  if (!section) return;
+  
+  const feed = activities.slice(0, 15); // Limit to 15
+  
+  if (feed.length === 0) {
+    section.innerHTML = '';
+    return;
+  }
+  
+  // Helper: format time ago
+  const timeAgo = (timestamp) => {
+    const diff = Date.now() - new Date(timestamp).getTime();
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    if (days > 0) return `${days}d ago`;
+    if (hours > 0) return `${hours}h ago`;
+    return 'just now';
+  };
+  
+  // Helper: format impact
+  const formatImpact = (type, value) => {
+    if (!type || value === 0) return '';
+    if (type === 'revenue') return `+€${value}`;
+    if (type === 'time_saved') return `+${value}min`;
+    if (type === 'knowledge') return `+${value} findings`;
+    if (type === 'content') return `+${value} items`;
+    return `+${value}`;
+  };
+  
+  // Helper: result badge
+  const resultBadge = (result) => {
+    const colors = {
+      'success': '#4aa088',
+      'failed': '#c47070',
+      'partial': '#d4a853'
+    };
+    const color = colors[result] || '#8e8e8e';
+    return `<span class="feed-result" style="background:${color}20;color:${color}">${result}</span>`;
+  };
+  
+  const items = feed.map(item => {
+    const agentColor = AGENT_COLORS[item.agent] || '#8e8e8e';
+    const detail = item.detail.length > 80 ? item.detail.substring(0, 80) + '...' : item.detail;
+    const impact = formatImpact(item.impact_type, item.impact_value);
+    
+    return `
+      <div class="feed-item">
+        <div class="feed-agent" style="color:${agentColor}">${item.agent}</div>
+        <div class="feed-action">
+          <strong>${item.action}</strong>: ${detail}
+          ${impact ? `<span class="feed-impact">${impact}</span>` : ''}
+        </div>
+        ${resultBadge(item.result)}
+        <div class="feed-time">${timeAgo(item.created_at)}</div>
+      </div>
+    `;
+  }).join('');
+  
+  section.innerHTML = `
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:12px">ACTIVITY FEED</div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:32px">
+      ${items}
+    </div>
+  `;
+}
+
+// ── Executive Tab Switcher ──
+
+let execTab = 'florian';
+
+function switchExecTab(tab) {
+  execTab = tab;
+  document.querySelectorAll('.exec-tab').forEach(t => t.classList.remove('active'));
+  const clickedTab = Array.from(document.querySelectorAll('.exec-tab')).find(t => t.textContent === (tab === 'florian' ? 'Florian' : 'Mia + Team'));
+  if (clickedTab) clickedTab.classList.add('active');
+  
+  const florianDiv = document.getElementById('execFlorian');
+  const miaDiv = document.getElementById('execMia');
+  if (florianDiv) florianDiv.style.display = tab === 'florian' ? 'block' : 'none';
+  if (miaDiv) miaDiv.style.display = tab === 'mia' ? 'block' : 'none';
+}
+
+// ── Decisions ──
+
+function renderDecisions(decisions) {
+  const statsSection = document.getElementById('decisionStats');
+  const decisionsSection = document.getElementById('recentDecisions');
+  if (!decisionsSection) return;
+  
+  const today = new Date().toISOString().split('T')[0];
+  const todayDecisions = decisions.filter(d => d.date === today);
+  const totalDecisions = todayDecisions.length;
+  const followed = todayDecisions.filter(d => d.recommendation_followed === 1).length;
+  const followedPct = totalDecisions > 0 ? Math.round((followed / totalDecisions) * 100) : 0;
+  
+  if (statsSection && totalDecisions > 0) {
+    statsSection.innerHTML = `
+      <div class="stats-row">
+        <div class="stats-item">
+          <div class="stats-value">${totalDecisions}</div>
+          <div class="stats-label">Today's Decisions</div>
+        </div>
+        <div class="stats-item">
+          <div class="stats-value">${followedPct}%</div>
+          <div class="stats-label">Mia Followed</div>
+        </div>
+        <div class="stats-item">
+          <div class="stats-value">${totalDecisions - followed}</div>
+          <div class="stats-label">Florian Pushback</div>
+        </div>
+      </div>
+    `;
+  }
+  
+  if (decisions.length === 0) {
+    decisionsSection.innerHTML = '';
+    return;
+  }
+  
+  const items = decisions.slice(0, 10).map(d => {
+    const followedClass = d.recommendation_followed === 1 ? 'decision-yes' : d.recommendation_followed === 0 ? 'decision-no' : 'decision-partial';
+    const followedLabel = d.recommendation_followed === 1 ? 'FOLLOWED' : d.recommendation_followed === 0 ? 'OVERRIDDEN' : 'PARTIAL';
+    const questionShort = d.question.length > 60 ? d.question.substring(0, 60) + '...' : d.question;
+    
+    return `
+      <div class="decision-item">
+        <div>
+          <span class="decision-id">${d.decision_id}</span>
+          <span class="decision-question">${questionShort}</span>
+          <span class="decision-followed ${followedClass}">${followedLabel}</span>
+        </div>
+        <div class="decision-meta">
+          Mia: ${d.mia_recommendation || '—'} → Florian: ${d.florian_decision || '—'}
+          ${d.reason ? `<br><em>${d.reason}</em>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  decisionsSection.innerHTML = `
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:12px">RECENT DECISIONS</div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:32px">
+      ${items}
+    </div>
+  `;
+}
+
+// ── Backlog ──
+
+function renderBacklog(backlog) {
+  const section = document.getElementById('backlogSection');
+  if (!section) return;
+  
+  const priorityColors = {
+    'NOW': '#c47070',
+    'HIGH': '#d4a853',
+    'NORMAL': '#8e8e8e',
+    'LOW': '#555'
+  };
+  
+  const items = backlog.map(item => {
+    const priorityColor = priorityColors[item.priority] || '#8e8e8e';
+    const agent = item.assigned_to || '—';
+    
+    return `
+      <div class="backlog-item">
+        <span class="backlog-priority" style="background:${priorityColor}20;color:${priorityColor}">${item.priority}</span>
+        <div class="backlog-desc">${item.description}</div>
+        <span style="font-size:10px;color:var(--text-dim);width:80px;text-align:right">${agent}</span>
+        <div class="backlog-actions">
+          <button class="backlog-btn" onclick="startBacklogItem(${item.id})">Start</button>
+          <button class="backlog-btn" onclick="deleteBacklogItem(${item.id})">Delete</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  const content = backlog.length > 0 ? items : '<div style="text-align:center;padding:20px;color:var(--text-dim)">No backlog items</div>';
+  
+  section.innerHTML = `
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:12px">BACKLOG</div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:32px">
+      ${content}
+      <div class="backlog-add">
+        <input class="backlog-input" id="backlogInput" placeholder="+ Add to backlog (Enter to save)" onkeydown="if(event.key==='Enter')addBacklogItem()">
+      </div>
+    </div>
+  `;
+}
+
+async function addBacklogItem() {
+  const input = document.getElementById('backlogInput');
+  if (!input || !input.value.trim()) return;
+  
+  try {
+    await fetch(API + '/backlog', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ description: input.value.trim(), source: 'florian', priority: 'NORMAL' })
+    });
+    input.value = '';
+    renderOperationsView();
+  } catch (e) {
+    console.error('Failed to add backlog item:', e);
+  }
+}
+
+async function startBacklogItem(id) {
+  try {
+    await fetch(API + '/backlog/' + id, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'started' })
+    });
+    renderOperationsView();
+  } catch (e) {
+    console.error('Failed to start backlog item:', e);
+  }
+}
+
+async function deleteBacklogItem(id) {
+  try {
+    await fetch(API + '/backlog/' + id, { method: 'DELETE' });
+    renderOperationsView();
+  } catch (e) {
+    console.error('Failed to delete backlog item:', e);
+  }
+}
+
+// Note: Running tasks rendering is placeholder - no active running tasks system yet
+// This can be populated when sub-agent execution is tracked
 
 function addGoal() {
   const description = prompt('Goal description:');

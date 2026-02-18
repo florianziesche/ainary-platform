@@ -1,5 +1,5 @@
 # Engineering Standards — Domain Knowledge
-*Auto-consolidated: 2026-02-18 14:03 | 6 findings | avg conf: 88% | 0 verified*
+*Auto-consolidated: 2026-02-18 22:36 | 6 findings | avg conf: 88% | 0 verified*
 
 ## Verified Claims (conf ≥80%)
 
@@ -26,3 +26,39 @@ Tags: ux_design, empty_state, frontend, website_design
 **RF-038** [80%]: Eine horizontale 4-Column Kanban Pipeline View zeigt Flywheel-Gesundheit auf einen Blick besser als eine vertikale Liste. Topics als Cards mit Connection-Badges + Findings-Count machen die Compound-Effekte sichtbar.
 Source: Execution Platform Pipeline View v0.11.3. Research: Atlassian Funnel Charts, PipelineCRM Kanban, Linear App Design.
 Tags: pipeline, ux_design, kanban, visualization, product_design, website_design
+
+## Dead Findings
+
+- ~~RF-019~~: Low conf finding for validation test — killed: Automated test artifacts, not real knowledge
+- ~~RF-023~~: Low conf finding for validation test — killed: Automated test artifacts, not real knowledge
+- ~~RF-033~~: Low conf finding for validation test — killed: Automated test artifacts, not real knowledge
+- ~~RF-036~~: Low conf finding for validation test — killed: Automated test artifacts, not real knowledge
+- ~~RF-040~~: Low conf finding for validation test — killed: Automated test artifacts, not real knowledge
+- ~~RF-043~~: Low conf finding for validation test — killed: Automated test artifacts, not real knowledge
+- ~~RF-004~~: Test finding for automated tests — killed: Automated test artifacts, not real knowledge
+- ~~RF-006~~: Test finding for automated tests — killed: Automated test artifacts, not real knowledge
+- ~~RF-008~~: Test finding for automated tests — killed: Automated test artifacts, not real knowledge
+- ~~RF-011~~: Test finding for automated tests — killed: Automated test artifacts, not real knowledge
+- ~~RF-014~~: Test finding for automated tests — killed: Automated test artifacts, not real knowledge
+- ~~RF-016~~: Test finding for automated tests — killed: Automated test artifacts, not real knowledge
+- ~~RF-018~~: Test finding for automated tests — killed: Automated test artifacts, not real knowledge
+- ~~RF-022~~: Test finding for automated tests — killed: Automated test artifacts, not real knowledge
+- ~~RF-032~~: Test finding for automated tests — killed: Automated test artifacts, not real knowledge
+- ~~RF-035~~: Test finding for automated tests — killed: Automated test artifacts, not real knowledge
+- ~~RF-039~~: Test finding for automated tests — killed: Automated test artifacts, not real knowledge
+- ~~RF-042~~: Test finding for automated tests — killed: Automated test artifacts, not real knowledge
+- ~~RF-021~~: Bayesian test — killed: Automated test artifacts, not real knowledge
+- ~~RF-005~~: Test contradiction detection — killed: Automated test artifacts, not real knowledge
+- ~~RF-007~~: Test contradiction detection — killed: Automated test artifacts, not real knowledge
+- ~~RF-010~~: Test contradiction detection — killed: Automated test artifacts, not real knowledge
+- ~~RF-013~~: Test contradiction detection — killed: Automated test artifacts, not real knowledge
+- ~~RF-020~~: Test contradiction detection — killed: Automated test artifacts, not real knowledge
+- ~~RF-024~~: Test contradiction detection — killed: Automated test artifacts, not real knowledge
+- ~~RF-034~~: Test contradiction detection — killed: Automated test artifacts, not real knowledge
+- ~~RF-037~~: Test contradiction detection — killed: Automated test artifacts, not real knowledge
+- ~~RF-041~~: Test contradiction detection — killed: Automated test artifacts, not real knowledge
+- ~~RF-044~~: Test contradiction detection — killed: Automated test artifacts, not real knowledge
+- ~~RF-009~~: Low conf finding for validation test — killed: Automated test artifacts, not real knowledge
+- ~~RF-012~~: Low conf finding for validation test — killed: Automated test artifacts, not real knowledge
+- ~~RF-015~~: Low conf finding for validation test — killed: Automated test artifacts, not real knowledge
+- ~~RF-017~~: Low conf finding for validation test — killed: Automated test artifacts, not real knowledge

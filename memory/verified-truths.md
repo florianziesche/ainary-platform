@@ -31,3 +31,6 @@
 | T-026 | Primary Venture Partners application gesendet am 2026-02-18, ermöglicht durch Execution Platform + CV Generator + GitHub Repo | Florian direkt | 2026-02-18 | 2027-02-18 | 100% |
 | T-027 | Glasswing Portfolio AI Agents: Asepha (pharma agentic), Basetwo AI (manufacturing), Allure Security (fraud AI), Beacon (gov transport AI), Black Kite (cyber), ChaosSearch (analytics) | glasswing.vc/our-companies 2026-02-18 | 2026-02-18 | 2027-02-18 | 92% |
 | T-028 | Seligman Ventures: Brandneuer Fund (Feb 12 2026), KEIN Portfolio yet. Padvals Pre-Seligman Investments: Cohere, Relyance AI, Exaforce, Harness. | Fortune/BusinessWire 2026-02-18 | 2026-02-18 | 2026-08-18 | 95% |
+| T-029 | Asepha: CEO Eunice Wu (PharmD), CTO Can Uncu (AMD MI300X engineer); $4M Seed July 2025 (Glasswing lead); Fortune 50 customers; 96% OCR accuracy, 71% preference vs human pharmacist | BusinessWire 2025-07-14 | 2026-02-18 | 2026-08-18 | 95% |
+| T-030 | LangSmith Plus: $39/seat/mo, 10K base traces/mo; $2.50/1K traces (14d retention) or $5/1K (400d); LangGraph $0.005/run | langchain.com/pricing 2026-02-18 | 2026-02-18 | 2026-08-18 | 98% |
+| T-031 | Arize Phoenix: FREE self-hosted unlimited; Cloud Free 25K spans/mo; Pro $50/mo (50K spans, 15d retention); Overage $10/M spans, $3/GB | phoenix.arize.com/pricing 2026-02-18 | 2026-02-18 | 2026-08-18 | 98% |

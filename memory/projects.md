@@ -13,6 +13,16 @@
 - Research bestätigt: KEINE Konkurrenz in Production
 - Content Flywheel: 5 Artikel → Repo → Credibility → Repeat
 
+### Execution Platform / CKE (NEU 2026-02-18)
+- **Version:** v0.11.5, 57+ API endpoints, 18 DB tables
+- **GitHub:** github.com/florianziesche/execution-platform
+- **Stack:** FastAPI + SQLite + vanilla JS, localhost:8080
+- **Features:** Correction Engine (29 corrections, 18 quality standards), Pre-Flight Gate, Trust per Skill (9 skills), Pipeline View, Finding Detail, Memory Sync, File Upload, Command Palette (Cmd+K)
+- **Decisions:** D-151 to D-158 (see decisions.md)
+- **Done-Def v1:** Fehlerfrei + Live AI + Trust System + 5 VC Emails durch Platform gesendet
+- **Next:** Phase 2 — OpenClaw Integration (sessions_send → real AI)
+- **Issue:** main.sqlite = 14 GB (embeddings), disk tight
+
 ### Ainary Platform Website
 - **Status:** LIVE https://platform-website-lilac.vercel.app
 - **GitHub:** https://github.com/fziescheus-alt/ainary-platform (private)
@@ -45,10 +55,12 @@
 - **Substack:** https://finitematter.substack.com/
 
 ### VC Job Search
+- **Primary Venture Partners:** SUBMITTED 18.02 ✅ (OIR: Agents, Primary Labs)
+  - Brian Schechter (Partner), $125K-$175K, NYC/SF
+  - CV v2 custom (monochromatic, Primary brand match)
+  - Campaign "Project BSchech": 7-channel approach (portal + VC Lab + intros + Twitter + LinkedIn + physical + Etched)
 - **HOF Capital:** SUBMITTED 13.02 ✅
 - **Betaworks, Leonis, Wingspan:** Ready, not submitted
-- **27 Openings** researched
-- **IBM Ventures:** CV + Cover Letter ready
 - **50-Fund Pipeline** (2026-02-17): `research/inbox/vc-pipeline-50-funds-2026-02-17.md`
 - Top: Glasswing, Radical ($1.8B), Earlybird/HV/La Famiglia, Conviction, Nyca
 - NEW: FutureSight (EIR NYC), Seligman ($500M, launched Feb 12!), Innovate.VC (EIR)

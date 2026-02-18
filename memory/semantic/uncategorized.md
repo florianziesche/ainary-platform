@@ -1,40 +1,16 @@
 # Uncategorized — Domain Knowledge
-*Auto-consolidated: 2026-02-18 14:03 | 33 findings | avg conf: 58% | 0 verified*
+*Auto-consolidated: 2026-02-18 22:36 | 3 findings | avg conf: 87% | 0 verified*
 
-## Emergent Patterns
+## Verified Claims (conf ≥80%)
 
-**test × automated** (12 findings): Test finding for automated tests; Test finding for automated tests; Test finding for automated tests
+**RF-049** [90%]: AI startup funding reached $202B globally in 2025 (+75% YoY), capturing ~50% of all VC funding
+Source: Crunchbase / PitchBook Q4 2025 Venture Monitor
+Tags: market_data, vc_funding
 
-**ai_quality × pre_flight** (11 findings): Test contradiction detection; Test contradiction detection; Test contradiction detection
+**RF-050** [85%]: Vertical AI taps 13% of GDP (labor budgets), not 1% (IT budgets) — 10x larger opportunity than vertical SaaS
+Source: Bessemer Venture Partners, State of Cloud 2026
+Tags: market_data, vertical_ai
 
-## Developing (50-80% confidence)
-
-- RF-019 [79%]: Low conf finding for validation test
-- RF-023 [79%]: Low conf finding for validation test
-- RF-033 [79%]: Low conf finding for validation test
-- RF-036 [79%]: Low conf finding for validation test
-- RF-040 [79%]: Low conf finding for validation test
-- RF-043 [79%]: Low conf finding for validation test
-- RF-004 [60%]: Test finding for automated tests
-- RF-006 [60%]: Test finding for automated tests
-- RF-008 [60%]: Test finding for automated tests
-- RF-011 [60%]: Test finding for automated tests
-- RF-014 [60%]: Test finding for automated tests
-- RF-016 [60%]: Test finding for automated tests
-- RF-018 [60%]: Test finding for automated tests
-- RF-022 [60%]: Test finding for automated tests
-- RF-032 [60%]: Test finding for automated tests
-- RF-035 [60%]: Test finding for automated tests
-- RF-039 [60%]: Test finding for automated tests
-- RF-042 [60%]: Test finding for automated tests
-- RF-021 [51%]: Bayesian test
-- RF-005 [50%]: Test contradiction detection
-- RF-007 [50%]: Test contradiction detection
-- RF-010 [50%]: Test contradiction detection
-- RF-013 [50%]: Test contradiction detection
-- RF-020 [50%]: Test contradiction detection
-- RF-024 [50%]: Test contradiction detection
-- RF-034 [50%]: Test contradiction detection
-- RF-037 [50%]: Test contradiction detection
-- RF-041 [50%]: Test contradiction detection
-- RF-044 [50%]: Test contradiction detection
+**RF-051** [85%]: 98% of manufacturers exploring AI but only 20% fully prepared to use it at scale
+Source: Redwood Software survey (n=300 companies), Jan 2026
+Tags: market_data, manufacturing

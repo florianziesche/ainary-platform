@@ -5,6 +5,16 @@
 - **Nancy** — Florians Frau, NYC. +16462260465 (iMessage). Massage/Caregiver/Freelance. Max 1 Satz, keine internen Infos.
 - **Floriana** — Tochter, 3 Jahre, Geb. 25.12.2022. Kindergarten DE. Quality Time 18:00-20:30.
 
+## Florian — CV Facts
+- GitHub: github.com/florianziesche (war fziescheus-alt, Username-Change nötig)
+- Consulting: Founder-operator advisory für German-US startups. Helped raise $700K, supported YC admission.
+- CV Titel: "Founder Operator & Consultant (AI Systems)" — NICHT "Agent Systems Builder" (made-up)
+- CV Regel: Output-Metriken > Input-Metriken ("daily output: X" statt "used 12h+ daily")
+
+## VC Contacts (Primary)
+- **Brian Schechter** — Partner, Primary Venture Partners. Ex-CEO SelfMade. Boards: Etched.ai, Tabs, Ark Biotech. Twitter @BSchech, LinkedIn brian-schechter-1822ba16.
+- **Primary VP:** 156 5th Ave / 386 Park Ave S, 14th Floor, NY 10010
+
 ## CNC / Freelance
 - **Andreas Brand** — Onkel, GF Maschinenbau Schlottwitz. Demo-Partner. Email 06.02 gesendet, Antwort pending.
 - **Daniel Daum** — GF Freie Presse (NICHT ecoro). Called 09.02 + Executive Brief via WhatsApp.

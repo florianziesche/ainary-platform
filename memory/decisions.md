@@ -243,6 +243,12 @@
 - D-156: Mia als Backend, aber austauschbar (Action Layer Interface).
 - D-157: Build = gut WENN Build → Send → Revenue. Sonst schlecht.
 
+### D-158: ISO-aligned Documentation Standards (2026-02-18)
+- Semantic Versioning für alle Projekte
+- CHANGELOG.md, ARCHITECTURE.md, ROADMAP.md pro Projekt
+- Security Controls nach ISO 27001 (Localhost-only = kein Auth nötig Phase 1)
+- Jede Änderung: Datum + Was + Warum
+
 ### D-150: Chooser Workflow = Standard für alles (2026-02-15 00:10)
 - "We should always work like this, same for website, other tools, dashboards plus an option to write comments"
 - Template Chooser Pattern für alle Design-Entscheidungen verwenden

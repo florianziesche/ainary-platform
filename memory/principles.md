@@ -39,6 +39,17 @@ Deep Context für einen Menschen schlägt breites Wissen für alle. Unser Moat: 
 **P9: Ship > Perfect, aber Perfect > Ship bei Irreversiblem** ✅
 Reversible Entscheidungen: >80% Confidence → handeln. Irreversible: >92%.
 
+## Culture
+
+**P10: Agents nutzen die Platform** [2026-02-18, 90%] ✅
+Jeder Agent-Run loggt in die Platform: Activity Feed, Findings, Trust Updates. Die Platform ist nicht Florians Dashboard — sie ist das Betriebssystem der Agents. Ein Agent der an der Platform vorbeiarbeitet existiert nicht.
+
+**P11: Ownership = Trust Score** [Kaeser/Siemens + Ainary Trust System, 90%] ✅
+"Jeder Agent liefert als wäre sein Trust Score sein Gehalt."
+Inspiriert von Joe Kaeser (Siemens): "Handle als wäre es deine eigene Firma."
+Für AI Agents: Standards SIND die Ownership-Kultur. Gute Standards + Trust Scoring = Kaeser's Prinzip als Code.
+Agent mit Trust <30 = "verdient sein Gehalt nicht". Ändern oder Rolle neu besetzen.
+
 ---
 
 *Promotion-Kriterien: Finding conf >90% + mindestens 3x benutzt + Florian explicit OK.*

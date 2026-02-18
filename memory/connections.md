@@ -46,8 +46,17 @@
 - **Next:** Glasswing Cover Letter update mit Asepha-Angle
 
 ## C-008: AgentTrust Competitive Landscape × Differentiation
-- **Fakten:** T-022 (LangSmith observability), T-023 (Arize Phoenix), T-024 (Galileo)
+- **Fakten:** T-022 (LangSmith observability), T-023 (Arize Phoenix), T-024 (Galileo), T-030 (LangSmith $2.50-$5/1K traces), T-031 (Phoenix FREE-$50/mo)
 - **Insight:** "No competition" war FALSCH. Observability existiert (LangSmith, Arize, Galileo). ABER: Sie tracen, sie monitoren, sie alerten — KEINER kalibriert. AgentTrust ist NICHT "better observability", sondern **Calibration Layer ÜBER Observability**. Budget-CoCoA, Trust Scores, Beipackzettel = neues Problem, nicht bessere Lösung für altes Problem.
+- **Pricing Gap:** LangSmith $2.50-$5/1K traces (observability) vs AgentTrust $0.005/check (calibration) = 500× billiger, unterschiedliches Problem. AgentTrust ist ADD-ON, nicht Konkurrent.
 - **Implikation:** Positioning shift. NICHT "we monitor agents better" sondern "we calibrate agent trust — observability tells you WHAT happened, calibration tells you IF you can trust it".
-- **Integration:** LangSmith/Arize = PARTNER, nicht Konkurrent. Sie liefern Traces → AgentTrust berechnet Trust Scores.
+- **Integration:** LangSmith/Arize = PARTNER, nicht Konkurrent. Sie liefern Traces → AgentTrust berechnet Trust Scores. Phoenix FREE self-hosted + AgentTrust SDK = perfektes Startup-Bundle.
 - **Next:** AgentTrust README muss Arize/LangSmith als Integration Partners positionieren
+
+## C-009: Asepha × AgentTrust Perfect Product-Market Fit
+- **Fakten:** T-029 (Asepha: Can Uncu ex-AMD MI300X, 96% OCR accuracy, Fortune 50, HIPAA/SOC2), T-027 (Glasswing Portfolio), C-007 (Asepha als Beta-Kundin)
+- **Insight:** Can Uncu (CTO) baute AMD MI300X chip (powers OpenAI/Azure) → versteht LLM Stack auf Hardware-Ebene. 96% OCR accuracy + 71% preference vs human = **sie BRAUCHEN Calibration für die restlichen 4%/29%**. Fortune 50 customers in pharma = extreme regulatory pressure (FDA), Fehler = Klagen/Leben. Asepha löst Admin-Bottleneck (70% understaffed), AgentTrust löst Trust-Bottleneck (wie vertraust du dem Agent bei 4% Fehlerrate?).
+- **Contact:** CEO Eunice Wu (PharmD), CTO Can Uncu; asepha.ai, linkedin.com/company/asepha; NYC office opening
+- **Intro Path:** Glasswing Portfolio → Rudina Seseri (Glasswing Partner, Asepha Lead Investor) → Warm Intro zu Eunice/Can
+- **Pitch Angle:** "You automated 96% of pharmacy data entry. AgentTrust calibrates the trust boundary for the other 4% — so you know WHEN to escalate to a human pharmacist vs when the agent is confident enough."
+- **Next:** Florian VC application → Glasswing → Name-drop Asepha in cover letter → Get intro after hire
