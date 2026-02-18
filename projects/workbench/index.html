@@ -343,6 +343,23 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var
 .folder-topic-name{font-size:11px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .folder-topic-pct{font-size:9px;color:var(--text-dim)}
 .unfiled-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);padding:10px 16px 4px}
+
+/* Priority Badges */
+.priority-badge{font-size:8px;text-transform:uppercase;letter-spacing:1px;padding:1px 4px;border-radius:2px;font-weight:600;flex-shrink:0}
+.priority-badge.NOW{background:rgba(196,112,112,0.15);color:#c47070}
+.priority-badge.HIGH{background:rgba(212,168,83,0.15);color:#d4a853}
+.priority-badge.LOW{color:var(--text-dim)}
+.priority-badge-lg{font-size:10px;padding:3px 8px;border-radius:3px;font-weight:600;display:inline-block}
+.topic-priority{display:flex;align-items:center;gap:8px;margin-top:6px;cursor:pointer;padding:6px 0}
+.topic-priority:hover{opacity:0.8}
+.priority-conf{font-size:9px;color:var(--text-dim)}
+.priority-explanation{display:none;background:var(--surface);border:1px solid var(--border);border-radius:4px;margin-top:8px;padding:12px}
+.priority-explanation.open{display:block}
+.priority-group-header{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);padding:10px 16px 4px;border-top:1px solid var(--border);margin-top:8px}
+.priority-group-header:first-child{border-top:none;margin-top:0}
+.sort-toggle{display:flex;gap:4px;padding:8px 16px;border-bottom:1px solid var(--border)}
+.sort-toggle-btn{flex:1;padding:4px 8px;font-size:9px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;border:1px solid var(--border);background:none;color:var(--text-dim);border-radius:3px;cursor:pointer;transition:all 0.1s;font-family:inherit}
+.sort-toggle-btn.active{background:rgba(255,255,255,0.06);border-color:var(--text-dim);color:var(--text)}
 .add-folder-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;cursor:pointer;color:var(--text-dim);font-size:11px;transition:all 0.1s}
 .add-folder-btn:hover{color:var(--text);background:rgba(255,255,255,0.03)}
 .folder-input{background:var(--surface-2);border:1px solid var(--border-light);border-radius:3px;padding:4px 8px;font-size:11px;color:var(--text);font-family:inherit;outline:none;width:100%}
@@ -482,6 +499,17 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var
 .overlay-actions button.primary{background:var(--text);color:var(--bg);border-color:var(--text)}
 
 .loading{text-align:center;padding:40px;color:var(--text-dim);font-size:12px}
+.sys-indicator{display:flex;align-items:center;gap:8px;padding:10px 20px;font-size:10px;color:var(--text-dim);border-top:1px solid var(--border);cursor:pointer}
+.sys-indicator:hover{background:rgba(255,255,255,0.02)}
+.sys-dot{width:6px;height:6px;border-radius:50%}
+.exec-health{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.exec-health-row{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;border-bottom:1px solid var(--border);font-size:11px}
+.exec-health-row:last-child{border-bottom:none}
+.exec-health-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.goal-val-btn{width:18px;height:18px;border-radius:3px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;font-size:10px;display:inline-flex;align-items:center;justify-content:center}
+.goal-val-btn:hover{background:var(--surface-2)}
+.goal-add-input{background:transparent;border:none;color:var(--text-muted);font-size:11px;width:100%;outline:none;font-family:Inter,sans-serif}
+.goal-add-input::placeholder{color:var(--text-dim)}
 </style>
 </head>
 <body>
@@ -493,6 +521,10 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var
     <p style="font-size:10px">Research → Systems → Content → Revenue</p>
   </div>
   <div class="pipeline" id="pipeline"></div>
+  <div class="sort-toggle">
+    <button class="sort-toggle-btn active" id="sortFolders" onclick="setSortMode('folders')">Sort: Folders</button>
+    <button class="sort-toggle-btn" id="sortPriority" onclick="setSortMode('priority')">Sort: Priority</button>
+  </div>
   <div class="folder-tree" id="folderTree"><div class="loading">Loading...</div></div>
   <div style="display:flex;gap:4px;padding:4px 12px">
     <div class="add-folder-btn" style="flex:1;padding:6px 8px" onclick="startAddTopic()">+ Topic</div>
@@ -519,6 +551,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var
   <div id="pipelineView" style="display:none;flex:1;overflow:auto;padding:24px"></div>
   <div id="principlesView" style="display:none;flex:1;overflow:auto;padding:32px 24px"></div>
   <div id="stageView" class="stage-view"></div>
+  <div id="operationsView" style="display:none;flex:1;overflow:auto;padding:32px 24px"></div>
   <div class="action-bar" id="actionBar" style="display:none"></div>
   <div class="input-area">
     <textarea class="input-field" id="inputField" placeholder="Add context, decide, give feedback..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
@@ -672,6 +705,7 @@ let currentFolder = null;
 let topicsCache = {};
 let foldersCache = [];
 let draggedTopicId = null;
+let sortMode = 'folders'; // 'folders' or 'priority'
 
 // ── INIT ──
 async function init() {
@@ -722,6 +756,36 @@ async function loadPipeline() {
       <div class="pipe-bar"><div class="pipe-fill" style="width:${pct}%"></div></div>
     </div>`;
   }).join('');
+  
+  // Executive Board FIRST, then pipeline stages
+  el.innerHTML = `
+  <div class="pipe-stage" onclick="showOperations()" style="margin-bottom:4px">
+    <div class="pipe-icon" style="background:rgba(212,168,83,0.15);color:#d4a853">E</div>
+    <div class="pipe-info">
+      <div class="pipe-name" style="color:#d4a853">Executive Board</div>
+      <div class="pipe-count" id="ops-score">Score: --</div>
+    </div>
+  </div>
+  <div style="border-bottom:1px solid var(--border);margin:4px 20px 8px"></div>` + el.innerHTML + `
+  <div class="sys-indicator" id="sysIndicator" onclick="showOperations()">
+    <div class="sys-dot" id="sysDot" style="background:#4aa088"></div>
+    <span id="sysLabel">All systems nominal</span>
+  </div>`;
+  
+  // Load today's score for the Operations item
+  loadOperationsScore();
+}
+
+async function loadOperationsScore() {
+  try {
+    const data = await fetch(API + '/standup/today').then(r => r.json());
+    const scoreEl = document.getElementById('ops-score');
+    if (scoreEl && data.score) {
+      scoreEl.textContent = `Score: ${data.score.score_current}`;
+    }
+  } catch (e) {
+    console.error('Failed to load operations score:', e);
+  }
 }
 
 let activeStageFilter = null;
@@ -783,6 +847,387 @@ function hideStageView() {
   ctx.style.display = '';
   
   if (currentTopic) selectTopic(currentTopic);
+}
+
+// ── OPERATIONS VIEW ──
+let operationsViewOpen = false;
+
+function showOperations() {
+  // Hide all other views
+  if (pipelineViewOpen) { pipelineViewOpen = false; document.getElementById('pipelineView').style.display = 'none'; }
+  if (principlesViewOpen) { principlesViewOpen = false; document.getElementById('principlesView').style.display = 'none'; }
+  if (stageViewOpen) { stageViewOpen = false; hideStageView(); document.querySelectorAll('.pipe-stage').forEach(s=>s.classList.remove('active')); activeStageFilter = null; }
+  
+  const conv = document.getElementById('conv');
+  const opsView = document.getElementById('operationsView');
+  const steps = document.getElementById('stepsBar');
+  const actionBar = document.getElementById('actionBar');
+  const input = document.querySelector('.input-area');
+  const ctx = document.getElementById('ctxPanel');
+  
+  conv.style.display = 'none';
+  if (steps) steps.style.display = 'none';
+  if (actionBar) actionBar.style.display = 'none';
+  if (input) input.style.display = 'none';
+  ctx.style.display = 'none';
+  opsView.style.display = 'flex';
+  
+  operationsViewOpen = true;
+  renderOperationsView();
+}
+
+function hideOperations() {
+  const conv = document.getElementById('conv');
+  const opsView = document.getElementById('operationsView');
+  const steps = document.getElementById('stepsBar');
+  const input = document.querySelector('.input-area');
+  const ctx = document.getElementById('ctxPanel');
+  
+  opsView.style.display = 'none';
+  conv.style.display = '';
+  if (steps) steps.style.display = '';
+  if (input) input.style.display = '';
+  ctx.style.display = '';
+  
+  operationsViewOpen = false;
+  if (currentTopic) selectTopic(currentTopic);
+}
+
+async function renderOperationsView() {
+  const view = document.getElementById('operationsView');
+  view.innerHTML = '<div class="loading">Loading Executive Board data...</div>';
+  
+  try {
+    const kpiData = await fetch(API + '/executive/kpis').then(r => r.json());
+    const standupData = await fetch(API + '/standup/today').then(r => r.json());
+    const history = await fetch(API + '/standup/history?days=14').then(r => r.json());
+    
+    const strategic = kpiData.strategic;
+    const operational = kpiData.operational;
+    const agents = kpiData.agents;
+    const goals = kpiData.goals;
+    
+    // Update sidebar system health indicator
+    const sysDot = document.getElementById('sysDot');
+    const sysLabel = document.getElementById('sysLabel');
+    if (sysDot && sysLabel && kpiData.health) {
+      const issues = kpiData.health.issues;
+      if (issues === 0) { sysDot.style.background = '#4aa088'; sysLabel.textContent = 'All systems nominal'; }
+      else if (issues === 1) { sysDot.style.background = '#d4a853'; sysLabel.textContent = '1 issue detected'; }
+      else { sysDot.style.background = '#c47070'; sysLabel.textContent = issues + ' issues detected'; }
+    }
+    
+    const score = standupData.score;
+    const tasks = standupData.tasks;
+    
+    // Helper: format revenue
+    const formatRevenue = (amount) => {
+      return '€' + amount.toLocaleString('de-DE', {maximumFractionDigits: 0});
+    };
+    
+    // Helper: KPI color
+    const kpiColor = (current, target) => {
+      const pct = current / target;
+      return pct >= 1 ? '#4aa088' : pct >= 0.5 ? '#d4a853' : '#c47070';
+    };
+    
+    // Helper: goal status
+    const goalStatus = (goal) => {
+      const now = new Date();
+      const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      const dayOfMonth = now.getDate();
+      const expectedProgress = dayOfMonth / daysInMonth;
+      const actualProgress = goal.current_value / goal.target_value;
+      
+      if (actualProgress >= 1) return {label: 'DONE', color: '#4aa088'};
+      if (actualProgress >= expectedProgress) return {label: 'ON TRACK', color: '#4aa088'};
+      if (goal.current_value === 0 && dayOfMonth > 10) return {label: 'AT RISK', color: '#c47070'};
+      return {label: 'BEHIND', color: '#d4a853'};
+    };
+    
+    // Helper: last active
+    const formatLastActive = (dateStr) => {
+      if (!dateStr) return '—';
+      const diff = Math.floor((new Date() - new Date(dateStr)) / (1000 * 60 * 60 * 24));
+      if (diff === 0) return 'today';
+      if (diff === 1) return 'yesterday';
+      if (diff < 7) return `${diff} days ago`;
+      return '7+ days';
+    };
+    
+    const monthName = new Date().toLocaleDateString('en-US', { month: 'long' }).toUpperCase();
+    const year = new Date().getFullYear();
+    
+    view.innerHTML = `
+      <div style="max-width:900px;margin:0 auto;width:100%">
+        
+        <!-- Header -->
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px">
+          <div>
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:4px">AINARY VENTURES</div>
+            <h2 style="font-size:20px;font-weight:700;letter-spacing:-0.3px">Executive Board</h2>
+          </div>
+          <div style="text-align:right;font-size:10px;color:var(--text-dim)">
+            ${monthName} ${year}
+          </div>
+        </div>
+        
+        <div style="border-bottom:2px solid var(--border);margin-bottom:24px"></div>
+        
+        <!-- Section 1: Strategic KPIs -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-bottom:32px">
+          ${['revenue', 'sends', 'commitments', 'team_health'].map(key => {
+            const kpi = strategic[key];
+            const color = kpiColor(kpi.current, kpi.target);
+            const pct = Math.round((kpi.current / kpi.target) * 100);
+            const displayValue = key === 'revenue' ? formatRevenue(kpi.current) : 
+                                 key === 'commitments' ? kpi.current + '%' : kpi.current;
+            const targetLabel = key === 'revenue' ? formatRevenue(kpi.target) : 
+                               key === 'commitments' ? kpi.target + '%' : kpi.target + '/wk';
+            return `
+              <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:20px;text-align:center">
+                <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:12px">${kpi.label}</div>
+                <div style="font-size:36px;font-weight:700;color:${color};line-height:1;margin-bottom:12px">${displayValue}</div>
+                <div style="height:3px;background:var(--surface-2);border-radius:2px;overflow:hidden;margin-bottom:8px">
+                  <div style="height:100%;width:${Math.min(pct, 100)}%;background:${color};border-radius:2px"></div>
+                </div>
+                <div style="font-size:10px;color:var(--text-dim)">target: ${targetLabel}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+        
+        <!-- Section 2: Operational KPIs -->
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:8px">OPERATIONAL</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:32px;display:flex;gap:20px;flex-wrap:wrap">
+          <span>Findings/Week: <strong>${operational.findings_week}</strong></span>
+          <span>Pipeline: 
+            <span style="color:#8e8e8e">${operational.pipeline.research}R</span> → 
+            <span style="color:#6b8aab">${operational.pipeline.systems}S</span> → 
+            <span style="color:#9b8ec4">${operational.pipeline.content}C</span> → 
+            <span style="color:#d4a853">${operational.pipeline.revenue}€</span>
+          </span>
+          <span>Outcomes/Month: <strong>${operational.outcomes_month}</strong></span>
+          <span>Active: <strong>${operational.active_agents}/${operational.total_agents}</strong> Agents</span>
+        </div>
+        
+        <!-- Section 3: Monthly Goals -->
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:12px">${monthName} GOALS</div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:32px">
+          ${goals.length > 0 ? goals.map(goal => {
+            const status = goalStatus(goal);
+            const progress = goal.target_value > 0 ? (goal.current_value / goal.target_value) * 100 : 0;
+            const progressLabel = `${goal.current_value}/${goal.target_value}`;
+            return `
+              <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px">
+                <div style="flex:1">${goal.description}</div>
+                <button class="goal-val-btn" onclick="updateGoalValue(${goal.id},${goal.current_value - 1})">−</button>
+                <div style="font-size:11px;font-weight:600;color:var(--text-muted);width:40px;text-align:center">${progressLabel}</div>
+                <button class="goal-val-btn" onclick="updateGoalValue(${goal.id},${goal.current_value + 1})">+</button>
+                <div style="font-size:9px;font-weight:600;padding:2px 8px;border-radius:3px;background:${status.color}20;color:${status.color};width:80px;text-align:center">${status.label}</div>
+                <div style="width:80px;height:3px;background:var(--surface-2);border-radius:2px;overflow:hidden">
+                  <div style="height:100%;width:${Math.min(progress, 100)}%;background:${status.color};border-radius:2px"></div>
+                </div>
+              </div>
+            `;
+          }).join('') : '<div style="text-align:center;padding:20px;color:var(--text-dim)">No goals set for this month</div>'}
+          <div style="padding:8px 16px;border-top:1px solid var(--border)">
+            <input class="goal-add-input" placeholder="+ Add goal (Enter to save)" onkeydown="if(event.key==='Enter')addGoalInline(this)">
+          </div>
+        </div>
+        
+        <!-- Section 4: Team Performance -->
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:12px">TEAM</div>
+        <div style="border-top:2px solid var(--border);margin-bottom:8px"></div>
+        <div style="margin-bottom:32px">
+          ${agents.sort((a,b) => b.score - a.score).map(agent => {
+            const barColor = agent.score >= 60 ? '#4aa088' : agent.score >= 30 ? '#d4a853' : '#c47070';
+            const lastActive = formatLastActive(agent.last_active);
+            const isActive = agent.last_active && (new Date() - new Date(agent.last_active)) < 7 * 24 * 60 * 60 * 1000;
+            const statusColor = isActive ? 'var(--text-muted)' : '#c47070';
+            const statusText = isActive ? 'Active' : 'Inactive';
+            return `
+              <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+                <div style="width:100px;font-size:11px;font-weight:600">${agent.name}</div>
+                <div style="flex:1;font-size:10px;color:var(--text-dim)">${agent.role}</div>
+                <div style="width:40px;font-size:11px;font-weight:600;text-align:right">${agent.score}</div>
+                <div style="width:80px;font-size:10px;color:var(--text-dim);text-align:right">${lastActive}</div>
+                <div style="width:150px;height:3px;background:var(--surface-2);border-radius:2px;overflow:hidden">
+                  <div style="height:100%;width:${agent.score}%;background:${barColor};border-radius:2px"></div>
+                </div>
+                <div style="width:60px;font-size:10px;color:${statusColor};text-align:right">${statusText}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+        
+        <!-- Section 5: System Health -->
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:12px">SYSTEM HEALTH</div>
+        <div class="exec-health" style="margin-bottom:32px">
+          ${(kpiData.health ? kpiData.health.checks : []).map(h => {
+            const dotColor = h.status === 'ok' ? '#4aa088' : h.status === 'warning' ? '#d4a853' : '#c47070';
+            return `
+              <div class="exec-health-row">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div class="exec-health-dot" style="background:${dotColor}"></div>
+                  <span>${h.name}</span>
+                </div>
+                <span style="color:var(--text-dim)">${h.value}</span>
+              </div>`;
+          }).join('')}
+        </div>
+        
+        <!-- Section 6: Daily Standup (existing) -->
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:12px">TODAY</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px">
+          <div>
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)">Committed Tasks</div>
+            <div id="committedTasksList" style="display:flex;flex-direction:column;gap:8px">
+              ${tasks.filter(t => t.type === 'committed').map(t => `
+                <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:6px">
+                  <input type="checkbox" ${t.status === 'done' ? 'checked' : ''} 
+                         onchange="toggleTaskStatus(${t.id}, this.checked ? 'done' : 'pending')"
+                         style="width:16px;height:16px;cursor:pointer">
+                  <div style="flex:1;font-size:12px;${t.status === 'done' ? 'text-decoration:line-through;color:var(--text-dim)' : ''}">${t.description}</div>
+                  ${t.is_send ? '<span style="font-size:9px;padding:2px 6px;background:rgba(212,168,83,0.15);color:var(--warm);border-radius:3px;font-weight:600">SEND</span>' : ''}
+                </div>
+              `).join('')}
+            </div>
+            <div style="margin-top:12px">
+              <input type="text" id="newTaskInput" placeholder="Add committed task..." 
+                     style="width:100%;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--text);font-family:inherit"
+                     onkeydown="if(event.key==='Enter')addTask()">
+            </div>
+          </div>
+          
+          <div>
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)">Score: ${score.score_current}</div>
+            <div style="display:flex;gap:8px;align-items:flex-end;height:140px;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:6px">
+              ${history.slice(-7).map(day => {
+                const barColor = day.score_current >= 100 ? '#4aa088' : day.score_current >= 70 ? '#d4a853' : '#c47070';
+                const height = Math.max(5, (day.score_current / 120) * 100);
+                const date = new Date(day.date).toLocaleDateString('de-DE', { weekday: 'short' });
+                return `
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+                    <div style="font-size:9px;font-weight:600;color:var(--text-muted)">${day.score_current}</div>
+                    <div style="width:100%;background:${barColor};border-radius:3px 3px 0 0;height:${height}%"></div>
+                    <div style="font-size:8px;color:var(--text-dim)">${date}</div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  } catch (e) {
+    console.error('Failed to load executive board:', e);
+    view.innerHTML = `<div style="text-align:center;padding:60px;color:var(--danger)">Failed to load executive board data</div>`;
+  }
+}
+
+function addGoal() {
+  const description = prompt('Goal description:');
+  if (!description) return;
+  const target = parseInt(prompt('Target value:', '1'));
+  if (!target || target < 1) return;
+  
+  fetch(API + '/executive/goals', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ description, target_value: target, current_value: 0 })
+  })
+  .then(() => renderOperationsView())
+  .catch(e => console.error('Failed to add goal:', e));
+}
+
+function addGoalInline(input) {
+  const desc = input.value.trim();
+  if (!desc) return;
+  const target = parseInt(prompt('Target value:', '1'));
+  if (!target || target < 1) return;
+  input.value = '';
+  fetch(API + '/executive/goals', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ description: desc, target_value: target, current_value: 0 })
+  }).then(() => renderOperationsView()).catch(e => console.error(e));
+}
+
+function updateGoalValue(goalId, newValue) {
+  if (newValue < 0) newValue = 0;
+  fetch(API + '/executive/goals/' + goalId, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ current_value: newValue })
+  }).then(() => renderOperationsView()).catch(e => console.error(e));
+}
+
+async function toggleTaskStatus(taskId, status) {
+  try {
+    await fetch(API + `/standup/tasks/${taskId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    });
+    
+    // Recalculate score
+    await fetch(API + '/standup/recalc', { method: 'PUT' });
+    
+    // Reload view
+    renderOperationsView();
+    loadOperationsScore();
+  } catch (e) {
+    console.error('Failed to update task:', e);
+  }
+}
+
+async function addTask() {
+  const input = document.getElementById('newTaskInput');
+  const description = input.value.trim();
+  if (!description) return;
+  
+  const isSend = description.toLowerCase().includes('send') || description.toLowerCase().includes('email') || description.toLowerCase().includes('pitch');
+  
+  try {
+    await fetch(API + '/standup/tasks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ description, is_send: isSend ? 1 : 0 })
+    });
+    
+    input.value = '';
+    renderOperationsView();
+    loadOperationsScore();
+  } catch (e) {
+    console.error('Failed to add task:', e);
+  }
+}
+
+async function addExtra() {
+  const input = document.getElementById('newExtraInput');
+  const description = input.value.trim();
+  if (!description) return;
+  
+  const isSend = description.toLowerCase().includes('send') || description.toLowerCase().includes('email') || description.toLowerCase().includes('pitch');
+  
+  try {
+    await fetch(API + '/standup/extra', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ description, is_send: isSend ? 1 : 0 })
+    });
+    
+    input.value = '';
+    
+    // Recalculate score
+    await fetch(API + '/standup/recalc', { method: 'PUT' });
+    
+    renderOperationsView();
+    loadOperationsScore();
+  } catch (e) {
+    console.error('Failed to add extra:', e);
+  }
 }
 
 // ── STAGE DETAIL VIEW ──
@@ -1184,7 +1629,37 @@ async function loadFolderTree() {
     ? topics.filter(t => t.stage === activeStageFilter) 
     : topics;
   
-  // Group topics by folder
+  const el = document.getElementById('folderTree');
+  let html = '';
+  
+  // Priority sorting mode
+  if (sortMode === 'priority') {
+    const priorityOrder = ['NOW', 'HIGH', 'NORMAL', 'LOW'];
+    const topicsByPriority = {NOW: [], HIGH: [], NORMAL: [], LOW: []};
+    
+    filteredTopics.forEach(t => {
+      const priority = t.priority || 'NORMAL';
+      if (topicsByPriority[priority]) {
+        topicsByPriority[priority].push(t);
+      } else {
+        topicsByPriority['NORMAL'].push(t);
+      }
+    });
+    
+    // Render groups
+    priorityOrder.forEach(priority => {
+      const items = topicsByPriority[priority];
+      if (items.length > 0) {
+        html += `<div class="priority-group-header">── ${priority} ──</div>`;
+        items.forEach(t => { html += renderTopicItem(t); });
+      }
+    });
+    
+    el.innerHTML = html;
+    return;
+  }
+  
+  // Folder sorting mode (original logic)
   const topicsByFolder = {};
   const unfiled = [];
   filteredTopics.forEach(t => {
@@ -1201,9 +1676,6 @@ async function loadFolderTree() {
   // Build tree (only root folders for now, nested later)
   const rootFolders = folders.filter(f => !f.parent_id).sort((a,b) => a.position - b.position);
   const childFolders = folders.filter(f => f.parent_id);
-  
-  const el = document.getElementById('folderTree');
-  let html = '';
   
   function renderFolder(f, depth=0) {
     const items = topicsByFolder[f.id] || [];
@@ -1247,14 +1719,39 @@ async function loadFolderTree() {
 
 function renderTopicItem(t) {
   const isActive = currentTopic === t.id;
+  const priority = t.priority || 'NORMAL';
+  let priorityBadge = '';
+  if (priority === 'NOW') {
+    priorityBadge = '<span class="priority-badge NOW">NOW</span>';
+  } else if (priority === 'HIGH') {
+    priorityBadge = '<span class="priority-badge HIGH">HIGH</span>';
+  } else if (priority === 'LOW') {
+    priorityBadge = '<span class="priority-badge LOW">LOW</span>';
+  }
+  
   return `<div class="folder-topic${isActive?' active':''}" 
               draggable="true" data-topic-id="${t.id}"
               ondragstart="topicDragStart(event,'${t.id}')" ondragend="topicDragEnd(event)"
               onclick="selectTopic('${t.id}')">
     <div class="folder-topic-dot${t.progress<20?' unread':''}"></div>
     <span class="folder-topic-name">${t.name}</span>
+    ${priorityBadge}
     <span class="folder-topic-pct">${t.progress}%</span>
   </div>`;
+}
+
+// ── SORT MODE ──
+function setSortMode(mode) {
+  sortMode = mode;
+  document.getElementById('sortFolders').classList.toggle('active', mode === 'folders');
+  document.getElementById('sortPriority').classList.toggle('active', mode === 'priority');
+  loadFolderTree();
+}
+
+// ── PRIORITY ──
+function togglePriorityExplanation() {
+  const el = document.getElementById('priorityExplanation');
+  if (el) el.classList.toggle('open');
 }
 
 // ── FOLDER ACTIONS ──
@@ -1348,6 +1845,7 @@ async function selectTopic(id) {
   // Close special views
   if (principlesViewOpen) { principlesViewOpen = false; const prv = document.getElementById('principlesView'); if(prv) prv.style.display = 'none'; document.querySelector('.input-area').style.display = ''; document.getElementById('conv').style.display = ''; document.getElementById('ctxPanel').style.display = ''; }
   if (stageViewOpen) { stageViewOpen = false; hideStageView(); document.querySelectorAll('.pipe-stage').forEach(s=>s.classList.remove('active')); activeStageFilter = null; }
+  if (operationsViewOpen) { hideOperations(); }
   // Highlight in list
   document.querySelectorAll('.topic-item').forEach(t=>t.classList.remove('active'));
   const items = document.querySelectorAll('.topic-item');
@@ -1358,9 +1856,33 @@ async function selectTopic(id) {
   const meta = JSON.parse(topic.meta||'{}');
   
   // Header
+  const priority = topic.priority || 'NORMAL';
+  const priorityClass = priority === 'NOW' ? 'NOW' : priority === 'HIGH' ? 'HIGH' : priority === 'LOW' ? 'LOW' : '';
+  const priorityBadge = priorityClass ? `<span class="priority-badge-lg ${priorityClass}">${priority}</span>` : '';
+  
   document.getElementById('topicTitle').innerHTML = topic.name + ' <span id="preflightBadge"></span>';
-  document.getElementById('topicSub').textContent = 
-    topic.stage + (meta.contact?' · '+meta.contact:'') + (meta.email?' · '+meta.email:'') + (meta.potential?' · '+meta.potential:'');
+  
+  let subHtml = topic.stage + (meta.contact?' · '+meta.contact:'') + (meta.email?' · '+meta.email:'') + (meta.potential?' · '+meta.potential:'');
+  
+  // Add priority display
+  if (priority && priority !== 'NORMAL') {
+    const confidence = topic.priority_confidence || 50;
+    const reason = topic.priority_reason || 'Auto-calculated';
+    subHtml += `<div class="topic-priority" onclick="togglePriorityExplanation()">
+      ${priorityBadge}
+      <span class="priority-conf">Confidence: ${confidence}%</span>
+    </div>
+    <div class="priority-explanation" id="priorityExplanation">
+      <div style="font-size:11px;color:var(--text-muted);padding:8px 0;border-bottom:1px solid var(--border);margin-bottom:8px">
+        ${reason}
+      </div>
+      <div style="font-size:10px;color:var(--text-dim)">
+        Click priority to override manually
+      </div>
+    </div>`;
+  }
+  
+  document.getElementById('topicSub').innerHTML = subHtml;
   
   // Load pre-flight check
   loadPreflight(topic.id);
@@ -2369,6 +2891,9 @@ document.addEventListener('keydown', e => {
   // Cmd+I: Principles View
   if ((e.metaKey || e.ctrlKey) && e.key === 'i') { e.preventDefault(); togglePrinciplesView(); return; }
   
+  // Cmd+O: Operations
+  if ((e.metaKey || e.ctrlKey) && e.key === 'o') { e.preventDefault(); showOperations(); return; }
+  
   // Cmd+N: New Topic
   if ((e.metaKey || e.ctrlKey) && e.key === 'n') { e.preventDefault(); startAddTopic(); return; }
   
@@ -3170,6 +3695,11 @@ function connectWS() {
     
     if (event.type === 'trust_update') {
       scheduleReload('trust');
+    }
+    
+    if (event.type === 'standup_update') {
+      if (operationsViewOpen) renderOperationsView();
+      loadOperationsScore();
     }
     
     if (event.type === 'finding_created' || event.type === 'finding_updated') {

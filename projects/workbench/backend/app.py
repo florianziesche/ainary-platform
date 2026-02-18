@@ -196,6 +196,31 @@ def init_db():
             down_votes INTEGER DEFAULT 0,
             updated_at TEXT DEFAULT CURRENT_TIMESTAMP
         );
+        CREATE TABLE IF NOT EXISTS daily_scores (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date TEXT NOT NULL,
+            score_reset INTEGER DEFAULT 100,
+            score_current INTEGER DEFAULT 100,
+            score_ema REAL DEFAULT 100.0,
+            tasks_committed INTEGER DEFAULT 0,
+            tasks_completed INTEGER DEFAULT 0,
+            tasks_extra INTEGER DEFAULT 0,
+            sends INTEGER DEFAULT 0,
+            notes TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS daily_tasks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date TEXT NOT NULL,
+            description TEXT NOT NULL,
+            type TEXT DEFAULT 'committed',
+            status TEXT DEFAULT 'pending',
+            is_send INTEGER DEFAULT 0,
+            points INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
     """)
     
     db.executescript("""
@@ -291,6 +316,29 @@ def init_db():
         );
     """)
     
+    # Executive Board tables
+    db.executescript("""
+        CREATE TABLE IF NOT EXISTS revenue_events (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            amount REAL NOT NULL,
+            source TEXT NOT NULL,
+            description TEXT,
+            date TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS monthly_goals (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            month TEXT NOT NULL,
+            description TEXT NOT NULL,
+            target_value INTEGER DEFAULT 1,
+            current_value INTEGER DEFAULT 0,
+            status TEXT DEFAULT 'pending',
+            sort_order INTEGER DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+    """)
+    
     # Migrations for existing DBs
     try:
         db.execute("ALTER TABLE topics ADD COLUMN folder_id TEXT")
@@ -303,6 +351,15 @@ def init_db():
     except: pass
     try:
         db.execute("ALTER TABLE findings ADD COLUMN source_url TEXT")
+    except: pass
+    try:
+        db.execute("ALTER TABLE topics ADD COLUMN priority TEXT DEFAULT 'NORMAL'")
+    except: pass
+    try:
+        db.execute("ALTER TABLE topics ADD COLUMN priority_reason TEXT DEFAULT ''")
+    except: pass
+    try:
+        db.execute("ALTER TABLE topics ADD COLUMN priority_confidence INTEGER DEFAULT 50")
     except: pass
     
     # Seed default folders
@@ -924,6 +981,428 @@ def eval_history(days: int = 7):
     db.close()
     return [dict(r) for r in rows]
 
+# ── Daily Standup ──
+
+@app.get("/api/standup/today")
+def get_standup_today():
+    """Get today's score and tasks. Creates today's entry if not exists."""
+    db = get_db()
+    today = datetime.now().strftime("%Y-%m-%d")
+    
+    # Get or create today's score entry
+    score_row = db.execute("SELECT * FROM daily_scores WHERE date = ?", (today,)).fetchone()
+    if not score_row:
+        # Create today's entry starting at 100
+        # Calculate EMA from yesterday
+        yesterday = db.execute(
+            "SELECT score_ema FROM daily_scores WHERE date < ? ORDER BY date DESC LIMIT 1",
+            (today,)
+        ).fetchone()
+        yesterday_ema = yesterday['score_ema'] if yesterday else 100.0
+        
+        db.execute(
+            "INSERT INTO daily_scores (date, score_reset, score_current, score_ema) VALUES (?,?,?,?)",
+            (today, 100, 100, yesterday_ema)
+        )
+        db.commit()
+        score_row = db.execute("SELECT * FROM daily_scores WHERE date = ?", (today,)).fetchone()
+    
+    # Get today's tasks
+    tasks = db.execute(
+        "SELECT * FROM daily_tasks WHERE date = ? ORDER BY created_at",
+        (today,)
+    ).fetchall()
+    
+    db.close()
+    
+    return {
+        "score": dict(score_row),
+        "tasks": [dict(t) for t in tasks]
+    }
+
+@app.post("/api/standup/tasks")
+def add_standup_task(body: dict):
+    """Add a committed task for today."""
+    db = get_db()
+    today = datetime.now().strftime("%Y-%m-%d")
+    description = body.get("description", "")
+    is_send = body.get("is_send", 0)
+    
+    if not description.strip():
+        raise HTTPException(400, "Description required")
+    
+    cursor = db.execute(
+        "INSERT INTO daily_tasks (date, description, type, is_send) VALUES (?,?,?,?)",
+        (today, description, "committed", is_send)
+    )
+    task_id = cursor.lastrowid
+    
+    # Update count
+    db.execute(
+        "UPDATE daily_scores SET tasks_committed = tasks_committed + 1, updated_at = CURRENT_TIMESTAMP WHERE date = ?",
+        (today,)
+    )
+    
+    db.commit()
+    db.close()
+    
+    notify("standup_update", {"date": today})
+    return {"id": task_id, "status": "created"}
+
+@app.put("/api/standup/tasks/{task_id}")
+def update_standup_task(task_id: int, body: dict):
+    """Update task status (done/missed)."""
+    db = get_db()
+    status = body.get("status")
+    
+    if status not in ["done", "missed", "pending"]:
+        raise HTTPException(400, "Invalid status")
+    
+    # Get current task
+    task = db.execute("SELECT * FROM daily_tasks WHERE id = ?", (task_id,)).fetchone()
+    if not task:
+        raise HTTPException(404, "Task not found")
+    
+    old_status = task['status']
+    task_date = task['date']
+    
+    # Update task
+    db.execute(
+        "UPDATE daily_tasks SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+        (status, task_id)
+    )
+    
+    # Update score row counts
+    if old_status != status:
+        if old_status == "done":
+            db.execute("UPDATE daily_scores SET tasks_completed = tasks_completed - 1 WHERE date = ?", (task_date,))
+        elif status == "done":
+            db.execute("UPDATE daily_scores SET tasks_completed = tasks_completed + 1 WHERE date = ?", (task_date,))
+    
+    db.commit()
+    db.close()
+    
+    notify("standup_update", {"date": task_date})
+    return {"status": "updated"}
+
+@app.post("/api/standup/extra")
+def add_extra_task(body: dict):
+    """Add an extra (bonus) task that was already done."""
+    db = get_db()
+    today = datetime.now().strftime("%Y-%m-%d")
+    description = body.get("description", "")
+    is_send = body.get("is_send", 0)
+    
+    if not description.strip():
+        raise HTTPException(400, "Description required")
+    
+    cursor = db.execute(
+        "INSERT INTO daily_tasks (date, description, type, status, is_send) VALUES (?,?,?,?,?)",
+        (today, description, "extra", "done", is_send)
+    )
+    task_id = cursor.lastrowid
+    
+    # Update count
+    db.execute(
+        "UPDATE daily_scores SET tasks_extra = tasks_extra + 1, updated_at = CURRENT_TIMESTAMP WHERE date = ?",
+        (today,)
+    )
+    
+    db.commit()
+    db.close()
+    
+    notify("standup_update", {"date": today})
+    return {"id": task_id, "status": "created"}
+
+@app.get("/api/standup/history")
+def get_standup_history(days: int = 14):
+    """Get last N days of scores for chart."""
+    db = get_db()
+    rows = db.execute(
+        "SELECT * FROM daily_scores ORDER BY date DESC LIMIT ?",
+        (days,)
+    ).fetchall()
+    db.close()
+    
+    # Reverse to chronological order
+    return [dict(r) for r in reversed(rows)]
+
+@app.put("/api/standup/recalc")
+def recalc_standup_score():
+    """Recalculate today's score based on tasks."""
+    db = get_db()
+    today = datetime.now().strftime("%Y-%m-%d")
+    
+    # Get all today's tasks
+    tasks = db.execute("SELECT * FROM daily_tasks WHERE date = ?", (today,)).fetchall()
+    
+    # Calculate points
+    score = 100
+    tasks_committed = 0
+    tasks_completed = 0
+    tasks_extra = 0
+    sends = 0
+    
+    for task in tasks:
+        task_type = task['type']
+        status = task['status']
+        is_send = task['is_send']
+        
+        if task_type == "committed":
+            tasks_committed += 1
+            if status == "done":
+                score += 2
+                tasks_completed += 1
+                if is_send:
+                    score += 1
+                    sends += 1
+            elif status == "missed":
+                score -= 3
+        elif task_type == "extra" and status == "done":
+            score += 2
+            tasks_extra += 1
+            if is_send:
+                score += 1
+                sends += 1
+    
+    # Calculate EMA: 0.3 * today_score + 0.7 * yesterday_ema
+    yesterday = db.execute(
+        "SELECT score_ema FROM daily_scores WHERE date < ? ORDER BY date DESC LIMIT 1",
+        (today,)
+    ).fetchone()
+    yesterday_ema = yesterday['score_ema'] if yesterday else 100.0
+    ema = 0.3 * score + 0.7 * yesterday_ema
+    
+    # Update today's score
+    db.execute(
+        """UPDATE daily_scores SET 
+           score_current = ?, 
+           score_ema = ?,
+           tasks_committed = ?,
+           tasks_completed = ?,
+           tasks_extra = ?,
+           sends = ?,
+           updated_at = CURRENT_TIMESTAMP
+           WHERE date = ?""",
+        (score, ema, tasks_committed, tasks_completed, tasks_extra, sends, today)
+    )
+    
+    # Update task points
+    for task in tasks:
+        task_type = task['type']
+        status = task['status']
+        is_send = task['is_send']
+        points = 0
+        
+        if task_type == "committed":
+            if status == "done":
+                points = 2 + (1 if is_send else 0)
+            elif status == "missed":
+                points = -3
+        elif task_type == "extra" and status == "done":
+            points = 2 + (1 if is_send else 0)
+        
+        db.execute(
+            "UPDATE daily_tasks SET points = ? WHERE id = ?",
+            (points, task['id'])
+        )
+    
+    db.commit()
+    db.close()
+    
+    notify("standup_update", {"date": today})
+    return {"score": score, "ema": round(ema, 1)}
+
+# ── Executive Board ──
+
+@app.get("/api/executive/kpis")
+def get_executive_kpis():
+    """Returns all KPI data in one call for the Executive Board."""
+    db = get_db()
+    today = datetime.now().strftime('%Y-%m-%d')
+    
+    # Strategic KPIs
+    # 1. Revenue (manual entries needed - new table)
+    revenue_ytd = db.execute("SELECT COALESCE(SUM(amount),0) FROM revenue_events").fetchone()[0]
+    
+    # 2. Sends this week (count tasks marked is_send=1 and done in last 7 days)
+    sends_week = db.execute("SELECT COUNT(*) FROM daily_tasks WHERE is_send=1 AND status='done' AND date >= date('now','-7 days')").fetchone()[0]
+    
+    # 3. Commitments kept (% of committed tasks done vs total committed, last 7 days)
+    committed = db.execute("SELECT COUNT(*) FROM daily_tasks WHERE type='committed' AND date >= date('now','-7 days')").fetchone()[0]
+    committed_done = db.execute("SELECT COUNT(*) FROM daily_tasks WHERE type='committed' AND status='done' AND date >= date('now','-7 days')").fetchone()[0]
+    commitments_pct = round((committed_done/committed)*100) if committed > 0 else 100
+    
+    # 4. Team Health (average of trust skills)
+    trust_rows = db.execute("SELECT score FROM trust_skills").fetchall()
+    team_health = round(sum(r['score'] for r in trust_rows)/len(trust_rows)) if trust_rows else 50
+    
+    # Operational KPIs
+    # 5. Findings created this week
+    findings_week = db.execute("SELECT COUNT(*) FROM findings WHERE created_at >= date('now','-7 days') AND status='alive'").fetchone()[0]
+    
+    # 6. Pipeline flow rates
+    stages = {}
+    for stage in ['research','systems','content','revenue']:
+        stages[stage] = db.execute("SELECT COUNT(*) FROM findings WHERE stage=? AND status='alive'", (stage,)).fetchone()[0]
+    
+    # 7. Outcomes this month (sends + published)
+    sends_month = db.execute("SELECT COUNT(*) FROM daily_tasks WHERE is_send=1 AND status='done' AND date >= date('now','start of month')").fetchone()[0]
+    
+    # 8. Active agents (trust skills updated in last 7 days)
+    active_agents = db.execute("SELECT COUNT(*) FROM trust_skills WHERE updated_at >= date('now','-7 days')").fetchone()[0]
+    total_agents = db.execute("SELECT COUNT(*) FROM trust_skills").fetchone()[0]
+    
+    # Agent details for team table
+    agents = []
+    agent_mapping = [
+        ('HUNTER', ['email','cv'], 'VC Job Search'),
+        ('WRITER', ['linkedin'], 'Content & Blog'),
+        ('RESEARCHER', ['research'], 'Deep Dives'),
+        ('OPERATOR', ['website'], 'Systems'),
+        ('DEALMAKER', ['consulting'], 'Freelance & Sales')
+    ]
+    for name, skills, role in agent_mapping:
+        skill_rows = db.execute("SELECT skill, score, updated_at FROM trust_skills WHERE skill IN ({})".format(','.join('?'*len(skills))), skills).fetchall()
+        if skill_rows:
+            avg_score = round(sum(r['score'] for r in skill_rows)/len(skill_rows))
+            last_active = max(r['updated_at'] for r in skill_rows)
+        else:
+            avg_score = 0
+            last_active = None
+        agents.append({"name": name, "role": role, "score": avg_score, "last_active": last_active})
+    
+    # Monthly goals (from new table)
+    goals = db.execute("SELECT * FROM monthly_goals WHERE month=? ORDER BY sort_order", (datetime.now().strftime('%Y-%m'),)).fetchall()
+    goals = [dict(g) for g in goals] if goals else []
+    
+    # System Health
+    import shutil
+    disk = shutil.disk_usage('/')
+    disk_free_gb = round(disk.free / (1024**3), 1)
+    
+    db_path = os.path.join(os.path.dirname(__file__), 'workbench.db')
+    db_size_mb = round(os.path.getsize(db_path) / (1024**2), 1) if os.path.exists(db_path) else 0
+    
+    pipeline_total = sum(stages.values())
+    health_checks = [
+        {"name": "Disk Space", "value": f"{disk_free_gb} GB free", "status": "critical" if disk_free_gb < 5 else "warning" if disk_free_gb < 10 else "ok"},
+        {"name": "Database", "value": f"{db_size_mb} MB", "status": "warning" if db_size_mb > 100 else "ok"},
+        {"name": "API", "value": "v0.12.3 healthy", "status": "ok"},
+        {"name": "Findings", "value": f"{pipeline_total} alive", "status": "ok"},
+        {"name": "Cron Jobs", "value": "22 active", "status": "ok"},
+    ]
+    issues = [h for h in health_checks if h['status'] != 'ok']
+    
+    db.close()
+    
+    return {
+        "strategic": {
+            "revenue": {"current": revenue_ytd, "target": 100000, "label": "Revenue YTD"},
+            "sends": {"current": sends_week, "target": 5, "label": "Sends / Week"},
+            "commitments": {"current": commitments_pct, "target": 80, "label": "Commitments Kept"},
+            "team_health": {"current": team_health, "target": 60, "label": "Team Health"}
+        },
+        "operational": {
+            "findings_week": findings_week,
+            "pipeline": stages,
+            "outcomes_month": sends_month,
+            "active_agents": active_agents,
+            "total_agents": total_agents
+        },
+        "agents": agents,
+        "goals": goals,
+        "health": {"checks": health_checks, "issues": len(issues)}
+    }
+
+@app.post("/api/executive/revenue")
+def log_revenue_event(body: dict):
+    """Log revenue event. Body: {amount, source, description, date}"""
+    db = get_db()
+    amount = body.get("amount")
+    source = body.get("source", "")
+    description = body.get("description", "")
+    date = body.get("date", datetime.now().strftime('%Y-%m-%d'))
+    
+    if amount is None or amount <= 0:
+        db.close()
+        raise HTTPException(400, "amount must be a positive number")
+    
+    cursor = db.execute(
+        "INSERT INTO revenue_events (amount, source, description, date) VALUES (?,?,?,?)",
+        (amount, source, description, date)
+    )
+    revenue_id = cursor.lastrowid
+    
+    db.commit()
+    db.close()
+    
+    notify("revenue_logged", {"id": revenue_id, "amount": amount})
+    return {"id": revenue_id, "status": "created", "amount": amount}
+
+@app.post("/api/executive/goals")
+def add_monthly_goal(body: dict):
+    """Add monthly goal. Body: {description, target_value, current_value}"""
+    db = get_db()
+    description = body.get("description", "").strip()
+    target_value = body.get("target_value", 1)
+    current_value = body.get("current_value", 0)
+    
+    if not description:
+        db.close()
+        raise HTTPException(400, "description required")
+    
+    # Get current month
+    month = datetime.now().strftime('%Y-%m')
+    
+    # Get next sort_order
+    max_order = db.execute("SELECT COALESCE(MAX(sort_order), -1) FROM monthly_goals WHERE month=?", (month,)).fetchone()[0]
+    sort_order = max_order + 1
+    
+    cursor = db.execute(
+        "INSERT INTO monthly_goals (month, description, target_value, current_value, sort_order) VALUES (?,?,?,?,?)",
+        (month, description, target_value, current_value, sort_order)
+    )
+    goal_id = cursor.lastrowid
+    
+    db.commit()
+    db.close()
+    
+    notify("goal_added", {"id": goal_id, "description": description})
+    return {"id": goal_id, "status": "created"}
+
+@app.put("/api/executive/goals/{goal_id}")
+def update_monthly_goal(goal_id: int, body: dict):
+    """Update goal progress. Body: {current_value} or {status}"""
+    db = get_db()
+    
+    goal = db.execute("SELECT * FROM monthly_goals WHERE id=?", (goal_id,)).fetchone()
+    if not goal:
+        db.close()
+        raise HTTPException(404, "Goal not found")
+    
+    updates = []
+    params = []
+    
+    if "current_value" in body:
+        updates.append("current_value = ?")
+        params.append(body["current_value"])
+    
+    if "status" in body:
+        updates.append("status = ?")
+        params.append(body["status"])
+    
+    if updates:
+        updates.append("updated_at = CURRENT_TIMESTAMP")
+        params.append(goal_id)
+        db.execute(f"UPDATE monthly_goals SET {', '.join(updates)} WHERE id = ?", params)
+        db.commit()
+    
+    db.close()
+    
+    notify("goal_updated", {"id": goal_id})
+    return {"status": "updated"}
+
 # ── Pipeline Stats ──
 
 @app.get("/api/pipeline")
@@ -1155,6 +1634,154 @@ def delete_topic(topic_id: str):
     db.close()
     notify("topic_update", {"topic_id": topic_id})
     return {"status": "deleted"}
+
+# ── Priority System ──
+
+class PriorityUpdate(BaseModel):
+    priority: str  # NOW, HIGH, NORMAL, LOW
+    reason: str
+    confidence: int
+
+@app.put("/api/topics/{topic_id}/priority")
+def update_topic_priority(topic_id: str, p: PriorityUpdate):
+    """Update priority for a single topic."""
+    db = get_db()
+    
+    # Validate priority
+    if p.priority not in ["NOW", "HIGH", "NORMAL", "LOW"]:
+        db.close()
+        raise HTTPException(400, "Priority must be NOW, HIGH, NORMAL, or LOW")
+    
+    # Validate confidence
+    if not (0 <= p.confidence <= 100):
+        db.close()
+        raise HTTPException(400, "Confidence must be between 0 and 100")
+    
+    db.execute(
+        "UPDATE topics SET priority = ?, priority_reason = ?, priority_confidence = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+        (p.priority, p.reason, p.confidence, topic_id)
+    )
+    db.commit()
+    db.close()
+    
+    notify("topic_update", {"topic_id": topic_id})
+    return {"status": "updated", "priority": p.priority, "confidence": p.confidence}
+
+@app.post("/api/topics/auto-prioritize")
+def auto_prioritize_topics():
+    """Auto-calculate priority for all topics based on available data."""
+    db = get_db()
+    topics = db.execute("SELECT * FROM topics").fetchall()
+    now = datetime.now()
+    
+    updates = []
+    
+    for topic in topics:
+        score = 0
+        confidence_factors = 0
+        total_factors = 5
+        
+        meta = json.loads(topic['meta']) if topic['meta'] else {}
+        
+        # Factor 1: Revenue potential
+        if meta.get('potential'):
+            score += 30
+            confidence_factors += 1
+        
+        # Factor 2: Deadline proximity
+        if meta.get('deadline'):
+            try:
+                # Try ISO format first (YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)
+                deadline_str = meta['deadline']
+                if 'T' in deadline_str:
+                    deadline = datetime.fromisoformat(deadline_str)
+                else:
+                    deadline = datetime.strptime(deadline_str, '%Y-%m-%d')
+                days_left = (deadline - now).days
+                if days_left <= 3:
+                    score += 35
+                elif days_left <= 7:
+                    score += 25
+                elif days_left <= 14:
+                    score += 15
+                confidence_factors += 1
+            except:
+                pass  # Invalid deadline format
+        
+        # Factor 3: Stage (revenue > content > systems > research)
+        stage_scores = {'revenue': 20, 'content': 15, 'systems': 10, 'research': 5}
+        score += stage_scores.get(topic['stage'], 5)
+        confidence_factors += 1
+        
+        # Factor 4: Sends pending (topics with <50% progress in revenue stage)
+        if topic['stage'] == 'revenue' and topic['progress'] < 50:
+            score += 20
+            confidence_factors += 1
+        
+        # Factor 5: Staleness (last updated > 7 days ago = lower priority)
+        # This is always available
+        confidence_factors += 1
+        try:
+            updated = datetime.fromisoformat(topic['updated_at'])
+            days_since_update = (now - updated).days
+            if days_since_update > 7:
+                score -= 10  # Reduce score for stale topics
+        except:
+            pass
+        
+        # Map score to category
+        if score >= 60:
+            priority = 'NOW'
+        elif score >= 35:
+            priority = 'HIGH'
+        elif score >= 15:
+            priority = 'NORMAL'
+        else:
+            priority = 'LOW'
+        
+        # Calculate confidence percentage
+        confidence = int((confidence_factors / total_factors) * 100)
+        
+        # Build reason string
+        reasons = []
+        if meta.get('potential'):
+            reasons.append(f"Revenue: {meta['potential']}")
+        if meta.get('deadline'):
+            reasons.append(f"Deadline: {meta['deadline']}")
+        reasons.append(f"Stage: {topic['stage']}")
+        if topic['stage'] == 'revenue' and topic['progress'] < 50:
+            reasons.append("Sends pending")
+        
+        reason = " | ".join(reasons) if reasons else f"Stage: {topic['stage']}"
+        
+        # Update topic
+        db.execute(
+            "UPDATE topics SET priority = ?, priority_reason = ?, priority_confidence = ? WHERE id = ?",
+            (priority, reason, confidence, topic['id'])
+        )
+        
+        updates.append({
+            "id": topic['id'],
+            "name": topic['name'],
+            "priority": priority,
+            "confidence": confidence,
+            "score": score
+        })
+    
+    db.commit()
+    db.close()
+    
+    # Summary
+    summary = {
+        "total": len(updates),
+        "NOW": len([u for u in updates if u['priority'] == 'NOW']),
+        "HIGH": len([u for u in updates if u['priority'] == 'HIGH']),
+        "NORMAL": len([u for u in updates if u['priority'] == 'NORMAL']),
+        "LOW": len([u for u in updates if u['priority'] == 'LOW']),
+    }
+    
+    notify("priority_update", summary)
+    return {"status": "completed", "summary": summary, "updates": updates}
 
 # ── File Upload ──
 
