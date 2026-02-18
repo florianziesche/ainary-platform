@@ -31,7 +31,7 @@ Dear HOF Capital Investment Team,
 Your requirement for AI or SWE experience is exactly why I'm reaching out. I don't just evaluate AI companies — I build production AI systems.
 
 Background:
-• 5 years as startup CEO, raised €5.5M across equity and grants
+• 5 years as startup CEO, raised €5.0M across equity and grants
 • Built a legal AI platform achieving <0.2% hallucination rate using multi-agent verification architecture (BM25 + semantic retrieval, cross-encoder re-ranking, 4-agent verification pipeline)
 • MD/COO at 36ZERO Vision, a cloud computer vision SaaS company in Munich
 • Currently building CNC manufacturing AI and advising European startups on AI implementation
@@ -85,7 +85,7 @@ I saw your Agent Systems Camp announcement and thought: "I'm literally building 
 My daily workflow involves multi-agent AI systems with autonomous planning, memory management, and proactive execution — the exact thesis of your Spring '26 Camp. I don't just invest in these ideas; I ship them.
 
 Background:
-• 5 years startup CEO (€5.5M raised), built AI products from zero to production
+• 5 years startup CEO (€5.0M raised), built AI products from zero to production
 • Currently running multi-agent systems daily: legal AI with <0.2% hallucination rate, manufacturing AI for CNC production, and an AI orchestration layer that manages my workflow
 • MD/COO at 36ZERO Vision (cloud computer vision SaaS)
 
@@ -129,7 +129,7 @@ Subject: Associate Application — Technical Founder Ready to Back the Next Wave
 
 Dear Leonis Capital team,
 
-"The first partner for technical founders" — that line resonated because I've been on the other side. As a technical founder who raised €5.5M and built production AI systems, I know what early-stage technical founders actually need from their first investor.
+"The first partner for technical founders" — that line resonated because I've been on the other side. As a technical founder who raised €5.0M and built production AI systems, I know what early-stage technical founders actually need from their first investor.
 
 Why I want to join Leonis specifically:
 • Your research-heavy approach mirrors how I work — I build conviction through deep technical understanding, not pattern matching
@@ -176,7 +176,7 @@ Most AI due diligence asks "does the demo work?" My experience lets me ask harde
 
 Key qualifications:
 • Built legal AI with <0.2% hallucination rate — multi-agent verification architecture
-• 5 years as CEO, raised €5.5M, built products from zero to revenue
+• 5 years as CEO, raised €5.0M, built products from zero to revenue
 • Deep technical expertise: LLMs, RAG systems, multi-agent architectures, AI governance
 • Unique position spanning NYC and European AI ecosystems
 
@@ -209,7 +209,7 @@ Hi Sarah,
 
 I've been following Conviction's thesis on AI-native companies, and your background resonates — you were an operator before an investor, and it shows in how you think about AI companies.
 
-I'm in a similar transition. After 5 years as a startup CEO (€5.5M raised, production AI systems), I'm moving to the investing side. Currently in the VC Lab program, building my thesis around AI-native infrastructure.
+I'm in a similar transition. After 5 years as a startup CEO (€5.0M raised, production AI systems), I'm moving to the investing side. Currently in the VC Lab program, building my thesis around AI-native infrastructure.
 
 I'm not writing to ask for a job — I'm writing because I'd value 15 minutes of your perspective on:
 • How you evaluate AI companies differently given your operator background

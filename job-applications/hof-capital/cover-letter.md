@@ -16,7 +16,7 @@ As a former startup CEO who spent 5 years building AI products and raising ventu
 ## Relevant Experience
 
 **As Founder/CEO of 36ZERO Vision (2019-2024):**
-- Raised €5.5M across multiple rounds (€4M equity, €1.5M grants)
+- Raised €5.0M across multiple rounds (€3.5M equity, €1.5M grants)
 - Built cloud-based computer vision platform for industrial quality inspection
 - Shipped to 15+ enterprise customers
 - Led technical and commercial strategy

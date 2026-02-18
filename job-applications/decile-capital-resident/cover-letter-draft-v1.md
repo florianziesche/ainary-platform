@@ -16,7 +16,7 @@ As CEO and co-founder of 36ZERO Vision, a cloud-based computer vision SaaS start
 - **2021:** Closed €3M VC round plus €135K in angel investments (3 angels at €35K, €50K, and €50K)
 - **2023:** Secured €1M follow-on VC round during challenging market conditions
 - **Grants:** Won €1.5M+ in non-dilutive funding (ZIM and Forschungszulage — competitive German R&D programs)
-- **Total raised:** €5.5M+ (€4M equity, €1.5M+ grants)
+- **Total raised:** €5.0M+ (€3.5M equity, €1.5M+ grants)
 
 Beyond closing rounds, I managed the full fundraising lifecycle: LP/investor research, pipeline tracking, due diligence preparation, and follow-up sequences. I know what it takes to move investors from first meeting to wire transfer.
 
@@ -45,7 +45,7 @@ Phone: [Add phone]
 ## Atlas Notes (for Florian's review)
 
 **Strengths of this draft:**
-- Leads with specific numbers (€5.5M raised)
+- Leads with specific numbers (€5.0M raised)
 - Shows both equity and grant fundraising experience
 - Connects VC Lab participation to genuine interest in Decile
 - Highlights AI workflow (relevant to Decile Hub)

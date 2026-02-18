@@ -10,7 +10,7 @@ I've spent five years as the founder your Onsite team advises — scaling an ent
 
 **WHY ME — Operator, not observer**
 
-As MD/COO at 36ZERO Vision, I took a cloud computer vision SaaS from zero to 15+ enterprise clients — BMW, Siemens, Bosch — closing €50K–500K deals. I raised €5.5M+, managed P&L in a 150-person org, and built AI systems in production (RAG pipelines at <0.2% hallucination, multi-agent architectures, automated research workflows). I know what "do more with less" looks like because I built AI tools that replace six-figure consulting projects.
+As MD/COO at 36ZERO Vision, I took a cloud computer vision SaaS from zero to 15+ enterprise clients — BMW, Siemens, Bosch — closing €50K–500K deals. I raised €5.0M+, managed P&L in a 150-person org, and built AI systems in production (RAG pipelines at <0.2% hallucination, multi-agent architectures, automated research workflows). I know what "do more with less" looks like because I built AI tools that replace six-figure consulting projects.
 
 **WHY ONSITE — Not just VC**
 

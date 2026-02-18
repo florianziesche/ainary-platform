@@ -58,7 +58,7 @@ Each letter follows the structure:
 Opens with specific connection to that fund's investment thesis or portfolio
 
 ### Paragraph 2: Credentials
-"Built and scaled AI SaaS to BMW/Siemens/Bosch, raised €5.5M+. As MD/COO managed P&L in 150-person org."
+"Built and scaled AI SaaS to BMW/Siemens/Bosch, raised €5.0M+. As MD/COO managed P&L in 150-person org."
 
 ### Paragraph 3: Technical Depth
 - RAG system (<0.2% hallucination rate)

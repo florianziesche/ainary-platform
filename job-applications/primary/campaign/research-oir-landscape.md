@@ -220,7 +220,7 @@ Based on role descriptions and incubation outcomes:
 ## STRATEGIC TAKEAWAYS FOR FLORIAN'S APPLICATION
 
 ### 1. Frame Your Operator Experience
-- **Primary wants builders, not thinkers.** Your 36ZERO CEO experience = 0→1 execution (€5.5M raised, enterprise AI product)
+- **Primary wants builders, not thinkers.** Your 36ZERO CEO experience = 0→1 execution (€5.0M raised, enterprise AI product)
 - Emphasize: "I've built vertical AI for BMW/Siemens/Bosch. I know what enterprise buyers need and what tech actually works."
 - NOT: "I want to explore ideas in AI" (that's a16z EIR framing)
 

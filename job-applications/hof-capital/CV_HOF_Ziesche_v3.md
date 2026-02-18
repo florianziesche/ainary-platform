@@ -19,7 +19,7 @@ linkedin.com/in/florianziesche | finitematter.substack.com
 
 ### Summary
 
-Five years building an AI startup from zero to BMW, Siemens, Bosch. $5.5M+ raised. German-born, built companies in Munich, now based in New York. Bridging European technical founders with US venture. Currently in VC Lab (Decile Group, Cohort 6): building AI-focused fund thesis, deal sourcing, due diligence, portfolio construction, LP outreach.
+Five years building an AI startup from zero to BMW, Siemens, Bosch. $5.0M+ raised. German-born, built companies in Munich, now based in New York. Bridging European technical founders with US venture. Currently in VC Lab (Decile Group, Cohort 6): building AI-focused fund thesis, deal sourcing, due diligence, portfolio construction, LP outreach.
 
 ---
 
@@ -78,7 +78,7 @@ Technical University of Munich (TUM)
 
 - **Affiliations:** Alchemist Accelerator · VC Lab (Decile Group) · UnternehmerTUM
 - **Languages:** German (native), English (fluent)
-- **Capital Raised:** €5.5M+ total
+- **Capital Raised:** €5.0M+ total
 
 ---
 

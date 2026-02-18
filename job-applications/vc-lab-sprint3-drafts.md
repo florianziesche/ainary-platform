@@ -91,7 +91,7 @@
    - EF: Bentinck saw Europe's talent bottleneck firsthand.
    - The Flywheel: Industrial AI founders solving industrial AI's valley of death.
    
-   **My thesis isn't theory—it's lived:** I'm a European founder who raised $5.5M, built AI-first products for German industrials, moved to NYC, and saw how broken the EU→US bridge is. That's not a pitch. That's a thesis.
+   **My thesis isn't theory—it's lived:** I'm a European founder who raised $5.0M, built AI-first products for German industrials, moved to NYC, and saw how broken the EU→US bridge is. That's not a pitch. That's a thesis.
 
 3. **Geography = Edge (If You Own It)**  
    - AI Seed: London → Silicon Valley bridge for European AI founders.
@@ -280,7 +280,7 @@ Specificity attracts the right deals. If I say "we invest in AI," I'll get 1,000
 Reputation compounds. The first fund is hard—no one knows you. But if you're helpful, transparent, and add value freely, founders talk. By Fund II, you'll have inbound flow.
 
 **Example (My Playbook):**
-- Post weekly on LinkedIn: "What I learned raising $5.5M across 5 rounds" or "How European founders can crack US enterprise sales."
+- Post weekly on LinkedIn: "What I learned raising $5.0M across 5 rounds" or "How European founders can crack US enterprise sales."
 - Host monthly "EU → US Founder Office Hours" in NYC.
 - Use Alchemist + VC Lab networks to stay top-of-mind.
 - Make 3 warm intros per week for founders I can't back.
@@ -397,7 +397,7 @@ I'm not building a generalist seed fund competing with a16z or First Round. I'm 
 ### My Unfair Advantages
 
 1. **Operator Credibility (5 Years as AI Startup CEO)**  
-   - Raised $5.5M across 5 rounds (pre-seed through Series A).
+   - Raised $5.0M across 5 rounds (pre-seed through Series A).
    - Shipped AI products to BMW, Siemens, Bosch (enterprise sales cycles, procurement, compliance).
    - Survived the valley of death—know what kills startups and how to avoid it.
    
@@ -447,7 +447,7 @@ I'm not building a generalist seed fund competing with a16z or First Round. I'm 
 **Tactics:**
 1. **Content (Weekly LinkedIn + Monthly Blog):**
    - Write about EU → US founder journey: "5 Mistakes European Founders Make Selling to US Enterprise."
-   - Share my fundraising story: "What I Learned Raising $5.5M Across 5 Rounds."
+   - Share my fundraising story: "What I Learned Raising $5.0M Across 5 Rounds."
    - Post VC learnings: "Why Seed Stage Is About Team, Not Traction" (build credibility as investor, not just operator).
    
    **Output:** 1 LinkedIn post/week (aim for 500+ reactions/month), 1 long-form blog post/month.
@@ -460,7 +460,7 @@ I'm not building a generalist seed fund competing with a16z or First Round. I'm 
    **Output:** 1 dinner/month in NYC, 1 dinner/quarter in Europe. Track: How many attendees become pipeline companies?
 
 3. **Activate Networks:**
-   - **Alchemist:** Reach out to 20 recent portfolio companies. Offer office hours: "I've raised $5.5M and sold to enterprise—happy to help."
+   - **Alchemist:** Reach out to 20 recent portfolio companies. Offer office hours: "I've raised $5.0M and sold to enterprise—happy to help."
    - **VC Lab:** Join Slack, introduce myself, share thesis. Ask: "Who's seeing great European founders building AI for the US?"
    - **LinkedIn:** DM 50 founders in my target profile. Don't pitch—just offer value: "Loved your post on EU → US expansion. Happy to intro you to [X contact]."
    
@@ -561,7 +561,7 @@ I'm not building a generalist seed fund competing with a16z or First Round. I'm 
 **Speed:** First call in 3 days, decision in 24 hours, term sheet in 2 weeks.  
 **Specificity:** I'm not generalist. I'm "EU → US, AI-first, enterprise" only.  
 **Sweat Equity:** I'll intro to BMW, Siemens, Bosch. I'll help hire US sales reps. I'll debug go-to-market.  
-**Credibility:** I've lived it—$5.5M raised, enterprise sold, valley of death survived.  
+**Credibility:** I've lived it—$5.0M raised, enterprise sold, valley of death survived.  
 **Alignment:** Small fund ($5M) = concentrated bets. I *have* to make this work. I'm not diversifying across 50 companies.
 
 **Bottom Line:** European founders building AI for the US don't need another check. They need someone who's done it, knows the pitfalls, and will open doors. That's me.
@@ -603,7 +603,7 @@ This matters to me because I'm building that fund—right here in NYC.
 
 **My thesis:** Back European founders building AI-first and deep-tech companies for the US market.
 
-**My edge:** I've lived it. 5 years as an AI startup CEO. $5.5M raised across 5 rounds. Enterprise clients like BMW, Siemens, Bosch. I know what it takes to cross the Atlantic and survive the valley of death.
+**My edge:** I've lived it. 5 years as an AI startup CEO. $5.0M raised across 5 rounds. Enterprise clients like BMW, Siemens, Bosch. I know what it takes to cross the Atlantic and survive the valley of death.
 
 NYC is the perfect base for this. It's the #2 AI hub in the US (20% of AI VC), the talent pipeline is surging (1 of every 7 tech workers moved here since 2019), and the ecosystem is founder-friendly. Lux, Union Square Ventures, Insight Partners—they're all doubling down. So am I.
 
@@ -711,7 +711,7 @@ For any European founder reading this: study how these companies hire. It's not 
 
 When valuations were insane (2021-2022), founders could raise on PowerPoint. Now? You need a product, customers, and proof you can execute.
 
-That's exactly the environment where operator-turned-VCs win. I've raised $5.5M across 5 rounds, sold to BMW/Siemens/Bosch, and survived the valley of death. I know what *actually* matters at seed: team, product velocity, and go-to-market clarity.
+That's exactly the environment where operator-turned-VCs win. I've raised $5.0M across 5 rounds, sold to BMW/Siemens/Bosch, and survived the valley of death. I know what *actually* matters at seed: team, product velocity, and go-to-market clarity.
 
 Founders raising now need investors who've done it—not just written about it.
 

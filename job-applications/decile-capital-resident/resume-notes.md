@@ -9,7 +9,7 @@
 Based on the job requirements, emphasize:
 
 ### 1. Fundraising Experience (LEAD WITH THIS)
-- €5.5M+ total raised
+- €5.0M+ total raised
 - €3M VC round (2021)
 - €1M follow-on VC round (2023)
 - €135K angel investments
@@ -39,12 +39,12 @@ Based on the job requirements, emphasize:
 - Name, NYC location, LinkedIn, email, phone
 
 **Summary (2-3 lines):**
-> Former startup CEO with €5.5M+ in fundraising experience, now transitioning to venture capital. Deep expertise in AI/ML products and founder-operator perspective on what makes startups succeed.
+> Former startup CEO with €5.0M+ in fundraising experience, now transitioning to venture capital. Deep expertise in AI/ML products and founder-operator perspective on what makes startups succeed.
 
 **Experience:**
 
 **36ZERO Vision** — Co-Founder & CEO (2019-2024)
-- Raised €5.5M+ across VC, angels, and grants
+- Raised €5.0M+ across VC, angels, and grants
 - Built cloud computer vision SaaS platform
 - Led team of X people
 - [Key metrics: ARR, customers, etc.]

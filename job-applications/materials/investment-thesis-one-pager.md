@@ -92,7 +92,7 @@ Enterprise is crowded (Microsoft, Salesforce). SMB is underserved:
 
 ## Why Me
 
-- **Operator Background:** 5 years as startup CEO, raised €5.5M, built technical products
+- **Operator Background:** 5 years as startup CEO, raised €5.0M, built technical products
 - **Technical Depth:** Hands-on with LLMs, RAG systems, multi-agent architectures
 - **Vertical Experience:** Currently building CNC software, understand manufacturing
 - **Network:** 200+ founder relationships from fundraising advisory

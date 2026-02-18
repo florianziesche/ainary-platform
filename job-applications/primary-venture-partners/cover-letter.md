@@ -11,13 +11,13 @@ I'm a former startup CEO transitioning to venture capital, and Primary's seed-st
 
 ## Why Primary
 
-Primary's approach to working closely with founders at the earliest stages aligns with where I believe I can add the most value. Having raised €5.5M for my own startup and advised numerous founders on fundraising, I understand the seed-stage journey intimately.
+Primary's approach to working closely with founders at the earliest stages aligns with where I believe I can add the most value. Having raised €5.0M for my own startup and advised numerous founders on fundraising, I understand the seed-stage journey intimately.
 
 ## My Background
 
 **36ZERO Vision (Founder/CEO, 2019-2024):**
 - Cloud-based computer vision SaaS for industrial quality inspection
-- Raised €4M equity + €1.5M in grants
+- Raised €3.5M equity + €1.5M in grants
 - Built and led team of 12 engineers
 - Sold to enterprise customers including automotive suppliers
 

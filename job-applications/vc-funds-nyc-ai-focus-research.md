@@ -27,7 +27,7 @@ Find 10+ NYC-based VC funds with AI focus, check hiring status, prepare applicat
 - **LinkedIn:** Radical Ventures
 - **Application Angle:**
   - Technical AI background (Legal AI, Multi-Agent RAG)
-  - Operator experience (5 years CEO, €5.5M raised)
+  - Operator experience (5 years CEO, €5.0M raised)
   - NYC-based, willing to travel
 - **Contact:** jobs@radical.vc / LinkedIn direct
 
@@ -194,7 +194,7 @@ Find 10+ NYC-based VC funds with AI focus, check hiring status, prepare applicat
 - **LinkedIn:** Bowery Capital
 - **Application Angle:**
   - B2B SaaS operator (5 years)
-  - Fundraising experience (€5.5M)
+  - Fundraising experience (€5.0M)
   - NYC local
 
 ---
@@ -276,7 +276,7 @@ Find 10+ NYC-based VC funds with AI focus, check hiring status, prepare applicat
 
 Dear [Partner Name],
 
-I'm an NYC-based founder (ex-CEO, €5.5M raised) transitioning into VC with a focus on AI-first companies.
+I'm an NYC-based founder (ex-CEO, €5.0M raised) transitioning into VC with a focus on AI-first companies.
 
 **Why I'm reaching out:**
 - [Fund Name]'s thesis on [specific thesis point] aligns with my experience building [relevant project]

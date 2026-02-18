@@ -65,8 +65,8 @@ It's $1T+ because it doesn't replace one industry. It adds a new participant to 
 
 > What are the most impressive things that you've accomplished in your professional and/or academic career? What makes each of these accomplishments so impressive?
 
-**1. AI startup: PMF, $1M+ revenue, $5.5M raised.**
-Co-founded a computer vision company in Munich. Reached product-market fit and closed BMW, Siemens, Bosch, Magna, and Linamar on six-figure contracts. Grew annual contract value from $240K to over $1M in one year. Raised $5.5M across angel, venture, and grant rounds. Hired 15+ people.
+**1. AI startup: PMF, $1M+ revenue, $5.0M raised.**
+Co-founded a computer vision company in Munich. Reached product-market fit and closed BMW, Siemens, Bosch, Magna, and Linamar on six-figure contracts. Grew annual contract value from $240K to over $1M in one year. Raised $5.0M across angel, venture, and grant rounds. Hired 15+ people.
 
 **2. Credit risk ML at BNP Paribas: +15 percentage points.**
 My master thesis at TUM was the first machine learning approach at BNP Paribas Consors Finanz's Munich office. I tested over 500 model variations on 168K credit applications. Result: improved the GINI coefficient from 56% (production baseline) to 71%. On a portfolio with €5.5B in revenue and €1.2B in cost of risk, a 1% reduction in default losses saves roughly €12M per year.

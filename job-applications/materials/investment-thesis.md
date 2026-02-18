@@ -95,7 +95,7 @@ Horizontal tools reimagined:
 
 ### Operator Background
 - **5 years** as startup CEO in computer vision / AI
-- **€5.5M raised** across VC rounds and grants
+- **€5.0M raised** across VC rounds and grants
 - **Built and shipped** enterprise AI products
 - **Sold to enterprises** — understand procurement cycles
 

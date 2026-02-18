@@ -16,7 +16,7 @@ As CEO and co-founder of 36ZERO Vision, a cloud-based computer vision SaaS start
 - **2021:** Closed €3M VC round plus €135K angel investments
 - **2023:** Secured €1M follow-on round during challenging market conditions
 - **Grants:** Won €1.5M+ in non-dilutive funding (ZIM and Forschungszulage)
-- **Total raised:** €5.5M+ (€4M equity, €1.5M+ grants)
+- **Total raised:** €5.0M+ (€3.5M equity, €1.5M+ grants)
 
 Beyond closing rounds, I managed the full fundraising lifecycle: LP/investor research, pipeline tracking, due diligence preparation, and follow-up sequences.
 

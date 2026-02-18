@@ -136,7 +136,7 @@
 
 ### Angle #1: Operator → Investor
 **Pitch:**
-- 5 years CEO, €5.5M raised
+- 5 years CEO, €5.0M raised
 - Built production AI systems (not just invested in them)
 - Understand founder pain points (fundraising, hiring, product)
 - Can add value beyond capital: technical diligence, operational support

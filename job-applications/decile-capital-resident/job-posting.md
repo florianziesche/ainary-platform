@@ -60,7 +60,7 @@ Support Decile Capital's fundraising operations, LP research, investment diligen
 
 | Requirement | Florian's Edge |
 |-------------|----------------|
-| Fundraising experience | Raised €5.5M+ as founder (€4M equity + €1.5M grants) |
+| Fundraising experience | Raised €5.0M+ as founder (€3.5M equity + €1.5M grants) |
 | Entry level | Fresh perspective + real operator experience |
 | LP research | Has worked both sides — knows what investors look for |
 | VC ecosystem exposure | Currently IN VC Lab |

@@ -37,7 +37,7 @@ You describe yourself as a fund with a "speciality in machine intelligence." I d
 My current workflow involves multi-agent AI systems with autonomous planning, memory management, and proactive execution. Before that, I built a legal AI platform achieving <0.2% hallucination rates using hybrid retrieval (BM25 + semantic), cross-encoder re-ranking, and 4-agent verification pipelines. I understand machine intelligence from the architecture layer up.
 
 Background:
-• 5 years as startup CEO/founder, raised €5.5M across equity and grants
+• 5 years as startup CEO/founder, raised €5.0M across equity and grants
 • MD/COO at 36ZERO Vision, a cloud computer vision SaaS company
 • Currently building AI systems for manufacturing (CNC) and advising startups on AI implementation
 • Deep technical expertise: LLMs, RAG, multi-agent architectures, AI governance
@@ -89,7 +89,7 @@ Your thesis — "founded by data scientists and entrepreneurs for data-focused e
 I'm a founder-turned-operator who builds production AI systems. When I read that DVP focuses on companies with "a unique advantage in AI/machine learning" transforming "the future of financial services, data science, hiring, manufacturing and more," I noticed something: I'm actively building in one of your focus sectors. My CNC Planner Pro uses GPT-4 Vision to analyze technical drawings and automatically generate manufacturing calculations, pricing, and machine code — AI transforming manufacturing, in production, today.
 
 Background:
-• 5 years as startup CEO, raised €5.5M (€3M equity + €1.5M grants)
+• 5 years as startup CEO, raised €5.0M (€3M equity + €1.5M grants)
 • Built legal AI with <0.2% hallucination rate — multi-agent verification architecture
 • MD/COO at 36ZERO Vision (cloud computer vision SaaS, Munich)
 • Currently building AI for manufacturing + advising startups on AI implementation
@@ -135,7 +135,7 @@ Dear Samsung Next Ventures team,
 I'm applying because I bring an unusual combination: deep AI technical expertise, 5 years of startup operator experience, and a genuine passion for identifying paradigm-shifting companies at the earliest stages.
 
 Background:
-• Former startup CEO/founder (€5.5M raised), MD/COO at cloud computer vision SaaS
+• Former startup CEO/founder (€5.0M raised), MD/COO at cloud computer vision SaaS
 • Built production AI systems: legal AI with <0.2% hallucination rate, manufacturing AI for CNC production, multi-agent orchestration platforms
 • Deep technical expertise across your focus areas: AI/ML (primary), fintech (built financial models), healthtech (advisor), infrastructure (built cloud-native platforms)
 
@@ -179,7 +179,7 @@ Dear ERA Investment Team,
 As someone who's been an accelerator-stage founder and scaled to institutional fundraising, I understand the full lifecycle of early-stage companies — from the messy pre-seed days through Series B growth challenges.
 
 Background:
-• 5 years as startup CEO/founder, raised €5.5M total
+• 5 years as startup CEO/founder, raised €5.0M total
 • Built production AI systems across legal, manufacturing, and computer vision sectors
 • MD/COO at 36ZERO Vision (cloud computer vision SaaS)
 • Technical expertise: LLMs, multi-agent AI, RAG systems, full-stack development

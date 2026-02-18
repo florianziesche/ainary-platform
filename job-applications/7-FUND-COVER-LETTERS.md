@@ -16,7 +16,7 @@ When I built a production RAG system achieving <0.2% hallucination rates, the go
 
 **What I bring to Lionheart:**
 
-I've lived the AI stack from production to cap table. As CEO/Founder at 36ZERO Vision, I built a cloud computer vision SaaS platform and sold it to enterprise clients — BMW, Siemens, Bosch. I raised €5.5M+ across equity and grants and learned the hard way what separates AI demos from AI products. The gap is reliability, governance, and human oversight — precisely where your thesis sits.
+I've lived the AI stack from production to cap table. As CEO/Founder at 36ZERO Vision, I built a cloud computer vision SaaS platform and sold it to enterprise clients — BMW, Siemens, Bosch. I raised €5.0M+ across equity and grants and learned the hard way what separates AI demos from AI products. The gap is reliability, governance, and human oversight — precisely where your thesis sits.
 
 Today, I build multi-agent AI architectures daily. My GitHub (github.com/fziescheus-alt) shows this in practice: **Exec-Research-Factory** is a multi-agent research pipeline with autonomous planning and verification; **CNC_Planner_PRO** applies AI to complex manufacturing workflows where errors have real-world consequences; **llm-guide** documents production patterns for reliable AI deployment. These aren't weekend projects — they're working systems that reflect my conviction that AI must be built carefully.
 
@@ -47,7 +47,7 @@ Your portfolio of 130+ investments spanning fintech, AI, and deep tech — from 
 
 **My background:**
 
-5 years as CEO/Founder at 36ZERO Vision, a cloud computer vision SaaS company serving BMW, Siemens, and Bosch. I raised €5.5M+, built engineering teams, negotiated enterprise contracts, and learned the precise gap between technical capability and product-market fit. As MD/COO, I owned the P&L and operations — the kind of data-driven execution Point72 values.
+5 years as CEO/Founder at 36ZERO Vision, a cloud computer vision SaaS company serving BMW, Siemens, and Bosch. I raised €5.0M+, built engineering teams, negotiated enterprise contracts, and learned the precise gap between technical capability and product-market fit. As MD/COO, I owned the P&L and operations — the kind of data-driven execution Point72 values.
 
 Today, I build production AI systems daily. My GitHub (github.com/fziescheus-alt) demonstrates this: **research-system** is a multi-agent architecture for autonomous research with planning and verification layers; **CNC_Planner_PRO** applies LLM reasoning to manufacturing process optimization; **task-management** shows how I build AI-native workflow systems. I write code, deploy models, and stress-test architectures — I don't just evaluate pitch decks.
 
@@ -79,7 +79,7 @@ Your AI & Robotics Fund and AI First Fund sit at the intersection of where I've 
 
 **My background:**
 
-As CEO/Founder of 36ZERO Vision, I built a cloud computer vision SaaS company from zero to enterprise clients (BMW, Siemens, Bosch), raising €5.5M+ across equity and grants. I know what separates AI companies that scale from those that stall — it's not the model, it's the data flywheel, the integration layer, and the go-to-market motion.
+As CEO/Founder of 36ZERO Vision, I built a cloud computer vision SaaS company from zero to enterprise clients (BMW, Siemens, Bosch), raising €5.0M+ across equity and grants. I know what separates AI companies that scale from those that stall — it's not the model, it's the data flywheel, the integration layer, and the go-to-market motion.
 
 I build AI systems daily. My GitHub (github.com/fziescheus-alt) is my portfolio: **Exec-Research-Factory** automates complex research workflows using multi-agent coordination — the kind of agentic AI your portfolio companies are building; **CNC_Planner_PRO** applies AI to manufacturing, demonstrating vertical AI applications; **llm-guide** is a practitioner's guide to production LLM patterns I've battle-tested. These show I evaluate AI from the inside out.
 
@@ -109,7 +109,7 @@ BCV's recent insight on 2025 AI trends captured something I've observed firsthan
 
 **BCV values operators. I am one.**
 
-As CEO/Founder of 36ZERO Vision, I built a cloud computer vision SaaS platform and brought it to production with BMW, Siemens, and Bosch. Raising €5.5M+, managing engineering teams, negotiating enterprise contracts, pivoting when the market demanded it — I've lived every stage of the application software journey BCV invests in.
+As CEO/Founder of 36ZERO Vision, I built a cloud computer vision SaaS platform and brought it to production with BMW, Siemens, and Bosch. Raising €5.0M+, managing engineering teams, negotiating enterprise contracts, pivoting when the market demanded it — I've lived every stage of the application software journey BCV invests in.
 
 As MD/COO, I owned operations, revenue, and product simultaneously. I know what a company's org chart, burn rate, and customer retention metrics actually mean, because I've been responsible for all three.
 
@@ -147,7 +147,7 @@ Equal Ventures' approach is rare and deliberate: thesis-driven, concentrated bet
 
 Your "prepared mind" framework — exhaustive research, validation with market experts, then conviction-driven investment — mirrors how I've operated my entire career. At 36ZERO Vision, I didn't build a generic AI company. I built cloud computer vision for specific industrial applications (BMW, Siemens, Bosch), going deep into manufacturing workflows before writing a line of code. That vertical discipline is Equal's DNA.
 
-I raised €5.5M+ as CEO/Founder, then served as MD/COO owning operations and revenue. I know what it takes to disrupt legacy industries from the inside — the sales cycles are longer, the integration is harder, and the moats are deeper. That's exactly where Equal invests.
+I raised €5.0M+ as CEO/Founder, then served as MD/COO owning operations and revenue. I know what it takes to disrupt legacy industries from the inside — the sales cycles are longer, the integration is harder, and the moats are deeper. That's exactly where Equal invests.
 
 **How I'd contribute to Equal's thesis work:**
 
@@ -182,7 +182,7 @@ That thesis is exactly where my experience lives.
 
 **My background:**
 
-At 36ZERO Vision, I built a cloud computer vision SaaS platform — literally AI that processes and understands visual media. Our enterprise clients (BMW, Siemens, Bosch) used our technology to analyze visual data at scale. I raised €5.5M+, built the engineering team, and learned that AI companies win or lose based on their access to data, distribution, and enterprise relationships — exactly the strategic assets Comcast brings to portfolio companies.
+At 36ZERO Vision, I built a cloud computer vision SaaS platform — literally AI that processes and understands visual media. Our enterprise clients (BMW, Siemens, Bosch) used our technology to analyze visual data at scale. I raised €5.0M+, built the engineering team, and learned that AI companies win or lose based on their access to data, distribution, and enterprise relationships — exactly the strategic assets Comcast brings to portfolio companies.
 
 As MD/COO, I owned the full stack: product, operations, revenue. I understand both the technology and the business model of companies like Creatify and Moonvalley, because I've built in that same AI-meets-media space.
 
@@ -218,7 +218,7 @@ Your NYC program backs founders across FinTech, Enterprise SaaS, Health & Wellne
 
 **Why I'm the right Business Associate:**
 
-I've been a Techstars founder in spirit. At 36ZERO Vision, I lived the 13-week sprint lifecycle on repeat — building MVPs, iterating with customers, pitching investors, and making existential decisions weekly. I raised €5.5M+ and served enterprise clients (BMW, Siemens, Bosch). I've been on the other side of every conversation a Techstars mentor has with a founder.
+I've been a Techstars founder in spirit. At 36ZERO Vision, I lived the 13-week sprint lifecycle on repeat — building MVPs, iterating with customers, pitching investors, and making existential decisions weekly. I raised €5.0M+ and served enterprise clients (BMW, Siemens, Bosch). I've been on the other side of every conversation a Techstars mentor has with a founder.
 
 But what makes me different is that I still build. My GitHub (github.com/fziescheus-alt) is active daily: **CNC_Planner_PRO** is a production AI application for manufacturing — the kind of vertical SaaS a Techstars cohort company might build; **Exec-Research-Factory** shows multi-agent AI system design; **task-management** demonstrates how I structure complex operations. When a founder asks "how should I architect this?" I don't give theoretical answers — I show them working code.
 

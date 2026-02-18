@@ -1,6 +1,6 @@
 # FutureSight Ventures — EIR Application
 
-**Subject:** EIR Interest — Former B2B AI CEO, €5.5M raised, built for BMW/Siemens/Bosch
+**Subject:** EIR Interest — Former B2B AI CEO, €5.0M raised, built for BMW/Siemens/Bosch
 
 ---
 
@@ -10,7 +10,7 @@ After 5 years building and scaling enterprise AI products — shipping cloud CV 
 
 **What I bring to an EIR seat:**
 
-As CEO/Founder of 36ZERO Vision, I raised €5.5M+, signed 15+ enterprise clients, and managed P&L inside a 150-person organization. I built production AI systems — RAG pipelines with <0.2% hallucination rates, multi-agent architectures, and inference optimization — not demos, but software that BMW runs in production. I've sat across from procurement teams at Siemens and navigated 12-month enterprise sales cycles. That pattern recognition — what separates a real technical moat from an API wrapper — is hard to get from a spreadsheet.
+As CEO/Founder of 36ZERO Vision, I raised €5.0M+, signed 15+ enterprise clients, and managed P&L inside a 150-person organization. I built production AI systems — RAG pipelines with <0.2% hallucination rates, multi-agent architectures, and inference optimization — not demos, but software that BMW runs in production. I've sat across from procurement teams at Siemens and navigated 12-month enterprise sales cycles. That pattern recognition — what separates a real technical moat from an API wrapper — is hard to get from a spreadsheet.
 
 **Why FutureSight specifically:**
 

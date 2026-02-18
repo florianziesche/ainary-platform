@@ -12,7 +12,7 @@ Your Five-Stage Agent Autonomy Framework nails the problem: 95% of enterprise AI
 
 My AgentTrust framework (github.com/fziescheus-alt/agenttrust) operationalizes the trust dimension your framework describes — calibrating when agents should act autonomously vs. defer to humans, with real measurement instead of vibes. Three primitives: Budget-CoCoA calibration (3 independent samples → real confidence), Trust Scores (earned autonomy, not assumed), and mandatory Beipackzettel metadata on every output. It's the missing layer between "the model is smart" and "the agent is reliable."
 
-This isn't academic. As CEO/COO at 36ZERO Vision, I built enterprise AI SaaS for BMW, Siemens, and Bosch. Raised €5.5M+. Shipped production RAG at <0.2% hallucination. I know which AI products survive procurement and which die in pilot — the exact filter your Stage 3/4 distinction captures.
+This isn't academic. As CEO/COO at 36ZERO Vision, I built enterprise AI SaaS for BMW, Siemens, and Bosch. Raised €5.0M+. Shipped production RAG at <0.2% hallucination. I know which AI products survive procurement and which die in pilot — the exact filter your Stage 3/4 distinction captures.
 
 What I'd bring to Glasswing:
 

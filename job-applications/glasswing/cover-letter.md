@@ -10,7 +10,7 @@ Rudina,
 
 Your 5-Stage Agent Autonomy Framework defines autonomy as a spectrum based on context, capability, and trust. I built the open-source implementation of that idea. My AgentTrust framework (github.com/fziescheus-alt/agenttrust) operationalizes exactly what your framework describes theoretically — calibrating when AI agents should act autonomously vs. defer to humans, mapped across trust dimensions. My "State of AI Agent Trust 2026" research directly extends the evaluation lens Glasswing applies to portfolio decisions.
 
-This isn't academic for me. As CEO/COO at 36ZERO Vision, I built and scaled enterprise AI SaaS — cloud computer vision for BMW, Siemens, and Bosch. Raised €5.5M+. Managed P&L in a 150-person org. Shipped a RAG system with <0.2% hallucination rate to production. I know what separates real AI moats from demo-ware because I've built the infrastructure that enterprise buyers actually sign contracts for.
+This isn't academic for me. As CEO/COO at 36ZERO Vision, I built and scaled enterprise AI SaaS — cloud computer vision for BMW, Siemens, and Bosch. Raised €5.0M+. Managed P&L in a 150-person org. Shipped a RAG system with <0.2% hallucination rate to production. I know what separates real AI moats from demo-ware because I've built the infrastructure that enterprise buyers actually sign contracts for.
 
 What I'd bring to Glasswing specifically:
 

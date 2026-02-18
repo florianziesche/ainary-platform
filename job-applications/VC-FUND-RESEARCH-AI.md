@@ -95,7 +95,7 @@
 ### My Edge:
 1. **Technical depth:** Built production AI systems (not just demos)
 2. **Enterprise experience:** <0.2% hallucination rate for legal AI
-3. **Operator background:** 5 years CEO, €5.5M raised
+3. **Operator background:** 5 years CEO, €5.0M raised
 4. **Current practice:** Building AI systems daily
 
 ### Story to Tell:
@@ -132,7 +132,7 @@ Hi [Name],
 
 Saw your work at [Fund] — impressive portfolio in AI.
 
-I'm an ex-founder (€5.5M raised, AI/CV) transitioning to VC. Specifically interested in AI-native investing because I've actually built production AI systems.
+I'm an ex-founder (€5.0M raised, AI/CV) transitioning to VC. Specifically interested in AI-native investing because I've actually built production AI systems.
 
 Would love to hear how [Fund] approaches AI deal evaluation. Happy to share what I've learned about AI development if useful.
 
