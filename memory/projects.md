@@ -22,6 +22,12 @@
 - **Deploy:** `cd projects/platform-website && cp landing.html index.html && git add . && git commit && vercel --prod --yes`
 - **TODO:** Custom domain, Stripe, Mobile polish
 
+### Python Research Pipeline (NEU 2026-02-17)
+- **Pfad:** `projects/research-pipeline/pipeline.py`
+- **Stack:** Multi-model routing (Haiku→Sonnet→Opus), ~$1.34/report
+- **Budget:** $200 = ~149 reports
+- **Needs:** ANTHROPIC_API_KEY env var
+
 ### AI Company X-Ray
 - **Status:** Funktioniert. BMW, Siemens, MBS Reports generiert.
 - **Pfad:** `projects/ai-company-xray/xray.js`
@@ -43,6 +49,10 @@
 - **Betaworks, Leonis, Wingspan:** Ready, not submitted
 - **27 Openings** researched
 - **IBM Ventures:** CV + Cover Letter ready
+- **50-Fund Pipeline** (2026-02-17): `research/inbox/vc-pipeline-50-funds-2026-02-17.md`
+- Top: Glasswing, Radical ($1.8B), Earlybird/HV/La Famiglia, Conviction, Nyca
+- NEW: FutureSight (EIR NYC), Seligman ($500M, launched Feb 12!), Innovate.VC (EIR)
+- **5 cold outreach drafts** ready, not sent
 
 ### Freelance / CNC
 - **MBS:** X-Ray Report generiert 13.02. Andreas Email pending seit 06.02.
@@ -57,7 +67,7 @@
 
 ## 🟡 Paused
 - Freie Presse KI (Daniel Daum called, waiting)
-- BM Glashütte (Email ready, not sent)
+- BM Glashütte (WhatsApp gesendet 17.02, Terminvorschläge Mi-Fr ab 15h, Mo-Di 9-14h)
 - Bürgergeld/ALG1 (Restanspruch unklar)
 
 ## 🔵 Infrastructure (nicht Revenue)

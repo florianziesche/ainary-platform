@@ -1,216 +1,60 @@
-# INDEX.md — Workspace-Verzeichnis (grep-bar)
+# INDEX.md — Workspace Directory
+*`grep -i "keyword" INDEX.md` findet alles. Aktualisiert: 2026-02-17*
 
-*Mias Ersatz für Gedächtnis. `grep -i "keyword" INDEX.md` findet alles.*
-*Aktualisieren nach jeder neuen wichtigen Datei.*
-
----
-
-## System-Dateien (Root)
-- `MEMORY.md` — Mias Langzeitgedächtnis, kuratiert
-- `SOUL.md` — Mias Persönlichkeit, Werte, Betriebsmodus
-- `VOICE.md` — Wie Mia klingt (Deutsch, kurz, direkt, keine Füllwörter)
-- `IDENTITY.md` — Name (Mia), Creature, Vibe, Emoji (♔)
-- `USER.md` — Florian Ziesche: Background, Familie, Finanzen, Preferences
-- `TWIN.md` — Florians Digital Twin (Entscheidungsmodell, 95%+ Confidence Rules)
-- `AGENTS.md` — Sub-Agents (Hunter, Writer, Researcher, Operator, Dealmaker, Analyst, Strategist)
-- `TOOLS.md` — Tool-Inventar und lokale Konfiguration
-- `HEARTBEAT.md` — Heartbeat-Checkliste und proaktive Aufgaben
-- `NORTH_STAR.md` — €500K Ziel, 4 Engines, wöchentliche Non-Negotiables, Tracking
-- `COCKPIT.md` — Operatives Dashboard (sollte auf COCKPIT.html verweisen)
-- `DEFINITION-OF-DONE.md` — Qualitätsstandard: "Ready-to-Send" Checkliste
-- `BRAND-IDENTITY-SYNTHESIS.md` — Ainary CI: Farben (Gold #c8aa50), Fonts (Inter, JetBrains Mono), Voice, Rules
-- `MISSION-500K.md` — Mission Statement und Strategie
-- `OPERATING-SYSTEM.md` — Florians persönliches Betriebssystem
-- `SHARED-VALUES.md` — Gemeinsame Werte Mia + Florian
-- `PRIORITIES.md` — Priorisierungs-Framework
+## Root (13 System-Dateien)
+- `SOUL.md` — Identität, Arbeitsweise, Voice
+- `USER.md` — Florian: Background, Familie, Preferences
+- `MEMORY.md` — Pointer auf Memory-System
+- `AGENTS.md` — Workspace-Regeln, Task→Standards Trigger-Map
+- `HEARTBEAT.md` — Proaktive Check-Ins
+- `TOOLS.md` — Tool-Inventar, Permissions
+- `IDENTITY.md` — Name (Mia), Emoji (♔)
+- `SUB-AGENT-CONTEXT.md` — Regeln für Sub-Agents (wächst bei jedem Bug)
+- `INDEX.md` — Dieses Verzeichnis
+- `TWIN.md` — Florians Entscheidungsmodell (>90% → handeln)
+- `NORTH_STAR.md` — €500K Ziel, 4 Engines
 - `ACTIVE_TASK.md` — Aktueller Task (Crash Recovery)
-- `BACKLOG.md` — Task-Backlog
-- `INBOX.md` — Eingangskorb für neue Ideen/Tasks
-- `TODAY.md` — Heutige Prioritäten
-- `SEND-THESE-NOW.md` — Dringende Sends die raus müssen
-- `EXPONENTIAL.md` — Exponentielles Denken Framework
+- `IDEAS.md` — Ideen + Inbox
+- `BEIPACKZETTEL.md` — Mias Schwächen, Blind Spots, Transparenz
 
-## Standards & Qualität
-- `DEFINITION-OF-DONE.md` — Wann ist ein Output wirklich fertig
-- `BRAND-IDENTITY-SYNTHESIS.md` — Corporate Identity komplett (479 Zeilen)
-- `standards/FLORIAN.md` — Florians Erwartungen, Patterns, Preferences
-- `standards/CORPORATE-IDENTITY.md` — CI Standards (Farben, Fonts, Spacing)
-- `standards/LINKING-RULES.md` — Obsidian Linking-Regeln (inline, max 3-5, keine Related-Sections)
-- `standards/DONE-GAP-DETECTOR.md` — Done Gap Detector System (Attack, Score, Tag)
-- `standards/checklists/before-delivery.md` — Vor jeder Delivery Checkliste
-- `standards/RESEARCH-PROTOCOL.md` — Pre-Research Protocol (Question → Hypothesis → MECE → BLUF → Admiralty Rating)
-- `standards/SYNTHESIS-PROTOCOL.md` — Synthesis Protocol (SCQA, Insight Ladder, Pre-mortem, Calibrated Confidence)
-- `standards/MENTAL-MODELS-LOOKUP.md` — Situation → Model → Action (8 Situationen, Mental Models Library)
-- `standards/OUTPUT-PREFLIGHT.md` — 6 Meta-Rules + 5 Pre-Output Questions (Board Discussion 1/8)
-- `standards/3-LEAN-CHECKLISTS.md` — Content/Outreach/Deliverable Checklists (Munger's Killer Items, 5-9 items)
-- `research/golden-standards/design-system.md` — CSS Design System (Linear/Notion-inspired)
-- `research/golden-standards/form-inputs.md` — Form Input Patterns
-- `research/golden-standards/price-display.md` — Pricing Display Patterns
-- `research/golden-standards/sidebar-navigation.md` — Sidebar Navigation Patterns
-- `skills/report-design/SKILL.md` — LaTeX Report Standards (XeLaTeX, Helvetica Neue, Margins)
-- `skills/pptx-design/SKILL.md` — PowerPoint Design Standards
-- `skills/cv-design/SKILL.md` — CV/Lebenslauf Design Standards
-- `skills/presentation-design/` — HTML Presentation Standards
-- `skills/vc-application/` — VC Application Standards
-- `brand/BRAND-GUIDE.md` — Brand Guidelines
-- `brand/CONTENT-STANDARD.md` — Content Quality Standards
-- `brand/INFOGRAPHIC-STANDARD.md` — Infografik Standards
-- `templates/FLORIAN-BRAND-KIT.md` — Brand Kit Zusammenfassung
-- `templates/GRAPHIC-BRIEF.md` — Briefing-Template für Grafiken
-- `agents/DESIGN-SYSTEM.md` — Agent Design System
-- `agents/FEEDBACK-STANDARD.md` — Feedback-Qualitätsstandards
-
-## Prozesse & Selbstverbesserung
-- `agents/CONTINUOUS-IMPROVEMENT.md` — Continuous Improvement Prozess
-- `agents/MIA-IMPROVEMENT-PLAN.md` — Mias Verbesserungsplan
-- `agents/SKILL-MASTERY-PLAN.md` — Skill-Aufbau-Plan
-- `agents/DELEGATION-PLAYBOOK.md` — Wann/wie an Sub-Agents delegieren
-- `agents/SUBAGENT-PLAYBOOK.md` — Sub-Agent Management
-- `agents/EXECUTION-TRACKER.md` — Execution Tracking (Sends vs Builds)
-- `agents/EXECUTION-METRICS.md` — Metriken für Execution
-- `agents/BUILD-BLOCKER.md` — Build-Blocker System (max 2 Features/Tag ohne Send)
-- `agents/FEEDBACK-SYSTEM.md` — Feedback-Loop System
-- `agents/quality-gap-analysis.md` — Qualitätslücken-Analyse
-- `SELF-IMPROVEMENT.md` — Selbstverbesserungs-Framework
-- `MIA-VERBESSERUNGSANALYSE.md` — Detaillierte Verbesserungsanalyse
-- `system-optimization/` — System-Optimierungsdokumente
-
-## Revenue & Pipeline
-- `NORTH_STAR.md` — €500K Ziel, 4 Engines mit Milestones
-- `SEND-THESE-NOW.md` — Sofort zu sendende Outreach
-- `sends/` — Send-Tracking
-- `outreach/` — Outreach-Materialien
-- `crm/` — CRM-Daten (2 Dateien)
-- `tracking/` — Tracking-Dateien (6 Dateien)
-- `sales/` — Sales-Materialien (6 Dateien)
-
-## Projekte (aktiv)
-- `projects/ai-company-xray/` — **AI Company X-Ray** (Corporate AI Audit Tool, GPT-4o, 5 Agents, Hyperthink, deployed)
-  - `projects/ai-company-xray/PROJECT-STATUS.md` — **MASTER REFERENCE** (Architektur, Bugs, GTM, Roadmap)
-- `projects/startup-xray/` — **Startup X-Ray** (Deal Screener für VCs, gleiche Engine, Purple Accent, Confidence Indicators)
-  - `projects/startup-xray/PROJECT-STATUS.md` — **MASTER REFERENCE**
-- `projects/ga4-agent-dashboard/` — **GA4 Intelligence Agent** (Dashboard v2, deployed: fziescheus-alt.github.io/ga4-intelligence)
-- `projects/glashuette-ki/` — Bürgermeister Glashütte: Dashboards, Konzept, Briefing, Email
-- `projects/cnc-planner/` — CNC Planer: Dashboards, Briefings, v18 Demo
-- `projects/ki-mittelstand/` — KI-Beratung Mittelstand: Report, Decks, Demos
-- `projects/depodigest/` — DepoDigest Projekt
-- `projects/invoice-automation/` — Rechnungsautomatisierung
-- `projects/master-dashboard.html` — Master Dashboard (alle Assets verlinkt)
-- `projects/asset-dashboard.html` — Asset Dashboard
-
-## Produkte
-- `products/cnc-planner/` — CNC Planer Pro (v18, 6117 LOC, leads, outreach)
-- `products/ai-consulting/` — KI-Beratung Pakete
-- `products/consulting/` — Consulting allgemein
-- `products/ki-mittelstand/` — KI Mittelstand spezifisch
-- `products/courses/` — Kurs-Materialien
-- `products/notion-ceo-bundle/` — Notion CEO Bundle
-- `products/lead-magnet/` — Lead Magnets
-
-## Job Applications (VC)
-- `job-applications/` — 117 Dateien: Cover Letters (LaTeX+PDF), Research, Targets
-- `job-applications/READY-TO-APPLY.md` — Bewerbungen die raus können
-- `job-applications/10-NEW-VC-TARGETS-2026-02-05.md` — Neue Fund-Targets
-- `job-applications/CL_*.pdf` — Fertige Cover Letters (Betaworks, Bloomberg, Conviction, FirstMark, etc.)
-- `vc-lab/` — VC Lab Programm (Decile Group), Sprint-Materialien
-- `fund-research/` — Fund Research (5 Dateien)
-
-## Content
-- `content/CONTENT-STRATEGY-Q1.md` — Q1 2026 Content-Strategie
-- `content/CONTENT-CALENDAR.md` — Content-Kalender
-- `content/CONTENT-QUEUE.md` — Content-Queue
-- `content/FLYWHEEL-EXECUTION.md` — Content Flywheel Plan
-- `content/10-LINKEDIN-POSTS-READY.md` — 10 LinkedIn Posts fertig
-- `content/5-SUBSTACK-ARTICLES.md` — 5 Substack-Artikel
-- `content/BLOG-CONCEPT-v2.md` — Blog-Konzept v2
-- `content/linkedin/` — LinkedIn-spezifische Posts
-- `content/twitter/` — Twitter-spezifische Posts
-- `content/substack/` — Substack-Artikel
-- `content/drafts/` — Content-Drafts
-- `content/social/` — Social Media allgemein
-- `content-strategy/` — Content-Strategie Dokumente (9 Dateien)
-- `content-drafts/` — Weitere Drafts
-- `substack-drafts/` — Substack-Drafts (2 Dateien)
-- `LINKEDIN-5-POSTS-READY.md` — 5 LinkedIn Posts (Root)
-
-## Brand & Identity
-- `BRAND-IDENTITY-SYNTHESIS.md` — Haupt-CI-Dokument (479 Zeilen)
-- `BRAND-ANALYSIS-FLORIAN.md` — Florians persönliche Brand-Analyse
-- `BRAND-SUMMARY-EXECUTIVE.md` — Executive Summary Brand
-- `brand/BRAND-GUIDE.md` — Brand Guidelines
-- `brand/CONTENT-STANDARD.md` — Content Standards
-- `brand/corporate-identity-mockup.html` — CI Mockup
-- `brand/assets/` — Brand Assets (Logos, etc.)
-- `brand/concepts/` — Brand-Konzepte
-- `brand/final/` — Finale Brand-Materialien
-
-## Research
-- `research/golden-standards/` — Design Golden Standards (4 Dateien)
-- `research/sota-*.md` — State of the Art Reports
-- `research/vc-*.md` — VC Research
-- `research/36zero-*.md` — 36ZERO Vision Analyse
-- `research/cnc-competitive-landscape-2026-02-07.md` — CNC Wettbewerb
-- `research/brand-positioning/` — Brand Positioning Research
-- `research/night-research/` — Nacht-Research Sessions
-
-## Board of Advisors
-- `board/charlie-munger/SECOND-BRAIN.md` — Munger: Inversion, Mental Models, Checklisten
-- `board/elad-gil/SECOND-BRAIN.md` — Gil: Scaling, Phase Transitions, Operator
-- `board/marc-andreessen/SECOND-BRAIN.md` — Andreessen: Software, Distribution, Bold
-- `board/paul-graham/SECOND-BRAIN.md` — Graham: Startups, Essays, Do Things That Don't Scale
-- `board/peter-thiel/SECOND-BRAIN.md` — Thiel: Monopol, Contrarian, Zero to One
-- `board/reid-hoffman/SECOND-BRAIN.md` — Hoffman: Netzwerk, Blitzscaling, Alliances
-
-## Experiments
-- `experiments/agent-evolution/` — Agent Evolution Experiment (Weekly)
-- `experiments/agent-evolution/THE-PROTOCOL.md` — The Protocol (6 Laws)
-- `experiments/agent-evolution/weekly-questions.md` — Fragen-Queue
-
-## Skills (eigene)
-- `skills/capability-evolver/` — Self-Evolution Engine
-- `skills/cv-design/SKILL.md` — CV Design Regeln
-- `skills/pptx-design/SKILL.md` — PowerPoint Design Regeln
-- `skills/presentation-design/` — Presentation Design
-- `skills/report-design/SKILL.md` — LaTeX Report Regeln
-- `skills/research/` — Research Skill
-- `skills/sota-brief/` — SOTA Brief Skill
-- `skills/vc-application/` — VC Application Skill
+## Standards (6 Dateien)
+- `standards/BRAND.md` — CI: Farben, Fonts, Voice, Website-Rules, Report-Rules
+- `standards/CONTENT-VOICE.md` — Anti-LLM Schreibstandard, Florians Stimme
+- `standards/FLORIAN.md` — Florians Erwartungen und Patterns
+- `standards/RESEARCH-PROTOCOL.md` — MECE, BLUF, Admiralty, Stopping Criteria
+- `standards/SYNTHESIS-PROTOCOL.md` — SCQA, Insight Ladder, Confidence Calibration
+- `standards/WEBSITE-DESIGN-GUIDE.md` — Website Design Golden Standard
 
 ## Memory
-- `memory/YYYY-MM-DD.md` — Tagesnotizen (32+ Dateien, seit ~Jan 2026)
-- `memory/heartbeat-state.json` — Heartbeat-Tracking
-- `memory/kintsugi.md` — **Fehler & Treffer** (Golden Repairs + Hits, 9 Repairs + 4 Hits documented)
-- `memory/wins/` — Win-Dokumentation (Self-Generated ICL Dataset, Mechanism 3)
-- `memory/wins/README.md` — Wie Wins dokumentieren (Prompt → Output → Why It Worked)
-- `memory/sota-research/` — SOTA Research Briefs (ArXiv, Papers)
+- `memory/MEMORY-INDEX.md` — Pointer
+- `memory/people.md` — Kontakte
+- `memory/projects.md` — Projekte
+- `memory/decisions.md` — Entscheidungslog
+- `memory/patterns.md` — Erkannte Muster
+- `memory/tech.md` — Tech-Stack
+- `memory/kintsugi.md` — Fehler-Log
+- `memory/YYYY-MM-DD.md` — Tägliche Logs
 
-## Scripts & Automation
-- `scripts/pre-build-check.sh` — Build-Blocker Check
-- `scripts/log-send.sh` — Send-Logging
-- `scripts/send-enforcer.sh` — Send-Enforcement
-- `scripts/` — 26 Scripts total (Backup, Automation, etc.)
+## Skills
+- `skills/report-design/` — LaTeX Report Standards
+- `skills/pptx-design/` — PowerPoint Standards
+- `skills/cv-design/` — Lebenslauf Standards
+- `skills/presentation-design/` — HTML Presentations
+- `skills/vc-application/` — VC Bewerbungen
+- `skills/website-ui/` — Website UI Patterns
+- `skills/research/` — Research Templates
 
-## Websites
-- `ainary-website-v3/` — Ainary Website v3 (496 Dateien, Node.js Projekt)
-- `website/` — Ältere Website-Version
-- `websites/` — Weitere Websites
+## Reports
+- `reports/workspace-architecture-research.md` — Research: Ideale AI Agent Architektur (4.500 Wörter, 22 Quellen)
 
----
+## Key Projects
+- `projects/platform-website/` — ainaryventures.com (Vercel)
+- `projects/glashuette-ki/` — Bürgermeister Dashboard + Fördermittel
 
-*Letzte Aktualisierung: 2026-02-08*
-*Bei Suche: `grep -i "keyword" INDEX.md`*
+## Archive
+- `archive/2026-02-root-cleanup/` — 68 archivierte Dateien vom Root-Cleanup 17.02.2026
 
-## Principles (EvolveR-based, ab 2026-02-10)
-- `principles/README.md` — How the scoring system works
-- `principles/product.md` — **Product Principles** (Ehrlichkeit>Bullshit, Architektur vor Code, Provocateur=Diff, Send First, Master Reference, 13 total)
-- `principles/execution.md` — Sends, shipping, task management (P-EX-01 to P-EX-03)
-- `principles/quality.md` — Output quality, framing, delivery (P-QU-01 to P-QU-05)
-- `principles/research.md` — Research, experiments, multi-agent (P-RE-01 to P-RE-06)
-- `principles/memory.md` — Memory management, knowledge org (P-ME-01 to P-ME-05)
-
-## Memory Architecture (3-Layer + Manager)
-- `memory/YYYY-MM-DD.md` — Episodic (daily raw logs)
-- `memory/semantic/*.md` — Semantic (facts, contacts, projects, decisions)
-- `memory/procedural/*.md` — Procedural (how-to, patterns, rules)
-- `memory/memory-ops-YYYY-MM-DD.md` — Memory Manager decisions log
-- `MEMORY.md` — Curated long-term (legacy, being migrated)
+## Obsidian Vault
+- Location: `/Users/florianziesche/Library/Mobile Documents/iCloud~md~obsidian/Documents/System_OS/`
+- 422 Notes, PARA-Struktur (00_Inbox → 90_Archive)
+- Enthält jetzt auch: archivierte Standards, Brand Research, VC Research

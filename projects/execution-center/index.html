@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>♔ Execution Center</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#0a0a0a; color:#d4d4d4; font-family:'Inter',system-ui,sans-serif; }
+
+.header { padding:40px 20px 20px; max-width:1000px; margin:0 auto; }
+.header h1 { font-size:28px; color:#fff; }
+.header h1 span { color:#c8aa50; }
+.header .subtitle { color:#888; font-size:13px; margin-top:4px; }
+
+.stats { display:flex; gap:12px; max-width:1000px; margin:20px auto; padding:0 20px; }
+.stat { flex:1; padding:16px; border-radius:8px; text-align:center; }
+.stat .num { font-size:32px; font-weight:700; }
+.stat .label { font-size:11px; color:#888; margin-top:4px; }
+.stat-red { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); }
+.stat-red .num { color:#ef4444; }
+.stat-gold { background:rgba(200,170,80,0.1); border:1px solid rgba(200,170,80,0.2); }
+.stat-gold .num { color:#c8aa50; }
+.stat-green { background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.2); }
+.stat-green .num { color:#22c55e; }
+.stat-blue { background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.2); }
+.stat-blue .num { color:#6366f1; }
+
+.section { max-width:1000px; margin:30px auto; padding:0 20px; }
+.section-title { font-size:16px; color:#fff; font-weight:600; margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+.section-title .badge { font-size:11px; padding:2px 8px; border-radius:10px; }
+.badge-urgent { background:rgba(239,68,68,0.2); color:#ef4444; }
+.badge-ready { background:rgba(200,170,80,0.2); color:#c8aa50; }
+.badge-blocked { background:rgba(251,146,60,0.2); color:#fb923c; }
+
+/* Action Cards */
+.action-card { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:10px; margin-bottom:12px; overflow:hidden; transition:all 0.2s; }
+.action-card:hover { border-color:rgba(200,170,80,0.3); }
+.action-card.urgent { border-left:3px solid #ef4444; }
+.action-card.ready { border-left:3px solid #c8aa50; }
+.action-card.blocked { border-left:3px solid #fb923c; }
+.action-card.sent { border-left:3px solid #22c55e; opacity:0.5; }
+
+.card-header { padding:16px 20px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; }
+.card-header h3 { font-size:14px; color:#fff; }
+.card-header .status { font-size:11px; padding:3px 10px; border-radius:12px; font-weight:600; }
+.status-send { background:#c8aa50; color:#0a0a0a; }
+.status-blocked { background:rgba(251,146,60,0.2); color:#fb923c; }
+.status-urgent { background:rgba(239,68,68,0.2); color:#ef4444; }
+.status-sent { background:rgba(34,197,94,0.2); color:#22c55e; }
+.status-decide { background:rgba(99,102,241,0.2); color:#6366f1; }
+
+.card-body { padding:0 20px 16px; display:none; }
+.card-body.open { display:block; }
+
+.detail-grid { display:grid; grid-template-columns:120px 1fr; gap:6px 12px; font-size:12px; }
+.detail-label { color:#888; }
+.detail-value { color:#d4d4d4; }
+.detail-value.ok { color:#22c55e; }
+.detail-value.missing { color:#ef4444; }
+.detail-value.partial { color:#eab308; }
+
+.cmd-box { margin-top:12px; background:rgba(200,170,80,0.08); border:1px solid rgba(200,170,80,0.2); border-radius:6px; padding:12px; font-family:'JetBrains Mono',monospace; font-size:11px; color:#c8aa50; position:relative; cursor:pointer; word-break:break-all; line-height:1.6; }
+.cmd-box:hover { background:rgba(200,170,80,0.12); }
+.cmd-box::after { content:'📋 Click to copy'; position:absolute; top:4px; right:8px; font-size:9px; color:#888; font-family:Inter,system-ui; }
+.cmd-box.copied::after { content:'✅ Copied!'; color:#22c55e; }
+
+.blocker { margin-top:8px; padding:8px 12px; background:rgba(239,68,68,0.06); border-radius:6px; font-size:12px; color:#ef4444; display:flex; align-items:center; gap:6px; }
+.blocker::before { content:'⛔'; }
+
+.impact { margin-top:8px; padding:8px 12px; background:rgba(99,102,241,0.06); border-radius:6px; font-size:12px; }
+.impact .if-yes { color:#22c55e; }
+.impact .if-no { color:#ef4444; }
+
+.second-order { margin-top:8px; padding:8px 12px; background:rgba(200,170,80,0.06); border-radius:6px; font-size:12px; color:#c8aa50; }
+.second-order::before { content:'🔮 '; }
+
+/* Checklist */
+.checklist { display:flex; gap:16px; margin-top:12px; flex-wrap:wrap; }
+.check-item { font-size:11px; display:flex; align-items:center; gap:4px; }
+.check-ok::before { content:'✅'; }
+.check-miss::before { content:'❌'; }
+.check-partial::before { content:'⚠️'; }
+
+.footer { text-align:center; padding:40px 20px; color:#555; font-size:11px; }
+
+/* Pipeline overview */
+.pipeline { display:flex; gap:2px; margin-bottom:20px; border-radius:6px; overflow:hidden; height:8px; }
+.pipe-seg { transition:all 0.3s; }
+.pipe-sent { background:#22c55e; }
+.pipe-ready { background:#c8aa50; }
+.pipe-blocked { background:#fb923c; }
+.pipe-nostart { background:#333; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>♔ Execution <span>Center</span></h1>
+  <div class="subtitle">Revenue = f(sends). Jede Zeile hier ist eine potenzielle Antwort.</div>
+</div>
+
+<div class="stats">
+  <div class="stat stat-red">
+    <div class="num">0</div>
+    <div class="label">GESENDET</div>
+  </div>
+  <div class="stat stat-gold">
+    <div class="num">3</div>
+    <div class="label">READY TO SEND</div>
+  </div>
+  <div class="stat stat-blue">
+    <div class="num">8</div>
+    <div class="label">BLOCKED</div>
+  </div>
+  <div class="stat stat-green">
+    <div class="num">€0</div>
+    <div class="label">PIPELINE VALUE</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="pipeline">
+    <div class="pipe-seg pipe-ready" style="flex:3" title="3 Ready"></div>
+    <div class="pipe-seg pipe-blocked" style="flex:8" title="8 Blocked"></div>
+    <div class="pipe-seg pipe-nostart" style="flex:3" title="3 Not Started"></div>
+  </div>
+</div>
+
+<!-- READY TO SEND -->
+<div class="section">
+  <div class="section-title">🚀 Ready to Send <span class="badge badge-ready">3</span></div>
+
+  <div class="action-card ready" onclick="toggle(this)">
+    <div class="card-header">
+      <h3>Glasswing Ventures — Rudina Seseri</h3>
+      <span class="status status-send">SEND NOW</span>
+    </div>
+    <div class="card-body">
+      <div class="detail-grid">
+        <span class="detail-label">Rolle</span><span class="detail-value">Operating/Platform (Cold Outreach)</span>
+        <span class="detail-label">Potential</span><span class="detail-value">$120K+ VC Salary</span>
+        <span class="detail-label">Draft</span><span class="detail-value ok">✅ cover-letter-final.md</span>
+        <span class="detail-label">Email</span><span class="detail-value partial">⚠️ rudina@glasswing.vc (~90%)</span>
+        <span class="detail-label">CC</span><span class="detail-value ok">✅ info@glasswing.vc</span>
+        <span class="detail-label">CV nötig?</span><span class="detail-value ok">Nein — Cold Email first</span>
+        <span class="detail-label">Hook</span><span class="detail-value">AgentTrust × Five-Stage Framework</span>
+        <span class="detail-label">Confidence</span><span class="detail-value">88% — stärkster Thesis-Overlap</span>
+      </div>
+      <div class="checklist">
+        <span class="check-item check-ok">Draft</span>
+        <span class="check-item check-ok">Email</span>
+        <span class="check-item check-ok">Subject</span>
+        <span class="check-item check-ok">No attachment needed</span>
+      </div>
+      <div class="cmd-box" onclick="copyCmd(event, this)">gog gmail send --to rudina@glasswing.vc --cc info@glasswing.vc --account f.ziesche.us@gmail.com --subject "Your Five-Stage Framework × My Open-Source Implementation" --body-file /Users/florianziesche/.openclaw/workspace/job-applications/glasswing/cover-letter-final.md</div>
+      <div class="second-order">Wenn Rudina antwortet → Interview Prep nötig: Glasswing Portfolio, Fund III Thesis, AgentTrust Demo</div>
+    </div>
+  </div>
+
+  <div class="action-card ready" onclick="toggle(this)">
+    <div class="card-header">
+      <h3>Betaworks — Venture Partner</h3>
+      <span class="status status-send">SEND NOW</span>
+    </div>
+    <div class="card-body">
+      <div class="detail-grid">
+        <span class="detail-label">Draft</span><span class="detail-value ok">✅ CL_Betaworks_Ziesche.pdf</span>
+        <span class="detail-label">CV</span><span class="detail-value ok">✅ CV_Florian_Ziesche_VC_2026_v2.pdf</span>
+        <span class="detail-label">Email</span><span class="detail-value partial">⚠️ Needs research</span>
+      </div>
+      <div class="blocker">Email-Adresse des Empfängers fehlt. Research nötig.</div>
+    </div>
+  </div>
+
+  <div class="action-card ready" onclick="toggle(this)">
+    <div class="card-header">
+      <h3>Insight Partners — Onsite Advisor</h3>
+      <span class="status status-send">SEND NOW</span>
+    </div>
+    <div class="card-body">
+      <div class="detail-grid">
+        <span class="detail-label">Draft</span><span class="detail-value ok">✅ cover-letter.md</span>
+        <span class="detail-label">Hook</span><span class="detail-value">"Founder your Onsite team advises"</span>
+        <span class="detail-label">Email</span><span class="detail-value missing">❌ Empfänger unbekannt</span>
+      </div>
+      <div class="blocker">Wer bei Insight Partners? Email Research nötig.</div>
+      <div class="cmd-box" onclick="copyCmd(event, this)" style="opacity:0.4">gog gmail send --to ???@insightpartners.com --subject "From the founder side to your Onsite team" --body-file /Users/florianziesche/.openclaw/workspace/job-applications/insight-partners/cover-letter.md</div>
+    </div>
+  </div>
+</div>
+
+<!-- BATCH 1: PDF COVER LETTERS -->
+<div class="section">
+  <div class="section-title">📨 Batch 1 — PDF Cover Letters <span class="badge badge-blocked">8 blocked</span></div>
+
+  <div class="action-card blocked" onclick="toggle(this)">
+    <div class="card-header">
+      <h3>Bloomberg Beta</h3><span class="status status-blocked">NEEDS EMAIL</span>
+    </div>
+    <div class="card-body">
+      <div class="checklist">
+        <span class="check-item check-ok">CL PDF</span>
+        <span class="check-item check-ok">CV PDF</span>
+        <span class="check-item check-miss">Empfänger Email</span>
+        <span class="check-item check-miss">Send-Befehl</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="action-card blocked" onclick="toggle(this)">
+    <div class="card-header">
+      <h3>Conviction</h3><span class="status status-blocked">NEEDS EMAIL</span>
+    </div>
+    <div class="card-body">
+      <div class="checklist">
+        <span class="check-item check-ok">CL PDF</span>
+        <span class="check-item check-ok">CV PDF</span>
+        <span class="check-item check-miss">Empfänger Email</span>
+        <span class="check-item check-miss">Send-Befehl</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="action-card blocked" onclick="toggle(this)">
+    <div class="card-header"><h3>FirstMark Capital</h3><span class="status status-blocked">NEEDS EMAIL</span></div>
+    <div class="card-body"><div class="checklist"><span class="check-item check-ok">CL PDF</span><span class="check-item check-ok">CV PDF</span><span class="check-item check-miss">Email</span></div></div>
+  </div>
+  <div class="action-card blocked" onclick="toggle(this)">
+    <div class="card-header"><h3>General Catalyst</h3><span class="status status-blocked">NEEDS EMAIL</span></div>
+    <div class="card-body"><div class="checklist"><span class="check-item check-ok">CL PDF</span><span class="check-item check-ok">CV PDF</span><span class="check-item check-miss">Email</span></div></div>
+  </div>
+  <div class="action-card blocked" onclick="toggle(this)">
+    <div class="card-header"><h3>Lionheart Ventures</h3><span class="status status-blocked">NEEDS EMAIL</span></div>
+    <div class="card-body"><div class="checklist"><span class="check-item check-ok">CL PDF</span><span class="check-item check-ok">CV PDF</span><span class="check-item check-miss">Email</span></div></div>
+  </div>
+  <div class="action-card blocked" onclick="toggle(this)">
+    <div class="card-header"><h3>Lux Capital</h3><span class="status status-blocked">NEEDS EMAIL</span></div>
+    <div class="card-body"><div class="checklist"><span class="check-item check-ok">CL PDF</span><span class="check-item check-ok">CV PDF</span><span class="check-item check-miss">Email</span></div></div>
+  </div>
+  <div class="action-card blocked" onclick="toggle(this)">
+    <div class="card-header"><h3>Point72 Ventures</h3><span class="status status-blocked">NEEDS EMAIL</span></div>
+    <div class="card-body"><div class="checklist"><span class="check-item check-ok">CL PDF</span><span class="check-item check-ok">CV PDF</span><span class="check-item check-miss">Email</span></div></div>
+  </div>
+  <div class="action-card blocked" onclick="toggle(this)">
+    <div class="card-header"><h3>Wingspan (HOF Capital)</h3><span class="status status-blocked">NEEDS EMAIL</span></div>
+    <div class="card-body"><div class="checklist"><span class="check-item check-ok">CL PDF</span><span class="check-item check-ok">CV PDF</span><span class="check-item check-miss">Email</span></div></div>
+  </div>
+</div>
+
+<!-- DECISIONS -->
+<div class="section">
+  <div class="section-title">⚡ Entscheidungen <span class="badge badge-urgent">2</span></div>
+
+  <div class="action-card urgent" onclick="toggle(this)">
+    <div class="card-header">
+      <h3>🔴 Steuer-Mahnung — Barbara Rabl</h3>
+      <span class="status status-urgent">URGENT</span>
+    </div>
+    <div class="card-body">
+      <div class="detail-grid">
+        <span class="detail-label">Was</span><span class="detail-value">USt Zahlungen Q3/2024 - Q3/2025</span>
+        <span class="detail-label">Von</span><span class="detail-value">b.rabl@rueterpartner.de</span>
+        <span class="detail-label">Betrag</span><span class="detail-value missing">❌ UNBEKANNT — Email lesen</span>
+      </div>
+      <div class="impact">
+        <div class="if-yes">✅ Reagieren → Ratenzahlung möglich, kein Eskalation</div>
+        <div class="if-no">❌ Ignorieren → Zinsen + mögliche Zwangsvollstreckung</div>
+      </div>
+      <div class="blocker">Betrag unbekannt. Email muss gelesen werden.</div>
+    </div>
+  </div>
+
+  <div class="action-card urgent" onclick="toggle(this)">
+    <div class="card-header">
+      <h3>🟡 GitHub Copilot Trial — endet MORGEN</h3>
+      <span class="status status-decide">DECIDE</span>
+    </div>
+    <div class="card-body">
+      <div class="impact">
+        <div class="if-yes">✅ Behalten: $19/mo — nützlich wenn du codest</div>
+        <div class="if-no">❌ Canceln: Spart $228/Jahr — Mia macht den Code</div>
+      </div>
+      <div class="second-order">Empfehlung: Canceln. Du codest kaum selbst. [70%]</div>
+    </div>
+  </div>
+</div>
+
+<!-- BLOCKED -->
+<div class="section">
+  <div class="section-title">🔧 Nächster Unblock-Schritt</div>
+  <div class="action-card" style="border-left:3px solid #6366f1;">
+    <div class="card-header">
+      <h3>Mia kann JETZT 8 Emails recherchieren</h3>
+      <span class="status" style="background:rgba(99,102,241,0.2);color:#6366f1;">AUTOMATE</span>
+    </div>
+    <div class="card-body open">
+      <p style="font-size:13px;margin-bottom:12px;">8 von 11 Bewerbungen sind nur blockiert weil <strong>Email-Adressen fehlen</strong>. Mia kann alle 8 in einem Sub-Agent-Run recherchieren und die Send-Befehle vorbereiten.</p>
+      <p style="font-size:13px;color:#c8aa50;">Sage "Recherchiere alle Emails" → in 10 Minuten sind alle 8 ready-to-send.</p>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  ♔ Execution Center · Revenue = f(sends) · Stand: 17.02.2026 20:48 CET
+</div>
+
+<script>
+function toggle(card) {
+  const body = card.querySelector('.card-body');
+  if (body) body.classList.toggle('open');
+}
+function copyCmd(e, el) {
+  e.stopPropagation();
+  navigator.clipboard.writeText(el.textContent.trim());
+  el.classList.add('copied');
+  setTimeout(() => el.classList.remove('copied'), 2000);
+}
+// Auto-open first ready card
+document.querySelector('.action-card.ready .card-body').classList.add('open');
+</script>
+</body>
+</html>

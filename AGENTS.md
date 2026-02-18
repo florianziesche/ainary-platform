@@ -1,93 +1,136 @@
-# AGENTS.md - Workspace & Agents
+# AGENTS.md — Workspace Rules
 
-This folder is home.
+## Task → Standards Trigger Map (LOAD FIRST, NOT OPTIONAL)
 
----
+| Task contains... | Load ONLY these | Do NOT load |
+|------------------|----------------|-------------|
+| Website, CSS, HTML, Deploy | `standards/WEBSITE-DESIGN-GUIDE.md` + `standards/BRAND.md` | RESEARCH-PROTOCOL, CONTENT-VOICE |
+| Research, Analyse, Report | `standards/RESEARCH-PROTOCOL.md` | BRAND, WEBSITE-DESIGN-GUIDE |
+| Content, Post, Artikel, LinkedIn | `standards/CONTENT-VOICE.md` | RESEARCH-PROTOCOL, BRAND |
+| Dokument, PDF, LaTeX, Report | `skills/report-design/SKILL.md` | WEBSITE-DESIGN-GUIDE |
+| Email, Outreach, Pitch, Message | `standards/FLORIAN.md` | BRAND, RESEARCH-PROTOCOL |
+| Bewerbung, VC Application | `skills/vc-application/SKILL.md` | CONTENT-VOICE |
+| Entscheidung, Strategie, Trade-off | `TWIN.md` (full) | all standards |
+| Sub-Agent spawnen | `SUB-AGENT-CONTEXT.md` | — |
+| Presentation, Slides | `skills/presentation-design/SKILL.md` | RESEARCH-PROTOCOL |
+| Heartbeat | `ref/HEARTBEAT.md` | all standards |
+
+## Task Loop (10 Schritte, nicht optional)
+1. **AKTIVIEREN:** `memory_search` + `verified-truths.md` + `connections.md` — was wissen wir schon?
+2. **HYPOTHESE:** Starke Vermutung BEVOR recherchiert wird
+3. **TESTEN:** Hypothese widerlegen versuchen, nicht bestätigen
+4. **AUSFÜHREN:** Die Arbeit machen
+5. **3-SEKUNDEN-CHECK:** Beantwortet? Belegt? Nutzbar? → Nein = Retry
+6. **EXTRAHIEREN:** Neue Fakten → `verified-truths.md`
+7. **VERBINDEN:** 2-3 Connections → `connections.md`
+8. **VORBEREITEN:** Was passiert wenn es klappt? Was brauchen wir dann?
+9. **TRUST:** `agenttrust-score.py update <agent> <conf> <outcome>`
+10. **LIEFERN**
+
+## Decision Tree — Was lese ich wann?
+*Florian kann jederzeit sagen: "Lies den Baum." Dann starte ich hier.*
+
+```
+START: Neue Aufgabe erhalten
+│
+├─ Kenne ich den Aufgabentyp?
+│  ├─ JA → Trigger Map oben → Standard laden → weiter
+│  └─ NEIN → Florian fragen: "Was ist das Ziel?"
+│
+├─ Bin ich unsicher? (Confidence < 90%)
+│  ├─ JA → TWIN.md lesen → Florian fragen
+│  └─ NEIN → handeln
+│
+├─ Gibt es Zahlen/Statistiken in meiner Antwort?
+│  ├─ JA → Quelle verifizieren (web_search). Keine Quelle = "unverified" dazuschreiben
+│  └─ NEIN → weiter
+│
+├─ Ist es visuell? (Website, Design, CSS, PDF)
+│  ├─ JA → standards/BRAND.md LESEN. Nicht "ich weiß das schon."
+│  └─ NEIN → weiter
+│
+├─ Schreibe ich Text für andere? (Post, Email, Artikel)
+│  ├─ JA → standards/CONTENT-VOICE.md LESEN. Anti-LLM Check.
+│  └─ NEIN → weiter
+│
+├─ Ist es Research?
+│  ├─ JA → standards/RESEARCH-PROTOCOL.md LESEN. MECE + Hypothese VOR dem Suchen.
+│  └─ NEIN → weiter
+│
+├─ Ist die Aufgabe komplex? (>30 min, mehrere Schritte)
+│  ├─ JA → Sub-Agent mit SUB-AGENT-CONTEXT.md spawnen
+│  └─ NEIN → selbst machen
+│
+├─ NACH der Aufgabe:
+│  ├─ Self-audit: Habe ich alle Anforderungen erfüllt?
+│  ├─ Confidence angeben: [X% — weil Y, unsicher bei Z]
+│  ├─ Bug gefunden? → Regel in SUB-AGENT-CONTEXT.md
+│  └─ Neues Wissen? → memory/YYYY-MM-DD.md (Memory-R1)
+│
+└─ STOP
+```
+
+**Florians Trigger-Wörter:**
+- "Lies den Baum" → Diesen Entscheidungsbaum durchgehen
+- "Hast du den Standard gelesen?" → Standard für den Aufgabentyp laden
+- "Du driftest" → Anti-Sycophancy: Pushback geben
+- "Langsamer" → Speed-Bias: Qualität vor Geschwindigkeit
+- "Quelle?" → Zahl verifizieren oder "unverified" markieren
+- "Check Obsidian" → Vault durchsuchen
 
 ## Every Session
-1. Read `SOUL.md` — who you are
-2. Read `USER.md` — who you're helping
-3. Read `memory/YYYY-MM-DD.md` (today + yesterday)
-4. **Main session**: Also read `MEMORY.md`
+1. Read `SOUL.md` — who I am, how I work
+2. Read `USER.md` — who Florian is
+3. Read `MEMORY.md` → follow its load order
+4. Main session only: Read today's + yesterday's `memory/YYYY-MM-DD.md`
 
 ## Before EVERY Task
-1. Run `./scripts/pre-flight.sh [task-type]` (cnc|bm|vc|content|visual|general)
-2. Read `TWIN.md` — Can I decide autonomously? (>90% → act, <90% → ask)
-3. `grep -i "[keyword]" INDEX.md` — Does something exist?
-4. For complex tasks → spawn Sub-Agent WITH `SUB-AGENT-CONTEXT.md` + relevant knowledge files
-5. Read `standards/checklists/before-any-output.md` before delivering
+1. **Identify task type** → load the right standards (Trigger Map above)
+2. **Check TWIN.md** — Can I decide autonomously? (>90% → act, <90% → ask)
+3. **Complex task?** → Spawn Sub-Agent WITH `SUB-AGENT-CONTEXT.md`
+4. **grep INDEX.md** — Does something relevant exist already?
 
-**After delivery:** Update `failures/output-tracker.md`
+## After Delivery
+1. **Self-audit:** Re-read requirements. What's missing? Rate confidence.
+2. **Bug/Issue?** → Create rule in `SUB-AGENT-CONTEXT.md` (system thinking)
+3. **New knowledge?** → Update `memory/YYYY-MM-DD.md` (Memory-R1: will this matter in 30 days?)
 
----
-
-## Memory (Typed — inspired by MIRIX)
-| Type | File(s) | Update Cadence |
-|------|---------|----------------|
-| **Core** (identity) | SOUL.md, USER.md | Monthly, human only |
-| **Episodic** (events) | memory/YYYY-MM-DD.md | Daily |
-| **Semantic** (knowledge) | MEMORY.md | Weekly distillation |
-| **Procedural** (how-to) | AGENTS.md, TOOLS.md | When process changes |
-| **Resource** (references) | memory/people.md, projects.md | On change |
-| **Shared** (sub-agents) | SUB-AGENT-CONTEXT.md | Before spawning |
-
-- **Crash Recovery:** `ACTIVE_TASK.md` — update before non-trivial tasks
-
-### Memory-R1 Rules (STORE / UPDATE / DELETE / NOOP)
-Before writing to any memory file, ask:
-1. **Will this change future behavior in 30 days?** No → NOOP
+## Memory-R1 Rules
+Before writing to any memory file:
+1. **Will this change behavior in 30 days?** No → NOOP
 2. **Does this update existing knowledge?** Yes → UPDATE (don't duplicate)
-3. **Is existing info now wrong/stale?** Yes → DELETE the old entry
-4. **Is this genuinely new signal?** Yes → STORE
+3. **Is existing info now wrong?** Yes → DELETE the old entry
+4. **Genuinely new signal?** Yes → STORE
 
-"Mental notes" don't survive. WRITE TO FILES — but only what matters.
-Bei jeder nicht-trivialen Aufgabe: ERST `ACTIVE_TASK.md` updaten, DANN arbeiten
+## Sub-Agent Quality Gate
+Every sub-agent task MUST end with self-audit:
+1. Re-read original task requirements
+2. Check every requirement against output
+3. If files edited: verify no unintended changes
+4. Rate confidence: <80% → flag what's uncertain
 
----
-
-## Sub-Agent Quality Gate (Reflection Pattern)
-Every sub-agent task MUST end with a self-audit step:
-```
-BEFORE COMPLETING: Audit your own output:
-1. Re-read the original task requirements
-2. Check every requirement against your output — what's missing?
-3. If files were edited: verify no unintended changes (diff check)
-4. If deploying: test the build locally first
-5. Rate your confidence: <80% → flag what's uncertain
-```
-This prevents the ~20% error rate we observed in sub-agent output.
+## Memory System
+| Type | File(s) | Update |
+|------|---------|--------|
+| Core (identity) | SOUL.md, USER.md | Monthly, human only |
+| Episodic (events) | memory/YYYY-MM-DD.md | Daily |
+| Semantic (knowledge) | MEMORY.md | Weekly distillation |
+| Procedural (how-to) | AGENTS.md, SUB-AGENT-CONTEXT.md | When process changes |
+| Resource (references) | memory/people.md, projects.md | On change |
 
 ## Safety
 - Don't exfiltrate private data
 - `trash` > `rm`
 - When in doubt, ask
-- Cron jobs MUST NOT modify SOUL.md, AGENTS.md, or MEMORY.md autonomously
-
-## Build Enforcement
-Before ANY build task: `./scripts/pre-build-check.sh "Feature Name"`
-If BLOCKED: Send ONE thing first, log it: `./scripts/log-send.sh "Description"`
-
-## Group Chats
-You have access to Florian's stuff ≠ share his stuff. Participate, don't dominate.
-React like a human (1 reaction max). Stay silent when conversation flows fine.
-
----
+- Cron jobs MUST NOT modify SOUL.md, AGENTS.md, or MEMORY.md
 
 ## Active Agents
-
 | Agent | Role | Trigger |
 |-------|------|---------|
-| 🎯 HUNTER | VC Job Search | Applications, interviews, networking |
-| ✍️ WRITER | Content & Blog | Posts, articles, social media |
-| 🔬 RESEARCHER | Deep Dives | Research, fund analysis, market maps |
-| 🧮 OPERATOR | Systems | Notion, automation, process optimization |
-| 💼 DEALMAKER | Freelance & Sales | Proposals, outreach, pricing |
-| 📊 ANALYST | Data & Metrics | Revenue, content performance, goals |
-| 🧠 STRATEGIST | Thinking Partner | Big decisions, trade-offs, strategy |
+| 🎯 HUNTER | VC Job Search | Applications, interviews |
+| ✍️ WRITER | Content & Blog | Posts, articles |
+| 🔬 RESEARCHER | Deep Dives | Research, analysis |
+| 🧮 OPERATOR | Systems | Automation, process |
+| 💼 DEALMAKER | Freelance & Sales | Proposals, outreach |
 
-**Agent Rules:** One per task. Hands back to King. Can request input. Learns → MEMORY.md.
-
-**Inactive:** TEACHER, NETWORKER, INVESTOR, BUILDER — activate when needed.
-
----
-*Last updated: 2026-02-17 — Added Typed Memory (MIRIX), Memory-R1 rules, SUB-AGENT-CONTEXT.md*
+*One per task. Hands back to main. Can request input.*

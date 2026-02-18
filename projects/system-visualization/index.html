@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mia System Architecture ♔</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#0a0a0a; color:#d4d4d4; font-family:'Inter',system-ui,sans-serif; overflow-x:hidden; }
+
+/* Header */
+.header { text-align:center; padding:60px 20px 40px; }
+.header h1 { font-size:36px; color:#fff; letter-spacing:-0.5px; }
+.header h1 span { color:#c8aa50; }
+.header p { color:#888; margin-top:8px; font-size:14px; }
+
+/* Sections */
+.section { max-width:1100px; margin:0 auto 60px; padding:0 20px; }
+.section-title { font-size:22px; color:#fff; margin-bottom:24px; padding-bottom:12px; border-bottom:1px solid rgba(200,170,80,0.2); }
+.section-title span { color:#c8aa50; }
+
+/* Flywheel */
+.flywheel-container { display:flex; justify-content:center; padding:40px 0; }
+.flywheel { position:relative; width:500px; height:500px; }
+.flywheel-node { position:absolute; width:120px; height:120px; border-radius:50%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; font-size:12px; font-weight:600; transition:all 0.3s; cursor:pointer; }
+.flywheel-node:hover { transform:scale(1.1); z-index:10; }
+.flywheel-node .icon { font-size:28px; margin-bottom:4px; }
+.flywheel-node .label { font-size:11px; color:#fff; line-height:1.3; }
+.flywheel-node .sub { font-size:9px; color:#888; margin-top:2px; }
+
+.fn-research { top:0; left:190px; background:rgba(99,102,241,0.15); border:2px solid rgba(99,102,241,0.4); }
+.fn-insights { top:95px; left:370px; background:rgba(200,170,80,0.15); border:2px solid rgba(200,170,80,0.4); }
+.fn-connections { top:270px; left:380px; background:rgba(16,185,129,0.15); border:2px solid rgba(16,185,129,0.4); }
+.fn-content { top:380px; left:190px; background:rgba(244,114,182,0.15); border:2px solid rgba(244,114,182,0.4); }
+.fn-leads { top:270px; left:0; background:rgba(251,146,60,0.15); border:2px solid rgba(251,146,60,0.4); }
+.fn-revenue { top:95px; left:10px; background:rgba(52,211,153,0.15); border:2px solid rgba(52,211,153,0.4); }
+
+/* Flywheel arrows - SVG */
+.flywheel svg { position:absolute; top:0; left:0; width:500px; height:500px; pointer-events:none; }
+.flywheel svg path { fill:none; stroke:rgba(200,170,80,0.3); stroke-width:2; marker-end:url(#arrow); }
+
+/* Layered Architecture */
+.layers { display:flex; flex-direction:column; gap:2px; }
+.layer { display:flex; align-items:stretch; border-radius:8px; overflow:hidden; transition:all 0.3s; }
+.layer:hover { transform:translateX(4px); }
+.layer-num { width:60px; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:700; color:#0a0a0a; flex-shrink:0; }
+.layer-content { flex:1; padding:16px 20px; }
+.layer-name { font-size:14px; font-weight:600; color:#fff; }
+.layer-files { font-size:12px; color:#888; margin-top:4px; font-family:'JetBrains Mono',monospace; }
+.layer-desc { font-size:11px; color:#666; margin-top:4px; }
+
+.l1 { background:rgba(200,170,80,0.12); }
+.l1 .layer-num { background:#c8aa50; }
+.l2 { background:rgba(99,102,241,0.10); }
+.l2 .layer-num { background:#6366f1; color:#fff; }
+.l3 { background:rgba(16,185,129,0.10); }
+.l3 .layer-num { background:#10b981; }
+.l4 { background:rgba(251,146,60,0.10); }
+.l4 .layer-num { background:#fb923c; }
+.l5 { background:rgba(107,114,128,0.10); }
+.l5 .layer-num { background:#6b7280; color:#fff; }
+
+/* Trust System */
+.trust-visual { display:flex; gap:12px; flex-wrap:wrap; }
+.trust-level { flex:1; min-width:200px; padding:20px; border-radius:8px; text-align:center; }
+.trust-level .score { font-size:32px; font-weight:700; }
+.trust-level .name { font-size:13px; font-weight:600; margin-top:4px; }
+.trust-level .desc { font-size:11px; color:#888; margin-top:8px; }
+.trust-level .qa { font-size:12px; margin-top:6px; font-family:monospace; }
+
+.tl-untrusted { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); }
+.tl-untrusted .score { color:#ef4444; }
+.tl-supervised { background:rgba(234,179,8,0.1); border:1px solid rgba(234,179,8,0.3); }
+.tl-supervised .score { color:#eab308; }
+.tl-spotcheck { background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.3); }
+.tl-spotcheck .score { color:#22c55e; }
+.tl-autonomous { background:rgba(200,170,80,0.1); border:1px solid rgba(200,170,80,0.3); }
+.tl-autonomous .score { color:#c8aa50; }
+
+.trust-rules { margin-top:20px; display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.trust-rule { padding:12px; border-radius:6px; font-size:12px; display:flex; align-items:center; gap:8px; }
+.trust-rule .delta { font-size:18px; font-weight:700; width:36px; text-align:center; flex-shrink:0; }
+.tr-good { background:rgba(34,197,94,0.08); }
+.tr-good .delta { color:#22c55e; }
+.tr-bad { background:rgba(239,68,68,0.08); }
+.tr-bad .delta { color:#ef4444; }
+.tr-flag { background:rgba(99,102,241,0.08); }
+.tr-flag .delta { color:#6366f1; }
+.tr-hidden { background:rgba(239,68,68,0.08); }
+.tr-hidden .delta { color:#ef4444; }
+
+/* Task Loop */
+.task-loop { display:flex; flex-direction:column; gap:4px; }
+.task-step { display:flex; align-items:center; gap:12px; padding:12px 16px; border-radius:8px; background:rgba(255,255,255,0.03); border-left:3px solid transparent; transition:all 0.2s; }
+.task-step:hover { background:rgba(255,255,255,0.06); transform:translateX(4px); }
+.task-step .num { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; }
+.task-step .text { font-size:13px; }
+.task-step .file { font-size:11px; color:#888; font-family:monospace; }
+
+.ts-activate { border-left-color:#6366f1; }
+.ts-activate .num { background:rgba(99,102,241,0.2); color:#6366f1; }
+.ts-hypothesis { border-left-color:#c8aa50; }
+.ts-hypothesis .num { background:rgba(200,170,80,0.2); color:#c8aa50; }
+.ts-test { border-left-color:#ef4444; }
+.ts-test .num { background:rgba(239,68,68,0.2); color:#ef4444; }
+.ts-execute { border-left-color:#22c55e; }
+.ts-execute .num { background:rgba(34,197,94,0.2); color:#22c55e; }
+.ts-check { border-left-color:#eab308; }
+.ts-check .num { background:rgba(234,179,8,0.2); color:#eab308; }
+.ts-extract { border-left-color:#6366f1; }
+.ts-extract .num { background:rgba(99,102,241,0.2); color:#6366f1; }
+.ts-connect { border-left-color:#10b981; }
+.ts-connect .num { background:rgba(16,185,129,0.2); color:#10b981; }
+.ts-prepare { border-left-color:#f472b6; }
+.ts-prepare .num { background:rgba(244,114,182,0.2); color:#f472b6; }
+.ts-trust { border-left-color:#c8aa50; }
+.ts-trust .num { background:rgba(200,170,80,0.2); color:#c8aa50; }
+.ts-deliver { border-left-color:#34d399; }
+.ts-deliver .num { background:rgba(52,211,153,0.2); color:#34d399; }
+
+/* Agents */
+.agents-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; }
+.agent-card { padding:20px; border-radius:8px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); text-align:center; transition:all 0.2s; }
+.agent-card:hover { border-color:rgba(200,170,80,0.3); transform:translateY(-2px); }
+.agent-card .emoji { font-size:32px; }
+.agent-card .name { font-size:14px; font-weight:600; color:#fff; margin-top:8px; }
+.agent-card .role { font-size:11px; color:#888; margin-top:4px; }
+.agent-card .score { font-size:12px; margin-top:8px; padding:4px 8px; border-radius:4px; display:inline-block; }
+.score-untrusted { background:rgba(239,68,68,0.15); color:#ef4444; }
+
+/* Cron Timeline */
+.cron-timeline { position:relative; padding-left:40px; }
+.cron-timeline::before { content:''; position:absolute; left:15px; top:0; bottom:0; width:2px; background:rgba(200,170,80,0.2); }
+.cron-item { position:relative; margin-bottom:12px; padding:12px 16px; border-radius:8px; background:rgba(255,255,255,0.03); }
+.cron-item::before { content:''; position:absolute; left:-29px; top:16px; width:10px; height:10px; border-radius:50%; background:#c8aa50; }
+.cron-item.disabled { opacity:0.4; }
+.cron-item.disabled::before { background:#6b7280; }
+.cron-time { font-size:12px; color:#c8aa50; font-family:monospace; font-weight:600; }
+.cron-name { font-size:13px; color:#fff; margin-top:2px; }
+.cron-desc { font-size:11px; color:#888; margin-top:2px; }
+
+/* Footer */
+.footer { text-align:center; padding:40px 20px 60px; color:#555; font-size:12px; }
+
+/* Responsive */
+@media (max-width:600px) {
+  .flywheel-container { display:none; }
+  .trust-rules { grid-template-columns:1fr; }
+  .trust-visual { flex-direction:column; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Mia <span>♔</span> System Architecture</h1>
+  <p>Compound Intelligence Engine — Stand 17. Februar 2026</p>
+</div>
+
+<!-- FLYWHEEL -->
+<div class="section">
+  <div class="section-title">🔄 <span>Compound Flywheel</span></div>
+  <div class="flywheel-container">
+    <div class="flywheel">
+      <svg viewBox="0 0 500 500">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(200,170,80,0.5)"/>
+          </marker>
+        </defs>
+        <!-- Curved arrows between nodes -->
+        <path d="M 300,40 Q 400,20 420,110"/>
+        <path d="M 450,220 Q 470,300 430,330"/>
+        <path d="M 380,390 Q 330,430 280,410"/>
+        <path d="M 170,390 Q 80,370 60,300"/>
+        <path d="M 40,200 Q 20,130 70,100"/>
+        <path d="M 150,60 Q 180,30 220,30"/>
+      </svg>
+      <div class="flywheel-node fn-research">
+        <div class="icon">🔬</div>
+        <div class="label">Research</div>
+        <div class="sub">Directed Agent<br>3×/Tag</div>
+      </div>
+      <div class="flywheel-node fn-insights">
+        <div class="icon">💡</div>
+        <div class="label">Insights</div>
+        <div class="sub">verified-truths.md</div>
+      </div>
+      <div class="flywheel-node fn-connections">
+        <div class="icon">🧠</div>
+        <div class="label">Connections</div>
+        <div class="sub">connections.md<br>Knowledge Graph</div>
+      </div>
+      <div class="flywheel-node fn-content">
+        <div class="icon">✍️</div>
+        <div class="label">Content</div>
+        <div class="sub">LinkedIn, Blog<br>aus Connections</div>
+      </div>
+      <div class="flywheel-node fn-leads">
+        <div class="icon">🎯</div>
+        <div class="label">Leads</div>
+        <div class="sub">Outreach, SEO<br>Authority</div>
+      </div>
+      <div class="flywheel-node fn-revenue">
+        <div class="icon">💰</div>
+        <div class="label">Revenue</div>
+        <div class="sub">Consulting, VC<br>Credits, Grants</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LAYERED ARCHITECTURE -->
+<div class="section">
+  <div class="section-title">📐 <span>Layered Graph Architecture</span></div>
+  <div class="layers">
+    <div class="layer l1">
+      <div class="layer-num">L1</div>
+      <div class="layer-content">
+        <div class="layer-name">Prinzipien</div>
+        <div class="layer-files">SOUL.md · AGENTS.md · USER.md</div>
+        <div class="layer-desc">Identität, Regeln, Prozesse — ändert sich monatlich</div>
+      </div>
+    </div>
+    <div class="layer l2">
+      <div class="layer-num">L2</div>
+      <div class="layer-content">
+        <div class="layer-name">Verifiziertes Wissen</div>
+        <div class="layer-files">verified-truths.md · connections.md</div>
+        <div class="layer-desc">Fakten mit Quellen + Verfallsdatum · Verbindungen zwischen Fakten — wachsend, compound</div>
+      </div>
+    </div>
+    <div class="layer l3">
+      <div class="layer-num">L3</div>
+      <div class="layer-content">
+        <div class="layer-name">Referenz-Daten</div>
+        <div class="layer-files">people.md · projects.md · decisions-YYYY-MM.md</div>
+        <div class="layer-desc">Stabile Referenzen — Personen, Projekte, Entscheidungen</div>
+      </div>
+    </div>
+    <div class="layer l4">
+      <div class="layer-num">L4</div>
+      <div class="layer-content">
+        <div class="layer-name">Operations</div>
+        <div class="layer-files">corrections-*.md · trust-score.md · agenttrust-state.json</div>
+        <div class="layer-desc">Agent-Lernen, Trust Tracking, Quality Scores</div>
+      </div>
+    </div>
+    <div class="layer l5">
+      <div class="layer-num">L5</div>
+      <div class="layer-content">
+        <div class="layer-name">Ephemeral</div>
+        <div class="layer-files">2026-MM-DD.md · news-scan-*.md · sota-research/*.md</div>
+        <div class="layer-desc">Tages-Logs, Scans — 30-Tage-Verfall, wird archiviert oder promoted zu L2</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TASK LOOP -->
+<div class="section">
+  <div class="section-title">🔟 <span>Task Loop</span> <span style="font-size:13px;color:#888;font-weight:400">— jede Aufgabe, nicht optional</span></div>
+  <div class="task-loop">
+    <div class="task-step ts-activate">
+      <div class="num">1</div>
+      <div><div class="text">AKTIVIEREN — Was wissen wir schon?</div><div class="file">memory_search + verified-truths.md + connections.md</div></div>
+    </div>
+    <div class="task-step ts-hypothesis">
+      <div class="num">2</div>
+      <div><div class="text">HYPOTHESE — Starke Vermutung BEVOR recherchiert wird</div></div>
+    </div>
+    <div class="task-step ts-test">
+      <div class="num">3</div>
+      <div><div class="text">TESTEN — Hypothese widerlegen versuchen, nicht bestätigen</div></div>
+    </div>
+    <div class="task-step ts-execute">
+      <div class="num">4</div>
+      <div><div class="text">AUSFÜHREN — Die Arbeit machen</div></div>
+    </div>
+    <div class="task-step ts-check">
+      <div class="num">5</div>
+      <div><div class="text">3-SEKUNDEN-CHECK — Beantwortet? Belegt? Nutzbar?</div><div class="file">Nein = Retry, nicht shippen</div></div>
+    </div>
+    <div class="task-step ts-extract">
+      <div class="num">6</div>
+      <div><div class="text">EXTRAHIEREN — Neue Fakten identifizieren</div><div class="file">→ verified-truths.md</div></div>
+    </div>
+    <div class="task-step ts-connect">
+      <div class="num">7</div>
+      <div><div class="text">VERBINDEN — 2-3 Connections zu bestehendem Wissen</div><div class="file">→ connections.md</div></div>
+    </div>
+    <div class="task-step ts-prepare">
+      <div class="num">8</div>
+      <div><div class="text">VORBEREITEN — Was passiert wenn es klappt? Was brauchen wir dann?</div></div>
+    </div>
+    <div class="task-step ts-trust">
+      <div class="num">9</div>
+      <div><div class="text">TRUST — Score updaten</div><div class="file">agenttrust-score.py update &lt;agent&gt; &lt;conf&gt; &lt;outcome&gt;</div></div>
+    </div>
+    <div class="task-step ts-deliver">
+      <div class="num">10</div>
+      <div><div class="text">LIEFERN — Output an Florian</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TRUST SYSTEM -->
+<div class="section">
+  <div class="section-title">🛡️ <span>AgentTrust System</span> <span style="font-size:13px;color:#888;font-weight:400">— from our own GitHub repo, now live</span></div>
+  <div class="trust-visual">
+    <div class="trust-level tl-untrusted">
+      <div class="score">0-30</div>
+      <div class="name">🔴 UNTRUSTED</div>
+      <div class="desc">QA prüft alles</div>
+      <div class="qa">qa_rate: 100%</div>
+    </div>
+    <div class="trust-level tl-supervised">
+      <div class="score">31-60</div>
+      <div class="name">🟡 SUPERVISED</div>
+      <div class="desc">QA prüft Flagged</div>
+      <div class="qa">qa_rate: 50%</div>
+    </div>
+    <div class="trust-level tl-spotcheck">
+      <div class="score">61-80</div>
+      <div class="name">🟢 SPOT CHECK</div>
+      <div class="desc">QA Stichproben</div>
+      <div class="qa">qa_rate: 20%</div>
+    </div>
+    <div class="trust-level tl-autonomous">
+      <div class="score">81+</div>
+      <div class="name">⭐ AUTONOMOUS</div>
+      <div class="desc">Direkte Auslieferung</div>
+      <div class="qa">qa_rate: 0%</div>
+    </div>
+  </div>
+  <div class="trust-rules">
+    <div class="trust-rule tr-good"><div class="delta">+1</div><div>Guter Output mit realistischer Confidence</div></div>
+    <div class="trust-rule tr-flag"><div class="delta">+2</div><div>Unsicherheit ehrlich geflagged (und bestätigt)</div></div>
+    <div class="trust-rule tr-bad"><div class="delta">-3</div><div>Schlechter Output + hohe Confidence (Overconfident)</div></div>
+    <div class="trust-rule tr-hidden"><div class="delta">-3</div><div>Problem versteckt, QA findet es</div></div>
+  </div>
+</div>
+
+<!-- AGENTS -->
+<div class="section">
+  <div class="section-title">🤖 <span>Active Agents</span></div>
+  <div class="agents-grid">
+    <div class="agent-card">
+      <div class="emoji">♔</div>
+      <div class="name">MAIN (Mia)</div>
+      <div class="role">Orchestrator, Co-Founderin</div>
+      <div class="score score-untrusted">🔴 8/100</div>
+    </div>
+    <div class="agent-card">
+      <div class="emoji">🎯</div>
+      <div class="name">HUNTER</div>
+      <div class="role">VC Jobs, Applications</div>
+      <div class="score score-untrusted">🔴 0/100</div>
+    </div>
+    <div class="agent-card">
+      <div class="emoji">✍️</div>
+      <div class="name">WRITER</div>
+      <div class="role">Content, Posts, Artikel</div>
+      <div class="score score-untrusted">🔴 1/100</div>
+    </div>
+    <div class="agent-card">
+      <div class="emoji">🔬</div>
+      <div class="name">RESEARCHER</div>
+      <div class="role">Deep Dives, Analysis</div>
+      <div class="score score-untrusted">🔴 1/100</div>
+    </div>
+    <div class="agent-card">
+      <div class="emoji">🧮</div>
+      <div class="name">BUILDER</div>
+      <div class="role">Website, CSS, Code</div>
+      <div class="score score-untrusted">🔴 1/100</div>
+    </div>
+    <div class="agent-card">
+      <div class="emoji">💼</div>
+      <div class="name">DEALMAKER</div>
+      <div class="role">Consulting, Outreach</div>
+      <div class="score score-untrusted">🔴 0/100</div>
+    </div>
+  </div>
+</div>
+
+<!-- CRON TIMELINE -->
+<div class="section">
+  <div class="section-title">⏰ <span>Daily Automation</span></div>
+  <div class="cron-timeline">
+    <div class="cron-item"><div class="cron-time">02:00</div><div class="cron-name">Overnight Work (NORTH_STAR)</div><div class="cron-desc">Autonome Nachtarbeit — Revenue-fokussiert</div></div>
+    <div class="cron-item"><div class="cron-time">03:00</div><div class="cron-name">Daily Backup</div><div class="cron-desc">System-Backup</div></div>
+    <div class="cron-item"><div class="cron-time">04:00 Mo/Do</div><div class="cron-name">SOTA Paper Scanner</div><div class="cron-desc">arxiv + Trending Papers</div></div>
+    <div class="cron-item"><div class="cron-time">05:00</div><div class="cron-name">Capability Evolver</div><div class="cron-desc">Self-Improvement + Learning Scan</div></div>
+    <div class="cron-item"><div class="cron-time">06:00 / 14:00 / 22:00</div><div class="cron-name">🔬 Directed Research Agent ⭐ NEU</div><div class="cron-desc">Wissenslücken finden → gerichtet recherchieren → verified-truths + connections</div></div>
+    <div class="cron-item"><div class="cron-time">07:00 / 13:00 / 19:00</div><div class="cron-name">Research Intake (blogwatcher)</div><div class="cron-desc">RSS/Feed Scan</div></div>
+    <div class="cron-item"><div class="cron-time">07:30 Mo/Mi/Fr</div><div class="cron-name">Intelligence Brief</div><div class="cron-desc">5-Bullet Brief via Telegram</div></div>
+    <div class="cron-item"><div class="cron-time">08:00</div><div class="cron-name">Memory Reload + Morning Email</div><div class="cron-desc">Daily Briefing an Florian</div></div>
+    <div class="cron-item"><div class="cron-time">08:30</div><div class="cron-name">Morning Brief (NORTH_STAR)</div><div class="cron-desc">THE ONE THING + Tagesplan</div></div>
+    <div class="cron-item"><div class="cron-time">09:00 Mo-Fr</div><div class="cron-name">Email Triage</div><div class="cron-desc">Inbox sortieren, Drafts vorbereiten</div></div>
+    <div class="cron-item"><div class="cron-time">10:00 Mo-Fr</div><div class="cron-name">Outreach Accountability</div><div class="cron-desc">Wurde heute gesendet?</div></div>
+    <div class="cron-item"><div class="cron-time">11:00 Mo/Mi/Fr</div><div class="cron-name">Content Repurposing</div><div class="cron-desc">Insights → LinkedIn + Twitter</div></div>
+    <div class="cron-item"><div class="cron-time">12:00 / 16:00 / 20:00</div><div class="cron-name">🛡️ Quality Audit ⭐ NEU</div><div class="cron-desc">AgentTrust Scoring — agenttrust-score.py</div></div>
+    <div class="cron-item"><div class="cron-time">13:00</div><div class="cron-name">Midday Check</div><div class="cron-desc">THE ONE THING gemacht?</div></div>
+    <div class="cron-item"><div class="cron-time">21:00</div><div class="cron-name">Evening Review + Decision Logger + Daily Report</div><div class="cron-desc">Memory-R1, Decisions, Email Report</div></div>
+    <div class="cron-item"><div class="cron-time">23:00</div><div class="cron-name">Google Drive Sync</div><div class="cron-desc">Workspace → Drive Backup</div></div>
+  </div>
+</div>
+
+<!-- SOUL.MD SUMMARY -->
+<div class="section">
+  <div class="section-title">📜 <span>SOUL.md</span> <span style="font-size:13px;color:#888;font-weight:400">— 80 → 28 Zeilen (heute)</span></div>
+  <div style="background:rgba(255,255,255,0.03); border-radius:8px; padding:20px; font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.8; color:#888;">
+    <span style="color:#c8aa50"># Mia ♔ — Co-Founderin, nicht Assistentin</span><br><br>
+    <span style="color:#6366f1">## Jede Antwort</span> — 8 Regeln, 0 Widersprüche<br>
+    <span style="color:#eab308">## Before Task</span> — 1 Zeile: Reflection Loop<br>
+    <span style="color:#22c55e">## After Task</span> — Bug→Regel, Memory-R1, Anti-Drift<br>
+    <span style="color:#6366f1">## Compound Intelligence</span> — Truth DB, Connections, Anti-Entropy, Hypothesis-First, Second-Order<br>
+    <span style="color:#c8aa50">## Priorities</span> — Revenue = f(sends), NOT f(builds)<br>
+    <span style="color:#10b981">## Compound Loop</span> — Flywheel + 7-Tage-Filter<br>
+  </div>
+</div>
+
+<div class="footer">
+  ♔ Mia System Architecture · Ainary Ventures · Built 2026-02-17<br>
+  <span style="color:#c8aa50">Trust is earned, not assumed.</span>
+</div>
+
+</body>
+</html>
