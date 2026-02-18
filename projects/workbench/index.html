@@ -42,8 +42,239 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var
 .topic-meta{font-size:10px;color:var(--text-dim);margin-top:1px}
 .topic-pct{font-size:10px;color:var(--text-dim)}
 
-.trust-footer{padding:10px 20px;border-top:1px solid var(--border);display:flex;gap:12px;flex-wrap:wrap}
+.trust-footer{padding:8px 12px;border-top:1px solid var(--border);max-height:180px;overflow-y:auto}
 .trust-mini{font-size:9px;color:var(--text-dim)}
+.trust-header{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);padding:0 4px 6px;display:flex;justify-content:space-between}
+.trust-skill{display:flex;align-items:center;gap:6px;padding:3px 4px;font-size:10px}
+.trust-skill-name{width:70px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.trust-skill-bar{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.trust-skill-fill{height:100%;border-radius:2px;transition:width 0.3s}
+.trust-skill-score{width:24px;text-align:right;color:var(--text-dim);font-size:9px;flex-shrink:0}
+
+/* Corrections in context */
+.ctx-correction{padding:6px 8px;border-left:2px solid var(--danger);margin-bottom:4px;font-size:10px;line-height:1.5;background:rgba(196,112,112,0.04);border-radius:0 3px 3px 0}
+.ctx-correction-rule{color:var(--text-muted)}
+.ctx-correction-detail{color:var(--text-dim);margin-top:2px}
+.ctx-correction-wrong{text-decoration:line-through;color:var(--danger)}
+.ctx-correction-right{color:var(--warm)}
+.ctx-correction-count{font-size:8px;color:var(--text-dim);margin-top:2px}
+.ctx-severity{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;flex-shrink:0}
+.ctx-severity.s1{background:var(--text-dim)}
+.ctx-severity.s2{background:var(--warm)}
+.ctx-severity.s3{background:var(--danger)}
+
+/* Pre-flight badge */
+.preflight-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:3px;font-size:9px;font-weight:600;margin-left:8px}
+.preflight-badge.pass{background:rgba(74,170,136,0.1);color:#4aa088;border:1px solid rgba(74,170,136,0.2)}
+.preflight-badge.warn{background:rgba(212,168,83,0.1);color:var(--warm);border:1px solid rgba(212,168,83,0.2)}
+.preflight-badge.fail{background:rgba(196,112,112,0.1);color:var(--danger);border:1px solid rgba(196,112,112,0.2)}
+
+/* Event log in context */
+.ctx-event{display:flex;gap:6px;padding:4px 8px;font-size:9px;color:var(--text-dim)}
+.ctx-event-time{flex-shrink:0;width:36px;color:var(--text-dim)}
+.ctx-event-dot{width:4px;height:4px;border-radius:50%;background:var(--text-dim);margin-top:5px;flex-shrink:0}
+.ctx-event-text{flex:1;line-height:1.4}
+
+/* Upload area */
+.ctx-upload{border:1px dashed var(--border-light);border-radius:4px;padding:12px;text-align:center;cursor:pointer;transition:all 0.15s;margin-top:4px}
+.ctx-upload:hover{border-color:var(--warm);background:rgba(212,168,83,0.04)}
+.ctx-upload-text{font-size:10px;color:var(--text-dim)}
+.ctx-upload input[type=file]{display:none}
+.ctx-add-ref{display:flex;align-items:center;gap:4px;padding:6px 8px;cursor:pointer;font-size:10px;color:var(--text-dim);transition:all 0.1s;margin-top:4px}
+.ctx-add-ref:hover{color:var(--warm)}
+
+/* Guardrails */
+.guardrail{display:inline-flex;align-items:center;gap:4px;font-size:9px;padding:2px 6px;border-radius:3px;font-weight:600;letter-spacing:0.3px}
+.guardrail.auto{background:rgba(80,200,120,0.1);color:#50c878}
+.guardrail.review{background:rgba(212,168,83,0.1);color:var(--warm)}
+.guardrail.confirm{background:rgba(196,112,112,0.1);color:var(--danger)}
+
+/* Action Buttons */
+.action-bar{display:flex;gap:6px;padding:8px 16px;border-top:1px solid var(--border);background:var(--surface)}
+.action-btn{padding:6px 14px;border-radius:4px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-family:inherit;transition:all 0.1s;display:flex;align-items:center;gap:5px}
+.action-btn:hover{background:var(--border-light);border-color:var(--text-dim)}
+.action-btn.primary{background:var(--text);color:var(--bg);border-color:var(--text)}
+.action-btn.primary:hover{opacity:0.9}
+.action-btn.danger{border-color:rgba(196,112,112,0.3);color:var(--danger)}
+.action-btn .guardrail{margin-left:2px}
+
+/* Command Palette */
+.cmd-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;align-items:flex-start;justify-content:center;padding-top:20vh}
+.cmd-overlay.open{display:flex}
+.cmd-box{background:var(--surface);border:1px solid var(--border-light);border-radius:12px;width:560px;max-width:90vw;overflow:hidden;box-shadow:0 24px 48px rgba(0,0,0,0.4)}
+.cmd-input{width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);padding:16px 20px;font-size:14px;color:var(--text);font-family:inherit;outline:none}
+.cmd-input::placeholder{color:var(--text-dim)}
+.cmd-results{max-height:320px;overflow-y:auto}
+.cmd-item{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;transition:background 0.05s}
+.cmd-item:hover,.cmd-item.active{background:var(--surface-2)}
+.cmd-item-icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text-dim);background:var(--surface-2);border-radius:4px;flex-shrink:0}
+.cmd-item-text{flex:1}
+.cmd-item-title{font-size:12px}
+.cmd-item-sub{font-size:10px;color:var(--text-dim)}
+.cmd-item-kbd{font-size:9px;color:var(--text-dim);padding:2px 5px;background:var(--surface-2);border-radius:3px;font-family:monospace}
+.cmd-footer{display:flex;gap:12px;padding:8px 20px;border-top:1px solid var(--border);font-size:9px;color:var(--text-dim)}
+
+/* Confirm Dialog */
+.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:400;align-items:center;justify-content:center}
+.confirm-overlay.open{display:flex}
+.confirm-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:24px;width:420px}
+.confirm-box h3{font-size:14px;margin-bottom:8px}
+.confirm-box p{font-size:12px;color:var(--text-muted);margin-bottom:16px;line-height:1.5}
+.confirm-btns{display:flex;gap:8px;justify-content:flex-end}
+.confirm-btns button{padding:8px 16px;border-radius:4px;font-size:12px;cursor:pointer;border:none;font-family:inherit}
+.confirm-btns .primary{background:var(--text);color:var(--bg);font-weight:600}
+.confirm-btns .secondary{background:none;border:1px solid var(--border);color:var(--text-muted)}
+
+/* Pipeline View */
+.pv{display:flex;gap:16px;height:100%;min-height:0}
+.pv-col{flex:1;min-width:200px;display:flex;flex-direction:column;gap:0}
+.pv-col-header{padding:12px 14px;border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;display:flex;justify-content:space-between;align-items:center}
+.pv-col-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
+.pv-col-stats{font-size:9px;color:var(--text-dim);text-align:right;line-height:1.5}
+.pv-col-body{flex:1;overflow-y:auto;border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;padding:8px;display:flex;flex-direction:column;gap:6px;background:rgba(255,255,255,0.01)}
+.pv-card{padding:10px 12px;border-radius:6px;background:var(--surface);border:1px solid var(--border);cursor:pointer;transition:all 0.1s}
+.pv-card:hover{border-color:var(--border-light);background:var(--surface-2)}
+.pv-card-name{font-size:11px;font-weight:600;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pv-card-meta{display:flex;gap:6px;align-items:center;font-size:9px;color:var(--text-dim)}
+.pv-card-progress{width:40px;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.pv-card-progress-fill{height:100%;border-radius:2px;background:var(--text-dim)}
+.pv-card-connections{display:flex;gap:3px;flex-wrap:wrap;margin-top:4px}
+.pv-card-conn{font-size:8px;padding:1px 4px;border-radius:2px;background:rgba(255,255,255,0.04);color:var(--text-dim)}
+.pv-card-findings{font-size:9px;color:var(--warm);margin-top:3px}
+.pv-flow{display:flex;align-items:center;justify-content:center;width:32px;flex-shrink:0}
+.pv-flow-inner{display:flex;flex-direction:column;align-items:center;gap:2px}
+.pv-flow-arrow{color:var(--border-light);font-size:14px}
+.pv-flow-rate{font-size:8px;font-weight:600;writing-mode:vertical-rl;text-orientation:mixed}
+.pv-header{margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.pv-header h2{font-size:16px;font-weight:700}
+.pv-header-stats{display:flex;gap:16px;font-size:11px;color:var(--text-muted)}
+.pv-header-stat{display:flex;flex-direction:column;align-items:center}
+.pv-header-stat-val{font-size:18px;font-weight:700;color:var(--text)}
+.pv-header-stat-label{font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px}
+.pv-orphan-alert{padding:8px 12px;border-radius:6px;background:rgba(196,112,112,0.06);border:1px solid rgba(196,112,112,0.15);margin-top:12px;font-size:10px;color:var(--danger)}
+.pv-card.connect-source{border-color:var(--warm);box-shadow:0 0 0 1px var(--warm)}
+.pv-card.connect-target:hover{border-color:#4aa088;box-shadow:0 0 0 1px #4aa088}
+.pv-connect-bar{position:sticky;top:0;z-index:10;padding:10px 16px;background:var(--surface);border:1px solid var(--warm);border-radius:8px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--warm)}
+.pv-connect-bar button{padding:4px 12px;border:1px solid var(--border);background:none;color:var(--text-dim);border-radius:4px;cursor:pointer;font-size:10px;font-family:inherit}
+.pv-connect-bar button:hover{border-color:var(--text-dim);color:var(--text)}
+.pv-research-lines{margin-top:12px;padding:12px;border-radius:8px;border:1px solid var(--border);background:var(--surface)}
+.pv-rl-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);margin-bottom:8px}
+.pv-rl-item{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:11px}
+.pv-rl-name{color:var(--text-muted)}
+.pv-rl-score{font-weight:600;color:var(--warm)}
+
+/* Findings */
+.ctx-finding{padding:8px;border-left:2px solid var(--border-light);margin-bottom:6px;border-radius:0 4px 4px 0;background:rgba(255,255,255,0.015);transition:all 0.15s}
+.ctx-finding:hover{background:rgba(255,255,255,0.03)}
+.ctx-finding.dead{opacity:0.4;text-decoration:line-through}
+.ctx-finding.contested{border-left-color:var(--warm)}
+.ctx-finding-claim{font-size:11px;color:var(--text-muted);line-height:1.5}
+.ctx-finding-meta{display:flex;align-items:center;gap:6px;margin-top:4px;font-size:9px;color:var(--text-dim)}
+.ctx-finding-id{font-family:monospace;font-size:9px}
+.conf-badge{display:inline-block;padding:1px 5px;border-radius:2px;font-size:9px;font-weight:600}
+.conf-badge.high{background:rgba(74,170,136,0.12);color:#4aa088}
+.conf-badge.mid{background:rgba(212,168,83,0.12);color:var(--warm)}
+.conf-badge.low{background:rgba(196,112,112,0.12);color:var(--danger)}
+.compound-score{font-size:9px;font-weight:600;color:var(--warm)}
+.finding-actions{display:flex;gap:4px;margin-top:4px}
+.finding-btn{font-size:9px;padding:2px 6px;border:1px solid var(--border);background:none;color:var(--text-dim);border-radius:2px;cursor:pointer;font-family:inherit}
+.finding-btn:hover{border-color:var(--text-dim);color:var(--text-muted)}
+.ctx-finding-detail{display:none;margin-top:6px;padding:6px 0;border-top:1px solid var(--border);font-size:9px;color:var(--text-dim);line-height:1.6}
+.ctx-finding.expanded .ctx-finding-detail{display:block}
+.ctx-finding.expanded{background:rgba(255,255,255,0.03)}
+.finding-detail-section{margin-bottom:6px}
+.finding-detail-label{font-weight:600;text-transform:uppercase;letter-spacing:0.3px;color:var(--text-dim);margin-bottom:2px}
+.finding-history-item{display:flex;gap:6px;padding:2px 0}
+.finding-history-item .old{text-decoration:line-through;color:var(--danger)}
+.finding-history-item .new{color:#4aa088}
+.finding-related-item{display:flex;gap:6px;padding:2px 0;cursor:pointer}
+.finding-related-item:hover{color:var(--text-muted)}
+.save-finding-btn{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border:1px solid var(--border);background:none;color:var(--text-dim);border-radius:3px;cursor:pointer;font-size:9px;font-family:inherit;margin-top:4px;transition:all 0.1s}
+.save-finding-btn:hover{border-color:var(--warm);color:var(--warm)}
+
+/* Finding Inline Form */
+.finding-form-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:250;align-items:center;justify-content:center}
+.finding-form-overlay.open{display:flex}
+.finding-form{background:var(--surface);border:1px solid var(--border-light);border-radius:10px;width:480px;max-width:90vw;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,0.4)}
+.finding-form-header{padding:16px 20px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.finding-form-header h3{font-size:13px;font-weight:600;color:var(--text)}
+.finding-form-close{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:16px;padding:4px 8px}
+.finding-form-close:hover{color:var(--text)}
+.finding-form-body{padding:16px 20px}
+.finding-field{margin-bottom:14px}
+.finding-field label{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);margin-bottom:5px}
+.finding-field textarea,.finding-field input,.finding-field select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:9px 12px;font-size:12px;color:var(--text);font-family:inherit;outline:none;transition:border-color 0.15s}
+.finding-field textarea:focus,.finding-field input:focus,.finding-field select:focus{border-color:var(--warm)}
+.finding-field textarea{resize:vertical;min-height:60px;line-height:1.5}
+.finding-field select{appearance:none;cursor:pointer}
+.finding-field .hint{font-size:9px;color:var(--text-dim);margin-top:3px}
+.finding-conf-row{display:flex;align-items:center;gap:12px}
+.finding-conf-slider{flex:1;accent-color:var(--warm);height:3px}
+.finding-conf-val{font-size:12px;font-weight:600;min-width:36px;text-align:right}
+.finding-form-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.finding-form-footer .secondary{font-size:11px;color:var(--text-dim);background:none;border:none;cursor:pointer;font-family:inherit}
+.finding-form-footer .primary-btn{padding:8px 20px;background:var(--text);color:var(--bg);border:none;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity 0.1s}
+.finding-form-footer .primary-btn:hover{opacity:0.9}
+.finding-form-footer .primary-btn:disabled{opacity:0.3;cursor:not-allowed}
+
+/* New topic modal */
+.new-topic-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;align-items:center;justify-content:center}
+.new-topic-overlay.open{display:flex}
+.new-topic-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:24px;width:400px;max-width:90vw}
+.new-topic-box h3{font-size:14px;margin-bottom:16px}
+.new-topic-field{display:block;width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:4px;padding:8px 12px;font-size:12px;color:var(--text);font-family:inherit;outline:none;margin-bottom:10px}
+.new-topic-field:focus{border-color:var(--warm)}
+.new-topic-row{display:flex;gap:8px;margin-bottom:10px}
+.new-topic-select{flex:1;background:var(--surface-2);border:1px solid var(--border);border-radius:4px;padding:8px;font-size:11px;color:var(--text);font-family:inherit;outline:none;-webkit-appearance:none}
+.new-topic-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.new-topic-btns button{padding:8px 16px;border-radius:4px;font-size:12px;cursor:pointer;border:none;font-family:inherit}
+.new-topic-btns .primary{background:var(--text);color:var(--bg);font-weight:600}
+.new-topic-btns .secondary{background:none;border:1px solid var(--border);color:var(--text-muted)}
+
+/* Folders */
+.folder-tree{flex:1;overflow-y:auto;padding:4px 0}
+.folder{user-select:none}
+.folder-head{display:flex;align-items:center;padding:6px 16px 6px 12px;cursor:pointer;transition:all 0.1s;border-left:2px solid transparent;gap:6px}
+.folder-head:hover{background:rgba(255,255,255,0.03)}
+.folder-head.active{background:rgba(255,255,255,0.04);border-left-color:var(--text-muted)}
+.folder-chevron{font-size:8px;color:var(--text-dim);width:12px;text-align:center;transition:transform 0.15s;flex-shrink:0}
+.folder.collapsed .folder-chevron{transform:rotate(-90deg)}
+.folder-icon{width:18px;height:18px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;background:rgba(255,255,255,0.04);flex-shrink:0}
+.folder-name{font-size:11px;font-weight:600;color:var(--text-muted);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.folder-head.active .folder-name{color:var(--text)}
+.folder-count{font-size:9px;color:var(--text-dim);flex-shrink:0}
+.folder-children{padding-left:12px}
+.folder.collapsed .folder-children{display:none}
+.folder-drop-zone{min-height:2px;transition:all 0.15s}
+.folder-drop-zone.over{min-height:24px;background:rgba(212,168,83,0.08);border:1px dashed rgba(212,168,83,0.3);border-radius:4px;margin:2px 12px}
+.folder-actions{display:none;gap:4px;margin-left:auto}
+.folder-head:hover .folder-actions{display:flex}
+.folder-action{font-size:10px;color:var(--text-dim);cursor:pointer;padding:2px 4px;border-radius:2px}
+.folder-action:hover{color:var(--text);background:rgba(255,255,255,0.06)}
+.folder-topic{display:flex;align-items:center;padding:6px 16px 6px 20px;cursor:pointer;transition:all 0.1s;border-left:2px solid transparent;gap:8px}
+.folder-topic:hover{background:rgba(255,255,255,0.02)}
+.folder-topic.active{background:rgba(255,255,255,0.04);border-left-color:var(--text-muted)}
+.folder-topic.dragging{opacity:0.4}
+.folder-topic-dot{width:5px;height:5px;border-radius:50%;background:var(--text-dim);flex-shrink:0}
+.folder-topic-dot.unread{background:var(--warm)}
+.folder-topic-name{font-size:11px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.folder-topic-pct{font-size:9px;color:var(--text-dim)}
+.unfiled-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);padding:10px 16px 4px}
+.add-folder-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;cursor:pointer;color:var(--text-dim);font-size:11px;transition:all 0.1s}
+.add-folder-btn:hover{color:var(--text);background:rgba(255,255,255,0.03)}
+.folder-input{background:var(--surface-2);border:1px solid var(--border-light);border-radius:3px;padding:4px 8px;font-size:11px;color:var(--text);font-family:inherit;outline:none;width:100%}
+.folder-input:focus{border-color:var(--warm)}
+
+/* Standards panel in context */
+.ctx-standard{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:3px;cursor:pointer;margin-bottom:2px;font-size:11px;color:var(--text-muted);border:1px solid transparent;transition:all 0.12s}
+.ctx-standard:hover{background:rgba(255,255,255,0.03);border-color:var(--border)}
+.ctx-standard.active{border-color:var(--warm);background:rgba(212,168,83,0.04)}
+.ctx-standard-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.ctx-checklist{padding:4px 8px;font-size:10px;color:var(--text-dim);line-height:1.8}
+.ctx-check{display:flex;align-items:center;gap:6px;padding:2px 0;cursor:pointer}
+.ctx-check-box{width:14px;height:14px;border:1px solid var(--border-light);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:8px;flex-shrink:0}
+.ctx-check.done .ctx-check-box{border-color:var(--warm);color:var(--warm)}
+.ctx-check.done span{text-decoration:line-through;color:var(--text-dim)}
 
 /* Right */
 .right-wrap{flex:1;display:flex;overflow:hidden}
@@ -174,11 +405,15 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var
 
 <div class="left">
   <div class="left-header">
-    <h1>Execution Platform <span id="wsStatus" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--danger);margin-left:6px;vertical-align:middle;transition:background 0.3s"></span></h1>
+    <h1 style="cursor:pointer" onclick="togglePipelineView()">Execution Platform <span id="wsStatus" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--danger);margin-left:6px;vertical-align:middle;transition:background 0.3s"></span></h1>
     <p>Research → Systems → Content → Revenue</p>
   </div>
   <div class="pipeline" id="pipeline"></div>
-  <div class="topic-list" id="topicList"><div class="loading">Loading...</div></div>
+  <div class="folder-tree" id="folderTree"><div class="loading">Loading...</div></div>
+  <div style="display:flex;gap:4px;padding:4px 12px">
+    <div class="add-folder-btn" style="flex:1;padding:6px 8px" onclick="startAddTopic()">+ Topic</div>
+    <div class="add-folder-btn" style="flex:1;padding:6px 8px" onclick="startAddFolder()">+ Ordner</div>
+  </div>
   <div class="trust-footer" id="trustFooter"></div>
 </div>
 
@@ -197,6 +432,8 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var
   </div>
   <div class="steps-bar" id="stepsBar"></div>
   <div class="conv" id="conv"><div class="loading">Select a topic to start</div></div>
+  <div id="pipelineView" style="display:none;flex:1;overflow:auto;padding:24px"></div>
+  <div class="action-bar" id="actionBar" style="display:none"></div>
   <div class="input-area">
     <textarea class="input-field" id="inputField" placeholder="Add context, decide, give feedback..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
     <button class="send-btn" onclick="sendMsg()">Send</button>
@@ -223,15 +460,137 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var
 </div>
 </div>
 
+<!-- Email Compose Dialog -->
+<div class="confirm-overlay" id="emailOverlay">
+  <div class="confirm-box" style="width:560px">
+    <h3>Email senden</h3>
+    <input class="new-topic-field" id="emailTo" placeholder="An (email@example.com)">
+    <input class="new-topic-field" id="emailSubject" placeholder="Betreff">
+    <textarea class="new-topic-field" id="emailBody" placeholder="Nachricht..." rows="8" style="resize:vertical;min-height:120px"></textarea>
+    <div id="emailAttachments" style="font-size:10px;color:var(--text-dim);margin-bottom:10px"></div>
+    <div class="confirm-btns">
+      <button class="secondary" onclick="closeEmailDialog()">Abbrechen</button>
+      <button class="primary" onclick="sendEmailFromDialog()">Senden</button>
+    </div>
+  </div>
+</div>
+
+<!-- Command Palette (Cmd+K) -->
+<div class="cmd-overlay" id="cmdOverlay" onclick="if(event.target===this)closeCmd()">
+  <div class="cmd-box">
+    <input class="cmd-input" id="cmdInput" placeholder="Suche Topics, Aktionen, Ordner..." oninput="filterCmd(this.value)">
+    <div class="cmd-results" id="cmdResults"></div>
+    <div class="cmd-footer">
+      <span>↑↓ navigieren</span><span>↵ auswählen</span><span>esc schließen</span>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Dialog (Guardrail: 🔴 CONFIRM) -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <h3 id="confirmTitle">Aktion bestätigen</h3>
+    <p id="confirmDesc"></p>
+    <div class="confirm-btns">
+      <button class="secondary" onclick="closeConfirm(false)">Abbrechen</button>
+      <button class="primary" onclick="closeConfirm(true)">Ausführen</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Topic Modal -->
+<div class="new-topic-overlay" id="newTopicOverlay" onclick="if(event.target===this)closeNewTopic()">
+  <div class="new-topic-box">
+    <h3>Neues Topic</h3>
+    <input class="new-topic-field" id="ntName" placeholder="Name (z.B. Glasswing Bewerbung)" autofocus>
+    <div class="new-topic-row">
+      <select class="new-topic-select" id="ntStage">
+        <option value="revenue">Revenue</option>
+        <option value="content">Content</option>
+        <option value="systems">Systems</option>
+        <option value="research">Research</option>
+      </select>
+      <select class="new-topic-select" id="ntFolder">
+        <option value="">Kein Ordner</option>
+      </select>
+      <select class="new-topic-select" id="ntOutputType">
+        <option value="general">General</option>
+        <option value="email">Email</option>
+        <option value="linkedin">LinkedIn</option>
+        <option value="blog">Blog</option>
+        <option value="report">Report</option>
+        <option value="website">Website</option>
+      </select>
+    </div>
+    <input class="new-topic-field" id="ntContact" placeholder="Kontakt (optional)">
+    <input class="new-topic-field" id="ntEmail" placeholder="Email (optional)">
+    <div class="new-topic-btns">
+      <button class="secondary" onclick="closeNewTopic()">Abbrechen</button>
+      <button class="primary" onclick="submitNewTopic()">Erstellen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Finding Form -->
+<div class="finding-form-overlay" id="findingOverlay" onclick="if(event.target===this)closeFindingForm()">
+  <div class="finding-form">
+    <div class="finding-form-header">
+      <h3>Save Finding</h3>
+      <button class="finding-form-close" onclick="closeFindingForm()">&times;</button>
+    </div>
+    <div class="finding-form-body">
+      <div class="finding-field">
+        <label>Claim</label>
+        <textarea id="ffClaim" placeholder="What did you learn? State it as a testable claim."></textarea>
+        <div class="hint">Be specific. "X leads to Y" is better than "X is interesting".</div>
+      </div>
+      <div class="finding-field">
+        <label>Confidence</label>
+        <div class="finding-conf-row">
+          <input type="range" class="finding-conf-slider" id="ffConf" min="5" max="95" value="50" oninput="document.getElementById('ffConfVal').textContent=this.value+'%';document.getElementById('ffConfVal').style.color=this.value>=70?'#4aa088':this.value>=30?'var(--warm)':'var(--danger)'">
+          <span class="finding-conf-val" id="ffConfVal">50%</span>
+        </div>
+      </div>
+      <div class="finding-field">
+        <label>Source Type</label>
+        <select id="ffSource">
+          <option value="conversation">Conversation</option>
+          <option value="own_hypothesis">Own Hypothesis</option>
+          <option value="own_data">Own Data / Experience</option>
+          <option value="linkedin_poll">LinkedIn Poll</option>
+          <option value="industry_report">Industry Report</option>
+          <option value="academic_paper">Academic Paper</option>
+          <option value="revenue_validated">Revenue Validated</option>
+        </select>
+      </div>
+      <div class="finding-field">
+        <label>Tags</label>
+        <input id="ffTags" placeholder="e.g. ai_quality, trust, pre_flight (comma-separated)">
+      </div>
+      <div class="finding-field">
+        <label>Context (optional)</label>
+        <textarea id="ffContext" placeholder="Why is this important? What evidence supports it?" style="min-height:40px"></textarea>
+      </div>
+    </div>
+    <div class="finding-form-footer">
+      <button class="secondary" onclick="closeFindingForm()">Cancel</button>
+      <button class="primary-btn" id="ffSubmit" onclick="submitFinding()">Save Finding</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const API = 'http://localhost:8080/api';
 let currentTopic = null;
+let currentFolder = null;
 let topicsCache = {};
+let foldersCache = [];
+let draggedTopicId = null;
 
 // ── INIT ──
 async function init() {
   await loadPipeline();
-  await loadTopics();
+  await loadFolderTree();
   await loadTrust();
 }
 
@@ -245,10 +604,29 @@ async function loadPipeline() {
     {key:'content',icon:'C',name:'Content'},
     {key:'revenue',icon:'€',name:'Revenue'}
   ];
+  const flowKeys = ['research_to_systems','systems_to_content','content_to_revenue'];
   el.innerHTML = stages.map((s,i) => {
     const d = r.stages[s.key];
     const pct = Math.round(d.avg_progress);
-    return (i>0?'<div class="pipe-arrow">↓</div>':'')+
+    
+    // Flow arrow between stages
+    let arrow = '';
+    if (i > 0) {
+      const fk = flowKeys[i-1];
+      const flow = r.flows && r.flows[fk];
+      if (flow && flow.source_count > 0) {
+        const convPct = flow.conversion_pct;
+        const flowColor = convPct > 50 ? '#4aa088' : convPct > 0 ? 'var(--warm)' : 'var(--text-dim)';
+        arrow = `<div class="pipe-arrow" style="display:flex;align-items:center;justify-content:center;gap:6px">
+          <span style="color:var(--border-light)">↓</span>
+          <span style="font-size:8px;color:${flowColor};font-weight:600">${flow.connected}/${flow.source_count} (${convPct}%)</span>
+        </div>`;
+      } else {
+        arrow = '<div class="pipe-arrow">↓</div>';
+      }
+    }
+    
+    return arrow+
     `<div class="pipe-stage" onclick="filterStage('${s.key}',this)">
       <div class="pipe-icon">${s.icon}</div>
       <div class="pipe-info">
@@ -260,45 +638,188 @@ async function loadPipeline() {
   }).join('');
 }
 
-// ── TOPICS ──
-async function loadTopics(stageFilter) {
-  const url = stageFilter ? API+'/topics?stage='+stageFilter : API+'/topics';
-  const topics = await fetch(url).then(r=>r.json());
-  const el = document.getElementById('topicList');
+let activeStageFilter = null;
+
+function filterStage(stage, el) {
+  const wasActive = el.classList.contains('active');
+  document.querySelectorAll('.pipe-stage').forEach(s=>s.classList.remove('active'));
+  if (wasActive) { activeStageFilter = null; } 
+  else { el.classList.add('active'); activeStageFilter = stage; }
+  loadFolderTree();
+}
+
+// ── FOLDER TREE ──
+async function loadFolderTree() {
+  const [folders, topics] = await Promise.all([
+    fetch(API+'/folders').then(r=>r.json()),
+    fetch(API+'/topics').then(r=>r.json())
+  ]);
+  foldersCache = folders;
+  topicsCache = {};
+  topics.forEach(t => topicsCache[t.id] = t);
+  window._allTopics = topics; // Cache for Cmd+K
   
-  // Group by stage
-  const groups = {};
-  topics.forEach(t => {
-    topicsCache[t.id] = t;
-    if (!groups[t.stage]) groups[t.stage] = [];
-    groups[t.stage].push(t);
+  // Filter by stage if active
+  const filteredTopics = activeStageFilter 
+    ? topics.filter(t => t.stage === activeStageFilter) 
+    : topics;
+  
+  // Group topics by folder
+  const topicsByFolder = {};
+  const unfiled = [];
+  filteredTopics.forEach(t => {
+    if (t.folder_id) {
+      if (!topicsByFolder[t.folder_id]) topicsByFolder[t.folder_id] = [];
+      topicsByFolder[t.folder_id].push(t);
+    } else {
+      unfiled.push(t);
+    }
   });
+  // Sort within folders
+  Object.values(topicsByFolder).forEach(arr => arr.sort((a,b) => (a.folder_position||0) - (b.folder_position||0)));
   
-  const stageLabels = {revenue:'Revenue Pipeline',content:'Content Pipeline',systems:'Systems',research:'Research'};
+  // Build tree (only root folders for now, nested later)
+  const rootFolders = folders.filter(f => !f.parent_id).sort((a,b) => a.position - b.position);
+  const childFolders = folders.filter(f => f.parent_id);
+  
+  const el = document.getElementById('folderTree');
   let html = '';
-  for (const stage of ['revenue','content','systems','research']) {
-    if (!groups[stage]) continue;
-    html += `<div class="topic-section-label">${stageLabels[stage]}</div>`;
-    groups[stage].forEach(t => {
-      const meta = JSON.parse(t.meta||'{}');
-      const isActive = currentTopic === t.id;
-      html += `<div class="topic-item${isActive?' active':''}" onclick="selectTopic('${t.id}')">
-        <div class="topic-dot${t.progress<20?' unread':''}"></div>
-        <div class="topic-info">
-          <div class="topic-name">${t.name}</div>
-          <div class="topic-meta">${t.stage}${meta.contact?' · '+meta.contact:''}</div>
+  
+  function renderFolder(f, depth=0) {
+    const items = topicsByFolder[f.id] || [];
+    const children = childFolders.filter(c => c.parent_id === f.id).sort((a,b) => a.position - b.position);
+    const count = items.length + children.reduce((s,c) => s + (topicsByFolder[c.id]||[]).length, 0);
+    const isCollapsed = f.collapsed;
+    const colorStyle = f.color ? `color:${f.color}` : '';
+    
+    html += `<div class="folder${isCollapsed?' collapsed':''}" data-folder-id="${f.id}">
+      <div class="folder-head${currentFolder===f.id?' active':''}" 
+           onclick="toggleFolder('${f.id}')"
+           ondragover="folderDragOver(event,'${f.id}')" ondrop="folderDrop(event,'${f.id}')" ondragleave="folderDragLeave(event)">
+        <span class="folder-chevron">▼</span>
+        <div class="folder-icon" style="${colorStyle}">${f.icon||'F'}</div>
+        <span class="folder-name">${f.name}</span>
+        <span class="folder-count">${count}</span>
+        <div class="folder-actions">
+          <span class="folder-action" onclick="event.stopPropagation();renameFolder('${f.id}')" title="Rename">✎</span>
+          <span class="folder-action" onclick="event.stopPropagation();deleteFolder('${f.id}')" title="Delete">✕</span>
         </div>
-        <div class="topic-pct">${t.progress}%</div>
-      </div>`;
-    });
+      </div>
+      <div class="folder-children">
+        <div class="folder-drop-zone" data-folder="${f.id}" ondragover="zoneDragOver(event)" ondrop="zoneDrop(event,'${f.id}')" ondragleave="zoneDragLeave(event)"></div>`;
+    
+    children.forEach(c => renderFolder(c, depth+1));
+    items.forEach(t => { html += renderTopicItem(t); });
+    
+    html += `</div></div>`;
   }
+  
+  rootFolders.forEach(f => renderFolder(f));
+  
+  // Unfiled topics
+  if (unfiled.length) {
+    html += `<div class="unfiled-label">Unsortiert</div>`;
+    unfiled.forEach(t => { html += renderTopicItem(t); });
+  }
+  
   el.innerHTML = html;
 }
 
-function filterStage(stage, el) {
-  document.querySelectorAll('.pipe-stage').forEach(s=>s.classList.remove('active'));
-  el.classList.add('active');
-  loadTopics(stage);
+function renderTopicItem(t) {
+  const isActive = currentTopic === t.id;
+  return `<div class="folder-topic${isActive?' active':''}" 
+              draggable="true" data-topic-id="${t.id}"
+              ondragstart="topicDragStart(event,'${t.id}')" ondragend="topicDragEnd(event)"
+              onclick="selectTopic('${t.id}')">
+    <div class="folder-topic-dot${t.progress<20?' unread':''}"></div>
+    <span class="folder-topic-name">${t.name}</span>
+    <span class="folder-topic-pct">${t.progress}%</span>
+  </div>`;
+}
+
+// ── FOLDER ACTIONS ──
+async function toggleFolder(folderId) {
+  const el = document.querySelector(`[data-folder-id="${folderId}"]`);
+  if (!el) return;
+  const isCollapsed = el.classList.toggle('collapsed');
+  await fetch(API+'/folders/'+folderId, {
+    method:'PATCH', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({collapsed: isCollapsed})
+  });
+}
+
+async function startAddFolder() {
+  const name = prompt('Ordner-Name:');
+  if (!name) return;
+  const id = name.toLowerCase().replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-');
+  await fetch(API+'/folders', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({id, name})
+  });
+  loadFolderTree();
+}
+
+async function renameFolder(folderId) {
+  const f = foldersCache.find(f => f.id === folderId);
+  const name = prompt('Neuer Name:', f?.name || '');
+  if (!name) return;
+  await fetch(API+'/folders/'+folderId, {
+    method:'PATCH', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({name})
+  });
+  loadFolderTree();
+}
+
+async function deleteFolder(folderId) {
+  if (!confirm('Ordner löschen? Topics werden nicht gelöscht.')) return;
+  await fetch(API+'/folders/'+folderId, {method:'DELETE'});
+  loadFolderTree();
+}
+
+// ── DRAG & DROP ──
+function topicDragStart(e, topicId) {
+  draggedTopicId = topicId;
+  e.target.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', topicId);
+}
+
+function topicDragEnd(e) {
+  e.target.classList.remove('dragging');
+  draggedTopicId = null;
+  document.querySelectorAll('.folder-drop-zone.over').forEach(z => z.classList.remove('over'));
+}
+
+function folderDragOver(e, folderId) {
+  e.preventDefault();
+  e.currentTarget.style.background = 'rgba(212,168,83,0.06)';
+}
+
+function folderDragLeave(e) {
+  e.currentTarget.style.background = '';
+}
+
+async function folderDrop(e, folderId) {
+  e.preventDefault();
+  e.currentTarget.style.background = '';
+  if (!draggedTopicId) return;
+  await fetch(API+'/topics/'+draggedTopicId+'/move', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({folder_id: folderId, position: 0})
+  });
+  loadFolderTree();
+}
+
+function zoneDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('over'); }
+function zoneDragLeave(e) { e.currentTarget.classList.remove('over'); }
+async function zoneDrop(e, folderId) {
+  e.preventDefault(); e.currentTarget.classList.remove('over');
+  if (!draggedTopicId) return;
+  await fetch(API+'/topics/'+draggedTopicId+'/move', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({folder_id: folderId, position: 0})
+  });
+  loadFolderTree();
 }
 
 // ── SELECT TOPIC ──
@@ -314,9 +835,12 @@ async function selectTopic(id) {
   const meta = JSON.parse(topic.meta||'{}');
   
   // Header
-  document.getElementById('topicTitle').textContent = topic.name;
+  document.getElementById('topicTitle').innerHTML = topic.name + ' <span id="preflightBadge"></span>';
   document.getElementById('topicSub').textContent = 
     topic.stage + (meta.contact?' · '+meta.contact:'') + (meta.email?' · '+meta.email:'') + (meta.potential?' · '+meta.potential:'');
+  
+  // Load pre-flight check
+  loadPreflight(topic.id);
   
   // Show Generate CV button for fund topics
   const cvFunds = ['betaworks','bloomberg','bloomberg-beta','conviction','firstmark','generalcatalyst','glasswing','insight','lionheart','lux','point72','ibm-ventures','futuresight'];
@@ -332,8 +856,11 @@ async function selectTopic(id) {
   // Context panel
   renderContext(topic);
   
+  // Action bar (guardrails)
+  renderActionBar(topic);
+  
   // Re-highlight active topic
-  loadTopics();
+  loadFolderTree();
 }
 
 // ── STEPS ──
@@ -383,7 +910,7 @@ function renderMessages(messages) {
             <span class="proposal-type">${p.proposal_type}</span>
             ${p.confidence ? `<span class="proposal-confidence">${p.confidence}% — ${p.confidence_reason||''}</span>` : ''}
           </div>
-          <div class="proposal-body">${p.content}</div>`;
+          <div class="proposal-body">${esc(p.content)}</div>`;
         
         // Options
         if (options.length) {
@@ -417,9 +944,14 @@ function renderMessages(messages) {
       });
     }
     
+    // Escape user content, allow Mia markdown
+    const safeContent = m.sender === 'mia' ? m.content.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>') : esc(m.content);
+    
+    const findingBtn = m.sender === 'mia' ? `<button class="save-finding-btn" onclick="event.stopPropagation();openFindingForm(${m.id},'${esc(m.content.substring(0,300).replace(/'/g,'').replace(/\n/g,' '))}')">+ Finding</button>` : '';
+    
     return `<div class="msg ${cls}">
       ${cls!=='system'?`<div class="sender">${m.sender==='mia'?'Mia':'Florian'}</div>`:''}
-      <div class="bubble">${m.content}${proposalHtml}</div>
+      <div class="bubble">${safeContent}${proposalHtml}${findingBtn}</div>
       <div class="time">${new Date(m.created_at).toLocaleString('de-DE',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
     </div>`;
   }).join('');
@@ -461,7 +993,386 @@ async function sendMsg() {
   f.value = '';
   f.style.height = 'auto';
   await postMessage('human', t);
-  // WebSocket will trigger the reload
+  
+  // Trigger AI response (streaming)
+  await streamAIResponse(currentTopic, t);
+}
+
+async function streamAIResponse(topicId, userMessage) {
+  // Show typing indicator
+  const conv = document.getElementById('conv');
+  const indicator = document.createElement('div');
+  indicator.className = 'msg mia';
+  indicator.id = 'aiTyping';
+  indicator.innerHTML = `<div class="msg-meta"><span class="msg-sender">Mia</span><span class="msg-time">typing...</span></div><div class="msg-body" id="aiStreamBody" style="opacity:0.7">▊</div>`;
+  conv.appendChild(indicator);
+  conv.scrollTop = conv.scrollHeight;
+  
+  try {
+    const resp = await fetch(API+'/ai/stream', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({message: userMessage, topic_id: topicId})
+    });
+    
+    if (!resp.ok) {
+      // Fallback: non-streaming
+      indicator.remove();
+      const fallback = await fetch(API+'/ai/chat', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({message: userMessage, topic_id: topicId})
+      });
+      if (fallback.ok) {
+        // Message saved server-side, WebSocket will reload
+      } else {
+        const err = await fallback.text();
+        console.error('AI error:', err);
+        showSystemMsg('AI-Fehler: ' + err.slice(0, 100));
+      }
+      return;
+    }
+    
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    const body = document.getElementById('aiStreamBody');
+    let fullText = '';
+    let buffer = '';
+    
+    while (true) {
+      const {done, value} = await reader.read();
+      if (done) break;
+      
+      buffer += decoder.decode(value, {stream: true});
+      const lines = buffer.split('\n');
+      buffer = lines.pop(); // keep incomplete line
+      
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        try {
+          const data = JSON.parse(line.slice(6));
+          if (data.done) break;
+          if (data.text) {
+            fullText += data.text;
+            body.innerHTML = marked ? marked.parse(fullText) : fullText.replace(/\n/g, '<br>');
+            body.style.opacity = '1';
+            conv.scrollTop = conv.scrollHeight;
+          }
+        } catch(e) {}
+      }
+    }
+    
+    // Remove typing indicator — WebSocket reload will show the saved message
+    indicator.remove();
+    // Force reload to get the properly formatted message
+    if (currentTopic === topicId) selectTopic(topicId);
+    
+  } catch(e) {
+    if (indicator.parentNode) indicator.remove();
+    console.error('Stream error:', e);
+    if (e.name === 'TypeError' && e.message.includes('fetch')) {
+      showSystemMsg('Backend nicht erreichbar. Server läuft auf localhost:8080?');
+    } else if (e.name === 'AbortError') {
+      showSystemMsg('AI-Anfrage abgebrochen.');
+    } else {
+      showSystemMsg('AI-Fehler: ' + (e.message || 'Unbekannt. Mia offline?'));
+    }
+  }
+}
+
+// ── GUARDRAILS ──
+// Trust score → permission level
+function getGuardrail(skill) {
+  const trustMap = {};
+  (window._trustSkills || []).forEach(s => { trustMap[s.skill] = s.score; trustMap[s.skill.toLowerCase()] = s.score; });
+  const score = trustMap[skill] || trustMap[skill.toLowerCase()] || 30;
+  if (score >= 60) return {level: 'auto', label: 'AUTO', color: '#50c878'};
+  if (score >= 30) return {level: 'review', label: 'REVIEW', color: '#d4a853'};
+  return {level: 'confirm', label: 'CONFIRM', color: '#c47070'};
+}
+
+function guardrailBadge(skill) {
+  const g = getGuardrail(skill);
+  return `<span class="guardrail ${g.level}">${g.label}</span>`;
+}
+
+// ── ACTION BAR ──
+function renderActionBar(topic) {
+  const bar = document.getElementById('actionBar');
+  if (!topic) { bar.style.display = 'none'; return; }
+  
+  const meta = JSON.parse(topic.meta || '{}');
+  const actions = [];
+  
+  // Determine available actions based on topic stage and state
+  if (topic.stage === 'revenue') {
+    actions.push({id:'generate_cv', label:'CV generieren', skill:'Cv Generation', icon:'◆'});
+    actions.push({id:'send_email', label:'Email senden', skill:'Email Drafts', icon:'→', primary:true});
+  }
+  if (meta.output_type === 'email' || meta.email) {
+    actions.push({id:'send_email', label:'Email senden', skill:'Email Drafts', icon:'→', primary:true});
+  }
+  if (meta.output_type === 'linkedin') {
+    actions.push({id:'publish', label:'Veröffentlichen', skill:'Linkedin Content', icon:'↑'});
+  }
+  if (meta.output_type === 'blog') {
+    actions.push({id:'publish', label:'Veröffentlichen', skill:'Linkedin Content', icon:'↑'});
+  }
+  
+  // Always available
+  actions.push({id:'ask_mia', label:'Mia fragen', skill:'Research', icon:'?'});
+  
+  // Dedupe by id
+  const seen = new Set();
+  const unique = actions.filter(a => { if (seen.has(a.id)) return false; seen.add(a.id); return true; });
+  
+  bar.innerHTML = unique.map(a => {
+    const g = getGuardrail(a.skill);
+    return `<button class="action-btn ${a.primary ? 'primary' : ''}" onclick="executeAction('${topic.id}','${a.id}','${a.skill}')">
+      ${a.label} ${guardrailBadge(a.skill)}
+    </button>`;
+  }).join('');
+  bar.style.display = unique.length ? 'flex' : 'none';
+}
+
+let _confirmResolve = null;
+
+function showConfirm(title, desc) {
+  return new Promise(resolve => {
+    _confirmResolve = resolve;
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmDesc').textContent = desc;
+    document.getElementById('confirmOverlay').classList.add('open');
+  });
+}
+
+function closeConfirm(result) {
+  document.getElementById('confirmOverlay').classList.remove('open');
+  if (_confirmResolve) { _confirmResolve(result); _confirmResolve = null; }
+}
+
+async function executeAction(topicId, actionType, skill) {
+  const g = getGuardrail(skill);
+  
+  // CONFIRM gate: explicit confirmation required
+  if (g.level === 'confirm') {
+    const ok = await showConfirm(
+      `Bestätigung erforderlich`,
+      `Trust für "${skill}" ist niedrig (Score < 30). Diese Aktion ist irreversibel und braucht deine explizite Bestätigung.\n\nAktion: ${actionType}\nTopic: ${topicId}`
+    );
+    if (!ok) return;
+  }
+  
+  // REVIEW gate: show preview, require explicit "Weiter"
+  if (g.level === 'review') {
+    const ok = await showConfirm(
+      `Review empfohlen`,
+      `Trust für "${skill}" liegt im mittleren Bereich (Score 30-59). Bitte prüfe das Ergebnis vor dem Senden.\n\nAktion: ${actionType}`
+    );
+    if (!ok) return;
+  }
+  
+  // AUTO: proceeds without interruption (trust >= 60)
+  
+  if (actionType === 'ask_mia') {
+    document.getElementById('inputField').focus();
+    return;
+  }
+  
+  if (actionType === 'generate_cv') {
+    try {
+      const resp = await fetch(API+'/actions/generate-cv/'+topicId, {method:'POST'});
+      if (resp.ok) selectTopic(topicId);
+      else showSystemMsg('CV-Generierung fehlgeschlagen');
+    } catch(e) { showSystemMsg('Fehler: '+e.message); }
+    return;
+  }
+  
+  if (actionType === 'send_email') {
+    openEmailDialog(topicId);
+    return;
+  }
+  
+  // Queue action for Mia
+  await fetch(API+'/actions/queue', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({topic_id: topicId, action_type: actionType, params: {}})
+  });
+  selectTopic(topicId);
+}
+
+// ── EMAIL DIALOG ──
+let _emailTopicId = null;
+let _emailAttachments = [];
+
+async function openEmailDialog(topicId) {
+  _emailTopicId = topicId;
+  _emailAttachments = [];
+  
+  // Pre-fill from topic data
+  const topic = await fetch(API+'/topics/'+topicId).then(r=>r.json());
+  const meta = JSON.parse(topic.meta || '{}');
+  
+  document.getElementById('emailTo').value = meta.email || '';
+  document.getElementById('emailSubject').value = meta.subject || 'Venture Partner — AI-Native Operator Background';
+  document.getElementById('emailBody').value = '';
+  
+  // Find attachments (cover letter + CV)
+  const docs = topic.documents || [];
+  const attachable = docs.filter(d => d.path && (d.doc_type === 'pdf'));
+  _emailAttachments = attachable.map(d => d.path);
+  
+  const attEl = document.getElementById('emailAttachments');
+  attEl.innerHTML = _emailAttachments.length 
+    ? 'Anhänge: ' + _emailAttachments.map(a => a.split('/').pop()).join(', ')
+    : 'Keine Anhänge gefunden';
+  
+  document.getElementById('emailOverlay').classList.add('open');
+  document.getElementById('emailTo').focus();
+}
+
+function closeEmailDialog() {
+  document.getElementById('emailOverlay').classList.remove('open');
+}
+
+async function sendEmailFromDialog() {
+  const to = document.getElementById('emailTo').value.trim();
+  const subject = document.getElementById('emailSubject').value.trim();
+  const body = document.getElementById('emailBody').value.trim();
+  
+  if (!to || !subject || !body) {
+    alert('Alle Felder ausfüllen');
+    return;
+  }
+  // Basic email validation
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
+    alert('Ungültige Email-Adresse: ' + to);
+    return;
+  }
+  if (body.length < 10) {
+    alert('Nachricht zu kurz (min. 10 Zeichen)');
+    return;
+  }
+  
+  const btn = document.querySelector('#emailOverlay .primary');
+  btn.textContent = 'Sende...';
+  btn.disabled = true;
+  
+  try {
+    const resp = await fetch(API+'/actions/send-email', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        to, subject, body,
+        attachments: _emailAttachments,
+        topic_id: _emailTopicId
+      })
+    });
+    
+    if (resp.ok) {
+      closeEmailDialog();
+      if (_emailTopicId) selectTopic(_emailTopicId);
+      showSystemMsg('Email gesendet an ' + to);
+    } else {
+      const err = await resp.json();
+      alert('Fehler: ' + (err.detail || 'Unbekannt'));
+    }
+  } catch(e) {
+    alert('Fehler: ' + e.message);
+  } finally {
+    btn.textContent = 'Senden';
+    btn.disabled = false;
+  }
+}
+
+// ── COMMAND PALETTE ──
+let cmdItems = [];
+let cmdActiveIdx = 0;
+
+function openCmd() {
+  const overlay = document.getElementById('cmdOverlay');
+  overlay.classList.add('open');
+  document.getElementById('cmdInput').value = '';
+  document.getElementById('cmdInput').focus();
+  cmdActiveIdx = 0;
+  buildCmdItems();
+  filterCmd('');
+}
+
+function closeCmd() {
+  document.getElementById('cmdOverlay').classList.remove('open');
+}
+
+function buildCmdItems() {
+  cmdItems = [];
+  
+  // Topics
+  (window._allTopics || []).forEach(t => {
+    cmdItems.push({type:'topic', id:t.id, title:t.name, sub:`${t.stage} · ${t.progress}%`, icon:'◉', action:() => { selectTopic(t.id); closeCmd(); }});
+  });
+  
+  // Folders
+  (window.foldersCache || []).forEach(f => {
+    cmdItems.push({type:'folder', id:f.id, title:f.name, sub:'Ordner', icon:'▸', action:() => { closeCmd(); }});
+  });
+  
+  // Actions
+  cmdItems.push({type:'action', id:'new-topic', title:'Neues Topic erstellen', sub:'Cmd+N', icon:'+', action:() => { closeCmd(); startAddTopic(); }});
+  cmdItems.push({type:'action', id:'new-folder', title:'Neuer Ordner', sub:'', icon:'+', action:() => { closeCmd(); startAddFolder(); }});
+  cmdItems.push({type:'action', id:'toggle-ctx', title:'Context Panel toggle', sub:'Cmd+.', icon:'◨', action:() => { closeCmd(); toggleCtx(); }});
+  cmdItems.push({type:'action', id:'pipeline', title:'Pipeline Overview', sub:'Cmd+P', icon:'◈', action:() => { closeCmd(); togglePipelineView(); }});
+}
+
+function filterCmd(query) {
+  const q = query.toLowerCase();
+  const filtered = q ? cmdItems.filter(i => i.title.toLowerCase().includes(q) || (i.sub||'').toLowerCase().includes(q)) : cmdItems;
+  const el = document.getElementById('cmdResults');
+  cmdActiveIdx = 0;
+  
+  el.innerHTML = filtered.slice(0, 12).map((item, i) => `
+    <div class="cmd-item ${i===0?'active':''}" data-idx="${i}" onclick="cmdItems.find(c=>c.id==='${item.id}')?.action()" onmouseenter="cmdSetActive(${i})">
+      <div class="cmd-item-icon">${item.icon}</div>
+      <div class="cmd-item-text">
+        <div class="cmd-item-title">${item.title}</div>
+        ${item.sub ? `<div class="cmd-item-sub">${item.sub}</div>` : ''}
+      </div>
+    </div>
+  `).join('') || '<div style="padding:20px;text-align:center;font-size:11px;color:var(--text-dim)">Keine Ergebnisse</div>';
+  
+  window._cmdFiltered = filtered.slice(0, 12);
+}
+
+function cmdSetActive(idx) {
+  cmdActiveIdx = idx;
+  document.querySelectorAll('.cmd-item').forEach((el, i) => el.classList.toggle('active', i === idx));
+}
+
+function cmdNav(dir) {
+  const items = document.querySelectorAll('.cmd-item');
+  if (!items.length) return;
+  cmdActiveIdx = Math.max(0, Math.min(items.length - 1, cmdActiveIdx + dir));
+  items.forEach((el, i) => el.classList.toggle('active', i === cmdActiveIdx));
+  items[cmdActiveIdx]?.scrollIntoView({block: 'nearest'});
+}
+
+function cmdSelect() {
+  const filtered = window._cmdFiltered || [];
+  if (filtered[cmdActiveIdx]) filtered[cmdActiveIdx].action();
+}
+
+function esc(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function showSystemMsg(text) {
+  const conv = document.getElementById('conv');
+  const div = document.createElement('div');
+  div.className = 'msg system';
+  div.innerHTML = `<div class="msg-body" style="color:var(--danger);font-size:11px">${esc(text)}</div>`;
+  conv.appendChild(div);
+  conv.scrollTop = conv.scrollHeight;
 }
 
 async function postMessage(sender, content) {
@@ -490,8 +1401,8 @@ function renderContext(topic) {
     </div></div>`;
   
   // Documents
+  html += `<div class="ctx-sec"><div class="ctx-sec-title">Documents</div>`;
   if (topic.documents && topic.documents.length) {
-    html += `<div class="ctx-sec"><div class="ctx-sec-title">Documents</div>`;
     topic.documents.forEach(d => {
       const icon = (d.doc_type||'').toUpperCase().slice(0,3);
       let href = '#';
@@ -504,12 +1415,15 @@ function renderContext(topic) {
         <div><div>${d.name}</div>${sub ? `<div style="font-size:9px;color:var(--text-dim)">${sub}</div>` : ''}</div>
       </a>`;
     });
-    html += '</div>';
   }
+  html += `<div class="ctx-upload" onclick="triggerUpload('${topic.id}','doc')">
+    <div class="ctx-upload-text">+ Dokument hochladen</div>
+  </div>`;
+  html += '</div>';
   
   // References (Golden Standard / Expected Outcome)
+  html += `<div class="ctx-sec"><div class="ctx-sec-title" style="color:var(--warm)">⬥ References</div>`;
   if (topic.references && topic.references.length) {
-    html += `<div class="ctx-sec"><div class="ctx-sec-title" style="color:var(--warm)">⬥ References</div>`;
     topic.references.forEach(d => {
       const icon = (d.doc_type||'').toUpperCase().slice(0,3);
       let href = '#';
@@ -521,23 +1435,243 @@ function renderContext(topic) {
         <div><div>${d.name}</div>${sub ? `<div style="font-size:9px;color:var(--text-dim)">${sub}</div>` : ''}</div>
       </a>`;
     });
-    html += '</div>';
   }
+  html += `<div class="ctx-upload" onclick="triggerUpload('${topic.id}','ref')" style="border-color:rgba(212,168,83,0.2)">
+    <div class="ctx-upload-text" style="color:var(--warm)">+ Referenz hochladen</div>
+  </div>`;
+  html += `<div class="ctx-add-ref" onclick="addReference('${topic.id}')">+ URL/Pfad als Referenz</div>`;
+  html += '</div>';
 
-  // Connections
+  // Connections (bidirectional with stage badges)
   if (topic.connections && topic.connections.length) {
+    const stageColors = {research:'#8e8e8e',systems:'#6b8aab',content:'#9b8ec4',revenue:'var(--warm)'};
+    const upstream = topic.connections.filter(c => c.direction === 'upstream');
+    const downstream = topic.connections.filter(c => c.direction === 'downstream');
+    
     html += `<div class="ctx-sec"><div class="ctx-sec-title">Connected Topics</div>`;
-    topic.connections.forEach(c => {
-      html += `<a class="ctx-conn" href="#" onclick="event.preventDefault();selectTopic('${c.to_topic}')" style="text-decoration:none;color:inherit">
-        <div class="ctx-conn-dot"></div>
-        <div><div style="font-size:11px;color:var(--text-muted)">${c.target_name}</div>
-        <div class="ctx-rel">${c.relation||''}</div></div>
-      </a>`;
-    });
+    
+    if (upstream.length) {
+      html += `<div style="font-size:9px;color:var(--text-dim);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Upstream (feeds into this)</div>`;
+      upstream.forEach(c => {
+        const sc = stageColors[c.target_stage] || 'var(--text-dim)';
+        html += `<a class="ctx-conn" href="#" onclick="event.preventDefault();selectTopic('${c.to_topic}')" style="text-decoration:none;color:inherit">
+          <div class="ctx-conn-dot" style="background:${sc}"></div>
+          <div><div style="font-size:11px;color:var(--text-muted)">${c.target_name} <span style="font-size:9px;padding:1px 4px;border-radius:2px;background:rgba(255,255,255,0.05);color:${sc}">${c.target_stage||''}</span></div>
+          <div class="ctx-rel">${c.relation||''}</div></div>
+        </a>`;
+      });
+    }
+    if (downstream.length) {
+      html += `<div style="font-size:9px;color:var(--text-dim);margin-bottom:4px;margin-top:${upstream.length?'8':'0'}px;text-transform:uppercase;letter-spacing:0.5px">Downstream (outputs to)</div>`;
+      downstream.forEach(c => {
+        const sc = stageColors[c.target_stage] || 'var(--text-dim)';
+        html += `<a class="ctx-conn" href="#" onclick="event.preventDefault();selectTopic('${c.to_topic}')" style="text-decoration:none;color:inherit">
+          <div class="ctx-conn-dot" style="background:${sc}"></div>
+          <div><div style="font-size:11px;color:var(--text-muted)">${c.target_name} <span style="font-size:9px;padding:1px 4px;border-radius:2px;background:rgba(255,255,255,0.05);color:${sc}">${c.target_stage||''}</span></div>
+          <div class="ctx-rel">${c.relation||''}</div></div>
+        </a>`;
+      });
+    }
     html += '</div>';
   }
   
+  // Findings (CKE)
+  html += `<div class="ctx-sec"><div class="ctx-sec-title" style="color:var(--warm)">Findings</div>
+    <div id="ctxFindings"><div style="font-size:10px;color:var(--text-dim)">Loading...</div></div>
+  </div>`;
+  
+  // Quality Gate (dynamic from corrections)
+  html += `<div class="ctx-sec"><div class="ctx-sec-title" style="color:var(--warm)">⬥ Quality Gate</div>
+    <div class="ctx-checklist" id="ctxQualityGate">
+      <div class="ctx-check" onclick="this.classList.toggle('done')"><div class="ctx-check-box">✓</div><span>Frage beantwortet?</span></div>
+      <div class="ctx-check" onclick="this.classList.toggle('done')"><div class="ctx-check-box">✓</div><span>Externe Zahlen belegt?</span></div>
+      <div class="ctx-check" onclick="this.classList.toggle('done')"><div class="ctx-check-box">✓</div><span>Sofort nutzbar?</span></div>
+      <div class="ctx-check" onclick="this.classList.toggle('done')"><div class="ctx-check-box">✓</div><span>Links klickbar?</span></div>
+      <div class="ctx-check" onclick="this.classList.toggle('done')"><div class="ctx-check-box">✓</div><span>Spelling geprüft?</span></div>
+      <div class="ctx-check" onclick="this.classList.toggle('done')"><div class="ctx-check-box">✓</div><span>Max 2 Iterationen</span></div>
+    </div>
+  </div>`;
+  
+  // Corrections (loaded async)
+  html += `<div class="ctx-sec"><div class="ctx-sec-title" style="color:var(--danger)">⬥ Active Corrections</div>
+    <div id="ctxCorrections"><div style="font-size:10px;color:var(--text-dim)">Loading...</div></div>
+  </div>`;
+  
+  // Event Log
+  html += `<div class="ctx-sec"><div class="ctx-sec-title">⬥ Activity</div>
+    <div id="ctxEvents"><div style="font-size:10px;color:var(--text-dim)">No events</div></div>
+  </div>`;
+  
   el.innerHTML = html;
+  
+  // Load corrections, events, and findings async
+  loadCorrections(topic);
+  loadEvents(topic.id);
+  loadFindings(topic.id);
+}
+
+// ── NEW TOPIC ──
+function startAddTopic() {
+  const overlay = document.getElementById('newTopicOverlay');
+  const folderSelect = document.getElementById('ntFolder');
+  // Populate folders
+  folderSelect.innerHTML = '<option value="">Kein Ordner</option>' + 
+    foldersCache.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
+  overlay.classList.add('open');
+  document.getElementById('ntName').focus();
+}
+
+function closeNewTopic() {
+  document.getElementById('newTopicOverlay').classList.remove('open');
+  document.getElementById('ntName').value = '';
+  document.getElementById('ntContact').value = '';
+  document.getElementById('ntEmail').value = '';
+}
+
+async function submitNewTopic() {
+  const name = document.getElementById('ntName').value.trim();
+  if (!name) return;
+  const id = name.toLowerCase().replace(/[^a-z0-9äöü]/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
+  const stage = document.getElementById('ntStage').value;
+  const folderId = document.getElementById('ntFolder').value || null;
+  const outputType = document.getElementById('ntOutputType').value;
+  const contact = document.getElementById('ntContact').value.trim();
+  const email = document.getElementById('ntEmail').value.trim();
+  
+  const meta = {output_type: outputType};
+  if (contact) meta.contact = contact;
+  if (email) meta.email = email;
+  
+  await fetch(API+'/topics', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({id, name, stage, meta})
+  });
+  
+  if (folderId) {
+    await fetch(API+'/topics/'+id+'/move', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({folder_id: folderId})
+    });
+  }
+  
+  closeNewTopic();
+  await loadFolderTree();
+  selectTopic(id);
+}
+
+// ── FILE UPLOAD ──
+function triggerUpload(topicId, kind) {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.multiple = true;
+  input.onchange = async (e) => {
+    for (const file of e.target.files) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('kind', kind);
+      await fetch(API+'/topics/'+topicId+'/upload', {method:'POST', body: formData});
+    }
+    if (currentTopic) selectTopic(currentTopic);
+  };
+  input.click();
+}
+
+async function addReference(topicId) {
+  const url = prompt('Reference URL oder Pfad:');
+  if (!url) return;
+  const name = prompt('Name:', url.split('/').pop() || 'Reference');
+  if (!name) return;
+  
+  const isUrl = url.startsWith('http');
+  await fetch(API+'/topics/'+topicId+'/add-reference', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({name, url: isUrl ? url : null, path: isUrl ? null : url, doc_type: 'ref'})
+  });
+  if (currentTopic) selectTopic(currentTopic);
+}
+
+async function loadPreflight(topicId) {
+  const badge = document.getElementById('preflightBadge');
+  if (!badge) return;
+  try {
+    const pf = await fetch(API+'/preflight/'+topicId).then(r=>r.json());
+    if (pf.total_checks === 0) { badge.innerHTML = ''; return; }
+    
+    badge.className = 'preflight-badge ' + pf.overall;
+    if (pf.overall === 'pass') {
+      badge.innerHTML = `${pf.passed}/${pf.total_checks} pass`;
+      badge.title = 'Alle Pre-Flight Checks bestanden';
+    } else if (pf.overall === 'fail') {
+      badge.innerHTML = `${pf.failed} fail`;
+      badge.title = `${pf.failed} Checks fehlgeschlagen, ${pf.warned} Warnungen`;
+    } else {
+      badge.innerHTML = `${pf.warned} warn`;
+      badge.title = `${pf.warned} Warnungen, ${pf.passed} bestanden`;
+    }
+    if (!pf.has_output) {
+      badge.className = 'preflight-badge warn';
+      badge.innerHTML = `${pf.total_checks} checks`;
+      badge.title = 'Kein Output zum Prüfen vorhanden';
+    }
+  } catch(e) {
+    badge.innerHTML = '';
+  }
+}
+
+async function loadCorrections(topic) {
+  const el = document.getElementById('ctxCorrections');
+  if (!el) return;
+  try {
+    // Determine relevant categories based on topic meta
+    const meta = JSON.parse(topic.meta || '{}');
+    const corrections = await fetch(API+'/corrections').then(r=>r.json());
+    
+    // Show top corrections by severity, max 8
+    const top = corrections.slice(0, 8);
+    if (!top.length) { el.innerHTML = '<div style="font-size:10px;color:var(--text-dim)">No corrections</div>'; return; }
+    
+    el.innerHTML = top.map(c => `
+      <div class="ctx-correction">
+        <div class="ctx-correction-rule">
+          <span class="ctx-severity s${c.severity}"></span>${c.rule}
+        </div>
+        ${c.wrong || c.rght ? `<div class="ctx-correction-detail">
+          ${c.wrong ? `<span class="ctx-correction-wrong">${c.wrong}</span>` : ''}
+          ${c.wrong && c.rght ? ' → ' : ''}
+          ${c.rght ? `<span class="ctx-correction-right">${c.rght}</span>` : ''}
+        </div>` : ''}
+        ${c.violation_count > 0 ? `<div class="ctx-correction-count">${c.violation_count} violations</div>` : ''}
+      </div>
+    `).join('');
+  } catch(e) {
+    el.innerHTML = '<div style="font-size:10px;color:var(--danger)">Failed to load</div>';
+  }
+}
+
+async function loadEvents(topicId) {
+  const el = document.getElementById('ctxEvents');
+  if (!el) return;
+  try {
+    const events = await fetch(API+'/events/'+topicId+'?limit=10').then(r=>r.json());
+    if (!events.length) { el.innerHTML = '<div style="font-size:10px;color:var(--text-dim)">No activity yet</div>'; return; }
+    
+    el.innerHTML = events.map(e => {
+      const t = new Date(e.created_at);
+      const time = t.toLocaleTimeString('de-DE', {hour:'2-digit',minute:'2-digit'});
+      const detail = JSON.parse(e.detail || '{}');
+      let text = e.event_type.replace(/_/g, ' ');
+      if (e.event_type === 'correction_violation') text = `Correction violated: #${detail.correction_id}`;
+      if (e.event_type === 'trust_feedback') text = `Trust ${detail.direction}: ${detail.skill}`;
+      if (e.event_type === 'state_change') text = `State: ${detail.from} → ${detail.to}`;
+      return `<div class="ctx-event">
+        <span class="ctx-event-time">${time}</span>
+        <span class="ctx-event-dot"></span>
+        <span class="ctx-event-text">${text}</span>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    el.innerHTML = '<div style="font-size:10px;color:var(--danger)">Failed to load</div>';
+  }
 }
 
 function toggleCtx() {
@@ -558,9 +1692,26 @@ function openFiles() {
 
 // ── TRUST ──
 async function loadTrust() {
-  const trust = await fetch(API+'/trust').then(r=>r.json());
+  let skills = [];
+  try { skills = await fetch(API+'/trust/skills').then(r=>r.json()); } catch(e) {}
+  window._trustSkills = skills; // Cache for guardrails
   const el = document.getElementById('trustFooter');
-  el.innerHTML = trust.map(t => `<div class="trust-mini">${t.agent}: ${t.score}</div>`).join('');
+  if (!skills.length) { el.innerHTML = '<div class="trust-mini">No trust data</div>'; return; }
+  
+  const avg = Math.round(skills.reduce((s,t) => s + t.score, 0) / skills.length);
+  const barColor = (score) => score >= 60 ? '#4aa088' : score >= 30 ? 'var(--warm)' : 'var(--danger)';
+  const label = (s) => s.replace(/_/g,' ').replace(/\b\w/g,l=>l.toUpperCase());
+  
+  el.innerHTML = `
+    <div class="trust-header"><span>Trust per Skill</span><span>Avg: ${avg}</span></div>
+    ${skills.map(t => `
+      <div class="trust-skill">
+        <span class="trust-skill-name" title="${label(t.skill)}">${label(t.skill)}</span>
+        <div class="trust-skill-bar"><div class="trust-skill-fill" style="width:${t.score}%;background:${barColor(t.score)}"></div></div>
+        <span class="trust-skill-score">${t.score}</span>
+      </div>
+    `).join('')}
+  `;
 }
 
 // ── UTILS ──
@@ -658,7 +1809,63 @@ function copyFileContent() {
 }
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeOverlay();
+  const cmdOpen = document.getElementById('cmdOverlay').classList.contains('open');
+  const newTopicOpen = document.getElementById('newTopicOverlay').classList.contains('open');
+  const confirmOpen = document.getElementById('confirmOverlay').classList.contains('open');
+  const inputFocused = document.activeElement?.tagName === 'TEXTAREA' || document.activeElement?.tagName === 'INPUT';
+  
+  // Escape: close modals
+  if (e.key === 'Escape') { 
+    if (cmdOpen) { closeCmd(); e.preventDefault(); return; }
+    if (confirmOpen) { closeConfirm(false); e.preventDefault(); return; }
+    if (newTopicOpen) { closeNewTopic(); e.preventDefault(); return; }
+    closeOverlay(); return;
+  }
+  
+  // Command Palette navigation
+  if (cmdOpen) {
+    if (e.key === 'ArrowDown') { e.preventDefault(); cmdNav(1); return; }
+    if (e.key === 'ArrowUp') { e.preventDefault(); cmdNav(-1); return; }
+    if (e.key === 'Enter') { e.preventDefault(); cmdSelect(); return; }
+    return;
+  }
+  
+  // New Topic modal
+  if (newTopicOpen && e.key === 'Enter') { submitNewTopic(); return; }
+  
+  // Confirm dialog
+  if (confirmOpen && e.key === 'Enter') { closeConfirm(true); return; }
+  
+  // Cmd+K: Command Palette
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); openCmd(); return; }
+  
+  // Cmd+P: Pipeline View
+  if ((e.metaKey || e.ctrlKey) && e.key === 'p') { e.preventDefault(); togglePipelineView(); return; }
+  
+  // Cmd+N: New Topic
+  if ((e.metaKey || e.ctrlKey) && e.key === 'n') { e.preventDefault(); startAddTopic(); return; }
+  
+  // Cmd+.: Toggle Context
+  if ((e.metaKey || e.ctrlKey) && e.key === '.') { e.preventDefault(); toggleCtx(); return; }
+  
+  // Skip shortcuts when typing
+  if (inputFocused) return;
+  
+  // J/K: Navigate topics
+  if (e.key === 'j' || e.key === 'k') {
+    const topics = window._allTopics || [];
+    if (!topics.length) return;
+    const idx = topics.findIndex(t => t.id === currentTopic);
+    const next = e.key === 'j' ? Math.min(idx + 1, topics.length - 1) : Math.max(idx - 1, 0);
+    if (topics[next]) selectTopic(topics[next].id);
+    return;
+  }
+  
+  // E: Focus input (edit)
+  if (e.key === 'e') { document.getElementById('inputField').focus(); return; }
+  
+  // C: Toggle context
+  if (e.key === 'c') { toggleCtx(); return; }
 });
 
 function copyDraft(btn) {
@@ -673,6 +1880,513 @@ document.getElementById('inputField').addEventListener('input', function() {
   this.style.height=Math.min(this.scrollHeight,120)+'px';
 });
 
+// ── PIPELINE VIEW ──
+let pipelineViewOpen = false;
+let connectMode = null; // null or {from: topicId, fromName: string}
+
+async function togglePipelineView() {
+  pipelineViewOpen = !pipelineViewOpen;
+  const conv = document.getElementById('conv');
+  const pv = document.getElementById('pipelineView');
+  const steps = document.getElementById('stepsBar');
+  const actionBar = document.getElementById('actionBar');
+  const input = document.querySelector('.input-area');
+  const topicHeader = document.querySelector('.topic-header');
+  
+  if (pipelineViewOpen) {
+    conv.style.display = 'none';
+    if (steps) steps.style.display = 'none';
+    if (actionBar) actionBar.style.display = 'none';
+    if (input) input.style.display = 'none';
+    pv.style.display = 'flex';
+    pv.style.flexDirection = 'column';
+    // Hide context panel
+    document.getElementById('ctxPanel').style.display = 'none';
+    await renderPipelineView();
+  } else {
+    conv.style.display = '';
+    if (steps) steps.style.display = '';
+    if (input) input.style.display = '';
+    pv.style.display = 'none';
+    document.getElementById('ctxPanel').style.display = '';
+    if (currentTopic) selectTopic(currentTopic);
+  }
+}
+
+async function renderPipelineView() {
+  const pv = document.getElementById('pipelineView');
+  
+  try {
+    const [pipeline, detail] = await Promise.all([
+      fetch(API+'/pipeline').then(r=>r.json()),
+      fetch(API+'/pipeline/detail').then(r=>r.json())
+    ]);
+    
+    const stages = [
+      {key:'research', name:'Research', color:'#8e8e8e'},
+      {key:'systems', name:'Systems', color:'#6b8aab'},
+      {key:'content', name:'Content', color:'#9b8ec4'},
+      {key:'revenue', name:'Revenue', color:'var(--warm)'}
+    ];
+    
+    const flowKeys = ['research_to_systems','systems_to_content','content_to_revenue'];
+    
+    // Connect mode bar
+    let html = '';
+    if (connectMode) {
+      html += `<div class="pv-connect-bar">
+        <span>Connecting from <strong>${esc(connectMode.fromName)}</strong> — click a target card</span>
+        <button onclick="cancelConnect()">Cancel</button>
+      </div>`;
+    }
+    
+    // Header stats
+    html += `<div class="pv-header">
+      <div>
+        <h2>Pipeline Overview</h2>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px">Research → Systems → Content → Revenue</div>
+      </div>
+      <div class="pv-header-stats">
+        <div class="pv-header-stat"><span class="pv-header-stat-val">${pipeline.total_items}</span><span class="pv-header-stat-label">Topics</span></div>
+        <div class="pv-header-stat"><span class="pv-header-stat-val">${pipeline.outcomes}</span><span class="pv-header-stat-label">Completed</span></div>
+        <div class="pv-header-stat"><span class="pv-header-stat-val">${pipeline.total_votes}</span><span class="pv-header-stat-label">Votes</span></div>
+      </div>
+    </div>`;
+    
+    // Kanban columns with flow arrows
+    html += '<div class="pv">';
+    
+    stages.forEach((s, i) => {
+      const topics = detail[s.key] || [];
+      const stageStats = pipeline.stages[s.key];
+      const pct = Math.round(stageStats.avg_progress);
+      
+      // Flow arrow between columns
+      if (i > 0) {
+        const fk = flowKeys[i-1];
+        const flow = pipeline.flows && pipeline.flows[fk];
+        const convPct = flow ? flow.conversion_pct : 0;
+        const flowColor = convPct > 50 ? '#4aa088' : convPct > 0 ? 'var(--warm)' : 'var(--text-dim)';
+        html += `<div class="pv-flow">
+          <div class="pv-flow-inner">
+            <div class="pv-flow-arrow">→</div>
+            <div class="pv-flow-rate" style="color:${flowColor}">${flow ? flow.connected : 0}/${flow ? flow.source_count : 0}</div>
+          </div>
+        </div>`;
+      }
+      
+      html += `<div class="pv-col">
+        <div class="pv-col-header" style="border-color:${s.color}30">
+          <div class="pv-col-title" style="color:${s.color}">${s.name}</div>
+          <div class="pv-col-stats">${topics.length} topics<br>${pct}% avg</div>
+        </div>
+        <div class="pv-col-body">`;
+      
+      if (topics.length === 0) {
+        html += `<div style="text-align:center;padding:20px 8px;color:var(--text-dim);font-size:10px">
+          <div style="opacity:0.15;font-size:16px;margin-bottom:4px">&#9672;</div>
+          No ${s.name.toLowerCase()} topics yet
+        </div>`;
+      }
+      
+      topics.forEach(t => {
+        const connCount = (t.connections_out||[]).length + (t.connections_in||[]).length;
+        const stateColor = t.state === 'error' ? 'var(--danger)' : t.state === 'done' ? '#4aa088' : 'var(--text-dim)';
+        
+        const isSource = connectMode && connectMode.from === t.id;
+        const isTarget = connectMode && connectMode.from !== t.id;
+        html += `<div class="pv-card${isSource?' connect-source':''}${isTarget?' connect-target':''}" 
+          onclick="pvCardClick('${t.id}','${esc(t.name).replace(/'/g,'')}')">
+          <div class="pv-card-name">${esc(t.name)}</div>
+          <div class="pv-card-meta">
+            <div class="pv-card-progress"><div class="pv-card-progress-fill" style="width:${t.progress}%;background:${stateColor}"></div></div>
+            <span>${t.progress}%</span>
+            ${connCount > 0 ? `<span style="color:var(--warm)">${connCount} conn</span>` : ''}
+          </div>`;
+        
+        // Show connections as tiny badges
+        const allConns = [...(t.connections_out||[]), ...(t.connections_in||[])];
+        if (allConns.length > 0) {
+          html += '<div class="pv-card-connections">';
+          allConns.slice(0, 4).forEach(c => {
+            const stColor = stages.find(st=>st.key===c.stage);
+            html += `<span class="pv-card-conn" style="border-left:2px solid ${stColor?stColor.color:'var(--text-dim)'}">${c.name.substring(0,15)}</span>`;
+          });
+          if (allConns.length > 4) html += `<span class="pv-card-conn">+${allConns.length-4}</span>`;
+          html += '</div>';
+        }
+        
+        // Findings + Connect button
+        html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">';
+        if (t.findings_alive > 0) {
+          html += `<span class="pv-card-findings">${t.findings_alive} finding${t.findings_alive!==1?'s':''}</span>`;
+        } else {
+          html += '<span></span>';
+        }
+        if (!connectMode) {
+          html += `<button class="finding-btn" onclick="event.stopPropagation();startConnect('${t.id}','${esc(t.name).replace(/'/g,'')}',event)" style="font-size:8px">connect</button>`;
+        }
+        html += '</div>';
+        
+        html += '</div>';
+      });
+      
+      html += '</div></div>';
+    });
+    
+    html += '</div>';
+    
+    // Research lines summary
+    if (pipeline.research_lines && pipeline.research_lines.length) {
+      html += `<div class="pv-research-lines">
+        <div class="pv-rl-title">Research Lines</div>`;
+      pipeline.research_lines.forEach(rl => {
+        html += `<div class="pv-rl-item">
+          <span class="pv-rl-name">${rl.research_line.replace(/-/g,' ')}</span>
+          <span><span style="color:var(--text-dim);font-size:10px">${rl.count} findings · avg ${Math.round(rl.avg_conf*100)}%</span> <span class="pv-rl-score">${rl.total_score}</span></span>
+        </div>`;
+      });
+      html += '</div>';
+    }
+    
+    // Orphan alerts
+    if (pipeline.orphans && pipeline.orphans.length) {
+      html += '<div class="pv-orphan-alert">';
+      html += `<strong>Orphan Alert:</strong> ${pipeline.orphans.length} topic${pipeline.orphans.length!==1?'s':''} with no connections for >7 days:`;
+      pipeline.orphans.forEach(o => {
+        html += ` <span style="cursor:pointer;text-decoration:underline" onclick="togglePipelineView();selectTopic('${o.id}')">${o.name}</span>`;
+      });
+      html += '</div>';
+    }
+    
+    pv.innerHTML = html;
+    
+  } catch(e) {
+    pv.innerHTML = `<div style="padding:40px;text-align:center;color:var(--danger)">Error loading pipeline: ${e.message}</div>`;
+  }
+}
+
+function pvCardClick(topicId, topicName) {
+  if (!connectMode) {
+    // Normal click: navigate to topic
+    pipelineViewOpen = false;
+    document.getElementById('pipelineView').style.display = 'none';
+    document.getElementById('conv').style.display = '';
+    document.querySelector('.input-area').style.display = '';
+    document.getElementById('ctxPanel').style.display = '';
+    selectTopic(topicId);
+    return;
+  }
+  
+  if (connectMode.from === topicId) {
+    // Clicked same card: cancel
+    cancelConnect();
+    return;
+  }
+  
+  // Connect mode: create connection
+  createConnectionFromPipeline(connectMode.from, topicId, topicName);
+}
+
+function startConnect(topicId, topicName, event) {
+  event.stopPropagation();
+  connectMode = {from: topicId, fromName: topicName};
+  renderPipelineView();
+}
+
+function cancelConnect() {
+  connectMode = null;
+  renderPipelineView();
+}
+
+async function createConnectionFromPipeline(fromId, toId, toName) {
+  const relation = prompt('Relation (how does this connect?):', '');
+  if (relation === null) { cancelConnect(); return; }
+  
+  try {
+    const r = await fetch(API+'/connections', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({from: fromId, to: toId, relation: relation || 'related'})
+    });
+    const data = await r.json();
+    if (data.status === 'connected') {
+      showSystemMsg(`Connected → ${toName}`);
+    }
+  } catch(e) {
+    showSystemMsg('Error: '+e.message);
+  }
+  
+  connectMode = null;
+  renderPipelineView();
+}
+
+// ── FINDINGS (CKE) ──
+
+function confBadgeClass(c) { return c >= 0.7 ? 'high' : c >= 0.3 ? 'mid' : 'low'; }
+
+async function loadFindings(topicId) {
+  const el = document.getElementById('ctxFindings');
+  if (!el) return;
+  try {
+    const findings = await fetch(API+'/topics/'+topicId+'/findings').then(r=>r.json());
+    if (!findings.length) {
+      el.innerHTML = `<div style="text-align:center;padding:12px 8px">
+        <div style="font-size:18px;opacity:0.15;margin-bottom:6px">&#9672;</div>
+        <div style="font-size:10px;color:var(--text-dim);line-height:1.6">No findings yet.<br>Use <span style="color:var(--warm)">+ Finding</span> on Mia messages to extract knowledge.</div>
+      </div>`;
+      return;
+    }
+    el.innerHTML = findings.map(f => {
+      const cls = f.status === 'dead' ? 'dead' : f.status === 'contested' ? 'contested' : '';
+      const confClass = confBadgeClass(f.confidence);
+      const tags = (f.tags||[]).slice(0,3).join(', ');
+      return `<div class="ctx-finding ${cls}" onclick="toggleFindingDetail(this,'${f.id}')" style="cursor:pointer">
+        <div class="ctx-finding-claim">${esc(f.claim)}</div>
+        <div class="ctx-finding-meta">
+          <span class="ctx-finding-id">${f.id}</span>
+          <span class="conf-badge ${confClass}">${Math.round(f.confidence*100)}%</span>
+          ${f.verified ? '<span style="color:#4a9" title="Verified">&#10003;</span>' : ''}
+          ${f.source_type==='agent_verified' && !f.verified ? '<span style="color:var(--warm)" title="Agent verified, needs human check">&#9888;</span>' : ''}
+          ${f.compound_score > 0 ? `<span class="compound-score">${f.compound_score.toFixed(1)}</span>` : ''}
+          <span>${f.status}</span>
+        </div>
+        ${tags ? `<div style="font-size:9px;color:var(--text-dim);margin-top:2px">${tags}</div>` : ''}
+        <div class="finding-actions" onclick="event.stopPropagation()">
+          <button class="finding-btn" onclick="validateFinding('${f.id}','support')">support</button>
+          <button class="finding-btn" onclick="validateFinding('${f.id}','contradict')">contradict</button>
+          ${f.status==='contested'?`<button class="finding-btn" style="border-color:var(--danger);color:var(--danger)" onclick="killFinding('${f.id}')">kill</button>`:''}
+        </div>
+        <div class="ctx-finding-detail" id="finding-detail-${f.id}">
+          <div style="text-align:center;color:var(--text-dim);padding:4px">Loading...</div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    el.innerHTML = '<div style="font-size:10px;color:var(--danger)">Error loading findings</div>';
+  }
+}
+
+async function toggleFindingDetail(el, findingId) {
+  const wasExpanded = el.classList.contains('expanded');
+  
+  // Collapse all others
+  document.querySelectorAll('.ctx-finding.expanded').forEach(f => f.classList.remove('expanded'));
+  
+  if (wasExpanded) return;
+  
+  el.classList.add('expanded');
+  const detailEl = document.getElementById('finding-detail-'+findingId);
+  if (!detailEl) return;
+  
+  try {
+    const [finding, related] = await Promise.all([
+      fetch(API+'/findings/'+findingId).then(r=>r.json()),
+      fetch(API+'/findings/'+findingId+'/related').then(r=>r.json())
+    ]);
+    
+    let html = '';
+    
+    // Source
+    if (finding.source_type || finding.source_detail) {
+      html += `<div class="finding-detail-section">
+        <div class="finding-detail-label">Source</div>
+        <div>${finding.source_type||''} ${finding.source_detail ? '— '+esc(finding.source_detail) : ''}
+          ${finding.source_url ? `<br><a href="${esc(finding.source_url)}" target="_blank" style="color:var(--warm);text-decoration:underline;font-size:9px">${esc(finding.source_url.substring(0,60))}</a>` : ''}
+        </div>
+        ${!finding.verified ? `<button class="finding-btn" style="margin-top:4px;border-color:#4a9;color:#4a9" onclick="event.stopPropagation();verifyFinding('${findingId}',this)">&#10003; Verify</button>` : '<div style="color:#4a9;margin-top:2px">&#10003; Human verified</div>'}
+      </div>`;
+    }
+    
+    // Context
+    if (finding.context) {
+      html += `<div class="finding-detail-section">
+        <div class="finding-detail-label">Context</div>
+        <div>${esc(finding.context)}</div>
+      </div>`;
+    }
+    
+    // Confidence History
+    if (finding.confidence_history && finding.confidence_history.length > 1) {
+      html += `<div class="finding-detail-section">
+        <div class="finding-detail-label">Confidence History</div>`;
+      finding.confidence_history.slice(0, 5).forEach(h => {
+        const oldPct = Math.round((h.old_confidence||0)*100);
+        const newPct = Math.round((h.new_confidence||0)*100);
+        html += `<div class="finding-history-item">
+          <span class="old">${oldPct}%</span>
+          <span>→</span>
+          <span class="new">${newPct}%</span>
+          <span style="color:var(--text-dim)">${h.reason||''}</span>
+        </div>`;
+      });
+      html += '</div>';
+    }
+    
+    // Related Findings
+    if (related.length > 0) {
+      html += `<div class="finding-detail-section">
+        <div class="finding-detail-label">Related Findings</div>`;
+      related.slice(0, 5).forEach(r => {
+        const confClass = confBadgeClass(r.confidence);
+        html += `<div class="finding-related-item">
+          <span style="font-family:monospace">${r.id}</span>
+          <span class="conf-badge ${confClass}">${Math.round(r.confidence*100)}%</span>
+          <span>${esc(r.claim.substring(0, 60))}${r.claim.length>60?'...':''}</span>
+        </div>`;
+      });
+      html += '</div>';
+    }
+    
+    // Killed by
+    if (finding.status === 'dead' && finding.killed_by) {
+      html += `<div class="finding-detail-section">
+        <div class="finding-detail-label" style="color:var(--danger)">Killed By</div>
+        <div>${esc(finding.killed_by)}</div>
+      </div>`;
+    }
+    
+    detailEl.innerHTML = html || '<div style="color:var(--text-dim)">No additional details.</div>';
+  } catch(e) {
+    detailEl.innerHTML = `<div style="color:var(--danger)">Error: ${e.message}</div>`;
+  }
+}
+
+let _findingMsgId = null;
+
+function openFindingForm(messageId, preview) {
+  _findingMsgId = messageId;
+  const decoded = preview.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/<br>/g,' ').substring(0,300);
+  document.getElementById('ffClaim').value = decoded;
+  document.getElementById('ffConf').value = 50;
+  document.getElementById('ffConfVal').textContent = '50%';
+  document.getElementById('ffConfVal').style.color = 'var(--warm)';
+  document.getElementById('ffSource').value = 'conversation';
+  document.getElementById('ffTags').value = '';
+  document.getElementById('ffContext').value = '';
+  document.getElementById('ffSubmit').disabled = false;
+  document.getElementById('findingOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('ffClaim').focus(), 100);
+}
+
+function closeFindingForm() {
+  document.getElementById('findingOverlay').classList.remove('open');
+  _findingMsgId = null;
+}
+
+async function submitFinding() {
+  const claim = document.getElementById('ffClaim').value.trim();
+  if (!claim) { document.getElementById('ffClaim').style.borderColor = 'var(--danger)'; return; }
+  
+  const btn = document.getElementById('ffSubmit');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+  
+  const conf = parseInt(document.getElementById('ffConf').value) / 100;
+  const source = document.getElementById('ffSource').value;
+  const tagsRaw = document.getElementById('ffTags').value;
+  const tags = tagsRaw ? tagsRaw.split(',').map(t=>t.trim().toLowerCase().replace(/\s+/g,'_')).filter(Boolean) : [];
+  const context = document.getElementById('ffContext').value.trim();
+  
+  try {
+    const r = await fetch(API+'/findings', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        claim,
+        confidence: conf,
+        tags,
+        source_type: source,
+        context: context || undefined,
+        extracted_from: _findingMsgId ? 'message_'+_findingMsgId : undefined,
+        topic_id: currentTopic
+      })
+    });
+    const data = await r.json();
+    if (data.id) {
+      closeFindingForm();
+      showSystemMsg(`Finding ${data.id} saved (${Math.round(conf*100)}%)`);
+      if (data.potential_contradictions && data.potential_contradictions.length) {
+        showSystemMsg(`Potential contradiction: ${data.potential_contradictions.map(c=>c.id+': '+c.claim.substring(0,50)).join(' | ')}`);
+      }
+      loadFindings(currentTopic);
+    } else {
+      btn.textContent = 'Save Finding';
+      btn.disabled = false;
+      showSystemMsg('Error: ' + (data.detail || 'Unknown error'));
+    }
+  } catch(e) {
+    btn.textContent = 'Save Finding';
+    btn.disabled = false;
+    showSystemMsg('Error: '+e.message);
+  }
+}
+
+// Keyboard: Escape closes finding form
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.getElementById('findingOverlay').classList.contains('open')) {
+    closeFindingForm();
+  }
+});
+
+async function validateFinding(findingId, direction) {
+  // Inline: use a small prompt for reason (acceptable for single field)
+  // But build a proper one later. For now, use confirm-style approach.
+  const btn = event.target;
+  const oldText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '...';
+  
+  try {
+    const r = await fetch(API+'/findings/'+findingId+'/validate', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        direction,
+        source_type: 'own_data',
+        reason: direction
+      })
+    });
+    const data = await r.json();
+    showSystemMsg(`${findingId}: ${Math.round(data.old_confidence*100)}% → ${Math.round(data.new_confidence*100)}%`);
+    loadFindings(currentTopic);
+  } catch(e) {
+    showSystemMsg('Error: '+e.message);
+  } finally {
+    btn.textContent = oldText;
+    btn.disabled = false;
+  }
+}
+
+async function killFinding(findingId) {
+  const reason = prompt('Why is this finding dead?', '');
+  if (!reason) return;
+  
+  try {
+    await fetch(API+'/findings/'+findingId, {
+      method: 'PUT',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ status: 'dead', killed_by: reason })
+    });
+    showSystemMsg(`${findingId} killed: ${reason}`);
+    loadFindings(currentTopic);
+  } catch(e) {
+    showSystemMsg('Error: '+e.message);
+  }
+}
+
+async function verifyFinding(findingId, btnEl) {
+  try {
+    const r = await fetch(API+'/findings/'+findingId+'/verify', {method:'POST'});
+    const data = await r.json();
+    if (btnEl) btnEl.outerHTML = '<div style="color:#4a9;margin-top:2px">&#10003; Verified ('+Math.round(data.new_confidence*100)+'%)</div>';
+    showSystemMsg(`${findingId} verified: ${Math.round(data.old_confidence*100)}% → ${Math.round(data.new_confidence*100)}%`);
+    loadFindings(currentTopic);
+  } catch(e) {
+    showSystemMsg('Error: '+e.message);
+  }
+}
+
 // ── WEBSOCKET ──
 let ws = null;
 let wsRetry = 0;
@@ -683,7 +2397,10 @@ function connectWS() {
   
   ws.onopen = () => {
     wsRetry = 0;
-    document.getElementById('wsStatus').style.background = '#4a9'; // green = connected
+    document.getElementById('wsStatus').style.background = '#4a9';
+    // Remove disconnect banner
+    const banner = document.getElementById('wsBanner');
+    if (banner) banner.remove();
     console.log('[ws] connected');
     // Ping every 30s to keep alive
     ws._ping = setInterval(() => { try { ws.send('ping'); } catch(e) {} }, 30000);
@@ -708,7 +2425,7 @@ function connectWS() {
           else conv.scrollTop = oldScroll;
         });
       }
-      if (_pendingReloads.list) loadTopics();
+      if (_pendingReloads.list) loadFolderTree();
       if (_pendingReloads.pipeline) loadPipeline();
       if (_pendingReloads.trust) loadTrust();
       
@@ -732,16 +2449,31 @@ function connectWS() {
       scheduleReload('pipeline');
     }
     
+    if (event.type === 'folder_update') {
+      scheduleReload('list');
+    }
+    
     if (event.type === 'trust_update') {
       scheduleReload('trust');
+    }
+    
+    if (event.type === 'finding_created' || event.type === 'finding_updated') {
+      if (currentTopic) loadFindings(currentTopic);
     }
   };
   
   ws.onclose = () => {
-    document.getElementById('wsStatus').style.background = 'var(--danger)'; // red = disconnected
-    console.log('[ws] disconnected');
+    document.getElementById('wsStatus').style.background = 'var(--danger)';
+    console.log('[ws] disconnected, retry #' + (wsRetry+1));
     clearInterval(ws._ping);
-    // Reconnect with backoff
+    // Show disconnect banner after 3s
+    if (!document.getElementById('wsBanner')) {
+      const banner = document.createElement('div');
+      banner.id = 'wsBanner';
+      banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:var(--danger);color:white;text-align:center;padding:6px;font-size:11px;z-index:500;font-weight:500';
+      banner.textContent = 'Verbindung verloren — Reconnect...';
+      document.body.appendChild(banner);
+    }
     wsRetry++;
     const delay = Math.min(1000 * Math.pow(2, wsRetry), 10000);
     setTimeout(connectWS, delay);

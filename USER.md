@@ -23,7 +23,7 @@
 
 ## Professional Background
 - Former CEO/Founder, later MD/COO at 36ZERO Vision (cloud CV SaaS, Munich)
-- Raised €5.5M+ total | Clients: BMW, Siemens, Bosch
+- Raised €5.0M total (€3.5M equity + €1.5M grants) | Clients: BMW, Siemens, Bosch
 - Expertise: LLMs, agentic AI, RAG, AI governance
 
 ## Working Style

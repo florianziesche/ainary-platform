@@ -234,6 +234,15 @@
 - "Research ist die ground truth for me"
 - Alle Design-Entscheidungen müssen Benchmarks zitieren (BCG, McKinsey, Economist)
 
+### D-151 bis D-157: Execution Platform Decisions (2026-02-18)
+- D-151: Localhost + Auto-Start (launchctl). Remote = Phase 2.
+- D-152: Offline-fähig (Navigation OK ohne Mia, AI + Actions brauchen Mia).
+- D-153: Feedback DETAILLIERT — pro Abschnitt/Claim markieren.
+- D-154: Platform = primäres Interface. Telegram für Quick Messages.
+- D-155: Done v1 = Fehlerfrei + Live AI + Trust System + 5 VC Emails durch Platform gesendet.
+- D-156: Mia als Backend, aber austauschbar (Action Layer Interface).
+- D-157: Build = gut WENN Build → Send → Revenue. Sonst schlecht.
+
 ### D-150: Chooser Workflow = Standard für alles (2026-02-15 00:10)
 - "We should always work like this, same for website, other tools, dashboards plus an option to write comments"
 - Template Chooser Pattern für alle Design-Entscheidungen verwenden

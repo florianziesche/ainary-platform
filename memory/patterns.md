@@ -20,6 +20,12 @@
 - **Sub-Agents: EXAKTE Briefings** → "Kopiere 1:1, ändere NUR Text"
 - **Screenshots vor Delivery** → browser target=host funktioniert
 
+### Build vs Send
+- **Build → Send → Revenue = guter Build.** Workbench führte direkt zu Primary-Send.
+- **Build → Build → Build = schlecht.** Template v17, Design ohne Deadline.
+- **Nicht pauschal "Building-Pattern!" rufen.** Prüfen ob der Build Revenue unterstützt.
+- **Morning Brief muss gegen echte Daten prüfen.** "0 Sends" war falsch.
+
 ### System
 - **Files > Memory. Immer.**
 - **Standards > Quick Fixes.** Eine Regel spart 20 Einzelkorrekturen.

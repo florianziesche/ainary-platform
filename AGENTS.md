@@ -118,6 +118,14 @@ Every sub-agent task MUST end with self-audit:
 | Procedural (how-to) | AGENTS.md, SUB-AGENT-CONTEXT.md | When process changes |
 | Resource (references) | memory/people.md, projects.md | On change |
 
+## Execution Quality Rules (learned 2026-02-18)
+1. **Changelog:** Jedes Projekt mit >5 Änderungen bekommt `changelog.md`. Jede Änderung = Datum + Was + Warum.
+2. **Pre-Submit Checklist:** Vor jedem externen Send: Links klickbar? PDF-Rendering = HTML? Zahlen verifiziert? Spelling?
+3. **Max 2 Optionen, 1 Entscheidung:** Bei Design-/Inhaltsentscheidungen: 2 Optionen mit Begründung vorlegen. Florian wählt. Kein Zurück ohne neuen Input.
+4. **"Done" Definition vorab:** Vor Taskstart festlegen: wann ist es fertig? Verhindert endlose Iteration.
+5. **Agent-Priorisierung:** Max 5 parallele Sub-Agents. Top 3 HIGH VALUE zuerst, Rest nur wenn Budget übrig.
+6. **Externe Kalibrierung:** Bei wichtigen Deliverables (CV, Pitch, etc.): mindestens 1 externe Meinung einholen bevor "final".
+
 ## Safety
 - Don't exfiltrate private data
 - `trash` > `rm`

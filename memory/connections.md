@@ -38,3 +38,16 @@
 - **Insight:** Glasswing hat SECHZIG Portfolio-Firmen die alle im Stage 2→3 Gap stecken. Cydelphi (DFIR), Verusen (MRO Inventory), Base Operations (Threat Intel) — alle bauen Agents, keiner hat Calibration Infra.
 - **Implikation:** AgentTrust ist nicht nur Thesis-fit, es ist ein **Multiplier für das gesamte Portfolio**. 1 Platform × 60 Unternehmen = sofortiger Wertzuwachs über die gesamte Portfoliobreite.
 - **Next:** Cover Letter Glasswing — "AgentTrust doesn't just fit your thesis, it upgrades your entire portfolio"
+
+## C-007: Glasswing Portfolio × AgentTrust Product-Portfolio Fit
+- **Fakten:** T-027 (6 AI agent cos: Asepha, Basetwo, Allure, Beacon, Black Kite, ChaosSearch), C-006 (60+ total portfolio)
+- **Insight:** **Asepha** ist die PERFEKTE AgentTrust Beta-Kundin — agentic pharma platform, high-stakes (drug errors = lives), regulatory compliance (FDA), existing system integration. Wenn AgentTrust bei Asepha funktioniert, funktioniert es überall.
+- **Implikation:** Cover Letter Glasswing sollte Asepha NAMENTLICH nennen — "I'd love to help Asepha calibrate their pharma agents for FDA compliance."
+- **Next:** Glasswing Cover Letter update mit Asepha-Angle
+
+## C-008: AgentTrust Competitive Landscape × Differentiation
+- **Fakten:** T-022 (LangSmith observability), T-023 (Arize Phoenix), T-024 (Galileo)
+- **Insight:** "No competition" war FALSCH. Observability existiert (LangSmith, Arize, Galileo). ABER: Sie tracen, sie monitoren, sie alerten — KEINER kalibriert. AgentTrust ist NICHT "better observability", sondern **Calibration Layer ÜBER Observability**. Budget-CoCoA, Trust Scores, Beipackzettel = neues Problem, nicht bessere Lösung für altes Problem.
+- **Implikation:** Positioning shift. NICHT "we monitor agents better" sondern "we calibrate agent trust — observability tells you WHAT happened, calibration tells you IF you can trust it".
+- **Integration:** LangSmith/Arize = PARTNER, nicht Konkurrent. Sie liefern Traces → AgentTrust berechnet Trust Scores.
+- **Next:** AgentTrust README muss Arize/LangSmith als Integration Partners positionieren
