@@ -404,6 +404,21 @@ def init_db():
         db.execute("ALTER TABLE topics ADD COLUMN priority_confidence INTEGER DEFAULT 50")
     except: pass
     try:
+        db.execute("ALTER TABLE topics ADD COLUMN cost_total REAL DEFAULT 0.0")
+    except: pass
+    try:
+        db.execute("ALTER TABLE topics ADD COLUMN cost_updated_at TEXT")
+    except: pass
+    try:
+        db.execute("ALTER TABLE messages ADD COLUMN cost REAL DEFAULT 0.0")
+    except: pass
+    try:
+        db.execute("ALTER TABLE messages ADD COLUMN tokens_prompt INTEGER DEFAULT 0")
+    except: pass
+    try:
+        db.execute("ALTER TABLE messages ADD COLUMN tokens_completion INTEGER DEFAULT 0")
+    except: pass
+    try:
         db.execute("ALTER TABLE findings ADD COLUMN evidence_type TEXT")
     except: pass
     try:
@@ -515,10 +530,11 @@ def init_db():
     for skill, score in skill_seeds:
         db.execute("INSERT OR IGNORE INTO trust_skills (skill, score) VALUES (?,?)", (skill, score))
     
-    # Seed trust scores
-    for agent in ['main', 'writer', 'researcher', 'builder', 'hunter', 'dealmaker']:
-        db.execute("INSERT OR IGNORE INTO trust_scores (agent, score) VALUES (?, ?)",
-                   (agent, 8 if agent == 'main' else 1))
+    # DEPRECATED: trust_scores seeding (migrated to trust_skills)
+    # Legacy table kept for archival purposes only
+    # for agent in ['main', 'writer', 'researcher', 'builder', 'hunter', 'dealmaker']:
+    #     db.execute("INSERT OR IGNORE INTO trust_scores (agent, score) VALUES (?, ?)",
+    #                (agent, 8 if agent == 'main' else 1))
     
     db.commit()
     db.close()
@@ -629,6 +645,89 @@ def get_topic(topic_id: str):
     result['references'] = [dict(r) for r in refs]
     result['connections'] = [dict(c) for c in conns]
     return result
+
+# ── Session Replay (Feature #3) ──
+
+@app.get("/api/topics/{topic_id}/replay")
+def get_topic_replay(topic_id: str, limit: int = 100):
+    """Session Replay: chronological event stream (messages + state changes + actions).
+    Returns a timeline of all activity for debugging/audit.
+    """
+    db = get_db()
+    
+    # Verify topic exists
+    topic = db.execute("SELECT id, name FROM topics WHERE id = ?", (topic_id,)).fetchone()
+    if not topic:
+        db.close()
+        raise HTTPException(404, "Topic not found")
+    
+    # Collect events from multiple sources
+    timeline = []
+    
+    # 1. Messages (human, mia, system)
+    messages = db.execute("""
+        SELECT id, sender, content, msg_type, created_at, cost, tokens_prompt, tokens_completion
+        FROM messages WHERE topic_id = ? ORDER BY created_at
+    """, (topic_id,)).fetchall()
+    for m in messages:
+        timeline.append({
+            "type": "message",
+            "timestamp": m['created_at'],
+            "sender": m['sender'],
+            "content": m['content'][:500],  # Truncate long messages
+            "msg_type": m['msg_type'],
+            "cost": m['cost'] if m['cost'] else None,
+            "tokens": {
+                "prompt": m['tokens_prompt'],
+                "completion": m['tokens_completion']
+            } if m['tokens_prompt'] else None
+        })
+    
+    # 2. Events (state_change, file_uploaded, action_queued, etc.)
+    events = db.execute("""
+        SELECT event_type, detail, created_at
+        FROM events WHERE topic_id = ? ORDER BY created_at
+    """, (topic_id,)).fetchall()
+    for e in events:
+        detail = json.loads(e['detail'] or '{}')
+        timeline.append({
+            "type": "event",
+            "timestamp": e['created_at'],
+            "event_type": e['event_type'],
+            "detail": detail
+        })
+    
+    # 3. Step completions
+    steps = db.execute("""
+        SELECT label, done, position
+        FROM steps WHERE topic_id = ?
+    """, (topic_id,)).fetchall()
+    # We don't have step completion timestamps, so we approximate from messages
+    # For MVP: Just show current state
+    for s in steps:
+        if s['done']:
+            # Approximate: use first message after step was created (not perfect, but works for MVP)
+            timeline.append({
+                "type": "step_completed",
+                "timestamp": None,  # No timestamp available
+                "step": s['label'],
+                "position": s['position']
+            })
+    
+    # Sort by timestamp (None values last)
+    timeline.sort(key=lambda x: x['timestamp'] or '9999-99-99')
+    
+    # Apply limit
+    timeline = timeline[:limit]
+    
+    db.close()
+    
+    return {
+        "topic_id": topic_id,
+        "topic_name": topic['name'],
+        "event_count": len(timeline),
+        "timeline": timeline
+    }
 
 # ── Messages ──
 
@@ -944,16 +1043,40 @@ def vote_proposal(proposal_id: int, v: VoteCreate):
     db = get_db()
     db.execute("INSERT INTO votes (proposal_id, direction) VALUES (?,?)", (proposal_id, v.direction))
     
-    # Update trust score for 'main' agent
+    # MIGRATED: Update trust_skills instead of trust_scores (skill-level Bayesian)
+    # Map legacy 'main' agent to a generic 'general' skill for backward compatibility
+    skill = "general"
+    
+    # Upsert skill if not exists
+    existing = db.execute("SELECT * FROM trust_skills WHERE skill = ?", (skill,)).fetchone()
+    if not existing:
+        db.execute("INSERT INTO trust_skills (skill, score, total, up, down) VALUES (?,50,0,0,0)", (skill,))
+    
+    # Update using Bayesian trust logic (same as /api/trust/skills/{skill}/feedback)
+    C = 10
+    PRIOR = 50
+    
     if v.direction == "up":
-        db.execute("UPDATE trust_scores SET up_votes = up_votes + 1, total_votes = total_votes + 1, score = MIN(100, score + 1), updated_at = CURRENT_TIMESTAMP WHERE agent = 'main'")
+        db.execute("UPDATE trust_skills SET up = up + 1, total = total + 1, updated_at = CURRENT_TIMESTAMP WHERE skill = ?", (skill,))
     else:
-        db.execute("UPDATE trust_scores SET down_votes = down_votes + 1, total_votes = total_votes + 1, score = MAX(0, score - 2), updated_at = CURRENT_TIMESTAMP WHERE agent = 'main'")
+        db.execute("UPDATE trust_skills SET down = down + 1, total = total + 1, updated_at = CURRENT_TIMESTAMP WHERE skill = ?", (skill,))
+    
+    # Recalculate Bayesian score
+    row = db.execute("SELECT up, down, total FROM trust_skills WHERE skill = ?", (skill,)).fetchone()
+    if row:
+        up = row['up']
+        down = row['down']
+        n = row['total']
+        weighted_total = up + down * 1.5
+        observed_score = (up / weighted_total * 100) if weighted_total > 0 else PRIOR
+        bayesian_score = (C * PRIOR + observed_score * n) / (C + n)
+        bayesian_score = max(0, min(100, round(bayesian_score)))
+        db.execute("UPDATE trust_skills SET score = ? WHERE skill = ?", (bayesian_score, skill))
     
     db.commit()
     db.close()
     
-    notify("trust_update", {"proposal_id": proposal_id, "direction": v.direction})
+    notify("trust_update", {"proposal_id": proposal_id, "direction": v.direction, "skill": skill})
     return {"status": "voted"}
 
 # ── Steps ──
@@ -1016,10 +1139,23 @@ def add_connection(conn: dict):
 
 @app.get("/api/trust")
 def get_trust():
+    """
+    DEPRECATED: Use GET /api/trust/skills for granular skill-level trust scores.
+    This endpoint aggregates trust_skills for backward compatibility.
+    """
+    from fastapi.responses import JSONResponse
     db = get_db()
-    rows = db.execute("SELECT * FROM trust_scores ORDER BY agent").fetchall()
+    rows = db.execute("SELECT * FROM trust_skills ORDER BY skill").fetchall()
     db.close()
-    return [dict(r) for r in rows]
+    
+    # Transform to old agent-level format (aggregate by first component of skill name)
+    # E.g., "research", "email_drafts" → keep as-is, treat each skill as an "agent"
+    result = [dict(r) for r in rows]
+    
+    return JSONResponse(
+        content=result,
+        headers={"X-Deprecation-Warning": "This endpoint is deprecated. Use GET /api/trust/skills for skill-level trust scores."}
+    )
 
 # ── Eval ──
 
@@ -1314,6 +1450,9 @@ def get_executive_kpis():
     trust_rows = db.execute("SELECT score FROM trust_skills").fetchall()
     team_health = round(sum(r['score'] for r in trust_rows)/len(trust_rows)) if trust_rows else 50
     
+    # 5. Total AI Cost (Feature #1: Cost Tracking)
+    total_ai_cost = db.execute("SELECT COALESCE(SUM(cost_total), 0.0) FROM topics").fetchone()[0]
+    
     # Operational KPIs
     # 5. Findings created this week
     findings_week = db.execute("SELECT COUNT(*) FROM findings WHERE created_at >= date('now','-7 days') AND status='alive'").fetchone()[0]
@@ -1365,7 +1504,7 @@ def get_executive_kpis():
     health_checks = [
         {"name": "Disk Space", "value": f"{disk_free_gb} GB free", "status": "critical" if disk_free_gb < 5 else "warning" if disk_free_gb < 10 else "ok"},
         {"name": "Database", "value": f"{db_size_mb} MB", "status": "warning" if db_size_mb > 100 else "ok"},
-        {"name": "API", "value": "v0.12.3 healthy", "status": "ok"},
+        {"name": "API", "value": "v0.13.0 healthy", "status": "ok"},
         {"name": "Findings", "value": f"{pipeline_total} alive", "status": "ok"},
         {"name": "Cron Jobs", "value": "22 active", "status": "ok"},
     ]
@@ -1378,7 +1517,8 @@ def get_executive_kpis():
             "revenue": {"current": revenue_ytd, "target": 100000, "label": "Revenue YTD"},
             "sends": {"current": sends_week, "target": 5, "label": "Sends / Week"},
             "commitments": {"current": commitments_pct, "target": 80, "label": "Commitments Kept"},
-            "team_health": {"current": team_health, "target": 60, "label": "Team Health"}
+            "team_health": {"current": team_health, "target": 60, "label": "Team Health"},
+            "ai_cost": {"current": round(total_ai_cost, 2), "target": 10.0, "label": "Total AI Cost (USD)"}
         },
         "operational": {
             "findings_week": findings_week,
@@ -1917,6 +2057,50 @@ def delete_topic(topic_id: str):
     db.close()
     notify("topic_update", {"topic_id": topic_id})
     return {"status": "deleted"}
+
+# ── Cost Tracking (Feature #1) ──
+
+@app.get("/api/topics/{topic_id}/cost")
+def get_topic_cost(topic_id: str):
+    """Get cost breakdown for a topic.
+    Returns: total cost + breakdown by message/model.
+    """
+    db = get_db()
+    
+    # Get topic total
+    topic = db.execute("SELECT cost_total, cost_updated_at FROM topics WHERE id = ?", (topic_id,)).fetchone()
+    if not topic:
+        db.close()
+        raise HTTPException(404, "Topic not found")
+    
+    # Get message breakdown
+    messages = db.execute("""
+        SELECT id, sender, created_at, cost, tokens_prompt, tokens_completion
+        FROM messages WHERE topic_id = ? AND cost > 0
+        ORDER BY created_at DESC
+    """, (topic_id,)).fetchall()
+    
+    breakdown = []
+    for m in messages:
+        breakdown.append({
+            "message_id": m['id'],
+            "sender": m['sender'],
+            "cost": round(m['cost'], 6),
+            "tokens_prompt": m['tokens_prompt'],
+            "tokens_completion": m['tokens_completion'],
+            "created_at": m['created_at']
+        })
+    
+    db.close()
+    
+    return {
+        "topic_id": topic_id,
+        "total": round(topic['cost_total'] or 0.0, 6),
+        "currency": "USD",
+        "last_updated": topic['cost_updated_at'],
+        "message_count": len(breakdown),
+        "breakdown": breakdown
+    }
 
 # ── Priority System ──
 
@@ -2675,6 +2859,24 @@ AI_PROVIDER = "openai"  # "anthropic" or "openai"
 ANTHROPIC_MODEL = "claude-sonnet-4-5-20250514"
 OPENAI_MODEL = "gpt-4o-mini"
 
+# ── Cost Calculation (Feature #1) ──
+# Pricing as of 2026-02-19 (USD per 1M tokens)
+MODEL_PRICING = {
+    "gpt-4o-mini": {"prompt": 0.15, "completion": 0.60},  # $0.15/$0.60 per 1M tokens
+    "gpt-4o": {"prompt": 2.50, "completion": 10.00},
+    "claude-sonnet-4-5-20250514": {"prompt": 3.00, "completion": 15.00},
+    "claude-opus-4-6": {"prompt": 15.00, "completion": 75.00},
+}
+
+def calculate_ai_cost(model: str, prompt_tokens: int, completion_tokens: int) -> float:
+    """Calculate cost in USD for an AI request.
+    Returns: cost in USD (e.g., 0.0023 for $0.0023)
+    """
+    pricing = MODEL_PRICING.get(model, {"prompt": 3.00, "completion": 15.00})  # Default to Sonnet
+    cost_prompt = (prompt_tokens / 1_000_000) * pricing["prompt"]
+    cost_completion = (completion_tokens / 1_000_000) * pricing["completion"]
+    return round(cost_prompt + cost_completion, 6)
+
 def _build_system_prompt(topic_id: str) -> str:
     """Build a context-rich system prompt for the AI based on topic data."""
     db = get_db()
@@ -2803,13 +3005,21 @@ async def ai_chat(req: AIRequest):
         _log_ai_error(req.topic_id, "unknown", str(e)[:200])
         raise HTTPException(500, f"AI error: {str(e)[:200]}")
     
-    # Save message
+    # Calculate cost (Feature #1: Cost Tracking)
+    prompt_tokens = usage.get("prompt_tokens", 0)
+    completion_tokens = usage.get("completion_tokens", 0)
+    cost = calculate_ai_cost(model_used, prompt_tokens, completion_tokens)
+    
+    # Save message with cost
     db = get_db()
-    db.execute("INSERT INTO messages (topic_id, sender, content, msg_type) VALUES (?,?,?,?)",
-               (req.topic_id, "mia", ai_text, "text"))
+    db.execute("INSERT INTO messages (topic_id, sender, content, msg_type, cost, tokens_prompt, tokens_completion) VALUES (?,?,?,?,?,?,?)",
+               (req.topic_id, "mia", ai_text, "text", cost, prompt_tokens, completion_tokens))
     db.execute("INSERT INTO events (topic_id, event_type, detail) VALUES (?,?,?)",
-               (req.topic_id, "ai_response", json.dumps({"model": model_used, "tokens": usage})))
-    db.execute("UPDATE topics SET updated_at = CURRENT_TIMESTAMP WHERE id = ?", (req.topic_id,))
+               (req.topic_id, "ai_response", json.dumps({"model": model_used, "tokens": usage, "cost": cost})))
+    
+    # Update topic cost
+    db.execute("UPDATE topics SET cost_total = cost_total + ?, cost_updated_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+               (cost, req.topic_id))
     db.commit()
     db.close()
     
@@ -2818,7 +3028,7 @@ async def ai_chat(req: AIRequest):
     # Auto pre-flight on response
     preflight = preflight_check(req.topic_id)
     
-    return {"response": ai_text, "usage": usage, "preflight": preflight}
+    return {"response": ai_text, "usage": usage, "cost": cost, "preflight": preflight}
 
 def _log_ai_error(topic_id: str, error_type: str, detail: str):
     """Log AI errors to events + messages for visibility."""
@@ -3846,7 +4056,7 @@ def health():
         "error_topics": error_topics,
         "pending_actions": pending_actions,
         "failed_actions": failed_actions,
-        "version": "0.12.3"
+        "version": "0.13.0"
     }
 
 # ── Email Send (via gog CLI) ──

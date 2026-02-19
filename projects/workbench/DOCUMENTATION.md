@@ -200,6 +200,68 @@ Base URL: `http://localhost:8080`
 **Body:** `{folder_id: string|null, position?: number}`
 **Returns:** `{status: "moved"}`
 
+#### GET /api/topics/{topic_id}/cost
+
+**Purpose:** Get cost breakdown for a topic (total AI cost + per-message breakdown).
+**Returns:**
+```json
+{
+  "topic_id": "string",
+  "total": 0.123456,
+  "currency": "USD",
+  "last_updated": "2026-02-19T10:30:00",
+  "message_count": 5,
+  "breakdown": [
+    {
+      "message_id": 123,
+      "sender": "mia",
+      "cost": 0.002345,
+      "tokens_prompt": 450,
+      "tokens_completion": 200,
+      "created_at": "2026-02-19T09:15:00"
+    }
+  ]
+}
+```
+**Note:** Only AI responses (via `/api/ai/chat`) track cost. Streaming responses (`/api/ai/stream`) do not include cost tracking due to API limitations.
+
+#### GET /api/topics/{topic_id}/replay
+
+**Purpose:** Session replay — chronological event stream for debugging/audit. Combines messages, events, and state changes.
+**Parameters:** `?limit=100` (default)
+**Returns:**
+```json
+{
+  "topic_id": "string",
+  "topic_name": "string",
+  "event_count": 42,
+  "timeline": [
+    {
+      "type": "message",
+      "timestamp": "2026-02-19T09:15:00",
+      "sender": "human",
+      "content": "...",
+      "msg_type": "text",
+      "cost": 0.002345,
+      "tokens": {"prompt": 450, "completion": 200}
+    },
+    {
+      "type": "event",
+      "timestamp": "2026-02-19T09:16:00",
+      "event_type": "state_change",
+      "detail": {"from": "active", "to": "running"}
+    },
+    {
+      "type": "step_completed",
+      "timestamp": null,
+      "step": "Research complete",
+      "position": 0
+    }
+  ]
+}
+```
+**Use Cases:** Debug state transitions, audit AI responses, track topic evolution over time.
+
 ---
 
 ### 2. Messages & Proposals
@@ -321,7 +383,8 @@ Base URL: `http://localhost:8080`
     "revenue": {current, target, label},
     "sends": {current, target, label},
     "commitments": {current, target, label},
-    "team_health": {current, target, label}
+    "team_health": {current, target, label},
+    "ai_cost": {current, target, label}
   },
   "operational": {
     "findings_week", "pipeline": {research, systems, content, revenue},
@@ -708,6 +771,7 @@ Base URL: `http://localhost:8080`
 
 #### POST /api/actions/send-email
 
+**Status:** Planned: Q2 (not yet implemented)
 **Purpose:** Send email via gog CLI. Logs event, updates topic state on failure.
 **Body:** `{to: string, subject: string, body: string, account?: string, attachments?: [string], topic_id?: string}`
 **Returns:** `{status: "sent", to, subject}`
@@ -725,6 +789,31 @@ Base URL: `http://localhost:8080`
 #### WebSocket /ws
 
 **Purpose:** Real-time updates. Send "ping" to receive `{type: "pong"}`. Server broadcasts events: `topic_update`, `message`, `trust_update`, `standup_update`, `folder_update`, `activity_logged`, `finding_created`, `finding_updated`, `revenue_logged`, `goal_added`, `goal_updated`, `decision_logged`, `backlog_updated`, `priority_update`, `action_queued`, `findings_imported`, `finding_verified`.
+
+---
+
+## UI Features
+
+### Keyboard Shortcuts
+
+Press `?` to show all shortcuts in-app.
+
+| Shortcut | Action |
+|----------|--------|
+| **Cmd+K** | Open command palette (search topics, actions, folders) |
+| **Cmd+N** | New topic |
+| **Cmd+P** | Toggle pipeline view |
+| **Cmd+I** | Toggle principles view |
+| **Cmd+O** | Toggle executive board |
+| **Cmd+.** | Toggle context panel |
+| **J / K** | Navigate topics (down / up) |
+| **E** | Focus message input |
+| **C** | Toggle context panel |
+| **S** | Toggle topic priority (LOW → NORMAL → HIGH → NOW) |
+| **D** | Mark current topic as done |
+| **/** | Focus search (same as Cmd+K) |
+| **?** | Show keyboard shortcuts help |
+| **Esc** | Close modals |
 
 ---
 

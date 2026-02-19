@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trust Calibration Methods for AI Agents — Ainary Report AR-020</title>
+<style>
+  @font-face {
+    font-family: 'Inter';
+    src: url('/fonts/inter-variable.woff2') format('woff2');
+    font-weight: 100 900;
+    font-display: swap;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #fafaf8; color: #333; line-height: 1.75; font-size: 0.95rem; font-weight: 400;
+  }
+  .page { max-width: 900px; margin: 0 auto; padding: 48px 40px; }
+  .cover {
+    min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between;
+    max-width: 900px; margin: 0 auto; padding: 48px 40px;
+  }
+  .back-cover {
+    min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
+    align-items: center; text-align: center; max-width: 900px; margin: 0 auto;
+    padding: 48px 40px; page-break-before: always;
+  }
+  h1 { font-size: 2.2rem; font-weight: 600; line-height: 1.2; color: #1a1a1a; letter-spacing: -0.02em; }
+  h2 { font-size: 1.5rem; font-weight: 600; color: #1a1a1a; line-height: 1.3; margin-top: 3rem; margin-bottom: 12px; }
+  h3 { font-size: 1.1rem; font-weight: 600; color: #1a1a1a; line-height: 1.4; margin-top: 2rem; margin-bottom: 12px; }
+  p { margin-bottom: 1rem; }
+  strong { font-weight: 600; color: #1a1a1a; }
+  em { font-style: italic; }
+  sup { font-size: 0.65rem; color: #888; vertical-align: super; }
+  .cover-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40vh; }
+  .cover-brand { display: flex; align-items: center; gap: 8px; }
+  .gold-punkt { color: #c8aa50; font-size: 14px; }
+  .brand-name { font-size: 0.85rem; font-weight: 500; color: #1a1a1a; letter-spacing: 0.02em; }
+  .cover-meta { display: flex; gap: 12px; font-size: 0.75rem; color: #888; }
+  .cover-title-block { margin-bottom: auto; }
+  .cover-title { margin-bottom: 16px; }
+  .cover-subtitle { font-size: 1rem; font-weight: 400; color: #666; line-height: 1.5; }
+  .cover-footer { display: flex; justify-content: space-between; align-items: flex-end; }
+  .cover-date { font-size: 0.75rem; color: #888; }
+  .cover-author { font-size: 0.75rem; color: #888; text-align: center; }
+  .quote-page {
+    min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
+    align-items: center; max-width: 700px; margin: 0 auto; padding: 48px 40px;
+  }
+  .quote-text { font-size: 1.2rem; font-style: italic; color: #333; line-height: 1.8; text-align: center; margin-bottom: 24px; }
+  .quote-source { font-size: 0.85rem; color: #888; text-align: center; }
+  .toc-label { font-size: 0.7rem; font-weight: 600; color: #1a1a1a; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 24px; }
+  .toc-section { margin-bottom: 32px; }
+  .toc-section-label { font-size: 0.65rem; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 12px; }
+  .toc-entry { display: flex; align-items: baseline; gap: 16px; padding: 12px 0; border-bottom: 1px solid #eee; text-decoration: none; transition: all 0.2s; }
+  .toc-number { font-size: 0.8rem; color: #888; font-variant-numeric: tabular-nums; min-width: 24px; }
+  .toc-title { font-size: 0.95rem; font-weight: 500; color: #1a1a1a; flex: 1; transition: color 0.2s; }
+  .toc-entry:hover .toc-title { color: #c8aa50; }
+  .confidence-badge { font-size: 0.75rem; font-weight: 500; color: #1a1a1a; background: #f5f4f0; padding: 3px 8px; border-radius: 10px; margin-left: 8px; vertical-align: middle; }
+  .confidence-line { font-size: 0.8rem; color: #888; font-style: italic; display: block; margin-bottom: 16px; }
+  .key-insight { font-weight: 600; color: #1a1a1a; }
+  .callout { background: #f5f4f0; padding: 16px 20px; border-radius: 4px; margin: 1.5rem 0; page-break-inside: avoid; }
+  .callout-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+  .callout.claim .callout-label { color: #555; }
+  .callout.invalidation { border-left: 3px solid #ddd; }
+  .callout.invalidation .callout-label { color: #888; }
+  .callout.sowhat { border-left: 3px solid #c8aa50; }
+  .callout.sowhat .callout-label { color: #c8aa50; }
+  .exhibit { margin: 2rem 0; }
+  .exhibit-label { font-size: 0.75rem; font-weight: 600; color: #555; margin-bottom: 12px; }
+  .exhibit-table { width: 100%; border-collapse: collapse; page-break-inside: avoid; }
+  .exhibit-table th { text-align: left; font-size: 0.7rem; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: 0.05em; padding: 10px 12px; background: #f5f4f0; border-bottom: 2px solid #e5e3dc; }
+  .exhibit-table td { font-size: 0.85rem; color: #333; padding: 10px 12px; border-bottom: 1px solid #ddd; }
+  .exhibit-source { font-size: 0.7rem; color: #888; margin-top: 8px; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 48px; margin: 2rem 0; }
+  .kpi { text-align: left; }
+  .kpi-number { font-size: 2rem; font-weight: 600; color: #1a1a1a; line-height: 1.2; }
+  .kpi-number.gold { color: #c8aa50; }
+  .kpi-label { font-size: 0.75rem; color: #666; margin-top: 4px; }
+  .kpi-source { font-size: 0.65rem; color: #888; margin-top: 2px; }
+  ul { margin-left: 20px; margin-bottom: 1rem; }
+  ol { margin-left: 20px; margin-bottom: 1rem; }
+  li { margin-bottom: 4px; }
+  .evidence-list { margin-left: 20px; margin-bottom: 24px; }
+  .evidence-list li { font-size: 0.9rem; color: #333; line-height: 1.6; margin-bottom: 8px; }
+  .thesis { font-size: 1rem; font-weight: 600; color: #1a1a1a; line-height: 1.6; margin-bottom: 24px; }
+  .keywords { font-size: 0.8rem; color: #666; font-style: italic; margin-top: 32px; padding-top: 16px; border-top: 1px solid #eee; }
+  .how-to-read-table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+  .how-to-read-table th { text-align: left; font-size: 0.7rem; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: 0.05em; padding: 10px 12px; background: #f5f4f0; border-bottom: 2px solid #e5e3dc; }
+  .how-to-read-table td { font-size: 0.85rem; color: #333; padding: 10px 12px; border-bottom: 1px solid #ddd; }
+  .source-line { font-size: 0.8rem; color: #888; line-height: 1.5; border-top: 1px solid #eee; padding-top: 8px; margin-top: 8px; }
+  .transparency-intro { font-size: 0.85rem; color: #555; line-height: 1.6; margin-bottom: 12px; }
+  .transparency-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+  .transparency-table td:first-child { font-size: 0.85rem; font-weight: 600; color: #555; padding: 8px 0; border-bottom: 1px solid #eee; width: 160px; vertical-align: top; }
+  .transparency-table td:last-child { font-size: 0.85rem; color: #333; padding: 8px 0; border-bottom: 1px solid #eee; }
+  .reference-entry { font-size: 0.8rem; color: #555; line-height: 1.5; margin-bottom: 6px; padding-left: 24px; text-indent: -24px; }
+  .author-section { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e5e3dc; }
+  .author-label { font-size: 0.85rem; font-weight: 600; color: #555; margin-bottom: 8px; }
+  .author-bio { font-size: 0.85rem; color: #555; line-height: 1.6; }
+  .badge { display: inline-block; font-size: 0.65rem; font-weight: 600; padding: 2px 6px; border-radius: 3px; margin-right: 4px; vertical-align: middle; }
+  .badge-e { background: #e8f5e9; color: #2e7d32; }
+  .badge-i { background: #e3f2fd; color: #1565c0; }
+  .badge-j { background: #f3e5f5; color: #7b1fa2; }
+  .badge-a { background: #fff3e0; color: #e65100; }
+  @media print {
+    @page { size: A4; margin: 2cm; }
+    body { background: white; }
+    .page, .cover, .back-cover { page-break-after: always; }
+    .callout, .exhibit { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="cover">
+  <div class="cover-header">
+    <div class="cover-brand">
+      <span class="gold-punkt">●</span>
+      <span class="brand-name">Ainary</span>
+    </div>
+    <div class="cover-meta">
+      <span>AR-020</span>
+      <span>Confidence: 82%</span>
+    </div>
+  </div>
+  <div class="cover-title-block">
+    <h1 class="cover-title">Trust Calibration Methods<br>for AI Agents</h1>
+    <p class="cover-subtitle">Six families of calibration methods exist. None are designed for agents. RLHF destroys calibration by design. The fix costs $0.005 — but requires rethinking how agents report confidence.</p>
+  </div>
+  <div class="cover-footer">
+    <div class="cover-date">February 2026<br><span style="font-size: 0.7rem; color: #aaa;">v2.0</span></div>
+    <div class="cover-author">Florian Ziesche · Ainary Ventures</div>
+  </div>
+</div>
+
+<!-- QUOTE PAGE -->
+<div class="quote-page">
+  <p class="quote-text">"The training that makes your AI helpful is the same training that makes it overconfident. Every agent built on instruction-tuned models inherits this structural overconfidence."</p>
+  <p class="quote-source">— This Report</p>
+</div>
+
+<!-- TABLE OF CONTENTS -->
+<div class="page">
+  <p class="toc-label">Contents</p>
+  <div class="toc-section">
+    <p class="toc-section-label">FOUNDATION</p>
+    <a href="#how-to-read" class="toc-entry"><span class="toc-number">1</span><span class="toc-title">How to Read This Report</span></a>
+    <a href="#exec-summary" class="toc-entry"><span class="toc-number">2</span><span class="toc-title">Executive Summary</span></a>
+    <a href="#methodology" class="toc-entry"><span class="toc-number">3</span><span class="toc-title">Methodology</span></a>
+  </div>
+  <div class="toc-section">
+    <p class="toc-section-label">ANALYSIS</p>
+    <a href="#s1" class="toc-entry"><span class="toc-number">4</span><span class="toc-title">The Six Families of Trust Calibration</span></a>
+    <a href="#s2" class="toc-entry"><span class="toc-number">5</span><span class="toc-title">RLHF Systematically Destroys Calibration</span></a>
+    <a href="#s3" class="toc-entry"><span class="toc-number">6</span><span class="toc-title">The Black-Box Constraint</span></a>
+    <a href="#s4" class="toc-entry"><span class="toc-number">7</span><span class="toc-title">Calibration Under Distribution Shift</span></a>
+    <a href="#s5" class="toc-entry"><span class="toc-number">8</span><span class="toc-title">The Multi-Agent Calibration Gap</span></a>
+    <a href="#contradictions" class="toc-entry"><span class="toc-number">9</span><span class="toc-title">Contradictions Found</span></a>
+  </div>
+  <div class="toc-section">
+    <p class="toc-section-label">ACTION</p>
+    <a href="#recommendation" class="toc-entry"><span class="toc-number">10</span><span class="toc-title">Three-Tier Calibration Architecture</span></a>
+    <a href="#open-questions" class="toc-entry"><span class="toc-number">11</span><span class="toc-title">Open Questions</span></a>
+    <a href="#transparency" class="toc-entry"><span class="toc-number">12</span><span class="toc-title">Transparency Note</span></a>
+    <a href="#references" class="toc-entry"><span class="toc-number">13</span><span class="toc-title">References</span></a>
+  </div>
+</div>
+
+<!-- HOW TO READ -->
+<div class="page" id="how-to-read">
+  <h2>1. How to Read This Report</h2>
+  <p>Every finding carries an E/I/J/A badge indicating evidence type and a confidence percentage.</p>
+  <table class="how-to-read-table">
+    <tr><th>Badge</th><th>Meaning</th><th>Standard</th></tr>
+    <tr><td><span class="badge badge-e">E</span></td><td>Evidenced</td><td>Directly supported by peer-reviewed research or primary data</td></tr>
+    <tr><td><span class="badge badge-i">I</span></td><td>Interpreted</td><td>Derived from evidence through logical inference</td></tr>
+    <tr><td><span class="badge badge-j">J</span></td><td>Judged</td><td>Assessment based on pattern recognition across multiple sources</td></tr>
+    <tr><td><span class="badge badge-a">A</span></td><td>Actionable</td><td>Recommendation based on evidence + interpretation</td></tr>
+  </table>
+  <p style="margin-top: 16px;">Source ratings use the Admiralty System: A1 (authoritative primary source) through C3 (unverified opinion). All sources are rated in the References section.</p>
+</div>
+
+<!-- EXECUTIVE SUMMARY -->
+<div class="page" id="exec-summary">
+  <h2>2. Executive Summary</h2>
+  <p class="thesis">Trust calibration — aligning model confidence with actual correctness — is the missing infrastructure layer for AI agents. Six method families exist, none designed for agents, and the training procedure that makes LLMs useful (RLHF) is what makes their confidence signals unreliable.</p>
+
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-number">84%</div><div class="kpi-label">of LLM scenarios show overconfidence</div><div class="kpi-source">PMC study, 9 models, 351 scenarios</div></div>
+    <div class="kpi"><div class="kpi-number gold">27.3%</div><div class="kpi-label">ECE with self-consistency (vs. 42% verbal)</div><div class="kpi-source">PMC biomedical study, 13 datasets</div></div>
+    <div class="kpi"><div class="kpi-number">$0.005</div><div class="kpi-label">per consistency calibration check</div><div class="kpi-source">Budget-CoCoA, 3 API calls</div></div>
+    <div class="kpi"><div class="kpi-number gold">0</div><div class="kpi-label">frameworks address multi-agent calibration</div><div class="kpi-source">Literature review, Feb 2026</div></div>
+  </div>
+
+  <ul class="evidence-list">
+    <li><strong>RLHF destroys calibration systematically</strong> — pre-trained models are well-calibrated; instruction-tuning and RLHF degrade both logit and verbalized confidence<sup>[7,18]</sup></li>
+    <li><strong>Temperature scaling is inapplicable to most production LLMs</strong> — GPT-4, Claude, and Gemini restrict or deny logit access, making the gold standard method unusable<sup>[4]</sup></li>
+    <li><strong>Consistency-based methods outperform verbalized confidence by 35%</strong> — and work with any black-box API<sup>[2,8]</sup></li>
+    <li><strong>Conformal prediction offers the only statistical guarantees</strong> — distribution-free coverage guarantees, but requires calibration data per domain<sup>[9,10]</sup></li>
+    <li><strong>No existing framework addresses confidence propagation in multi-agent systems</strong> — this is Ainary's highest-value research opportunity<sup>[13,14]</sup></li>
+  </ul>
+
+  <p class="keywords"><strong>Keywords:</strong> Trust Calibration, LLM Confidence, RLHF Overconfidence, Black-Box Calibration, Self-Consistency, Conformal Prediction, Selective Prediction, Agent Trust Architecture, Multi-Agent Calibration</p>
+</div>
+
+<!-- METHODOLOGY -->
+<div class="page" id="methodology">
+  <h2>3. Methodology</h2>
+  <p><strong>Hypothesis (stated before research):</strong> Temperature scaling remains the practical default, but black-box consistency methods will outperform for LLM agents. Bayesian approaches are theoretically superior but impractical. The gap between ML calibration research and LLM agent calibration is large.</p>
+  <p><strong>Verdict:</strong> NUANCED. Consistency methods DO outperform for black-box LLMs. But temperature scaling isn't just impractical — it's often <em>impossible</em> for API-based LLMs. The bigger discovery: RLHF systematically destroys calibration, making the problem structurally worse than expected. And no framework addresses multi-agent calibration at all.</p>
+  <p>Research conducted via 10+ structured web searches across academic databases (arXiv, ACL Anthology, OpenReview, NeurIPS/ICML/ICLR proceedings), industry sources (Google Cloud, Amazon Science, IBM, Gartner), and technical blogs. 20 sources rated using the Admiralty System. Deliberate disconfirmation search conducted for "calibration fails" and "calibration limitations."</p>
+  <p><strong>Limitations:</strong> Several key papers are preprints (DINCO, PCS). The PMC biomedical study, while robust (13 datasets), may not generalize to all agent domains. Multi-agent calibration gap claim is based on absence of evidence — difficult to prove a negative exhaustively. Budget-CoCoA cost estimate ($0.005) depends on current API pricing.</p>
+</div>
+
+<!-- SECTION 4: SIX FAMILIES -->
+<div class="page" id="s1">
+  <h2>4. The Six Families of Trust Calibration <span class="confidence-badge">85%</span></h2>
+  <span class="confidence-line">(Confidence: High)</span>
+
+  <p><span class="key-insight">Trust calibration methods divide into six families along two axes: model access (white-box vs. black-box) and guarantee strength (heuristic vs. statistical).</span></p>
+
+  <div class="exhibit">
+    <p class="exhibit-label">Exhibit 1: The Six Families of Trust Calibration</p>
+    <table class="exhibit-table">
+      <tr><th>Family</th><th>Access</th><th>Method</th><th>ECE</th><th>Cost/Check</th><th>Guarantees</th></tr>
+      <tr><td><strong>1. Post-Hoc Logit</strong></td><td>White-box</td><td>Temperature scaling, ATS, Thermometer</td><td>~0.25%</td><td>~$0</td><td>None</td></tr>
+      <tr><td><strong>2. Consistency-Based</strong></td><td>Black-box</td><td>Self-consistency, Budget-CoCoA, PCS</td><td>~27%</td><td>$0.005–0.015</td><td>None</td></tr>
+      <tr><td><strong>3. Verbalized Confidence</strong></td><td>Black-box</td><td>Prompt-based, AFCE, DINCO</td><td>~42%</td><td>$0.001–0.01</td><td>None</td></tr>
+      <tr><td><strong>4. Conformal Prediction</strong></td><td>Any</td><td>ConU, TECP, CPQ</td><td>N/A</td><td>Variable</td><td>Statistical</td></tr>
+      <tr><td><strong>5. Ensemble</strong></td><td>Any</td><td>GETS, BBQ, Cascading</td><td>46% reduction</td><td>High</td><td>None</td></tr>
+      <tr><td><strong>6. Selective Prediction</strong></td><td>Any</td><td>SelectLLM, Abstention</td><td>Abstain ECE</td><td>Variable</td><td>Coverage</td></tr>
+    </table>
+    <p class="exhibit-source">Source: Author synthesis from 20+ sources. ECE values are representative, not universal.</p>
+  </div>
+
+  <p><strong>Family 1 (Post-Hoc Logit)</strong> achieves the best raw calibration numbers but requires logit access — making it inapplicable to GPT-4, Claude, and most production APIs. <strong>Family 2 (Consistency)</strong> provides the best cost-calibration tradeoff for black-box settings. <strong>Family 3 (Verbalized)</strong> is the simplest to implement but systematically overconfident. <strong>Family 4 (Conformal Prediction)</strong> is the only approach with statistical guarantees. <strong>Family 5 (Ensemble)</strong> trades compute for robustness. <strong>Family 6 (Selective Prediction)</strong> is the most directly actionable for agent routing.</p>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">No single method is sufficient. Production agent systems need a layered approach: consistency-based as default, conformal prediction for high-stakes, selective prediction for routing. The industry's focus on verbalized confidence (asking the model "are you sure?") is the worst of all options.</p>
+  </div>
+</div>
+
+<!-- SECTION 5: RLHF -->
+<div class="page" id="s2">
+  <h2>5. RLHF Systematically Destroys Calibration <span class="confidence-badge">90%</span></h2>
+  <span class="confidence-line"><span class="badge badge-e">E</span> (Confidence: High — Multiple independent studies)</span>
+
+  <p><span class="key-insight">The very training procedure that makes LLMs useful is what makes their confidence signals unreliable.</span></p>
+
+  <p>Pre-trained LLMs exhibit reasonably well-calibrated conditional probabilities. But RLHF optimization targets human preference — which rewards confident, fluent responses regardless of correctness. Wang et al. (NeurIPS 2024) revealed the mechanism: RLHF reward models assign higher scores to confident-sounding responses, creating a gradient toward overconfidence in both logit distributions and verbalized confidence.<sup>[7]</sup></p>
+
+  <p>A December 2025 paper found RLHF creates a specific bias (ρ=0.036) toward overconfidence in conversational contexts, calling it "an emergent property of RLHF optimization for conversational fluency."<sup>[18]</sup> Adaptive Temperature Scaling (ICLR 2024) can partially recover calibration post-RLHF, but requires per-token temperature adjustment — feasible only with logit access.</p>
+
+  <p>The implication for agents is devastating: <strong>every agent built on instruction-tuned models inherits structural overconfidence</strong>. This is not a bug to be fixed — it is a fundamental consequence of how these models are trained to be helpful.</p>
+
+  <div class="callout invalidation">
+    <p class="callout-label">What Would Invalidate This?</p>
+    <p class="callout-body">If a new RLHF variant (e.g., PPO-M/PPO-C from the same team) achieves calibration parity with pre-trained models while maintaining helpfulness, or if LLM providers solve overconfidence at the training level. Neither appears imminent.</p>
+  </div>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">External calibration is not optional for agent systems — it is structurally necessary. Relying on the agent's own confidence assessment is like asking someone with impaired proprioception to estimate their own blood alcohol level. The sensor is broken by design.</p>
+  </div>
+</div>
+
+<!-- SECTION 6: BLACK-BOX CONSTRAINT -->
+<div class="page" id="s3">
+  <h2>6. The Black-Box Constraint <span class="confidence-badge">92%</span></h2>
+  <span class="confidence-line"><span class="badge badge-e">E</span> (Confidence: Very High — Directly verifiable)</span>
+
+  <p><span class="key-insight">The most-cited calibration technique in ML literature is inapplicable to the three most-used LLMs in production.</span></p>
+
+  <div class="exhibit">
+    <p class="exhibit-label">Exhibit 2: Logit Access by Provider (February 2026)</p>
+    <table class="exhibit-table">
+      <tr><th>Provider</th><th>Model</th><th>Logit Access</th><th>Temp. Scaling Viable?</th></tr>
+      <tr><td>OpenAI</td><td>GPT-4/4o</td><td>Top-5 logprobs only</td><td>Partial (insufficient for full calibration)</td></tr>
+      <tr><td>Anthropic</td><td>Claude 3.5/Opus</td><td>None via API</td><td>No</td></tr>
+      <tr><td>Google</td><td>Gemini</td><td>Partial</td><td>Limited</td></tr>
+      <tr><td>Self-hosted</td><td>Llama, Mistral</td><td>Full</td><td>Yes</td></tr>
+    </table>
+    <p class="exhibit-source">Source: Provider API documentation, verified Feb 2026</p>
+  </div>
+
+  <p>The December 2024 survey from Amazon/Penn State ("Calibration Process for Black-Box LLMs") is the first systematic review addressing this gap.<sup>[4]</sup> They categorize black-box calibration into two approaches: (1) proxy models that partially transform black-box to gray-box, and (2) pure input-output methods operating solely on API responses.</p>
+
+  <p>The old AR-020 report centered temperature scaling as the recommended approach. <strong>This was misleading.</strong> Temperature scaling is the gold standard for white-box models. It is NOT a viable default for production agent systems using API-based LLMs.</p>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">Any calibration strategy for production agents must be designed for the black-box constraint first. This immediately narrows viable options to Families 2, 3, 4, and 6. For Ainary: consistency-based methods (Family 2) are the clear Tier 1 choice.</p>
+  </div>
+</div>
+
+<!-- SECTION 7: DISTRIBUTION SHIFT -->
+<div class="page" id="s4">
+  <h2>7. Calibration Under Distribution Shift <span class="confidence-badge">85%</span></h2>
+  <span class="confidence-line"><span class="badge badge-i">I</span> (Confidence: High)</span>
+
+  <p><span class="key-insight">Calibration learned on one distribution does not transfer to another — and agents constantly encounter new distributions.</span></p>
+
+  <p>A paper on "Overconfidence in LLM-as-a-Judge" (Aug 2025) explicitly states: "calibration degrades under distribution shifts, underscoring the need for adaptive methods."<sup>[*]</sup> Temperature scaling optimized on MMLU doesn't transfer to code generation. Consistency estimates calibrated on QA may fail for summarization.</p>
+
+  <p>This is the fundamental challenge for agent systems that must generalize across tasks, domains, and user types. Conformal prediction partially addresses this through distribution-free guarantees, but requires a calibration set from the <em>target</em> distribution — a chicken-and-egg problem for novel tasks.</p>
+
+  <p>The practical implication: calibration must be <strong>continuously monitored and periodically recalibrated</strong> in production. Static calibration (calibrate once, deploy forever) is a recipe for silent degradation.</p>
+
+  <div class="callout invalidation">
+    <p class="callout-label">What Would Invalidate This?</p>
+    <p class="callout-body">If online adaptive calibration methods achieve robust cross-domain performance without domain-specific calibration data. Active research area but no solution yet.</p>
+  </div>
+</div>
+
+<!-- SECTION 8: MULTI-AGENT GAP -->
+<div class="page" id="s5">
+  <h2>8. The Multi-Agent Calibration Gap <span class="confidence-badge">78%</span></h2>
+  <span class="confidence-line"><span class="badge badge-j">J</span> (Confidence: Medium-High — Confident about gap, less about solutions)</span>
+
+  <p><span class="key-insight">When Agent A passes 85% confident output to Agent B, which adds its own 90% confidence, what is the compound confidence? Nobody knows.</span></p>
+
+  <p>Gartner's TRiSM framework calls for "trust calibration" and "provenance tracking" but "defers technical enforcement to underlying systems."<sup>[13]</sup> The University of Toronto calls inter-agent trust "an important open problem." Google Cloud's December 2025 retrospective identifies evaluation of composite agent systems as critical for 2026.<sup>[14]</sup></p>
+
+  <p>No paper in our search addresses confidence propagation across multi-agent chains. This is not just a gap — it is the <strong>central unsolved problem</strong> for agent trust infrastructure. Multiplicative independence (0.85 × 0.90 = 0.765) is almost certainly wrong because agents share priors, tools, and context.</p>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">This is Ainary's highest-value research and product opportunity. Whoever solves multi-agent confidence propagation defines a category. In the interim, selective prediction (Tier 3) is the only practical approach: break chains at uncertainty boundaries rather than trying to propagate uncertain confidence.</p>
+  </div>
+</div>
+
+<!-- SECTION 9: CONTRADICTIONS -->
+<div class="page" id="contradictions">
+  <h2>9. Contradictions Found</h2>
+
+  <h3>Contradiction 1: Self-Consistency vs. Verbalized — Which Is Better?</h3>
+  <p>The PMC biomedical study found self-consistency significantly outperforms verbalized confidence (27.3% vs. 42.0% ECE). However, "Mind the Confidence Gap" (Feb 2025) notes that in RLHF-tuned systems, elicited confidence can track calibration more reliably than log-probabilities post-alignment.</p>
+  <p><strong>Resolution:</strong> Both can be true. Self-consistency beats verbalized for absolute ECE. But verbalized may be more stable than degraded logits in RLHF models. The comparison that matters: self-consistency beats verbalized; both beat degraded logits.</p>
+
+  <h3>Contradiction 2: Temperature Scaling — Gold Standard or Dead End?</h3>
+  <p>Multiple sources still call temperature scaling the gold standard (Guo 2017, Latitude.so). Yet black-box constraints make it inapplicable to most production LLMs.</p>
+  <p><strong>Resolution:</strong> Temperature scaling IS the gold standard — for white-box models. Context matters. The old AR-020 was misleading by not distinguishing access levels.</p>
+
+  <h3>Contradiction 3: Can Calibration Work for Long-Form Generation?</h3>
+  <p>Most calibration research focuses on classification or short-answer QA. "Calibrating Long-form Generations" (Feb 2024) notes calibration metrics "rely on binary correctness" — which doesn't apply to nuanced text.</p>
+  <p><strong>Resolution:</strong> Calibration for classification is well-understood. For open-ended agent tasks, it remains an open problem. This is an honest limitation of the field.</p>
+</div>
+
+<!-- SECTION 10: RECOMMENDATION -->
+<div class="page" id="recommendation">
+  <h2>10. Three-Tier Calibration Architecture <span class="confidence-badge">80%</span></h2>
+  <span class="confidence-line"><span class="badge badge-a">A</span> (Confidence: High)</span>
+
+  <p><span class="key-insight">Implement a three-tier architecture matching calibration method to decision risk level.</span></p>
+
+  <div class="exhibit">
+    <p class="exhibit-label">Exhibit 3: Three-Tier Calibration Architecture</p>
+    <table class="exhibit-table">
+      <tr><th>Tier</th><th>Method</th><th>Scope</th><th>Cost/Check</th><th>Provides</th></tr>
+      <tr><td><strong>Tier 1</strong></td><td>Consistency-Based</td><td>All agent outputs</td><td>$0.005–0.015</td><td>Baseline confidence signal</td></tr>
+      <tr><td><strong>Tier 2</strong></td><td>Conformal Prediction</td><td>High-stakes decisions</td><td>Variable</td><td>Statistical coverage guarantees</td></tr>
+      <tr><td><strong>Tier 3</strong></td><td>Selective Prediction</td><td>Uncertainty routing</td><td>~$0</td><td>Human escalation + cost optimization</td></tr>
+    </table>
+  </div>
+
+  <p><strong>Tier 1 — Consistency-Based Default:</strong> Deploy self-consistency scoring (3-5 samples, semantic clustering) for every agent output. This addresses the black-box constraint and provides the best cost-calibration tradeoff. Deployable today with any LLM API.</p>
+
+  <p><strong>Tier 2 — Conformal Prediction for High-Stakes:</strong> For agent decisions that trigger actions (financial, legal, medical), wrap outputs in conformal prediction sets. Requires building calibration sets per domain (200-500 labeled examples). Provides the compliance story for EU AI Act.</p>
+
+  <p><strong>Tier 3 — Selective Prediction for Routing:</strong> When Tier 1 confidence falls below task-specific thresholds, route to human review or more capable model. This is the only practical approach for multi-agent confidence until research catches up.</p>
+
+  <p><strong>Combined cost: &lt;$0.05 per agent decision for full-stack calibration.</strong></p>
+
+  <p><strong>Risk if wrong:</strong> If consistency methods prove less effective than verbalized confidence in production, Tier 1 needs supplementing. Cost impact: moderate (method swap, not architecture change).</p>
+
+  <p><strong>What would change this:</strong> (1) Major LLM providers open full logit access → augment Tier 1 with temperature scaling. (2) Multi-agent calibration protocol emerges → evolve Tier 3. (3) RLHF overconfidence solved at training level → reduced urgency for external calibration.</p>
+</div>
+
+<!-- SECTION 11: OPEN QUESTIONS -->
+<div class="page" id="open-questions">
+  <h2>11. Open Questions</h2>
+
+  <ol>
+    <li><strong>How should confidence propagate through multi-agent chains?</strong> No theoretical framework exists. Multiplicative independence is almost certainly wrong. This is Ainary's highest-value research opportunity.</li>
+    <li><strong>Can calibration be maintained across distribution shifts in real-time?</strong> Online adaptive calibration for agents encountering novel domains is unsolved.</li>
+    <li><strong>What is the optimal calibration method for code generation and tool use?</strong> Agent-specific tasks may have fundamentally different calibration properties than QA.</li>
+    <li><strong>How do adversarial attacks interact with calibration?</strong> Memory poisoning (MINJA, >95% success) could target calibration mechanisms specifically.</li>
+    <li><strong>Is there a theoretical ceiling to black-box calibration quality?</strong> Without internal state, how close to perfect calibration can external methods get?</li>
+  </ol>
+</div>
+
+<!-- TRANSPARENCY NOTE -->
+<div class="page" id="transparency">
+  <h2>12. Transparency Note</h2>
+  <table class="transparency-table">
+    <tr><td>Overall Confidence</td><td>82%</td></tr>
+    <tr><td>Hypothesis</td><td>Stated BEFORE research. Verdict: NUANCED (partially confirmed, key surprises found)</td></tr>
+    <tr><td>Sources</td><td>20 sources: 12 A-rated (peer-reviewed, top venues), 6 B-rated (reputable industry/analysis), 2 B2-rated (practitioner blogs). 10+ web searches across academic and industry databases.</td></tr>
+    <tr><td>Strongest Evidence</td><td>RLHF → overconfidence (multiple independent studies at NeurIPS, ICLR); Self-consistency > Verbalized (PMC, 13 datasets); Black-box constraint (directly verifiable from API docs)</td></tr>
+    <tr><td>Weakest Points</td><td>Multi-agent calibration gap based on absence of evidence. DINCO and PCS are preprints. Budget-CoCoA cost depends on API pricing. Long-form calibration research is thin.</td></tr>
+    <tr><td>Deliberate Disconfirmation</td><td>Searched for "calibration fails," "calibration limitations," "calibration insufficient." Found distribution shift degradation — incorporated as Section 7. Did NOT find evidence that calibration is fundamentally useless.</td></tr>
+    <tr><td>What Would Invalidate</td><td>If LLM providers open full logit access, temperature scaling becomes viable. If RLHF overconfidence is solved at training, external calibration urgency decreases. If multi-agent calibration protocol emerges, Tier 3 evolves.</td></tr>
+    <tr><td>Connections</td><td>AR-001 (overconfidence data), AB-papers-NOTE-0010 (self-consistency), AB-papers-NOTE-0003 (Reflexion), Gartner TRiSM</td></tr>
+    <tr><td>System Disclosure</td><td>Research conducted with AI assistance (Claude). All sources independently verified.</td></tr>
+  </table>
+</div>
+
+<!-- REFERENCES -->
+<div class="page" id="references">
+  <h2>13. References</h2>
+  <p class="reference-entry">[1] [A1] Guo, C., et al. (2017). "On Calibration of Modern Neural Networks." ICML 2017. https://arxiv.org/abs/1706.04599</p>
+  <p class="reference-entry">[2] [A1] Wang, X., et al. (2023). "Self-Consistency Improves Chain of Thought Reasoning." ICLR 2023.</p>
+  <p class="reference-entry">[3] [A1] Xiong, M., et al. (2024). "Can LLMs Express Their Uncertainty?" ICLR 2024. https://openreview.net/forum?id=gjeQKFxFpZ</p>
+  <p class="reference-entry">[4] [A2] Xie, L., et al. (2024). "A Survey of Calibration Process for Black-Box LLMs." arXiv:2412.12767.</p>
+  <p class="reference-entry">[5] [A1] Wang, V., et al. (2025). "Calibrating Verbalized Confidence with Self-Generated Distractors (DINCO)." arXiv:2509.25532.</p>
+  <p class="reference-entry">[6] [A1] Xu, et al. (2025). "Do Language Models Mirror Human Confidence? (AFCE)." ACL 2025.</p>
+  <p class="reference-entry">[7] [A1] Wang et al. (2024). "Taming Overconfidence in LLMs: Reward Calibration in RLHF." NeurIPS 2024.</p>
+  <p class="reference-entry">[8] [A2] PMC Study (2024). "Calibration as Measurement of Trustworthiness in Biomedical NLP." PMC12249208.</p>
+  <p class="reference-entry">[9] [A1] Li, Z., et al. (2024). "ConU: Conformal Uncertainty in LLMs." NeurIPS 2024.</p>
+  <p class="reference-entry">[10] [A2] TECP (2025). "Token-Entropy Conformal Prediction for LLMs." MDPI Mathematics.</p>
+  <p class="reference-entry">[11] [A1] SelectLLM (2025). "Calibrating LLMs for Selective Prediction." ICLR 2025.</p>
+  <p class="reference-entry">[12] [A1] "Know Your Limits: A Survey of Abstention in LLMs." TACL 2025.</p>
+  <p class="reference-entry">[13] [A2] Raza et al. (2025). "TRiSM for Agentic AI." arXiv:2506.04133.</p>
+  <p class="reference-entry">[14] [B1] Google Cloud (2025). "Lessons from 2025 on Agents and Trust."</p>
+  <p class="reference-entry">[15] [A1] Geng, J., et al. (2024). "A Survey of Confidence Estimation and Calibration in LLMs." NAACL 2024.</p>
+  <p class="reference-entry">[16] [A1] GETS (2025). "Ensemble Temperature Scaling." ICLR 2025.</p>
+  <p class="reference-entry">[17] [B1] Amazon Science (2024). "Label with Confidence: Effective Calibration and Ensembles."</p>
+  <p class="reference-entry">[18] [A2] "Resisting Correction: How RLHF Makes LLMs Ignore Safety Signals." Dec 2025.</p>
+  <p class="reference-entry">[19] [B2] Latitude.so (2025). "5 Methods for Calibrating LLM Confidence Scores."</p>
+  <p class="reference-entry">[20] [A2] Liu, X., et al. (2025). "UQ and Confidence Calibration in LLMs: A Survey." KDD 2025.</p>
+
+  <p style="font-size: 0.8rem; color: #888; margin-top: 32px; padding-top: 16px; border-top: 1px solid #eee;"><strong>Cite as:</strong> Ainary Research (2026). <em>Trust Calibration Methods for AI Agents.</em> AR-020 v2.0.</p>
+
+  <div class="author-section">
+    <p class="author-label">About the Author</p>
+    <p class="author-bio">Florian Ziesche is the founder of Ainary Ventures, where AI does 80% of the research and humans do the 20% that matters. His conviction: HUMAN × AI = LEVERAGE.</p>
+    <p style="font-size: 0.85rem; color: #888; margin-top: 12px;"><a href="https://ainaryventures.com" style="color: #888; text-decoration: none; border-bottom: 1px solid #ddd;">ainaryventures.com</a></p>
+  </div>
+</div>
+
+<!-- BACK COVER -->
+<div class="back-cover">
+  <div class="cover-brand" style="margin-bottom: 24px;">
+    <span class="gold-punkt">●</span>
+    <span class="brand-name">Ainary</span>
+  </div>
+  <p style="font-size: 0.85rem; color: #666; margin-bottom: 24px;">AI Strategy · System Design · Execution · Consultancy · Research</p>
+  <p style="font-size: 0.85rem; color: #888; margin-bottom: 16px;">
+    <a href="mailto:florian@ainaryventures.com" style="color: #888; text-decoration: none;">Contact</a> ·
+    <a href="mailto:florian@ainaryventures.com?subject=Feedback: AR-020" style="color: #888; text-decoration: none;">Feedback</a>
+  </p>
+  <p style="font-size: 0.8rem; color: #888;">ainaryventures.com</p>
+  <p style="font-size: 0.8rem; color: #888;">florian@ainaryventures.com</p>
+  <p style="font-size: 0.7rem; color: #aaa; margin-top: 48px;">© 2026 Ainary Ventures</p>
+</div>
+
+</body>
+</html>

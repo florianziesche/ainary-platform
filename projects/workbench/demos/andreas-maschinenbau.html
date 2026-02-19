@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KI-Dashboard — Maschinenbau Schlottwitz</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #fafaf8;
+            --bg-card: #ffffff;
+            --bg-section: #f5f4f0;
+            --bg-accent: #f0ede5;
+            --text-primary: #1a1a1a;
+            --text-secondary: #555555;
+            --text-tertiary: #888888;
+            --border: #e5e3dc;
+            --border-light: #eeedea;
+            --gold-warm: #d4a853;
+            --gold-base: #c8aa50;
+            --gold-deep: #9d7f3b;
+            --gold-pale: #e8d89f;
+            --green: #2d8a4e;
+            --green-bg: #ecf7f0;
+            --red: #c53030;
+            --red-bg: #fef2f2;
+            --blue: #2b6cb0;
+            --blue-bg: #ebf4ff;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.7;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Header */
+        header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 2rem;
+        }
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo-area h1 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.2rem;
+        }
+        .company-info {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+        }
+        .header-stats {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.2rem;
+        }
+
+        /* Tabs */
+        .tabs {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .tabs-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            gap: 0;
+        }
+        .tab-btn {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: var(--text-tertiary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .tab-btn:hover { color: var(--text-primary); }
+        .tab-btn.active {
+            color: var(--gold-deep);
+            border-bottom-color: var(--gold-warm);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 2rem;
+        }
+        .section-header {
+            margin-bottom: 1.5rem;
+        }
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.3rem;
+        }
+        .section-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            transition: all 0.3s;
+        }
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--gold-base);
+            box-shadow: 0 0 0 3px rgba(212, 168, 83, 0.1);
+        }
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.8rem 1.5rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: var(--gold-warm);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--gold-deep);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(212, 168, 83, 0.3);
+        }
+        .btn-secondary {
+            background: var(--bg-section);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover {
+            background: var(--bg-accent);
+            border-color: var(--gold-base);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .card-badge {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .badge-success {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+        .badge-warning {
+            background: var(--gold-pale);
+            color: var(--gold-deep);
+        }
+        .badge-info {
+            background: var(--blue-bg);
+            color: var(--blue);
+        }
+
+        /* Data Display */
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .data-row:last-child {
+            border-bottom: none;
+        }
+        .data-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .data-value {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .data-value.large {
+            font-size: 1.2rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Result Box */
+        .result-box {
+            background: var(--bg-section);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        .result-box.success {
+            background: var(--green-bg);
+            border-color: var(--green);
+        }
+        .result-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        /* Grid */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        /* Table */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .table th {
+            text-align: left;
+            padding: 0.8rem;
+            background: var(--bg-section);
+            border-bottom: 2px solid var(--border);
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .table td {
+            padding: 0.8rem;
+            border-bottom: 1px solid var(--border-light);
+            color: var(--text-secondary);
+        }
+        .table tr:hover {
+            background: var(--bg-section);
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 24px;
+            background: var(--bg-section);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--green);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+        }
+        .progress-fill.warning {
+            background: var(--gold-warm);
+        }
+        .progress-fill.danger {
+            background: var(--red);
+        }
+
+        /* Machine Status */
+        .machine-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        .machine-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.2rem;
+            transition: all 0.3s;
+        }
+        .machine-card:hover {
+            border-color: var(--gold-base);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+        .machine-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+        .machine-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .machine-status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .machine-status.running {
+            background: var(--green);
+            box-shadow: 0 0 8px var(--green);
+        }
+        .machine-status.idle {
+            background: var(--gold-warm);
+        }
+        .machine-status.maintenance {
+            background: var(--red);
+        }
+        .machine-info {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.8rem;
+        }
+
+        @media (max-width: 900px) {
+            .header-stats { display: none; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-content">
+        <div class="logo-area">
+            <h1>Maschinenbau Schlottwitz</h1>
+            <div class="company-info">CNC-Fertigung · Präzisionsteile · ~25 Mitarbeiter</div>
+        </div>
+        <div class="header-stats">
+            <div class="stat-item">
+                <div class="stat-value" style="color:var(--green);">87%</div>
+                <div class="stat-label">Auslastung</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">12</div>
+                <div class="stat-label">Offene Anfragen</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" style="color:var(--gold-warm);">23.450 €</div>
+                <div class="stat-label">Ø Auftragswert</div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<nav class="tabs">
+    <div class="tabs-inner">
+        <button class="tab-btn active" onclick="switchTab('angebot')">Angebotserstellung</button>
+        <button class="tab-btn" onclick="switchTab('recherche')">Kundenrecherche</button>
+        <button class="tab-btn" onclick="switchTab('planung')">Auftragsplanung</button>
+    </div>
+</nav>
+
+<div class="container">
+
+<!-- TAB: Angebotserstellung -->
+<div class="tab-content active" id="tab-angebot">
+    
+    <div class="section">
+        <div class="section-header">
+            <h2 class="section-title">Neue Kundenanfrage</h2>
+            <p class="section-desc">KI-gestützte Kalkulation — von der Anfrage zum druckfertigen Angebot in Minuten</p>
+        </div>
+
+        <div class="grid-2">
+            <div>
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Kundendaten</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Kunde</label>
+                        <select class="form-select" id="kundenSelect" onchange="updateKundendaten()">
+                            <option value="">— Kunde auswählen —</option>
+                            <option value="automotive">Müller Automotive GmbH</option>
+                            <option value="electronics">TechParts Dresden</option>
+                            <option value="neuling">Neukunde: Schmidt Werkzeugbau</option>
+                        </select>
+                    </div>
+                    <div id="kundendatenBox" style="display:none;">
+                        <div class="data-row">
+                            <span class="data-label">Branche</span>
+                            <span class="data-value" id="kdBranche">—</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Zahlungsziel</span>
+                            <span class="data-value" id="kdZahlungsziel">—</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="data-label">Durchschnittl. Auftragswert</span>
+                            <span class="data-value" id="kdAuftragswert">—</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Teildaten</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Material</label>
+                        <select class="form-select" id="material">
+                            <option value="alu">Aluminium 7075</option>
+                            <option value="stahl">Edelstahl 1.4301</option>
+                            <option value="messing">Messing CuZn39Pb3</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Länge (mm)</label>
+                            <input type="number" class="form-input" id="laenge" value="150" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Durchmesser (mm)</label>
+                            <input type="number" class="form-input" id="durchmesser" value="40" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Stückzahl</label>
+                            <input type="number" class="form-input" id="stueckzahl" value="250" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Liefertermin</label>
+                            <input type="date" class="form-input" id="liefertermin" value="2026-04-15" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Besonderheiten</label>
+                        <textarea class="form-textarea" id="besonderheiten" placeholder="z.B. Toleranz IT7, Oberflächengüte Ra 0.8"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">KI-Kalkulation</span>
+                        <span class="card-badge badge-info">Auto</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Materialkosten</span>
+                        <span class="data-value">2.450,00 €</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">CNC-Fräsen (8,5h × 70 €/h)</span>
+                        <span class="data-value">595,00 €</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Drehen (3,2h × 65 €/h)</span>
+                        <span class="data-value">208,00 €</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Entgraten (1,5h × 31 €/h)</span>
+                        <span class="data-value">46,50 €</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Gemeinkosten (32%)</span>
+                        <span class="data-value">1.056,00 €</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Gewinn (8%)</span>
+                        <span class="data-value">348,44 €</span>
+                    </div>
+                    <div class="data-row" style="border-top:2px solid var(--gold-warm);padding-top:1rem;margin-top:1rem;">
+                        <span class="data-label" style="font-weight:700;color:var(--text-primary);">Angebotspreis (netto)</span>
+                        <span class="data-value large" style="color:var(--gold-deep);">4.703,94 €</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Preis pro Stück</span>
+                        <span class="data-value">18,82 €</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" style="width:100%;margin-bottom:1rem;" onclick="generiereAngebot()">Angebot generieren (PDF)</button>
+                <button class="btn btn-secondary" style="width:100%;">Zur Nachkalkulation</button>
+
+                <div class="result-box" id="angebotResult" style="display:none;">
+                    <div class="result-title">✅ Angebot erstellt</div>
+                    <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:1rem;">
+                        PDF-Angebot für <strong>Müller Automotive GmbH</strong> wurde generiert und steht zum Download bereit.
+                    </p>
+                    <div class="data-row">
+                        <span class="data-label">Dateiname</span>
+                        <span class="data-value">2026-02-19_Angebot_MAG_Drehteil_250Stk.pdf</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Angebotsnummer</span>
+                        <span class="data-value">A2026-047</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Gültig bis</span>
+                        <span class="data-value">19.03.2026</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- TAB: Kundenrecherche -->
+<div class="tab-content" id="tab-recherche">
+    
+    <div class="section">
+        <div class="section-header">
+            <h2 class="section-title">Kundenrecherche</h2>
+            <p class="section-desc">KI durchsucht öffentliche Quellen nach Firmendaten, Brancheninfos und Ansprechpartnern</p>
+        </div>
+
+        <div class="grid-2">
+            <div>
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Firma suchen</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Firmenname oder Website</label>
+                        <input type="text" class="form-input" id="firmenSuche" placeholder="z.B. TechParts Dresden oder techparts-dresden.de" />
+                    </div>
+                    <button class="btn btn-primary" style="width:100%;" onclick="recherchieren()">Recherche starten</button>
+                </div>
+
+                <div class="card" id="rechercheResult" style="display:none;">
+                    <div class="card-header">
+                        <span class="card-title">TechParts Dresden GmbH</span>
+                        <span class="card-badge badge-success">Verifiziert</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Branche</span>
+                        <span class="data-value">Elektronikfertigung, Zulieferer</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Mitarbeiter</span>
+                        <span class="data-value">~120 (Quelle: LinkedIn)</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Umsatz (geschätzt)</span>
+                        <span class="data-value">~18 Mio. € (2024)</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Gründung</span>
+                        <span class="data-value">2008</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Adresse</span>
+                        <span class="data-value">Gewerbepark Ost 14, 01309 Dresden</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Website</span>
+                        <span class="data-value">techparts-dresden.de</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Handelsregister</span>
+                        <span class="data-value">HRB 27851, AG Dresden</span>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="card" id="ansprechpartnerCard" style="display:none;">
+                    <div class="card-header">
+                        <span class="card-title">Ansprechpartner</span>
+                    </div>
+                    <div style="border-left:3px solid var(--gold-warm);padding-left:1rem;margin-bottom:1rem;">
+                        <div style="font-weight:600;margin-bottom:0.3rem;">Michael Weber</div>
+                        <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.5rem;">Geschäftsführer & Einkaufsleiter</div>
+                        <div style="font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--text-tertiary);">
+                            📧 m.weber@techparts-dresden.de<br>
+                            📞 +49 351 440 29 10
+                        </div>
+                    </div>
+                    <div style="border-left:3px solid var(--blue);padding-left:1rem;margin-bottom:1rem;">
+                        <div style="font-weight:600;margin-bottom:0.3rem;">Sandra Müller</div>
+                        <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.5rem;">Leiterin Produktion</div>
+                        <div style="font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--text-tertiary);">
+                            📧 s.mueller@techparts-dresden.de<br>
+                            📞 +49 351 440 29 23
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" id="branchenInfo" style="display:none;">
+                    <div class="card-header">
+                        <span class="card-title">Branchenkontext</span>
+                    </div>
+                    <p style="font-size:0.9rem;color:var(--text-secondary);line-height:1.7;margin-bottom:1rem;">
+                        TechParts Dresden ist ein mittelständischer Elektronik-Zulieferer mit Fokus auf Präzisionsteile für die Halbleiter- und Sensorindustrie. Typische Anforderungen: IT6-IT7 Toleranzen, Ra 0.4-0.8 Oberflächengüte, Aluminium und Edelstahl bevorzugt.
+                    </p>
+                    <div style="background:var(--blue-bg);border-radius:6px;padding:1rem;">
+                        <div style="font-weight:600;margin-bottom:0.5rem;color:var(--blue);">💡 KI-Empfehlung</div>
+                        <ul style="margin-left:1.2rem;font-size:0.85rem;color:var(--text-secondary);">
+                            <li>Angebot mit 5% Mengenrabatt ab 500 Stück</li>
+                            <li>Express-Lieferung als USP (haben oft knappe Timelines)</li>
+                            <li>Referenz zu ähnlichem Projekt (Sensor-Gehäuse 2025)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- TAB: Auftragsplanung -->
+<div class="tab-content" id="tab-planung">
+    
+    <div class="section">
+        <div class="section-header">
+            <h2 class="section-title">Maschinen-Auslastung</h2>
+            <p class="section-desc">Echtzeit-Übersicht über CNC-Maschinen und laufende Aufträge</p>
+        </div>
+
+        <div class="grid-3">
+            <div class="card">
+                <div style="font-size:0.8rem;color:var(--text-tertiary);margin-bottom:0.5rem;">Gesamt-Auslastung</div>
+                <div style="font-size:2rem;font-weight:700;color:var(--green);margin-bottom:0.5rem;">87%</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width:87%">87%</div>
+                </div>
+            </div>
+            <div class="card">
+                <div style="font-size:0.8rem;color:var(--text-tertiary);margin-bottom:0.5rem;">Laufende Aufträge</div>
+                <div style="font-size:2rem;font-weight:700;color:var(--text-primary);margin-bottom:0.5rem;">14</div>
+                <div style="font-size:0.85rem;color:var(--text-secondary);">3 Eilaufträge, 11 Normal</div>
+            </div>
+            <div class="card">
+                <div style="font-size:0.8rem;color:var(--text-tertiary);margin-bottom:0.5rem;">Freie Kapazität</div>
+                <div style="font-size:2rem;font-weight:700;color:var(--gold-warm);margin-bottom:0.5rem;">52h</div>
+                <div style="font-size:0.85rem;color:var(--text-secondary);">Diese Woche (bis Fr.)</div>
+            </div>
+        </div>
+
+        <div class="machine-grid">
+            <div class="machine-card">
+                <div class="machine-header">
+                    <span class="machine-name">CNC-1 Hermle C40</span>
+                    <span class="machine-status running" title="In Betrieb"></span>
+                </div>
+                <div class="machine-info">
+                    Aktuell: Auftrag A2026-042 (Müller Automotive)<br>
+                    Restlaufzeit: 3h 24min
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width:92%">92%</div>
+                </div>
+            </div>
+
+            <div class="machine-card">
+                <div class="machine-header">
+                    <span class="machine-name">CNC-2 DMG Mori</span>
+                    <span class="machine-status running" title="In Betrieb"></span>
+                </div>
+                <div class="machine-info">
+                    Aktuell: Auftrag A2026-045 (Schmidt GmbH)<br>
+                    Restlaufzeit: 1h 15min
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width:78%">78%</div>
+                </div>
+            </div>
+
+            <div class="machine-card">
+                <div class="machine-header">
+                    <span class="machine-name">Drehmaschine INDEX</span>
+                    <span class="machine-status idle" title="Bereit"></span>
+                </div>
+                <div class="machine-info">
+                    Bereit für nächsten Auftrag<br>
+                    Letzter: A2026-041 (10:45 Uhr)
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill warning" style="width:15%">15%</div>
+                </div>
+            </div>
+
+            <div class="machine-card">
+                <div class="machine-header">
+                    <span class="machine-name">CNC-3 Haas VF-4</span>
+                    <span class="machine-status running" title="In Betrieb"></span>
+                </div>
+                <div class="machine-info">
+                    Aktuell: Auftrag A2026-038 (TechParts)<br>
+                    Restlaufzeit: 6h 52min
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width:95%">95%</div>
+                </div>
+            </div>
+
+            <div class="machine-card">
+                <div class="machine-header">
+                    <span class="machine-name">Fräse Deckel Maho</span>
+                    <span class="machine-status maintenance" title="Wartung"></span>
+                </div>
+                <div class="machine-info">
+                    Planmäßige Wartung<br>
+                    Verfügbar ab: Mi. 14:00 Uhr
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill danger" style="width:0%">Wartung</div>
+                </div>
+            </div>
+
+            <div class="machine-card">
+                <div class="machine-header">
+                    <span class="machine-name">Säge Kasto</span>
+                    <span class="machine-status idle" title="Bereit"></span>
+                </div>
+                <div class="machine-info">
+                    Bereit für nächsten Auftrag<br>
+                    Letzter: A2026-044 (11:30 Uhr)
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill warning" style="width:22%">22%</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top:2rem;">
+            <div class="card-header">
+                <span class="card-title">Aktuelle Aufträge</span>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Auftrag</th>
+                        <th>Kunde</th>
+                        <th>Teil</th>
+                        <th>Maschine</th>
+                        <th>Status</th>
+                        <th>Liefertermin</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight:600;">A2026-042</td>
+                        <td>Müller Automotive</td>
+                        <td>Drehteil Alu, 250 Stk.</td>
+                        <td>CNC-1 Hermle</td>
+                        <td><span class="card-badge badge-info">92% fertig</span></td>
+                        <td>21.02.2026</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight:600;">A2026-045</td>
+                        <td>Schmidt GmbH</td>
+                        <td>Frästeile Stahl, 80 Stk.</td>
+                        <td>CNC-2 DMG</td>
+                        <td><span class="card-badge badge-info">78% fertig</span></td>
+                        <td>20.02.2026</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight:600;">A2026-038</td>
+                        <td>TechParts Dresden</td>
+                        <td>Sensor-Gehäuse, 500 Stk.</td>
+                        <td>CNC-3 Haas</td>
+                        <td><span class="card-badge badge-success">Läuft</span></td>
+                        <td>25.02.2026</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight:600;">A2026-047</td>
+                        <td>Neuer Auftrag</td>
+                        <td>—</td>
+                        <td>—</td>
+                        <td><span class="card-badge badge-warning">Wartet</span></td>
+                        <td>27.02.2026</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="result-box" style="background:var(--blue-bg);border-color:var(--blue);">
+            <div class="result-title" style="color:var(--blue);">💡 KI-Empfehlung: Optimale Einplanung</div>
+            <p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.7;">
+                <strong>Neuer Auftrag A2026-047</strong> kann optimal eingeplant werden:<br><br>
+                • <strong>Drehmaschine INDEX:</strong> Verfügbar ab sofort (aktuell 15% Auslastung)<br>
+                • <strong>Geschätzte Fertigstellung:</strong> 26.02.2026 15:00 Uhr (1 Tag vor Termin)<br>
+                • <strong>Risiko:</strong> Niedrig — keine Eilaufträge in der Pipeline<br><br>
+                <span style="color:var(--green);font-weight:600;">✓ Empfehlung: Auftrag annehmen</span>
+            </p>
+        </div>
+    </div>
+
+</div>
+
+</div>
+
+<script>
+    // Tab switching
+    function switchTab(name) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + name).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    // Kundendaten updaten
+    const kunden = {
+        automotive: {
+            branche: 'Automotive Zulieferer',
+            zahlungsziel: '30 Tage netto',
+            auftragswert: '~24.000 € (Ø letztes Jahr)'
+        },
+        electronics: {
+            branche: 'Elektronikfertigung',
+            zahlungsziel: '14 Tage netto',
+            auftragswert: '~18.500 € (Ø letztes Jahr)'
+        },
+        neuling: {
+            branche: 'Werkzeugbau (Neukunde)',
+            zahlungsziel: 'Noch zu verhandeln',
+            auftragswert: 'Keine Historie'
+        }
+    };
+
+    function updateKundendaten() {
+        const select = document.getElementById('kundenSelect');
+        const box = document.getElementById('kundendatenBox');
+        const kunde = kunden[select.value];
+
+        if (kunde) {
+            document.getElementById('kdBranche').textContent = kunde.branche;
+            document.getElementById('kdZahlungsziel').textContent = kunde.zahlungsziel;
+            document.getElementById('kdAuftragswert').textContent = kunde.auftragswert;
+            box.style.display = 'block';
+        } else {
+            box.style.display = 'none';
+        }
+    }
+
+    function generiereAngebot() {
+        const resultBox = document.getElementById('angebotResult');
+        resultBox.style.display = 'block';
+        resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function recherchieren() {
+        document.getElementById('rechercheResult').style.display = 'block';
+        document.getElementById('ansprechpartnerCard').style.display = 'block';
+        document.getElementById('branchenInfo').style.display = 'block';
+        
+        setTimeout(() => {
+            document.getElementById('rechercheResult').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+    }
+</script>
+
+</body>
+</html>

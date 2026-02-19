@@ -360,26 +360,46 @@ function checkSendEnforcement() {
     // 🚨 SEND FIRST ENFORCEMENT (Kintsugi #1)
     // The evolver should NOT improve a system that isn't being USED for revenue
     const TRACKER = path.resolve(__dirname, '../../agents/EXECUTION-TRACKER.md');
-    const MEMORY_FILES = ['2026-02-13.md', '2026-02-12.md', '2026-02-11.md'].map(f => 
-        path.join(MEMORY_DIR, f)
-    );
     
-    let zeroSendDays = 0;
-    for (const memFile of MEMORY_FILES) {
-        if (!fs.existsSync(memFile)) continue;
-        try {
-            const content = fs.readFileSync(memFile, 'utf8');
-            const sends = (content.match(/^- \[x\].*Send:/gmi) || []).length;
-            if (sends === 0) zeroSendDays++;
-        } catch (e) {}
+    // DYNAMIC: Check last 3 days instead of hardcoded dates
+    const today = new Date();
+    const MEMORY_FILES = [];
+    for (let i = 0; i < 3; i++) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toISOString().split('T')[0];
+        MEMORY_FILES.push(path.join(MEMORY_DIR, dateStr + '.md'));
     }
     
-    // If 3+ consecutive zero-send days, evolution should focus on ENFORCEMENT, not features
-    if (zeroSendDays >= 3) {
+    let zeroSendDays = 0;
+    let checkedDays = 0;
+    
+    for (const memFile of MEMORY_FILES) {
+        if (!fs.existsSync(memFile)) continue;
+        checkedDays++;
+        
+        try {
+            const content = fs.readFileSync(memFile, 'utf8');
+            
+            // IMPROVED: Look for actual send evidence, not just checkboxes
+            // Check for: SENT, submitted, versandt, email to, application to
+            const sendEvidence = content.match(/\bSENT\b|submitted|versandt|email to|application to|✅.*email|✅.*application/gi);
+            
+            if (!sendEvidence || sendEvidence.length === 0) {
+                zeroSendDays++;
+            }
+        } catch (e) {
+            console.error(`[Send Enforcement] Error reading ${memFile}:`, e.message);
+        }
+    }
+    
+    // Only trigger if we checked at least 2 days and found 3+ zero-send days
+    // (Protects against false positives when memory files are missing)
+    if (checkedDays >= 2 && zeroSendDays >= 3) {
         return {
             blocked: false, // Don't block evolution, but change its focus
             warning: true,
-            message: `⚠️ SEND ENFORCEMENT MODE ACTIVE\n${zeroSendDays} days of zero sends detected.\nEvolution will focus on ENFORCEMENT mechanisms, not new features.`,
+            message: `⚠️ SEND ENFORCEMENT MODE ACTIVE\n${zeroSendDays} days of zero sends detected (checked ${checkedDays} days).\nEvolution will focus on ENFORCEMENT mechanisms, not new features.`,
             opportunityCost: zeroSendDays * 421 // €/day from USER.md
         };
     }

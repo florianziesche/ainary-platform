@@ -1,9 +1,9 @@
-# Execution Platform
+# Ainary Execution Platform
 
-**Version:** 0.7.0
-**Status:** In Development (Phase 1)
-**Maintainer:** Florian Ziesche + Mia (AI Co-Founder)
-**Letzte Änderung:** 2026-02-18
+**Version:** 0.13.0  
+**Status:** Active Development (Phase C Complete)  
+**Maintainer:** Florian Ziesche + Mia (AI Co-Founder)  
+**Last Updated:** 2026-02-19
 
 ---
 
@@ -23,30 +23,32 @@ Jede AI-Aktion hat einen Trust-Score. Jede Korrektur wird zur permanenten Regel.
 
 ---
 
-## Was die Platform IST
+## What the Platform IS
 
-| Eigenschaft | Beschreibung |
-|-------------|-------------|
-| **Execution Interface** | Der Ort, an dem Arbeit passiert — nicht nur geplant oder diskutiert wird |
-| **Trust System** | Granulares Vertrauen pro Skill (Research: 70, Email: 30, Financial: 5). Bestimmt Autonomie-Level. |
-| **Correction Engine** | Jede Korrektur wird zur Klassen-Regel. "Nie wieder LLM-Phrasen" gilt für ALLE zukünftigen Outputs. |
-| **Quality Gate** | Pre-Flight Checks gegen 29 Korrekturen + 18 Standards vor jedem Ergebnis |
-| **Context Hub** | Alle Infos zu einem Task an einem Ort: Dokumente, Referenzen, Korrekturen, verbundene Topics |
-| **Audit Trail** | Jede Aktion wird geloggt. Was wurde wann von wem entschieden und warum. |
-| **Single-User, Localhost** | Läuft auf Florians MacBook. Keine Cloud, kein Login, kein Overhead. |
-| **Offline-fähig** | Navigation und Kontext funktionieren ohne AI-Verbindung. Aktionen brauchen Mia. |
+| Property | Description |
+|----------|-------------|
+| **Execution Interface** | Where work happens — not just planned or discussed |
+| **Trust System** | Granular trust per skill (Research: 70, Email: 30, Financial: 5). Determines autonomy level. |
+| **Correction Engine** | Every correction becomes a class-wide rule. "No LLM phrases" applies to ALL future outputs. |
+| **Quality Gate** | Pre-flight checks against 29 corrections + 18 standards before every result |
+| **Context Hub** | All info for a task in one place: documents, references, corrections, connected topics |
+| **Audit Trail** | Every action logged. What was decided when, by whom, and why. |
+| **Single-User, Localhost** | Runs on Florian's MacBook. No cloud, no login, no overhead. |
+| **Offline-Capable** | Navigation and context work without AI connection. Actions require Mia. |
+| **Cost Tracking** | Per-topic AI spend with message-level detail. Track burn rate against $10/month target. |
+| **Session Replay** | Full timeline reconstruction: messages + events + state changes in chronological order. |
 
-## Was die Platform NICHT ist
+## What the Platform is NOT
 
-| Nicht | Warum nicht |
-|-------|-------------|
-| **Kein Chat-Ersatz** | Telegram bleibt für schnelle Nachrichten. Die Platform ist für strukturierte Arbeit. |
-| **Kein Projektmanagement-Tool** | Keine Gantt-Charts, keine Sprints, keine Team-Features. Ein Mensch, eine AI. |
-| **Kein Dashboard** | Dashboards zeigen Daten. Die Platform führt Arbeit aus und verändert die reale Welt (Emails senden, CVs generieren, Dokumente erstellen). |
-| **Kein AI-Playground** | Kein freies Prompten. Jede Interaktion hat einen Task-Kontext, wird geprüft und gespeichert. |
-| **Kein SaaS-Produkt** | Localhost, Single-User. Kein Multi-Tenancy, kein Billing, kein Onboarding. |
-| **Kein Ersatz für Denken** | Florian trifft alle irreversiblen Entscheidungen. Die Platform empfiehlt, Florian entscheidet. |
-| **Keine Build-Ausrede** | Build ist nur gut wenn Build → Send → Revenue. Platform-Entwicklung ist Mittel, nicht Zweck. (D-157) |
+| Not | Why Not |
+|-----|---------|
+| **Not a Chat Replacement** | Telegram for quick messages. Platform for structured work. |
+| **Not Project Management** | No Gantt charts, sprints, or team features. One human, one AI. |
+| **Not a Dashboard** | Dashboards show data. Platform executes work and changes the real world (sends emails, generates CVs, creates documents). |
+| **Not an AI Playground** | No free prompting. Every interaction has task context, is checked, and stored. |
+| **Not a SaaS Product** | Localhost, single-user. No multi-tenancy, billing, or onboarding. |
+| **Not a Replacement for Thinking** | Florian makes all irreversible decisions. Platform recommends, Florian decides. |
+| **Not a Build Excuse** | Build is only good if Build → Send → Revenue. Platform development is means, not end. (D-157) |
 
 ---
 
@@ -210,7 +212,68 @@ projects/workbench/
 
 ---
 
-## Starten
+---
+
+## Recent Updates (v0.13.0)
+
+### Phase A: Database Performance
+- **7 new indexes** for frequently queried tables (messages, findings, events)
+- Verified index usage via EXPLAIN QUERY PLAN
+- ~30-50% faster query performance on topic lookups
+
+### Phase B: Cost Tracking
+- **Per-topic AI cost breakdown** with per-message details
+- **Total AI Cost KPI** in Executive Board (5th strategic metric, target $10/month)
+- Cost tracking in messages table: `cost`, `tokens_prompt`, `tokens_completion`
+- Cost aggregation in topics table: `cost_total`, `cost_updated_at`
+- Automatic cost calculation for all `/api/ai/chat` responses
+
+### Phase C: Session Replay + Keyboard Shortcuts
+- **Session Replay endpoint** (`GET /api/topics/{id}/replay`): chronological timeline of messages, events, state changes
+- **4 new keyboard shortcuts:**
+  - **S**: Toggle topic priority (LOW → NORMAL → HIGH → NOW)
+  - **D**: Mark current topic as done
+  - **/**: Focus search (alias for Cmd+K)
+  - **?**: Show keyboard shortcuts help modal
+
+[See [CHANGELOG.md](CHANGELOG.md) for full version history]
+
+---
+
+## Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| **J** | Next topic |
+| **K** | Previous topic |
+| **E** | Edit current topic |
+| **C** | Toggle context panel |
+| **S** | Toggle topic priority |
+| **D** | Mark topic done |
+| **Cmd+K** (or **/**) | Command palette / Search |
+| **Cmd+N** | New topic |
+| **Cmd+.** | Toggle context panel |
+| **Cmd+Enter** | Send message (in chat) |
+| **Esc** | Close modals / Cancel |
+| **?** | Show this help |
+| **↑/↓** | Navigate command palette |
+| **Enter** | Select in command palette |
+
+---
+
+## Quick Start
+
+### Auto-Start (Recommended)
+
+```bash
+# Start the platform (auto-starts on boot via launchctl)
+launchctl start com.ainary.workbench
+
+# Open in browser
+open http://localhost:8080
+```
+
+### Manual Start
 
 ```bash
 cd projects/workbench/backend

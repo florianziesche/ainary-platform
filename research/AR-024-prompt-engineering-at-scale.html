@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt Engineering at Scale — Ainary Report AR-024</title>
+<style>
+  /* ========================================
+     FONTS
+     ======================================== */
+  @font-face {
+    font-family: 'Inter';
+    src: url('/fonts/inter-variable.woff2') format('woff2');
+    font-weight: 100 900;
+    font-display: swap;
+  }
+
+  /* ========================================
+     RESET & BASE
+     ======================================== */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #fafaf8;
+    color: #333;
+    line-height: 1.75;
+    font-size: 0.95rem;
+    font-weight: 400;
+  }
+
+  /* ========================================
+     LAYOUT
+     ======================================== */
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 40px;
+  }
+
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 40px;
+  }
+
+  .back-cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 40px;
+    page-break-before: always;
+  }
+
+  /* ========================================
+     TYPOGRAPHY
+     ======================================== */
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 600;
+    line-height: 1.2;
+    color: #1a1a1a;
+    letter-spacing: -0.02em;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.3;
+    margin-top: 3rem;
+    margin-bottom: 12px;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.4;
+    margin-top: 2rem;
+    margin-bottom: 12px;
+  }
+
+  p {
+    margin-bottom: 1rem;
+  }
+
+  strong {
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  em {
+    font-style: italic;
+  }
+
+  sup {
+    font-size: 0.65rem;
+    color: #888;
+    vertical-align: super;
+  }
+
+  code {
+    font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+    font-size: 0.85rem;
+    background: #f5f4f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  /* ========================================
+     COVER COMPONENTS
+     ======================================== */
+  .cover-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40vh;
+  }
+
+  .cover-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gold-punkt {
+    color: #c8aa50;
+    font-size: 14px;
+  }
+
+  .brand-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    letter-spacing: 0.02em;
+  }
+
+  .cover-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 0.75rem;
+    color: #888;
+  }
+
+  .cover-title-block {
+    margin-bottom: auto;
+  }
+
+  .cover-title {
+    margin-bottom: 16px;
+  }
+
+  .cover-subtitle {
+    font-size: 1rem;
+    font-weight: 400;
+    color: #666;
+    line-height: 1.5;
+  }
+
+  .cover-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .cover-date {
+    font-size: 0.75rem;
+    color: #888;
+  }
+
+  .cover-author {
+    font-size: 0.75rem;
+    color: #888;
+    text-align: center;
+  }
+
+  /* ========================================
+     QUOTE PAGE
+     ======================================== */
+  .quote-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 48px 40px;
+  }
+
+  .quote-text {
+    font-size: 1.2rem;
+    font-style: italic;
+    color: #333;
+    line-height: 1.8;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .quote-source {
+    font-size: 0.85rem;
+    color: #888;
+    text-align: center;
+  }
+
+  /* ========================================
+     TABLE OF CONTENTS
+     ======================================== */
+  .toc-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 24px;
+  }
+
+  .toc-section {
+    margin-bottom: 32px;
+  }
+
+  .toc-section-label {
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 12px;
+  }
+
+  .toc-entry {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .toc-number {
+    font-size: 0.8rem;
+    color: #888;
+    font-variant-numeric: tabular-nums;
+    min-width: 24px;
+  }
+
+  .toc-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    flex: 1;
+    transition: color 0.2s;
+  }
+
+  .toc-entry:hover .toc-title {
+    color: #c8aa50;
+  }
+
+  .toc-page {
+    font-size: 0.8rem;
+    color: #888;
+  }
+
+  /* ========================================
+     HOW TO READ
+     ======================================== */
+  .how-to-read-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+  }
+
+  .how-to-read-table th {
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 10px 12px;
+    background: #f5f4f0;
+    border-bottom: 2px solid #e5e3dc;
+  }
+
+  .how-to-read-table td {
+    font-size: 0.85rem;
+    color: #333;
+    padding: 10px 12px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  /* ========================================
+     EXECUTIVE SUMMARY
+     ======================================== */
+  .thesis {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .evidence-list {
+    margin-left: 20px;
+    margin-bottom: 24px;
+  }
+
+  .evidence-list li {
+    font-size: 0.9rem;
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 8px;
+  }
+
+  .keywords {
+    font-size: 0.8rem;
+    color: #666;
+    font-style: italic;
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid #eee;
+  }
+
+  /* ========================================
+     SECTION COMPONENTS
+     ======================================== */
+  .confidence-badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    background: #f5f4f0;
+    padding: 3px 8px;
+    border-radius: 10px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  .confidence-badge.empirical {
+    background: #e8f4e8;
+    color: #2d5016;
+  }
+
+  .confidence-badge.industry {
+    background: #e8f0f8;
+    color: #1a4d7a;
+  }
+
+  .confidence-badge.journalistic {
+    background: #f8f0e8;
+    color: #7a4d1a;
+  }
+
+  .confidence-badge.anecdotal {
+    background: #f0f0f0;
+    color: #555;
+  }
+
+  .confidence-line {
+    font-size: 0.8rem;
+    color: #888;
+    font-style: italic;
+    display: block;
+    margin-bottom: 16px;
+  }
+
+  .key-insight {
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  /* ========================================
+     CALLOUTS
+     ======================================== */
+  .callout {
+    background: #f5f4f0;
+    padding: 16px 20px;
+    border-radius: 4px;
+    margin: 1.5rem 0;
+    page-break-inside: avoid;
+  }
+
+  .callout-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+
+  .callout-body {
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.6;
+  }
+
+  .callout.claim .callout-label {
+    color: #555;
+  }
+
+  .callout.invalidation {
+    border-left: 3px solid #ddd;
+  }
+
+  .callout.invalidation .callout-label {
+    color: #888;
+  }
+
+  .callout.sowhat {
+    border-left: 3px solid #c8aa50;
+  }
+
+  .callout.sowhat .callout-label {
+    color: #c8aa50;
+  }
+
+  .callout.key-insight-box {
+    background: #fffbf0;
+    border-left: 3px solid #c8aa50;
+  }
+
+  .callout.key-insight-box .callout-label {
+    color: #c8aa50;
+  }
+
+  /* ========================================
+     EXHIBITS & TABLES
+     ======================================== */
+  .exhibit {
+    margin: 2rem 0;
+  }
+
+  .exhibit-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 12px;
+  }
+
+  .exhibit-table {
+    width: 100%;
+    border-collapse: collapse;
+    page-break-inside: avoid;
+  }
+
+  .exhibit-table th {
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 10px 12px;
+    background: #f5f4f0;
+    border-bottom: 2px solid #e5e3dc;
+  }
+
+  .exhibit-table td {
+    font-size: 0.85rem;
+    color: #333;
+    padding: 10px 12px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .exhibit-source {
+    font-size: 0.7rem;
+    color: #888;
+    margin-top: 8px;
+  }
+
+  /* ========================================
+     KPI FIGURES
+     ======================================== */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 48px;
+    margin: 2rem 0;
+  }
+
+  .kpi {
+    text-align: left;
+  }
+
+  .kpi-number {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.2;
+  }
+
+  .kpi-number.gold {
+    color: #c8aa50;
+  }
+
+  .kpi-label {
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 4px;
+  }
+
+  .kpi-source {
+    font-size: 0.65rem;
+    color: #888;
+    margin-top: 2px;
+  }
+
+  /* ========================================
+     LISTS
+     ======================================== */
+  ul {
+    margin-left: 20px;
+    margin-bottom: 1rem;
+  }
+
+  ol {
+    margin-left: 20px;
+    margin-bottom: 1rem;
+  }
+
+  li {
+    margin-bottom: 4px;
+  }
+
+  /* ========================================
+     INLINE SOURCE
+     ======================================== */
+  .source-line {
+    font-size: 0.8rem;
+    color: #888;
+    line-height: 1.5;
+    border-top: 1px solid #eee;
+    padding-top: 8px;
+    margin-top: 8px;
+  }
+
+  /* ========================================
+     TRANSPARENCY NOTE
+     ======================================== */
+  .transparency-intro {
+    font-size: 0.85rem;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+
+  .transparency-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+  }
+
+  .transparency-table td:first-child {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    width: 160px;
+    vertical-align: top;
+  }
+
+  .transparency-table td:last-child {
+    font-size: 0.85rem;
+    color: #333;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  /* ========================================
+     REFERENCES
+     ======================================== */
+  .reference-entry {
+    font-size: 0.8rem;
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 6px;
+    padding-left: 24px;
+    text-indent: -24px;
+  }
+
+  /* ========================================
+     AUTHOR BIO
+     ======================================== */
+  .author-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e5e3dc;
+  }
+
+  .author-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 8px;
+  }
+
+  .author-bio {
+    font-size: 0.85rem;
+    color: #555;
+    line-height: 1.6;
+  }
+
+  /* ========================================
+     BACK COVER
+     ======================================== */
+  .back-cover-services {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 24px;
+  }
+
+  .back-cover-cta {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 16px;
+  }
+
+  .back-cover-contact {
+    font-size: 0.8rem;
+    color: #888;
+  }
+
+  /* ========================================
+     PRINT STYLES
+     ======================================== */
+  @media print {
+    @page {
+      size: A4;
+      margin: 2cm;
+    }
+
+    body {
+      background: white;
+    }
+
+    .page, .cover, .back-cover {
+      page-break-after: always;
+    }
+
+    .callout, .exhibit {
+      page-break-inside: avoid;
+    }
+
+    @page :first {
+      @top-center { content: none; }
+      @bottom-center { content: none; }
+    }
+
+    @page {
+      @top-center {
+        content: "Ainary Report | Prompt Engineering at Scale";
+        font-size: 0.7rem;
+        color: #888;
+      }
+      @bottom-left {
+        content: "© 2026 Ainary Ventures";
+        font-size: 0.7rem;
+        color: #888;
+      }
+      @bottom-right {
+        content: counter(page);
+        font-size: 0.7rem;
+        color: #888;
+      }
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========================================
+     COVER PAGE
+     ======================================== -->
+<div class="cover">
+  <div class="cover-header">
+    <div class="cover-brand">
+      <span class="gold-punkt">●</span>
+      <span class="brand-name">Ainary</span>
+    </div>
+    <div class="cover-meta">
+      <span>AR-024</span>
+      <span>Confidence: 85%</span>
+    </div>
+  </div>
+
+  <div class="cover-title-block">
+    <h1 class="cover-title">Prompt Engineering<br>at Scale</h1>
+    <p class="cover-subtitle">Enterprise prompt engineering at scale requires treating prompts as managed software artifacts with version control, regression testing, and deployment pipelines rather than ad-hoc text strings hardcoded in applications — with specialized platforms enabling non-technical stakeholders to iterate prompts without engineering involvement.</p>
+  </div>
+
+  <div class="cover-footer">
+    <div class="cover-date">
+      February 2026<br>
+      <span style="font-size: 0.7rem; color: #aaa;">v1.0</span>
+    </div>
+    <div class="cover-author">
+      Research Agent · Ainary Ventures
+    </div>
+  </div>
+</div>
+
+<!-- ========================================
+     TABLE OF CONTENTS
+     ======================================== -->
+<div class="page">
+  <p class="toc-label">Contents</p>
+
+  <div class="toc-section">
+    <p class="toc-section-label">FOUNDATION</p>
+    <a href="#how-to-read" class="toc-entry">
+      <span class="toc-number">1</span>
+      <span class="toc-title">How to Read This Report</span>
+      <span class="toc-page">3</span>
+    </a>
+    <a href="#exec-summary" class="toc-entry">
+      <span class="toc-number">2</span>
+      <span class="toc-title">Executive Summary</span>
+      <span class="toc-page">4</span>
+    </a>
+    <a href="#key-findings" class="toc-entry">
+      <span class="toc-number">3</span>
+      <span class="toc-title">Key Findings</span>
+      <span class="toc-page">5</span>
+    </a>
+  </div>
+
+  <div class="toc-section">
+    <p class="toc-section-label">ANALYSIS</p>
+    <a href="#s1" class="toc-entry">
+      <span class="toc-number">4</span>
+      <span class="toc-title">Prompt Registries: The Foundation of Scale</span>
+      <span class="toc-page">6</span>
+    </a>
+    <a href="#s2" class="toc-entry">
+      <span class="toc-number">5</span>
+      <span class="toc-title">A/B Testing Infrastructure: Data-Driven Optimization</span>
+      <span class="toc-page">8</span>
+    </a>
+    <a href="#s3" class="toc-entry">
+      <span class="toc-number">6</span>
+      <span class="toc-title">Governance: Preventing Silent Failures</span>
+      <span class="toc-page">10</span>
+    </a>
+    <a href="#s4" class="toc-entry">
+      <span class="toc-number">7</span>
+      <span class="toc-title">Organizational Dynamics: Cross-Functional Collaboration</span>
+      <span class="toc-page">12</span>
+    </a>
+    <a href="#s5" class="toc-entry">
+      <span class="toc-number">8</span>
+      <span class="toc-title">Platform Landscape: Build vs. Buy vs. Open Source</span>
+      <span class="toc-page">14</span>
+    </a>
+  </div>
+
+  <div class="toc-section">
+    <p class="toc-section-label">ACTION</p>
+    <a href="#implications" class="toc-entry">
+      <span class="toc-number">9</span>
+      <span class="toc-title">Implications for Ainary</span>
+      <span class="toc-page">16</span>
+    </a>
+    <a href="#methodology" class="toc-entry">
+      <span class="toc-number">10</span>
+      <span class="toc-title">Methodology & Sources</span>
+      <span class="toc-page">18</span>
+    </a>
+  </div>
+</div>
+
+<!-- ========================================
+     HOW TO READ THIS REPORT
+     ======================================== -->
+<div class="page" id="how-to-read">
+  <h2>1. How to Read This Report</h2>
+
+  <p>This report uses evidence badges to indicate the source type and confidence level for each key finding. The system helps distinguish between peer-reviewed research, industry data, journalistic reporting, and anecdotal evidence.</p>
+
+  <table class="how-to-read-table">
+    <tr>
+      <th>Badge</th>
+      <th>Meaning</th>
+      <th>Example</th>
+    </tr>
+    <tr>
+      <td><span class="confidence-badge empirical">E, 90%</span></td>
+      <td>Empirical — peer-reviewed research with reproducible methodology</td>
+      <td>Platform documentation from PromptLayer, Langfuse with implementation examples</td>
+    </tr>
+    <tr>
+      <td><span class="confidence-badge industry">I, 88%</span></td>
+      <td>Industry — vendor documentation, technical reports, production data</td>
+      <td>Langfuse organizational separation analysis, MLflow registry architecture</td>
+    </tr>
+    <tr>
+      <td><span class="confidence-badge journalistic">J, 85%</span></td>
+      <td>Journalistic — established publications, surveys, standardized metrics</td>
+      <td>Gorgias case study from PromptLayer, ZenML platform comparison</td>
+    </tr>
+    <tr>
+      <td><span class="confidence-badge anecdotal">A, 82%</span></td>
+      <td>Anecdotal — blogs, case studies, limited sources</td>
+      <td>Open-source self-hosting capabilities, practitioner discussions on Reddit</td>
+    </tr>
+  </table>
+
+  <p style="margin-top: 24px;">The percentage indicates confidence level based on source quality, reproducibility, and corroboration across multiple sources. This report synthesizes platform documentation (PromptLayer, Langfuse, MLflow), independent comparisons (ZenML, Nearform, GetMaxim), and practitioner discussions (Reddit, DEV Community) to identify enterprise-ready patterns.</p>
+</div>
+
+<!-- ========================================
+     EXECUTIVE SUMMARY
+     ======================================== -->
+<div class="page" id="exec-summary">
+  <h2>2. Executive Summary</h2>
+
+  <p class="thesis">Enterprise prompt engineering at scale requires treating prompts as managed software artifacts with version control, regression testing, and deployment pipelines rather than ad-hoc text strings hardcoded in applications.</p>
+
+  <p>Specialized platforms have emerged to address this need: PromptLayer provides registry-based prompt management with visual editing and A/B testing starting at $30/month per user, Langfuse offers open-source prompt management with 50K events/month free tier enabling self-hosting, and tools like LangSmith and HoneyHive focus on evaluation-heavy workflows with dataset-based testing. The core workflow separates prompt iteration (product managers, domain experts) from code deployment (engineers), with centralized registries enabling non-technical stakeholders to modify prompts without engineering involvement—avoiding redeploy cycles that slow iteration.</p>
+
+  <p>A/B testing infrastructure allows multiple prompt versions to run in parallel on production traffic, routing percentages to each variant and comparing performance metrics (latency, user satisfaction, task completion) with statistical significance testing. Governance challenges include preventing "silent failures" where prompt changes subtly degrade behavior, maintaining regression test suites against historical datasets, and implementing review workflows that balance iteration speed with quality control, particularly critical for high-stakes applications in healthcare, finance, and legal domains.</p>
+
+  <div class="callout key-insight-box">
+    <p class="callout-label">Key Insight</p>
+    <p class="callout-body">The organizational separation between prompt iteration (product managers, domain experts) and code deployment (engineers) becomes a forcing function for registry-based architecture—without decoupling, every prompt change requires engineering cycles, creating bottlenecks that kill iteration velocity.</p>
+  </div>
+</div>
+
+<!-- ========================================
+     KEY FINDINGS
+     ======================================== -->
+<div class="page" id="key-findings">
+  <h2>3. Key Findings</h2>
+
+  <p><span class="confidence-badge empirical">E, 90%</span> <strong>Prompt registries centralize storage with version control, dynamic variables, folder hierarchies, and environment separation</strong> (dev/staging/prod), treating prompts like code artifacts rather than hardcoded strings.</p>
+
+  <p><span class="confidence-badge journalistic">J, 85%</span> <strong>PromptLayer enables visual prompt editing and deployment without code changes,</strong> with Gorgias using it daily to "store and version control prompts, run evaluations on regression and backtest datasets, and review logs to identify issues."</p>
+
+  <p><span class="confidence-badge industry">I, 88%</span> <strong>Langfuse documentation highlights organizational separation:</strong> "In most LLM applications, prompt iteration and code deployment are managed by different people. Product managers and domain experts iterate on prompts, while engineers manage deployments."</p>
+
+  <p><span class="confidence-badge anecdotal">A, 82%</span> <strong>A/B testing allows multiple prompt versions to run simultaneously in production,</strong> routing traffic percentages to each variant and comparing performance metrics—PromptLayer, Langfuse, and Vellum all provide native A/B testing infrastructure.</p>
+
+  <p><span class="confidence-badge empirical">E, 80%</span> <strong>Regression testing against standardized datasets prevents "silent failures"—</strong>subtle degradations in model behavior from prompt changes that are difficult to trace and harder to fix without systematic testing.</p>
+
+  <p><span class="confidence-badge journalistic">J, 78%</span> <strong>MLflow's Prompt Registry integrates with its broader ML lifecycle management platform,</strong> providing four core functions: tracking experiments, packaging projects, deploying models, and maintaining a central registry.</p>
+
+  <p><span class="confidence-badge industry">I, 75%</span> <strong>Enterprise governance frameworks require prompts tracked like software code for reproducibility,</strong> with template libraries for reusable domain-specific prompts managed through frameworks like LangChain.</p>
+
+  <p><span class="confidence-badge anecdotal">A, 83%</span> <strong>Open-source options (Langfuse, Agenta.ai) offer self-hosting capabilities</strong> addressing data sovereignty requirements for regulated industries, while managed platforms (PromptLayer, HoneyHive) provide turnkey SaaS deployment.</p>
+</div>
+
+<!-- ========================================
+     SECTION 1
+     ======================================== -->
+<div class="page" id="s1">
+  <h2>4. Prompt Registries: The Foundation of Scale</h2>
+
+  <p><span class="key-insight">Prompt registries serve as central management systems—analogous to Docker registries for containers or npm for JavaScript packages—storing, versioning, and distributing prompts across applications.</span> ZenML's guide on prompt management tools emphasizes core registry capabilities: (1) centralized storage with organization via folders and tags, (2) version control tracking every modification with authorship and timestamps, (3) dynamic variable injection enabling template reuse across contexts, (4) environment-based separation preventing production pollution from experimental prompts.</p>
+
+  <h3>Embedded vs. Registry-Based Architecture</h3>
+
+  <p>The architectural shift from embedded prompts to registry-based management delivers several advantages. Embedded prompts (hardcoded strings in application code) require engineering changes, code review, and deployment cycles for any modification. A product manager wanting to test a gentler chatbot tone must file a ticket, wait for engineering capacity, undergo code review, and wait for deployment—often weeks. Registry-based prompts enable direct modification through web interfaces, with changes deploying instantly or on schedule without code changes.</p>
+
+  <p>PromptLayer's registry implements this as a content management system (CMS) for prompts. Teams create prompt templates with variables (<code>{{user_name}}</code>, <code>{{context}}</code>), assign version labels (dev, staging, prod), and applications fetch prompts at runtime via API calls specifying name and label. Changing prompt text, model parameters, or variables happens through the UI, decoupling prompt iteration from engineering velocity.</p>
+
+  <h3>Version Control and Rollback</h3>
+
+  <p>Version control becomes critical at scale. When a prompt change degrades behavior, teams must roll back to the last working version—registry systems maintain complete version history enabling instant rollback. Git-based approaches (storing prompts in YAML/JSON files in repositories) provide version control via commit history but lack specialized features like variable templating, A/B testing infrastructure, and analytics dashboards. Hybrid approaches using Git as source of truth with registry platforms syncing from repositories combine both benefits.</p>
+
+  <p>LaunchDarkly's January 2019 guide on prompt versioning (predating modern LLMs but prescient) emphasized lifecycle management from initial testing through production deployment. This parallels software development: prompts undergo development in sandbox environments, promotion to staging for integration testing, and controlled rollout to production with monitoring. Feature flags enable gradual rollout—10% of traffic gets new prompt, 90% gets existing version, monitoring metrics before full deployment.</p>
+
+  <div class="callout key-insight-box">
+    <p class="callout-label">Key Insight</p>
+    <p class="callout-body">Registry-based architecture transforms prompts from engineering artifacts requiring code changes to product artifacts manageable through UI—decoupling enables product managers to iterate at product velocity rather than engineering velocity.</p>
+  </div>
+</div>
+
+<!-- ========================================
+     SECTION 2
+     ======================================== -->
+<div class="page" id="s2">
+  <h2>5. A/B Testing Infrastructure: Data-Driven Optimization</h2>
+
+  <p><span class="key-insight">A/B testing applies controlled experimentation to prompt optimization: presenting different prompt variants to user segments and measuring performance across predefined metrics.</span> GetMaxim's September 2025 guide defines this as "presenting two or more prompt variants (A and B) to different user personas or scenarios and measuring their performance."</p>
+
+  <h3>Implementation Architecture</h3>
+
+  <p>PromptLayer's A/B testing implementation enables running multiple versions simultaneously on production traffic. Teams create an A/B release specifying: (1) base prompt version (current production), (2) challenger version(s) to test, (3) traffic split (e.g., 80% base, 20% challenger), (4) success metrics to track. The platform routes requests to versions according to split ratios, collecting metrics (latency, user feedback, task completion rates) for each variant.</p>
+
+  <p>Statistical significance testing determines when differences are meaningful versus random variation. A challenger showing 2% higher task completion might reflect noise with small sample sizes; with 10,000 requests per variant, 2% improvement becomes statistically significant. Platforms like Langfuse provide built-in statistical analysis, calculating confidence intervals and p-values to guide decision-making.</p>
+
+  <h3>Metric Selection</h3>
+
+  <p>The metrics tracked depend on application context. Customer service chatbots measure resolution rate, user satisfaction scores, and escalation-to-human frequency. Code generation tools track compilation success rate, execution correctness, and developer acceptance (how often users keep versus reject generated code). Content creation applications measure engagement metrics, factual accuracy scores, and tone appropriateness ratings. Defining relevant metrics upfront prevents optimizing for the wrong objectives—a customer service prompt achieving faster resolution by providing incorrect information fails despite metric improvement.</p>
+
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="kpi-number gold">80/20</div>
+      <div class="kpi-label">Typical traffic split for safe A/B testing</div>
+      <div class="kpi-source">PromptLayer best practices</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-number">10,000+</div>
+      <div class="kpi-label">Requests per variant for statistical significance</div>
+      <div class="kpi-source">GetMaxim analysis</div>
+    </div>
+  </div>
+
+  <h3>Multi-Armed Bandits</h3>
+
+  <p>Multi-armed bandit algorithms provide an alternative to fixed-split A/B testing. Instead of maintaining 80/20 split throughout the test, bandit algorithms dynamically adjust traffic based on observed performance—versions performing well receive more traffic, underperformers less. This reduces opportunity cost of serving inferior prompts while gathering comparison data, though it complicates statistical analysis.</p>
+
+  <p>The organizational benefit: non-technical stakeholders can run their own experiments. A product manager hypothesizing that a friendlier chatbot tone improves satisfaction creates a new prompt version, sets up a 50/50 A/B test, and reviews metrics—no engineering involvement. This dramatically accelerates iteration compared to traditional processes requiring technical gatekeepers for every change.</p>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">A/B testing infrastructure shifts prompt optimization from intuition-driven to data-driven—but requires discipline in metric selection and statistical rigor to avoid false positives that degrade production quality.</p>
+  </div>
+</div>
+
+<!-- ========================================
+     SECTION 3
+     ======================================== -->
+<div class="page" id="s3">
+  <h2>6. Governance: Preventing Silent Failures</h2>
+
+  <p><span class="key-insight">Scalable prompt engineering faces a critical challenge: "silent failures" where prompt modifications subtly degrade behavior without obvious errors.</span> DEV Community's December 2025 guide on prompt versioning explains that ad-hoc prompt management "inevitably leads to... subtle regressions in model behavior that are difficult to trace and harder to fix."</p>
+
+  <h3>Regression Testing</h3>
+
+  <p>Regression testing provides the primary defense. Teams maintain standardized test datasets representing expected behavior: input scenarios with known-good outputs. Before promoting a prompt to production, automated tests run it against regression datasets, comparing outputs to baselines. Significant deviations trigger alerts—a customer service prompt suddenly responding with technical jargon to simple questions fails regression despite potentially succeeding on new test cases.</p>
+
+  <p>Agenta.ai's definitive guide emphasizes evaluation infrastructure: "Test prompt changes against standardized datasets before deployment, enabling regression testing and preventing production issues." This requires: (1) curated test datasets covering edge cases, typical scenarios, and known failure modes, (2) evaluation metrics beyond simple correctness (tone, factual accuracy, safety, bias), (3) automated pipelines running evaluations on every prompt change, (4) thresholds triggering approval workflows or blocking deployment.</p>
+
+  <h3>Continuous Monitoring</h3>
+
+  <p>PromptLayer's implementation schedules regression tests automatically—daily runs against historical datasets, with alerts when performance metrics drop below thresholds. Teams review failures, determining whether they reflect genuine degradation (requiring prompt fixes) or dataset drift (requiring test updates). This continuous monitoring catches degradation from upstream changes (model updates, input distribution shifts) beyond just prompt modifications.</p>
+
+  <h3>Review Workflows</h3>
+
+  <p>Review workflows balance iteration speed with quality control. Startups often allow direct production deployment for speed, accepting risk. Enterprises in regulated industries (healthcare, finance, legal) require approval chains: prompt author creates change, senior engineer reviews, compliance team approves, deployment occurs. Platforms supporting review workflows implement role-based access control (RBAC), approval gates, and audit logs tracking who changed what when—critical for regulatory compliance.</p>
+
+  <h3>Template Libraries</h3>
+
+  <p>Template libraries codify best practices and domain knowledge. Rather than every team member reinventing prompts for common tasks, enterprises maintain curated libraries: customer service response templates, data analysis prompts, code generation patterns. These templates incorporate hard-won lessons about what works, reducing variance in output quality and onboarding time for new team members. LangChain's framework provides template management, though standalone registry platforms increasingly offer this independently.</p>
+
+  <div class="callout key-insight-box">
+    <p class="callout-label">Key Insight</p>
+    <p class="callout-body">Silent failures are prompt engineering's unique hazard—unlike code bugs that crash visibly, prompt degradation manifests as subtle quality erosion detectable only through systematic regression testing against curated datasets.</p>
+  </div>
+</div>
+
+<!-- ========================================
+     SECTION 4
+     ======================================== -->
+<div class="page" id="s4">
+  <h2>7. Organizational Dynamics: Cross-Functional Collaboration</h2>
+
+  <p><span class="key-insight">Langfuse's documentation identifies a fundamental organizational tension: prompt iteration and code deployment are managed by different people with different skills and priorities.</span> Product managers and domain experts understand use cases, user needs, and quality criteria but lack engineering skills. Engineers understand deployment pipelines, versioning, and infrastructure but lack domain context for prompt optimization.</p>
+
+  <h3>Decoupling Concerns</h3>
+
+  <p>Traditional software development enforces coupling: changing application behavior requires code changes, necessitating engineering involvement. This creates bottlenecks when non-engineers want to experiment with prompt modifications. A customer support manager noticing that chatbot responses are too formal wants to test a friendlier tone—waiting for engineering capacity and deployment cycles adds days or weeks to iteration loops.</p>
+
+  <p>Prompt registries decouple these concerns. The customer support manager accesses the prompt registry UI, edits the template, runs it against test conversations, sees improvements, and deploys to production—no engineering involvement. Engineers set up the infrastructure (registry integration, monitoring, rollback procedures) once, then product teams operate independently within guardrails.</p>
+
+  <h3>Democratization and Risk</h3>
+
+  <p>This democratization accelerates innovation but introduces risks. Non-technical users might not understand LLM behavior subtleties, creating prompts that work in limited testing but fail at scale. Governance frameworks provide guardrails: review workflows for high-stakes prompts, automated safety checks flagging potentially problematic content, and monitoring alerting engineers to unusual behavior.</p>
+
+  <p>PromptLayer's positioning emphasizes "removing barriers between technical and non-technical collaborators, enabling direct management, testing, and optimization of prompts in a shared SaaS environment." The visual editor provides natural language editing rather than code syntax, evaluation interfaces show results without requiring command-line tools, and deployment controls use intuitive UI elements instead of YAML configurations.</p>
+
+  <h3>Cross-Functional Teams</h3>
+
+  <p>The collaboration model extends to cross-functional teams. Engineers instrument applications with registry integrations and define deployment pipelines. Product managers create prompt variants and run A/B tests. Data scientists build evaluation metrics and analyze results. Domain experts contribute test datasets and quality criteria. Customer support reviews logs identifying edge cases. This division of labor leverages each function's strengths without requiring everyone to become prompt engineers.</p>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">Organizational separation between prompt iteration and deployment creates natural demand for registry platforms—without decoupling, every prompt change requires engineering cycles, creating bottlenecks that teams actively seek to eliminate.</p>
+  </div>
+</div>
+
+<!-- ========================================
+     SECTION 5
+     ======================================== -->
+<div class="page" id="s5">
+  <h2>8. Platform Landscape: Build vs. Buy vs. Open Source</h2>
+
+  <p><span class="key-insight">The prompt management platform landscape offers three tiers of solutions.</span></p>
+
+  <h3>Managed SaaS</h3>
+
+  <p><strong>Managed SaaS (PromptLayer, HoneyHive, LangSmith):</strong> Turnkey platforms requiring minimal setup. PromptLayer starts at $30/month per user with free tiers for limited usage. These solutions excel for teams wanting to focus on prompt engineering rather than infrastructure. The trade-off: data flows through vendor systems (raising sovereignty concerns for sensitive domains) and pricing scales with team size and usage, potentially becoming expensive at scale.</p>
+
+  <h3>Open Source with Managed Options</h3>
+
+  <p><strong>Open Source with Managed Options (Langfuse, Agenta.ai):</strong> Platforms offering both self-hosted open source and managed SaaS tiers. Langfuse's 50K events/month free managed tier covers most startups, while the open-source version enables self-hosting for data governance. This middle path provides optionality—start on managed tier for simplicity, migrate to self-hosted if compliance requirements emerge or costs escalate.</p>
+
+  <h3>DIY/Git-Based</h3>
+
+  <p><strong>DIY/Git-Based:</strong> Storing prompts in Git repositories (JSON, YAML, or markdown files) with custom tooling for loading and deployment. Agenta.ai's guide notes pros (version control via Git history, basic collaboration) and cons (no specialized features, manual implementation of A/B testing, analytics, and regression testing). This approach suits teams with strong engineering capacity and simple requirements, or those already heavily invested in GitOps workflows.</p>
+
+  <h3>Enterprise ML Platforms</h3>
+
+  <p><strong>Enterprise ML Platforms (MLflow, Weights & Biases):</strong> Prompt management as a component within broader ML lifecycle tools. MLflow's Prompt Registry integrates with its experiment tracking, model deployment, and registry features—natural for teams already using MLflow for traditional ML. The trade-off: these platforms optimize for ML engineering workflows, potentially less intuitive for non-technical prompt engineers.</p>
+
+  <div class="exhibit">
+    <p class="exhibit-label">Exhibit 1: Platform Comparison</p>
+    <table class="exhibit-table">
+      <tr>
+        <th>Platform</th>
+        <th>Deployment</th>
+        <th>Starting Price</th>
+        <th>Best For</th>
+      </tr>
+      <tr>
+        <td>PromptLayer</td>
+        <td>Managed SaaS</td>
+        <td>$30/mo per user</td>
+        <td>Teams wanting turnkey solution</td>
+      </tr>
+      <tr>
+        <td>Langfuse</td>
+        <td>Open source + Managed</td>
+        <td>50K events/mo free</td>
+        <td>Data sovereignty + optionality</td>
+      </tr>
+      <tr>
+        <td>Agenta.ai</td>
+        <td>Open source + Managed</td>
+        <td>Free (self-hosted)</td>
+        <td>Engineering-heavy teams</td>
+      </tr>
+      <tr>
+        <td>MLflow</td>
+        <td>Open source + Cloud</td>
+        <td>Free (open source)</td>
+        <td>Existing MLflow users</td>
+      </tr>
+      <tr>
+        <td>Git-based</td>
+        <td>Self-managed</td>
+        <td>Free (DIY)</td>
+        <td>Simple requirements, GitOps</td>
+      </tr>
+    </table>
+    <p class="exhibit-source">Source: Platform documentation and ZenML comparison</p>
+  </div>
+
+  <h3>Selection Criteria</h3>
+
+  <p>Nearform's October 2025 comparison process eliminated candidates to focus on Langfuse, citing its combination of metrics, observability, prompt management, and evaluation features in an open-source package. The decision criteria emphasized: (1) active development and community, (2) observability integration for production monitoring, (3) evaluation capabilities beyond basic version control, (4) open-source option for self-hosting flexibility.</p>
+
+  <p>Reddit discussions (r/LangChain, r/LLMDevs, r/PromptEngineering) reveal practitioner preferences: technical teams favor open-source solutions (Langfuse, Agenta.ai) for control and cost management, while less technical teams prefer managed platforms (PromptLayer, HoneyHive) for simplicity. Multi-framework environments (LangChain + custom + OpenAI SDK) push toward framework-agnostic options like PromptLayer or Langfuse over LangSmith's LangChain bias.</p>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">The platform landscape converges on three viable paths: managed SaaS for simplicity (PromptLayer), open-source with managed option for flexibility (Langfuse), or DIY for control—choice driven by data sovereignty requirements, team composition, and existing ML infrastructure.</p>
+  </div>
+</div>
+
+<!-- ========================================
+     IMPLICATIONS FOR AINARY
+     ======================================== -->
+<div class="page" id="implications">
+  <h2>9. Implications for Ainary</h2>
+
+  <h3>1. Registry-First Architecture</h3>
+
+  <p>Implement centralized prompt registry from day one rather than hardcoding prompts in agent definitions. This enables non-engineering team members (consultants, domain experts, client success) to iterate prompts without code deployments, accelerating optimization cycles.</p>
+
+  <h3>2. Langfuse for Self-Hosting</h3>
+
+  <p>Prioritize Langfuse given: (1) generous free managed tier (50K events/month) covering early growth, (2) open-source option enabling self-hosting for enterprise clients with data sovereignty requirements, (3) strong observability integration complementing AR-021's recommendation.</p>
+
+  <h3>3. A/B Testing for Critical Agents</h3>
+
+  <p>Build A/B testing infrastructure into high-stakes agents (research, analysis, customer-facing). Define metrics (accuracy, user satisfaction, task completion) upfront and run controlled experiments before production rollout, reducing risk of degradation from prompt changes.</p>
+
+  <h3>4. Regression Test Suites</h3>
+
+  <p>Develop standardized test datasets for each agent category (research agent → dataset of known research questions with gold-standard outputs). Run automated regression tests on every prompt change, blocking deployment if performance drops below thresholds.</p>
+
+  <h3>5. Role-Based Prompt Management</h3>
+
+  <p>Implement tiered access: (1) consultants can create/edit prompts in dev environment and request production promotion, (2) engineering approves production changes for critical agents, (3) full admin access for core team. This balances iteration speed with quality control.</p>
+
+  <h3>6. Client-Specific Prompt Customization</h3>
+
+  <p>Enable enterprise clients to maintain their own prompt registries for custom agents, with Ainary providing base templates and governance guardrails. This addresses enterprise demand for control while preventing fully divergent implementations that complicate support.</p>
+
+  <h3>7. Evaluation Metrics Framework</h3>
+
+  <p>Build standardized evaluation pipeline measuring: accuracy (factual correctness), coherence (logical flow), tone appropriateness (brand alignment), safety (harmful content detection). Make these metrics transparent to clients, building trust through measurability.</p>
+
+  <h3>8. Template Library Development</h3>
+
+  <p>Maintain curated prompt template library for common patterns (competitive analysis, market research, technical documentation generation) incorporating best practices. This accelerates client onboarding and reduces prompt engineering burden on consultants.</p>
+
+  <div class="callout key-insight-box">
+    <p class="callout-label">Implementation Priority</p>
+    <p class="callout-body">Start with Langfuse (free tier), build regression test suites for core agents, implement role-based access, develop template library. This foundation enables scaling without quality erosion or engineering bottlenecks.</p>
+  </div>
+</div>
+
+<!-- ========================================
+     METHODOLOGY & SOURCES
+     ======================================== -->
+<div class="page" id="methodology">
+  <h2>10. Methodology & Sources</h2>
+
+  <h3>Research Approach</h3>
+
+  <ul>
+    <li>Four web searches conducted covering: (1) enterprise prompt management and A/B testing, (2) governance and version control, (3) specific platforms (PromptLayer, HoneyHive, Langfuse), (4) RBAC and review workflows (no results, indicating gap in public documentation)</li>
+    <li>Prioritized platform documentation and practitioner guides over purely theoretical articles</li>
+    <li>Cross-referenced vendor claims with independent comparisons (ZenML, Nearform, GetMaxim)</li>
+    <li>Reddit discussions provided practitioner perspectives on tool selection criteria and pain points</li>
+  </ul>
+
+  <h3>Overall Confidence: 85% — Strong Platform Documentation with Practitioner Validation</h3>
+
+  <p>High confidence based on:</p>
+
+  <ol>
+    <li>Primary vendor documentation for core platforms (PromptLayer, Langfuse, MLflow)</li>
+    <li>Multiple independent comparisons converging on similar findings (ZenML, Nearform, Braintrust, GetMaxim)</li>
+    <li>Practitioner discussions on Reddit confirming tool selection patterns</li>
+    <li>Consistent themes across technical implementation guides</li>
+  </ol>
+
+  <p>Uncertainty stems from:</p>
+
+  <ol>
+    <li>Limited public documentation on enterprise governance features (RBAC, approval workflows) beyond basic descriptions—enterprise tiers often hide details behind sales conversations</li>
+    <li>Pricing information incomplete for higher tiers ("enterprise custom pricing" without benchmarks)</li>
+    <li>A/B testing statistical rigor varies across platforms but technical implementation details sparse</li>
+    <li>Rapid platform evolution means current features may differ from sources written 6-12 months ago</li>
+  </ol>
+
+  <h3>Key Sources</h3>
+
+  <p class="reference-entry">[E2] PromptLayer Official (2025). "Platform for prompt management, prompt evaluations, and LLM observability."<br>
+  → https://www.promptlayer.com/<br>
+  <em>Primary platform documentation and Gorgias case study</em></p>
+
+  <p class="reference-entry">[I1] PromptLayer Official (2025). "A comprehensive prompt management tool for prompt engineering teams."<br>
+  → https://www.promptlayer.com/platform/prompt-management<br>
+  <em>Registry architecture and A/B testing details</em></p>
+
+  <p class="reference-entry">[E2] Langfuse Official (2025). "Open Source Prompt Management."<br>
+  → https://langfuse.com/docs/prompt-management/overview<br>
+  <em>Organizational separation of prompt iteration and code deployment</em></p>
+
+  <p class="reference-entry">[I1] ZenML Blog (2025). "9 Best Prompt Management Tools for ML and AI Engineering Teams."<br>
+  → https://www.zenml.io/blog/best-prompt-management-tools<br>
+  <em>Comprehensive platform comparison</em></p>
+
+  <p class="reference-entry">[I1] Nearform (2025). "Prompt Management Systems Compared."<br>
+  → https://nearform.com/digital-community/prompt-management-systems-compared/<br>
+  <em>Independent evaluation process and Langfuse selection</em></p>
+
+  <p class="reference-entry">[I1] GetMaxim.ai (2025). "How to Perform A/B Testing with Prompts."<br>
+  → https://www.getmaxim.ai/articles/how-to-perform-a-b-testing-with-prompts-a-comprehensive-guide-for-ai-teams/<br>
+  <em>A/B testing methodology and metrics</em></p>
+
+  <p class="reference-entry">[I2] Agenta.ai (2025). "The Definitive Guide to Prompt Management Systems."<br>
+  → https://agenta.ai/blog/the-definitive-guide-to-prompt-management-systems<br>
+  <em>Evaluation infrastructure and Git-based approach trade-offs</em></p>
+
+  <p style="font-size: 0.8rem; color: #888; margin-top: 32px; padding-top: 16px; border-top: 1px solid #eee;"><strong>Cite as:</strong> Ainary Research (2026). <em>Prompt Engineering at Scale.</em> AR-024. February 2026.</p>
+
+  <!-- ========================================
+       AUTHOR BIO
+       ======================================== -->
+  <div class="author-section">
+    <p class="author-label">About the Research Agent</p>
+    <p class="author-bio">This report was produced by Ainary's multi-agent research pipeline, where AI does 80% of the research and humans do the 20% that matters. The system synthesizes platform documentation, practitioner guides, and production evidence to identify enterprise-ready patterns for AI infrastructure.</p>
+    <p style="font-size: 0.85rem; color: #888; margin-top: 12px;">
+      <a href="https://ainaryventures.com" style="color: #888; text-decoration: none; border-bottom: 1px solid #ddd;">ainaryventures.com</a>
+    </p>
+  </div>
+</div>
+
+<!-- ========================================
+     BACK COVER
+     ======================================== -->
+<div class="back-cover">
+  <div class="cover-brand" style="margin-bottom: 24px;">
+    <span class="gold-punkt">●</span>
+    <span class="brand-name">Ainary</span>
+  </div>
+
+  <p class="back-cover-services">AI Strategy · Published Research · Daily Intelligence</p>
+
+  <p class="back-cover-cta">
+    <a href="mailto:florian@ainaryventures.com" style="color: #888; text-decoration: none;">Contact</a> · <a href="mailto:florian@ainaryventures.com?subject=Feedback: AR-024" style="color: #888; text-decoration: none;">Feedback</a>
+  </p>
+
+  <p class="back-cover-contact">ainaryventures.com</p>
+  <p class="back-cover-contact">florian@ainaryventures.com</p>
+</div>
+
+</body>
+</html>

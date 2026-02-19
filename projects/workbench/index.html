@@ -592,7 +592,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);backgroun
 <div class="left">
   <div class="left-header">
     <div style="font-size:13px;font-weight:700;letter-spacing:3px;color:#d4a853;font-variant:small-caps;margin-bottom:4px">AINARY</div>
-    <h1 style="cursor:pointer;font-size:11px;font-weight:500;color:var(--text-dim);margin-bottom:8px" onclick="togglePipelineView()">Execution Platform v0.12.3 <span id="wsStatus" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--danger);margin-left:6px;vertical-align:middle;transition:background 0.3s"></span></h1>
+    <h1 style="cursor:pointer;font-size:11px;font-weight:500;color:var(--text-dim);margin-bottom:8px" onclick="togglePipelineView()">Execution Platform v0.13.0 <span id="wsStatus" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--danger);margin-left:6px;vertical-align:middle;transition:background 0.3s"></span></h1>
     <p style="font-size:10px">Research → Systems → Content → Revenue</p>
   </div>
   <div class="pipeline" id="pipeline"></div>
@@ -1140,15 +1140,17 @@ async function renderOperationsView() {
         <div style="border-bottom:2px solid var(--border);margin-bottom:24px"></div>
         
         <!-- Section 1: Strategic KPIs -->
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-bottom:32px">
-          ${['revenue', 'sends', 'commitments', 'team_health'].map(key => {
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:20px;margin-bottom:32px">
+          ${['revenue', 'sends', 'commitments', 'team_health', 'ai_cost'].map(key => {
             const kpi = strategic[key];
             const color = kpiColor(kpi.current, kpi.target);
             const pct = Math.round((kpi.current / kpi.target) * 100);
             const displayValue = key === 'revenue' ? formatRevenue(kpi.current) : 
-                                 key === 'commitments' ? kpi.current + '%' : kpi.current;
+                                 key === 'commitments' ? kpi.current + '%' :
+                                 key === 'ai_cost' ? '$' + kpi.current.toFixed(2) : kpi.current;
             const targetLabel = key === 'revenue' ? formatRevenue(kpi.target) : 
-                               key === 'commitments' ? kpi.target + '%' : kpi.target + '/wk';
+                               key === 'commitments' ? kpi.target + '%' :
+                               key === 'ai_cost' ? '$' + kpi.target.toFixed(2) : kpi.target + '/wk';
             return `
               <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:20px;text-align:center">
                 <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:12px">${kpi.label}</div>
@@ -3725,6 +3727,32 @@ document.addEventListener('keydown', e => {
   
   // C: Toggle context
   if (e.key === 'c') { toggleCtx(); return; }
+  
+  // S: Toggle Star/Priority (Feature #3: Keyboard Shortcuts)
+  if (e.key === 's' && currentTopic) {
+    toggleTopicPriority(currentTopic);
+    return;
+  }
+  
+  // D: Mark topic as Done (Feature #3: Keyboard Shortcuts)
+  if (e.key === 'd' && currentTopic) {
+    markTopicDone(currentTopic);
+    return;
+  }
+  
+  // /: Focus search (Feature #3: Keyboard Shortcuts)
+  if (e.key === '/') {
+    e.preventDefault();
+    openCmd();
+    return;
+  }
+  
+  // ?: Show keyboard shortcuts help (Feature #3: Keyboard Shortcuts)
+  if (e.key === '?') {
+    e.preventDefault();
+    showKeyboardHelp();
+    return;
+  }
 });
 
 function copyDraft(btn) {
@@ -3738,6 +3766,108 @@ document.getElementById('inputField').addEventListener('input', function() {
   this.style.height='auto';
   this.style.height=Math.min(this.scrollHeight,120)+'px';
 });
+
+// ── NEW KEYBOARD SHORTCUTS (Feature #3) ──
+
+async function toggleTopicPriority(topicId) {
+  const topic = topicsCache[topicId];
+  if (!topic) return;
+  
+  const currentPriority = topic.priority || 'NORMAL';
+  const priorities = ['LOW', 'NORMAL', 'HIGH', 'NOW'];
+  const currentIdx = priorities.indexOf(currentPriority);
+  const nextIdx = (currentIdx + 1) % priorities.length;
+  const nextPriority = priorities[nextIdx];
+  
+  try {
+    await fetch(`${API}/topics/${topicId}/priority`, {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        priority: nextPriority,
+        reason: `Toggled via keyboard shortcut (S)`,
+        confidence: 80
+      })
+    });
+    
+    // Update cache and reload
+    topic.priority = nextPriority;
+    await loadFolderTree();
+    
+    // Visual feedback
+    const el = document.querySelector(`.folder-topic[data-topic-id="${topicId}"]`);
+    if (el) {
+      el.style.background = 'rgba(212,168,83,0.1)';
+      setTimeout(() => el.style.background = '', 500);
+    }
+  } catch (e) {
+    console.error('Failed to toggle priority:', e);
+  }
+}
+
+async function markTopicDone(topicId) {
+  const topic = topicsCache[topicId];
+  if (!topic) return;
+  
+  try {
+    await fetch(`${API}/topics/${topicId}/state`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({state: 'done'})
+    });
+    
+    // Update cache
+    topic.state = 'done';
+    await loadFolderTree();
+    
+    // Visual feedback - find next topic to select
+    const topics = window._allTopics || [];
+    const idx = topics.findIndex(t => t.id === topicId);
+    const next = topics[idx + 1] || topics[idx - 1];
+    if (next) selectTopic(next.id);
+  } catch (e) {
+    console.error('Failed to mark done:', e);
+  }
+}
+
+function showKeyboardHelp() {
+  const shortcuts = [
+    {key: 'Cmd+K', desc: 'Open command palette'},
+    {key: 'Cmd+N', desc: 'New topic'},
+    {key: 'Cmd+P', desc: 'Toggle pipeline view'},
+    {key: 'Cmd+I', desc: 'Toggle principles view'},
+    {key: 'Cmd+O', desc: 'Toggle executive board'},
+    {key: 'Cmd+.', desc: 'Toggle context panel'},
+    {key: 'J / K', desc: 'Navigate topics (down / up)'},
+    {key: 'E', desc: 'Focus message input'},
+    {key: 'C', desc: 'Toggle context panel'},
+    {key: 'S', desc: 'Toggle topic priority (LOW → NORMAL → HIGH → NOW)'},
+    {key: 'D', desc: 'Mark current topic as done'},
+    {key: '/', desc: 'Focus search (same as Cmd+K)'},
+    {key: '?', desc: 'Show this help'},
+    {key: 'Esc', desc: 'Close modals'},
+  ];
+  
+  const overlay = document.getElementById('confirmOverlay');
+  const box = overlay.querySelector('.confirm-box');
+  
+  box.innerHTML = `
+    <h3>Keyboard Shortcuts</h3>
+    <div style="max-height:400px;overflow-y:auto">
+      ${shortcuts.map(s => `
+        <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12px;border-bottom:1px solid var(--border)">
+          <kbd style="font-family:monospace;background:var(--surface-2);padding:2px 8px;border-radius:3px;font-size:11px">${s.key}</kbd>
+          <span style="color:var(--text-muted);margin-left:16px">${s.desc}</span>
+        </div>
+      `).join('')}
+    </div>
+    <div class="confirm-btns" style="margin-top:16px">
+      <button class="primary" onclick="closeConfirm(false)">Close</button>
+    </div>
+  `;
+  
+  overlay.classList.add('open');
+}
 
 // ── PRINCIPLES VIEW ──
 let principlesViewOpen = false;

@@ -86,12 +86,43 @@ fi
 
 echo ""
 
+# --- TODAY'S SENDS CHECK (REALITY CHECK) ---
+echo "${BOLD}✉️ TODAY'S REALITY CHECK:${NC}"
+echo ""
+
+# Check today's memory file for actual sends
+TODAY_SENDS=0
+SEND_EVIDENCE=""
+
+if [ -f "$DAILY_LOG" ]; then
+    # Look for send evidence: "SENT", "submitted", "versandt", "email to", "application to"
+    if grep -qiE "(SENT|submitted|versandt|email to|application to|✅.*email|✅.*application)" "$DAILY_LOG" 2>/dev/null; then
+        TODAY_SENDS=1
+        SEND_EVIDENCE=$(grep -iE "(SENT|submitted|versandt|email to|application to)" "$DAILY_LOG" | head -3)
+        echo -e "  ${GREEN}✅ Sends detected today:${NC}"
+        echo "$SEND_EVIDENCE" | sed 's/^/     /'
+    else
+        echo -e "  ${RED}❌ NO sends detected in $DAILY_LOG${NC}"
+        echo -e "     ${YELLOW}(Checked for: SENT, submitted, email to, application to)${NC}"
+    fi
+fi
+
+echo ""
+
 # --- OPPORTUNITY COST ---
 echo "${BOLD}💸 OPPORTUNITY COST:${NC}"
 echo ""
 
 # Count days without sends (look at tracker)
 ZERO_SEND_DAYS=$(grep -c "| 0 |" "$TRACKER" 2>/dev/null || echo "0")
+
+# Override if today has sends but tracker not updated yet
+if [ "$TODAY_SENDS" -eq 1 ] && [ "$ZERO_SEND_DAYS" -gt 0 ]; then
+    echo -e "  ${YELLOW}⚠️ Tracker shows $ZERO_SEND_DAYS zero-send days, but today has sends.${NC}"
+    echo -e "     ${YELLOW}Consider updating EXECUTION-TRACKER.md${NC}"
+    ZERO_SEND_DAYS=$((ZERO_SEND_DAYS - 1))
+fi
+
 TOTAL_COST=$((ZERO_SEND_DAYS * DAILY_OPPORTUNITY_COST))
 
 if [ "$ZERO_SEND_DAYS" -gt 0 ]; then
@@ -99,6 +130,8 @@ if [ "$ZERO_SEND_DAYS" -gt 0 ]; then
     echo -e "  ${RED}Estimated lost value: €${TOTAL_COST}${NC}"
     echo ""
     echo -e "  ${YELLOW}Based on: €421/day opportunity cost from MEMORY.md analysis${NC}"
+else
+    echo -e "  ${GREEN}✓ No opportunity cost detected${NC}"
 fi
 
 echo ""

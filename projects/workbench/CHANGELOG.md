@@ -4,6 +4,58 @@ All notable changes. Format: [ISO 8601 Date] [Version] [Category].
 
 ---
 
+## [0.13.0] — 2026-02-19
+
+### Added
+- **Phase A: Database Performance**
+  - 7 new indexes for frequently queried tables (messages, findings, events, daily_scores, activity_feed)
+  - Verified: EXPLAIN QUERY PLAN shows index usage for topic_id lookups
+
+- **Phase B: Cost Tracking**
+  - GET /api/topics/{id}/cost endpoint: per-topic AI cost breakdown with per-message details
+  - Total AI Cost KPI in Executive Board (5th strategic metric, target $10/month)
+  - Cost tracking in messages table: cost, tokens_prompt, tokens_completion
+  - Cost aggregation in topics table: cost_total, cost_updated_at
+  - Automatic cost calculation and storage for all /api/ai/chat responses
+
+- **Phase C: Session Replay + Keyboard Shortcuts**
+  - GET /api/topics/{id}/replay endpoint: chronological timeline of messages, events, state changes
+  - New keyboard shortcuts:
+    - **S**: Toggle topic priority (LOW → NORMAL → HIGH → NOW)
+    - **D**: Mark current topic as done
+    - **/**: Focus search (same as Cmd+K)
+    - **?**: Show keyboard shortcuts help modal
+
+### Changed
+- Version: 0.12.6 → 0.13.0
+- Executive Board UI: 4-column → 5-column grid for strategic KPIs
+- DOCUMENTATION.md: send-email endpoint marked as "Planned: Q2"
+
+### Technical Notes
+- Cost tracking limitation: /api/ai/stream does not track cost (streaming APIs don't return token counts)
+- DB backups: workbench.db.bak-phase-a, workbench.db.bak-phase-b
+- All changes additive, backward compatible
+
+---
+
+---
+
+## [0.12.6] — 2026-02-19
+
+### Changed
+- **BREAKING: Trust System Merge** — `trust_scores` (agent-level) deprecated in favor of `trust_skills` (skill-level Bayesian)
+  - `GET /api/trust` now returns `trust_skills` data with `X-Deprecation-Warning` header
+  - Vote endpoint (`POST /api/proposals/{id}/vote`) redirects to `trust_skills` with skill="general"
+  - Legacy `trust_scores` table kept for archival (exported to `trust_scores_archive.json`)
+  - **Migration:** Database backed up, no data loss
+  - **Impact:** Frontend using `GET /api/trust` will receive skill-level data instead of agent-level (structure change)
+  - **Recommended:** Update clients to use `GET /api/trust/skills` directly
+
+### Fixed
+- Trust system redundancy eliminated — single source of truth established
+
+---
+
 ## [0.12.5] — 2026-02-19
 
 ### Added

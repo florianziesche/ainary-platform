@@ -3,265 +3,1021 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ainary — Gemeinde Glashütte</title>
+<title>Ainary Platform — Gemeinde Glashütte</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+:root{--bg:#0a0a0a;--surface:#141414;--surface-2:#1a1a1a;--border:#1e1e1e;--border-light:#2a2a2a;--text:#ececec;--text-muted:#8e8e8e;--text-dim:#555;--warm:#d4a853;--danger:#c47070}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',-apple-system,sans-serif;background:#0a0a0a;background-image:radial-gradient(circle,rgba(212,168,83,0.04) 1px,transparent 1px);background-size:20px 20px;background-position:10px 10px;color:#e0e0e0;-webkit-font-smoothing:antialiased;line-height:1.5}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);background-image:radial-gradient(circle,rgba(212,168,83,0.04) 1px,transparent 1px);background-size:20px 20px;background-position:10px 10px;color:var(--text);-webkit-font-smoothing:antialiased;height:100vh;display:flex;overflow:hidden}
 
-/* Header */
-.header{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;border-bottom:1px solid #2a2a2a;background:#141414;position:sticky;top:0;z-index:10}
-.logo{font-size:13px;font-weight:700;letter-spacing:4px;color:#d4a853}
-.workspace-name{font-size:15px;font-weight:600;color:#e0e0e0}
-.stages{display:flex;gap:4px}
-.stage{padding:6px 14px;font-size:11px;font-weight:600;color:#5a5a5a;border:1px solid #2a2a2a;border-radius:4px;cursor:default;transition:all .15s}
-.stage.active{color:#d4a853;border-color:#d4a853;background:rgba(212,168,83,0.08)}
+.left{width:280px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.left-header{padding:20px;border-bottom:1px solid var(--border)}
+.pipe-stage{display:flex;align-items:center;padding:10px 20px;cursor:pointer;transition:all 0.1s;border-left:2px solid transparent;gap:12px}
+.pipe-stage:hover{background:rgba(255,255,255,0.03)}
+.pipe-stage.active{background:rgba(255,255,255,0.04);border-left-color:var(--text-muted)}
+.pipe-icon{font-size:12px;width:20px;text-align:center;color:var(--text-dim);font-weight:700}
+.pipe-info{flex:1}
+.pipe-name{font-size:12px;font-weight:600;color:var(--text-muted)}
+.pipe-stage.active .pipe-name{color:var(--text)}
+.pipe-count{font-size:10px;color:var(--text-dim);margin-top:1px}
+.pipe-bar{width:40px;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.pipe-fill{height:100%;background:var(--text-dim);border-radius:2px;transition:width 0.3s}
+.pipe-arrow{text-align:center;padding:2px 0;color:var(--border-light);font-size:8px}
 
-/* Layout */
-.content{max-width:1000px;margin:0 auto;padding:32px 24px 64px}
-.section{margin-bottom:40px}
-.section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:#5a5a5a;margin-bottom:16px}
+.pipeline{border-bottom:1px solid var(--border)}
+.topic-list{flex:1;overflow-y:auto}
+.folder-tree{flex:1;overflow-y:auto;padding:4px 0}
+.folder{user-select:none}
+.folder-head{display:flex;align-items:center;padding:6px 16px 6px 12px;cursor:pointer;transition:all 0.1s;border-left:2px solid transparent;gap:6px}
+.folder-head:hover{background:rgba(255,255,255,0.03)}
+.folder-head.active{background:rgba(255,255,255,0.04);border-left-color:var(--text-muted)}
+.folder-chevron{font-size:8px;color:var(--text-dim);width:12px;text-align:center;transition:transform 0.15s;flex-shrink:0}
+.folder.collapsed .folder-chevron{transform:rotate(-90deg)}
+.folder-icon{width:18px;height:18px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;background:rgba(255,255,255,0.04);flex-shrink:0}
+.folder-name{font-size:11px;font-weight:600;color:var(--text-muted);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.folder-head.active .folder-name{color:var(--text)}
+.folder-count{font-size:9px;color:var(--text-dim);flex-shrink:0}
+.folder-children{padding-left:12px}
+.folder.collapsed .folder-children{display:none}
+.folder-topic{display:flex;align-items:center;padding:6px 16px 6px 20px;cursor:pointer;transition:all 0.1s;border-left:2px solid transparent;gap:8px}
+.folder-topic:hover{background:rgba(255,255,255,0.02)}
+.folder-topic.active{background:rgba(255,255,255,0.04);border-left-color:var(--text-muted)}
+.folder-topic-dot{width:5px;height:5px;border-radius:50%;background:var(--text-dim);flex-shrink:0}
+.folder-topic-dot.unread{background:var(--warm)}
+.folder-topic-name{font-size:11px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.folder-topic-pct{font-size:9px;color:var(--text-dim)}
 
-/* KPI Cards */
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.kpi{background:#141414;border:1px solid #2a2a2a;border-radius:6px;padding:16px}
-.kpi-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#8e8e8e;margin-bottom:8px}
-.kpi-value{font-size:24px;font-weight:700;margin-bottom:4px}
-.kpi-target{font-size:10px;color:#5a5a5a}
-.kpi-bar{height:4px;background:#2a2a2a;border-radius:2px;margin-top:10px;overflow:hidden}
-.kpi-bar-fill{height:100%;border-radius:2px}
-.kpi.red .kpi-value{color:#c47070}
-.kpi.red .kpi-bar-fill{background:#c47070}
-.kpi.yellow .kpi-value{color:#d4a853}
-.kpi.yellow .kpi-bar-fill{background:#d4a853}
-.kpi.gray .kpi-value{color:#5a5a5a;font-size:14px}
+.trust-footer{padding:8px 12px;border-top:1px solid var(--border);max-height:180px;overflow-y:auto}
+.trust-header{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);padding:0 4px 6px;display:flex;justify-content:space-between}
+.trust-skill{display:flex;align-items:center;gap:6px;padding:3px 4px;font-size:10px}
+.trust-skill-name{width:70px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.trust-skill-bar{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.trust-skill-fill{height:100%;border-radius:2px;transition:width 0.3s}
+.trust-skill-score{width:24px;text-align:right;color:var(--text-dim);font-size:9px;flex-shrink:0}
 
-/* Goals */
-.goals-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.goal{background:#141414;border:1px solid #2a2a2a;border-radius:6px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
-.goal-info{flex:1}
-.goal-name{font-size:13px;font-weight:500}
-.goal-progress{font-size:11px;color:#8e8e8e;margin-top:2px}
-.goal-status{font-size:9px;font-weight:700;letter-spacing:1px;padding:3px 8px;border-radius:3px;white-space:nowrap}
-.goal-status.behind{color:#c47070;background:rgba(196,112,112,0.1);border:1px solid rgba(196,112,112,0.2)}
-.goal-status.at-risk{color:#d4a853;background:rgba(212,168,83,0.1);border:1px solid rgba(212,168,83,0.2)}
-.goal-status.on-track{color:#4aa088;background:rgba(74,160,136,0.1);border:1px solid rgba(74,160,136,0.2)}
+.right-wrap{flex:1;display:flex;overflow:hidden}
+.right{flex:1;display:flex;flex-direction:column;min-width:0}
+.right-header{padding:14px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.right-header-left h2{font-size:15px;font-weight:600}
+.right-header-left .sub{font-size:11px;color:var(--text-dim);margin-top:1px}
+.hdr-btns{display:flex;gap:6px}
+.hdr-btn{padding:6px 12px;border-radius:4px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:none;color:var(--text-muted);font-family:inherit;transition:all 0.12s}
+.hdr-btn:hover{border-color:var(--border-light);color:var(--text)}
+.hdr-btn.on{background:rgba(255,255,255,0.06);border-color:var(--text-dim);color:var(--text)}
 
-/* Findings */
-.findings-group{margin-bottom:20px}
-.findings-group-title{font-size:11px;font-weight:600;color:#8e8e8e;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #1e1e1e}
-.finding{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-left:2px solid #2a2a2a;margin-bottom:6px;background:rgba(20,20,20,0.5);border-radius:0 4px 4px 0}
-.finding-badge{width:22px;height:22px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px}
-.badge-E{background:rgba(74,160,136,0.15);color:#4aa088;border:1px solid rgba(74,160,136,0.3)}
-.badge-I{background:rgba(212,168,83,0.15);color:#d4a853;border:1px solid rgba(212,168,83,0.3)}
-.badge-J{background:rgba(130,160,220,0.15);color:#82a0dc;border:1px solid rgba(130,160,220,0.3)}
-.badge-A{background:rgba(180,130,200,0.15);color:#b482c8;border:1px solid rgba(180,130,200,0.3)}
-.finding-text{font-size:12px;color:#e0e0e0;flex:1;line-height:1.5}
-.finding-conf{font-size:10px;color:#5a5a5a;white-space:nowrap;margin-top:2px}
+.sys-indicator{display:flex;align-items:center;gap:8px;padding:10px 20px;font-size:10px;color:var(--text-dim);border-top:1px solid var(--border);cursor:pointer}
+.sys-indicator:hover{background:rgba(255,255,255,0.02)}
+.sys-dot{width:6px;height:6px;border-radius:50%}
 
-/* Impact */
-.impact-box{background:#141414;border:1px solid #2a2a2a;border-radius:6px;padding:24px;font-size:13px}
-.impact-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:#d4a853;margin-bottom:4px}
-.impact-line{color:#d4a853;margin-bottom:16px;font-size:11px}
-.impact-row{display:flex;align-items:baseline;margin-bottom:10px;gap:16px}
-.impact-label{width:140px;color:#8e8e8e;font-size:12px;flex-shrink:0}
-.impact-value{font-size:16px;font-weight:600;color:#e0e0e0;width:100px;flex-shrink:0}
-.impact-detail{font-size:11px;color:#5a5a5a}
-.impact-note{font-size:10px;color:#5a5a5a;margin-top:16px;padding-top:12px;border-top:1px solid #2a2a2a;font-style:italic}
+/* Executive Tabs */
+.exec-tabs{display:flex;gap:0;margin-bottom:24px;border-bottom:1px solid var(--border)}
+.exec-tab{padding:10px 20px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s}
+.exec-tab:hover{color:var(--text-muted)}
+.exec-tab.active{color:#d4a853;border-bottom-color:#d4a853}
 
-/* Steps */
-.steps{background:#141414;border:1px solid #2a2a2a;border-radius:6px;padding:20px 24px}
-.step{display:flex;gap:12px;margin-bottom:12px;font-size:13px}
-.step:last-child{margin-bottom:0}
-.step-num{color:#d4a853;font-weight:700;font-size:12px;margin-top:1px}
-.step-text{color:#e0e0e0}
-.step-meta{color:#5a5a5a;font-size:11px}
+/* Running Tasks */
+.running-item{display:flex;align-items:center;gap:10px;padding:8px 16px;border-bottom:1px solid var(--border);font-size:11px}
+.running-status{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.running-active{background:#4aa088;animation:pulse 2s infinite}
+.running-ready{background:var(--warm)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
 
-/* Footer */
-.footer{text-align:center;padding:32px;font-size:10px;color:#5a5a5a;border-top:1px solid #1e1e1e}
-.footer-brand{color:#8e8e8e;margin-bottom:4px}
+/* Stats */
+.stats-row{display:flex;gap:24px;padding:12px 16px;font-size:11px;color:var(--text-muted)}
+.stats-item{display:flex;flex-direction:column;gap:2px}
+.stats-value{font-size:18px;font-weight:700;color:var(--text)}
+.stats-label{font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px}
 
-@media(max-width:768px){
-  .kpi-grid,.goals-grid{grid-template-columns:1fr 1fr}
-  .header{flex-wrap:wrap;gap:8px}
-  .stages{width:100%;justify-content:center}
-}
-@media(max-width:500px){
-  .kpi-grid,.goals-grid{grid-template-columns:1fr}
-}
+/* Feed */
+.feed-item{display:flex;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:11px;align-items:flex-start}
+.feed-item:last-child{border-bottom:none}
+.feed-agent{font-weight:600;width:90px;flex-shrink:0}
+.feed-action{color:var(--text-muted);flex:1}
+.feed-time{color:var(--text-dim);font-size:10px;flex-shrink:0}
+
+/* Evidence badges */
+.evidence-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;letter-spacing:0.5px;display:inline-block}
+.evidence-E{background:rgba(74,160,136,0.15);color:#4aa088}
+.evidence-I{background:rgba(107,138,171,0.15);color:#6b8aab}
+.evidence-J{background:rgba(155,142,196,0.15);color:#9b8ec4}
+.evidence-A{background:rgba(212,168,83,0.15);color:#d4a853}
+.impact-badge{font-size:9px;font-weight:600;padding:2px 6px;border-radius:3px;letter-spacing:0.5px}
+.impact-kritisch{background:rgba(196,112,112,0.15);color:#c47070}
+.impact-hoch{background:rgba(212,168,83,0.15);color:#d4a853}
+.impact-mittel{background:rgba(255,255,255,0.05);color:var(--text-muted)}
+.impact-niedrig{background:rgba(255,255,255,0.03);color:var(--text-dim)}
+
+/* Stage View */
+.stage-view{display:none;flex:1;overflow:auto;padding:24px;flex-direction:column}
+.stage-view.open{display:flex}
+.stage-header{margin-bottom:24px}
+.stage-header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.stage-title{font-size:20px;font-weight:700;display:flex;align-items:center;gap:12px}
+.stage-icon{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;border:2px solid}
+.stage-metrics{display:flex;gap:20px}
+.stage-metric{text-align:center}
+.stage-metric-val{font-size:24px;font-weight:700}
+.stage-metric-label{font-size:9px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-dim);margin-top:2px}
+.stage-findings{display:flex;flex-direction:column;gap:8px}
+.stage-finding-card{padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all 0.12s;border-left:3px solid var(--border-light)}
+.stage-finding-card:hover{background:var(--surface-2);border-color:var(--border-light)}
+.stage-finding-card.expanded{background:var(--surface-2);border-left-color:var(--warm)}
+.stage-finding-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.stage-finding-left{flex:1;min-width:0}
+.stage-finding-id{font-family:monospace;font-size:9px;color:var(--text-dim);margin-bottom:4px}
+.stage-finding-claim{font-size:12px;color:var(--text);line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.stage-finding-card.expanded .stage-finding-claim{-webkit-line-clamp:unset;display:block}
+.stage-finding-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.stage-conf-bar{width:60px;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.stage-conf-fill{height:100%;border-radius:2px}
+.stage-finding-meta{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:9px;color:var(--text-dim);flex-wrap:wrap}
+.stage-finding-detail{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--text-muted);line-height:1.6}
+.stage-finding-card.expanded .stage-finding-detail{display:block}
+
+/* Context panel */
+.ctx{width:0;overflow:hidden;border-left:1px solid var(--border);background:var(--surface);transition:width 0.2s;flex-shrink:0}
+.ctx.open{width:260px}
+.ctx-inner{width:260px;overflow-y:auto;padding:0;height:100%}
+.ctx-sec{border-bottom:1px solid var(--border);padding:14px 16px}
+.ctx-sec-title{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:8px}
+
+/* Command Palette */
+.cmd-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;align-items:flex-start;justify-content:center;padding-top:20vh}
+.cmd-overlay.open{display:flex}
+.cmd-box{background:var(--surface);border:1px solid var(--border-light);border-radius:12px;width:560px;max-width:90vw;overflow:hidden;box-shadow:0 24px 48px rgba(0,0,0,0.4)}
+.cmd-input{width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);padding:16px 20px;font-size:14px;color:var(--text);font-family:inherit;outline:none}
+.cmd-input::placeholder{color:var(--text-dim)}
+.cmd-results{max-height:320px;overflow-y:auto}
+.cmd-item{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;transition:background 0.05s}
+.cmd-item:hover,.cmd-item.active{background:var(--surface-2)}
+.cmd-item-icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text-dim);background:var(--surface-2);border-radius:4px;flex-shrink:0}
+.cmd-item-text{flex:1}
+.cmd-item-title{font-size:12px}
+.cmd-item-sub{font-size:10px;color:var(--text-dim)}
+.cmd-footer{display:flex;gap:12px;padding:8px 20px;border-top:1px solid var(--border);font-size:9px;color:var(--text-dim)}
+
+/* Ortsteile grid */
+.ot-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.ot-card{padding:10px;border-radius:6px;background:var(--surface);border:1px solid var(--border);text-align:center;transition:all 0.1s}
+.ot-card:hover{border-color:var(--border-light)}
+.ot-name{font-size:10px;font-weight:600;margin-bottom:2px}
+.ot-mood{font-size:9px}
+.ot-green{color:#4aa088}
+.ot-gold{color:var(--warm)}
+.ot-red{color:var(--danger)}
+
+/* Stadtrat */
+.sr-bar{display:flex;height:12px;border-radius:6px;overflow:hidden;gap:2px;margin:8px 0}
+.sr-seg{height:100%;border-radius:3px}
+
+/* Gegner */
+.gegner-item{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:11px}
+.gegner-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* Input */
+.input-area{padding:12px 24px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end}
+.input-field{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-size:12px;color:var(--text);font-family:inherit;resize:none;outline:none;min-height:40px;max-height:120px;line-height:1.5}
+.input-field:focus{border-color:var(--text-dim)}
+.input-field::placeholder{color:var(--text-dim)}
+.send-btn{padding:10px 16px;border-radius:6px;background:var(--text);color:var(--bg);border:none;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0}
+.send-btn:hover{background:#fff}
+
+/* Pipeline View */
+.pv{display:flex;gap:16px;height:100%;min-height:0}
+.pv-col{flex:1;min-width:200px;display:flex;flex-direction:column;gap:0}
+.pv-col-header{padding:12px 14px;border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none;display:flex;justify-content:space-between;align-items:center}
+.pv-col-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
+.pv-col-stats{font-size:9px;color:var(--text-dim);text-align:right;line-height:1.5}
+.pv-col-body{flex:1;overflow-y:auto;border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;padding:8px;display:flex;flex-direction:column;gap:6px;background:rgba(255,255,255,0.01)}
+.pv-card{padding:10px 12px;border-radius:6px;background:var(--surface);border:1px solid var(--border);cursor:pointer;transition:all 0.1s}
+.pv-card:hover{border-color:var(--border-light);background:var(--surface-2)}
+.pv-card-name{font-size:11px;font-weight:600;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pv-card-meta{display:flex;gap:6px;align-items:center;font-size:9px;color:var(--text-dim)}
+.pv-card-findings{font-size:9px;color:var(--warm);margin-top:3px}
+.pv-flow{display:flex;align-items:center;justify-content:center;width:32px;flex-shrink:0}
+.pv-flow-arrow{color:var(--border-light);font-size:14px}
+.pv-header{margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.pv-header h2{font-size:16px;font-weight:700}
+
+.exec-health{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.exec-health-row{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;border-bottom:1px solid var(--border);font-size:11px}
+.exec-health-row:last-child{border-bottom:none}
+.exec-health-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div class="logo">AINARY</div>
-  <div class="workspace-name">Gemeinde Glashütte</div>
-  <div class="stages">
-    <div class="stage active">Analyse</div>
-    <div class="stage">Lösung</div>
-    <div class="stage">Pilot</div>
-    <div class="stage">Ergebnis</div>
+<div class="left">
+  <div class="left-header">
+    <div style="font-size:13px;font-weight:700;letter-spacing:3px;color:#d4a853;font-variant:small-caps;margin-bottom:4px">AINARY</div>
+    <div style="font-size:11px;font-weight:500;color:var(--text-muted);margin-bottom:4px">Gemeinde Glashütte</div>
+    <p style="font-size:10px;color:var(--text-dim)">Analyse → Umsetzung → Kommunikation → Ergebnis</p>
+  </div>
+  <div class="pipeline" id="pipeline"></div>
+  <div class="folder-tree" id="folderTree"></div>
+  <div class="trust-footer" id="trustFooter"></div>
+</div>
+
+<div class="right-wrap">
+<div class="right">
+  <div class="right-header">
+    <div class="right-header-left">
+      <h2 id="topicTitle">Executive Board</h2>
+      <div class="sub" id="topicSub">Gemeinde Glashütte — Digitalisierungsstrategie</div>
+    </div>
+    <div class="hdr-btns">
+      <button class="hdr-btn" id="ctxBtn" onclick="toggleCtx()">Context</button>
+    </div>
+  </div>
+  <div id="operationsView" style="flex:1;overflow:auto;padding:32px 24px;display:flex;flex-direction:column"></div>
+  <div id="stageView" class="stage-view"></div>
+  <div id="pipelineView" style="display:none;flex:1;overflow:auto;padding:24px"></div>
+  <div class="input-area" style="display:none">
+    <textarea class="input-field" placeholder="Kontext hinzufügen, Feedback geben..." rows="1"></textarea>
+    <button class="send-btn">Senden</button>
+  </div>
+</div>
+<div class="ctx" id="ctxPanel"><div class="ctx-inner" id="ctxInner"></div></div>
+</div>
+
+<!-- Command Palette -->
+<div class="cmd-overlay" id="cmdOverlay" onclick="if(event.target===this)closeCmd()">
+  <div class="cmd-box">
+    <input class="cmd-input" id="cmdInput" placeholder="Suche Topics, Findings, Stages..." oninput="filterCmd(this.value)">
+    <div class="cmd-results" id="cmdResults"></div>
+    <div class="cmd-footer">
+      <span>↑↓ navigieren</span><span>↵ auswählen</span><span>esc schließen</span>
+    </div>
   </div>
 </div>
 
-<div class="content">
+<script>
+// ══════════════════════════════════════════════════════════════
+// DEMO DATA — All hardcoded, no API calls
+// ══════════════════════════════════════════════════════════════
 
-  <!-- KPIs -->
-  <div class="section">
-    <div class="section-title">Executive Dashboard</div>
-    <div class="kpi-grid">
-      <div class="kpi red">
-        <div class="kpi-label">Digitalisierungsgrad</div>
-        <div class="kpi-value">12%</div>
-        <div class="kpi-target">Ziel: 50%</div>
-        <div class="kpi-bar"><div class="kpi-bar-fill" style="width:24%"></div></div>
-      </div>
-      <div class="kpi red">
-        <div class="kpi-label">OZG-Leistungen Online</div>
-        <div class="kpi-value">3 / 58</div>
-        <div class="kpi-target">5% umgesetzt</div>
-        <div class="kpi-bar"><div class="kpi-bar-fill" style="width:5%"></div></div>
-      </div>
-      <div class="kpi yellow">
-        <div class="kpi-label">Ø Bearbeitungszeit</div>
-        <div class="kpi-value">12 min</div>
-        <div class="kpi-target">Ziel: 4 min</div>
-        <div class="kpi-bar"><div class="kpi-bar-fill" style="width:33%"></div></div>
-      </div>
-      <div class="kpi gray">
-        <div class="kpi-label">Bürger-Zufriedenheit</div>
-        <div class="kpi-value">noch nicht gemessen</div>
-        <div class="kpi-target">Messung in Phase 1 geplant</div>
-      </div>
+const AGENT_COLORS = {
+  'HUNTER': '#c47070',
+  'WRITER': '#9b8ec4',
+  'RESEARCHER': '#6b8aab',
+  'OPERATOR': '#4aa088',
+  'DEALMAKER': '#d4a853'
+};
+
+const STAGES = [
+  {key:'analyse', icon:'A', name:'Analyse', color:'#8e8e8e'},
+  {key:'umsetzung', icon:'U', name:'Umsetzung', color:'#6b8aab'},
+  {key:'kommunikation', icon:'K', name:'Kommunikation', color:'#9b8ec4'},
+  {key:'ergebnis', icon:'E', name:'Ergebnis', color:'var(--warm)'}
+];
+
+const FINDINGS = {
+  analyse: [
+    {id:'A-001', claim:'570.000 unbesetzte Stellen im öffentlichen Dienst', source:'dbb Beamtenbund, Sept. 2024', confidence:0.92, evidence:'I', impact:'kritisch'},
+    {id:'A-002', claim:'165.000 Vollzeitstellen durch KI entlastbar', source:'McKinsey, Juli 2024', confidence:0.88, evidence:'I', impact:'hoch'},
+    {id:'A-003', claim:'80% schnellere Bearbeitung mit KI', source:'AKDB Bayern, 2024', confidence:0.85, evidence:'E', impact:'hoch'},
+    {id:'A-004', claim:'<5% der Kommunen setzen KI systematisch ein', source:'Bitkom, 2024', confidence:0.90, evidence:'I', impact:'hoch'},
+    {id:'A-005', claim:'75% der Bürger befürworten KI in Behörden', source:'eGovernment MONITOR 2024', confidence:0.87, evidence:'E', impact:'mittel'},
+    {id:'A-006', claim:'37% der deutschen Kommunen setzen bereits KI ein oder planen es', source:'Civey 2025', confidence:0.83, evidence:'I', impact:'mittel'},
+    {id:'A-007', claim:'Fachkräftemangel: Gemeinden <10.000 Einwohner haben 0-1 IT-Fachkräfte', source:'', confidence:0.80, evidence:'J', impact:'kritisch'},
+    {id:'A-008', claim:'Dippoldiswalde bietet Online-Terminbuchung, Glashütte nicht', source:'online-buerger-service.de', confidence:0.95, evidence:'J', impact:'hoch'},
+    {id:'A-009', claim:'6.601 Einwohner, 16 Ortsteile, 95,56 km²', source:'Stat. Landesamt Sachsen', confidence:0.99, evidence:'E', impact:'niedrig'},
+    {id:'A-010', claim:'~10 Mio. Investitionsvolumen 2026', source:'Haushaltssatzung', confidence:0.95, evidence:'E', impact:'mittel'},
+    {id:'A-011', claim:'2,3 Mio. Kreditaufnahme', source:'Haushaltssatzung', confidence:0.95, evidence:'E', impact:'hoch'},
+    {id:'A-012', claim:'Gesamtstimmung 62% positiv, 23% neutral, 15% negativ', source:'KI-Sentiment-Analyse', confidence:0.70, evidence:'A', impact:'hoch'},
+    {id:'A-013', claim:'Nahversorgung 78% positiv — Edeka/Aldi Durchbruch', source:'MDR Sachsen, Dez 2025', confidence:0.75, evidence:'A', impact:'mittel'},
+    {id:'A-014', claim:'Vollsperrung K 9026 nur 32% positiv — kritisch', source:'', confidence:0.70, evidence:'A', impact:'hoch'},
+    {id:'A-015', claim:'Stadtrat: AfD 5, CDU 4, WVs 8, Grüne 1 — Mehrheit ohne AfD möglich (13/18)', source:'Kommunalwahl 2024', confidence:0.99, evidence:'E', impact:'hoch'}
+  ],
+  umsetzung: [
+    {id:'U-001', claim:'Tages-Briefing: 8h/Woche Einsparung', so_what:'Bürgermeister ist in 2 Min informiert statt 45 Min Emails', confidence:0.80, evidence:'A', impact:'hoch'},
+    {id:'U-002', claim:'Bürgeranfragen: 5h/Woche Einsparung', so_what:'KI-Entwürfe, Sachbearbeiter prüft', confidence:0.80, evidence:'A', impact:'hoch'},
+    {id:'U-003', claim:'Sitzungsprotokolle: 4h/Sitzung Einsparung', so_what:'Audio zu druckfertigem Protokoll', confidence:0.80, evidence:'A', impact:'mittel'},
+    {id:'U-004', claim:'Amtsblatt und Presse: 3h/Woche', so_what:'Ein Text, alle Formate', confidence:0.80, evidence:'A', impact:'mittel'},
+    {id:'U-005', claim:'Verwaltungs-Wissensbasis: 3h/Woche', so_what:'Beschlüsse in Sekunden finden', confidence:0.80, evidence:'A', impact:'mittel'},
+    {id:'U-006', claim:'Fördermittel-Scanner: 50.000€/Jahr Potenzial', so_what:'Automatische Identifikation passender Programme', confidence:0.80, evidence:'A', impact:'hoch'},
+    {id:'U-007', claim:'Online-Terminbuchung wie Dippoldiswalde', so_what:'', confidence:0.85, evidence:'J', impact:'hoch'},
+    {id:'U-008', claim:'AI-gestützte Bürger-Auskunft auf glashuette-sachs.de', so_what:'', confidence:0.75, evidence:'A', impact:'kritisch'},
+    {id:'U-009', claim:'CNC Planer Pro: Kalkulationszeit -70%', so_what:'Im Pilotbetrieb bei Maschinenbauer Schlottwitz', confidence:0.75, evidence:'A', impact:'hoch'}
+  ],
+  kommunikation: [
+    {id:'K-001', claim:'Bürger-Feedback-Kanal: WhatsApp/Web/App → KI kategorisiert → Intel für BM', so_what:'', confidence:0.80, evidence:'A', impact:'hoch'},
+    {id:'K-002', claim:'95% haben WhatsApp — niedrigste Einstiegshürde', so_what:'', confidence:0.85, evidence:'I', impact:'mittel'},
+    {id:'K-003', claim:'Multi-Kanal aus einer Quelle: Facebook (852), Instagram (1.099), Amtsblatt, Presse, Newsletter, Wochenrückblick', so_what:'', confidence:0.80, evidence:'A', impact:'hoch'},
+    {id:'K-004', claim:'16 Ortsteile, ein Dashboard — Stimmung pro Ortsteil trackbar', so_what:'', confidence:0.75, evidence:'A', impact:'kritisch'},
+    {id:'K-005', claim:'Pilot-Ergebnisse für Stadtrat aufbereiten', so_what:'', confidence:0.80, evidence:'A', impact:'hoch'}
+  ],
+  ergebnis: [
+    {id:'E-001', claim:'Phase 1: Analyse und Konzept — 1-2 Wochen', so_what:'', confidence:0.85, evidence:'A', impact:'mittel'},
+    {id:'E-002', claim:'Phase 2: Pilotbetrieb — 4-6 Wochen — EMPFOHLEN', so_what:'', confidence:0.85, evidence:'A', impact:'hoch'},
+    {id:'E-003', claim:'Phase 3: Laufende Optimierung — nach Bedarf', so_what:'', confidence:0.85, evidence:'A', impact:'mittel'},
+    {id:'E-004', claim:'EFRE Transformation I: bis 30.000€ (50% Zuschuss)', source:'SAB Sachsen', confidence:0.90, evidence:'E', impact:'hoch'},
+    {id:'E-005', claim:'EFRE Heranführung: bis 6.000€ (60% Zuschuss)', source:'SAB Sachsen', confidence:0.90, evidence:'E', impact:'mittel'},
+    {id:'E-006', claim:'go-digital: bis 16.500€', source:'BMWi', confidence:0.90, evidence:'E', impact:'mittel'},
+    {id:'E-007', claim:'OZG-Förderung Freistaat: Vollfinanzierung', source:'', confidence:0.85, evidence:'E', impact:'kritisch'},
+    {id:'E-008', claim:'Stadtrat hat 25.000€ für Digitalisierungsstrategie beschlossen', source:'Stadtratsbeschluss 23.01.2026', confidence:0.99, evidence:'E', impact:'hoch'}
+  ]
+};
+
+const TOPICS = [
+  {id:'fachkraeftemangel', name:'Fachkräftemangel & KI-Potenzial', stage:'analyse', findingCount:4},
+  {id:'ist-zustand', name:'Ist-Zustand Glashütte', stage:'analyse', findingCount:5},
+  {id:'sentiment', name:'Bürgerstimmung & Sentiment', stage:'analyse', findingCount:3},
+  {id:'stadtrat', name:'Stadtrat & Politische Lage', stage:'analyse', findingCount:3},
+  {id:'ki-tools', name:'KI-Werkzeuge Verwaltung', stage:'umsetzung', findingCount:6},
+  {id:'buergerservices', name:'Digitale Bürgerservices', stage:'umsetzung', findingCount:3},
+  {id:'buerger-komm', name:'Bürger-Kommunikation', stage:'kommunikation', findingCount:3},
+  {id:'ortsteile', name:'Ortsteile-Monitoring', stage:'kommunikation', findingCount:2},
+  {id:'phasen', name:'Umsetzungsphasen', stage:'ergebnis', findingCount:3},
+  {id:'foerdermittel', name:'Fördermittel & Finanzierung', stage:'ergebnis', findingCount:5}
+];
+
+const RUNNING_TASKS = [
+  {task:'Zeitungstracker Freie Presse', agent:'RESEARCHER', status:'aktiv', freq:'Kontinuierlich'},
+  {task:'Technologie-Tracker Kommune', agent:'RESEARCHER', status:'aktiv', freq:'Kontinuierlich'},
+  {task:'Sentimentanalyse Bürger (Facebook, Amtsblatt)', agent:'RESEARCHER', status:'aktiv', freq:'Wöchentlich'},
+  {task:'Ortsteil-Stimmungsmonitor', agent:'OPERATOR', status:'aktiv', freq:'Kontinuierlich'},
+  {task:'Fördermittel-Scanner (EFRE, BMBF, Freistaat)', agent:'HUNTER', status:'aktiv', freq:'Täglich'},
+  {task:'Stadtrats-Beschluss-Tracker', agent:'RESEARCHER', status:'aktiv', freq:'Nach Sitzung'},
+  {task:'Bürgeranfragen-Entwürfe', agent:'OPERATOR', status:'bereit', freq:'Bei Eingang'},
+  {task:'Amtsblatt-Generator', agent:'WRITER', status:'bereit', freq:'Wöchentlich'},
+  {task:'Pressemitteilungs-Assistent', agent:'WRITER', status:'bereit', freq:'Bei Bedarf'},
+  {task:'Herausforderer-Monitoring (Bretschneider, Ahrendt)', agent:'HUNTER', status:'aktiv', freq:'Kontinuierlich'}
+];
+
+const AGENTS = [
+  {name:'RESEARCHER', role:'Research, Analyse', score:74},
+  {name:'OPERATOR', role:'Systeme, Bürgeranfragen', score:55},
+  {name:'HUNTER', role:'Fördermittel, Monitoring', score:45},
+  {name:'WRITER', role:'Amtsblatt, Presse', score:40},
+  {name:'DEALMAKER', role:'Pilot-Verhandlung', score:30}
+];
+
+const ACTIVITY = [
+  {agent:'RESEARCHER', action:'Freie Presse gescannt — 3 relevante Artikel gefunden', time:'vor 2h'},
+  {agent:'HUNTER', action:'Neues EFRE-Programm identifiziert — Frist 30.06.2026', time:'vor 4h'},
+  {agent:'OPERATOR', action:'Sentimentanalyse aktualisiert — K9026 Stimmung sinkt', time:'vor 6h'},
+  {agent:'RESEARCHER', action:'Dippoldiswalde Online-Portal analysiert', time:'vor 1d'},
+  {agent:'WRITER', action:'Wochenrückblick-Entwurf erstellt', time:'vor 1d'}
+];
+
+const ORTSTEILE = [
+  {name:'Glashütte', mood:'Zufrieden', color:'green'},
+  {name:'Schlottwitz', mood:'Heimat-BM', color:'green'},
+  {name:'Reinhardtsgrimma', mood:'Kita-Neubau!', color:'green'},
+  {name:'Dittersdorf', mood:'Abwartend', color:'gold'},
+  {name:'Cunnersdorf', mood:'Mehr Infos', color:'gold'},
+  {name:'Johnsbach', mood:'Stabil', color:'green'},
+  {name:'Hirschbach', mood:'ÖPNV', color:'gold'},
+  {name:'Hermsdorf', mood:'Anbindung', color:'gold'},
+  {name:'Luchau', mood:'Ruhig', color:'green'},
+  {name:'Bärenhecke', mood:'OK', color:'green'},
+  {name:'Börnchen', mood:'Wenig Kontakt', color:'gold'},
+  {name:'Hausdorf', mood:'Stabil', color:'green'},
+  {name:'Niederfrauendorf', mood:'Bauland?', color:'gold'},
+  {name:'Oberfrauendorf', mood:'OK', color:'green'},
+  {name:'Neudörfel', mood:'Klein&leise', color:'gold'},
+  {name:'Rückenhain', mood:'Klein&leise', color:'gold'}
+];
+
+const GEGNER = [
+  {name:'Tilo Bretschneider', partei:'AfD', level:'Hoch', color:'#c47070'},
+  {name:'Uwe Ahrendt', partei:'Grüne', level:'Mittel', color:'var(--warm)'},
+  {name:'Markus Dreßler', partei:'CDU', level:'Niedrig', color:'#4aa088'},
+  {name:'Andreas Schuhmann', partei:'AfD', level:'Mittel', color:'var(--warm)'}
+];
+
+// ══════════════════════════════════════════════════════════════
+// VIEW STATE
+// ══════════════════════════════════════════════════════════════
+let currentView = 'executive'; // executive | stage | pipeline
+let currentStage = null;
+let currentTopic = null;
+
+function esc(str) {
+  const d = document.createElement('div');
+  d.textContent = str || '';
+  return d.innerHTML;
+}
+
+// ══════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════
+function init() {
+  renderPipeline();
+  renderFolderTree();
+  renderTrust();
+  renderOperationsView();
+  renderGlobalContext();
+}
+
+// ══════════════════════════════════════════════════════════════
+// PIPELINE (Sidebar stages)
+// ══════════════════════════════════════════════════════════════
+function renderPipeline() {
+  const el = document.getElementById('pipeline');
+  let html = `
+  <div class="pipe-stage" onclick="showExecutive()" style="margin-bottom:4px">
+    <div class="pipe-icon" style="background:rgba(212,168,83,0.15);color:#d4a853;border-radius:4px">E</div>
+    <div class="pipe-info">
+      <div class="pipe-name" style="color:#d4a853">Executive Board</div>
+      <div class="pipe-count">Gemeinde Glashütte</div>
     </div>
   </div>
+  <div style="border-bottom:1px solid var(--border);margin:4px 20px 8px"></div>`;
 
-  <!-- Goals -->
-  <div class="section">
-    <div class="section-title">Pilot-Ziele</div>
-    <div class="goals-grid">
-      <div class="goal">
-        <div class="goal-info">
-          <div class="goal-name">OZG Online-Formulare</div>
-          <div class="goal-progress">3 von 15 digitalisiert</div>
+  STAGES.forEach((s, i) => {
+    const count = FINDINGS[s.key] ? FINDINGS[s.key].length : 0;
+    const avgConf = FINDINGS[s.key] ? Math.round(FINDINGS[s.key].reduce((a,f)=>a+f.confidence,0)/count*100) : 0;
+    if (i > 0) html += '<div class="pipe-arrow">↓</div>';
+    html += `
+    <div class="pipe-stage" id="stage-${s.key}" onclick="showStage('${s.key}')">
+      <div class="pipe-icon">${s.icon}</div>
+      <div class="pipe-info">
+        <div class="pipe-name">${s.name}</div>
+        <div class="pipe-count">${count} findings · ${avgConf}% avg</div>
+      </div>
+      <div class="pipe-bar"><div class="pipe-fill" style="width:${avgConf}%"></div></div>
+    </div>`;
+  });
+
+  html += `
+  <div class="sys-indicator">
+    <div class="sys-dot" style="background:#4aa088"></div>
+    <span>Alle Systeme aktiv · 10 Tasks laufen</span>
+  </div>`;
+
+  el.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════════
+// FOLDER TREE (Topics)
+// ══════════════════════════════════════════════════════════════
+function renderFolderTree() {
+  const el = document.getElementById('folderTree');
+  let html = '';
+
+  STAGES.forEach(s => {
+    const topics = TOPICS.filter(t => t.stage === s.key);
+    if (!topics.length) return;
+    html += `<div class="folder">
+      <div class="folder-head" onclick="this.parentElement.classList.toggle('collapsed')">
+        <span class="folder-chevron">▼</span>
+        <div class="folder-icon" style="color:${s.color}">${s.icon}</div>
+        <span class="folder-name">${s.name}</span>
+        <span class="folder-count">${topics.length}</span>
+      </div>
+      <div class="folder-children">`;
+    topics.forEach(t => {
+      html += `<div class="folder-topic${currentTopic===t.id?' active':''}" onclick="selectTopic('${t.id}')">
+        <div class="folder-topic-dot unread"></div>
+        <span class="folder-topic-name">${t.name}</span>
+        <span class="folder-topic-pct">${t.findingCount}f</span>
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+
+  el.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════════
+// TRUST FOOTER
+// ══════════════════════════════════════════════════════════════
+function renderTrust() {
+  const el = document.getElementById('trustFooter');
+  const avg = Math.round(AGENTS.reduce((s,a)=>s+a.score,0)/AGENTS.length);
+  const barColor = s => s >= 60 ? '#4aa088' : s >= 30 ? 'var(--warm)' : 'var(--danger)';
+
+  el.innerHTML = `
+    <div class="trust-header"><span>Agent Trust</span><span>Avg: ${avg}</span></div>
+    ${AGENTS.map(a => `
+      <div class="trust-skill">
+        <span class="trust-skill-name">${a.name}</span>
+        <div class="trust-skill-bar"><div class="trust-skill-fill" style="width:${a.score}%;background:${barColor(a.score)}"></div></div>
+        <span class="trust-skill-score">${a.score}</span>
+      </div>
+    `).join('')}
+  `;
+}
+
+// ══════════════════════════════════════════════════════════════
+// EXECUTIVE BOARD
+// ══════════════════════════════════════════════════════════════
+function showExecutive() {
+  currentView = 'executive';
+  currentStage = null;
+  document.querySelectorAll('.pipe-stage').forEach(s => s.classList.remove('active'));
+  document.getElementById('stageView').classList.remove('open');
+  document.getElementById('pipelineView').style.display = 'none';
+  document.getElementById('operationsView').style.display = 'flex';
+  document.getElementById('topicTitle').textContent = 'Executive Board';
+  document.getElementById('topicSub').textContent = 'Gemeinde Glashütte — Digitalisierungsstrategie';
+  renderOperationsView();
+}
+
+let execTab = 'buergermeister';
+
+function renderOperationsView() {
+  const view = document.getElementById('operationsView');
+
+  view.innerHTML = `
+    <div style="max-width:900px;margin:0 auto;width:100%">
+
+      <!-- Header -->
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px">
+        <div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:4px">AINARY · GEMEINDE GLASHÜTTE</div>
+          <h2 style="font-size:20px;font-weight:700;letter-spacing:-0.3px">Executive Board</h2>
         </div>
-        <div class="goal-status behind">BEHIND</div>
+        <div style="text-align:right;font-size:10px;color:var(--text-dim)">FEBRUAR 2026</div>
       </div>
-      <div class="goal">
-        <div class="goal-info">
-          <div class="goal-name">Digitale Terminbuchung</div>
-          <div class="goal-progress">0 von 1 eingeführt</div>
+
+      <div style="border-bottom:2px solid var(--border);margin-bottom:24px"></div>
+
+      <!-- KPIs -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-bottom:32px">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:20px;text-align:center">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:12px">OZG-Umsetzung</div>
+          <div style="font-size:36px;font-weight:700;color:#c47070;line-height:1;margin-bottom:12px">3/58</div>
+          <div style="height:3px;background:var(--surface-2);border-radius:2px;overflow:hidden;margin-bottom:8px">
+            <div style="height:100%;width:5%;background:#c47070;border-radius:2px"></div>
+          </div>
+          <div style="font-size:10px;color:var(--text-dim)">Ziel: 20/58 (34%)</div>
         </div>
-        <div class="goal-status at-risk">AT RISK</div>
-      </div>
-      <div class="goal">
-        <div class="goal-info">
-          <div class="goal-name">Bearbeitungszeit senken</div>
-          <div class="goal-progress">12 min / Ziel 4 min</div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:20px;text-align:center">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:12px">Online-Services</div>
+          <div style="font-size:36px;font-weight:700;color:#c47070;line-height:1;margin-bottom:12px">1</div>
+          <div style="height:3px;background:var(--surface-2);border-radius:2px;overflow:hidden;margin-bottom:8px">
+            <div style="height:100%;width:10%;background:#c47070;border-radius:2px"></div>
+          </div>
+          <div style="font-size:10px;color:var(--text-dim)">Ziel: 10</div>
         </div>
-        <div class="goal-status behind">BEHIND</div>
-      </div>
-      <div class="goal">
-        <div class="goal-info">
-          <div class="goal-name">Pilotphase abschließen</div>
-          <div class="goal-progress">0% — gerade gestartet</div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:20px;text-align:center">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:12px">Bearbeitungszeit</div>
+          <div style="font-size:36px;font-weight:700;color:#d4a853;line-height:1;margin-bottom:12px">ø12m</div>
+          <div style="height:3px;background:var(--surface-2);border-radius:2px;overflow:hidden;margin-bottom:8px">
+            <div style="height:100%;width:42%;background:#d4a853;border-radius:2px"></div>
+          </div>
+          <div style="font-size:10px;color:var(--text-dim)">Ziel: ø5 min</div>
         </div>
-        <div class="goal-status on-track">ON TRACK</div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:20px;text-align:center">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:12px">Bürgerzufriedenheit</div>
+          <div style="font-size:36px;font-weight:700;color:var(--text-dim);line-height:1;margin-bottom:12px">—</div>
+          <div style="height:3px;background:var(--surface-2);border-radius:2px;overflow:hidden;margin-bottom:8px">
+            <div style="height:100%;width:0%;background:var(--text-dim);border-radius:2px"></div>
+          </div>
+          <div style="font-size:10px;color:var(--text-dim)">Nicht erhoben · Ziel: >80%</div>
+        </div>
+      </div>
+
+      <!-- Monthly Goals -->
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:12px">FEBRUAR ZIELE</div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:32px">
+        ${[
+          {name:'Online-Terminbuchung', status:'Geplant', pct:0, color:'#c47070'},
+          {name:'AI Bürger-Auskunft', status:'Geplant', pct:0, color:'#c47070'},
+          {name:'10 digitale Formulare', status:'Geplant', pct:0, color:'#c47070'},
+          {name:'OZG Prozessautom.', status:'Phase 2', pct:0, color:'var(--text-dim)'}
+        ].map(g => `
+          <div style="display:grid;grid-template-columns:1fr 100px 80px;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:12px">
+            <div>${g.name}</div>
+            <div style="font-size:9px;font-weight:600;padding:2px 8px;border-radius:3px;background:${g.color}20;color:${g.color};text-align:center">${g.status}</div>
+            <div style="height:3px;background:var(--surface-2);border-radius:2px;overflow:hidden">
+              <div style="height:100%;width:${g.pct}%;background:${g.color};border-radius:2px"></div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+
+      <!-- Executive Tabs -->
+      <div class="exec-tabs">
+        <div class="exec-tab active" onclick="switchExecTab('buergermeister')">Bürgermeister</div>
+        <div class="exec-tab" onclick="switchExecTab('team')">Agents & Tasks</div>
+      </div>
+
+      <!-- Bürgermeister Tab -->
+      <div id="execBM">
+
+        <!-- Stadtrat -->
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:12px">STADTRAT</div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin-bottom:24px">
+          <div class="sr-bar">
+            <div class="sr-seg" style="width:${5/18*100}%;background:#c47070" title="AfD: 5"></div>
+            <div class="sr-seg" style="width:${4/18*100}%;background:#333" title="CDU: 4"></div>
+            <div class="sr-seg" style="width:${8/18*100}%;background:var(--warm)" title="WVs: 8"></div>
+            <div class="sr-seg" style="width:${1/18*100}%;background:#4aa088" title="Grüne: 1"></div>
+          </div>
+          <div style="display:flex;gap:16px;font-size:11px;color:var(--text-muted);flex-wrap:wrap">
+            <span><span style="color:#c47070">●</span> AfD: 5</span>
+            <span><span style="color:#555">●</span> CDU: 4</span>
+            <span><span style="color:var(--warm)">●</span> WVs: 8</span>
+            <span><span style="color:#4aa088">●</span> Grüne: 1</span>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:#4aa088;font-weight:600">Mehrheit ohne AfD: CDU(4) + WVs(8) + Grüne(1) = 13/18 ✓</div>
+        </div>
+
+        <!-- Herausforderer -->
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:12px">HERAUSFORDERER</div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 20px;margin-bottom:24px">
+          ${GEGNER.map(g => `
+            <div class="gegner-item">
+              <div class="gegner-dot" style="background:${g.color}"></div>
+              <span style="font-weight:600">${g.name}</span>
+              <span style="color:var(--text-dim)">${g.partei}</span>
+              <span style="margin-left:auto;font-size:9px;padding:2px 8px;border-radius:3px;background:${g.color}20;color:${g.color};font-weight:600">${g.level}</span>
+            </div>
+          `).join('')}
+        </div>
+
+        <!-- Ortsteile -->
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:12px">16 ORTSTEILE — STIMMUNGSMONITOR</div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:32px">
+          <div class="ot-grid">
+            ${ORTSTEILE.map(o => `
+              <div class="ot-card">
+                <div class="ot-name">${o.name}</div>
+                <div class="ot-mood ot-${o.color}">${o.mood}</div>
+              </div>
+            `).join('')}
+          </div>
+          <div style="margin-top:12px;display:flex;gap:16px;font-size:9px;color:var(--text-dim)">
+            <span><span style="color:#4aa088">●</span> Positiv/Stabil</span>
+            <span><span style="color:var(--warm)">●</span> Beobachten</span>
+          </div>
+        </div>
+
+        <!-- Sentiment -->
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:12px">BÜRGERSTIMMUNG</div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin-bottom:32px">
+          <div style="display:flex;gap:4px;height:24px;border-radius:4px;overflow:hidden;margin-bottom:8px">
+            <div style="width:62%;background:#4aa088;border-radius:3px"></div>
+            <div style="width:23%;background:var(--text-dim);border-radius:3px"></div>
+            <div style="width:15%;background:#c47070;border-radius:3px"></div>
+          </div>
+          <div style="display:flex;gap:16px;font-size:11px;color:var(--text-muted)">
+            <span><span style="color:#4aa088">●</span> 62% positiv</span>
+            <span><span style="color:var(--text-dim)">●</span> 23% neutral</span>
+            <span><span style="color:#c47070">●</span> 15% negativ</span>
+          </div>
+          <div style="margin-top:8px;font-size:10px;color:var(--text-dim)">Quelle: KI-Sentiment-Analyse (Facebook, Amtsblatt, Presse)</div>
+        </div>
+
+      </div>
+
+      <!-- Team Tab -->
+      <div id="execTeam" style="display:none">
+
+        <!-- Running Tasks -->
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:12px">LAUFENDE AUFGABEN</div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:32px">
+          ${RUNNING_TASKS.map(t => {
+            const agentColor = AGENT_COLORS[t.agent] || '#8e8e8e';
+            const statusClass = t.status === 'aktiv' ? 'running-active' : 'running-ready';
+            return `
+            <div class="running-item">
+              <div class="running-status ${statusClass}"></div>
+              <span style="color:${agentColor};font-weight:600;width:90px">${t.agent}</span>
+              <span style="flex:1">${t.task}</span>
+              <span style="color:var(--text-dim);font-size:10px">${t.freq}</span>
+            </div>`;
+          }).join('')}
+        </div>
+
+        <!-- Team Performance -->
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:12px">TEAM</div>
+        <div style="border-top:2px solid var(--border);margin-bottom:8px"></div>
+        <div style="margin-bottom:32px">
+          ${AGENTS.sort((a,b) => b.score - a.score).map(agent => {
+            const barColor = agent.score >= 60 ? '#4aa088' : agent.score >= 30 ? '#d4a853' : '#c47070';
+            return `
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+              <div style="width:100px;font-size:11px;font-weight:600;color:${AGENT_COLORS[agent.name]||'#8e8e8e'}">${agent.name}</div>
+              <div style="flex:1;font-size:10px;color:var(--text-dim)">${agent.role}</div>
+              <div style="width:40px;font-size:11px;font-weight:600;text-align:right">${agent.score}</div>
+              <div style="width:150px;height:3px;background:var(--surface-2);border-radius:2px;overflow:hidden">
+                <div style="height:100%;width:${agent.score}%;background:${barColor};border-radius:2px"></div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+
+        <!-- Activity Feed -->
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--text-dim);margin-bottom:12px">AKTIVITÄTEN</div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:32px">
+          ${ACTIVITY.map(a => `
+            <div class="feed-item">
+              <div class="feed-agent" style="color:${AGENT_COLORS[a.agent]||'#8e8e8e'}">${a.agent}</div>
+              <div class="feed-action">${a.action}</div>
+              <div class="feed-time">${a.time}</div>
+            </div>
+          `).join('')}
+        </div>
+
+      </div>
+
+    </div>
+  `;
+}
+
+function switchExecTab(tab) {
+  execTab = tab;
+  document.querySelectorAll('.exec-tab').forEach(t => t.classList.remove('active'));
+  const tabs = document.querySelectorAll('.exec-tab');
+  if (tab === 'buergermeister') tabs[0].classList.add('active');
+  else tabs[1].classList.add('active');
+  document.getElementById('execBM').style.display = tab === 'buergermeister' ? 'block' : 'none';
+  document.getElementById('execTeam').style.display = tab === 'team' ? 'block' : 'none';
+}
+
+// ══════════════════════════════════════════════════════════════
+// STAGE VIEW
+// ══════════════════════════════════════════════════════════════
+function showStage(stageKey) {
+  currentView = 'stage';
+  currentStage = stageKey;
+  document.querySelectorAll('.pipe-stage').forEach(s => s.classList.remove('active'));
+  const stageEl = document.getElementById('stage-' + stageKey);
+  if (stageEl) stageEl.classList.add('active');
+
+  document.getElementById('operationsView').style.display = 'none';
+  document.getElementById('pipelineView').style.display = 'none';
+  document.getElementById('stageView').classList.add('open');
+
+  const config = STAGES.find(s => s.key === stageKey);
+  const findings = FINDINGS[stageKey] || [];
+  const totalCount = findings.length;
+  const avgConf = totalCount > 0 ? Math.round(findings.reduce((s,f) => s + f.confidence, 0) / totalCount * 100) : 0;
+
+  document.getElementById('topicTitle').textContent = config.name + ' Stage';
+  document.getElementById('topicSub').textContent = `${totalCount} Findings · Ø ${avgConf}% Konfidenz`;
+
+  const stageView = document.getElementById('stageView');
+
+  let html = `<div class="stage-header">
+    <div class="stage-header-top">
+      <div class="stage-title">
+        <div class="stage-icon" style="border-color:${config.color};color:${config.color}">${config.icon}</div>
+        <span>${config.name}</span>
+      </div>
+      <div class="stage-metrics">
+        <div class="stage-metric">
+          <div class="stage-metric-val" style="color:${config.color}">${totalCount}</div>
+          <div class="stage-metric-label">Findings</div>
+        </div>
+        <div class="stage-metric">
+          <div class="stage-metric-val">${avgConf}%</div>
+          <div class="stage-metric-label">Ø Konfidenz</div>
+        </div>
       </div>
     </div>
   </div>
+  <div class="stage-findings">`;
 
-  <!-- Findings -->
-  <div class="section">
-    <div class="section-title">Findings Pipeline</div>
+  findings.forEach(f => {
+    const confPct = Math.round(f.confidence * 100);
+    const confColor = confPct >= 70 ? '#4aa088' : confPct >= 30 ? 'var(--warm)' : 'var(--danger)';
+    html += `<div class="stage-finding-card" onclick="this.classList.toggle('expanded')">
+      <div class="stage-finding-header">
+        <div class="stage-finding-left">
+          <div class="stage-finding-id">#${f.id}</div>
+          <div class="stage-finding-claim">${esc(f.claim)}</div>
+          ${f.so_what ? `<div style="font-size:10px;color:var(--text-muted);margin-top:2px">→ ${esc(f.so_what)}</div>` : ''}
+          <div class="stage-finding-meta">
+            ${f.source ? `<span style="font-size:9px;color:var(--text-dim)">${esc(f.source)}</span>` : ''}
+          </div>
+        </div>
+        <div class="stage-finding-right">
+          <div class="stage-conf-bar">
+            <div class="stage-conf-fill" style="width:${confPct}%;background:${confColor}"></div>
+          </div>
+          <span style="font-size:10px;font-weight:600;color:${confColor}">${confPct}%</span>
+          <span class="evidence-badge evidence-${f.evidence}">${f.evidence}</span>
+          <span class="impact-badge impact-${f.impact}">${f.impact}</span>
+        </div>
+      </div>
+      <div class="stage-finding-detail">
+        <div><strong>Claim:</strong> ${esc(f.claim)}</div>
+        ${f.source ? `<div style="margin-top:6px"><strong>Quelle:</strong> ${esc(f.source)}</div>` : ''}
+        ${f.so_what ? `<div style="margin-top:6px"><strong>Bedeutung:</strong> ${esc(f.so_what)}</div>` : ''}
+        <div style="margin-top:6px"><strong>Evidenz:</strong> ${f.evidence} · <strong>Impact:</strong> ${f.impact} · <strong>Konfidenz:</strong> ${confPct}%</div>
+      </div>
+    </div>`;
+  });
 
-    <div class="findings-group">
-      <div class="findings-group-title">Analyse — 3 Findings</div>
-      <div class="finding">
-        <div class="finding-badge badge-I">I</div>
-        <div class="finding-text">OZG-Umsetzung Sachsen unter 30% — strukturelles Problem, nicht technisches<br><span class="finding-conf">82% Confidence · Inference</span></div>
-      </div>
-      <div class="finding">
-        <div class="finding-badge badge-J">J</div>
-        <div class="finding-text">Dippoldiswalde bietet Online-Terminbuchung, Glashütte nicht<br><span class="finding-conf">90% Confidence · Judgement</span></div>
-      </div>
-      <div class="finding">
-        <div class="finding-badge badge-E">E</div>
-        <div class="finding-text">Bürger erwarten digitale Services — 73% bevorzugen Online<br><span class="finding-conf">78% Confidence · Evidence</span></div>
-      </div>
+  html += '</div>';
+  stageView.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════════
+// TOPIC SELECT
+// ══════════════════════════════════════════════════════════════
+function selectTopic(topicId) {
+  currentTopic = topicId;
+  const topic = TOPICS.find(t => t.id === topicId);
+  if (!topic) return;
+  // Show the stage that contains this topic
+  showStage(topic.stage);
+  renderFolderTree();
+}
+
+// ══════════════════════════════════════════════════════════════
+// PIPELINE VIEW
+// ══════════════════════════════════════════════════════════════
+function showPipeline() {
+  currentView = 'pipeline';
+  document.querySelectorAll('.pipe-stage').forEach(s => s.classList.remove('active'));
+  document.getElementById('operationsView').style.display = 'none';
+  document.getElementById('stageView').classList.remove('open');
+  document.getElementById('pipelineView').style.display = 'flex';
+  document.getElementById('pipelineView').style.flexDirection = 'column';
+  document.getElementById('topicTitle').textContent = 'Pipeline Overview';
+  document.getElementById('topicSub').textContent = 'Analyse → Umsetzung → Kommunikation → Ergebnis';
+  renderPipelineView();
+}
+
+function renderPipelineView() {
+  const pv = document.getElementById('pipelineView');
+  const totalFindings = Object.values(FINDINGS).reduce((s,arr) => s + arr.length, 0);
+
+  let html = `<div class="pv-header">
+    <div>
+      <h2>Pipeline Overview</h2>
+      <div style="font-size:10px;color:var(--text-dim);margin-top:2px">Analyse → Umsetzung → Kommunikation → Ergebnis</div>
     </div>
-
-    <div class="findings-group">
-      <div class="findings-group-title">Lösung — 2 Findings</div>
-      <div class="finding">
-        <div class="finding-badge badge-I">I</div>
-        <div class="finding-text">Browser-basierte AI Agents können Standard-Formulare automatisch ausfüllen<br><span class="finding-conf">75% Confidence · Inference</span></div>
-      </div>
-      <div class="finding">
-        <div class="finding-badge badge-A">A</div>
-        <div class="finding-text">Gestaffelter Pilot in 3 Phasen reduziert Risiko auf 6.000 EUR pro Phase<br><span class="finding-conf">70% Confidence · Assumption</span></div>
-      </div>
-    </div>
-
-    <div class="findings-group">
-      <div class="findings-group-title">Pilot — 1 Finding</div>
-      <div class="finding">
-        <div class="finding-badge badge-A">A</div>
-        <div class="finding-text">Phase 1: Online-Terminbuchung + 3 OZG-Formulare — 8 Wochen, 6.000 EUR<br><span class="finding-conf">65% Confidence · Assumption</span></div>
-      </div>
-    </div>
+    <div style="font-size:11px;color:var(--text-muted)">${totalFindings} Findings · ${TOPICS.length} Topics</div>
   </div>
+  <div class="pv">`;
 
-  <!-- Impact -->
-  <div class="section">
-    <div class="impact-box">
-      <div class="impact-title">Erwarteter Impact</div>
-      <div class="impact-line">bei erfolgreicher Umsetzung</div>
-      <div class="impact-row">
-        <div class="impact-label">Zeitersparnis</div>
-        <div class="impact-value">~320h/Jahr</div>
-        <div class="impact-detail">Bearbeitungszeit 12 → 4 min x ~2.400 Vorgänge</div>
+  STAGES.forEach((s, i) => {
+    const findings = FINDINGS[s.key] || [];
+    const topics = TOPICS.filter(t => t.stage === s.key);
+
+    if (i > 0) {
+      html += `<div class="pv-flow"><div class="pv-flow-arrow">→</div></div>`;
+    }
+
+    html += `<div class="pv-col">
+      <div class="pv-col-header" style="border-color:${s.color}30">
+        <div class="pv-col-title" style="color:${s.color}">${s.name}</div>
+        <div class="pv-col-stats">${findings.length} findings<br>${topics.length} topics</div>
       </div>
-      <div class="impact-row">
-        <div class="impact-label">Kostenersparnis</div>
-        <div class="impact-value">~18.000 EUR/Jahr</div>
-        <div class="impact-detail">Personalkosten bei Ø 55 EUR/h</div>
-      </div>
-      <div class="impact-row">
-        <div class="impact-label">Bürger-Zugang</div>
-        <div class="impact-value">24/7</div>
-        <div class="impact-detail">statt Mo-Fr 9-12, Di 14-18</div>
-      </div>
-      <div class="impact-note">Hinweis: Schätzungen basierend auf Vergleichsgemeinden. Tatsächliche Ergebnisse können abweichen.</div>
+      <div class="pv-col-body">`;
+
+    topics.forEach(t => {
+      html += `<div class="pv-card" onclick="selectTopic('${t.id}')">
+        <div class="pv-card-name">${t.name}</div>
+        <div class="pv-card-meta"><span>${t.findingCount} findings</span></div>
+      </div>`;
+    });
+
+    html += '</div></div>';
+  });
+
+  html += '</div>';
+  pv.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════════
+// CONTEXT PANEL
+// ══════════════════════════════════════════════════════════════
+function toggleCtx() {
+  document.getElementById('ctxPanel').classList.toggle('open');
+  document.getElementById('ctxBtn').classList.toggle('on');
+}
+
+function renderGlobalContext() {
+  const el = document.getElementById('ctxInner');
+  let html = '';
+
+  html += `<div class="ctx-sec"><div class="ctx-sec-title" style="color:var(--warm)">Gemeinde Glashütte</div>
+    <div style="font-size:11px;color:var(--text-muted);line-height:1.7">
+      <div>6.601 Einwohner · 16 Ortsteile</div>
+      <div>95,56 km² · Landkreis Sächsische Schweiz-Osterzgebirge</div>
+      <div style="margin-top:6px">Investitionsvolumen 2026: ~10 Mio. €</div>
+      <div>Kreditaufnahme: 2,3 Mio. €</div>
+      <div style="margin-top:6px;color:var(--warm)">Budget Digitalisierung: 25.000 €</div>
     </div>
-  </div>
+  </div>`;
 
-  <!-- Next Steps -->
-  <div class="section">
-    <div class="section-title">Nächste Schritte</div>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">01</div>
-        <div class="step-text">Fördermittel-Antrag stellen <span class="step-meta">— EFRE Sachsen, bis 60% Förderquote</span></div>
-      </div>
-      <div class="step">
-        <div class="step-num">02</div>
-        <div class="step-text">Phase 1 starten: Online-Terminbuchung <span class="step-meta">— 8 Wochen, 6.000 EUR</span></div>
-      </div>
-      <div class="step">
-        <div class="step-num">03</div>
-        <div class="step-text">Ergebnisse messen und Phase 2 evaluieren <span class="step-meta">— Go/No-Go Entscheidung</span></div>
+  html += `<div class="ctx-sec"><div class="ctx-sec-title">Einspar-Potenzial</div>
+    <div style="font-size:11px;color:var(--text-muted);line-height:1.8">
+      <div>Tages-Briefing: <strong style="color:var(--text)">8h/Wo</strong></div>
+      <div>Bürgeranfragen: <strong style="color:var(--text)">5h/Wo</strong></div>
+      <div>Sitzungsprotokolle: <strong style="color:var(--text)">4h/Sitzung</strong></div>
+      <div>Amtsblatt & Presse: <strong style="color:var(--text)">3h/Wo</strong></div>
+      <div>Wissensbasis: <strong style="color:var(--text)">3h/Wo</strong></div>
+      <div>Fördermittel-Scanner: <strong style="color:var(--warm)">50.000€/Jahr</strong></div>
+    </div>
+  </div>`;
+
+  html += `<div class="ctx-sec"><div class="ctx-sec-title">Fördermittel</div>
+    <div style="font-size:11px;color:var(--text-muted);line-height:1.8">
+      <div>EFRE Transformation I: <strong style="color:#4aa088">bis 30.000€</strong></div>
+      <div>EFRE Heranführung: <strong style="color:#4aa088">bis 6.000€</strong></div>
+      <div>go-digital: <strong style="color:#4aa088">bis 16.500€</strong></div>
+      <div>OZG Freistaat: <strong style="color:#4aa088">Vollfinanzierung</strong></div>
+    </div>
+  </div>`;
+
+  html += `<div class="ctx-sec"><div class="ctx-sec-title" style="color:var(--warm)">Quick Stats</div>
+    <div style="font-size:10px;color:var(--text-dim);line-height:1.8">
+      <div>Findings: ${Object.values(FINDINGS).reduce((s,a)=>s+a.length,0)}</div>
+      <div>Topics: ${TOPICS.length}</div>
+      <div>Aktive Tasks: ${RUNNING_TASKS.filter(t=>t.status==='aktiv').length}</div>
+      <div>Bereite Tasks: ${RUNNING_TASKS.filter(t=>t.status==='bereit').length}</div>
+    </div>
+  </div>`;
+
+  el.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════════
+// COMMAND PALETTE
+// ══════════════════════════════════════════════════════════════
+let cmdActiveIdx = 0;
+let cmdFiltered = [];
+
+function openCmd() {
+  document.getElementById('cmdOverlay').classList.add('open');
+  document.getElementById('cmdInput').value = '';
+  document.getElementById('cmdInput').focus();
+  cmdActiveIdx = 0;
+  filterCmd('');
+}
+
+function closeCmd() {
+  document.getElementById('cmdOverlay').classList.remove('open');
+}
+
+function filterCmd(query) {
+  const q = query.toLowerCase();
+  const items = [];
+
+  // Topics
+  TOPICS.forEach(t => {
+    items.push({title: t.name, sub: t.stage, icon: '◉', action: () => { selectTopic(t.id); closeCmd(); }});
+  });
+
+  // Stages
+  STAGES.forEach(s => {
+    items.push({title: s.name + ' Stage', sub: (FINDINGS[s.key]||[]).length + ' findings', icon: s.icon, action: () => { showStage(s.key); closeCmd(); }});
+  });
+
+  // Views
+  items.push({title: 'Executive Board', sub: 'Übersicht', icon: 'E', action: () => { showExecutive(); closeCmd(); }});
+  items.push({title: 'Pipeline Overview', sub: 'Cmd+P', icon: '◈', action: () => { showPipeline(); closeCmd(); }});
+
+  cmdFiltered = q ? items.filter(i => i.title.toLowerCase().includes(q) || (i.sub||'').toLowerCase().includes(q)) : items;
+  cmdActiveIdx = 0;
+
+  const el = document.getElementById('cmdResults');
+  el.innerHTML = cmdFiltered.slice(0, 12).map((item, i) => `
+    <div class="cmd-item ${i===0?'active':''}" data-idx="${i}" onclick="cmdFiltered[${i}].action()" onmouseenter="cmdSetActive(${i})">
+      <div class="cmd-item-icon">${item.icon}</div>
+      <div class="cmd-item-text">
+        <div class="cmd-item-title">${item.title}</div>
+        ${item.sub ? `<div class="cmd-item-sub">${item.sub}</div>` : ''}
       </div>
     </div>
-  </div>
+  `).join('') || '<div style="padding:20px;text-align:center;font-size:11px;color:var(--text-dim)">Keine Ergebnisse</div>';
+}
 
-</div>
+function cmdSetActive(idx) {
+  cmdActiveIdx = idx;
+  document.querySelectorAll('.cmd-item').forEach((el, i) => el.classList.toggle('active', i === idx));
+}
 
-<div class="footer">
-  <div class="footer-brand">Ainary Ventures · AI Intelligence Tools for Strategic Decisions</div>
-  <div>Vertraulich · Erstellt am 19.02.2026</div>
-</div>
+// ══════════════════════════════════════════════════════════════
+// KEYBOARD SHORTCUTS
+// ══════════════════════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  const cmdOpen = document.getElementById('cmdOverlay').classList.contains('open');
 
+  if (e.key === 'Escape') {
+    if (cmdOpen) { closeCmd(); e.preventDefault(); return; }
+    if (currentView !== 'executive') { showExecutive(); return; }
+    return;
+  }
+
+  if (cmdOpen) {
+    if (e.key === 'ArrowDown') { e.preventDefault(); cmdActiveIdx = Math.min(cmdActiveIdx+1, cmdFiltered.length-1); cmdSetActive(cmdActiveIdx); return; }
+    if (e.key === 'ArrowUp') { e.preventDefault(); cmdActiveIdx = Math.max(cmdActiveIdx-1, 0); cmdSetActive(cmdActiveIdx); return; }
+    if (e.key === 'Enter') { e.preventDefault(); if(cmdFiltered[cmdActiveIdx]) cmdFiltered[cmdActiveIdx].action(); return; }
+    return;
+  }
+
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); openCmd(); return; }
+  if ((e.metaKey || e.ctrlKey) && e.key === 'p') { e.preventDefault(); showPipeline(); return; }
+  if ((e.metaKey || e.ctrlKey) && e.key === 'o') { e.preventDefault(); showExecutive(); return; }
+  if ((e.metaKey || e.ctrlKey) && e.key === '.') { e.preventDefault(); toggleCtx(); return; }
+});
+
+// ══════════════════════════════════════════════════════════════
+// START
+// ══════════════════════════════════════════════════════════════
+init();
+</script>
 </body>
 </html>

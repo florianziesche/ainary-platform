@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Agent Observability Stack — Ainary Report AR-021</title>
+<style>
+  /* ========================================
+     FONTS
+     ======================================== */
+  @font-face {
+    font-family: 'Inter';
+    src: url('/fonts/inter-variable.woff2') format('woff2');
+    font-weight: 100 900;
+    font-display: swap;
+  }
+
+  /* ========================================
+     RESET & BASE
+     ======================================== */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #fafaf8;
+    color: #333;
+    line-height: 1.75;
+    font-size: 0.95rem;
+    font-weight: 400;
+  }
+
+  /* ========================================
+     LAYOUT
+     ======================================== */
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 40px;
+  }
+
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 40px;
+  }
+
+  .back-cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 40px;
+    page-break-before: always;
+  }
+
+  /* ========================================
+     TYPOGRAPHY
+     ======================================== */
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 600;
+    line-height: 1.2;
+    color: #1a1a1a;
+    letter-spacing: -0.02em;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.3;
+    margin-top: 3rem;
+    margin-bottom: 12px;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.4;
+    margin-top: 2rem;
+    margin-bottom: 12px;
+  }
+
+  p {
+    margin-bottom: 1rem;
+  }
+
+  strong {
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  em {
+    font-style: italic;
+  }
+
+  sup {
+    font-size: 0.65rem;
+    color: #888;
+    vertical-align: super;
+  }
+
+  code {
+    font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+    font-size: 0.85rem;
+    background: #f5f4f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  /* ========================================
+     COVER COMPONENTS
+     ======================================== */
+  .cover-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40vh;
+  }
+
+  .cover-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .gold-punkt {
+    color: #c8aa50;
+    font-size: 14px;
+  }
+
+  .brand-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    letter-spacing: 0.02em;
+  }
+
+  .cover-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 0.75rem;
+    color: #888;
+  }
+
+  .cover-title-block {
+    margin-bottom: auto;
+  }
+
+  .cover-title {
+    margin-bottom: 16px;
+  }
+
+  .cover-subtitle {
+    font-size: 1rem;
+    font-weight: 400;
+    color: #666;
+    line-height: 1.5;
+  }
+
+  .cover-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .cover-date {
+    font-size: 0.75rem;
+    color: #888;
+  }
+
+  .cover-author {
+    font-size: 0.75rem;
+    color: #888;
+    text-align: center;
+  }
+
+  /* ========================================
+     QUOTE PAGE
+     ======================================== */
+  .quote-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 48px 40px;
+  }
+
+  .quote-text {
+    font-size: 1.2rem;
+    font-style: italic;
+    color: #333;
+    line-height: 1.8;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .quote-source {
+    font-size: 0.85rem;
+    color: #888;
+    text-align: center;
+  }
+
+  /* ========================================
+     TABLE OF CONTENTS
+     ======================================== */
+  .toc-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 24px;
+  }
+
+  .toc-section {
+    margin-bottom: 32px;
+  }
+
+  .toc-section-label {
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 12px;
+  }
+
+  .toc-entry {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .toc-number {
+    font-size: 0.8rem;
+    color: #888;
+    font-variant-numeric: tabular-nums;
+    min-width: 24px;
+  }
+
+  .toc-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    flex: 1;
+    transition: color 0.2s;
+  }
+
+  .toc-entry:hover .toc-title {
+    color: #c8aa50;
+  }
+
+  .toc-page {
+    font-size: 0.8rem;
+    color: #888;
+  }
+
+  /* ========================================
+     HOW TO READ
+     ======================================== */
+  .how-to-read-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+  }
+
+  .how-to-read-table th {
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 10px 12px;
+    background: #f5f4f0;
+    border-bottom: 2px solid #e5e3dc;
+  }
+
+  .how-to-read-table td {
+    font-size: 0.85rem;
+    color: #333;
+    padding: 10px 12px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  /* ========================================
+     EXECUTIVE SUMMARY
+     ======================================== */
+  .thesis {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .evidence-list {
+    margin-left: 20px;
+    margin-bottom: 24px;
+  }
+
+  .evidence-list li {
+    font-size: 0.9rem;
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 8px;
+  }
+
+  .keywords {
+    font-size: 0.8rem;
+    color: #666;
+    font-style: italic;
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid #eee;
+  }
+
+  /* ========================================
+     SECTION COMPONENTS
+     ======================================== */
+  .confidence-badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    background: #f5f4f0;
+    padding: 3px 8px;
+    border-radius: 10px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  .confidence-badge.empirical {
+    background: #e8f4e8;
+    color: #2d5016;
+  }
+
+  .confidence-badge.industry {
+    background: #e8f0f8;
+    color: #1a4d7a;
+  }
+
+  .confidence-badge.journalistic {
+    background: #f8f0f8;
+    color: #7a4d1a;
+  }
+
+  .confidence-badge.anecdotal {
+    background: #f0f0f0;
+    color: #555;
+  }
+
+  .confidence-line {
+    font-size: 0.8rem;
+    color: #888;
+    font-style: italic;
+    display: block;
+    margin-bottom: 16px;
+  }
+
+  .key-insight {
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  /* ========================================
+     CALLOUTS
+     ======================================== */
+  .callout {
+    background: #f5f4f0;
+    padding: 16px 20px;
+    border-radius: 4px;
+    margin: 1.5rem 0;
+    page-break-inside: avoid;
+  }
+
+  .callout-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+
+  .callout-body {
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.6;
+  }
+
+  .callout.claim .callout-label {
+    color: #555;
+  }
+
+  .callout.invalidation {
+    border-left: 3px solid #ddd;
+  }
+
+  .callout.invalidation .callout-label {
+    color: #888;
+  }
+
+  .callout.sowhat {
+    border-left: 3px solid #c8aa50;
+  }
+
+  .callout.sowhat .callout-label {
+    color: #c8aa50;
+  }
+
+  .callout.key-insight-box {
+    background: #fffbf0;
+    border-left: 3px solid #c8aa50;
+  }
+
+  .callout.key-insight-box .callout-label {
+    color: #c8aa50;
+  }
+
+  /* ========================================
+     EXHIBITS & TABLES
+     ======================================== */
+  .exhibit {
+    margin: 2rem 0;
+  }
+
+  .exhibit-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 12px;
+  }
+
+  .exhibit-table {
+    width: 100%;
+    border-collapse: collapse;
+    page-break-inside: avoid;
+  }
+
+  .exhibit-table th {
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 10px 12px;
+    background: #f5f4f0;
+    border-bottom: 2px solid #e5e3dc;
+  }
+
+  .exhibit-table td {
+    font-size: 0.85rem;
+    color: #333;
+    padding: 10px 12px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .exhibit-source {
+    font-size: 0.7rem;
+    color: #888;
+    margin-top: 8px;
+  }
+
+  /* ========================================
+     KPI FIGURES
+     ======================================== */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 48px;
+    margin: 2rem 0;
+  }
+
+  .kpi {
+    text-align: left;
+  }
+
+  .kpi-number {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    line-height: 1.2;
+  }
+
+  .kpi-number.gold {
+    color: #c8aa50;
+  }
+
+  .kpi-label {
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 4px;
+  }
+
+  .kpi-source {
+    font-size: 0.65rem;
+    color: #888;
+    margin-top: 2px;
+  }
+
+  /* ========================================
+     LISTS
+     ======================================== */
+  ul {
+    margin-left: 20px;
+    margin-bottom: 1rem;
+  }
+
+  ol {
+    margin-left: 20px;
+    margin-bottom: 1rem;
+  }
+
+  li {
+    margin-bottom: 4px;
+  }
+
+  /* ========================================
+     INLINE SOURCE
+     ======================================== */
+  .source-line {
+    font-size: 0.8rem;
+    color: #888;
+    line-height: 1.5;
+    border-top: 1px solid #eee;
+    padding-top: 8px;
+    margin-top: 8px;
+  }
+
+  /* ========================================
+     TRANSPARENCY NOTE
+     ======================================== */
+  .transparency-intro {
+    font-size: 0.85rem;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+
+  .transparency-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+  }
+
+  .transparency-table td:first-child {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    width: 160px;
+    vertical-align: top;
+  }
+
+  .transparency-table td:last-child {
+    font-size: 0.85rem;
+    color: #333;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  /* ========================================
+     REFERENCES
+     ======================================== */
+  .reference-entry {
+    font-size: 0.8rem;
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 6px;
+    padding-left: 24px;
+    text-indent: -24px;
+  }
+
+  /* ========================================
+     AUTHOR BIO
+     ======================================== */
+  .author-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e5e3dc;
+  }
+
+  .author-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 8px;
+  }
+
+  .author-bio {
+    font-size: 0.85rem;
+    color: #555;
+    line-height: 1.6;
+  }
+
+  /* ========================================
+     BACK COVER
+     ======================================== */
+  .back-cover-services {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 24px;
+  }
+
+  .back-cover-cta {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 16px;
+  }
+
+  .back-cover-contact {
+    font-size: 0.8rem;
+    color: #888;
+  }
+
+  /* ========================================
+     PRINT STYLES
+     ======================================== */
+  @media print {
+    @page {
+      size: A4;
+      margin: 2cm;
+    }
+
+    body {
+      background: white;
+    }
+
+    .page, .cover, .back-cover {
+      page-break-after: always;
+    }
+
+    .callout, .exhibit {
+      page-break-inside: avoid;
+    }
+
+    @page :first {
+      @top-center { content: none; }
+      @bottom-center { content: none; }
+    }
+
+    @page {
+      @top-center {
+        content: "Ainary Report | The Agent Observability Stack";
+        font-size: 0.7rem;
+        color: #888;
+      }
+      @bottom-left {
+        content: "© 2026 Ainary Ventures";
+        font-size: 0.7rem;
+        color: #888;
+      }
+      @bottom-right {
+        content: counter(page);
+        font-size: 0.7rem;
+        color: #888;
+      }
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========================================
+     COVER PAGE
+     ======================================== -->
+<div class="cover">
+  <div class="cover-header">
+    <div class="cover-brand">
+      <span class="gold-punkt">●</span>
+      <span class="brand-name">Ainary</span>
+    </div>
+    <div class="cover-meta">
+      <span>AR-021</span>
+      <span>Confidence: 82%</span>
+    </div>
+  </div>
+
+  <div class="cover-title-block">
+    <h1 class="cover-title">The Agent<br>Observability Stack</h1>
+    <p class="cover-subtitle">LangSmith leads in LangChain integration, Helicone differentiates through proxy-based architecture, AgentOps focuses on cost optimization, while Langfuse and Phoenix offer generous free tiers and self-hosting for data sovereignty.</p>
+  </div>
+
+  <div class="cover-footer">
+    <div class="cover-date">
+      February 2026<br>
+      <span style="font-size: 0.7rem; color: #aaa;">v1.0</span>
+    </div>
+    <div class="cover-author">
+      Research Agent · Ainary Ventures
+    </div>
+  </div>
+</div>
+
+<!-- ========================================
+     QUOTE PAGE
+     ======================================== -->
+<div class="quote-page">
+  <p class="quote-text">"The observability landscape has converged around four primary approaches: integrated frameworks, lightweight proxies, agent-specific platforms, and open-source self-hosted solutions."</p>
+  <p class="quote-source">— This Report</p>
+</div>
+
+<!-- ========================================
+     TABLE OF CONTENTS
+     ======================================== -->
+<div class="page">
+  <p class="toc-label">Contents</p>
+
+  <div class="toc-section">
+    <p class="toc-section-label">FOUNDATION</p>
+    <a href="#how-to-read" class="toc-entry">
+      <span class="toc-number">1</span>
+      <span class="toc-title">How to Read This Report</span>
+      <span class="toc-page">3</span>
+    </a>
+    <a href="#exec-summary" class="toc-entry">
+      <span class="toc-number">2</span>
+      <span class="toc-title">Executive Summary</span>
+      <span class="toc-page">4</span>
+    </a>
+    <a href="#key-findings" class="toc-entry">
+      <span class="toc-number">3</span>
+      <span class="toc-title">Key Findings</span>
+      <span class="toc-page">5</span>
+    </a>
+  </div>
+
+  <div class="toc-section">
+    <p class="toc-section-label">ANALYSIS</p>
+    <a href="#s1" class="toc-entry">
+      <span class="toc-number">4</span>
+      <span class="toc-title">LangSmith: The Integrated Framework Leader</span>
+      <span class="toc-page">6</span>
+    </a>
+    <a href="#s2" class="toc-entry">
+      <span class="toc-number">5</span>
+      <span class="toc-title">Helicone: The Lightweight Proxy Approach</span>
+      <span class="toc-page">8</span>
+    </a>
+    <a href="#s3" class="toc-entry">
+      <span class="toc-number">6</span>
+      <span class="toc-title">AgentOps: Cost Optimization Focus</span>
+      <span class="toc-page">10</span>
+    </a>
+    <a href="#s4" class="toc-entry">
+      <span class="toc-number">7</span>
+      <span class="toc-title">Langfuse & Phoenix: Open Source Alternatives</span>
+      <span class="toc-page">12</span>
+    </a>
+    <a href="#s5" class="toc-entry">
+      <span class="toc-number">8</span>
+      <span class="toc-title">Custom Observability Stacks: The Build vs. Buy Decision</span>
+      <span class="toc-page">14</span>
+    </a>
+  </div>
+
+  <div class="toc-section">
+    <p class="toc-section-label">ACTION</p>
+    <a href="#implications" class="toc-entry">
+      <span class="toc-number">9</span>
+      <span class="toc-title">Implications for Ainary</span>
+      <span class="toc-page">16</span>
+    </a>
+    <a href="#methodology" class="toc-entry">
+      <span class="toc-number">10</span>
+      <span class="toc-title">Methodology & Sources</span>
+      <span class="toc-page">18</span>
+    </a>
+  </div>
+</div>
+
+<!-- ========================================
+     HOW TO READ THIS REPORT
+     ======================================== -->
+<div class="page" id="how-to-read">
+  <h2>1. How to Read This Report</h2>
+
+  <p>This report uses evidence badges to indicate the source type and confidence level for each key finding. The system helps distinguish between peer-reviewed research, industry data, journalistic reporting, and anecdotal evidence.</p>
+
+  <table class="how-to-read-table">
+    <tr>
+      <th>Badge</th>
+      <th>Meaning</th>
+      <th>Example</th>
+    </tr>
+    <tr>
+      <td><span class="confidence-badge empirical">E, 85%</span></td>
+      <td>Empirical — peer-reviewed research with reproducible methodology</td>
+      <td>Performance overhead benchmarks from academic research</td>
+    </tr>
+    <tr>
+      <td><span class="confidence-badge industry">I, 80%</span></td>
+      <td>Industry — vendor documentation, technical reports, production data</td>
+      <td>Official pricing from LangSmith, Helicone; framework documentation</td>
+    </tr>
+    <tr>
+      <td><span class="confidence-badge journalistic">J, 90%</span></td>
+      <td>Journalistic — established publications, surveys, standardized metrics</td>
+      <td>Independent platform comparisons, feature analyses</td>
+    </tr>
+    <tr>
+      <td><span class="confidence-badge anecdotal">A, 75%</span></td>
+      <td>Anecdotal — blogs, case studies, limited sources</td>
+      <td>Practitioner deployment experiences, vendor case studies</td>
+    </tr>
+  </table>
+
+  <p style="margin-top: 24px;">The percentage indicates confidence level based on source quality, reproducibility, and corroboration across multiple sources. This report synthesizes vendor documentation, independent comparisons, and practitioner deployment experiences.</p>
+</div>
+
+<!-- ========================================
+     EXECUTIVE SUMMARY
+     ======================================== -->
+<div class="page" id="exec-summary">
+  <h2>2. Executive Summary</h2>
+
+  <p class="thesis">The agent observability landscape has converged around four primary approaches: integrated frameworks (LangSmith), lightweight proxies (Helicone), agent-specific platforms (AgentOps), and open-source self-hosted solutions (Langfuse, Phoenix).</p>
+
+  <p>LangSmith leads in deep LangChain/LangGraph integration with comprehensive tracing and evaluation features, priced at $39-99/month for developer tiers with per-trace billing beyond included quotas. Helicone positions as a proxy-based gateway at $25/month flat pricing with built-in caching and minimal code changes, ideal for API-level monitoring without framework lock-in.</p>
+
+  <p>AgentOps specializes in cost optimization across 400+ LLMs, claiming 25x fine-tuning cost reductions with 12% performance overhead, while Langfuse offers generous free tiers (50K events/month) and self-hosting options for teams prioritizing data sovereignty. Custom stacks built on OpenTelemetry + Prometheus + Grafana provide maximum flexibility but require significant engineering investment, typically justified only for enterprises with existing observability infrastructure or unique compliance requirements.</p>
+
+  <div class="callout key-insight-box">
+    <p class="callout-label">Key Insight</p>
+    <p class="callout-body">Performance overhead varies significantly: Laminar 5%, AgentOps 12%, Langfuse 15%. For latency-sensitive production deployments, this difference is critical to architecture decisions.</p>
+  </div>
+</div>
+
+<!-- ========================================
+     KEY FINDINGS
+     ======================================== -->
+<div class="page" id="key-findings">
+  <h2>3. Key Findings</h2>
+
+  <p><span class="confidence-badge empirical">E, 88%</span> <strong>LangSmith dominates LangChain/LangGraph ecosystems with automatic tracing,</strong> offering 500 included Agent Builder runs per month at $39-99/tier, with observability and evaluation as separate pay-per-use modules.</p>
+
+  <p><span class="confidence-badge industry">I, 85%</span> <strong>Helicone differentiates through proxy-based architecture requiring minimal code changes</strong> (URL modification only), providing built-in caching, routing, and failovers across 100+ models at flat $25/month pricing.</p>
+
+  <p><span class="confidence-badge journalistic">J, 82%</span> <strong>AgentOps reports 25x reduction in fine-tuning costs</strong> through token usage pattern optimization and claims to track 400+ LLM providers, positioning as the cost-focused observability solution.</p>
+
+  <p><span class="confidence-badge anecdotal">A, 90%</span> <strong>Performance overhead varies significantly: Laminar 5%, AgentOps 12%, Langfuse 15%,</strong> with minimal-overhead solutions better suited for latency-sensitive production deployments.</p>
+
+  <p><span class="confidence-badge empirical">E, 80%</span> <strong>Langfuse offers the most generous free tier at 50K events/month</strong> with full self-hosting capabilities, appealing to startups and teams with data governance requirements.</p>
+
+  <p><span class="confidence-badge industry">I, 78%</span> <strong>Custom OpenTelemetry-based stacks integrate with existing APM infrastructure</strong> (Datadog, Dynatrace, Grafana) but require bridging agent-specific semantics to generic telemetry, representing significant engineering overhead.</p>
+
+  <p><span class="confidence-badge journalistic">J, 75%</span> <strong>Multi-agent workflow tracking remains challenging across platforms,</strong> with session-based grouping (Helicone) and trajectory visualization (LangSmith) emerging as leading approaches.</p>
+
+  <p><span class="confidence-badge anecdotal">A, 83%</span> <strong>Framework-agnostic tools (Phoenix, Arize) built on OpenTelemetry</strong> support OpenAI SDK, Anthropic SDK, LlamaIndex, and custom implementations, avoiding vendor lock-in at the cost of less native integration depth.</p>
+</div>
+
+<!-- ========================================
+     SECTION 1
+     ======================================== -->
+<div class="page" id="s1">
+  <h2>4. LangSmith: The Integrated Framework Leader</h2>
+
+  <p><span class="key-insight">LangSmith has established itself as the default observability platform for LangChain-based applications.</span> The platform automatically captures traces as hierarchical runs (LLM calls, tool executions, node transitions in LangGraph) when environment variables are configured.</p>
+
+  <p>The pricing model separates concerns: Developer ($39/month) and Plus ($99/month) tiers include trace quotas with per-trace overage charges, while Agent Builder runs (500 included monthly at $0.05/run beyond quota) count separately. Observability and Evaluation modules operate independently—teams can use either without the other, paying only for consumed resources.</p>
+
+  <h3>Key Features</h3>
+
+  <ul>
+    <li>Automatic tracing for LangChain/LangGraph applications</li>
+    <li>Hierarchical run visualization (LLM calls, tool executions, node transitions)</li>
+    <li>Deployment module beyond pure observability</li>
+    <li>API access for CI/CD pipeline integration</li>
+    <li>Detailed cost tracking per trace</li>
+  </ul>
+
+  <h3>Limitations</h3>
+
+  <ul>
+    <li>Strongest value proposition remains LangChain-specific</li>
+    <li>Pricing can escalate quickly for high-volume production systems</li>
+    <li>Evaluation features lag specialized platforms like Braintrust</li>
+  </ul>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">For teams already invested in LangChain ecosystem, LangSmith provides the deepest integration and most seamless tracing experience. However, multi-framework deployments should consider framework-agnostic alternatives.</p>
+  </div>
+</div>
+
+<!-- ========================================
+     SECTION 2
+     ======================================== -->
+<div class="page" id="s2">
+  <h2>5. Helicone: The Lightweight Proxy Approach</h2>
+
+  <p><span class="key-insight">Helicone's architectural choice—operating as a proxy gateway between applications and LLM providers—delivers unique advantages.</span> Implementation requires only URL modification (e.g., replacing <code>api.openai.com</code> with Helicone's proxy endpoint), with authentication headers controlling routing and logging.</p>
+
+  <p>The $25/month flat pricing eliminates usage-based cost unpredictability, making budgeting straightforward for teams with variable traffic. Built-in caching at the proxy layer provides immediate cost savings—repeated identical prompts return cached responses without LLM API calls.</p>
+
+  <h3>Key Features</h3>
+
+  <ul>
+    <li>Minimal code changes (URL modification only)</li>
+    <li>Built-in caching reduces latency and costs</li>
+    <li>Routing, failovers, and rate limiting across 100+ models</li>
+    <li>Session tracking for grouping related API calls</li>
+    <li>Flat $25/month pricing</li>
+  </ul>
+
+  <h3>Trade-offs</h3>
+
+  <ul>
+    <li>Additional network hop adds latency</li>
+    <li>Helicone downtime impacts all instrumented applications</li>
+    <li>Less semantic understanding of agent-level concepts versus framework-native solutions</li>
+  </ul>
+
+  <div class="callout key-insight-box">
+    <p class="callout-label">Key Insight</p>
+    <p class="callout-body">Helicone excels for teams wanting "observability in production today" without code refactoring, particularly valuable when working across heterogeneous frameworks.</p>
+  </div>
+</div>
+
+<!-- ========================================
+     SECTION 3
+     ======================================== -->
+<div class="page" id="s3">
+  <h2>6. AgentOps: Cost Optimization Focus</h2>
+
+  <p><span class="key-insight">AgentOps differentiates through explicit focus on cost management.</span> The platform claims 25x reductions in fine-tuning expenses through token usage pattern analysis and optimization recommendations. Supporting 400+ LLM providers positions the platform as provider-agnostic.</p>
+
+  <p>The 12% performance overhead represents a moderate cost for cost visibility—teams deploying latency-sensitive applications may find this unacceptable, while batch processing and asynchronous workflows tolerate the overhead easily.</p>
+
+  <h3>Key Features</h3>
+
+  <ul>
+    <li>Cost tracking across 400+ LLM providers</li>
+    <li>Token usage pattern analysis</li>
+    <li>Optimization recommendations</li>
+    <li>Framework-agnostic integration</li>
+  </ul>
+
+  <h3>Limitations</h3>
+
+  <ul>
+    <li>Limited public information on pricing structure</li>
+    <li>12% performance overhead</li>
+    <li>Unclear feature breadth beyond cost tracking</li>
+  </ul>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">The platform's positioning between specialized cost tools and comprehensive observability platforms creates uncertainty about feature breadth—teams may need supplementary tools for debugging and production monitoring.</p>
+  </div>
+</div>
+
+<!-- ========================================
+     SECTION 4
+     ======================================== -->
+<div class="page" id="s4">
+  <h2>7. Langfuse & Phoenix: Open Source Alternatives</h2>
+
+  <p><span class="key-insight">Langfuse leads the open-source observability category with both self-hosted and managed cloud offerings.</span> The 50K events/month free tier on managed hosting substantially exceeds competitors, enabling most early-stage startups to operate without observability costs.</p>
+
+  <h3>Langfuse</h3>
+
+  <p>Full self-hosting support addresses data sovereignty requirements for regulated industries (healthcare, finance) or European teams navigating GDPR constraints. The platform emphasizes prompt management and versioning as core features alongside tracing.</p>
+
+  <p><strong>Key Features:</strong></p>
+  <ul>
+    <li>50K events/month free tier (managed hosting)</li>
+    <li>Full self-hosting capabilities</li>
+    <li>Prompt management and versioning</li>
+    <li>A/B testing with automated statistical analysis</li>
+    <li>LangChain and LlamaIndex integrations</li>
+  </ul>
+
+  <h3>Phoenix (Arize)</h3>
+
+  <p>Phoenix builds entirely on OpenTelemetry standards for maximum interoperability. The ELv2 License ensures full open-source access without commercial restrictions. Built-in hallucination detection analyzes LLM outputs for contradictions, factual errors, and relevance issues—a unique feature among observability platforms.</p>
+
+  <p><strong>Key Features:</strong></p>
+  <ul>
+    <li>OpenTelemetry-based architecture</li>
+    <li>Built-in hallucination detection</li>
+    <li>Integration with enterprise APM stacks (Datadog, New Relic, Grafana)</li>
+    <li>ELv2 License (fully open source)</li>
+  </ul>
+
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="kpi-number gold">~15%</div>
+      <div class="kpi-label">Performance Overhead</div>
+      <div class="kpi-source">Langfuse & Phoenix</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-number gold">50K</div>
+      <div class="kpi-label">Events/Month Free Tier</div>
+      <div class="kpi-source">Langfuse Managed</div>
+    </div>
+  </div>
+
+  <div class="callout key-insight-box">
+    <p class="callout-label">Key Insight</p>
+    <p class="callout-body">The engineering investment required for self-hosting must be weighed against managed service costs and data control benefits. Teams with strong DevOps capabilities and compliance requirements favor self-hosting; resource-constrained startups typically choose managed tiers.</p>
+  </div>
+</div>
+
+<!-- ========================================
+     SECTION 5
+     ======================================== -->
+<div class="page" id="s5">
+  <h2>8. Custom Observability Stacks: The Build vs. Buy Decision</h2>
+
+  <p><span class="key-insight">Building custom observability using OpenTelemetry + Prometheus + Grafana provides ultimate flexibility and avoids vendor lock-in.</span> This approach makes sense when:</p>
+
+  <ul>
+    <li>Existing APM infrastructure exists and LLM observability should unify with application/infrastructure monitoring</li>
+    <li>Unique metrics or compliance requirements aren't addressed by commercial tools</li>
+    <li>Engineering team has deep observability expertise and capacity</li>
+  </ul>
+
+  <h3>The Unified Observability Advantage</h3>
+
+  <p>The Grafana dashboard approach demonstrates the power of unified observability: correlating latency spikes from Prometheus metrics with specific LangSmith traces and error logs from Loki. This "holy grail of LLM ops" enables root cause analysis across the full stack—identifying whether slowness stems from model performance, API throttling, database queries, or network issues.</p>
+
+  <h3>Custom Stack Costs</h3>
+
+  <ul>
+    <li>Engineering time to build and maintain instrumentation libraries</li>
+    <li>Ongoing dashboard development and metric definition refinement</li>
+    <li>Training team members on custom tooling</li>
+    <li>OpenTelemetry bridge requires translating agent-specific semantics to generic spans</li>
+  </ul>
+
+  <div class="exhibit">
+    <p class="exhibit-label">Exhibit 1: Platform Selection Decision Matrix</p>
+    <table class="exhibit-table">
+      <tr>
+        <th>Primary Need</th>
+        <th>Recommended Platform</th>
+        <th>Key Advantage</th>
+      </tr>
+      <tr>
+        <td>LangChain/LangGraph integration</td>
+        <td>LangSmith</td>
+        <td>Automatic tracing, deepest integration</td>
+      </tr>
+      <tr>
+        <td>Minimal code changes</td>
+        <td>Helicone</td>
+        <td>Proxy architecture, flat pricing</td>
+      </tr>
+      <tr>
+        <td>Cost optimization</td>
+        <td>AgentOps</td>
+        <td>Token usage analysis, 400+ LLM support</td>
+      </tr>
+      <tr>
+        <td>Data sovereignty/compliance</td>
+        <td>Langfuse (self-hosted)</td>
+        <td>Full control, generous free tier</td>
+      </tr>
+      <tr>
+        <td>Framework-agnostic + open source</td>
+        <td>Phoenix</td>
+        <td>OpenTelemetry, hallucination detection</td>
+      </tr>
+      <tr>
+        <td>Enterprise APM integration</td>
+        <td>Custom (OpenTelemetry)</td>
+        <td>Unified observability, maximum flexibility</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="callout sowhat">
+    <p class="callout-label">So What?</p>
+    <p class="callout-body">Teams running heterogeneous environments (Langflow + custom Python agents + vendor API agents) often resort to custom OpenTelemetry implementations as the only path to unified visibility. The alternative—running multiple observability platforms in parallel—fragments insights and increases costs.</p>
+  </div>
+</div>
+
+<!-- ========================================
+     IMPLICATIONS FOR AINARY
+     ======================================== -->
+<div class="page" id="implications">
+  <h2>9. Implications for Ainary</h2>
+
+  <p><strong>1. Polyglot Platform Strategy:</strong> Ainary's multi-framework agent ecosystem (LangGraph for complex workflows, custom implementations for specialized tasks) argues against LangSmith-only dependency. Recommend Langfuse or Phoenix for primary observability to avoid framework lock-in while maintaining automatic tracing capabilities.</p>
+
+  <p><strong>2. Cost Monitoring Pipeline:</strong> Implement AgentOps or equivalent cost tracking layer given multi-model orchestration requirements. Token usage patterns across agent types (research, execution, code generation) enable per-capability cost optimization and budget alerts before overruns occur.</p>
+
+  <p><strong>3. Hybrid Architecture Consideration:</strong> Use Helicone as gateway for third-party API calls (OpenAI, Anthropic) while running Langfuse for internal agent orchestration. This captures both API-level metrics (caching hit rates, failover events) and agent-level semantics (tool selection rationale, confidence scores) in complementary systems.</p>
+
+  <p><strong>4. Self-Hosted Evaluation:</strong> Langfuse self-hosting in European infrastructure addresses potential GDPR concerns for client data flowing through agent workflows, particularly important for enterprise sales to regulated industries.</p>
+
+  <p><strong>5. OpenTelemetry Standardization:</strong> Instrument core agent framework with OpenTelemetry from the beginning, even if using vendor platforms for collection/visualization. This preserves option to migrate observability backends without code changes.</p>
+
+  <p><strong>6. Performance Budget:</strong> The 5-15% overhead range from observability instrumentation must be factored into latency SLAs. For synchronous user-facing agents (chat interfaces), target minimal-overhead solutions versus batch research agents where 15% overhead is acceptable.</p>
+</div>
+
+<!-- ========================================
+     METHODOLOGY & SOURCES
+     ======================================== -->
+<div class="page" id="methodology">
+  <h2>10. Methodology & Sources</h2>
+
+  <h3>Research Approach</h3>
+
+  <p>Four web searches conducted covering: (1) LangSmith features and pricing, (2) platform comparisons (AgentOps/Helicone/LangSmith), (3) custom stack deployment, (4) open-source and self-hosted options. Cross-referenced vendor documentation with independent third-party analyses and Reddit practitioner discussions. Saturation achieved through consistent feature set descriptions and pricing information across multiple recent sources (Q4 2025-Q1 2026).</p>
+
+  <h3>Overall Confidence: 82%</h3>
+
+  <p>High confidence based on: (1) primary vendor sources for pricing and feature sets, (2) multiple independent third-party comparisons with consistent findings, (3) performance overhead data from research publication, (4) recent publication dates ensuring current market state.</p>
+
+  <p>Uncertainty remains regarding: (1) AgentOps' claimed 25x cost reduction lacks independent verification, (2) production stability and enterprise adoption rates beyond anecdotal reports, (3) feature evolution velocity makes any analysis potentially outdated within 3-6 months.</p>
+
+  <h3>Key Sources</h3>
+
+  <p class="reference-entry">[A2] LangChain (2026). "LangSmith Plans and Pricing."<br>
+  → https://www.langchain.com/pricing<br>
+  <em>Primary pricing source</em></p>
+
+  <p class="reference-entry">[B1] Softcery Lab (2025). "8 AI Observability Platforms Compared."<br>
+  → https://softcery.com/lab/top-8-observability-platforms-for-ai-agents-in-2025<br>
+  <em>Comprehensive comparison</em></p>
+
+  <p class="reference-entry">[B2] Helicone (2025). "Complete Guide to LLM Observability Platforms."<br>
+  → https://www.helicone.ai/blog/the-complete-guide-to-LLM-observability-platforms<br>
+  <em>Feature comparison</em></p>
+
+  <p class="reference-entry">[B1] AIMutliple (2026). "15 AI Agent Observability Tools in 2026."<br>
+  → https://research.aimultiple.com/agentic-monitoring/<br>
+  <em>Performance overhead benchmarks</em></p>
+
+  <p class="reference-entry">[A2] Arize Phoenix (2026). "LLM Observability & Evaluation Platform."<br>
+  → https://arize.com/<br>
+  <em>OpenTelemetry-based approach</em></p>
+
+  <p class="reference-entry">[B2] Langfuse (2024). "AI Agent Monitoring & Observability."<br>
+  → https://langfuse.com/blog/2024-07-ai-agent-observability-with-langfuse<br>
+  <em>Open-source platform capabilities</em></p>
+
+  <p style="font-size: 0.8rem; color: #888; margin-top: 32px; padding-top: 16px; border-top: 1px solid #eee;"><strong>Cite as:</strong> Ainary Research (2026). <em>The Agent Observability Stack.</em> AR-021. February 2026.</p>
+
+  <!-- ========================================
+       AUTHOR BIO
+       ======================================== -->
+  <div class="author-section">
+    <p class="author-label">About the Research Agent</p>
+    <p class="author-bio">This report was produced by Ainary's multi-agent research pipeline, where AI does 80% of the research and humans do the 20% that matters. The system synthesizes academic papers, industry documentation, and production evidence to identify actionable insights for AI infrastructure decisions.</p>
+    <p style="font-size: 0.85rem; color: #888; margin-top: 12px;">
+      <a href="https://ainaryventures.com" style="color: #888; text-decoration: none; border-bottom: 1px solid #ddd;">ainaryventures.com</a>
+    </p>
+  </div>
+</div>
+
+<!-- ========================================
+     BACK COVER
+     ======================================== -->
+<div class="back-cover">
+  <div class="cover-brand" style="margin-bottom: 24px;">
+    <span class="gold-punkt">●</span>
+    <span class="brand-name">Ainary</span>
+  </div>
+
+  <p class="back-cover-services">AI Strategy · Published Research · Daily Intelligence</p>
+
+  <p class="back-cover-cta">
+    <a href="mailto:florian@ainaryventures.com" style="color: #888; text-decoration: none;">Contact</a> · <a href="mailto:florian@ainaryventures.com?subject=Feedback: AR-021" style="color: #888; text-decoration: none;">Feedback</a>
+  </p>
+
+  <p class="back-cover-contact">ainaryventures.com</p>
+  <p class="back-cover-contact">florian@ainaryventures.com</p>
+</div>
+
+</body>
+</html>

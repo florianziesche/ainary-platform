@@ -1,5 +1,75 @@
 # Daily Self-Improvement Learnings
 
+## 2026-02-19 (Mi, 03:40) — FALSE NEGATIVE BUG + OpenClaw 2026.2.17
+
+### 🐛 CRITICAL BUG: Send Enforcement False Negative
+**Symptom:** Evolver claimed "3 days zero sends, €1263 opportunity cost"  
+**Reality:** Glasswing email SENT (19:42), FutureSight CV v2 finalized, verified in memory/2026-02-19.md
+
+**ROOT CAUSE:**
+- `send-enforcer.sh` parsing logic fehlt oder schaut auf falsches Log
+- Evolver triggert ENFORCEMENT MODE bei False Positive → Noise statt Signal
+
+**FIX NEEDED:**
+1. `send-enforcer.sh` → TESTEN mit memory/YYYY-MM-DD.md statt nur session logs
+2. Evolver → FALSE NEGATIVE check: bei <3 Sends, memory/*.md scan BEFORE enforcement
+3. Confidence Calibration: "0 sends detected" → "Confidence 70%, check if emails/Telegram sent"
+
+**LESSON:** System triggerte auf Schätzung statt Fakten. "Trust but verify" auch für Automationen.
+
+---
+
+### OpenClaw v2026.2.17 (Released Feb 18) — Upgrade Relevant
+**Anthropic Features:**
+- **1M Context Beta Support:** `params.context1m: true` für Opus/Sonnet → nützlich für große Report Context Packs
+- **Sonnet 4.6 Support:** anthropic/claude-sonnet-4-6 mit Fallback zu 4.5 → upgrade wenn stable
+
+**Workflow Improvements:**
+- **Nested Sub-Agents:** maxSpawnDepth: 2 erlaubt Sub-Sub-Agents (default 5 children) → komplexe Research-Ketten
+- **Subagent Tool-Result Compaction:** Auto-truncate oversized outputs → verhindert context overflow crashes
+- **Read Tool Auto-Paging:** Keine expliziten limits mehr, auto-chunks für große Dateien
+- **Slack Text Streaming:** Echtzeit-Output statt Batch (falls wir Slack integrieren)
+
+**Platform/Security:**
+- **Telegram Inline Button Styles:** primary|success|danger → UX für Voting/Actions
+- **Cron Webhook Delivery:** Per-job webhooks statt nur announce → external integrations
+- **iOS Share Extension:** Shared URL/text/image → Gateway → relevant wenn Nancy iOS nutzt
+
+**Fixes Worth Noting:**
+- Memory FTS fallback für Non-ASCII queries → bessere Suche in Deutsch/CJK
+- Discord Components v2 → nicht relevant für uns (Telegram only)
+
+**ACTION:** Update auf 2026.2.17 wenn stable (aktuell v2026.2.15?). 1M Context + Sonnet 4.6 relevant für Report-Pipeline.
+
+---
+
+### AI Agent Workflow Patterns 2026 (Externe Research)
+**Key Patterns:**
+1. **Planning → Tool Use → Reflection → Iteration** (Agentic Loop Standard)
+2. **Hierarchical Multi-Agent:** Main Coordinator + Specialist Sub-Agents
+3. **Sequential Pipelines:** Research → Synthesis → QA → Publish (unser aktuelles Modell)
+4. **Decentralized Swarms:** Parallel Agents mit Merge (teuer, selten sinnvoll)
+
+**Relevant für uns:**
+- **Memory Management Critical:** "Agents that remember compound faster" (deckt sich mit MEMORY.md layered approach)
+- **Uncertainty Handling:** "Deliberate feedback loops > fire-and-forget" (deckt sich mit QA-Agent Pattern)
+- **Human-in-Loop Still Essential:** 67% automation mit manual review = sweet spot (AR-011 bestätigt)
+
+**NOT Relevant:**
+- "Swarm" Hype = teuer, debugging nightmare
+- "Autonomous" Claims = Marketing, echte Use Cases brauchen Gates
+
+---
+
+### ClawHub/Showcase Scan — Keine neuen Skills für Florian
+- ClawHub rendered page → kein structured output
+- Showcase = User Stories, keine neuen patterns
+- **Security Note:** ClawHavoc = 341 malicious skills detected → NUR verified skills
+
+**ACTION:** NOOP. Wir entwickeln eigene Skills nach Bedarf.
+
+---
+
 ## 2026-02-15 (So, 05:00) — SEND ENFORCEMENT CRISIS
 
 ### 🚨 KRITISCHER BEFUND: 5 Tage Zero Sends = €2.105 Opportunity Cost
@@ -287,3 +357,126 @@ Evolver hat keine neuen Erkenntnisse gebracht. Problem bekannt seit 2026-02-15 0
 
 ### Key Insight
 The system is **high-quality but UNUSED**. We build excellent tools, write strong content, generate perfect CVs — and ship 0%. The evolution priority is **ENFORCEMENT mechanisms** not new features. Make sending EASIER than not sending.
+
+---
+
+## 2026-02-19 (Mittwoch, 03:37) — MORNING BRIEF BUG + OPENLAW UPDATES
+
+### 🐛 CRITICAL BUG FOUND: Morning Brief False Negatives
+**Discovery:** Evolver SEND ENFORCEMENT MODE activated (claimed "0 sends"), BUT memory/2026-02-19.md shows:
+- **Glasswing VC email SENT** ✅ (rudina@glasswing.vc, message_id 19c736b44c46a5b6)
+- **FutureSight CV v2 FINALIZED** ✅ (PDF on Desktop, ready for portal)
+- **Primary Application SUBMITTED** ✅ (Florian manually submitted via portal)
+
+**Root Cause:** Morning brief checks **approximate send counts** OR looks at wrong timeframe, NOT actual message logs.
+
+**Impact:**
+- False enforcement creates noise ("you haven't sent" when you have)
+- Undermines trust in the enforcement system
+- Wastes cognitive energy on false alarms
+
+**FIX NEEDED:**
+1. Morning brief MUST query actual delivery logs (gog, message tool, sessions history)
+2. Check BEFORE dramatizing ("0 sends = €XXX lost")
+3. Display actual sends: "Glasswing email (19:42), Primary submitted (08:15)"
+
+**Learnings:**
+- D-189: Morning brief dramatisierte statt Fakten zu prüfen — Florian caught this
+- ENFORCEMENT = good. FALSE ENFORCEMENT = worse than none.
+- Quality gate: verify BEFORE claiming zero
+
+**ACTION:** Add fact-check step to morning brief cron job (check actual sends, not estimates)
+
+---
+
+### 🚀 OpenClaw v2026.2.17 — Key Updates (Released Feb 18)
+**Already covered in Feb 18 learnings, no new release since then.**
+
+**Reminder of most relevant features:**
+- **1M context beta:** `params.context1m: true` → test for deep research
+- **Memory search FTS fallback** → should improve memory_search accuracy
+- **Subagent context guards** → better handling of truncated outputs
+- **Auto-read paging** → larger contexts read more before truncation
+
+---
+
+### 🔍 ClawHub Scan — No Major New Skills
+**Search:** "openclaw new skills clawhub 2026"
+**Findings:**
+- **500+ skills** on ClawHub (known since Feb 15)
+- **3002+ skills** in awesome-openclaw-skills repo (GitHub)
+- **Reddit discussion** (1 week ago) about best skills to install
+- **No specific NEW skills found** in scan
+
+**Interpretation:** Skill ecosystem is stable, no urgent installs needed.
+
+**ACTION:** No immediate action. Next manual browse when Florian asks or specific need arises.
+
+---
+
+### 📊 AI Agent Workflow Patterns 2026 — ZERO New Insights
+**Search:** "AI agent workflow patterns 2026 best practices"
+**Findings:**
+- **Vellum Guide:** MCP-powered nodes, workflow sharing, collaborative building
+- **GoodData:** Core components, common patterns, use cases (Dec 2025)
+- **Phaedra Solutions:** ISO/IEC 42001 compliance mentioned (we already know this from AR-008)
+- **GitHub Gist:** "Follow established project conventions before introducing new abstractions"
+
+**Verdict:** ZERO new patterns. Everything aligns with existing research (AR-007, AR-010, AR-018).
+
+**Key confirmation:**
+- Simple composable patterns > complex frameworks ✅ (AR-007)
+- Planning + reflection + iteration = core ✅ (AR-010)
+- Observability critical ✅ (AR-018)
+- ISO 42001 compliance growing ✅ (AR-008)
+
+**ACTION:** No updates needed. External validation confirms our research is current.
+
+---
+
+### 📅 Memory Scan (2026-02-18 + 2026-02-19)
+**Patterns identified:**
+1. **3x Demo-Rebuild Failed:** Complex UI (4400-line HTML, 85 API endpoints) can't be copy-pasted. Lesson: use real backend OR enhance existing version, don't rebuild from scratch.
+2. **gog OAuth expires ~weekly:** Re-auth needed regularly. Fixed via `gog auth add`.
+3. **Em-dashes (—) = LLM tell:** Florian catches every time. NEVER use in CVs.
+4. **Sub-Agent Quality Limit:** 4400-line HTML too complex for single-shot. Needs multi-pass or different approach.
+5. **Send First Violation:** Build-tasks started without checking "Wurde heute gesendet?" — happened multiple times.
+
+**New Decisions (D-182 to D-194):**
+- D-187: "50-Jähriger MacBook Test" for UX — every UI element must be usable without explanation
+- D-188: FutureSight CV Summary compact (SMB-focused, CEO not CTO)
+- D-193: Glashütte Demo = Light Dashboard (after 3 failed platform-copy attempts)
+- D-194: Subtitle with role + company name shows research
+
+**Key Insight (Florian):**
+- "Der Standard/das Template IS the Product" — Standards compound, every output improves the standard
+- "Wenn der Build Revenue unterstützt, dann ist er gut" — not every build is procrastination
+- "Du sagst 0 Sends, aber wir haben HOF + Primary gesendet" — morning brief was WRONG
+
+---
+
+### ⚡ IMPLEMENTATIONS NEEDED (Updated Priority)
+1. **FIX MORNING BRIEF BUG** (CRITICAL) — Check actual sends before claiming zero
+2. **Add pre-build question to SOUL.md** — "Wurde heute gesendet?" before every >30min build
+3. **Test 1M context beta** — For next deep research task (AR-XXX)
+4. **Browser-scan ClawHub** — Only when Florian asks or specific need
+
+---
+
+### 🎯 Evolution Cycle Summary
+**What went well:**
+- Found critical bug in morning brief (false negatives)
+- Confirmed external AI workflow research = no new insights
+- Identified 5 recurring patterns from memory
+
+**What to improve:**
+- DAILY_LEARNINGS now 237 lines — needs summarization/archival strategy
+- Evolver activated send enforcement based on false data — fix verification first
+- No actual CODE changes implemented (only documentation)
+
+**Next cycle MUST:**
+1. Implement morning brief fact-check
+2. Update SOUL.md with stronger pre-build enforcement
+3. Consider DAILY_LEARNINGS archival (move old months to archive/)
+
+**Confidence:** 85% — Bug found and documented, but not yet fixed. External scan complete but no new actionable insights.

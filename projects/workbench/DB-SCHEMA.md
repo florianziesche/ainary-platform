@@ -261,6 +261,9 @@ Conversation messages within topics.
 | content | TEXT | NULL | Message text |
 | msg_type | TEXT | 'text' | text, system, error |
 | meta | TEXT | '{}' | JSON metadata |
+| cost | REAL | 0.0 | AI API cost in USD (0 for non-AI messages) |
+| tokens_prompt | INTEGER | 0 | Prompt tokens used (AI messages only) |
+| tokens_completion | INTEGER | 0 | Completion tokens used (AI messages only) |
 | created_at | TEXT | CURRENT_TIMESTAMP | Row creation time |
 
 ---
@@ -413,10 +416,14 @@ Core work items. The primary entity in the platform.
 | priority | TEXT | 'NORMAL' | NOW, HIGH, NORMAL, LOW |
 | priority_reason | TEXT | '' | Why this priority |
 | priority_confidence | INTEGER | 50 | Confidence in priority (0–100) |
+| cost_total | REAL | 0.0 | Total AI cost for this topic in USD (sum of message costs) |
+| cost_updated_at | TEXT | NULL | Last time cost was updated |
 
 ---
 
-## trust_scores
+## trust_scores (DEPRECATED)
+
+**⚠️ DEPRECATED:** Migrated to `trust_skills` as of 2026-02-19. Table kept for archival purposes only.
 
 Agent-level trust scores (legacy, before per-skill trust).
 
@@ -428,6 +435,12 @@ Agent-level trust scores (legacy, before per-skill trust).
 | up_votes | INTEGER | 0 | Positive feedback count |
 | down_votes | INTEGER | 0 | Negative feedback count |
 | updated_at | TEXT | CURRENT_TIMESTAMP | Last update time |
+
+**Migration Notes:**
+- GET /api/trust now aggregates from `trust_skills` (with deprecation header)
+- Vote endpoint redirects to `trust_skills` with skill="general"
+- Original data archived in `trust_scores_archive.json`
+- Use `trust_skills` for all new trust tracking
 
 ---
 
