@@ -2021,22 +2021,27 @@ function renderStageFindingCard(f, stage, stageColor) {
   if (stage === 'research') {
     const verifyBtn = f.verified 
       ? `<button class="stage-action-btn" style="color:#4aa088;pointer-events:none;opacity:0.7" disabled>✓ Verified${f.verified_at ? ' · ' + new Date(f.verified_at).toLocaleDateString('de-DE') : ''}</button>`
-      : `<button class="stage-action-btn" id="verify-btn-${f.id}" onclick="event.stopPropagation();verifyFindingInline('${f.id}',this)" title="Bestätigt: Ich habe dieses Finding geprüft und es ist korrekt.">✓ Bestätigen</button>`;
+      : `<button class="stage-action-btn" id="verify-btn-${f.id}" onclick="event.stopPropagation();verifyFindingInline('${f.id}',this)" title="Ich habe dieses Finding gelesen und es ist inhaltlich korrekt.">✓ Geprüft</button>`;
+    // Gate check: disable promote if requirements not met
+    const gateReady = f.evidence_type && f.sources_count > 0 && f.so_what;
+    const promoteBtn = gateReady
+      ? `<button class="stage-action-btn primary" id="promote-btn-${f.id}" onclick="event.stopPropagation();promoteFinding('${f.id}','systems')" title="Alle Anforderungen erfüllt. Finding wird zur Umsetzung in Systems weitergeleitet.">→ Bereit für Systems</button>`
+      : `<button class="stage-action-btn" id="promote-btn-${f.id}" style="opacity:0.35;cursor:not-allowed;border-style:dashed" disabled title="Noch nicht bereit. Erfülle erst: ${!f.evidence_type?'Evidenz-Typ, ':''}${!f.sources_count?'mindestens 1 Quelle, ':''}${!f.so_what?'Bedeutung (So What)':''}">🔒 Noch nicht bereit</button>`;
     actions = `
       ${verifyBtn}
-      <button class="stage-action-btn primary" id="promote-btn-${f.id}" onclick="event.stopPropagation();promoteFinding('${f.id}','systems')" title="Dieses Finding ist validiert und wird zur Umsetzung in Systems weitergeleitet. Erfordert: Evidence-Type, Quelle, und 'So What'.">→ Weiter zu Systems</button>
-      <button class="stage-action-btn danger" id="contest-btn-${f.id}" onclick="event.stopPropagation();contestFinding('${f.id}')" title="Ich bezweifle dieses Finding. Es wird als 'angefochten' markiert und du wirst nach dem Grund gefragt.">Anfechten</button>
+      ${promoteBtn}
+      <button class="stage-action-btn danger" id="contest-btn-${f.id}" onclick="event.stopPropagation();contestFinding('${f.id}')" title="Dieses Finding ist falsch oder überholt. Es wird als 'angefochten' markiert — du wirst nach dem Grund gefragt.">✗ Stimmt nicht</button>
     `;
   } else if (stage === 'systems') {
     actions = `
-      <button class="stage-action-btn" onclick="event.stopPropagation();markImplemented('${f.id}')" title="Dieses Finding wurde in ein System/Feature umgesetzt. Markiert es als implementiert.">✓ Implementiert</button>
-      <button class="stage-action-btn primary" onclick="event.stopPropagation();promoteFinding('${f.id}','content')" title="Dieses System-Finding ist bereit für Veröffentlichung als Artikel, Post oder Dokumentation.">→ Weiter zu Content</button>
+      <button class="stage-action-btn" onclick="event.stopPropagation();markImplemented('${f.id}')" title="Dieses Finding wurde in ein System, Feature oder Prozess umgesetzt.">✓ Umgesetzt</button>
+      <button class="stage-action-btn primary" onclick="event.stopPropagation();promoteFinding('${f.id}','content')" title="Dieses Finding ist bereit, als Artikel, Post oder Dokumentation veröffentlicht zu werden.">→ Bereit für Content</button>
     `;
   } else if (stage === 'content') {
     actions = `
-      <button class="stage-action-btn" onclick="event.stopPropagation();writeDraft('${f.id}')" title="Erstellt einen Content-Entwurf basierend auf diesem Finding.">Entwurf schreiben</button>
-      <button class="stage-action-btn" onclick="event.stopPropagation();markPublished('${f.id}')" title="Dieses Finding wurde als Artikel/Post veröffentlicht.">✓ Veröffentlicht</button>
-      <button class="stage-action-btn primary" onclick="event.stopPropagation();promoteFinding('${f.id}','revenue')" title="Dieser Content hat messbar zu Revenue beigetragen (Lead, Sale, Anfrage).">→ Weiter zu Revenue</button>
+      <button class="stage-action-btn" onclick="event.stopPropagation();writeDraft('${f.id}')" title="Erstellt einen Entwurf (Artikel, Post) basierend auf diesem Finding.">Entwurf schreiben</button>
+      <button class="stage-action-btn" onclick="event.stopPropagation();markPublished('${f.id}')" title="Dieser Inhalt wurde veröffentlicht (Blog, LinkedIn, etc.).">✓ Veröffentlicht</button>
+      <button class="stage-action-btn primary" onclick="event.stopPropagation();promoteFinding('${f.id}','revenue')" title="Dieser Content hat messbar zu Umsatz beigetragen (Lead, Anfrage, Sale).">→ Hat Umsatz gebracht</button>
     `;
   } else if (stage === 'revenue') {
     actions = `
@@ -2064,13 +2069,13 @@ function renderStageFindingCard(f, stage, stageColor) {
         </div>
         <span style="font-size:10px;font-weight:600;color:${confColor}">${confPct}%</span>
         <span class="evidence-badge evidence-${f.evidence_type || 'none'}">${f.evidence_type || '?'}</span>
-        <span class="impact-badge impact-${f.impact || 'MEDIUM'}">${f.impact || 'MEDIUM'}</span>
+        <span class="impact-badge impact-${f.impact || 'MEDIUM'}">${{'LOW':'Niedrig','MEDIUM':'Mittel','HIGH':'Hoch','CRITICAL':'Kritisch'}[f.impact||'MEDIUM']||'Mittel'}</span>
       </div>
     </div>
     <div class="stage-finding-detail" id="stage-finding-detail-${f.id}" onclick="event.stopPropagation()">
-      <div><strong>Vollständig:</strong><br>${esc(f.claim)}</div>
+      <div><strong>Beschreibung:</strong><br>${esc(f.claim)}</div>
       ${f.context ? `<div style="margin-top:8px"><strong>Belege:</strong><br>${esc(f.context)}</div>` : ''}
-      ${f.research_line ? `<div style="margin-top:8px"><strong>Forschungslinie:</strong> ${f.research_line.replace(/-/g, ' ')}</div>` : ''}
+      ${f.research_line ? `<div style="margin-top:8px"><strong>Kategorie:</strong> ${f.research_line.replace(/-/g, ' ')}</div>` : ''}
       <div style="margin-top:12px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
         <label style="font-size:9px;color:var(--text-dim)">Evidenz:
           <select style="font-size:11px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:4px 8px;cursor:pointer;min-width:180px" onchange="updateFindingField('${f.id}','evidence_type',this.value)">
@@ -2095,7 +2100,7 @@ function renderStageFindingCard(f, stage, stageColor) {
           <span style="font-size:9px;color:var(--text-dim)">BEDEUTUNG (Was folgt daraus?)</span>
           ${!f.so_what ? `<button style="font-size:9px;background:transparent;border:1px solid var(--border);border-radius:3px;color:var(--warm);padding:2px 8px;cursor:pointer" onclick="generateSoWhat('${f.id}')">AI: Generieren</button>` : ''}
         </div>
-        <div id="so-what-${f.id}" style="font-size:11px;color:var(--text-muted);padding:6px 8px;background:var(--surface);border:1px solid var(--border);border-radius:4px;min-height:30px">${f.so_what ? esc(f.so_what) : '<span style="color:var(--text-dim);font-style:italic">Noch nicht analysiert</span>'}</div>
+        <div id="so-what-${f.id}" style="font-size:11px;color:var(--text-muted);padding:6px 8px;background:var(--surface);border:1px solid var(--border);border-radius:4px;min-height:30px">${f.so_what ? esc(f.so_what) : '<span style="color:var(--danger);font-style:italic">Noch nicht analysiert</span> <button style="font-size:9px;background:transparent;border:1px solid var(--danger);border-radius:3px;color:var(--danger);padding:2px 8px;cursor:pointer;margin-left:8px" onclick="generateSoWhat(\''+f.id+'\')">Erneut versuchen</button>'}</div>
       </div>
       ${f.topic_id ? `<div style="margin-top:8px"><a href="#" onclick="event.stopPropagation();event.preventDefault();hideStageView();selectTopic('${f.topic_id}');toggleCtx()" style="font-size:10px;color:var(--warm);text-decoration:none">→ Zum Topic (Dokumente, Referenzen, Details)</a></div>` : ''}
       <div class="stage-finding-actions" style="margin-top:12px">${actions}</div>
@@ -2117,9 +2122,21 @@ async function toggleStageFinding(el, findingId) {
       if (detail && !detail.querySelector('.gate-status')) {
         let gateHtml = '<div class="gate-status ' + (gateRes.can_promote ? 'gate-ready' : 'gate-blocked') + '">';
         if (gateRes.checks && gateRes.checks.length) {
+          const gateLabels = {
+            'confidence': 'Konfidenz',
+            'evidence': 'Evidenz-Typ',
+            'sources': 'Quellen',
+            'so_what': 'Bedeutung'
+          };
           gateRes.checks.forEach(c => {
+            const label = gateLabels[c.name] || c.name;
+            const reqText = c.name === 'evidence' ? 'Studie, Analyse, Bericht oder Erfahrung auswählen'
+              : c.name === 'so_what' ? 'Bedeutung muss ausgefüllt sein'
+              : c.name === 'sources' ? 'mindestens 1 Quelle'
+              : c.name === 'confidence' ? '≥60%'
+              : c.required;
             gateHtml += '<div class="gate-check ' + (c.passed ? 'gate-pass' : 'gate-fail') + '">' +
-              (c.passed ? '✓' : '✗') + ' ' + c.name + ': ' + c.actual + ' (need ' + c.required + ')</div>';
+              (c.passed ? '✓' : '✗') + ' ' + label + ': ' + (c.passed ? c.actual : reqText) + '</div>';
           });
         } else {
           gateHtml += '<div class="gate-check" style="color:var(--text-dim)">Final stage — no promotion gate</div>';
