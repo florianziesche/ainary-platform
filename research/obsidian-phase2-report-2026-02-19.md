@@ -1,10 +1,12 @@
 ---
-version: 1.0.0
+version: 1.0.1
 status: complete
 created: 2026-02-19
 completed: 2026-02-19
+updated: 2026-02-19
 vault_path: ~/Library/Mobile Documents/iCloud~md~obsidian/Documents/System_OS
 backup_location: System_OS_BACKUP_2026-02-19
+verification_method: web_search (for active job postings)
 ---
 
 # Obsidian Vault Restructure — Phase 2 Report
@@ -35,6 +37,23 @@ Phase 2 successfully consolidated 15 claim files into a single Claims-Ledger, ag
 - **Location:** `20_Areas/AI-Research/Claims/`
 - **Files:** 15 claim files (C001-C015)
 - **Format:** Individual markdown files with frontmatter
+
+**Source Files (Full Names):**
+1. `C001 — 67% of security alerts are ignored by SOC analysts.md`
+2. `C002 — 84% of LLM outputs are overconfident (verbalized confidence .md`
+3. `C003 — Tool calling fails 3-15% of the time in production agent sys.md`
+4. `C004 — 6% of companies achieve 'AI High Performer' status with 2-3x.md`
+5. `C005 — MemoryGraft attack achieves >95% memory injection success ra.md`
+6. `C006 — 80-99% false positive rate in healthcare alert systems.md`
+7. `C007 — Each reminder reduces response rate by 30% (alert fatigue).md`
+8. `C008 — Klarna saved $60M with AI agents but reversed deployment due.md`
+9. `C009 — VW Cariad $7.5B loss attributed to AI orchestration complexi.md`
+10. `C010 — 96% of security breaches are disclosed by the attacker, not .md`
+11. `C011 — LangChain grew from 0 to 100k GitHub stars in approximately .md`
+12. `C012 — Vercel achieved $200M ARR via DX-first design philosophy.md`
+13. `C013 — Air Canada held legally liable for chatbot hallucination.md`
+14. `C014 — Grok RAG poisoning contaminated thousands of responses befor.md`
+15. `C015 — Waymo required 7 collisions before issuing recall.md`
 
 ### Output
 - **File:** `20_Areas/AI-Research/Claims/Claims-Ledger.md`
@@ -94,12 +113,19 @@ All original C001-C015.md files preserved for Florian's review.
 ## Task 2: VC-Job-Hunt Consolidation
 
 ### Input Sources
-- `10_Projects/VC-Jobs-27-Links.md` — 27 job opportunities research
-- `20_Areas/Venture-Capital/Applications/_Pipeline.md` — Application pipeline
-- `20_Areas/Venture-Capital/Applications/VC-Openings-Feb-2026.md` — Feb 2026 openings
-- `20_Areas/Venture-Capital/Materials/00-Job-Search-Strategy.md` — Strategy document
-- `20_Areas/Venture-Capital/Applications/HOF-Capital/HOF-Application.md` — HOF Capital app
-- `20_Areas/Venture-Capital/Networking/NETWORK-ACTIVATION-30DAY.md` — Network playbook
+
+**Source Files (Full Paths):**
+1. `10_Projects/VC-Jobs-27-Links.md` — 27 job opportunities research (compiled Feb 11, 2026)
+2. `20_Areas/Venture-Capital/Applications/_Pipeline.md` — Application pipeline tracker
+3. `20_Areas/Venture-Capital/Applications/VC-Openings-Feb-2026.md` — Feb 2026 openings (compiled Feb 7, 2026)
+4. `20_Areas/Venture-Capital/Materials/00-Job-Search-Strategy.md` — Overall VC career strategy
+5. `20_Areas/Venture-Capital/Applications/HOF-Capital/HOF-Application.md` — HOF Capital application materials
+6. `20_Areas/Venture-Capital/Networking/NETWORK-ACTIVATION-30DAY.md` — 30-day network activation playbook (compiled Feb 10, 2026)
+
+**Verification:** Top 3 job postings verified active via web_search (2026-02-19):
+- ✅ Betaworks Investment Associate — ACTIVE (ZipRecruiter listing confirmed)
+- ✅ Moxxie Ventures Investor — ACTIVE (posted Jan 27, 2026, still open)
+- ✅ HOF Capital Associate/Senior Associate — ACTIVE (Harvard Career Services + multiple postings)
 
 ### Output
 - **File:** `10_Projects/VC-Job-Hunt.md`
@@ -363,7 +389,26 @@ Based on Phase 2 findings, suggested next steps:
 
 ---
 
-## Quality Assurance
+## Verification & Quality Assurance
+
+### Web Search Verification (Added 2026-02-19)
+
+To ensure accuracy and currency of information, web searches were conducted for critical uncertain claims:
+
+**Job Posting Verification:**
+- **Betaworks Investment Associate:** ✅ Confirmed active (ZipRecruiter listing, $85K-$125K, NYC)
+- **Moxxie Ventures Investor:** ✅ Confirmed active (careers.moxxie.vc, posted Jan 27, 2026)
+- **HOF Capital VC Associate:** ✅ Confirmed active (Harvard Career Services, multiple roles posted)
+
+**Search Queries Used:**
+1. "Betaworks Investment Associate job opening 2026"
+2. "Moxxie Ventures investor job posting January 2026"
+3. "HOF Capital venture capital associate AI job 2026"
+
+**Results:**
+- All 3 top-priority job postings are **actively hiring** as of Feb 19, 2026
+- No stale listings detected
+- Salary ranges and application links verified current
 
 ### Self-Audit Checklist
 
@@ -450,7 +495,14 @@ Based on Phase 2 findings, suggested next steps:
 
 ## Changelog
 
-**2026-02-19:**
+**2026-02-19 (v1.0.1 — Updated per Florian's request):**
+- ✅ Added **source file lists** to Claims-Ledger.md (15 original filenames)
+- ✅ Added **source file lists** to VC-Job-Hunt.md (6 original filenames with dates)
+- ✅ Added **web search verification** for top 3 job postings (all confirmed active)
+- ✅ Updated report with source file lists and verification methodology
+- ✅ Version bumped to 1.0.1 for all deliverables
+
+**2026-02-19 (v1.0.0 — Initial):**
 - Initial Phase 2 execution
 - Claims-Ledger.md created (15 claims)
 - VC-Job-Hunt.md created (27 opportunities)
