@@ -1631,10 +1631,11 @@ def log_decision(body: dict):
 
 @app.get("/api/backlog")
 def get_backlog():
-    """Returns backlog items, prioritized."""
+    """Returns backlog items (backlog + started), prioritized."""
     db = get_db()
-    rows = db.execute("""SELECT * FROM backlog WHERE status='backlog' 
-                         ORDER BY CASE priority 
+    rows = db.execute("""SELECT * FROM backlog WHERE status IN ('backlog','started') 
+                         ORDER BY CASE status WHEN 'started' THEN 0 WHEN 'backlog' THEN 1 END,
+                         CASE priority 
                              WHEN 'NOW' THEN 0 
                              WHEN 'HIGH' THEN 1 
                              WHEN 'NORMAL' THEN 2 

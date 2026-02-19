@@ -853,6 +853,13 @@ async function loadPipeline() {
   <div class="sys-indicator" id="sysIndicator" onclick="showOperations()">
     <div class="sys-dot" id="sysDot" style="background:#4aa088"></div>
     <span id="sysLabel">All systems nominal</span>
+  </div>
+  <div style="border-top:1px solid var(--border);margin-top:8px;padding-top:8px">
+    <div style="font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);padding:4px 20px">Demos</div>
+    <a href="/view/projects/workbench/demos/glashuette.html" target="_blank" style="display:flex;align-items:center;gap:8px;padding:8px 20px;font-size:11px;color:var(--text-muted);text-decoration:none;cursor:pointer;transition:background 0.1s" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+      <span style="color:var(--warm);font-weight:600;font-size:10px">G</span>
+      <span>Gemeinde Glashütte</span>
+    </a>
   </div>`;
   
   // Load today's score for the Operations item
@@ -874,107 +881,180 @@ async function loadOperationsScore() {
 let activeStageFilter = null;
 let stageViewOpen = false;
 
+// Unified View State
+const VIEW = {
+  current: 'topics',
+  stage: null,
+  contextMode: 'topic'
+};
+
+function switchView(target, opts = {}) {
+  const conv = document.getElementById('conv');
+  const stageView = document.getElementById('stageView');
+  const opsView = document.getElementById('operationsView');
+  const pipelineView = document.getElementById('pipelineView');
+  const principlesView = document.getElementById('principlesView');
+  const steps = document.getElementById('stepsBar');
+  const actionBar = document.getElementById('actionBar');
+  const input = document.querySelector('.input-area');
+  const ctx = document.getElementById('ctxPanel');
+
+  // Hide everything first
+  conv.style.display = 'none';
+  if (steps) steps.style.display = 'none';
+  if (actionBar) actionBar.style.display = 'none';
+  if (input) input.style.display = 'none';
+  stageView.classList.remove('open');
+  if (opsView) opsView.style.display = 'none';
+  if (pipelineView) pipelineView.style.display = 'none';
+  if (principlesView) principlesView.style.display = 'none';
+
+  // Reset old state variables for backward compatibility
+  operationsViewOpen = false;
+  pipelineViewOpen = false;
+  principlesViewOpen = false;
+  stageViewOpen = false;
+  activeStageFilter = null;
+  document.querySelectorAll('.pipe-stage').forEach(s => s.classList.remove('active'));
+
+  // Show target view
+  switch(target) {
+    case 'topics':
+      conv.style.display = '';
+      if (steps) steps.style.display = '';
+      if (input) input.style.display = '';
+      ctx.style.display = '';
+      VIEW.contextMode = 'topic';
+      if (currentTopic) selectTopic(currentTopic);
+      break;
+    case 'executive':
+      opsView.style.display = 'flex';
+      operationsViewOpen = true;
+      ctx.style.display = '';
+      VIEW.contextMode = 'global';
+      renderOperationsView();
+      renderGlobalContext();
+      break;
+    case 'stage':
+      stageView.classList.add('open');
+      stageViewOpen = true;
+      activeStageFilter = opts.stage;
+      ctx.style.display = '';
+      VIEW.contextMode = 'global';
+      renderStageView(opts.stage);
+      renderGlobalContext();
+      break;
+    case 'pipeline':
+      pipelineView.style.display = 'flex';
+      pipelineView.style.flexDirection = 'column';
+      pipelineViewOpen = true;
+      ctx.style.display = 'none';
+      renderPipelineView();
+      break;
+    case 'principles':
+      principlesView.style.display = 'flex';
+      principlesView.style.flexDirection = 'column';
+      principlesViewOpen = true;
+      ctx.style.display = 'none';
+      renderPrinciplesView();
+      break;
+  }
+
+  VIEW.current = target;
+  VIEW.stage = opts.stage || null;
+  updateHeaderButtons();
+  loadFolderTree();
+}
+
+function updateHeaderButtons() {
+  const ctxBtn = document.getElementById('ctxBtn');
+  if (ctxBtn) {
+    const ctxEnabled = ['topics', 'executive', 'stage'].includes(VIEW.current);
+    ctxBtn.style.opacity = ctxEnabled ? '1' : '0.3';
+    ctxBtn.style.pointerEvents = ctxEnabled ? 'auto' : 'none';
+    ctxBtn.title = ctxEnabled ? 'Context Panel öffnen' : 'Context nicht verfügbar in dieser Ansicht';
+  }
+}
+
+function renderGlobalContext() {
+  const el = document.getElementById('ctxInner');
+  if (!el) return;
+
+  let html = '';
+
+  html += '<div class="ctx-sec"><div class="ctx-sec-title">Dokumente</div>';
+  const docs = [
+    {name:'README', path:'projects/workbench/README.md'},
+    {name:'Architecture', path:'projects/workbench/ARCHITECTURE.md'},
+    {name:'API Reference', path:'projects/workbench/DOCUMENTATION.md'},
+    {name:'DB Schema', path:'projects/workbench/DB-SCHEMA.md'},
+    {name:'Formulas', path:'projects/workbench/FORMULAS.md'},
+    {name:'Security', path:'projects/workbench/SECURITY.md'},
+    {name:'Runbook', path:'projects/workbench/RUNBOOK.md'},
+    {name:'Design Doc', path:'projects/workbench/DESIGN-DOC.md'},
+  ];
+  docs.forEach(d => {
+    html += '<a class="ctx-doc" href="/view/' + d.path + '" target="_blank" style="text-decoration:none;color:inherit">' +
+      '<div class="ctx-doc-icon">MD</div><div>' + d.name + '</div></a>';
+  });
+  html += '</div>';
+
+  html += '<div class="ctx-sec"><div class="ctx-sec-title" style="color:var(--warm)">Quick Links</div>';
+  const links = [
+    {name:'GitHub (Private)', url:'https://github.com/florianziesche/ainary-platform'},
+    {name:'Landing Page', url:'https://ainaryventures.com'},
+    {name:'Glashütte Demo', url:'/view/projects/workbench/demos/glashuette.html'},
+  ];
+  links.forEach(l => {
+    html += '<a class="ctx-doc" href="' + l.url + '" target="_blank" style="text-decoration:none;color:inherit">' +
+      '<div class="ctx-doc-icon" style="background:rgba(212,168,83,0.1);color:var(--warm);border-color:rgba(212,168,83,0.2)">→</div><div>' + l.name + '</div></a>';
+  });
+  html += '</div>';
+
+  html += '<div class="ctx-sec"><div class="ctx-sec-title">Standards</div>';
+  const standards = [
+    {name:'R2 Deep Dive Research', path:'standards/R2-DEEP-DIVE-RESEARCH.md'},
+    {name:'S1 Ersttermin-Prep', path:'standards/S1-ERSTTERMIN-PREP.md'},
+    {name:'Agent Context Package', path:'standards/AGENT-CONTEXT-PACKAGE.md'},
+  ];
+  standards.forEach(s => {
+    html += '<a class="ctx-doc" href="/view/' + s.path + '" target="_blank" style="text-decoration:none;color:inherit">' +
+      '<div class="ctx-doc-icon">STD</div><div>' + s.name + '</div></a>';
+  });
+  html += '</div>';
+
+  el.innerHTML = html;
+}
+
 function filterStage(stage, el) {
   const wasActive = el.classList.contains('active');
   document.querySelectorAll('.pipe-stage').forEach(s=>s.classList.remove('active'));
   
   if (wasActive) {
-    // Deselect: hide stage view, show topic content
-    activeStageFilter = null;
-    stageViewOpen = false;
-    hideStageView();
+    switchView('topics');
   } else {
-    // Select: show stage view for this stage
     el.classList.add('active');
-    activeStageFilter = stage;
-    stageViewOpen = true;
-    showStageView(stage);
+    switchView('stage', {stage});
   }
-  
-  loadFolderTree(); // This will filter topics in sidebar
 }
 
 function showStageView(stage) {
-  // Hide other views
-  if (pipelineViewOpen) { pipelineViewOpen = false; document.getElementById('pipelineView').style.display = 'none'; }
-  if (principlesViewOpen) { principlesViewOpen = false; document.getElementById('principlesView').style.display = 'none'; }
-  if (operationsViewOpen) { operationsViewOpen = false; document.getElementById('operationsView').style.display = 'none'; }
-  
-  const conv = document.getElementById('conv');
-  const stageView = document.getElementById('stageView');
-  const steps = document.getElementById('stepsBar');
-  const actionBar = document.getElementById('actionBar');
-  const input = document.querySelector('.input-area');
-  const ctx = document.getElementById('ctxPanel');
-  
-  conv.style.display = 'none';
-  if (steps) steps.style.display = 'none';
-  if (actionBar) actionBar.style.display = 'none';
-  if (input) input.style.display = 'none';
-  ctx.style.display = 'none';
-  stageView.classList.add('open');
-  
-  renderStageView(stage);
+  switchView('stage', {stage});
 }
 
 function hideStageView() {
-  const conv = document.getElementById('conv');
-  const stageView = document.getElementById('stageView');
-  const steps = document.getElementById('stepsBar');
-  const input = document.querySelector('.input-area');
-  const ctx = document.getElementById('ctxPanel');
-  
-  stageView.classList.remove('open');
-  conv.style.display = '';
-  if (steps) steps.style.display = '';
-  if (input) input.style.display = '';
-  ctx.style.display = '';
-  
-  if (currentTopic) selectTopic(currentTopic);
+  switchView('topics');
 }
 
 // ── OPERATIONS VIEW ──
 let operationsViewOpen = false;
 
 function showOperations() {
-  // Hide all other views
-  if (pipelineViewOpen) { pipelineViewOpen = false; document.getElementById('pipelineView').style.display = 'none'; }
-  if (principlesViewOpen) { principlesViewOpen = false; document.getElementById('principlesView').style.display = 'none'; }
-  if (stageViewOpen) { stageViewOpen = false; hideStageView(); document.querySelectorAll('.pipe-stage').forEach(s=>s.classList.remove('active')); activeStageFilter = null; }
-  
-  const conv = document.getElementById('conv');
-  const opsView = document.getElementById('operationsView');
-  const steps = document.getElementById('stepsBar');
-  const actionBar = document.getElementById('actionBar');
-  const input = document.querySelector('.input-area');
-  const ctx = document.getElementById('ctxPanel');
-  
-  conv.style.display = 'none';
-  if (steps) steps.style.display = 'none';
-  if (actionBar) actionBar.style.display = 'none';
-  if (input) input.style.display = 'none';
-  ctx.style.display = 'none';
-  opsView.style.display = 'flex';
-  
-  operationsViewOpen = true;
-  renderOperationsView();
+  switchView('executive');
 }
 
 function hideOperations() {
-  const conv = document.getElementById('conv');
-  const opsView = document.getElementById('operationsView');
-  const steps = document.getElementById('stepsBar');
-  const input = document.querySelector('.input-area');
-  const ctx = document.getElementById('ctxPanel');
-  
-  opsView.style.display = 'none';
-  conv.style.display = '';
-  if (steps) steps.style.display = '';
-  if (input) input.style.display = '';
-  ctx.style.display = '';
-  
-  operationsViewOpen = false;
-  if (currentTopic) selectTopic(currentTopic);
+  switchView('topics');
 }
 
 async function renderOperationsView() {
@@ -1569,14 +1649,18 @@ function renderBacklog(backlog) {
     const priorityColor = priorityColors[item.priority] || '#8e8e8e';
     const agent = item.assigned_to || '—';
     
+    const isStarted = item.status === 'started';
     return `
-      <div class="backlog-item">
-        <span class="backlog-priority" style="background:${priorityColor}20;color:${priorityColor}">${item.priority}</span>
+      <div class="backlog-item" style="${isStarted ? 'border-left:2px solid #4aa088;background:rgba(74,160,136,0.03)' : ''}">
+        ${isStarted ? '<span style="width:6px;height:6px;border-radius:50%;background:#4aa088;flex-shrink:0;animation:pulse 2s infinite"></span>' : ''}
+        <span class="backlog-priority" style="background:${priorityColor}20;color:${priorityColor}">${isStarted ? 'AKTIV' : item.priority}</span>
         <div class="backlog-desc">${item.description}</div>
         <span style="font-size:10px;color:var(--text-dim);width:80px;text-align:right">${agent}</span>
         <div class="backlog-actions">
-          <button class="backlog-btn" onclick="startBacklogItem(${item.id})">Start</button>
-          <button class="backlog-btn" onclick="deleteBacklogItem(${item.id})">Delete</button>
+          ${isStarted 
+            ? `<button class="backlog-btn" style="color:#4aa088;border-color:#4aa088" onclick="completeBacklogItem(${item.id})" title="Als erledigt markieren">✓ Fertig</button>`
+            : `<button class="backlog-btn" onclick="startBacklogItem(${item.id})" title="Jetzt daran arbeiten — wird als aktiv markiert">Starten</button>`}
+          <button class="backlog-btn" onclick="deleteBacklogItem(${item.id})" title="Dauerhaft löschen">Löschen</button>
         </div>
       </div>
     `;
@@ -1622,6 +1706,20 @@ async function startBacklogItem(id) {
     renderOperationsView();
   } catch (e) {
     console.error('Failed to start backlog item:', e);
+  }
+}
+
+async function completeBacklogItem(id) {
+  try {
+    await fetch(API + '/backlog/' + id, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'done' })
+    });
+    showSystemMsg('Backlog-Item erledigt');
+    renderOperationsView();
+  } catch (e) {
+    console.error('Failed to complete backlog item:', e);
   }
 }
 
@@ -2500,10 +2598,33 @@ async function zoneDrop(e, folderId) {
 // ── SELECT TOPIC ──
 async function selectTopic(id) {
   currentTopic = id;
-  // Close special views
-  if (principlesViewOpen) { principlesViewOpen = false; const prv = document.getElementById('principlesView'); if(prv) prv.style.display = 'none'; document.querySelector('.input-area').style.display = ''; document.getElementById('conv').style.display = ''; document.getElementById('ctxPanel').style.display = ''; }
-  if (stageViewOpen) { stageViewOpen = false; hideStageView(); document.querySelectorAll('.pipe-stage').forEach(s=>s.classList.remove('active')); activeStageFilter = null; }
-  if (operationsViewOpen) { hideOperations(); }
+  // Close special views - restore topics view elements if needed
+  if (VIEW.current !== 'topics') {
+    const stageView = document.getElementById('stageView');
+    const opsView = document.getElementById('operationsView');
+    const pipelineView = document.getElementById('pipelineView');
+    const principlesView = document.getElementById('principlesView');
+    stageView.classList.remove('open');
+    if (opsView) opsView.style.display = 'none';
+    if (pipelineView) pipelineView.style.display = 'none';
+    if (principlesView) principlesView.style.display = 'none';
+    document.getElementById('conv').style.display = '';
+    const steps = document.getElementById('stepsBar');
+    if (steps) steps.style.display = '';
+    const input = document.querySelector('.input-area');
+    if (input) input.style.display = '';
+    document.getElementById('ctxPanel').style.display = '';
+    document.querySelectorAll('.pipe-stage').forEach(s => s.classList.remove('active'));
+    operationsViewOpen = false;
+    pipelineViewOpen = false;
+    principlesViewOpen = false;
+    stageViewOpen = false;
+    activeStageFilter = null;
+    VIEW.current = 'topics';
+    VIEW.stage = null;
+    VIEW.contextMode = 'topic';
+    updateHeaderButtons();
+  }
   // Highlight in list
   document.querySelectorAll('.topic-item').forEach(t=>t.classList.remove('active'));
   const items = document.querySelectorAll('.topic-item');
@@ -3379,8 +3500,13 @@ async function loadEvents(topicId) {
 }
 
 function toggleCtx() {
-  document.getElementById('ctxPanel').classList.toggle('open');
+  const panel = document.getElementById('ctxPanel');
+  panel.classList.toggle('open');
   document.getElementById('ctxBtn').classList.toggle('on');
+  // If in global mode and opening, render global context
+  if (panel.classList.contains('open') && VIEW.contextMode === 'global') {
+    renderGlobalContext();
+  }
 }
 
 function openFiles() {
@@ -3550,7 +3676,7 @@ document.addEventListener('keydown', e => {
   if ((e.metaKey || e.ctrlKey) && e.key === 'i') { e.preventDefault(); togglePrinciplesView(); return; }
   
   // Cmd+O: Operations
-  if ((e.metaKey || e.ctrlKey) && e.key === 'o') { e.preventDefault(); showOperations(); return; }
+  if ((e.metaKey || e.ctrlKey) && e.key === 'o') { e.preventDefault(); switchView(VIEW.current === 'executive' ? 'topics' : 'executive'); return; }
   
   // Cmd+N: New Topic
   if ((e.metaKey || e.ctrlKey) && e.key === 'n') { e.preventDefault(); startAddTopic(); return; }
@@ -3594,33 +3720,8 @@ document.getElementById('inputField').addEventListener('input', function() {
 let principlesViewOpen = false;
 
 function togglePrinciplesView() {
-  principlesViewOpen = !principlesViewOpen;
-  if (pipelineViewOpen) { pipelineViewOpen = false; document.getElementById('pipelineView').style.display = 'none'; }
-  if (stageViewOpen) { stageViewOpen = false; hideStageView(); document.querySelectorAll('.pipe-stage').forEach(s=>s.classList.remove('active')); activeStageFilter = null; }
-  
-  const conv = document.getElementById('conv');
-  const pv = document.getElementById('principlesView');
-  const steps = document.getElementById('stepsBar');
-  const actionBar = document.getElementById('actionBar');
-  const input = document.querySelector('.input-area');
-  
-  if (principlesViewOpen) {
-    conv.style.display = 'none';
-    if (steps) steps.style.display = 'none';
-    if (actionBar) actionBar.style.display = 'none';
-    if (input) input.style.display = 'none';
-    pv.style.display = 'flex';
-    pv.style.flexDirection = 'column';
-    document.getElementById('ctxPanel').style.display = 'none';
-    renderPrinciplesView();
-  } else {
-    conv.style.display = '';
-    if (steps) steps.style.display = '';
-    if (input) input.style.display = '';
-    pv.style.display = 'none';
-    document.getElementById('ctxPanel').style.display = '';
-    if (currentTopic) selectTopic(currentTopic);
-  }
+  if (VIEW.current === 'principles') { switchView('topics'); }
+  else { switchView('principles'); }
 }
 
 function renderPrinciplesView() {
@@ -3781,34 +3882,8 @@ let pipelineViewOpen = false;
 let connectMode = null; // null or {from: topicId, fromName: string}
 
 async function togglePipelineView() {
-  pipelineViewOpen = !pipelineViewOpen;
-  if (principlesViewOpen) { principlesViewOpen = false; document.getElementById('principlesView').style.display = 'none'; }
-  if (stageViewOpen) { stageViewOpen = false; hideStageView(); document.querySelectorAll('.pipe-stage').forEach(s=>s.classList.remove('active')); activeStageFilter = null; }
-  const conv = document.getElementById('conv');
-  const pv = document.getElementById('pipelineView');
-  const steps = document.getElementById('stepsBar');
-  const actionBar = document.getElementById('actionBar');
-  const input = document.querySelector('.input-area');
-  const topicHeader = document.querySelector('.topic-header');
-  
-  if (pipelineViewOpen) {
-    conv.style.display = 'none';
-    if (steps) steps.style.display = 'none';
-    if (actionBar) actionBar.style.display = 'none';
-    if (input) input.style.display = 'none';
-    pv.style.display = 'flex';
-    pv.style.flexDirection = 'column';
-    // Hide context panel
-    document.getElementById('ctxPanel').style.display = 'none';
-    await renderPipelineView();
-  } else {
-    conv.style.display = '';
-    if (steps) steps.style.display = '';
-    if (input) input.style.display = '';
-    pv.style.display = 'none';
-    document.getElementById('ctxPanel').style.display = '';
-    if (currentTopic) selectTopic(currentTopic);
-  }
+  if (VIEW.current === 'pipeline') { switchView('topics'); }
+  else { switchView('pipeline'); }
 }
 
 async function renderPipelineView() {
@@ -3966,12 +4041,8 @@ async function renderPipelineView() {
 
 function pvCardClick(topicId, topicName) {
   if (!connectMode) {
-    // Normal click: navigate to topic
-    pipelineViewOpen = false;
-    document.getElementById('pipelineView').style.display = 'none';
-    document.getElementById('conv').style.display = '';
-    document.querySelector('.input-area').style.display = '';
-    document.getElementById('ctxPanel').style.display = '';
+    // Normal click: navigate to topic - switchView will handle cleanup
+    VIEW.current = 'pipeline'; // ensure switchView knows where we are
     selectTopic(topicId);
     return;
   }
