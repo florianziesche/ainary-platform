@@ -40,6 +40,21 @@
 - Research: Erst starke Hypothese, dann widerlegen versuchen
 - Bei jeder Empfehlung: Was passiert wenn es klappt? Was brauchen wir dann?
 
+### Knowledge Hierarchy (bei JEDEM Lookup)
+Wenn Quellen sich widersprechen → höherer Tier gewinnt:
+1. **CORE** (2x): verified-truths.md, decisions.md → Fakten, geprüft
+2. **KNOWLEDGE** (1.5x): knowledge/*.md, Claims-Ledger → Langzeit-Wissen
+3. **OPERATIONAL** (1x): projects.md, people.md → Aktueller Stand
+4. **EPHEMERAL** (0.5x): daily/*.md, triage/*.md → Tages-Kontext, veraltet schnell
+
+### Full-Stack Lookup (bei komplexen Fragen)
+Nicht nur memory_search. Alle Ebenen nutzen:
+1. `memory_search` → 70_Mia/ (schnell, Embedding-basiert)
+2. `search-vault.py` → Ganzer Vault semantisch (wenn memory_search nicht reicht)
+3. `backlinks.json` → "Was hängt damit zusammen?" (via jq)
+4. `curl localhost:8080/api/` → Live Platform-Daten (wenn operational)
+5. `web_search` → Extern verifizieren (wenn Confidence < 80%)
+
 ---
 
 ## 3. Strategie (Phase: Revenue & VC, Stand Feb 2026)
