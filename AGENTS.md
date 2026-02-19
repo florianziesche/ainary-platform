@@ -15,17 +15,18 @@
 | Presentation, Slides | `skills/presentation-design/SKILL.md` | RESEARCH-PROTOCOL |
 | Heartbeat | `ref/HEARTBEAT.md` | all standards |
 
-## Task Loop (10 Schritte, nicht optional)
-1. **AKTIVIEREN:** `memory_search` + `verified-truths.md` + `connections.md` — was wissen wir schon?
-2. **HYPOTHESE:** Starke Vermutung BEVOR recherchiert wird
-3. **TESTEN:** Hypothese widerlegen versuchen, nicht bestätigen
-4. **AUSFÜHREN:** Die Arbeit machen
-5. **3-SEKUNDEN-CHECK:** Beantwortet? Belegt? Nutzbar? → Nein = Retry
-6. **EXTRAHIEREN:** Neue Fakten → `verified-truths.md`
-7. **VERBINDEN:** 2-3 Connections → `connections.md`
-8. **VORBEREITEN:** Was passiert wenn es klappt? Was brauchen wir dann?
-9. **TRUST:** `agenttrust-score.py update <agent> <conf> <outcome>`
-10. **LIEFERN**
+## Task Loop (5 Schritte, mandatory)
+1. **AKTIVIEREN:** `memory_search` + relevanten Kontext laden — was wissen wir schon?
+2. **AUSFÜHREN:** Die Arbeit machen
+3. **PRÜFEN:** Beantwortet? Belegt? Nutzbar? → Nein = Retry
+4. **SPEICHERN:** Memory-R1 Check → wenn ja: memory/daily/YYYY-MM-DD.md
+5. **LIEFERN**
+
+### Zusätzlich bei Research/Deep Tasks (optional)
+- Hypothese VOR dem Suchen aufstellen, dann widerlegen versuchen
+- Neue Fakten → `verified-truths.md`
+- 2-3 Connections → `connections.md`
+- `agenttrust-score.py update <agent> <conf> <outcome>`
 
 ## Decision Tree — Was lese ich wann?
 *Florian kann jederzeit sagen: "Lies den Baum." Dann starte ich hier.*
@@ -79,10 +80,10 @@ START: Neue Aufgabe erhalten
 - "Check Obsidian" → Vault durchsuchen
 
 ## Every Session
-1. Read `SOUL.md` — who I am, how I work
+1. Read `SOUL.md` — who I am, how I work (includes Identity)
 2. Read `USER.md` — who Florian is
-3. Read `MEMORY.md` → follow its load order
-4. Main session only: Read today's + yesterday's `memory/YYYY-MM-DD.md`
+3. Read `memory/MEMORY-INDEX.md` → follow its load order
+4. Main session only: Read today's + yesterday's `memory/daily/YYYY-MM-DD.md`
 
 ## Before EVERY Task
 1. **Identify task type** → load the right standards (Trigger Map above)
@@ -113,10 +114,13 @@ Every sub-agent task MUST end with self-audit:
 | Type | File(s) | Update |
 |------|---------|--------|
 | Core (identity) | SOUL.md, USER.md | Monthly, human only |
-| Episodic (events) | memory/YYYY-MM-DD.md | Daily |
-| Semantic (knowledge) | MEMORY.md | Weekly distillation |
-| Procedural (how-to) | AGENTS.md, SUB-AGENT-CONTEXT.md | When process changes |
+| Episodic (events) | memory/daily/YYYY-MM-DD.md | Daily |
+| Semantic (knowledge) | memory/knowledge/*.md, verified-truths.md | On change |
+| Procedural (how-to) | AGENTS.md, SUB-AGENT-CONTEXT.md, memory/rules/*.md | When process changes |
 | Resource (references) | memory/people.md, projects.md | On change |
+| Navigation | memory/MEMORY-INDEX.md | When structure changes |
+
+*All memory/ paths resolve via symlink to Obsidian Vault/70_Mia/*
 
 ## Development Intake Rule (NON-NEGOTIABLE, learned 2026-02-19)
 **Erst Intake, dann Code.** Jeder Build >30min: `standards/Q2-DEVELOPMENT-INTAKE.md`.
