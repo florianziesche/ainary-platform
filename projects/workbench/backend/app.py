@@ -1633,8 +1633,8 @@ def log_decision(body: dict):
 def get_backlog():
     """Returns backlog items (backlog + started), prioritized."""
     db = get_db()
-    rows = db.execute("""SELECT * FROM backlog WHERE status IN ('backlog','started') 
-                         ORDER BY CASE status WHEN 'started' THEN 0 WHEN 'backlog' THEN 1 END,
+    rows = db.execute("""SELECT * FROM backlog WHERE status IN ('started','backlog','done') 
+                         ORDER BY CASE status WHEN 'started' THEN 0 WHEN 'done' THEN 1 WHEN 'backlog' THEN 2 END,
                          CASE priority 
                              WHEN 'NOW' THEN 0 
                              WHEN 'HIGH' THEN 1 

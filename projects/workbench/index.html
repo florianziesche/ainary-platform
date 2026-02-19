@@ -1650,18 +1650,31 @@ function renderBacklog(backlog) {
     const agent = item.assigned_to || '—';
     
     const isStarted = item.status === 'started';
+    const isDone = item.status === 'done';
+    const statusStyle = isStarted ? 'border-left:2px solid #4aa088;background:rgba(74,160,136,0.03)' 
+      : isDone ? 'border-left:2px solid var(--warm);background:rgba(212,168,83,0.03);opacity:0.7' : '';
+    const statusBadge = isStarted ? 'AKTIV' : isDone ? 'ERLEDIGT' : item.priority;
+    const badgeColor = isStarted ? '#4aa088' : isDone ? 'var(--warm)' : priorityColor;
+    
+    let buttons = '';
+    if (isDone) {
+      buttons = `
+        <button class="backlog-btn" style="color:var(--warm);border-color:var(--warm)" onclick="approveBacklogItem(${item.id})" title="Ich habe geprüft — Aufgabe ist wirklich erledigt. Wird archiviert.">✓ Bestätigt</button>
+        <button class="backlog-btn" onclick="startBacklogItem(${item.id})" title="Noch nicht fertig — zurück auf Aktiv setzen">↩ Zurück</button>`;
+    } else if (isStarted) {
+      buttons = `<button class="backlog-btn" style="color:#4aa088;border-color:#4aa088" onclick="completeBacklogItem(${item.id})" title="Aufgabe ist aus meiner Sicht fertig. Florian muss noch bestätigen.">✓ Fertig</button>`;
+    } else {
+      buttons = `<button class="backlog-btn" onclick="startBacklogItem(${item.id})" title="Jetzt daran arbeiten — wird als aktiv markiert">Starten</button>
+        <button class="backlog-btn" onclick="deleteBacklogItem(${item.id})" title="Dauerhaft löschen">Löschen</button>`;
+    }
+    
     return `
-      <div class="backlog-item" style="${isStarted ? 'border-left:2px solid #4aa088;background:rgba(74,160,136,0.03)' : ''}">
+      <div class="backlog-item" style="${statusStyle}">
         ${isStarted ? '<span style="width:6px;height:6px;border-radius:50%;background:#4aa088;flex-shrink:0;animation:pulse 2s infinite"></span>' : ''}
-        <span class="backlog-priority" style="background:${priorityColor}20;color:${priorityColor}">${isStarted ? 'AKTIV' : item.priority}</span>
+        <span class="backlog-priority" style="background:${badgeColor}20;color:${badgeColor}">${statusBadge}</span>
         <div class="backlog-desc">${item.description}</div>
         <span style="font-size:10px;color:var(--text-dim);width:80px;text-align:right">${agent}</span>
-        <div class="backlog-actions">
-          ${isStarted 
-            ? `<button class="backlog-btn" style="color:#4aa088;border-color:#4aa088" onclick="completeBacklogItem(${item.id})" title="Als erledigt markieren">✓ Fertig</button>`
-            : `<button class="backlog-btn" onclick="startBacklogItem(${item.id})" title="Jetzt daran arbeiten — wird als aktiv markiert">Starten</button>`}
-          <button class="backlog-btn" onclick="deleteBacklogItem(${item.id})" title="Dauerhaft löschen">Löschen</button>
-        </div>
+        <div class="backlog-actions">${buttons}</div>
       </div>
     `;
   }).join('');
@@ -1696,32 +1709,25 @@ async function addBacklogItem() {
   }
 }
 
-async function startBacklogItem(id) {
+async function updateBacklogStatus(id, status, msg) {
   try {
     await fetch(API + '/backlog/' + id, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: 'started' })
+      body: JSON.stringify({ status })
     });
-    renderOperationsView();
+    if (msg) showSystemMsg(msg);
+    // Re-render only the backlog section, not the whole view
+    const bl = await fetch(API + '/backlog').then(r => r.json());
+    renderBacklog(bl);
   } catch (e) {
-    console.error('Failed to start backlog item:', e);
+    console.error('Failed to update backlog item:', e);
   }
 }
 
-async function completeBacklogItem(id) {
-  try {
-    await fetch(API + '/backlog/' + id, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: 'done' })
-    });
-    showSystemMsg('Backlog-Item erledigt');
-    renderOperationsView();
-  } catch (e) {
-    console.error('Failed to complete backlog item:', e);
-  }
-}
+async function startBacklogItem(id) { updateBacklogStatus(id, 'started', 'Aufgabe gestartet'); }
+async function completeBacklogItem(id) { updateBacklogStatus(id, 'done', 'Aufgabe wartet auf Bestätigung'); }
+async function approveBacklogItem(id) { updateBacklogStatus(id, 'approved', 'Aufgabe bestätigt und archiviert'); }
 
 async function deleteBacklogItem(id) {
   try {
