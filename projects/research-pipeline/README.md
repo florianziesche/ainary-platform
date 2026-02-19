@@ -1,26 +1,80 @@
 # Ainary Research Pipeline
 
-Automated research report generation using Anthropic API.
-Optimized for $200 budget = ~3.3M Opus input tokens or ~60M Haiku input tokens.
+**Automated research report generation using Claude Opus + hierarchical RAG.**
 
-## Strategy: Multi-Model Routing
-- **Haiku** ($0.25/MTok in, $1.25/MTok out): Paper fetching, summarization, source extraction
-- **Sonnet** ($3/MTok in, $15/MTok out): Synthesis, pattern recognition, cross-referencing  
-- **Opus** ($15/MTok in, $75/MTok out): Final report writing, quality gate, opinionated analysis
+Produces A+++ grade research reports with:
+- Tiered knowledge retrieval (CORE 2x → KNOWLEDGE 1.5x → EPHEMERAL 0.5x)
+- Per-paragraph evidence classification (E/I/J/A badges)
+- Beipackzettel (Information Safety Label) per report
+- 13 deterministic validation checks
+- Self-calibrating confidence scores
 
-## Pipeline Stages
-1. **Intake** — Fetch papers from arxiv, RSS, web search (Haiku)
-2. **Extract** — Pull key findings, methods, results from each paper (Haiku)
-3. **Synthesize** — Cross-reference findings, identify patterns (Sonnet)
-4. **Write** — Generate report HTML from template (Opus)
-5. **Quality Gate** — Self-audit, source verification (Sonnet)
-6. **Publish** — Git push + Vercel deploy
+## Quick Start
 
-## Cost Estimate per Report
-- Intake: ~50K Haiku tokens = $0.01
-- Extract (10 papers): ~500K Haiku tokens = $0.13
-- Synthesize: ~100K Sonnet tokens = $0.30
-- Write: ~50K Opus tokens = $0.75
-- Quality: ~50K Sonnet tokens = $0.15
-- **Total per report: ~$1.34**
-- **$200 budget = ~149 reports**
+```bash
+# Create run directory
+OUTDIR=~/.openclaw/workspace/research/mia-pipeline/my-topic-$(date +%Y%m%d-%H%M)
+mkdir -p "$OUTDIR"
+
+# Write research brief (see SETUP.md for full schema)
+cat > "$OUTDIR/research-brief.json" << 'EOF'
+{
+  "topic": "Your Topic Here",
+  "decision": "What should the reader decide?",
+  "audience": "Who reads this?",
+  "audience_tag": "PUBLIC",
+  "sub_questions": ["Question 1?", "Question 2?", "Question 3?"]
+}
+EOF
+echo '{"claims": []}' > "$OUTDIR/all-claims.json"
+echo '{"contradictions": []}' > "$OUTDIR/contradictions.json"
+
+# Run pipeline (~60-90 min with OAuth, ~5 min with API key)
+python3 mia_synthesis_v3.py "$OUTDIR" --version v1
+```
+
+## Documentation
+
+- **[SETUP.md](SETUP.md)** — Complete setup guide (zero to first report)
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** — Pipeline architecture, data flow, design decisions
+
+## Architecture
+
+```
+research-brief.json
+       ↓
+Phase A: Outline (Opus) → JSON structure with 7 sections
+Phase B: Sections (Opus × 7) → Each section with RAG context + validation
+Phase C: Merge (Python) → Single document + Beipackzettel
+Phase D: Validate (Python) → 13 checks (E/I/J/A ratio, grounding, consistency)
+Phase E: Grade (Python) → A+++/A++/A+/B/C
+       ↓
+final-report.md + beipackzettel.json + validation-report.json
+```
+
+## Knowledge Tiers
+
+| Tier | Boost | Example |
+|---|---|---|
+| **CORE** | 2.0x | Verified claims (CRTs), self-corrections, curated findings |
+| **KNOWLEDGE** | 1.5x | Peer-reviewed papers, audited research |
+| **OPERATIONAL** | 1.0x | Project status, people, decisions |
+| **EPHEMERAL** | 0.5x | Daily notes, session logs |
+
+## Reports Produced
+
+| ID | Topic | Grade | Words | Date |
+|---|---|---|---|---|
+| MIA-001 | Trust Calibration for AI Agents | A+++ | 7,339 | 2026-02-19 |
+| MIA-002 | Hierarchical Knowledge: OpenClaw + Obsidian | — | — | 2026-02-19 |
+
+## Requirements
+
+- Python 3.10+
+- OpenClaw (for OAuth) or Anthropic API key
+- No external Python dependencies (stdlib only)
+- Optional: `agenttrust` library (`pip install -e .`)
+
+## License
+
+Private. Ainary Ventures.

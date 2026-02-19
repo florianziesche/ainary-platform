@@ -176,10 +176,31 @@ def call_opus(prompt: str, max_tokens: int = 16000) -> str:
     
     auth_data = json.loads(auth_path.read_text())
     token = None
-    for profile in auth_data:
-        if profile.get("accessToken", "").startswith("sk-ant-oat"):
-            token = profile["accessToken"]
-            break
+    # Handle both formats: list of profiles or dict with "profiles" key
+    profiles = auth_data
+    if isinstance(auth_data, dict):
+        profiles = auth_data.get("profiles", {})
+        if isinstance(profiles, dict):
+            # {name: {token: ...}} format
+            for name, p in profiles.items():
+                t = p.get("token", p.get("accessToken", ""))
+                if t.startswith("sk-ant-oat"):
+                    token = t
+                    break
+        else:
+            for p in profiles:
+                if isinstance(p, dict):
+                    t = p.get("token", p.get("accessToken", ""))
+                    if t.startswith("sk-ant-oat"):
+                        token = t
+                        break
+    elif isinstance(auth_data, list):
+        for p in auth_data:
+            if isinstance(p, dict):
+                t = p.get("token", p.get("accessToken", ""))
+                if t.startswith("sk-ant-oat"):
+                    token = t
+                    break
     
     if not token:
         raise RuntimeError("No sk-ant-oat token found in auth-profiles.json")

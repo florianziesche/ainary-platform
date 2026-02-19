@@ -557,14 +557,45 @@ Output JSON: {{"evidence": 0-2, "uncertainty": 0-2, "actionability": 0-2, "total
         for sr in sub_reports
     ])
 
+    # Python compacts context to stay under 40K chars total
+    # Sub-reports (~16K) + CRTs (~4K) + Task/Structure (~4K) = ~24K
+    # Leaves ~16K for vault + best_report combined
+    # Priority: sub-reports > CRTs > corrections > claims > vault summary > best_report excerpt
+    
+    # Vault: extract ONLY section headers + first 2 lines per section (summary, not full text)
+    vault_compact = ""
+    if vault:
+        vault_lines = vault.split("\n")
+        compact_lines = []
+        for i, line in enumerate(vault_lines):
+            if line.startswith("#") or line.startswith("- **") or line.startswith("| "):
+                compact_lines.append(line)
+                # Include next line for context
+                if i + 1 < len(vault_lines) and not vault_lines[i+1].startswith("#"):
+                    compact_lines.append(vault_lines[i+1])
+            if len("\n".join(compact_lines)) > 5000:
+                break
+        vault_compact = "\n".join(compact_lines)[:5000]
+    
+    # Best report: only executive summary (first 2000 chars)
+    best_report_excerpt = ""
+    if best_report:
+        # Find executive summary section
+        import re as _re
+        exec_match = _re.search(r'(?i)(executive summary.*?)(?=\n## |\Z)', best_report, _re.DOTALL)
+        if exec_match:
+            best_report_excerpt = exec_match.group(1)[:2000]
+        else:
+            best_report_excerpt = best_report[:2000]
+    
     synthesis_prompt = MIA_SYNTHESIS_PROMPT.format(
         real_question=brief.get("real_question", topic),
         why_now=brief.get("why_now", ""),
         sub_reports=sub_reports_text,
         crts=crts,
         corrections=corrections,
-        best_report=best_report[:20000],
-        vault=vault[:50000],
+        best_report=best_report_excerpt,
+        vault=vault_compact,
     )
 
     # Inject blindspots for documentation in final report
@@ -712,8 +743,8 @@ If a sub-report is marked GOOD: trust its [E] labeled findings.
     print(f"\n[PHASE 4] Opus builds assets (full context)...")
     asset_prompt = ASSET_SYNTHESIS_PROMPT.format(report=final_report[:15000])
 
-    # Enrich with vault context for cross-referencing
-    asset_prompt += f"\n\n## EXISTING VAULT KNOWLEDGE (for cross-references)\n{vault[:30000]}"
+    # Enrich with compact vault context for cross-referencing (not full vault)
+    asset_prompt += f"\n\n## EXISTING VAULT KNOWLEDGE (for cross-references)\n{vault_compact}"
     asset_prompt += f"\n\n## CRTs (link assets to verified truths)\n{crts}"
 
     assets = call_opus(asset_prompt, max_tokens=12000)

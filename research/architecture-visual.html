@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIA Pipeline v4 — Architecture & Report Layout</title>
+<style>
+  @font-face { font-family: 'Inter'; src: url('/fonts/inter-variable.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, sans-serif; background: #fafaf8; color: #333; line-height: 1.6; font-size: 0.9rem; }
+  .page { max-width: 1100px; margin: 0 auto; padding: 48px 40px; }
+  h1 { font-size: 2rem; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
+  h2 { font-size: 1.4rem; font-weight: 600; color: #1a1a1a; margin-top: 48px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #e5e3dc; }
+  h3 { font-size: 1.1rem; font-weight: 600; color: #1a1a1a; margin-top: 32px; margin-bottom: 12px; }
+  .subtitle { font-size: 1rem; color: #666; margin-bottom: 32px; }
+  .gold { color: #c8aa50; }
+
+  /* Architecture Diagram */
+  .arch-container { display: flex; flex-direction: column; gap: 24px; margin: 24px 0; }
+  .arch-row { display: flex; gap: 16px; align-items: stretch; }
+  .arch-box { flex: 1; border-radius: 8px; padding: 16px 20px; position: relative; }
+  .arch-box h4 { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+  .arch-box p { font-size: 0.82rem; color: #555; margin-bottom: 4px; }
+  .arch-box .detail { font-size: 0.75rem; color: #888; }
+  .arch-box.core { background: #1a1a1a; color: #fff; }
+  .arch-box.core h4 { color: #c8aa50; }
+  .arch-box.core p { color: #ccc; }
+  .arch-box.core .detail { color: #888; }
+  .arch-box.knowledge { background: #2c3e50; color: #fff; }
+  .arch-box.knowledge h4 { color: #81ecec; }
+  .arch-box.knowledge p { color: #ddd; }
+  .arch-box.knowledge .detail { color: #999; }
+  .arch-box.operational { background: #f5f4f0; border: 1px solid #e5e3dc; }
+  .arch-box.operational h4 { color: #555; }
+  .arch-box.ephemeral { background: #fff; border: 1px solid #eee; }
+  .arch-box.ephemeral h4 { color: #aaa; }
+  .arch-box .weight { position: absolute; top: 12px; right: 16px; font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+  .arch-box.core .weight { background: #c8aa50; color: #1a1a1a; }
+  .arch-box.knowledge .weight { background: #81ecec; color: #2c3e50; }
+  .arch-box.operational .weight { background: #e5e3dc; color: #555; }
+  .arch-box.ephemeral .weight { background: #f0f0f0; color: #aaa; }
+
+  /* Pipeline Flow */
+  .pipeline { display: flex; flex-direction: column; gap: 0; margin: 24px 0; }
+  .phase { display: flex; align-items: flex-start; gap: 20px; padding: 20px; border-left: 3px solid #e5e3dc; position: relative; }
+  .phase:last-child { border-left-color: transparent; }
+  .phase::before { content: ''; position: absolute; left: -8px; top: 20px; width: 13px; height: 13px; border-radius: 50%; }
+  .phase.python::before { background: #c8aa50; }
+  .phase.opus::before { background: #2c3e50; }
+  .phase.sonnet::before { background: #81ecec; }
+  .phase.human::before { background: #e74c3c; }
+  .phase-num { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; min-width: 80px; padding-top: 2px; }
+  .phase.python .phase-num { color: #c8aa50; }
+  .phase.opus .phase-num { color: #2c3e50; }
+  .phase.sonnet .phase-num { color: #0abda0; }
+  .phase.human .phase-num { color: #e74c3c; }
+  .phase-content { flex: 1; }
+  .phase-content h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
+  .phase-content p { font-size: 0.82rem; color: #555; }
+  .phase-content .output { font-size: 0.75rem; color: #888; margin-top: 6px; font-style: italic; }
+  .phase-content .files { font-size: 0.72rem; color: #aaa; margin-top: 4px; font-family: 'SF Mono', monospace; }
+  .arrow { text-align: center; color: #ccc; font-size: 1.2rem; padding: 4px 0; }
+  .checkpoint { background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px; padding: 10px 16px; margin: 8px 0; }
+  .checkpoint p { font-size: 0.8rem; color: #856404; }
+
+  /* Report Layout */
+  .report-layout { display: flex; flex-direction: column; gap: 0; margin: 24px 0; border: 1px solid #e5e3dc; border-radius: 8px; overflow: hidden; }
+  .report-section { padding: 16px 20px; border-bottom: 1px solid #eee; display: flex; gap: 16px; align-items: flex-start; }
+  .report-section:last-child { border-bottom: none; }
+  .report-section .num { font-size: 0.75rem; font-weight: 700; color: #888; min-width: 30px; }
+  .report-section .content { flex: 1; }
+  .report-section .content h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 2px; }
+  .report-section .content p { font-size: 0.78rem; color: #666; }
+  .report-section .visual { font-size: 0.7rem; color: #888; background: #f5f4f0; padding: 3px 8px; border-radius: 4px; white-space: nowrap; }
+  .report-section.cover-sec { background: #1a1a1a; }
+  .report-section.cover-sec .num { color: #c8aa50; }
+  .report-section.cover-sec h4 { color: #fff; }
+  .report-section.cover-sec p { color: #999; }
+  .report-section.cover-sec .visual { background: #333; color: #c8aa50; }
+  .report-section.bpz-sec { background: #f0f4f8; border-left: 4px solid #2c3e50; }
+  .report-section.analysis-sec { border-left: 4px solid #c8aa50; }
+  .report-section.action-sec { border-left: 4px solid #27ae60; }
+  .report-section.appendix-sec { border-left: 4px solid #888; }
+  .new-badge { font-size: 0.6rem; font-weight: 700; background: #e74c3c; color: #fff; padding: 1px 6px; border-radius: 3px; margin-left: 6px; vertical-align: middle; }
+
+  /* Doc Map */
+  .doc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 24px 0; }
+  .doc-card { background: #fff; border: 1px solid #eee; border-radius: 8px; padding: 16px; }
+  .doc-card h4 { font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; }
+  .doc-card .path { font-size: 0.7rem; color: #aaa; font-family: monospace; margin-bottom: 8px; }
+  .doc-card p { font-size: 0.78rem; color: #666; }
+  .doc-card .status { font-size: 0.65rem; font-weight: 600; padding: 2px 6px; border-radius: 3px; display: inline-block; margin-top: 8px; }
+  .doc-card .status.done { background: #d4edda; color: #155724; }
+  .doc-card .status.missing { background: #f8d7da; color: #721c24; }
+  .doc-card .status.new { background: #cce5ff; color: #004085; }
+
+  .legend { display: flex; gap: 24px; margin: 16px 0; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: #666; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+<h1><span class="gold">●</span> MIA Pipeline v4</h1>
+<p class="subtitle">Architecture, Report Layout & Documentation Map</p>
+
+<!-- ==================== SECTION 1: KNOWLEDGE HIERARCHY ==================== -->
+<h2>1. Hierarchical Knowledge Architecture</h2>
+<p>All knowledge sources ranked by trust. Higher tiers override lower tiers when conflicting. RAG Layer applies weight multipliers during retrieval.</p>
+
+<div class="arch-container">
+  <div class="arch-row">
+    <div class="arch-box core">
+      <span class="weight">2.0x</span>
+      <h4>Tier 1 — Core (Verified, Empirical)</h4>
+      <p>27 Compounding Research Truths (CRTs)</p>
+      <p>7 Corrections (self-calibrating)</p>
+      <p>14 Reference Library Papers (DOIs)</p>
+      <p class="detail">48 chunks · Last: 2026-02-19 · External source required for every entry</p>
+    </div>
+  </div>
+  <div class="arch-row">
+    <div class="arch-box knowledge">
+      <span class="weight">1.5x</span>
+      <h4>Tier 2 — Knowledge (Peer-reviewed, Curated)</h4>
+      <p>Top-20 Agent Papers (AUDITED) — 20 papers with claim audit</p>
+      <p>Agent Developments Jan/Feb 2026 — MCP, Opus 4.6, LangGraph</p>
+      <p>Cross-Pattern Insights — Original patterns + novelty checks</p>
+      <p>Compound Machine Architecture — Personal Intelligence thesis</p>
+      <p>AI Memory & Self-Improvement — Deep literature review</p>
+      <p class="detail">388 chunks · Last: 2026-02-19 · From Obsidian Vault 60_Resources/</p>
+    </div>
+  </div>
+  <div class="arch-row">
+    <div class="arch-box operational" style="flex: 1;">
+      <span class="weight">1.0x</span>
+      <h4>Tier 3 — Operational (Current State)</h4>
+      <p>projects.md · people.md · AR-INDEX.md</p>
+      <p>META-LEARNINGS.md · decisions.md</p>
+      <p class="detail">On-demand lookup · Not chunked in RAG</p>
+    </div>
+    <div class="arch-box ephemeral" style="flex: 1;">
+      <span class="weight">0.5x</span>
+      <h4>Tier 4 — Ephemeral (Daily Context)</h4>
+      <p>daily/2026-MM-DD.md</p>
+      <p>Session logs · Vault notes</p>
+      <p class="detail">~500 chunks · Decays fast · Never sole evidence</p>
+    </div>
+  </div>
+</div>
+
+<p style="font-size: 0.8rem; color: #888; text-align: center; margin-top: 8px;">
+  Total: ~936 chunks across 4 tiers · TF-IDF/BM25 retrieval with tier-boosted scoring · Query: top-k per section
+</p>
+
+<!-- ==================== SECTION 2: PIPELINE ARCHITECTURE ==================== -->
+<h2>2. Pipeline Architecture (v4 Target)</h2>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background: #c8aa50;"></div> Python (deterministic)</div>
+  <div class="legend-item"><div class="legend-dot" style="background: #2c3e50;"></div> Opus (synthesis, 1M context)</div>
+  <div class="legend-item"><div class="legend-dot" style="background: #81ecec;"></div> Sonnet (isolated research)</div>
+  <div class="legend-item"><div class="legend-dot" style="background: #e74c3c;"></div> Human checkpoint</div>
+</div>
+
+<div class="pipeline">
+
+  <div class="phase python">
+    <div class="phase-num">Phase 0<br>Intake</div>
+    <div class="phase-content">
+      <h4>Control Panel + Research Brief</h4>
+      <p>22 parameters: Topic, Decision, Audience, Risk Tier, Freshness, Narrative Arc, Original Thesis target</p>
+      <p class="output">→ control-panel.json, research-brief.json</p>
+    </div>
+  </div>
+
+  <div class="phase sonnet">
+    <div class="phase-num">Phase 1<br>Research</div>
+    <div class="phase-content">
+      <h4>Multi-Source Investigation (5 isolated Sonnet agents)</h4>
+      <p>Each sub-question → independent Sonnet with web_search. Source Log + Claim Ledger + Contradiction Register + Gap Map. Source diversity check: ≤60% from any category.</p>
+      <p class="output">→ source-log.md, claim-ledger.md, contradictions.json, gap-map.md, all-claims.json</p>
+      <p class="files">Law 2: Sonnet speaks only to Python. Never to Opus. Never to other Sonnet.</p>
+    </div>
+  </div>
+
+  <div class="phase python">
+    <div class="phase-num">Phase 1.5<br>RAG Enrich</div>
+    <div class="phase-content">
+      <h4>Hierarchical Knowledge Retrieval</h4>
+      <p>Query RAG with each sub-question + each claim. CORE (2x) hits override EPHEMERAL (0.5x). Merge with Sonnet findings. Flag conflicts between RAG knowledge and fresh research.</p>
+      <p class="output">→ enriched-claims.json (claims + RAG evidence + tier provenance)</p>
+      <p class="files">Law 3: Python everywhere deterministic.</p>
+    </div>
+  </div>
+
+  <div class="checkpoint">
+    <p>⚡ <strong>Human Checkpoint 1</strong> (30 seconds): Review enriched claims + gap map. Approve or redirect.</p>
+  </div>
+
+  <div class="phase opus">
+    <div class="phase-num">Phase 2<br>Thesis</div>
+    <div class="phase-content">
+      <h4>Thesis Development (1 Opus call)</h4>
+      <p>Original thesis ("Would an expert disagree?"), proposed framework (named), constructed scenario (3+ empirical steps), narrative arc (A→B transformation), section titles as arguments, 3× "Nobody else is saying"</p>
+      <p class="output">→ thesis.json (thesis, framework, scenario, arc, titles, nobody_bullets)</p>
+      <p class="files">Law 1: Opus receives only. Invents no facts. Connects what it gets.</p>
+    </div>
+  </div>
+
+  <div class="phase opus">
+    <div class="phase-num">Phase 3<br>Outline</div>
+    <div class="phase-content">
+      <h4>JSON Outline (1 Opus call)</h4>
+      <p>Section structure driven by thesis.json narrative arc. Each section: title (argument!), assigned claims, assigned sources, min words, KPI candidates, invalidation prompt. Claims assigned to Appendix only (not prose sections).</p>
+      <p class="output">→ outline.json</p>
+    </div>
+  </div>
+
+  <div class="phase opus">
+    <div class="phase-num">Phase 4<br>Sections</div>
+    <div class="phase-content">
+      <h4>Per-Section Writing (7-12 Opus calls, sequential)</h4>
+      <p>Each section gets: outline contract + assigned claims + RAG chunks for that section + all previous sections (consistency). Persona: "You are Florian Ziesche, founder of Ainary Ventures. Direct, no filler."</p>
+      <p><strong>Per-section validation (Python):</strong> word count, assigned sources present, banned words, "For the decision maker" callout, section confidence %, E/I/J/A ratio. Retry once if fails.</p>
+      <p class="output">→ sections/*.md (each section independently)</p>
+    </div>
+  </div>
+
+  <div class="phase python">
+    <div class="phase-num">Phase 5<br>Validate</div>
+    <div class="phase-content">
+      <h4>13 Deterministic Checks</h4>
+      <p>E/I/J/A count (E>50%, J<20%) · 3-Signal Confidence per claim · Beipackzettel correction · Source orphan check · Cross-reference check · Grounding check · Consistency check (numbers across sections) · Knowledge provenance chain</p>
+      <p class="output">→ validation-report.json</p>
+    </div>
+  </div>
+
+  <div class="phase python">
+    <div class="phase-num">Phase 6<br>Merge</div>
+    <div class="phase-content">
+      <h4>Assemble + Grade + Beipackzettel + HTML</h4>
+      <p>Merge sections into single document. Compute final grade (A+++/A++/A+/B). Generate Beipackzettel (confidence, risk level, blind spots, not checked). Insert into AR-001 HTML template with KPI grids, callout boxes, exhibits, cover, TOC, back cover. Knowledge hierarchy visible in Source Log.</p>
+      <p class="output">→ final-report.md, final-report.html, final-report.pdf, beipackzettel.json, trust-score.json</p>
+    </div>
+  </div>
+
+  <div class="checkpoint">
+    <p>⚡ <strong>Human Checkpoint 2</strong> (2 minutes): Read Beipackzettel + Executive Summary + Section Titles. Approve, edit titles, or request changes.</p>
+  </div>
+
+</div>
+
+<!-- ==================== SECTION 3: REPORT LAYOUT ==================== -->
+<h2>3. Report Layout (AR-001 Style + Beipackzettel + Hierarchical Knowledge)</h2>
+
+<div class="report-layout">
+  <div class="report-section cover-sec">
+    <div class="num">—</div>
+    <div class="content">
+      <h4>Cover Page</h4>
+      <p>Gold dot · "Ainary" · Report ID · Overall Confidence · Title · Subtitle · Date · Author</p>
+    </div>
+    <div class="visual">fullscreen</div>
+  </div>
+
+  <div class="report-section">
+    <div class="num">—</div>
+    <div class="content">
+      <h4>Table of Contents</h4>
+      <p>Grouped: Foundation / Analysis / Action / Appendix. Numbered entries with hover-gold.</p>
+    </div>
+    <div class="visual">toc-grid</div>
+  </div>
+
+  <div class="report-section bpz-sec">
+    <div class="num">1</div>
+    <div class="content">
+      <h4>Beipackzettel (Information Safety Label) <span class="new-badge">NEW</span></h4>
+      <p>KPI Grid: Confidence % · Risk Level · Source Count (by Admiralty tier). Blind spots. Not checked. "For the decision maker" summary. Machine-readable JSON link.</p>
+    </div>
+    <div class="visual">kpi-grid + callout</div>
+  </div>
+
+  <div class="report-section">
+    <div class="num">2</div>
+    <div class="content">
+      <h4>How to Read This Report</h4>
+      <p>E/I/J/A badge explanation table. Confidence tier table (85-90% / 70-75% / <70%). Knowledge hierarchy explanation.</p>
+    </div>
+    <div class="visual">2× tables</div>
+  </div>
+
+  <div class="report-section">
+    <div class="num">3</div>
+    <div class="content">
+      <h4>Executive Summary</h4>
+      <p>Thesis first (bold, 1 sentence). Evidence bullets (6-8). Keywords.</p>
+    </div>
+    <div class="visual">thesis + bullets</div>
+  </div>
+
+  <div class="report-section">
+    <div class="num">4</div>
+    <div class="content">
+      <h4>Methodology</h4>
+      <p>Short (1 paragraph). Source strategy. Knowledge hierarchy used. Pipeline disclosure.</p>
+    </div>
+    <div class="visual">1 paragraph</div>
+  </div>
+
+  <div class="report-section analysis-sec">
+    <div class="num">5-9</div>
+    <div class="content">
+      <h4>Analysis Sections (4-6 sections)</h4>
+      <p>Each section: Argument title · Confidence badge · Key insight (bold first sentence, original) · Evidence paragraphs with inline E/I/J/A badges · KPI Grid (2-3 big numbers with sources) · "What Would Invalidate This?" callout · "So What?" callout (gold border)</p>
+      <p style="margin-top: 8px;"><strong>Knowledge provenance per section:</strong> <span class="new-badge">NEW</span></p>
+      <p>"Based on: 3 CORE sources (S1, S7, S9) · 1 KNOWLEDGE source (S8) · Weakest link: S19 (Blog, B2)"</p>
+    </div>
+    <div class="visual">kpi + 2 callouts + badges + provenance</div>
+  </div>
+
+  <div class="report-section analysis-sec">
+    <div class="num">—</div>
+    <div class="content">
+      <h4>Constructed Scenario (if applicable)</h4>
+      <p>3+ empirical steps chained. Honest label: "Each step documented, chain not observed." What breaks the chain.</p>
+    </div>
+    <div class="visual">scenario-box</div>
+  </div>
+
+  <div class="report-section action-sec">
+    <div class="num">10</div>
+    <div class="content">
+      <h4>Recommendations</h4>
+      <p>Decision criteria. Phased action plan (Exhibit table). Investment estimate. "So What?" callout.</p>
+    </div>
+    <div class="visual">exhibit-table + callout</div>
+  </div>
+
+  <div class="report-section action-sec">
+    <div class="num">11</div>
+    <div class="content">
+      <h4>Predictions <span class="new-badge">NEW</span></h4>
+      <p>3-5 testable, dated predictions. BETA badge. Must pass: "Would >30% of experts disagree?"</p>
+    </div>
+    <div class="visual">prediction-cards</div>
+  </div>
+
+  <div class="report-section action-sec">
+    <div class="num">12</div>
+    <div class="content">
+      <h4>Risk Assessment</h4>
+      <p>Risk matrix (Exhibit table: Risk / Probability / Impact / Mitigation). Invalidation + So What callouts.</p>
+    </div>
+    <div class="visual">exhibit-table + callouts</div>
+  </div>
+
+  <div class="report-section appendix-sec">
+    <div class="num">13</div>
+    <div class="content">
+      <h4>Transparency Note</h4>
+      <p>Pipeline disclosure. 5-7 limitation bullets. Conflict of interest. Weakest point. System disclosure.</p>
+    </div>
+    <div class="visual">bullets</div>
+  </div>
+
+  <div class="report-section appendix-sec">
+    <div class="num">14</div>
+    <div class="content">
+      <h4>Claim Register</h4>
+      <p>10-25 claims with E/I/J/A label, source, confidence, invalidation condition.</p>
+    </div>
+    <div class="visual">table</div>
+  </div>
+
+  <div class="report-section appendix-sec">
+    <div class="num">15</div>
+    <div class="content">
+      <h4>Source Log (Hierarchical) <span class="new-badge">NEW</span></h4>
+      <p>ID · Title · Venue · Admiralty Tier · Knowledge Tier (CORE/KNOWLEDGE/EPHEMERAL) · Weight · Key Finding</p>
+    </div>
+    <div class="visual">table with tier colors</div>
+  </div>
+
+  <div class="report-section appendix-sec">
+    <div class="num">16</div>
+    <div class="content">
+      <h4>Contradiction Register</h4>
+      <p>Conflicts between sources. Resolution or "unresolved" with implications.</p>
+    </div>
+    <div class="visual">table</div>
+  </div>
+
+  <div class="report-section">
+    <div class="num">17</div>
+    <div class="content">
+      <h4>References</h4>
+      <p>Numbered, hanging indent, access dates, DOIs where available.</p>
+    </div>
+    <div class="visual">reference-list</div>
+  </div>
+
+  <div class="report-section cover-sec">
+    <div class="num">—</div>
+    <div class="content">
+      <h4>Back Cover</h4>
+      <p>Gold dot · "Ainary" · Services line · CTA · Contact</p>
+    </div>
+    <div class="visual">fullscreen centered</div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 4: DOCUMENTATION MAP ==================== -->
+<h2>4. Documentation Map</h2>
+
+<h3>Pipeline Specs (70_Mia/pipeline-v2.3/)</h3>
+<div class="doc-grid">
+  <div class="doc-card">
+    <h4>A-PLUS-PIPELINE-v2.md</h4>
+    <div class="path">agents/A-PLUS-PIPELINE-v2.md</div>
+    <p>Main spec. 9 phases, Control Panel, all rules. 24KB, 490 lines.</p>
+    <span class="status done">✓ EXISTS</span>
+  </div>
+  <div class="doc-card">
+    <h4>QA-AGENT-SPEC.md</h4>
+    <div class="path">agents/QA-AGENT-SPEC.md</div>
+    <p>QA process: 6 checks per section, scoring rules.</p>
+    <span class="status done">✓ EXISTS</span>
+  </div>
+  <div class="doc-card">
+    <h4>PROMPT-REGISTRY.md</h4>
+    <div class="path">agents/PROMPT-REGISTRY.md</div>
+    <p>8 agents, versions, model assignments.</p>
+    <span class="status done">✓ EXISTS</span>
+  </div>
+  <div class="doc-card">
+    <h4>EVAL-PACK.md</h4>
+    <div class="path">agents/EVAL-PACK.md</div>
+    <p>10 regression tests (RT-01 to RT-10) + rubric.</p>
+    <span class="status done">✓ EXISTS</span>
+  </div>
+  <div class="doc-card">
+    <h4>SYSTEMS.md</h4>
+    <div class="path">agents/SYSTEMS.md</div>
+    <p>8 supporting systems (Freshness, Claims, Predictions, etc.)</p>
+    <span class="status done">✓ EXISTS</span>
+  </div>
+  <div class="doc-card">
+    <h4>CHANGELOG.md</h4>
+    <div class="path">agents/CHANGELOG.md</div>
+    <p>v1.0→v2.0→v2.2→v2.3 evolution. 6 entries.</p>
+    <span class="status done">✓ EXISTS</span>
+  </div>
+  <div class="doc-card">
+    <h4>META-LEARNINGS.md</h4>
+    <div class="path">agents/META-LEARNINGS.md</div>
+    <p>19 learnings from 30+ reports. Quality/Process/Works/Doesn't.</p>
+    <span class="status new">★ NEW</span>
+  </div>
+  <div class="doc-card">
+    <h4>AR-INDEX.md</h4>
+    <div class="path">agents/AR-INDEX.md</div>
+    <p>32 report versions across 26 AR-IDs + MIA pipeline.</p>
+    <span class="status new">★ NEW</span>
+  </div>
+  <div class="doc-card">
+    <h4>KNOWLEDGE-HIERARCHY.md</h4>
+    <div class="path">agents/KNOWLEDGE-HIERARCHY.md</div>
+    <p>4 tiers documented with paths, chunks, topics.</p>
+    <span class="status new">★ NEW</span>
+  </div>
+</div>
+
+<h3>Spawn Templates (8 agents)</h3>
+<div class="doc-grid">
+  <div class="doc-card">
+    <h4>RESEARCH-AGENT.md</h4>
+    <div class="path">spawn-templates/</div>
+    <p>Phase 1. Source Log + Claim Ledger + Gap Map.</p>
+    <span class="status done">✓ EXISTS</span>
+  </div>
+  <div class="doc-card">
+    <h4>THESIS-AGENT.md</h4>
+    <div class="path">spawn-templates/</div>
+    <p>Phase 2. Original thesis + Framework + Narrative Arc.</p>
+    <span class="status done">✓ EXISTS</span>
+  </div>
+  <div class="doc-card">
+    <h4>WRITER-AGENT.md</h4>
+    <div class="path">spawn-templates/</div>
+    <p>Phase 4. HTML report with persona + template.</p>
+    <span class="status done">✓ EXISTS</span>
+  </div>
+  <div class="doc-card">
+    <h4>QA-AGENT.md</h4>
+    <div class="path">spawn-templates/</div>
+    <p>Phase 6. 10-pt rubric + claim audit.</p>
+    <span class="status done">✓ EXISTS</span>
+  </div>
+  <div class="doc-card">
+    <h4>+ 4 more</h4>
+    <div class="path">EXPERIMENT / VALIDATION / FIX / ASSET</div>
+    <p>Phases 3, 4-validation, 7, 9.</p>
+    <span class="status done">✓ ALL EXIST</span>
+  </div>
+</div>
+
+<h3>Python Scripts (research-pipeline/)</h3>
+<div class="doc-grid">
+  <div class="doc-card">
+    <h4>mia_synthesis_v3.py</h4>
+    <div class="path">projects/research-pipeline/</div>
+    <p>Current: 1,229 LOC. 5 phases, RAG, AgentTrust, per-section validation.</p>
+    <span class="status done">✓ v5 REPORT</span>
+  </div>
+  <div class="doc-card">
+    <h4>rag_layer.py</h4>
+    <div class="path">projects/research-pipeline/</div>
+    <p>TF-IDF/BM25. 936 chunks, 4 tiers, stdlib only.</p>
+    <span class="status new">★ UPDATED</span>
+  </div>
+  <div class="doc-card">
+    <h4>mia_synthesis_v4.py</h4>
+    <div class="path">projects/research-pipeline/</div>
+    <p>Target: v3 + Thesis Agent + AR-001 HTML + Predictions + Hierarchical Source Log.</p>
+    <span class="status missing">◇ PLANNED</span>
+  </div>
+  <div class="doc-card">
+    <h4>pipeline.py</h4>
+    <div class="path">projects/research-pipeline/</div>
+    <p>Original AR-001 v1 generator. 394 LOC, 6 phases. Opus writes HTML in 1 call.</p>
+    <span class="status done">✓ LEGACY</span>
+  </div>
+</div>
+
+<h3>Missing / Planned</h3>
+<div class="doc-grid">
+  <div class="doc-card">
+    <h4>TEMPLATE-RULES.md</h4>
+    <div class="path">content/reports/</div>
+    <p>= 01_TEMPLATES (found in vault). Needs copy/rename.</p>
+    <span class="status missing">◇ FOUND</span>
+  </div>
+  <div class="doc-card">
+    <h4>RESEARCH-ROADMAP-50.md</h4>
+    <div class="path">agents/</div>
+    <p>50 planned topics with Compound Value links.</p>
+    <span class="status missing">◇ NOT CREATED</span>
+  </div>
+  <div class="doc-card">
+    <h4>PREDICTION-SCORECARD.md</h4>
+    <div class="path">content/reports/</div>
+    <p>Track predictions across reports. Monthly update.</p>
+    <span class="status missing">◇ NOT CREATED</span>
+  </div>
+</div>
+
+<!-- ==================== SECTION 5: DATA FLOW ==================== -->
+<h2>5. Data Flow: Knowledge → Report → Knowledge</h2>
+
+<div style="text-align: center; margin: 32px 0; font-size: 0.85rem; color: #555; line-height: 2.2;">
+  <div style="display: inline-block; text-align: left;">
+    <strong style="color: #1a1a1a;">INPUT (Knowledge Hierarchy)</strong><br>
+    ┌─ CORE (2x): CRTs + Corrections + Reference Library<br>
+    ├─ KNOWLEDGE (1.5x): Vault Papers + Developments + Patterns<br>
+    ├─ OPERATIONAL (1x): Projects + People + AR-INDEX<br>
+    └─ EPHEMERAL (0.5x): Daily notes + Session logs<br>
+    <br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓ <span style="color: #c8aa50;">RAG Query (per section)</span><br>
+    <br>
+    <strong style="color: #1a1a1a;">PIPELINE (9 Phases)</strong><br>
+    &nbsp;&nbsp;Sonnet Research → Python Enrich → Opus Thesis → Opus Outline<br>
+    &nbsp;&nbsp;→ Opus Sections → Python Validate → Python Merge + HTML<br>
+    <br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓ <span style="color: #c8aa50;">Report Output</span><br>
+    <br>
+    <strong style="color: #1a1a1a;">OUTPUT</strong><br>
+    ┌─ Report (HTML + PDF + MD) with Beipackzettel<br>
+    ├─ beipackzettel.json (machine-readable)<br>
+    ├─ trust-score.json (cumulative agent trust)<br>
+    └─ validation-report.json (13 checks)<br>
+    <br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓ <span style="color: #27ae60;">Feedback Loop</span><br>
+    <br>
+    <strong style="color: #1a1a1a;">WRITEBACK (Knowledge grows)</strong><br>
+    ┌─ New claims → Claim Registry (OPERATIONAL)<br>
+    ├─ Verified findings → CRTs (CORE) ← <span style="color: #e74c3c;">human approval</span><br>
+    ├─ Corrections → corrections.json (CORE)<br>
+    ├─ Trust Score update → trust-score.json<br>
+    └─ Predictions → Prediction Scorecard (tracked monthly)<br>
+  </div>
+</div>
+
+<div style="text-align: center; margin-top: 48px; padding-top: 24px; border-top: 2px solid #1a1a1a; font-size: 0.85rem; color: #666;">
+  <strong>Ainary Ventures</strong><br>
+  AI Strategy · System Design · Execution · Consultancy · Research<br>
+  <span style="font-size: 0.75rem; color: #999;">February 2026 · v4 Architecture Draft</span>
+</div>
+
+</div>
+</body>
+</html>
