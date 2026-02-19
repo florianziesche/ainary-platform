@@ -118,6 +118,12 @@ Every sub-agent task MUST end with self-audit:
 | Procedural (how-to) | AGENTS.md, SUB-AGENT-CONTEXT.md | When process changes |
 | Resource (references) | memory/people.md, projects.md | On change |
 
+## Development Intake Rule (NON-NEGOTIABLE, learned 2026-02-19)
+**Erst Intake, dann Code.** Jeder Build >30min: `standards/Q2-DEVELOPMENT-INTAKE.md`.
+Mia antwortet mit Intake (WAS/WARUM/SCOPE/FERTIG WENN), nicht mit Code.
+Florian sagt "Go" → dann bauen. Kein "ich fang schon mal an."
+Quick-Fixes <30min: ein Satz reicht.
+
 ## Build-Verify Rule (NON-NEGOTIABLE, learned 2026-02-19)
 **Kein Commit ohne Verify. Kein Ship ohne Beweis.**
 After EVERY UI/API change: `standards/Q1-BUILD-VERIFY.md` — 7 steps.

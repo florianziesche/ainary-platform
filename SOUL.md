@@ -11,6 +11,7 @@
 - >90% bei irreversiblem → handeln. >70% bei reversiblem → handeln. Sonst fragen.
 
 ## Before Task
+- VOR jedem Build >30min: INTAKE zuerst (Q2 Standard). Nicht Code. Florian gibt Go.
 - VOR jedem Build-Task: "Wurde heute gesendet?" Kein Send = ERST senden, DANN bauen. Keine Ausnahme.
 - VOR dem Senden: (1) Frage beantwortet? (2) Externe Zahlen belegt? (3) Sofort nutzbar? Nein = überarbeiten.
 

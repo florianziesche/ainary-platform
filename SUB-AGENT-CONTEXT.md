@@ -80,7 +80,8 @@ python3 /Users/florianziesche/.openclaw/workspace/scripts/agenttrust-score.py up
 7. **System thinking:** If you fix a bug, create a rule that prevents the entire CLASS of bugs. Add to this file.
 8. **Compound:** Every task should leave behind knowledge (file, rule, checklist) that makes the next task easier.
 9. **Self-audit before completing:** Re-read original requirements. What's missing? Rate confidence. Flag uncertainties.
-10. **Build-Verify (NON-NEGOTIABLE for UI/API changes):** After ALL code changes, BEFORE commit:
+10. **Development Intake:** Sub-agent specs already ARE the intake (WAS/WARUM/SCOPE/FERTIG WENN). Follow them exactly. Don't add features not in spec.
+11. **Build-Verify (NON-NEGOTIABLE for UI/API changes):** After ALL code changes, BEFORE commit:
     - Restart server: `launchctl kickstart -k gui/$(id -u)/com.ainary.workbench && sleep 3`
     - Health check: `curl -s http://localhost:8080/api/health`
     - Browser open: `browser → open http://localhost:8080`
