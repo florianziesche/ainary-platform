@@ -118,6 +118,13 @@ Every sub-agent task MUST end with self-audit:
 | Procedural (how-to) | AGENTS.md, SUB-AGENT-CONTEXT.md | When process changes |
 | Resource (references) | memory/people.md, projects.md | On change |
 
+## Build-Verify Rule (NON-NEGOTIABLE, learned 2026-02-19)
+**Kein Commit ohne Verify. Kein Ship ohne Beweis.**
+After EVERY UI/API change: `standards/Q1-BUILD-VERIFY.md` — 7 steps.
+Steps 5+6 are MANDATORY: Browser öffnen, Screenshot machen, jeden geänderten Button klicken.
+Sub-Agents die UI ändern: QA-Verify Block am Ende der Spec (siehe Q1 Standard).
+Violation = Trust sinkt. "Ich bin sicher es geht" ist KEIN Beweis.
+
 ## Execution Quality Rules (learned 2026-02-18)
 1. **Changelog:** Jedes Projekt mit >5 Änderungen bekommt `changelog.md`. Jede Änderung = Datum + Was + Warum.
 2. **Pre-Submit Checklist:** Vor jedem externen Send: Links klickbar? PDF-Rendering = HTML? Zahlen verifiziert? Spelling?
