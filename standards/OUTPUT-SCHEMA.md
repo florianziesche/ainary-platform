@@ -37,8 +37,8 @@ Jeder Block hat: Pflichtfelder, Format, Validierungsregel.
   },
   "validation": {
     "confidence_is_computed": "must reference AgentTrust formula, not 'High/Med/Low'",
-    "e_pct_check": "E / (E+I+J+A) > 0.40 else WARNING",
-    "j_pct_check": "J / (E+I+J+A) < 0.25 else WARNING",
+    "e_pct_check": "E / (E+I+J+A) > 0.50 else WARNING",
+    "j_pct_check": "J / (E+I+J+A) < 0.20 else WARNING",
     "no_empty_lists": "sources and uncertainties and risks must be non-empty"
   }
 }
@@ -324,7 +324,7 @@ def validate_report(report_text: str) -> dict:
     checks["eija"] = eija
     checks["e_pct"] = round(eija["E"] / total * 100, 1)
     checks["j_pct"] = round(eija["J"] / total * 100, 1)
-    checks["eija_healthy"] = checks["e_pct"] > 40 and checks["j_pct"] < 25
+    checks["eija_healthy"] = checks["e_pct"] > 50 and checks["j_pct"] < 20
     
     # Blocks present
     blocks_present = sum(1 for k, v in checks.items() 

@@ -657,13 +657,53 @@ If a sub-report is marked GOOD: trust its [E] labeled findings.
                                for word in crt_line.lower().split()[:5]))
     print(f"  CRT coverage: {crt_mentions} CRTs referenced")
 
+    # ── LOG ENFORCEMENT (Python-verified) ───────────────────
+
+    # Source Log completeness: every [S#] in body must have entry in Source Log section
+    source_log_match = re.search(r'(?i)source\s*log(.*?)(?=\n##|\Z)', final_report, re.DOTALL)
+    source_log_text = source_log_match.group(1) if source_log_match else ""
+    sources_in_body = set(re.findall(r'\[S(\d+)\]', final_report))
+    sources_in_log = set(re.findall(r'\[S(\d+)\]', source_log_text))
+    orphan_sources = sources_in_body - sources_in_log  # in body but not logged
+    log_issues = []
+    if orphan_sources:
+        log_issues.append(f"Sources referenced but not in Source Log: {sorted(orphan_sources)}")
+        print(f"  WARNING: {len(orphan_sources)} orphan sources: {sorted(orphan_sources)}")
+
+    # Claim Ledger completeness
+    claim_ids = re.findall(r'CL-\d+', final_report)
+    if len(claim_ids) < 10:
+        log_issues.append(f"Claim Ledger has {len(claim_ids)} claims, need >= 10")
+        print(f"  WARNING: Only {len(claim_ids)} claims in Claim Ledger (need 10+)")
+
+    # Contradiction Register exists
+    has_contradictions = "contradiction" in final_report.lower()
+    if not has_contradictions:
+        log_issues.append("No Contradiction Register found")
+        print(f"  WARNING: No Contradiction Register")
+
+    # Beipackzettel field completeness
+    bpz_fields = ["Sources:", "Uncertainties:", "Risks:", "Not Checked:"]
+    missing_bpz = [f for f in bpz_fields if f not in final_report]
+    if missing_bpz:
+        log_issues.append(f"Beipackzettel missing fields: {missing_bpz}")
+        print(f"  WARNING: Beipackzettel missing: {missing_bpz}")
+
+    if not log_issues:
+        print(f"  Log enforcement: ALL PASS")
+
     validation = {
         "eija": eija,
         "e_pct": round(e_pct, 1),
         "j_pct": round(j_pct, 1),
         "sources_count": len(sources_used),
+        "orphan_sources": sorted(orphan_sources),
+        "claim_count": len(claim_ids),
+        "has_contradiction_register": has_contradictions,
+        "beipackzettel_missing_fields": missing_bpz,
+        "log_issues": log_issues,
         "crt_coverage": crt_mentions,
-        "healthy": e_pct > 50 and j_pct < 20,
+        "healthy": e_pct > 50 and j_pct < 20 and len(log_issues) == 0,
     }
     (output_dir / "validation.json").write_text(json.dumps(validation, indent=2))
 
@@ -695,9 +735,10 @@ If a sub-report is marked GOOD: trust its [E] labeled findings.
     has_framework = any(w in final_report.lower() for w in ["framework", "model", "maturity", "stack"])
 
     grade = "C"
-    if rubric_score >= 15 and e_pct > 50 and j_pct < 15 and has_beipackzettel and has_framework:
+    no_log_issues = len(log_issues) == 0
+    if rubric_score >= 15 and e_pct > 50 and j_pct < 20 and has_beipackzettel and has_framework and no_log_issues:
         grade = "A+++"
-    elif rubric_score >= 13 and e_pct > 40:
+    elif rubric_score >= 13 and e_pct > 50:
         grade = "A+"
     elif rubric_score >= 10:
         grade = "B"
@@ -709,6 +750,8 @@ If a sub-report is marked GOOD: trust its [E] labeled findings.
         "beipackzettel": has_beipackzettel,
         "framework": has_framework,
         "risks": has_risks,
+        "log_enforcement": "PASS" if no_log_issues else f"FAIL ({len(log_issues)} issues)",
+        "log_issues": log_issues,
         "decision": "SHIP" if grade in ("A+++", "A+") else "REVISE" if grade == "B" else "REJECT",
     }
     (output_dir / "quality-gate.json").write_text(json.dumps(verdict, indent=2))

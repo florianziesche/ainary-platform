@@ -618,7 +618,7 @@ All fields (confidence, sources, uncertainties, risks, not_checked) MUST be pres
 
 1. Opener: Surprises an expert? (not a definition, not "In today's world")
 2. Evidence discipline: Every claim has [S#]?
-3. E/I/J/A integrity: Labels present? E > 40%?
+3. E/I/J/A integrity: Labels present? E > 50%? J < 20%?
 4. Uncertainty explicit: Beipackzettel uncertainties are specific?
 5. Custom Framework: Original? Drawable? Not a 2x2 matrix?
 6. Recommendations actionable: Each has "If wrong"? Phased plan specific?
@@ -747,12 +747,12 @@ has_do_not_deploy = "Do Not Deploy If" in report
 new_fact_flags   = from validation.json
 
 # Grading
-if rubric >= 15 and E > 50% and J < 15%
+if rubric >= 15 and E > 50% and J < 20%
    and has_beipackzettel and has_framework
    and has_do_not_deploy and new_fact_flags == 0:
     grade = "A+++"
 
-elif rubric >= 13 and E > 40%:
+elif rubric >= 13 and E > 50%:
     grade = "A+"
 
 elif rubric >= 10:

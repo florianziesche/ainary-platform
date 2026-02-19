@@ -61,11 +61,18 @@ After EVERY non-trivial task, update your trust score:
 ```bash
 python3 /Users/florianziesche/.openclaw/workspace/scripts/agenttrust-score.py update <agent_id> <confidence> <outcome> '<reason>'
 ```
-- agent_id: writer | researcher | builder | hunter | dealmaker
+- agent_id: writer | researcher | builder | hunter | dealmaker | main
 - outcome: good | bad | flagged_real | hidden_problem
 - Overconfidence (said 90%+ but output was bad) = `bad` → -3 penalty
 - Honest uncertainty flag = `flagged_real` → +2 reward
 **Trust levels determine QA:** 0-30 = everything reviewed. 81+ = autonomous delivery.
+
+### Critical Cron Job Rule (Added 2026-02-19)
+**Morning Brief, Email Triage, Research Scans:** MUST check ACTUAL LOGS, not estimates.
+- Morning Brief claims "0 sends" → VERIFY via `gog gmail search`, `message` tool logs, `sessions_history`
+- Email Triage → check `gog auth manage` BEFORE claiming "no access"
+- Research Scans → verify file exists BEFORE claiming "wrote to X"
+**Pattern:** Estimating = risk of false negatives. Querying = ground truth. Always query.
 
 ## Working Protocol (ALL Sub-Agents)
 1. **AGENTS.md Trigger Map (MANDATORY FIRST STEP):** Read AGENTS.md, find your task in the trigger map, load the corresponding standards BEFORE starting. No standards loaded = Trust Score penalty.
