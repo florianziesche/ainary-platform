@@ -53,6 +53,50 @@ SECTION_ORDER: list[str] = [
     "appendix",
 ]
 
+# Section proportions (% of total target). Sum = 1.0
+SECTION_PROPORTIONS: dict[str, float] = {
+    "beipackzettel": 0.05,
+    "executive_summary": 0.10,
+    "framework": 0.13,
+    "key_findings": 0.27,
+    "recommendations": 0.18,
+    "risks": 0.13,
+    "appendix": 0.14,
+}
+
+# Absolute minimums (never go below, even for Tier 1)
+SECTION_FLOOR: dict[str, int] = {
+    "beipackzettel": 200,
+    "executive_summary": 400,
+    "framework": 500,
+    "key_findings": 800,
+    "recommendations": 600,
+    "risks": 400,
+    "appendix": 500,
+}
+
+
+def calculate_target_words(brief: dict, source_count: int = 0) -> int:
+    """Dynamic report length based on tier, sub-questions, and sources. +/-15% tolerance."""
+    base = 3000
+    sub_qs = len(brief.get("sub_questions", []))
+    base += sub_qs * 500
+    base += source_count * 200
+    tier = brief.get("risk_tier", 2)
+    tier_mult = {1: 0.7, 2: 1.0, 3: 1.4}
+    target = int(base * tier_mult.get(tier, 1.0))
+    return max(3000, min(target, 12000))
+
+
+def get_min_words(section_id: str, target_total: int) -> int:
+    """Per-section minimum = proportion * target * 0.85 (15% tolerance), floored."""
+    proportion = SECTION_PROPORTIONS.get(section_id, 0.10)
+    floor = SECTION_FLOOR.get(section_id, 300)
+    dynamic = int(target_total * proportion * 0.85)
+    return max(floor, dynamic)
+
+
+# Legacy compat: default MIN_WORDS for when no brief is available
 MIN_WORDS: dict[str, int] = {
     "beipackzettel": 300,
     "executive_summary": 600,
@@ -405,6 +449,12 @@ def phase_a_outline(
     brief = pipeline_data.get("research-brief.json", {})
     brief_str = json.dumps(brief, indent=2)[:3000] if brief else "(no brief)"
 
+    # Dynamic word target
+    _src_count = len(pipeline_data.get("all-claims.json", {}).get("claims", []))
+    _target_words = calculate_target_words(brief, source_count=_src_count)
+    print(f"  Target words: {_target_words} (tier={brief.get('risk_tier', 2)}, "
+          f"sub_qs={len(brief.get('sub_questions', []))}, sources={_src_count})")
+
     # Claims
     all_claims = pipeline_data.get("all-claims.json", {})
     if isinstance(all_claims, list):
@@ -467,7 +517,7 @@ def phase_a_outline(
             "version": version,
             "sections": [
                 {"id": s, "title": s, "key_points": [], "claim_assignments": [],
-                 "source_assignments": [], "min_words": MIN_WORDS.get(s, 500)}
+                 "source_assignments": [], "min_words": get_min_words(s, _target_words)}
                 for s in SECTION_ORDER
             ],
             "total_claims": len(claims_list),
@@ -488,8 +538,14 @@ def phase_a_outline(
         )
         outline = extract_json(response)
 
+    # Inject dynamic min_words into outline sections
+    outline["_target_words"] = _target_words
+    for sec in outline.get("sections", []):
+        sec["min_words"] = get_min_words(sec.get("id", ""), _target_words)
+
     elapsed = time.time() - t0
-    print(f"[PHASE A] Done in {elapsed:.1f}s — {len(outline.get('sections', []))} sections")
+    print(f"[PHASE A] Done in {elapsed:.1f}s — {len(outline.get('sections', []))} sections, "
+          f"target {_target_words} words")
     return outline
 
 
@@ -546,7 +602,7 @@ def _build_section_prompt(
         if sid in previous_sections:
             prev_text += f"\n\n## {sid} (already written)\n{previous_sections[sid][:3000]}"
 
-    min_words = MIN_WORDS.get(section_id, 500)
+    min_words = section.get("min_words", MIN_WORDS.get(section_id, 500))
     claims_assigned = section.get("claim_assignments", [])
     sources_assigned = section.get("source_assignments", [])
 
@@ -592,7 +648,7 @@ def _validate_section(
     """Validate a generated section. Returns list of issues."""
     issues: list[str] = []
     section_id = section["id"]
-    min_words = MIN_WORDS.get(section_id, 500)
+    min_words = section.get("min_words", MIN_WORDS.get(section_id, 500))
 
     word_count = len(text.split())
     if word_count < min_words:
@@ -665,7 +721,7 @@ def phase_b_sections(
         # Retry once for word count
         if word_issues:
             wc = len(text.split())
-            min_w = MIN_WORDS.get(section_id, 500)
+            min_w = section.get("min_words", MIN_WORDS.get(section_id, 500))
             print(f"    RETRY: word count {wc} < {min_w}")
             text = call_opus(
                 prompt + f"\n\nYour output was {wc} words. Write at least {min_w} words. Be thorough.",
