@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ainary Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#08080c;--s:#111116;--s2:#18181f;--inp:#0e0e13;--b:rgba(255,255,255,0.06);--bh:rgba(255,255,255,0.12);--ba:rgba(200,170,80,0.30);--t1:#ededf0;--t2:#8b8b95;--t3:#55555e;--gold:#c8aa50;--goldh:#d4b85c;--gm:rgba(200,170,80,0.15);--gb:rgba(200,170,80,0.20);--green:#34d399;--grm:rgba(52,211,153,0.10);--grb:rgba(52,211,153,0.20);--blue:#60a5fa;--f:'Inter',-apple-system,sans-serif;--m:'JetBrains Mono',monospace}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:var(--bg);color:var(--t1);font-family:var(--f);-webkit-font-smoothing:antialiased;min-height:100vh}
+
+    /* ========= LOGIN SCREEN ========= */
+    .login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px;position:relative}
+    .login-screen::before{content:'';position:absolute;top:20%;left:50%;transform:translateX(-50%);width:120%;height:60%;background:radial-gradient(ellipse at 50% 50%,rgba(200,170,80,0.04) 0%,transparent 60%);pointer-events:none}
+    .login-box{width:100%;max-width:400px;position:relative}
+    .login-logo{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:48px}
+    .login-logo .dot{width:12px;height:12px;border-radius:50%;background:var(--gold)}
+    .login-logo span{font-size:1.3rem;font-weight:600}
+    .login-card{background:var(--s);border:1px solid var(--b);border-radius:16px;padding:32px}
+    .login-card h2{font-size:1.1rem;font-weight:500;margin-bottom:4px}
+    .login-card .sub{font-size:0.85rem;color:var(--t2);margin-bottom:24px}
+    .login-field{margin-bottom:16px}
+    .login-field label{display:block;font-size:0.75rem;color:var(--t3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em}
+    .login-field input{width:100%;background:var(--inp);border:1px solid var(--b);border-radius:10px;padding:12px 16px;color:var(--t1);font-family:var(--f);font-size:0.95rem;outline:none;transition:border-color 0.2s}
+    .login-field input:focus{border-color:var(--ba)}
+    .login-field input::placeholder{color:var(--t3)}
+    .login-btn{width:100%;padding:14px;border-radius:10px;background:var(--gold);color:#fff;border:none;font-family:var(--f);font-size:0.95rem;font-weight:500;cursor:pointer;margin-top:8px;transition:background 0.15s}
+    .login-btn:hover{background:var(--goldh)}
+    .login-alt{display:flex;gap:12px;margin-top:20px;justify-content:center}
+    .login-alt-btn{background:var(--bg);border:1px solid var(--b);border-radius:8px;padding:8px 16px;color:var(--t2);font-size:0.8rem;cursor:pointer;transition:border-color 0.2s;font-family:var(--f)}
+    .login-alt-btn:hover{border-color:var(--bh);color:var(--t1)}
+    .login-demo{text-align:center;margin-top:20px;font-size:0.75rem;color:var(--t3)}
+    .login-demo a{color:var(--gold);text-decoration:none;cursor:pointer}
+
+    /* ========= PLATFORM ========= */
+    .platform{display:none}
+    .platform.active{display:block}
+
+    /* Nav */
+    .nav{position:sticky;top:0;z-index:100;background:rgba(8,8,12,0.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--b);height:56px}
+    .nav-in{max-width:900px;margin:0 auto;padding:0 32px;height:100%;display:flex;align-items:center;justify-content:space-between}
+    .nav-logo{font-weight:600;font-size:1.1rem;color:var(--t1);display:flex;align-items:center;gap:8px;text-decoration:none}
+    .ldot{width:10px;height:10px;border-radius:50%;background:var(--gold)}
+    .nav-r{display:flex;align-items:center;gap:16px}
+    .nav-link{color:var(--t2);text-decoration:none;font-size:0.85rem;font-weight:500}
+    .nav-link:hover{color:var(--t1)}
+    .nav-user{display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--t2)}
+    .nav-avatar{width:28px;height:28px;border-radius:50%;background:var(--gm);border:1px solid var(--gb);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:600;color:var(--gold)}
+    .cr-pill{display:flex;align-items:center;gap:5px;background:var(--gm);border:1px solid var(--gb);border-radius:20px;padding:4px 11px 4px 8px;font-family:var(--m);font-size:0.8rem;color:var(--gold);font-weight:600}
+
+    /* Content */
+    .content{max-width:900px;margin:0 auto;padding:32px}
+
+    /* Greeting */
+    .greeting{margin-bottom:32px;animation:fadeIn 0.5s}
+    .greeting h1{font-size:1.8rem;font-weight:600;letter-spacing:-0.01em;margin-bottom:8px}
+    .greeting .time{font-size:0.85rem;color:var(--t2)}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+    /* Briefing */
+    .briefing{background:var(--s);border:1px solid var(--b);border-radius:14px;padding:24px;margin-bottom:32px;animation:fadeIn 0.5s 0.1s both}
+    .briefing h3{font-size:0.85rem;font-weight:500;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+    .briefing h3 .badge{font-family:var(--m);font-size:0.65rem;background:var(--grm);color:var(--green);border:1px solid var(--grb);border-radius:5px;padding:2px 8px}
+    .brief-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--b)}
+    .brief-item:last-child{border-bottom:none}
+    .brief-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0}
+    .brief-icon.watch{background:var(--gm);border:1px solid var(--gb)}
+    .brief-icon.intel{background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.15)}
+    .brief-icon.cite{background:var(--grm);border:1px solid var(--grb)}
+    .brief-icon.admin{background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.15)}
+    .brief-text{flex:1}
+    .brief-text .title{font-size:0.85rem;font-weight:500;margin-bottom:2px}
+    .brief-text .desc{font-size:0.75rem;color:var(--t2);line-height:1.4}
+    .brief-action{align-self:center}
+    .brief-btn{background:var(--bg);border:1px solid var(--b);border-radius:6px;padding:6px 12px;color:var(--t2);font-size:0.75rem;cursor:pointer;font-family:var(--f);transition:all 0.15s;white-space:nowrap}
+    .brief-btn:hover{border-color:var(--gb);color:var(--gold)}
+    .brief-btn.gold{background:var(--gold);color:#fff;border-color:var(--gold)}
+
+    /* Tasks */
+    .tasks-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;animation:fadeIn 0.5s 0.2s both}
+    .tasks-header h2{font-size:1.1rem;font-weight:500}
+    .tasks-header .filter{font-size:0.75rem;color:var(--t3)}
+    .task-grid{display:flex;flex-direction:column;gap:10px;animation:fadeIn 0.5s 0.25s both}
+
+    .task-item{display:flex;align-items:center;gap:14px;padding:18px 20px;background:var(--s);border:1px solid var(--b);border-radius:12px;cursor:pointer;transition:border-color 0.2s,transform 0.15s}
+    .task-item:hover{border-color:var(--bh);transform:translateX(3px)}
+    .task-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+    .task-icon.research{background:var(--gm);border:1px solid var(--gb)}
+    .task-icon.acad{background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.15)}
+    .task-icon.intel{background:var(--grm);border:1px solid var(--grb)}
+    .task-icon.admin{background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.15)}
+    .task-info{flex:1}
+    .task-title{font-size:0.9rem;font-weight:500;margin-bottom:3px}
+    .task-meta{font-size:0.7rem;color:var(--t3);display:flex;align-items:center;gap:6px}
+    .task-meta .dot{width:3px;height:3px;border-radius:50%;background:var(--t3)}
+    .task-cost{font-family:var(--m);font-size:0.75rem;color:var(--gold);flex-shrink:0}
+    .task-cost.free{color:var(--green)}
+    .task-new{font-family:var(--m);font-size:0.6rem;background:rgba(251,191,36,0.15);color:#fbbf24;border:1px solid rgba(251,191,36,0.2);border-radius:4px;padding:2px 6px;margin-left:8px}
+
+    /* Quick input */
+    .quick-input{margin-top:24px;animation:fadeIn 0.5s 0.3s both}
+    .quick-input-box{display:flex;gap:12px;padding:16px 20px;background:var(--s);border:1px solid var(--b);border-radius:12px}
+    .qi{flex:1;background:var(--inp);border:1px solid var(--b);border-radius:8px;padding:12px 16px;color:var(--t1);font-family:var(--f);font-size:0.9rem;outline:none;transition:border-color 0.2s}
+    .qi:focus{border-color:var(--ba)}
+    .qi::placeholder{color:var(--t3)}
+    .qi-btn{padding:12px 20px;border-radius:8px;background:var(--gold);color:#fff;border:none;font-family:var(--f);font-size:0.85rem;font-weight:500;cursor:pointer;white-space:nowrap}
+    .qi-btn:hover{background:var(--goldh)}
+
+    /* Reports section */
+    .reports-section{margin-top:40px;animation:fadeIn 0.5s 0.35s both}
+    .reports-section h3{font-size:0.95rem;font-weight:500;margin-bottom:4px}
+    .reports-section .sub{font-size:0.75rem;color:var(--t3);margin-bottom:16px}
+    .report-item{display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--s);border:1px solid var(--b);border-radius:10px;text-decoration:none;margin-bottom:8px;transition:border-color 0.2s,transform 0.15s}
+    .report-item:hover{border-color:var(--bh);transform:translateX(3px)}
+    .report-icon{width:32px;height:32px;border-radius:7px;background:var(--gm);border:1px solid var(--gb);display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:600;color:var(--gold);font-family:var(--m);flex-shrink:0}
+    .report-info{flex:1}
+    .report-title{font-size:0.85rem;font-weight:500;color:var(--t1);margin-bottom:2px}
+    .report-meta{font-size:0.65rem;color:var(--t3)}
+    .report-badge{font-family:var(--m);font-size:0.6rem;padding:3px 7px;border-radius:4px;flex-shrink:0}
+    .report-badge.watching{background:var(--gm);color:var(--gold);border:1px solid var(--gb)}
+    .report-arrow{color:var(--t3);flex-shrink:0}
+    .report-item:hover .report-arrow{color:var(--gold)}
+
+    .footer{text-align:center;padding:40px;border-top:1px solid var(--b);color:var(--t3);font-size:0.75rem;margin-top:60px}
+
+    @media(max-width:640px){.content{padding:20px 16px}.login-box{padding:0 16px}}
+  </style>
+</head>
+<body>
+
+<!-- ========= LOGIN ========= -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <span class="dot"></span>
+      <span>Ainary</span>
+    </div>
+    <div class="login-card">
+      <h2>Welcome back</h2>
+      <div class="sub">Sign in to your research platform.</div>
+
+      <div class="login-field">
+        <label>Email</label>
+        <input type="email" id="loginEmail" placeholder="you@university.edu" onkeydown="if(event.key==='Enter')login()">
+      </div>
+      <div class="login-field">
+        <label>Password</label>
+        <input type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()">
+      </div>
+
+      <button class="login-btn" onclick="login()">Sign in →</button>
+
+      <div class="login-alt">
+        <button class="login-alt-btn" onclick="login()">📱 QR Code</button>
+        <button class="login-alt-btn" onclick="login()">🎤 Voice ID</button>
+      </div>
+
+      <div class="login-demo">
+        Demo: <a onclick="demoLogin('friedl')">Prof. Friedl</a> · <a onclick="demoLogin('andreas')">Andreas</a> · <a onclick="demoLogin('buergermeister')">Bürgermeister</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========= PLATFORM ========= -->
+<div class="platform" id="platform">
+
+  <nav class="nav">
+    <div class="nav-in">
+      <a href="#" class="nav-logo"><span class="ldot"></span> Ainary</a>
+      <div class="nav-r">
+        <a href="#" class="nav-link">Reports</a>
+        <div class="cr-pill"><span style="font-size:0.7rem">◆</span><span id="cr">10</span></div>
+        <div class="nav-user">
+          <div class="nav-avatar" id="navAvatar">GF</div>
+          <span id="navName">Prof. Friedl</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="content">
+
+    <!-- Greeting -->
+    <div class="greeting">
+      <h1 id="greetingText">Guten Morgen, Prof. Friedl.</h1>
+      <div class="time" id="greetingTime"></div>
+    </div>
+
+    <!-- Briefing -->
+    <div class="briefing">
+      <h3>📋 Your briefing <span class="badge" id="briefingBadge">3 updates</span></h3>
+      <div id="briefingItems">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- Tasks -->
+    <div class="tasks-header">
+      <h2>Your tasks</h2>
+      <span class="filter" id="creditInfo">◆ <span id="creditCount2">10</span> credits remaining</span>
+    </div>
+    <div class="task-grid" id="taskGrid">
+      <!-- Populated by JS -->
+    </div>
+
+    <!-- Quick input -->
+    <div class="quick-input">
+      <div class="quick-input-box">
+        <input type="text" class="qi" id="quickInp" placeholder="Or type any research question..." onkeydown="if(event.key==='Enter')quickGo()">
+        <button class="qi-btn" onclick="quickGo()">Research →</button>
+      </div>
+    </div>
+
+    <!-- Previous reports -->
+    <div class="reports-section" id="reportsSection">
+      <h3 id="reportsTitle">Your reports</h3>
+      <div class="sub" id="reportsSub">Generated by Mia · Evidence-scored</div>
+      <div id="reportsList">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">© 2026 Ainary · Trust is the product</div>
+</div>
+
+<script>
+// ========= USER DATABASE =========
+const users = {
+  friedl: {
+    name: 'Prof. Friedl',
+    initials: 'GF',
+    greeting: 'Guten Morgen, Prof. Friedl.',
+    credits: 10,
+    briefing: [
+      { icon: '👁', type: 'watch', title: '2 new papers on Goal Tensions', desc: 'Chen & Weber (2026) extend attention-based view. Müller (2026) tests framework in non-family firms.', action: 'Review · ◆1', actionType: 'gold' },
+      { icon: '📰', type: 'intel', title: 'EU Green Deal Amendment published', desc: 'New Scope 3 reporting requirements for manufacturing. Directly relevant to your decarbonization research.', action: 'Read brief', actionType: '' },
+      { icon: '📊', type: 'cite', title: 'Battery Cost paper cited 3× this week', desc: 'Lechner et al. (2024) cited by Toyota R&D, Fraunhofer ISE, and Stanford Energy.', action: 'View details', actionType: '' },
+    ],
+    tasks: [
+      { icon: '📰', type: 'intel', title: 'Daily Intel: Controlling + Decarbonization', meta: '~1 min · 50+ feeds · auto-refreshed', cost: 'free', costClass: 'free' },
+      { icon: '🔬', type: 'research', title: 'Competitive: Who\'s publishing on Goal Tensions?', meta: '~5 min · 24+ sources', cost: '◆ 2', costClass: '' },
+      { icon: '📚', type: 'acad', title: 'SOTA: AI in Management Accounting', meta: '~10 min · ArXiv + journals', cost: '◆ 3', costClass: '' },
+      { icon: '⭐', type: 'admin', title: 'Carbon Accounting Scope 3 — relevant for your Battery paper', meta: '~5 min · New from Ainary', cost: 'free', costClass: 'free', isNew: true },
+      { icon: '🔬', type: 'research', title: 'Executive Compensation Trends 2026', meta: '~5 min · 24+ sources', cost: '◆ 2', costClass: '' },
+      { icon: '📚', type: 'acad', title: 'SOTA: Attention-Based View — Latest Extensions', meta: '~10 min · citation mapping', cost: '◆ 3', costClass: '' },
+    ],
+    reports: [
+      { id: 'AR-042', title: 'Goal Tensions in Strategic Decision-Making', meta: '18 sources · 71% trust · Feb 20, 2026', watching: true, link: 'reports/goal-tensions-decarbonization.html' },
+    ]
+  },
+  andreas: {
+    name: 'Andreas',
+    initials: 'AK',
+    greeting: 'Morgen, Andreas.',
+    credits: 8,
+    briefing: [
+      { icon: '⚙️', type: 'watch', title: 'Neue Materialpreise verfügbar', desc: 'Stahl S235JR +2.3% seit letzter Woche. Aluminium stabil. Automatische Neuberechnung möglich.', action: 'Aktualisieren · ◆1', actionType: 'gold' },
+      { icon: '📰', type: 'intel', title: 'Maschinenbau Daily: 3 relevante Meldungen', desc: 'DMG Mori neues 5-Achs-Modell, Förderung Digitalisierung Mittelstand verlängert, Lieferkettengesetz Update.', action: 'Lesen', actionType: '' },
+      { icon: '📊', type: 'cite', title: 'CNC-Kalkulation: 2 neue Vergleichsdaten', desc: 'Benchmark-Daten von ähnlichen Betrieben verfügbar. Verbessert Ihre Angebotsgenauigkeit.', action: 'Einpflegen', actionType: '' },
+    ],
+    tasks: [
+      { icon: '📰', type: 'intel', title: 'Daily Intel: Maschinenbau + CNC', meta: '~1 min · 30+ Quellen', cost: 'free', costClass: 'free' },
+      { icon: '⚙️', type: 'research', title: 'CNC-Kalkulation aktualisieren', meta: '~3 min · Ihre Materialdaten', cost: '◆ 2', costClass: '' },
+      { icon: '🔬', type: 'research', title: 'Wettbewerbsanalyse: Ihre Region', meta: '~5 min · 15+ Quellen', cost: '◆ 2', costClass: '' },
+      { icon: '⭐', type: 'admin', title: 'Förderung "Digital Jetzt" — passt zu Ihrem Betrieb', meta: '~5 min · Neu von Ainary', cost: 'free', costClass: 'free', isNew: true },
+    ],
+    reports: [
+      { id: 'CNC-1', title: 'CNC-Kalkulation: 6-Positionen Vergleich', meta: '8 Quellen · 85% trust · Feb 18, 2026', watching: true, link: '#' },
+      { id: 'MR-1', title: 'Marktanalyse CNC-Fertigung Sachsen', meta: '12 Quellen · 74% trust · Feb 15, 2026', watching: false, link: '#' },
+    ]
+  },
+  buergermeister: {
+    name: 'Herr Bürgermeister',
+    initials: 'BM',
+    greeting: 'Guten Morgen, Herr Bürgermeister.',
+    credits: 10,
+    briefing: [
+      { icon: '🏛️', type: 'watch', title: 'Neue Fördermittel für Kommunen', desc: 'Freistaat Sachsen: Digitalisierungsförderung Kommunen 2026. Antragsfrist: 15.04.2026.', action: 'Details · free', actionType: '' },
+      { icon: '📰', type: 'intel', title: 'Kommunal-Intel: Glashütte & Region', desc: 'Tourismuszahlen Q4 2025, Bevölkerungsentwicklung Weißeritzkreis, Infrastrukturprojekte.', action: 'Lesen', actionType: '' },
+      { icon: '📊', type: 'cite', title: 'Vergleichskommunen: Neue Daten', desc: 'Altenberg, Dippoldiswalde, Freital — aktuelle Kennzahlen für Benchmarking.', action: 'Vergleichen', actionType: '' },
+    ],
+    tasks: [
+      { icon: '📰', type: 'intel', title: 'Daily Intel: Kommunalpolitik + Sachsen', meta: '~1 min · Amtsblätter + News', cost: 'free', costClass: 'free' },
+      { icon: '🏛️', type: 'research', title: 'Fördermittel-Scan: Was passt zu Glashütte?', meta: '~5 min · Bund + Land + EU', cost: '◆ 2', costClass: '' },
+      { icon: '🔬', type: 'research', title: 'Bürger-Analyse: Was bewegt Glashütte?', meta: '~5 min · Social Media + lokale Medien', cost: '◆ 2', costClass: '' },
+      { icon: '⭐', type: 'admin', title: 'Smart City Benchmark: Kommunen Ihrer Größe', meta: '~5 min · Neu von Ainary', cost: 'free', costClass: 'free', isNew: true },
+    ],
+    reports: []
+  }
+};
+
+// ========= LOGIN =========
+function login() {
+  const email = document.getElementById('loginEmail').value.toLowerCase();
+  if (email.includes('friedl') || email.includes('tum')) demoLogin('friedl');
+  else if (email.includes('andreas') || email.includes('cnc')) demoLogin('andreas');
+  else if (email.includes('bürger') || email.includes('glas')) demoLogin('buergermeister');
+  else demoLogin('friedl'); // Default demo
+}
+
+function demoLogin(userId) {
+  const user = users[userId];
+  if (!user) return;
+
+  // Hide login, show platform
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('platform').classList.add('active');
+
+  // Set greeting
+  document.getElementById('greetingText').textContent = user.greeting;
+  const now = new Date();
+  const day = now.toLocaleDateString('en', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  document.getElementById('greetingTime').textContent = `${day} · ${user.credits} credits remaining`;
+
+  // Nav
+  document.getElementById('navAvatar').textContent = user.initials;
+  document.getElementById('navName').textContent = user.name;
+  document.getElementById('cr').textContent = user.credits;
+  document.getElementById('creditCount2').textContent = user.credits;
+
+  // Briefing
+  document.getElementById('briefingBadge').textContent = user.briefing.length + ' updates';
+  document.getElementById('briefingItems').innerHTML = user.briefing.map(b => `
+    <div class="brief-item">
+      <div class="brief-icon ${b.type}">${b.icon}</div>
+      <div class="brief-text">
+        <div class="title">${b.title}</div>
+        <div class="desc">${b.desc}</div>
+      </div>
+      <div class="brief-action">
+        <button class="brief-btn ${b.actionType}">${b.action}</button>
+      </div>
+    </div>
+  `).join('');
+
+  // Tasks
+  document.getElementById('taskGrid').innerHTML = user.tasks.map(t => `
+    <div class="task-item" onclick="alert('In production, this triggers the Ainary pipeline. Coming soon.')">
+      <div class="task-icon ${t.type}">${t.icon}</div>
+      <div class="task-info">
+        <div class="task-title">${t.title}${t.isNew ? '<span class="task-new">NEW</span>' : ''}</div>
+        <div class="task-meta"><span>${t.meta}</span></div>
+      </div>
+      <div class="task-cost ${t.costClass}">${t.cost}</div>
+    </div>
+  `).join('');
+
+  // Reports
+  if (user.reports.length > 0) {
+    document.getElementById('reportsSection').style.display = 'block';
+    document.getElementById('reportsList').innerHTML = user.reports.map(r => `
+      <a href="${r.link}" target="_blank" class="report-item">
+        <div class="report-icon">${r.id.substring(0,2)}</div>
+        <div class="report-info">
+          <div class="report-title">${r.title}</div>
+          <div class="report-meta">${r.meta}</div>
+        </div>
+        ${r.watching ? '<span class="report-badge watching">👁 Watching</span>' : ''}
+        <span class="report-arrow">→</span>
+      </a>
+    `).join('');
+  } else {
+    document.getElementById('reportsTitle').textContent = 'No reports yet';
+    document.getElementById('reportsSub').textContent = 'Run your first task above to generate a report.';
+    document.getElementById('reportsList').innerHTML = '';
+  }
+}
+
+function quickGo() {
+  const v = document.getElementById('quickInp').value.trim();
+  if (!v) return;
+  alert(`In production: "${v}" → Ainary pipeline → live report.\n\nThis will be connected to OpenClaw on AWS.`);
+}
+</script>
+
+</body>
+</html>

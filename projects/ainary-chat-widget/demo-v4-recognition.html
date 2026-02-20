@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ainary — AI Intelligence Tools</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#08080c; --surface:#111116; --input:#0e0e13;
+      --border:rgba(255,255,255,0.06); --bh:rgba(255,255,255,0.12); --ba:rgba(200,170,80,0.30);
+      --t1:#ededf0; --t2:#8b8b95; --t3:#55555e;
+      --gold:#c8aa50; --goldh:#d4b85c; --goldm:rgba(200,170,80,0.15); --goldb:rgba(200,170,80,0.20);
+      --green:#34d399; --greenm:rgba(52,211,153,0.10); --greenb:rgba(52,211,153,0.20);
+      --blue:#60a5fa;
+      --f:'Inter',-apple-system,sans-serif; --m:'JetBrains Mono',monospace;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:var(--bg);color:var(--t1);font-family:var(--f);-webkit-font-smoothing:antialiased}
+
+    /* Nav */
+    .nav{position:sticky;top:0;z-index:100;background:rgba(8,8,12,0.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);height:56px}
+    .nav-in{max-width:900px;margin:0 auto;padding:0 32px;height:100%;display:flex;align-items:center;justify-content:space-between}
+    .nav-logo{font-weight:600;font-size:1.1rem;color:var(--t1);display:flex;align-items:center;gap:8px;text-decoration:none}
+    .logo-dot{width:10px;height:10px;border-radius:50%;background:var(--gold)}
+    .nav-r{display:flex;align-items:center;gap:20px}
+    .nav-link{color:var(--t2);text-decoration:none;font-size:0.85rem;font-weight:500}
+    .nav-link:hover{color:var(--t1)}
+    .cr-pill{display:flex;align-items:center;gap:6px;background:var(--goldm);border:1px solid var(--goldb);border-radius:20px;padding:4px 12px 4px 8px;font-family:var(--m);font-size:0.8rem;color:var(--gold);font-weight:600}
+
+    /* Hero */
+    .hero{text-align:center;padding:100px 32px 48px;position:relative}
+    .hero::before{content:'';position:absolute;top:-30%;left:50%;transform:translateX(-50%);width:140%;height:80%;background:radial-gradient(ellipse at 50% 0%,rgba(200,170,80,0.06) 0%,transparent 60%);pointer-events:none}
+    .hero h1{font-size:2.8rem;font-weight:600;letter-spacing:-0.02em;line-height:1.2;margin-bottom:16px;position:relative}
+    .hero p{font-size:1.1rem;font-weight:300;color:var(--t2);max-width:500px;margin:0 auto;position:relative}
+
+    /* Main */
+    .main{max-width:900px;margin:0 auto;padding:0 32px 40px}
+    .task-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+
+    /* Input */
+    .input-area{padding:28px 28px 0}
+    .input-row{display:flex;gap:12px}
+    .topic-input{flex:1;background:var(--input);border:1px solid var(--border);border-radius:10px;padding:14px 18px;color:var(--t1);font-family:var(--f);font-size:1rem;outline:none;transition:border-color 0.2s}
+    .topic-input:focus{border-color:var(--ba)}
+    .topic-input::placeholder{color:var(--t3)}
+
+    /* Recognition */
+    .recog{display:none;padding:12px 28px 0;animation:fadeIn 0.3s}
+    .recog.visible{display:block}
+    .recog-badge{display:inline-flex;align-items:center;gap:8px;background:var(--goldm);border:1px solid var(--goldb);border-radius:8px;padding:6px 14px;font-size:0.8rem}
+    .recog-badge .name{color:var(--gold);font-weight:600}
+    .recog-badge .desc{color:var(--t2)}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+
+    /* Personalized suggestions */
+    .suggestions{display:none;padding:16px 28px 0;animation:fadeIn 0.3s}
+    .suggestions.visible{display:block}
+    .suggestions h4{font-size:0.8rem;color:var(--t3);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.04em}
+    .sug-list{display:flex;flex-direction:column;gap:6px}
+    .sug-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:border-color 0.2s,transform 0.1s;font-size:0.85rem;color:var(--t2)}
+    .sug-item:hover{border-color:var(--goldb);transform:translateX(3px);color:var(--t1)}
+    .sug-item .sug-type{font-family:var(--m);font-size:0.65rem;color:var(--t3);margin-left:auto;white-space:nowrap}
+
+    /* Tabs */
+    .task-tabs{display:flex;gap:8px;padding:20px 28px}
+    .tab{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 12px;cursor:pointer;transition:border-color 0.2s,transform 0.15s;text-align:center}
+    .tab:hover{border-color:var(--bh);transform:translateY(-1px)}
+    .tab.sel{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold),0 4px 20px rgba(200,170,80,0.08)}
+    .tab h3{font-size:0.85rem;font-weight:500;margin-bottom:4px}
+    .tab-meta{font-size:0.7rem;color:var(--t3)}
+    .tab-cost{font-family:var(--m);font-size:0.7rem;color:var(--gold);margin-top:6px}
+    .tab-save{font-size:0.65rem;color:var(--green);margin-top:3px}
+
+    /* Explain (below tabs) */
+    .tab-explain{display:none;padding:0 28px 16px;font-size:0.8rem;color:var(--t2);line-height:1.5;animation:fadeIn 0.2s}
+    .tab-explain.visible{display:block}
+    .tab-explain strong{color:var(--t1)}
+
+    /* Go */
+    .go-area{padding:0 28px 24px}
+    .go-btn{width:100%;padding:14px;border-radius:10px;background:var(--gold);color:#fff;border:none;font-family:var(--f);font-size:0.95rem;font-weight:500;cursor:pointer;transition:background 0.15s,transform 0.1s}
+    .go-btn:hover{background:var(--goldh)}
+    .go-btn:active{transform:scale(0.995)}
+    .go-btn:disabled{opacity:0.4;cursor:not-allowed}
+
+    /* Exec */
+    .exec{display:none;border-top:1px solid var(--border)}
+    .exec.visible{display:block}
+    .exec-bar{height:3px;background:rgba(255,255,255,0.04)}
+    .exec-bar-fill{height:100%;background:var(--gold);width:0%;transition:width 0.5s ease-out;border-radius:2px}
+    .exec-log{padding:24px 28px;font-family:var(--m);font-size:0.8rem;color:var(--t3);line-height:2.2;max-height:260px;overflow-y:auto}
+    .exec-log .ag{color:var(--gold)}
+    .exec-log .ok{color:var(--green)}
+
+    /* KPI */
+    .kpi-row{display:none;padding:20px 28px;border-top:1px solid var(--border);grid-template-columns:repeat(3,1fr);gap:16px}
+    .kpi-row.visible{display:grid}
+    .kpi{text-align:center;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:10px}
+    .kpi .v{font-family:var(--m);font-size:1.6rem;font-weight:700;margin-bottom:2px}
+    .kpi .v.green{color:var(--green)}.kpi .v.gold{color:var(--gold)}.kpi .v.blue{color:var(--blue)}
+    .kpi .l{font-size:0.75rem;color:var(--t2);margin-bottom:6px}
+    .kpi .s{font-size:0.65rem;color:var(--t3);line-height:1.4}
+    .trust-bg{height:3px;background:rgba(255,255,255,0.06);border-radius:2px;margin-top:8px}
+    .trust-fill{height:100%;border-radius:2px;transition:width 1.5s ease-out;width:0%}
+    .trust-fill.hi{background:var(--green)}.trust-fill.md{background:var(--gold)}
+
+    /* Context */
+    .ctx{display:none;padding:20px 28px 24px;border-top:1px solid var(--border)}
+    .ctx.visible{display:block}
+    .ctx p{font-size:0.8rem;color:var(--t2);line-height:1.6}
+    .ctx .hl{color:var(--gold);font-weight:500}
+
+    /* Actions */
+    .actions{display:none;padding:16px 28px 24px;border-top:1px solid var(--border);gap:12px}
+    .actions.visible{display:flex}
+    .abtn{flex:1;padding:12px;border-radius:10px;font-family:var(--f);font-size:0.85rem;font-weight:500;cursor:pointer;text-align:center;text-decoration:none;transition:all 0.15s}
+    .abtn.pri{background:var(--gold);color:#fff;border:none}
+    .abtn.pri:hover{background:var(--goldh)}
+    .abtn.sec{background:transparent;color:var(--t1);border:1px solid var(--border)}
+    .abtn.sec:hover{border-color:var(--bh)}
+
+    /* Watch */
+    .watch-box{display:none;padding:16px 28px 24px;border-top:1px solid var(--border);animation:fadeIn 0.3s}
+    .watch-box.visible{display:block}
+    .watch-inner{background:var(--bg);border:1px solid var(--goldb);border-radius:10px;padding:16px 20px;display:flex;align-items:center;gap:12px}
+    .watch-inner .icon{font-size:1.1rem}
+    .watch-inner .txt{flex:1;font-size:0.8rem;color:var(--t2);line-height:1.4}
+    .watch-inner .txt strong{color:var(--t1)}
+    .watch-btn{background:var(--gold);color:#fff;border:none;border-radius:6px;padding:8px 14px;font-family:var(--f);font-size:0.8rem;font-weight:500;cursor:pointer;white-space:nowrap}
+    .watch-btn:hover{background:var(--goldh)}
+
+    /* Examples */
+    .examples{max-width:900px;margin:0 auto;padding:40px 32px 100px}
+    .examples h2{font-size:1.1rem;font-weight:500;margin-bottom:6px}
+    .examples .sub{font-size:0.8rem;color:var(--t3);margin-bottom:20px}
+    .ex-list{display:flex;flex-direction:column;gap:10px}
+    .ex-item{display:flex;align-items:center;gap:14px;padding:16px 20px;background:var(--surface);border:1px solid var(--border);border-radius:10px;text-decoration:none;transition:border-color 0.2s,transform 0.15s}
+    .ex-item:hover{border-color:var(--bh);transform:translateX(3px)}
+    .ex-icon{width:36px;height:36px;border-radius:8px;background:var(--goldm);border:1px solid var(--goldb);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:600;color:var(--gold);font-family:var(--m);flex-shrink:0}
+    .ex-info{flex:1}
+    .ex-title{font-size:0.85rem;font-weight:500;color:var(--t1);margin-bottom:3px}
+    .ex-meta{font-size:0.7rem;color:var(--t3)}
+    .ex-badge{font-family:var(--m);font-size:0.65rem;padding:3px 8px;border-radius:5px;background:var(--greenm);color:var(--green);border:1px solid var(--greenb);flex-shrink:0}
+    .ex-arrow{color:var(--t3);flex-shrink:0;transition:color 0.2s}
+    .ex-item:hover .ex-arrow{color:var(--gold)}
+
+    .footer{text-align:center;padding:40px;border-top:1px solid var(--border);color:var(--t3);font-size:0.75rem}
+
+    /* Mia Drawer */
+    .mia-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200}
+    .mia-ov.open{display:block}
+    .mia-dr{position:fixed;top:0;right:0;bottom:0;width:420px;max-width:90vw;background:var(--surface);border-left:1px solid var(--border);z-index:201;display:flex;flex-direction:column;transform:translateX(100%);transition:transform 0.3s ease-out}
+    .mia-dr.open{transform:translateX(0)}
+    .mia-hd{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+    .mia-av{width:32px;height:32px;border-radius:50%;background:var(--goldm);border:1px solid rgba(200,170,80,0.3);display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:600;color:var(--gold)}
+    .mia-hd h3{font-size:0.9rem;font-weight:500;flex:1}
+    .mia-x{background:none;border:none;color:var(--t3);cursor:pointer;font-size:1.2rem;padding:4px 8px}
+    .mia-st{font-size:0.7rem;color:var(--green);display:flex;align-items:center;gap:5px}
+    .mia-st::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px rgba(52,211,153,0.4)}
+    .mia-msgs{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+    .mia-msg{display:flex;gap:10px;animation:fadeIn 0.3s}
+    .mia-msg-av{width:26px;height:26px;border-radius:50%;flex-shrink:0;background:var(--goldm);color:var(--gold);border:1px solid rgba(200,170,80,0.2);display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:600}
+    .mia-bub{padding:12px 16px;border-radius:10px;background:var(--bg);border:1px solid var(--border);font-size:0.85rem;line-height:1.6}
+    .mia-bub strong{color:var(--gold);font-weight:500}
+    .mia-bub.user{background:var(--goldm);border-color:var(--goldb);margin-left:auto}
+    .mia-ir{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:10px}
+    .mia-i{flex:1;background:var(--input);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--t1);font-family:var(--f);font-size:0.85rem;outline:none}
+    .mia-i:focus{border-color:var(--ba)}
+    .mia-i::placeholder{color:var(--t3)}
+    .mia-s{width:36px;height:36px;border-radius:8px;background:var(--gold);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
+    .mia-s svg{width:16px;height:16px;fill:#fff}
+
+    @media(max-width:640px){
+      .hero{padding:80px 20px 36px}.hero h1{font-size:2rem}
+      .main,.examples{padding-left:16px;padding-right:16px}
+      .task-tabs{flex-direction:column}
+      .kpi-row.visible{grid-template-columns:1fr}
+      .mia-dr{width:100%;max-width:100%}
+      .input-area,.task-tabs,.go-area,.exec-log,.kpi-row,.ctx,.actions,.watch-box,.recog,.suggestions,.tab-explain{padding-left:20px;padding-right:20px}
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a href="#" class="nav-logo"><span class="logo-dot"></span> Ainary</a>
+    <div class="nav-r">
+      <a href="#examples" class="nav-link">Research</a>
+      <a href="#" class="nav-link">About</a>
+      <div class="cr-pill"><span style="font-size:0.7rem">◆</span><span id="cr">10</span></div>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <h1>Multiply your team.</h1>
+  <p>We do 80% of the work. You do the 20% that matters.</p>
+</section>
+
+<div class="main">
+  <div class="task-box">
+    <div class="input-area">
+      <div class="input-row">
+        <input type="text" class="topic-input" id="inp" placeholder="Enter a name, topic, or organization..." oninput="onInput(this.value)" onkeydown="if(event.key==='Enter')go()">
+      </div>
+    </div>
+
+    <!-- Recognition -->
+    <div class="recog" id="recog">
+      <div class="recog-badge">
+        <span class="name" id="recogName"></span>
+        <span class="desc" id="recogDesc"></span>
+      </div>
+    </div>
+
+    <!-- Personalized suggestions -->
+    <div class="suggestions" id="sugs">
+      <h4 id="sugsTitle">Suggested for you</h4>
+      <div class="sug-list" id="sugList"></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="task-tabs">
+      <div class="tab sel" id="t1" onclick="selTab(1)">
+        <h3>Research Study</h3>
+        <div class="tab-meta">~5 min · 24+ sources</div>
+        <div class="tab-cost">◆ 2 credits</div>
+        <div class="tab-save">Saves ~32 hrs</div>
+      </div>
+      <div class="tab" id="t2" onclick="selTab(2)">
+        <h3>Acad. Research</h3>
+        <div class="tab-meta">~10 min · SOTA deep-dive</div>
+        <div class="tab-cost">◆ 3 credits</div>
+        <div class="tab-save">Saves ~56 hrs</div>
+      </div>
+      <div class="tab" id="t3" onclick="selTab(3)">
+        <h3>Daily Intel</h3>
+        <div class="tab-meta">~1 min · 50+ feeds</div>
+        <div class="tab-cost">◆ 1 credit</div>
+        <div class="tab-save">Saves ~2 hrs/day</div>
+      </div>
+    </div>
+
+    <!-- Tab explanation -->
+    <div class="tab-explain visible" id="tabExp">
+      <span id="tabExpText"><strong>Research Study</strong> — Full multi-source report with executive summary, evidence-tagged findings (E/I/J/A), confidence scoring, and actionable recommendations. Like hiring a research analyst for a week — delivered in 5 minutes.</span>
+    </div>
+
+    <div class="go-area">
+      <button class="go-btn" id="goBtn" onclick="go()">Start research →</button>
+    </div>
+
+    <div class="exec" id="exec">
+      <div class="exec-bar"><div class="exec-bar-fill" id="ebar"></div></div>
+      <div class="exec-log" id="elog"></div>
+    </div>
+
+    <div class="kpi-row" id="kpis">
+      <div class="kpi"><div class="v green" id="kTime">32 hrs</div><div class="l">Time saved</div><div class="s" id="kTimeSub"></div></div>
+      <div class="kpi"><div class="v gold" id="kTrust">71%</div><div class="l">Trust score</div><div class="s" id="kTrustSub"></div><div class="trust-bg"><div class="trust-fill" id="tbar"></div></div></div>
+      <div class="kpi"><div class="v blue">20%</div><div class="l">Your part</div><div class="s">We did the research. Your judgment & decisions — that's yours.</div></div>
+    </div>
+
+    <div class="ctx" id="ctx"><p id="ctxText"></p></div>
+
+    <div class="actions" id="acts">
+      <a href="reports/goal-tensions-decarbonization.html" target="_blank" class="abtn pri" id="dlBtn">View report →</a>
+      <button class="abtn sec" onclick="openMia()">Talk to Mia →</button>
+    </div>
+
+    <div class="watch-box" id="watchBox">
+      <div class="watch-inner">
+        <span class="icon">👁</span>
+        <div class="txt"><strong>Watch this topic</strong> — Get notified when new research appears. Report updates cost ◆ 1 credit.</div>
+        <button class="watch-btn" id="watchBtn" onclick="watch()">Watch · free</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="examples" id="examples">
+  <h2>Published research</h2>
+  <div class="sub">Generated by Mia · Human reviewed</div>
+  <div class="ex-list">
+    <a href="https://ainaryventures.com/research/state-of-agent-trust-2026/" class="ex-item" target="_blank">
+      <div class="ex-icon">AR</div>
+      <div class="ex-info"><div class="ex-title">State of AI Agent Trust 2026</div><div class="ex-meta">47 pages · 24 sources · 5 min read</div></div>
+      <span class="ex-badge">Research Study</span><span class="ex-arrow">→</span>
+    </a>
+    <a href="https://ainaryventures.com/research/personal-ai-stack-2026/" class="ex-item" target="_blank">
+      <div class="ex-icon">AR</div>
+      <div class="ex-info"><div class="ex-title">Personal AI Stack 2026</div><div class="ex-meta">32 pages · 18 sources · 4 min read</div></div>
+      <span class="ex-badge">Research Study</span><span class="ex-arrow">→</span>
+    </a>
+    <a href="https://ainaryventures.com/research/knowledge-compounding-2026/" class="ex-item" target="_blank">
+      <div class="ex-icon">AR</div>
+      <div class="ex-info"><div class="ex-title">Knowledge Compounding 2026</div><div class="ex-meta">28 pages · 15 sources · 3 min read</div></div>
+      <span class="ex-badge">Research Study</span><span class="ex-arrow">→</span>
+    </a>
+  </div>
+</section>
+
+<div class="footer">© 2026 Ainary · Trust is the product</div>
+
+<div class="mia-ov" id="mOv" onclick="closeMia()"></div>
+<div class="mia-dr" id="mDr">
+  <div class="mia-hd"><div class="mia-av">M</div><h3>Mia</h3><div class="mia-st">Online</div><button class="mia-x" onclick="closeMia()">✕</button></div>
+  <div class="mia-msgs" id="mMsgs"></div>
+  <div class="mia-ir">
+    <input type="text" class="mia-i" id="mInp" placeholder="Ask Mia anything..." onkeydown="if(event.key==='Enter')mSend()">
+    <button class="mia-s" onclick="mSend()"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
+  </div>
+</div>
+
+<script>
+let credits=10, tab=1, running=false, lastTopic='', lastTask=null;
+
+// Task configs
+const T={
+  1:{name:'Research Study',cost:2,time:'~5 min',saved:'32 hrs',
+    savedSub:'3–4 weeks of manual research, compressed to 5 minutes.',
+    trust:71,trustSub:'Every claim evidence-tagged (E/I/J/A). Gaps explicitly disclosed.',
+    ctx:'This research would typically take <span class="hl" style="color:var(--gold);font-weight:500">3–4 weeks of focused academic work</span>. Institutions using AI-assisted research produce 2.4× more output per researcher at comparable quality. The 80% is done — the 20% that matters is yours.',
+    explain:'<strong>Research Study</strong> — Full multi-source report with executive summary, evidence-tagged findings (E/I/J/A), confidence scoring, and actionable recommendations. Like hiring a research analyst for a week — delivered in 5 minutes.',
+    agents:['Researcher','Analyst','Strategist','Critic','Synthesizer'],
+    work:['scanning 47 sources...','structuring findings...','generating recommendations...','cross-verifying claims...','compiling report...'],
+    go:'Start research →'},
+  2:{name:'Acad. Research',cost:3,time:'~10 min',saved:'56 hrs',
+    savedSub:'A systematic SOTA review takes a PhD researcher 6–8 weeks. 56 hours conservative.',
+    trust:68,trustSub:'Academic sources scored by methodology rigor, citations, recency.',
+    ctx:'A full SOTA literature review typically takes <span class="hl" style="color:var(--gold);font-weight:500">6–8 weeks of a PhD researcher\'s time</span>. Database searches, paper screening, citation mapping, gap analysis — that\'s the 80%. The 20% that creates academic value requires your expertise.',
+    explain:'<strong>Acad. Research</strong> — State-of-the-art deep-dive: ArXiv papers, citation network mapping, research frontier identification, methodology review, and gap analysis. What a PhD researcher does in 2 months — in 10 minutes.',
+    agents:['ArXiv Scanner','Citation Mapper','Gap Analyst','Method Reviewer','Synthesizer'],
+    work:['searching ArXiv, Semantic Scholar...','mapping citation networks...','identifying research gaps...','reviewing methodology rigor...','compiling SOTA brief...'],
+    go:'Start deep-dive →'},
+  3:{name:'Daily Intel',cost:1,time:'~1 min',saved:'2 hrs',
+    savedSub:'2 hours of daily feed scanning, filtered to a 3-minute read.',
+    trust:81,trustSub:'High source diversity. Each item scored by relevance and reliability.',
+    ctx:'Staying current means <span class="hl" style="color:var(--gold);font-weight:500">~2 hours of morning reading</span> per day. Over a month: 40+ hours of scanning that doesn\'t produce output. You get the signal without the noise.',
+    explain:'<strong>Daily Intel</strong> — Curated morning brief from 50+ feeds, filtered and scored for your domain. ArXiv preprints, news, regulatory changes, competitor moves — 3 minutes instead of 2 hours.',
+    agents:['Feed Scanner','Relevance Filter','Summarizer'],
+    work:['scanning 50+ feeds...','filtering by relevance...','generating brief...'],
+    go:'Get today\'s brief →'}
+};
+
+// Recognition database
+const DB={
+  'friedl':{name:'Prof. Gunther Friedl',desc:'TUM · Management Accounting · Dieter Schwarz Foundation',
+    suggestions:[
+      {text:'Goal Tensions in Strategic Decision-Making (his 2025 paper)',type:'Research Study',tab:1,topic:'Goal Tensions in Strategic Decision-Making — Friedl et al. 2025'},
+      {text:'Cost Modeling for GWh-Scale Battery Production (Nature, 2024)',type:'Acad. Research',tab:2,topic:'Cost modeling lithium-ion battery cells GWh-scale — Lechner, Friedl et al.'},
+      {text:'Daily Intel: Management Accounting + Decarbonization',type:'Daily Intel',tab:3,topic:'Management accounting, controlling, decarbonization strategy — daily'},
+      {text:'Executive Compensation & Performance Measurement (core research)',type:'Research Study',tab:1,topic:'Executive compensation and performance measurement — Friedl research overview'}
+    ]},
+  'gunther friedl':{ref:'friedl'},
+  'prof. friedl':{ref:'friedl'},
+  'prof friedl':{ref:'friedl'},
+  'tum':{name:'Technical University of Munich',desc:'50,000+ students · Top 50 global · AI research hub',
+    suggestions:[
+      {text:'TUM AI Research Landscape — groups, publications, partnerships',type:'Research Study',tab:1,topic:'TUM AI research landscape 2026'},
+      {text:'SOTA: AI Governance in Higher Education',type:'Acad. Research',tab:2,topic:'AI governance frameworks European higher education — SOTA'},
+      {text:'Daily Intel: AI in Academia & Technical Universities',type:'Daily Intel',tab:3,topic:'AI developments European academia technical universities'},
+      {text:'TUM School of Management — Research Impact Analysis',type:'Research Study',tab:1,topic:'TUM School of Management research impact publications rankings'}
+    ]},
+  'technical university of munich':{ref:'tum'},'tu münchen':{ref:'tum'},'tu munich':{ref:'tum'},
+  'bmw':{name:'BMW Group',desc:'Automotive OEM · AI/CV in production · Munich HQ',
+    suggestions:[
+      {text:'BMW AI Strategy vs. Mercedes, VW, Tesla',type:'Research Study',tab:1,topic:'BMW AI strategy investments patents vs competitors'},
+      {text:'SOTA: Computer Vision in Automotive Manufacturing',type:'Acad. Research',tab:2,topic:'Computer vision automotive manufacturing quality inspection ADAS — SOTA'},
+      {text:'Daily Intel: Automotive AI & Electrification',type:'Daily Intel',tab:3,topic:'AI automotive industry German OEMs electrification'},
+      {text:'AI Agent Governance for Enterprise Deployment',type:'Research Study',tab:1,topic:'AI agent trust governance frameworks enterprise BMW-scale'}
+    ]},
+  'controlling':{name:'Controlling / Management Accounting',desc:'Performance measurement · Cost accounting · Strategic planning',
+    suggestions:[
+      {text:'AI Impact on Management Accounting — Roles, Tools, Future',type:'Research Study',tab:1,topic:'AI impact on management accounting controlling profession'},
+      {text:'SOTA: AI-Augmented Performance Measurement Systems',type:'Acad. Research',tab:2,topic:'AI-augmented performance measurement balanced scorecard — SOTA'},
+      {text:'Daily Intel: Controlling & Digital Transformation',type:'Daily Intel',tab:3,topic:'Controlling management accounting digital transformation AI'},
+      {text:'Multi-Objective KPI Systems for Decarbonization',type:'Research Study',tab:1,topic:'Multi-objective KPI systems sustainability decarbonization controlling'}
+    ]},
+  'decarbonization':{name:'Decarbonization Strategy',desc:'Climate targets · Green Deal · Manufacturing transformation',
+    suggestions:[
+      {text:'Goal Tensions: Economic vs. Environmental in German Manufacturing',type:'Research Study',tab:1,topic:'Goal tensions economic environmental manufacturing decarbonization Germany'},
+      {text:'SOTA: Carbon Accounting & Scope 3 Emissions Modeling',type:'Acad. Research',tab:2,topic:'Carbon accounting scope 3 emissions modeling — SOTA'},
+      {text:'Daily Intel: EU Climate Policy & Industry Impact',type:'Daily Intel',tab:3,topic:'EU climate policy decarbonization industry manufacturing'},
+    ]}
+};
+
+function resolve(key){let e=DB[key];return e&&e.ref?DB[e.ref]:e;}
+
+// Input handler with recognition
+let debounce;
+function onInput(v){
+  clearTimeout(debounce);
+  debounce=setTimeout(()=>{
+    const key=v.toLowerCase().trim();
+    // Try exact, then partial
+    let match=resolve(key);
+    if(!match){for(const k in DB){if(key.length>=3&&k.includes(key)){match=resolve(k);break;}}}
+
+    const recog=document.getElementById('recog');
+    const sugs=document.getElementById('sugs');
+
+    if(match){
+      document.getElementById('recogName').textContent=match.name;
+      document.getElementById('recogDesc').textContent='— '+match.desc;
+      recog.classList.add('visible');
+
+      document.getElementById('sugsTitle').textContent='Suggested for '+match.name;
+      document.getElementById('sugList').innerHTML=match.suggestions.map((s,i)=>
+        `<div class="sug-item" onclick="pickSug(${i})"><span>${s.text}</span><span class="sug-type">${s.type}</span></div>`
+      ).join('');
+      sugs.classList.add('visible');
+    } else {
+      recog.classList.remove('visible');
+      sugs.classList.remove('visible');
+    }
+  },300);
+}
+
+function pickSug(i){
+  const key=document.getElementById('inp').value.toLowerCase().trim();
+  let match=resolve(key);
+  if(!match){for(const k in DB){if(key.length>=3&&k.includes(key)){match=resolve(k);break;}}}
+  if(!match)return;
+  const s=match.suggestions[i];
+  document.getElementById('inp').value=s.topic;
+  selTab(s.tab);
+  // Auto-scroll to go
+  document.getElementById('goBtn').scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+// Tab
+function selTab(n){
+  if(running)return;
+  tab=n;
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('sel',i+1===n));
+  document.getElementById('goBtn').textContent=T[n].go;
+  document.getElementById('tabExpText').innerHTML=T[n].explain;
+  document.getElementById('tabExp').classList.add('visible');
+}
+
+// Credits
+function spend(n){
+  credits-=n;
+  const el=document.getElementById('cr');
+  el.textContent=credits;
+  el.style.transition='transform 0.2s';
+  el.style.transform='scale(1.3)';
+  setTimeout(()=>el.style.transform='scale(1)',200);
+}
+
+// Go
+function go(){
+  if(running)return;
+  const topic=document.getElementById('inp').value.trim();
+  if(!topic){document.getElementById('inp').focus();return;}
+  const t=T[tab];
+  if(credits<t.cost){alert(`Need ${t.cost} credits, have ${credits}.`);return;}
+
+  running=true;lastTopic=topic;lastTask=t;
+  spend(t.cost);
+
+  const btn=document.getElementById('goBtn');
+  btn.disabled=true;btn.textContent='Running...';
+
+  const exec=document.getElementById('exec');
+  const elog=document.getElementById('elog');
+  const ebar=document.getElementById('ebar');
+  elog.innerHTML='';ebar.style.width='0%';
+  exec.classList.add('visible');
+  ['kpis','ctx','acts','watchBox'].forEach(id=>document.getElementById(id).classList.remove('visible'));
+
+  exec.scrollIntoView({behavior:'smooth',block:'nearest'});
+
+  let step=0;
+  const ag=t.agents,wk=t.work;
+
+  function ts(){const d=new Date();return d.toLocaleTimeString('en',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});}
+  function log(h){elog.innerHTML+=`<div><span style="color:var(--t3)">${ts()}</span> ${h}</div>`;elog.scrollTop=elog.scrollHeight;}
+
+  log(`→ "${topic}"`);
+  setTimeout(()=>{log(`<span class="ag">[Ainary]</span> Deploying ${ag.length} agents...`);ebar.style.width='8%';},400);
+
+  const delay=tab===3?400:600;
+  function next(){
+    if(step<ag.length){
+      const pfx=step<ag.length-1?'├':'└';
+      log(`${pfx} <span class="ag">${ag[step]}</span> — ${wk[step]}`);
+      ebar.style.width=`${8+((step+1)/ag.length)*82}%`;
+      step++;
+      setTimeout(next,delay+Math.random()*400);
+    }else{
+      ebar.style.width='100%';
+      setTimeout(()=>{
+        log(`<span class="ok">✓ Done</span> — ${t.name} complete · cross-verified`);
+        showResults();
+      },600);
+    }
+  }
+  setTimeout(next,1200);
+}
+
+function showResults(){
+  running=false;
+  const t=lastTask;
+  document.getElementById('goBtn').disabled=false;
+  document.getElementById('goBtn').textContent=T[tab].go;
+
+  document.getElementById('kTime').textContent=t.saved;
+  document.getElementById('kTimeSub').textContent=t.savedSub;
+  document.getElementById('kTrust').textContent=t.trust+'%';
+  document.getElementById('kTrustSub').textContent=t.trustSub;
+
+  const bar=document.getElementById('tbar');
+  bar.className='trust-fill '+(t.trust>=75?'hi':'md');
+  bar.style.width='0%';
+
+  document.getElementById('kpis').classList.add('visible');
+  setTimeout(()=>bar.style.width=t.trust+'%',50);
+
+  document.getElementById('ctxText').innerHTML=t.ctx;
+  document.getElementById('ctx').classList.add('visible');
+  document.getElementById('acts').classList.add('visible');
+  document.getElementById('watchBox').classList.add('visible');
+
+  document.getElementById('kpis').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function watch(){
+  const btn=document.getElementById('watchBtn');
+  btn.textContent='✓ Watching';
+  btn.style.background='#059669';
+  btn.onclick=null;
+}
+
+// Mia
+function openMia(){
+  const t=lastTask||T[1];
+  document.getElementById('mMsgs').innerHTML=`
+    <div class="mia-msg"><div class="mia-msg-av">M</div><div><div class="mia-bub">
+      <strong>"${lastTopic}"</strong> — done. ${t.saved} of work in ${t.time.replace('~','')}.<br><br>
+      Trust: <strong>${t.trust}%</strong>. Every claim evidence-tagged.<br><br>
+      Want me to go deeper on a specific finding, adjust scope, or run something new?
+    </div></div></div>`;
+  document.getElementById('mOv').classList.add('open');
+  document.getElementById('mDr').classList.add('open');
+}
+function closeMia(){document.getElementById('mOv').classList.remove('open');document.getElementById('mDr').classList.remove('open');}
+function mSend(){
+  const inp=document.getElementById('mInp');
+  if(!inp.value.trim())return;
+  const msgs=document.getElementById('mMsgs');
+  const u=document.createElement('div');u.className='mia-msg';u.style.justifyContent='flex-end';
+  u.innerHTML=`<div><div class="mia-bub user">${inp.value.trim()}</div></div>`;
+  msgs.appendChild(u);inp.value='';
+  setTimeout(()=>{
+    const r=document.createElement('div');r.className='mia-msg';
+    r.innerHTML=`<div class="mia-msg-av">M</div><div><div class="mia-bub">In production this connects live to the Ainary system. Every response sourced, scored, verifiable.<br><br><strong>${credits} credits remaining.</strong> <a href="mailto:florian@ainaryventures.com" style="color:var(--gold)">Get unlimited access →</a></div></div>`;
+    msgs.appendChild(r);msgs.scrollTop=msgs.scrollHeight;
+  },800);
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ainary — AI Intelligence Tools</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-page: #08080c;
+      --bg-surface: #111116;
+      --bg-input: #0e0e13;
+      --border: rgba(255,255,255,0.06);
+      --border-hover: rgba(255,255,255,0.12);
+      --border-active: rgba(200,170,80,0.30);
+      --text: #ededf0;
+      --text2: #8b8b95;
+      --text3: #55555e;
+      --gold: #c8aa50;
+      --gold-hover: #d4b85c;
+      --gold-muted: rgba(200,170,80,0.15);
+      --gold-border: rgba(200,170,80,0.20);
+      --green: #34d399;
+      --green-muted: rgba(52,211,153,0.10);
+      --green-border: rgba(52,211,153,0.20);
+      --blue: #60a5fa;
+      --font: 'Inter', -apple-system, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--bg-page); color:var(--text); font-family:var(--font); -webkit-font-smoothing:antialiased; }
+
+    /* Nav */
+    .nav { position:sticky; top:0; z-index:100; background:rgba(8,8,12,0.85); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); height:56px; }
+    .nav-inner { max-width:900px; margin:0 auto; padding:0 32px; height:100%; display:flex; align-items:center; justify-content:space-between; }
+    .nav-logo { font-weight:600; font-size:1.1rem; color:var(--text); display:flex; align-items:center; gap:8px; text-decoration:none; }
+    .logo-dot { width:10px; height:10px; border-radius:50%; background:var(--gold); }
+    .nav-right { display:flex; align-items:center; gap:20px; }
+    .nav-link { color:var(--text2); text-decoration:none; font-size:0.85rem; font-weight:500; }
+    .nav-link:hover { color:var(--text); }
+    .credits-pill { display:flex; align-items:center; gap:6px; background:var(--gold-muted); border:1px solid var(--gold-border); border-radius:20px; padding:4px 12px 4px 8px; font-family:var(--mono); font-size:0.8rem; color:var(--gold); font-weight:600; }
+    .credits-pill .diamond { font-size:0.7rem; }
+
+    /* Hero */
+    .hero { text-align:center; padding:100px 32px 48px; position:relative; }
+    .hero::before { content:''; position:absolute; top:-30%; left:50%; transform:translateX(-50%); width:140%; height:80%; background:radial-gradient(ellipse at 50% 0%, rgba(200,170,80,0.06) 0%, transparent 60%); pointer-events:none; }
+    .hero h1 { font-size:2.8rem; font-weight:600; letter-spacing:-0.02em; line-height:1.2; margin-bottom:16px; position:relative; }
+    .hero p { font-size:1.1rem; font-weight:300; color:var(--text2); max-width:500px; margin:0 auto; position:relative; }
+
+    /* Main Container */
+    .main { max-width:900px; margin:0 auto; padding:0 32px 40px; }
+
+    /* Task Box */
+    .task-box {
+      background:var(--bg-surface); border:1px solid var(--border);
+      border-radius:16px; overflow:hidden;
+    }
+
+    /* Input Area */
+    .input-area { padding:28px 28px 0; }
+    .input-row { display:flex; gap:12px; }
+    .topic-input {
+      flex:1; background:var(--bg-input); border:1px solid var(--border);
+      border-radius:10px; padding:14px 18px; color:var(--text);
+      font-family:var(--font); font-size:1rem; outline:none;
+      transition:border-color 0.2s;
+    }
+    .topic-input:focus { border-color:var(--border-active); }
+    .topic-input::placeholder { color:var(--text3); }
+
+    /* Task Tabs */
+    .task-tabs { display:flex; gap:8px; padding:20px 28px; }
+    .task-tab {
+      flex:1; background:var(--bg-page); border:1px solid var(--border);
+      border-radius:10px; padding:16px; cursor:pointer;
+      transition:border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+      text-align:center; position:relative;
+    }
+    .task-tab:hover { border-color:var(--border-hover); transform:translateY(-1px); }
+    .task-tab.selected { border-color:var(--gold); box-shadow:0 0 0 1px var(--gold), 0 4px 20px rgba(200,170,80,0.08); }
+    .task-tab h3 { font-size:0.85rem; font-weight:500; margin-bottom:6px; }
+    .task-tab-meta { font-size:0.75rem; color:var(--text3); display:flex; align-items:center; justify-content:center; gap:6px; }
+    .task-tab-meta .dot { width:3px; height:3px; border-radius:50%; background:var(--text3); }
+    .task-tab-cost { font-family:var(--mono); font-size:0.7rem; color:var(--gold); margin-top:8px; }
+    .task-tab-time { display:block; font-size:0.7rem; color:var(--green); margin-top:4px; }
+
+    /* Go Button */
+    .go-area { padding:0 28px 24px; }
+    .go-btn {
+      width:100%; padding:14px; border-radius:10px;
+      background:var(--gold); color:#fff; border:none;
+      font-family:var(--font); font-size:0.95rem; font-weight:500;
+      cursor:pointer; transition:background 0.15s, transform 0.1s;
+    }
+    .go-btn:hover { background:var(--gold-hover); }
+    .go-btn:active { transform:scale(0.995); }
+    .go-btn:disabled { opacity:0.4; cursor:not-allowed; }
+
+    /* Execution Area (inside task-box) */
+    .exec-area { display:none; border-top:1px solid var(--border); }
+    .exec-area.visible { display:block; }
+
+    .exec-log {
+      padding:24px 28px; font-family:var(--mono); font-size:0.8rem;
+      color:var(--text3); line-height:2.2; max-height:260px; overflow-y:auto;
+    }
+    .exec-log .agent { color:var(--gold); }
+    .exec-log .done { color:var(--green); }
+    .exec-log .time { color:var(--text3); }
+
+    .exec-progress { height:3px; background:rgba(255,255,255,0.04); }
+    .exec-progress-bar { height:100%; background:var(--gold); width:0%; transition:width 0.5s ease-out; border-radius:2px; }
+
+    /* KPI Row */
+    .kpi-row {
+      display:none; padding:20px 28px;
+      border-top:1px solid var(--border);
+      grid-template-columns:repeat(3,1fr); gap:16px;
+    }
+    .kpi-row.visible { display:grid; }
+    .kpi {
+      text-align:center; padding:16px;
+      background:var(--bg-page); border:1px solid var(--border);
+      border-radius:10px;
+    }
+    .kpi-val { font-family:var(--mono); font-size:1.6rem; font-weight:700; margin-bottom:2px; }
+    .kpi-val.green { color:var(--green); }
+    .kpi-val.gold { color:var(--gold); }
+    .kpi-val.blue { color:var(--blue); }
+    .kpi-label { font-size:0.75rem; color:var(--text2); margin-bottom:6px; }
+    .kpi-sub { font-size:0.65rem; color:var(--text3); line-height:1.4; }
+
+    /* Trust bar */
+    .trust-bar-bg { height:3px; background:rgba(255,255,255,0.06); border-radius:2px; margin-top:8px; }
+    .trust-bar { height:100%; border-radius:2px; transition:width 1.5s ease-out; width:0%; }
+    .trust-bar.high { background:var(--green); }
+    .trust-bar.med { background:var(--gold); }
+
+    /* Context Box */
+    .context-box {
+      display:none; padding:20px 28px 24px;
+      border-top:1px solid var(--border);
+    }
+    .context-box.visible { display:block; }
+    .context-box p { font-size:0.8rem; color:var(--text2); line-height:1.6; }
+    .context-box .hl { color:var(--gold); font-weight:500; }
+    .context-box .evidence { font-family:var(--mono); font-size:0.65rem; color:var(--text3); margin-top:10px; }
+
+    /* Result actions */
+    .result-actions {
+      display:none; padding:16px 28px 24px;
+      border-top:1px solid var(--border);
+      gap:12px;
+    }
+    .result-actions.visible { display:flex; }
+    .result-btn {
+      flex:1; padding:12px; border-radius:10px; font-family:var(--font);
+      font-size:0.85rem; font-weight:500; cursor:pointer;
+      transition:all 0.15s; text-align:center; text-decoration:none;
+    }
+    .result-btn.primary { background:var(--gold); color:#fff; border:none; }
+    .result-btn.primary:hover { background:var(--gold-hover); }
+    .result-btn.secondary { background:transparent; color:var(--text); border:1px solid var(--border); }
+    .result-btn.secondary:hover { border-color:var(--border-hover); }
+
+    /* Mia Slide-out */
+    .mia-overlay {
+      display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6);
+      z-index:200; animation:fadeIn 0.2s;
+    }
+    .mia-overlay.open { display:block; }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+    .mia-drawer {
+      position:fixed; top:0; right:0; bottom:0; width:420px; max-width:90vw;
+      background:var(--bg-surface); border-left:1px solid var(--border);
+      z-index:201; display:flex; flex-direction:column;
+      transform:translateX(100%); transition:transform 0.3s ease-out;
+    }
+    .mia-drawer.open { transform:translateX(0); }
+
+    .mia-header {
+      padding:16px 20px; border-bottom:1px solid var(--border);
+      display:flex; align-items:center; gap:10px;
+    }
+    .mia-av {
+      width:32px; height:32px; border-radius:50%;
+      background:var(--gold-muted); border:1px solid rgba(200,170,80,0.3);
+      display:flex; align-items:center; justify-content:center;
+      font-size:0.8rem; font-weight:600; color:var(--gold);
+    }
+    .mia-header h3 { font-size:0.9rem; font-weight:500; flex:1; }
+    .mia-close {
+      background:none; border:none; color:var(--text3); cursor:pointer;
+      font-size:1.2rem; padding:4px 8px;
+    }
+    .mia-close:hover { color:var(--text); }
+    .mia-status { font-size:0.7rem; color:var(--green); display:flex; align-items:center; gap:5px; }
+    .mia-status::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--green); box-shadow:0 0 6px rgba(52,211,153,0.4); }
+
+    .mia-msgs {
+      flex:1; overflow-y:auto; padding:20px;
+      display:flex; flex-direction:column; gap:14px;
+    }
+    .mia-msg { display:flex; gap:10px; animation:msgIn 0.3s ease-out; }
+    .mia-msg-av {
+      width:26px; height:26px; border-radius:50%; flex-shrink:0;
+      background:var(--gold-muted); color:var(--gold);
+      border:1px solid rgba(200,170,80,0.2);
+      display:flex; align-items:center; justify-content:center;
+      font-size:0.65rem; font-weight:600;
+    }
+    .mia-bubble {
+      padding:12px 16px; border-radius:10px;
+      background:var(--bg-page); border:1px solid var(--border);
+      font-size:0.85rem; line-height:1.6;
+    }
+    .mia-bubble strong { color:var(--gold); font-weight:500; }
+    .mia-bubble.user {
+      background:var(--gold-muted); border-color:var(--gold-border);
+      margin-left:auto;
+    }
+    @keyframes msgIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+    .mia-input-row {
+      padding:14px 20px; border-top:1px solid var(--border);
+      display:flex; gap:10px;
+    }
+    .mia-input {
+      flex:1; background:var(--bg-input); border:1px solid var(--border);
+      border-radius:8px; padding:10px 14px; color:var(--text);
+      font-family:var(--font); font-size:0.85rem; outline:none;
+    }
+    .mia-input:focus { border-color:var(--border-active); }
+    .mia-input::placeholder { color:var(--text3); }
+    .mia-send-btn {
+      width:36px; height:36px; border-radius:8px; background:var(--gold);
+      border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    }
+    .mia-send-btn svg { width:16px; height:16px; fill:#fff; }
+
+    /* Examples */
+    .examples { max-width:900px; margin:0 auto; padding:40px 32px 100px; }
+    .examples h2 { font-size:1.1rem; font-weight:500; margin-bottom:6px; }
+    .examples .sub { font-size:0.8rem; color:var(--text3); margin-bottom:20px; }
+    .ex-list { display:flex; flex-direction:column; gap:10px; }
+    .ex-item {
+      display:flex; align-items:center; gap:14px; padding:16px 20px;
+      background:var(--bg-surface); border:1px solid var(--border);
+      border-radius:10px; text-decoration:none; transition:border-color 0.2s, transform 0.15s;
+    }
+    .ex-item:hover { border-color:var(--border-hover); transform:translateX(3px); }
+    .ex-icon {
+      width:36px; height:36px; border-radius:8px; background:var(--gold-muted);
+      border:1px solid var(--gold-border); display:flex; align-items:center; justify-content:center;
+      font-size:0.7rem; font-weight:600; color:var(--gold); font-family:var(--mono); flex-shrink:0;
+    }
+    .ex-info { flex:1; }
+    .ex-title { font-size:0.85rem; font-weight:500; color:var(--text); margin-bottom:3px; }
+    .ex-meta { font-size:0.7rem; color:var(--text3); }
+    .ex-badge {
+      font-family:var(--mono); font-size:0.65rem; padding:3px 8px; border-radius:5px;
+      background:var(--green-muted); color:var(--green); border:1px solid var(--green-border); flex-shrink:0;
+    }
+    .ex-arrow { color:var(--text3); flex-shrink:0; transition:color 0.2s; }
+    .ex-item:hover .ex-arrow { color:var(--gold); }
+
+    /* Footer */
+    .footer { text-align:center; padding:40px; border-top:1px solid var(--border); color:var(--text3); font-size:0.75rem; }
+
+    /* Responsive */
+    @media(max-width:640px) {
+      .hero { padding:80px 20px 36px; }
+      .hero h1 { font-size:2rem; }
+      .main, .examples { padding-left:16px; padding-right:16px; }
+      .task-tabs { flex-direction:column; }
+      .kpi-row.visible { grid-template-columns:1fr; }
+      .mia-drawer { width:100%; max-width:100%; }
+      .input-area, .task-tabs, .go-area, .exec-log, .kpi-row, .context-box, .result-actions { padding-left:20px; padding-right:20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo"><span class="logo-dot"></span> Ainary</a>
+    <div class="nav-right">
+      <a href="#examples" class="nav-link">Research</a>
+      <a href="#" class="nav-link">About</a>
+      <div class="credits-pill">
+        <span class="diamond">◆</span>
+        <span id="creditCount">10</span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <h1>Multiply your team.</h1>
+  <p>We do 80% of the work. You do the 20% that matters.</p>
+</section>
+
+<!-- Main Container — everything in one box -->
+<div class="main">
+  <div class="task-box">
+
+    <!-- Input -->
+    <div class="input-area">
+      <div class="input-row">
+        <input type="text" class="topic-input" id="topicInput"
+               placeholder="What do you want to research?"
+               onkeydown="if(event.key==='Enter')go()">
+      </div>
+    </div>
+
+    <!-- Task Tabs -->
+    <div class="task-tabs">
+      <div class="task-tab selected" id="tab1" onclick="selectTab(1)">
+        <h3>Research Study</h3>
+        <div class="task-tab-meta"><span>~5 min</span><span class="dot"></span><span>24+ sources</span></div>
+        <div class="task-tab-cost">◆ 2 credits</div>
+        <div class="task-tab-time">Saves ~32 hrs</div>
+      </div>
+      <div class="task-tab" id="tab2" onclick="selectTab(2)">
+        <h3>Acad. Research</h3>
+        <div class="task-tab-meta"><span>~10 min</span><span class="dot"></span><span>SOTA deep-dive</span></div>
+        <div class="task-tab-cost">◆ 3 credits</div>
+        <div class="task-tab-time">Saves ~56 hrs</div>
+      </div>
+      <div class="task-tab" id="tab3" onclick="selectTab(3)">
+        <h3>Daily Intel</h3>
+        <div class="task-tab-meta"><span>~1 min</span><span class="dot"></span><span>50+ feeds</span></div>
+        <div class="task-tab-cost">◆ 1 credit</div>
+        <div class="task-tab-time">Saves ~2 hrs/day</div>
+      </div>
+    </div>
+
+    <!-- Go -->
+    <div class="go-area">
+      <button class="go-btn" id="goBtn" onclick="go()">Start research →</button>
+    </div>
+
+    <!-- Execution (appears after go) -->
+    <div class="exec-area" id="execArea">
+      <div class="exec-progress"><div class="exec-progress-bar" id="execBar"></div></div>
+      <div class="exec-log" id="execLog"></div>
+    </div>
+
+    <!-- KPIs (appears after execution) -->
+    <div class="kpi-row" id="kpiRow">
+      <div class="kpi">
+        <div class="kpi-val green" id="kpiTime">32 hrs</div>
+        <div class="kpi-label">Time saved</div>
+        <div class="kpi-sub" id="kpiTimeSub">3–4 weeks of manual research, compressed to 5 minutes.</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val gold" id="kpiTrust">73%</div>
+        <div class="kpi-label">Trust score</div>
+        <div class="kpi-sub" id="kpiTrustSub">Every claim evidence-tagged. You see exactly what's certain.</div>
+        <div class="trust-bar-bg"><div class="trust-bar" id="trustBar"></div></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val blue">20%</div>
+        <div class="kpi-label">Your part</div>
+        <div class="kpi-sub">We did the research. Your judgment, expertise &amp; decisions — that's yours.</div>
+      </div>
+    </div>
+
+    <!-- Context -->
+    <div class="context-box" id="contextBox">
+      <p id="contextText">
+        This research would typically take an academic <span class="hl">3–4 weeks of focused work</span>.
+        Institutions using AI-assisted research produce <span class="hl">2.4× more output per researcher</span> at comparable quality.
+        The 80% is done — the <span class="hl">20% that creates real value</span> is up to you.
+      </p>
+      <div class="evidence" id="contextEvidence">E — Nature AI in Research 2025 · I — Elsevier Productivity Report 2025</div>
+    </div>
+
+    <!-- Result Actions -->
+    <div class="result-actions" id="resultActions">
+      <a href="#" class="result-btn primary" id="downloadBtn">Download report →</a>
+      <button class="result-btn secondary" onclick="openMia()">Talk to Mia →</button>
+    </div>
+
+  </div><!-- /task-box -->
+</div><!-- /main -->
+
+<!-- Example Reports -->
+<section class="examples" id="examples">
+  <h2>Published research</h2>
+  <div class="sub">Generated by Mia · Human reviewed</div>
+  <div class="ex-list">
+    <a href="https://ainaryventures.com/research/state-of-agent-trust-2026/" class="ex-item" target="_blank">
+      <div class="ex-icon">AR</div>
+      <div class="ex-info">
+        <div class="ex-title">State of AI Agent Trust 2026</div>
+        <div class="ex-meta">47 pages · 24 sources · 5 min read · Feb 2026</div>
+      </div>
+      <span class="ex-badge">Research Study</span>
+      <span class="ex-arrow">→</span>
+    </a>
+    <a href="https://ainaryventures.com/research/personal-ai-stack-2026/" class="ex-item" target="_blank">
+      <div class="ex-icon">AR</div>
+      <div class="ex-info">
+        <div class="ex-title">Personal AI Stack 2026</div>
+        <div class="ex-meta">32 pages · 18 sources · 4 min read · Feb 2026</div>
+      </div>
+      <span class="ex-badge">Research Study</span>
+      <span class="ex-arrow">→</span>
+    </a>
+    <a href="https://ainaryventures.com/research/knowledge-compounding-2026/" class="ex-item" target="_blank">
+      <div class="ex-icon">AR</div>
+      <div class="ex-info">
+        <div class="ex-title">Knowledge Compounding 2026</div>
+        <div class="ex-meta">28 pages · 15 sources · 3 min read · Feb 2026</div>
+      </div>
+      <span class="ex-badge">Research Study</span>
+      <span class="ex-arrow">→</span>
+    </a>
+  </div>
+</section>
+
+<div class="footer">© 2026 Ainary · Trust is the product</div>
+
+<!-- Mia Drawer -->
+<div class="mia-overlay" id="miaOverlay" onclick="closeMia()"></div>
+<div class="mia-drawer" id="miaDrawer">
+  <div class="mia-header">
+    <div class="mia-av">M</div>
+    <h3>Mia</h3>
+    <div class="mia-status">Online</div>
+    <button class="mia-close" onclick="closeMia()">✕</button>
+  </div>
+  <div class="mia-msgs" id="miaMsgs"></div>
+  <div class="mia-input-row">
+    <input type="text" class="mia-input" id="miaInput" placeholder="Ask Mia anything..." onkeydown="if(event.key==='Enter')miaSend()">
+    <button class="mia-send-btn" onclick="miaSend()">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  // State
+  let credits = 10;
+  let selectedTab = 1;
+  let running = false;
+  let lastTopic = '';
+
+  const tasks = {
+    1: { name:'Research Study', cost:2, time:'~5 min', saved:'32 hrs', savedDesc:'3–4 weeks of manual research, compressed to 5 minutes.', trust:73, trustDesc:'Every claim evidence-tagged (E/I/J/A). You see exactly what\'s certain.', context:'This research would typically take an academic <span class="hl">3–4 weeks of focused work</span> — scanning databases, reading papers, cross-referencing, synthesizing. Institutions using AI-assisted research produce <span class="hl">2.4× more output per researcher</span> at comparable quality. The 80% is done — the <span class="hl">20% that creates real value</span> is up to you.', agents:['Researcher','Analyst','Strategist','Critic','Synthesizer'], agentWork:['scanning 47 sources...','structuring findings...','generating recommendations...','cross-verifying claims...','compiling report...'], goText:'Start research →' },
+    2: { name:'Acad. Research', cost:3, time:'~10 min', saved:'56 hrs', savedDesc:'A systematic SOTA review takes a PhD researcher 6–8 weeks. 56 hours is the conservative estimate.', trust:68, trustDesc:'Academic sources scored by methodology rigor, citations, recency. 68% reflects cutting-edge uncertainty.', context:'A full SOTA literature review — systematic search, screening, citation mapping, gap analysis — typically takes <span class="hl">6–8 weeks of a PhD researcher\'s time</span>. That\'s the 80%. The <span class="hl">20% that creates academic value</span> — the novel research question, cross-field connections — requires your expertise.', agents:['ArXiv Scanner','Citation Mapper','Gap Analyst','Method Reviewer','Synthesizer'], agentWork:['searching ArXiv, Semantic Scholar...','mapping citation networks...','identifying research gaps...','reviewing methodology rigor...','compiling SOTA brief...'], goText:'Start deep-dive →' },
+    3: { name:'Daily Intel', cost:1, time:'~1 min', saved:'2 hrs', savedDesc:'2 hours of daily feed scanning, filtered to a 3-minute read.', trust:81, trustDesc:'High source diversity from established feeds. Each item scored and tagged.', context:'Staying current means <span class="hl">~2 hours of morning reading</span> — scanning feeds, filtering noise, extracting signal. Over a month, that\'s 40+ hours. You get the <span class="hl">signal without the noise</span>, scored and summarized. 5 minutes instead of 2 hours.', agents:['Feed Scanner','Relevance Filter','Summarizer'], agentWork:['scanning 50+ feeds...','filtering by relevance...','generating brief...'], goText:'Get today\'s brief →' }
+  };
+
+  // Tab selection
+  function selectTab(n) {
+    if (running) return;
+    selectedTab = n;
+    document.querySelectorAll('.task-tab').forEach((t,i) => t.classList.toggle('selected', i+1===n));
+    document.getElementById('goBtn').textContent = tasks[n].goText;
+  }
+
+  // Credits
+  function spendCredits(n) {
+    credits -= n;
+    const el = document.getElementById('creditCount');
+    el.textContent = credits;
+    el.style.transition = 'transform 0.2s';
+    el.style.transform = 'scale(1.3)';
+    setTimeout(() => el.style.transform = 'scale(1)', 200);
+  }
+
+  // Go
+  function go() {
+    if (running) return;
+    const topic = document.getElementById('topicInput').value.trim();
+    if (!topic) { document.getElementById('topicInput').focus(); return; }
+
+    const task = tasks[selectedTab];
+    if (credits < task.cost) {
+      alert(`Not enough credits. Need ${task.cost}, have ${credits}.`);
+      return;
+    }
+
+    running = true;
+    lastTopic = topic;
+    spendCredits(task.cost);
+
+    const btn = document.getElementById('goBtn');
+    btn.disabled = true;
+    btn.textContent = 'Running...';
+
+    // Reset
+    const execArea = document.getElementById('execArea');
+    const execLog = document.getElementById('execLog');
+    const execBar = document.getElementById('execBar');
+    execLog.innerHTML = '';
+    execBar.style.width = '0%';
+    execArea.classList.add('visible');
+    document.getElementById('kpiRow').classList.remove('visible');
+    document.getElementById('contextBox').classList.remove('visible');
+    document.getElementById('resultActions').classList.remove('visible');
+
+    // Scroll to execution
+    execArea.scrollIntoView({ behavior:'smooth', block:'nearest' });
+
+    const agents = task.agents;
+    const work = task.agentWork;
+    let step = 0;
+
+    function ts() {
+      const d = new Date();
+      return d.toLocaleTimeString('en',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+    }
+
+    function log(html) {
+      execLog.innerHTML += `<div><span class="time">${ts()}</span> ${html}</div>`;
+      execLog.scrollTop = execLog.scrollHeight;
+    }
+
+    log(`→ "${topic}"`);
+    setTimeout(() => {
+      log(`<span class="agent">[Ainary]</span> Deploying ${agents.length} agents...`);
+      execBar.style.width = '8%';
+    }, 400);
+
+    const baseDelay = selectedTab === 3 ? 500 : 700;
+
+    function nextStep() {
+      if (step < agents.length) {
+        const prefix = step < agents.length - 1 ? '├' : '└';
+        log(`${prefix} <span class="agent">${agents[step]}</span> — ${work[step]}`);
+        execBar.style.width = `${8 + ((step+1)/agents.length)*82}%`;
+        step++;
+        setTimeout(nextStep, baseDelay + Math.random()*400);
+      } else {
+        execBar.style.width = '100%';
+        setTimeout(() => {
+          log(`<span class="done">✓ Done</span> — ${task.name} complete · cross-verified`);
+          showResults(task);
+        }, 600);
+      }
+    }
+
+    setTimeout(nextStep, 1200);
+  }
+
+  function showResults(task) {
+    running = false;
+    const btn = document.getElementById('goBtn');
+    btn.disabled = false;
+    btn.textContent = tasks[selectedTab].goText;
+
+    // KPIs
+    document.getElementById('kpiTime').textContent = task.saved;
+    document.getElementById('kpiTimeSub').textContent = task.savedDesc;
+    document.getElementById('kpiTrust').textContent = task.trust + '%';
+    document.getElementById('kpiTrustSub').textContent = task.trustDesc;
+
+    const bar = document.getElementById('trustBar');
+    bar.className = 'trust-bar ' + (task.trust >= 75 ? 'high' : 'med');
+    bar.style.width = '0%';
+
+    document.getElementById('kpiRow').classList.add('visible');
+    setTimeout(() => bar.style.width = task.trust + '%', 50);
+
+    // Context
+    document.getElementById('contextText').innerHTML = task.context;
+    document.getElementById('contextBox').classList.add('visible');
+
+    // Actions
+    document.getElementById('resultActions').classList.add('visible');
+
+    // Scroll to KPIs
+    document.getElementById('kpiRow').scrollIntoView({ behavior:'smooth', block:'nearest' });
+  }
+
+  // Mia
+  function openMia() {
+    const task = tasks[selectedTab];
+    document.getElementById('miaMsgs').innerHTML = `
+      <div class="mia-msg">
+        <div class="mia-msg-av">M</div>
+        <div>
+          <div class="mia-bubble">
+            <strong>"${lastTopic}"</strong> — done. ${task.saved} of work in ${task.time.replace('~','')}.<br><br>
+            Trust: <strong>${task.trust}%</strong>. Every claim evidence-tagged — you see what's solid and what needs your judgment.<br><br>
+            Want me to go deeper on a specific finding, adjust scope, or start something new?
+          </div>
+        </div>
+      </div>
+    `;
+    document.getElementById('miaOverlay').classList.add('open');
+    document.getElementById('miaDrawer').classList.add('open');
+  }
+
+  function closeMia() {
+    document.getElementById('miaOverlay').classList.remove('open');
+    document.getElementById('miaDrawer').classList.remove('open');
+  }
+
+  function miaSend() {
+    const input = document.getElementById('miaInput');
+    if (!input.value.trim()) return;
+    const msgs = document.getElementById('miaMsgs');
+
+    const u = document.createElement('div');
+    u.className = 'mia-msg';
+    u.style.justifyContent = 'flex-end';
+    u.innerHTML = `<div><div class="mia-bubble user">${input.value.trim()}</div></div>`;
+    msgs.appendChild(u);
+    input.value = '';
+
+    setTimeout(() => {
+      const r = document.createElement('div');
+      r.className = 'mia-msg';
+      r.innerHTML = `
+        <div class="mia-msg-av">M</div>
+        <div><div class="mia-bubble">
+          In production, this connects live to the Ainary system via OpenClaw. Every response sourced, scored, verifiable.<br><br>
+          <strong>${credits} credits remaining.</strong> <a href="mailto:florian@ainaryventures.com" style="color:var(--gold);">Get unlimited access →</a>
+        </div></div>
+      `;
+      msgs.appendChild(r);
+      msgs.scrollTop = msgs.scrollHeight;
+    }, 800);
+  }
+</script>
+
+</body>
+</html>

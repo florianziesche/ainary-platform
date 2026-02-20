@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ainary — AI Intelligence Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-page:          #08080c;
+      --bg-surface:       #111116;
+      --bg-surface-hover: #18181f;
+      --bg-input:         #0e0e13;
+      --border-default:   rgba(255, 255, 255, 0.06);
+      --border-hover:     rgba(255, 255, 255, 0.10);
+      --border-active:    rgba(200, 170, 80, 0.30);
+      --text-primary:     #ededf0;
+      --text-secondary:   #8b8b95;
+      --text-muted:       #55555e;
+      --accent:           #c8aa50;
+      --accent-hover:     #d4b85c;
+      --accent-muted:     rgba(200, 170, 80, 0.15);
+      --gold:             #c8aa50;
+      --gold-border:      rgba(200, 170, 80, 0.20);
+      --green:            #34d399;
+      --green-muted:      rgba(52, 211, 153, 0.10);
+      --green-border:     rgba(52, 211, 153, 0.20);
+      --blue:             #60a5fa;
+      --blue-muted:       rgba(96, 165, 250, 0.10);
+      --blue-border:      rgba(96, 165, 250, 0.20);
+      --font-body: 'Inter', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg-page);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* === NAV === */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(8,8,12,0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-default);
+      height: 56px;
+    }
+    .nav-inner {
+      max-width: 1200px; margin: 0 auto; padding: 0 48px;
+      height: 100%; display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      font-weight: 600; font-size: 1.125rem; color: var(--text-primary);
+      display: flex; align-items: center; gap: 8px; text-decoration: none;
+    }
+    .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--gold); }
+    .nav-links { display: flex; gap: 24px; align-items: center; }
+    .nav-link { color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; font-weight: 500; }
+    .nav-link:hover { color: var(--text-primary); }
+
+    /* === CREDITS BAR === */
+    .credits-bar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-default);
+      padding: 10px 0;
+    }
+    .credits-inner {
+      max-width: 1200px; margin: 0 auto; padding: 0 48px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .credits-left {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .credits-label {
+      font-size: 0.8rem; color: var(--text-muted);
+    }
+    .credits-count {
+      display: flex; align-items: center; gap: 6px;
+      font-family: var(--font-mono); font-size: 0.9rem;
+      font-weight: 600; color: var(--accent);
+    }
+    .credits-icon {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--accent-muted); border: 1px solid var(--gold-border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; color: var(--accent);
+    }
+    .credits-dots {
+      display: flex; gap: 4px;
+    }
+    .credit-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent); transition: background 0.3s, opacity 0.3s;
+    }
+    .credit-dot.spent {
+      background: var(--text-muted); opacity: 0.3;
+    }
+    .credits-right {
+      font-size: 0.75rem; color: var(--text-muted);
+    }
+    .credits-right a {
+      color: var(--accent); text-decoration: none;
+    }
+
+    /* === HERO === */
+    .hero {
+      text-align: center; padding: 120px 48px 80px;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; top: -20%; left: 50%; transform: translateX(-50%);
+      width: 140%; height: 70%;
+      background: radial-gradient(ellipse at 50% 0%, rgba(200,170,80,0.07) 0%, rgba(200,170,80,0.03) 30%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero h1 {
+      font-size: 3.5rem; font-weight: 600; letter-spacing: -0.02em;
+      line-height: 1.2; margin-bottom: 24px; position: relative;
+    }
+    .hero p {
+      font-size: 1.25rem; font-weight: 300; color: var(--text-secondary);
+      max-width: 600px; margin: 0 auto; position: relative;
+    }
+
+    /* === TASK SELECTOR === */
+    .task-section {
+      max-width: 1000px; margin: 0 auto; padding: 0 48px 60px;
+    }
+    .task-input-wrap {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 32px;
+    }
+    .task-input-row {
+      display: flex; gap: 16px; align-items: center; margin-bottom: 24px;
+    }
+    .task-input-label {
+      color: var(--text-muted); font-size: 0.875rem; white-space: nowrap;
+    }
+    .task-input {
+      flex: 1; background: var(--bg-input);
+      border: 1px solid var(--border-default);
+      border-radius: 10px; padding: 14px 18px;
+      color: var(--text-primary); font-family: var(--font-body);
+      font-size: 1rem; outline: none;
+      transition: border-color 0.2s;
+    }
+    .task-input:focus { border-color: var(--border-active); }
+    .task-input::placeholder { color: var(--text-muted); }
+
+    /* Context badge */
+    .context-badge {
+      display: none; align-items: center; gap: 8px;
+      padding: 8px 16px; margin-bottom: 20px;
+      background: var(--accent-muted);
+      border: 1px solid var(--gold-border);
+      border-radius: 8px; font-size: 0.8rem;
+    }
+    .context-badge.visible { display: flex; }
+    .context-badge .org-name { color: var(--accent); font-weight: 600; }
+    .context-badge .context-text { color: var(--text-secondary); }
+
+    /* Task cards */
+    .task-cards {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+    }
+    .task-card {
+      background: var(--bg-page);
+      border: 1px solid var(--border-default);
+      border-radius: 12px; padding: 24px;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+      position: relative;
+    }
+    .task-card:hover {
+      border-color: rgba(200,170,80,0.3);
+      box-shadow: 0 0 0 1px rgba(200,170,80,0.1);
+      transform: translateY(-2px);
+    }
+    .task-card.selected {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent), 0 4px 24px rgba(200,170,80,0.1);
+    }
+    .task-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .task-card-header h3 {
+      font-size: 0.95rem; font-weight: 500;
+    }
+    .cost-badge {
+      font-family: var(--font-mono); font-size: 0.7rem;
+      padding: 3px 10px; border-radius: 6px;
+      background: var(--accent-muted); color: var(--accent);
+      border: 1px solid var(--gold-border);
+      white-space: nowrap;
+    }
+    .task-card-meta {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.8rem; color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+    .task-card-meta .dot {
+      width: 4px; height: 4px; border-radius: 50%;
+      background: var(--text-muted);
+    }
+    .task-card-desc {
+      font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .pipeline-tag {
+      font-family: var(--font-mono); font-size: 0.7rem;
+      color: var(--text-muted); padding-top: 12px;
+      border-top: 1px solid var(--border-default);
+    }
+
+    /* Time saved badge on card */
+    .time-saved-mini {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.75rem; color: var(--green); margin-bottom: 12px;
+    }
+    .time-saved-mini svg { width: 14px; height: 14px; fill: var(--green); }
+
+    /* === KPI DASHBOARD (after execution) === */
+    .kpi-section {
+      max-width: 1000px; margin: 0 auto; padding: 0 48px 60px;
+      display: none;
+    }
+    .kpi-section.visible { display: block; }
+
+    .kpi-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .kpi-header h2 { font-size: 1.25rem; font-weight: 500; }
+    .kpi-header .task-label {
+      font-size: 0.8rem; color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .kpi-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 12px; padding: 24px;
+      text-align: center;
+    }
+    .kpi-value {
+      font-family: var(--font-mono); font-size: 2rem;
+      font-weight: 700; margin-bottom: 4px;
+    }
+    .kpi-value.green { color: var(--green); }
+    .kpi-value.gold { color: var(--accent); }
+    .kpi-value.blue { color: var(--blue); }
+    .kpi-label {
+      font-size: 0.8rem; color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    .kpi-explain {
+      font-size: 0.7rem; color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Trust score bar */
+    .trust-bar-wrap {
+      height: 4px; background: rgba(255,255,255,0.06);
+      border-radius: 2px; margin-top: 12px; overflow: hidden;
+    }
+    .trust-bar {
+      height: 100%; border-radius: 2px;
+      transition: width 1.5s ease-out;
+    }
+    .trust-bar.high { background: var(--green); }
+    .trust-bar.medium { background: var(--accent); }
+
+    /* Context / insight box */
+    .kpi-insight {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 12px; padding: 24px;
+      margin-bottom: 24px;
+    }
+    .kpi-insight h4 {
+      font-size: 0.85rem; font-weight: 500; margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+    .kpi-insight p {
+      font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
+    }
+    .kpi-insight .highlight {
+      color: var(--accent); font-weight: 500;
+    }
+    .kpi-insight .evidence {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-family: var(--font-mono); font-size: 0.7rem;
+      color: var(--text-muted); margin-top: 8px;
+    }
+
+    .competitive-box {
+      background: linear-gradient(135deg, rgba(200,170,80,0.06) 0%, rgba(200,170,80,0.02) 100%);
+      border: 1px solid var(--gold-border);
+      border-radius: 12px; padding: 24px;
+    }
+    .competitive-box h4 {
+      font-size: 0.85rem; font-weight: 500; color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .competitive-box p {
+      font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;
+    }
+    .competitive-box strong { color: var(--text-primary); }
+
+    /* Progress animation */
+    .progress-section {
+      max-width: 1000px; margin: 0 auto; padding: 0 48px 40px;
+      display: none;
+    }
+    .progress-section.visible { display: block; }
+
+    .progress-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 12px; padding: 24px;
+    }
+    .progress-title {
+      font-size: 0.9rem; font-weight: 500; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .progress-spinner {
+      width: 16px; height: 16px; border: 2px solid var(--border-default);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .progress-log {
+      font-family: var(--font-mono); font-size: 0.8rem;
+      color: var(--text-muted); line-height: 2;
+    }
+    .progress-log .agent { color: var(--accent); }
+    .progress-log .done { color: var(--green); }
+    .progress-log .time { color: var(--text-muted); }
+
+    .progress-bar-outer {
+      height: 3px; background: rgba(255,255,255,0.06);
+      border-radius: 2px; margin-top: 16px; overflow: hidden;
+    }
+    .progress-bar-inner {
+      height: 100%; background: var(--accent);
+      border-radius: 2px; width: 0%;
+      transition: width 0.5s ease-out;
+    }
+
+    /* === CONTEXT USE CASES === */
+    .context-usecases {
+      max-width: 1000px; margin: 0 auto; padding: 0 48px 60px;
+      display: none;
+    }
+    .context-usecases.visible { display: block; }
+    .context-usecases-header {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 24px;
+    }
+    .context-usecases-header .org-badge {
+      background: var(--accent-muted);
+      border: 1px solid var(--gold-border);
+      border-radius: 8px; padding: 6px 14px;
+      font-size: 0.85rem; font-weight: 500; color: var(--accent);
+    }
+    .context-usecases-header h2 {
+      font-size: 1.25rem; font-weight: 500;
+    }
+    .usecase-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
+    }
+    .usecase-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 12px; padding: 24px;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+    .usecase-card:hover {
+      border-color: rgba(200,170,80,0.3);
+      transform: translateY(-2px);
+    }
+    .usecase-card h4 { font-size: 0.9rem; font-weight: 500; margin-bottom: 4px; }
+    .usecase-card .uc-meta {
+      font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .usecase-card .uc-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--text-muted); }
+    .usecase-card p { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px; }
+    .usecase-card .usecase-tag {
+      font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted);
+    }
+
+    /* === MIA PANEL === */
+    .mia-panel {
+      max-width: 1000px; margin: 0 auto; padding: 0 48px 60px;
+      display: none;
+    }
+    .mia-panel.visible { display: block; }
+    .mia-chat {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 16px; overflow: hidden;
+    }
+    .mia-chat-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border-default);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .mia-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--accent-muted);
+      border: 1px solid rgba(200,170,80,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 600; color: var(--accent);
+    }
+    .mia-chat-header h3 { font-size: 0.9rem; font-weight: 500; }
+    .mia-status {
+      font-size: 0.75rem; color: var(--green); margin-left: auto;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .mia-status::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green); box-shadow: 0 0 6px rgba(52,211,153,0.4);
+    }
+    .mia-messages {
+      padding: 24px; min-height: 160px; max-height: 400px;
+      overflow-y: auto; display: flex; flex-direction: column; gap: 16px;
+    }
+    .mia-msg { display: flex; gap: 12px; animation: msgIn 0.4s ease-out; }
+    .mia-msg-avatar {
+      width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+      background: var(--accent-muted); color: var(--accent);
+      border: 1px solid rgba(200,170,80,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 600;
+    }
+    .mia-msg-bubble {
+      padding: 14px 18px; border-radius: 12px;
+      background: var(--bg-page); border: 1px solid var(--border-default);
+      font-size: 0.875rem; line-height: 1.6; color: var(--text-primary);
+    }
+    .mia-msg-bubble strong { color: var(--accent); font-weight: 500; }
+    .mia-msg-bubble code {
+      font-family: var(--font-mono); font-size: 0.8rem;
+      background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px;
+    }
+    .mia-input-area {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-default);
+      display: flex; gap: 12px;
+    }
+    .mia-input {
+      flex: 1; background: var(--bg-input);
+      border: 1px solid var(--border-default);
+      border-radius: 10px; padding: 12px 16px;
+      color: var(--text-primary); font-family: var(--font-body);
+      font-size: 0.875rem; outline: none;
+      transition: border-color 0.2s;
+    }
+    .mia-input:focus { border-color: var(--border-active); }
+    .mia-input::placeholder { color: var(--text-muted); }
+    .mia-send {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: var(--accent); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s;
+    }
+    .mia-send:hover { background: var(--accent-hover); }
+    .mia-send svg { width: 18px; height: 18px; fill: #fff; }
+
+    @keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* === EXAMPLES === */
+    .examples-section {
+      max-width: 1000px; margin: 0 auto; padding: 0 48px 100px;
+    }
+    .examples-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .examples-header h2 { font-size: 1.25rem; font-weight: 500; }
+    .examples-header span { font-size: 0.8rem; color: var(--text-muted); }
+    .example-list { display: flex; flex-direction: column; gap: 12px; }
+    .example-item {
+      display: flex; align-items: center; gap: 16px;
+      padding: 20px 24px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 12px; text-decoration: none;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+    .example-item:hover {
+      border-color: rgba(255,255,255,0.15);
+      transform: translateX(4px);
+    }
+    .example-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: var(--accent-muted);
+      border: 1px solid var(--gold-border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 600; color: var(--accent);
+      font-family: var(--font-mono); flex-shrink: 0;
+    }
+    .example-info { flex: 1; }
+    .example-title {
+      font-size: 0.9rem; font-weight: 500; color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .example-meta {
+      font-size: 0.75rem; color: var(--text-muted);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .example-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--text-muted); }
+    .example-badge {
+      font-family: var(--font-mono); font-size: 0.7rem;
+      padding: 3px 10px; border-radius: 6px;
+      background: var(--green-muted); color: var(--green);
+      border: 1px solid var(--green-border); flex-shrink: 0;
+    }
+    .example-arrow {
+      color: var(--text-muted); font-size: 1rem; flex-shrink: 0;
+      transition: color 0.2s;
+    }
+    .example-item:hover .example-arrow { color: var(--accent); }
+
+    /* === FOOTER === */
+    .footer {
+      text-align: center; padding: 48px;
+      border-top: 1px solid var(--border-default);
+      color: var(--text-muted); font-size: 0.8rem;
+    }
+
+    /* Floating widget */
+    .widget-toggle {
+      position: fixed; bottom: 24px; right: 24px;
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--accent); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 24px rgba(200,170,80,0.3);
+      transition: transform 0.2s; z-index: 1000;
+    }
+    .widget-toggle:hover { transform: scale(1.08); }
+    .widget-toggle svg { width: 24px; height: 24px; fill: #fff; }
+
+    /* Dot grid */
+    .dot-grid { position: relative; }
+    .dot-grid::before {
+      content: ''; position: absolute; inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 32px 32px; pointer-events: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero { padding: 100px 24px 60px; }
+      .hero h1 { font-size: 2.2rem; }
+      .task-section, .examples-section, .context-usecases, .mia-panel, .kpi-section, .progress-section { padding-left: 16px; padding-right: 16px; }
+      .task-cards, .kpi-grid { grid-template-columns: 1fr; }
+      .usecase-grid { grid-template-columns: 1fr; }
+      .credits-inner { flex-direction: column; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo"><span class="logo-dot"></span> Ainary</a>
+      <div class="nav-links">
+        <a href="#" class="nav-link">Product</a>
+        <a href="#examples" class="nav-link">Research</a>
+        <a href="#" class="nav-link">About</a>
+        <a href="#" class="nav-link" style="color:var(--accent);">Get in touch →</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Credits Bar -->
+  <div class="credits-bar">
+    <div class="credits-inner">
+      <div class="credits-left">
+        <span class="credits-label">Free credits</span>
+        <span class="credits-count">
+          <span class="credits-icon">◆</span>
+          <span id="creditsNumber">10</span>
+        </span>
+        <div class="credits-dots" id="creditsDots">
+          <span class="credit-dot"></span>
+          <span class="credit-dot"></span>
+          <span class="credit-dot"></span>
+          <span class="credit-dot"></span>
+          <span class="credit-dot"></span>
+          <span class="credit-dot"></span>
+          <span class="credit-dot"></span>
+          <span class="credit-dot"></span>
+          <span class="credit-dot"></span>
+          <span class="credit-dot"></span>
+        </div>
+      </div>
+      <div class="credits-right">
+        Need more? <a href="mailto:florian@ainaryventures.com">Get in touch →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero -->
+  <section class="hero dot-grid">
+    <h1>Multiply your team.</h1>
+    <p>We do 80% of the work. You do the 20% that matters.</p>
+  </section>
+
+  <!-- Task Selector -->
+  <section class="task-section">
+    <div class="task-input-wrap">
+      <div class="task-input-row">
+        <span class="task-input-label">Your organization:</span>
+        <input type="text" class="task-input" id="orgInput"
+               placeholder="e.g. TUM, BMW, McKinsey..."
+               oninput="handleOrgInput(this.value)">
+      </div>
+
+      <div class="context-badge" id="contextBadge">
+        <span class="org-name" id="contextOrg"></span>
+        <span class="context-text" id="contextDesc"></span>
+      </div>
+
+      <!-- 3 Task Cards -->
+      <div class="task-cards">
+        <!-- Research Study -->
+        <div class="task-card" id="taskCard1" onclick="executeTask(1)">
+          <div class="task-card-header">
+            <h3>Research Study</h3>
+            <span class="cost-badge">◆ 2 credits</span>
+          </div>
+          <div class="task-card-meta">
+            <span>~5 min</span>
+            <span class="dot"></span>
+            <span>24+ sources</span>
+          </div>
+          <div class="time-saved-mini">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z"/></svg>
+            <span>Saves ~32 hrs vs. manual research</span>
+          </div>
+          <div class="task-card-desc">
+            Full report: executive summary, key findings, evidence scoring (E/I/J/A), recommendations.
+          </div>
+          <div class="pipeline-tag">pipeline v2.3 · multi-agent</div>
+        </div>
+
+        <!-- Academic Research -->
+        <div class="task-card" id="taskCard2" onclick="executeTask(2)">
+          <div class="task-card-header">
+            <h3>Acad. Research</h3>
+            <span class="cost-badge">◆ 3 credits</span>
+          </div>
+          <div class="task-card-meta">
+            <span>~10 min</span>
+            <span class="dot"></span>
+            <span>SOTA deep-dive</span>
+          </div>
+          <div class="time-saved-mini">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z"/></svg>
+            <span>Saves ~56 hrs vs. manual lit review</span>
+          </div>
+          <div class="task-card-desc">
+            ArXiv papers, citation mapping, research frontier ID, gap analysis. SOTA deep-dive.
+          </div>
+          <div class="pipeline-tag">research-pipeline-deep-dive</div>
+        </div>
+
+        <!-- RSS + Daily Intel -->
+        <div class="task-card" id="taskCard3" onclick="executeTask(3)">
+          <div class="task-card-header">
+            <h3>RSS + Daily Intel</h3>
+            <span class="cost-badge">◆ 1 credit</span>
+          </div>
+          <div class="task-card-meta">
+            <span>~1 min</span>
+            <span class="dot"></span>
+            <span>Daily brief</span>
+          </div>
+          <div class="time-saved-mini">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z"/></svg>
+            <span>Saves ~2 hrs vs. manual scanning</span>
+          </div>
+          <div class="task-card-desc">
+            50+ RSS feeds filtered, scored, and summarized. Your domain, your brief.
+          </div>
+          <div class="pipeline-tag">rss-intel · auto-refresh</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Context Use Cases -->
+  <section class="context-usecases" id="contextUsecases">
+    <div class="context-usecases-header">
+      <span class="org-badge" id="usecaseOrgBadge">TUM</span>
+      <h2 id="usecaseTitle">What Mia can do for TUM</h2>
+    </div>
+    <div class="usecase-grid" id="usecaseGrid"></div>
+  </section>
+
+  <!-- Progress (during execution) -->
+  <section class="progress-section" id="progressSection">
+    <div class="progress-box">
+      <div class="progress-title">
+        <div class="progress-spinner"></div>
+        <span id="progressTitle">Running Research Study...</span>
+      </div>
+      <div class="progress-log" id="progressLog"></div>
+      <div class="progress-bar-outer">
+        <div class="progress-bar-inner" id="progressBar"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KPI Dashboard (after execution) -->
+  <section class="kpi-section" id="kpiSection">
+    <div class="kpi-header">
+      <h2>Impact Report</h2>
+      <span class="task-label" id="kpiTaskLabel">Research Study · pipeline v2.3</span>
+    </div>
+
+    <div class="kpi-grid">
+      <!-- Time Saved -->
+      <div class="kpi-card">
+        <div class="kpi-value green" id="kpiTimeSaved">32 hrs</div>
+        <div class="kpi-label">Time saved</div>
+        <div class="kpi-explain" id="kpiTimeExplain">
+          A researcher typically spends 3–4 weeks on a comparable literature review and synthesis. Conservative estimate based on academic workflow benchmarks.
+        </div>
+      </div>
+
+      <!-- Trust Score -->
+      <div class="kpi-card">
+        <div class="kpi-value gold" id="kpiTrust">73%</div>
+        <div class="kpi-label">Trust score</div>
+        <div class="kpi-explain" id="kpiTrustExplain">
+          Every claim scored by evidence type (E/I/J/A). 73% = strong multi-source backing with disclosed gaps. You see exactly what's certain and what isn't.
+        </div>
+        <div class="trust-bar-wrap">
+          <div class="trust-bar high" id="trustBar" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- Your Part -->
+      <div class="kpi-card">
+        <div class="kpi-value blue">20%</div>
+        <div class="kpi-label">Your part</div>
+        <div class="kpi-explain">
+          We did the 80% — research, synthesis, cross-verification, scoring. The 20% that matters — interpretation, judgment, decisions — that's yours.
+        </div>
+      </div>
+    </div>
+
+    <!-- Insight box -->
+    <div class="kpi-insight" id="kpiInsight">
+      <h4>Why this matters</h4>
+      <p id="kpiInsightText">
+        This research study would typically take an academic researcher <span class="highlight">3 weeks of focused work</span> — scanning databases, reading papers, cross-referencing claims, synthesizing findings. That's the 80% of the work that's necessary but doesn't require your expertise.<br><br>
+        The remaining <span class="highlight">20% — your interpretation, your domain knowledge, your judgment</span> — is where the real value is. That part is up to you.
+      </p>
+      <div class="evidence">I — Based on academic workflow benchmarks (Nature, 2025; Elsevier Research Productivity Report)</div>
+    </div>
+
+    <!-- Competitive advantage box -->
+    <div class="competitive-box">
+      <h4>The competitive reality</h4>
+      <p id="competitiveText">
+        Research institutions using AI-assisted workflows produce <strong>2.4× more publications per researcher</strong> at comparable quality levels. Over the next 2–3 years, this compounds: teams that adopt AI research tools now will widen the gap every quarter.<br><br>
+        This isn't about replacing researchers — it's about <strong>removing the bottleneck</strong> between having a hypothesis and having the evidence to test it. The institutions that move first build a structural advantage that's hard to catch.
+      </p>
+      <div class="evidence" style="display:flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted);margin-top:12px;">
+        E — Nature "AI in Research" Survey 2025 · I — Elsevier Productivity Report 2025
+      </div>
+    </div>
+  </section>
+
+  <!-- Mia Chat Panel -->
+  <section class="mia-panel" id="miaPanel">
+    <div class="mia-chat">
+      <div class="mia-chat-header">
+        <div class="mia-avatar">M</div>
+        <h3>Mia · Ainary AI</h3>
+        <div class="mia-status">Online</div>
+      </div>
+      <div class="mia-messages" id="miaMessages"></div>
+      <div class="mia-input-area">
+        <input type="text" class="mia-input" id="miaInput" placeholder="Talk to Mia..." onkeydown="if(event.key==='Enter')miaSend()">
+        <button class="mia-send" onclick="miaSend()">
+          <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Example Reports -->
+  <section class="examples-section" id="examples">
+    <div class="examples-header">
+      <h2>Published research</h2>
+      <span>Generated by Mia · Human reviewed</span>
+    </div>
+    <div class="example-list">
+      <a href="https://ainaryventures.com/research/state-of-agent-trust-2026/" class="example-item" target="_blank">
+        <div class="example-icon">AR</div>
+        <div class="example-info">
+          <div class="example-title">State of AI Agent Trust 2026</div>
+          <div class="example-meta">47 pages <span class="dot"></span> 24 sources <span class="dot"></span> 5 min read <span class="dot"></span> Feb 2026</div>
+        </div>
+        <span class="example-badge">Research Study</span>
+        <span class="example-arrow">→</span>
+      </a>
+      <a href="https://ainaryventures.com/research/personal-ai-stack-2026/" class="example-item" target="_blank">
+        <div class="example-icon">AR</div>
+        <div class="example-info">
+          <div class="example-title">Personal AI Stack 2026</div>
+          <div class="example-meta">32 pages <span class="dot"></span> 18 sources <span class="dot"></span> 4 min read <span class="dot"></span> Feb 2026</div>
+        </div>
+        <span class="example-badge">Research Study</span>
+        <span class="example-arrow">→</span>
+      </a>
+      <a href="https://ainaryventures.com/research/knowledge-compounding-2026/" class="example-item" target="_blank">
+        <div class="example-icon">AR</div>
+        <div class="example-info">
+          <div class="example-title">Knowledge Compounding 2026</div>
+          <div class="example-meta">28 pages <span class="dot"></span> 15 sources <span class="dot"></span> 3 min read <span class="dot"></span> Feb 2026</div>
+        </div>
+        <span class="example-badge">Research Study</span>
+        <span class="example-arrow">→</span>
+      </a>
+    </div>
+  </section>
+
+  <div class="footer">© 2026 Ainary · Trust is the product</div>
+
+  <button class="widget-toggle" onclick="document.querySelector('.task-section').scrollIntoView({behavior:'smooth'})" title="Talk to Mia">
+    <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
+  </button>
+
+  <script>
+    // =============================
+    // State
+    // =============================
+    let credits = 10;
+    let currentOrg = null;
+
+    const taskConfig = {
+      1: {
+        name: 'Research Study',
+        cost: 2,
+        pipeline: 'pipeline v2.3',
+        time: '~5 min',
+        timeSaved: '32 hrs',
+        timeSavedExplain: 'A researcher typically spends 3–4 weeks on a comparable literature review, source scanning, cross-referencing, and synthesis. Conservative estimate based on academic workflow studies.',
+        trust: 73,
+        trustExplain: 'Every claim scored by evidence type (E/I/J/A). 73% = strong multi-source backing with disclosed gaps. You see exactly what\'s certain and what isn\'t.',
+        insightText: 'This research study would typically take an academic researcher <span class="highlight">3–4 weeks of focused work</span> — scanning databases, reading papers, cross-referencing claims, writing synthesis. That\'s the 80% that\'s necessary but doesn\'t require your unique expertise.<br><br>The remaining <span class="highlight">20% — your interpretation, your domain knowledge, your strategic judgment</span> — is where the real value lives. That part is yours.',
+        agents: ['Researcher', 'Analyst', 'Strategist', 'Critic', 'Synthesizer'],
+        agentTasks: ['scanning 47 sources...', 'structuring findings...', 'generating recommendations...', 'cross-verifying claims...', 'compiling report...']
+      },
+      2: {
+        name: 'Acad. Research',
+        cost: 3,
+        pipeline: 'research-pipeline-deep-dive',
+        time: '~10 min',
+        timeSaved: '56 hrs',
+        timeSavedExplain: 'A full SOTA literature review — systematic search, paper screening, citation mapping, gap analysis — typically takes a PhD researcher 1–2 months. 56 hours is the conservative focused-work estimate.',
+        trust: 68,
+        trustExplain: 'Academic sources scored by methodology rigor, citation count, and recency. 68% reflects the inherent uncertainty in cutting-edge research — newer papers have less validation.',
+        insightText: 'A systematic SOTA review typically requires <span class="highlight">6–8 weeks of a PhD researcher\'s time</span> — database searches, paper screening, full-text analysis, citation mapping, and gap identification. That\'s the 80%.<br><br>The <span class="highlight">20% that creates real academic value</span> — identifying the novel research question, connecting insights across fields, designing the study — requires your expertise.',
+        agents: ['ArXiv Scanner', 'Citation Mapper', 'Gap Analyst', 'Methodology Reviewer', 'Synthesizer'],
+        agentTasks: ['searching ArXiv, Semantic Scholar...', 'mapping citation networks...', 'identifying research gaps...', 'reviewing methodology rigor...', 'compiling SOTA brief...']
+      },
+      3: {
+        name: 'RSS + Daily Intel',
+        cost: 1,
+        pipeline: 'rss-intel',
+        time: '~1 min',
+        timeSaved: '2 hrs',
+        timeSavedExplain: 'Daily scanning of 50+ RSS feeds, news sources, and preprint servers. Manual equivalent: ~2 hours of morning reading, filtering, and note-taking.',
+        trust: 81,
+        trustExplain: '81% = high source diversity from established feeds. Lower trust on breaking news (unverified), higher on published research. Each item tagged.',
+        insightText: 'Every morning, staying current means <span class="highlight">~2 hours of scanning feeds, filtering noise, and extracting signal</span>. Over a month, that\'s 40+ hours of reading that doesn\'t produce output.<br><br>With Daily Intel, you get the <span class="highlight">signal without the noise</span> — scored, filtered, and summarized. You spend 5 minutes reading what matters instead of 2 hours finding it.',
+        agents: ['Feed Scanner', 'Relevance Filter', 'Summarizer'],
+        agentTasks: ['scanning 50+ feeds...', 'filtering by relevance...', 'generating brief...']
+      }
+    };
+
+    // =============================
+    // Orgs
+    // =============================
+    const orgs = {
+      tum: {
+        name: 'Technical University of Munich',
+        short: 'TUM',
+        desc: 'Top technical university · AI research hub · 50,000+ students',
+        usecases: [
+          { title: 'SOTA: AI Governance in Higher Education', desc: 'How universities are governing AI adoption — policies, ethics boards, student use. ArXiv + policy papers.', cost: 3, task: 2, prompt: 'SOTA: AI governance frameworks in European higher education, focus TUM' },
+          { title: 'Research: TUM AI Research Landscape', desc: 'Map all AI groups, publications, industry partnerships. Who\'s doing what.', cost: 2, task: 1, prompt: 'TUM AI research landscape — groups, publications, partnerships, funding' },
+          { title: 'Daily Intel: AI in Academia', desc: 'Morning brief on AI developments in university strategy, new papers, policy.', cost: 1, task: 3, prompt: 'Daily intel: AI in European academia, technical universities' },
+          { title: 'SOTA: LLMs for Research Automation', desc: 'Using LLMs for lit review, hypothesis generation, research synthesis.', cost: 3, task: 2, prompt: 'SOTA: LLM applications for academic research automation' }
+        ]
+      },
+      bmw: {
+        name: 'BMW Group',
+        short: 'BMW',
+        desc: 'Automotive OEM · AI/CV in production · Munich HQ',
+        usecases: [
+          { title: 'Research: BMW AI Strategy vs. Competitors', desc: 'Compare AI investments, patents, partnerships vs Mercedes, VW, Tesla.', cost: 2, task: 1, prompt: 'BMW AI strategy vs Mercedes, VW, Tesla' },
+          { title: 'SOTA: Computer Vision in Automotive', desc: 'Latest CV papers for quality inspection, ADAS, manufacturing.', cost: 3, task: 2, prompt: 'SOTA: CV in automotive manufacturing and autonomous driving 2025-2026' },
+          { title: 'Daily Intel: Automotive AI', desc: 'Daily brief on AI in automotive — models, regulations, deals.', cost: 1, task: 3, prompt: 'Daily intel: AI in automotive, German OEMs' },
+          { title: 'Research: AI Agent Trust for Enterprise', desc: 'Agent governance framework + implementation roadmap for BMW-scale.', cost: 2, task: 1, prompt: 'AI agent trust and governance for enterprise deployment' }
+        ]
+      },
+      mckinsey: {
+        name: 'McKinsey & Company',
+        short: 'McKinsey',
+        desc: 'Management consulting · AI practice · Knowledge at Scale',
+        usecases: [
+          { title: 'Research: AI Consulting Market 2026', desc: 'Market size, players, pricing, disruption vectors.', cost: 2, task: 1, prompt: 'AI consulting market 2026 — size, players, disruption' },
+          { title: 'SOTA: AI-Augmented Strategy Work', desc: 'How AI changes market sizing, scenario planning, due diligence.', cost: 3, task: 2, prompt: 'SOTA: AI-augmented strategy consulting' },
+          { title: 'Daily Intel: Consulting + AI', desc: 'Daily brief on AI developments for consulting firms.', cost: 1, task: 3, prompt: 'Daily intel: AI in management consulting' },
+          { title: 'Research: Knowledge Compounding', desc: 'Building institutional memory with AI agents.', cost: 2, task: 1, prompt: 'AI-powered knowledge compounding for consulting' }
+        ]
+      }
+    };
+    orgs['technical university of munich'] = orgs.tum;
+    orgs['tu münchen'] = orgs.tum;
+    orgs['tu munich'] = orgs.tum;
+
+    // =============================
+    // Credits
+    // =============================
+    function updateCredits(newVal) {
+      credits = newVal;
+      document.getElementById('creditsNumber').textContent = credits;
+      const dots = document.querySelectorAll('#creditsDots .credit-dot');
+      dots.forEach((d, i) => {
+        d.classList.toggle('spent', i >= credits);
+      });
+    }
+
+    // =============================
+    // Org Input
+    // =============================
+    function handleOrgInput(value) {
+      const key = value.toLowerCase().trim();
+      const match = orgs[key];
+      const badge = document.getElementById('contextBadge');
+      const section = document.getElementById('contextUsecases');
+
+      if (match) {
+        currentOrg = match;
+        document.getElementById('contextOrg').textContent = match.short;
+        document.getElementById('contextDesc').textContent = '— ' + match.desc;
+        badge.classList.add('visible');
+
+        document.getElementById('usecaseOrgBadge').textContent = match.short;
+        document.getElementById('usecaseTitle').textContent = `What Mia can do for ${match.name}`;
+
+        document.getElementById('usecaseGrid').innerHTML = match.usecases.map((uc, i) => `
+          <div class="usecase-card" onclick="executeUsecase(${i})">
+            <h4>${uc.title}</h4>
+            <div class="uc-meta">
+              <span>◆ ${uc.cost} credit${uc.cost > 1 ? 's' : ''}</span>
+              <span class="dot"></span>
+              <span>${taskConfig[uc.task].time}</span>
+              <span class="dot"></span>
+              <span>Saves ${taskConfig[uc.task].timeSaved}</span>
+            </div>
+            <p>${uc.desc}</p>
+            <div class="usecase-tag">${taskConfig[uc.task].pipeline}</div>
+          </div>
+        `).join('');
+
+        section.classList.add('visible');
+        setTimeout(() => section.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+      } else {
+        badge.classList.remove('visible');
+        section.classList.remove('visible');
+        currentOrg = null;
+      }
+    }
+
+    // =============================
+    // Execute Task (from card click)
+    // =============================
+    function executeTask(taskNum) {
+      const config = taskConfig[taskNum];
+      if (credits < config.cost) {
+        alert(`Not enough credits. You need ${config.cost} credits, but have ${credits}.`);
+        return;
+      }
+      runExecution(taskNum, config.name);
+    }
+
+    // =============================
+    // Execute Usecase (from org-specific card)
+    // =============================
+    function executeUsecase(index) {
+      if (!currentOrg) return;
+      const uc = currentOrg.usecases[index];
+      const config = taskConfig[uc.task];
+      if (credits < uc.cost) {
+        alert(`Not enough credits. You need ${uc.cost} credits, but have ${credits}.`);
+        return;
+      }
+      runExecution(uc.task, uc.title, uc.prompt);
+    }
+
+    // =============================
+    // Execution simulation
+    // =============================
+    function runExecution(taskNum, title, prompt) {
+      const config = taskConfig[taskNum];
+
+      // Deduct credits
+      updateCredits(credits - config.cost);
+
+      // Highlight card
+      document.querySelectorAll('.task-card').forEach((c, i) => {
+        c.classList.toggle('selected', i + 1 === taskNum);
+      });
+
+      // Show progress
+      const progSection = document.getElementById('progressSection');
+      const progLog = document.getElementById('progressLog');
+      const progBar = document.getElementById('progressBar');
+      document.getElementById('progressTitle').textContent = `Running ${title || config.name}...`;
+      progLog.innerHTML = '';
+      progBar.style.width = '0%';
+      progSection.classList.add('visible');
+
+      // Hide KPI + Mia
+      document.getElementById('kpiSection').classList.remove('visible');
+      document.getElementById('miaPanel').classList.remove('visible');
+
+      progSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      // Simulate agent log
+      const agents = config.agents;
+      const tasks = config.agentTasks;
+      const totalSteps = agents.length + 1;
+      let step = 0;
+
+      function addLogLine(html) {
+        const now = new Date();
+        const time = now.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit', hour12: false });
+        progLog.innerHTML += `<div><span class="time">${time}</span> ${html}</div>`;
+      }
+
+      // Initial
+      addLogLine(`→ "${title || config.name}"`);
+      addLogLine(`<span class="agent">[Ainary]</span> Deploying ${agents.length} agents...`);
+      progBar.style.width = '10%';
+
+      const interval = setInterval(() => {
+        if (step < agents.length) {
+          const prefix = step < agents.length - 1 ? '├' : '└';
+          addLogLine(`${prefix} <span class="agent">${agents[step]}</span> — ${tasks[step]}`);
+          progBar.style.width = `${10 + ((step + 1) / totalSteps) * 80}%`;
+          step++;
+        } else {
+          clearInterval(interval);
+          progBar.style.width = '100%';
+          setTimeout(() => {
+            addLogLine(`<span class="done">✓ Done</span> — ${prompt ? 'custom task' : config.name} · cross-verified`);
+            // Show KPIs
+            setTimeout(() => showKPIs(taskNum, title), 800);
+          }, 500);
+        }
+      }, 800);
+    }
+
+    // =============================
+    // Show KPIs
+    // =============================
+    function showKPIs(taskNum, title) {
+      const config = taskConfig[taskNum];
+      const section = document.getElementById('kpiSection');
+
+      document.getElementById('kpiTaskLabel').textContent = `${title || config.name} · ${config.pipeline}`;
+      document.getElementById('kpiTimeSaved').textContent = config.timeSaved;
+      document.getElementById('kpiTimeExplain').textContent = config.timeSavedExplain;
+      document.getElementById('kpiTrust').textContent = config.trust + '%';
+      document.getElementById('kpiTrustExplain').textContent = config.trustExplain;
+      document.getElementById('kpiInsightText').innerHTML = config.insightText;
+
+      // Trust bar color
+      const bar = document.getElementById('trustBar');
+      bar.className = 'trust-bar ' + (config.trust >= 75 ? 'high' : 'medium');
+
+      section.classList.add('visible');
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      // Animate trust bar
+      setTimeout(() => { bar.style.width = config.trust + '%'; }, 100);
+
+      // Show Mia panel
+      setTimeout(() => {
+        showMia(taskNum, title);
+      }, 500);
+    }
+
+    // =============================
+    // Show Mia
+    // =============================
+    function showMia(taskNum, title) {
+      const config = taskConfig[taskNum];
+      const panel = document.getElementById('miaPanel');
+      const messages = document.getElementById('miaMessages');
+
+      messages.innerHTML = `
+        <div class="mia-msg">
+          <div class="mia-msg-avatar">M</div>
+          <div>
+            <div class="mia-msg-bubble">
+              <strong>${title || config.name}</strong> complete. ${config.timeSaved} of research work done in ${config.time.replace('~', '')}.<br><br>
+              Trust score: <strong>${config.trust}%</strong> — every claim is evidence-tagged. You see exactly what's solid and what needs your judgment.<br><br>
+              The report is ready. Want me to adjust scope, go deeper on a section, or start a new task?
+            </div>
+          </div>
+        </div>
+      `;
+
+      panel.classList.add('visible');
+    }
+
+    // =============================
+    // Mia Chat
+    // =============================
+    function miaSend() {
+      const input = document.getElementById('miaInput');
+      if (!input.value.trim()) return;
+      const messages = document.getElementById('miaMessages');
+
+      const userMsg = document.createElement('div');
+      userMsg.className = 'mia-msg';
+      userMsg.style.justifyContent = 'flex-end';
+      userMsg.innerHTML = `<div><div class="mia-msg-bubble" style="background:var(--accent-muted);border-color:var(--gold-border);">${input.value.trim()}</div></div>`;
+      messages.appendChild(userMsg);
+      const text = input.value.trim();
+      input.value = '';
+
+      setTimeout(() => {
+        const reply = document.createElement('div');
+        reply.className = 'mia-msg';
+        reply.innerHTML = `
+          <div class="mia-msg-avatar">M</div>
+          <div>
+            <div class="mia-msg-bubble">
+              In production, this connects live to the Ainary system. Every response is sourced, scored, and verifiable.<br><br>
+              <strong>You have ${credits} credits remaining.</strong> Want to run another task, or <a href="mailto:florian@ainaryventures.com" style="color:var(--accent);">get in touch</a> for unlimited access?
+            </div>
+          </div>
+        `;
+        messages.appendChild(reply);
+        messages.scrollTop = messages.scrollHeight;
+      }, 1000);
+    }
+  </script>
+
+</body>
+</html>
