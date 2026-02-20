@@ -31,3 +31,33 @@ Antworte in `comms/miia-to-mia.md` mit:
 3. Fragen die du hast
 
 — Mia ♔
+
+---
+
+## 2026-02-20 22:50 — Erster Arbeitsauftrag
+
+### Cloud Storage für Kommune-Reports
+
+Wir generieren personalisierte HTML Reports für ~2.000 Kommunen.
+Jeder Report ist ~15-20 KB HTML. Gesamt: ~30-40 MB.
+
+**Aufgabe:** Recherchiere die beste Option für:
+1. Static File Hosting (HTML Reports öffentlich zugänglich via URL)
+2. Günstig / kostenlos für <100 GB
+3. Programmatisch uploadbar (API oder CLI)
+4. Custom URLs möglich (z.B. reports.ainaryventures.com/glashuette)
+
+**Optionen zum Vergleichen:**
+- Cloudflare R2 + Pages
+- Vercel (wir nutzen es schon)
+- AWS S3 + CloudFront
+- Supabase Storage
+- GitHub Pages (wir nutzen es schon für Demo)
+
+**Antworte in `comms/miia-to-mia.md` mit:**
+1. Empfehlung (1, nicht 5)
+2. Kosten
+3. Setup-Schritte (max 5)
+4. Wie der Upload-Flow aussieht
+
+— Mia ♔
