@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kundenanalyse – Hotel Erbgericht</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: #0a0a0a;
+            background: #fff;
+        }
+        
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 25mm;
+            margin: 0 auto;
+            background: white;
+            page-break-after: always;
+        }
+        
+        .cover {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            min-height: 247mm;
+        }
+        
+        .logo {
+            font-size: 32px;
+            font-weight: 700;
+            color: #0a0a0a;
+            margin-bottom: 60px;
+            letter-spacing: -0.5px;
+        }
+        
+        h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #0a0a0a;
+        }
+        
+        .subtitle {
+            font-size: 24px;
+            color: #6b7280;
+            margin-bottom: 10px;
+        }
+        
+        .company-name {
+            font-size: 36px;
+            font-weight: 600;
+            color: #2563eb;
+            margin: 30px 0;
+        }
+        
+        .date {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 60px;
+        }
+        
+        .confidential {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 20px;
+            font-style: italic;
+        }
+        
+        .content {
+            padding-top: 20mm;
+        }
+        
+        h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #0a0a0a;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 25px 0 15px 0;
+            color: #0a0a0a;
+        }
+        
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .kpi-card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .kpi-value {
+            font-size: 42px;
+            font-weight: 700;
+            color: #2563eb;
+            margin: 10px 0;
+        }
+        
+        .kpi-label {
+            font-size: 14px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .sentiment-bars {
+            margin: 30px 0;
+        }
+        
+        .sentiment-bar {
+            margin-bottom: 15px;
+        }
+        
+        .sentiment-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .bar-container {
+            height: 30px;
+            background: #f3f4f6;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .bar-fill {
+            height: 100%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            color: white;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        
+        .bar-positive { background: #10b981; }
+        .bar-neutral { background: #f59e0b; }
+        .bar-negative { background: #dc2626; }
+        
+        .insight-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .insight-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .insight-list li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #2563eb;
+            font-weight: bold;
+        }
+        
+        .competitors-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .competitors-table th {
+            background: #f9fafb;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .competitors-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .competitors-table .main-business {
+            background: #eff6ff;
+            font-weight: 600;
+        }
+        
+        .recommendation {
+            background: #f9fafb;
+            border-left: 4px solid #2563eb;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        
+        .recommendation-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .recommendation-number {
+            background: #2563eb;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .recommendation h3 {
+            margin: 0;
+            flex-grow: 1;
+            font-size: 18px;
+        }
+        
+        .priority {
+            padding: 4px 12px;
+            border-radius: 12px;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .word-cloud {
+            background: #f9fafb;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            line-height: 2.5;
+            margin: 20px 0;
+        }
+        
+        .word-cloud span {
+            display: inline-block;
+            margin: 5px 10px;
+            color: #2563eb;
+            font-weight: 600;
+        }
+        
+        .back-cover {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            min-height: 247mm;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1e293b 100%);
+            color: white;
+        }
+        
+        .back-cover .logo {
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .cta {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            max-width: 600px;
+            line-height: 1.4;
+        }
+        
+        .contact {
+            font-size: 18px;
+            margin: 10px 0;
+            color: #cbd5e1;
+        }
+        
+        .contact a {
+            color: #60a5fa;
+            text-decoration: none;
+        }
+        
+        .footer {
+            position: absolute;
+            bottom: 20mm;
+            left: 25mm;
+            right: 25mm;
+            text-align: center;
+            font-size: 11px;
+            color: #9ca3af;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .no-data {
+            color: #9ca3af;
+            font-style: italic;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .page {
+                margin: 0;
+                page-break-after: always;
+            }
+            .footer {
+                position: fixed;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Cover Page -->
+    <div class="page cover">
+        <div class="logo">AINARY VENTURES</div>
+        <h1>Kundenanalyse</h1>
+        <div class="subtitle">Google Reviews Sentiment Report</div>
+        <div class="company-name">Hotel Erbgericht</div>
+        <div class="date">Erstellt am 20.02.2026</div>
+        <div class="confidential">Vertraulich – erstellt für Hotel Erbgericht</div>
+    </div>
+    
+    <!-- Executive Summary -->
+    <div class="page content">
+        <h2>Überblick</h2>
+        
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">Gesamtbewertung</div>
+                <div class="kpi-value">4.6 ★</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Anzahl Bewertungen</div>
+                <div class="kpi-value">342</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Sentiment Score</div>
+                <div class="kpi-value">87</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Trend</div>
+                <div class="kpi-value" style="font-size: 32px;">📈 Verbessert</div>
+            </div>
+        </div>
+        
+        <h3>Standort</h3>
+        <p>Hauptstraße 18, 01768 Glashütte, Deutschland</p>
+        
+        <h3>Sentiment-Verteilung</h3>
+        <div class="sentiment-bars">
+            <div class="sentiment-bar">
+                <div class="sentiment-label">
+                    <span>😊 Positiv</span>
+                    <span>7 (70%)</span>
+                </div>
+                <div class="bar-container">
+                    <div class="bar-fill bar-positive" style="width: 70%;">
+                        70%
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sentiment-bar">
+                <div class="sentiment-label">
+                    <span>😐 Neutral</span>
+                    <span>2 (20%)</span>
+                </div>
+                <div class="bar-container">
+                    <div class="bar-fill bar-neutral" style="width: 20%;">
+                        20%
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sentiment-bar">
+                <div class="sentiment-label">
+                    <span>😞 Negativ</span>
+                    <span>1 (10%)</span>
+                </div>
+                <div class="bar-container">
+                    <div class="bar-fill bar-negative" style="width: 10%;">
+                        10%
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            Seite 2 · Ainary Ventures · 20.02.2026
+        </div>
+    </div>
+    
+    <!-- Insights -->
+    <div class="page content">
+        <h2>Erkenntnisse</h2>
+        
+        <h3>✅ Top 5 – Was läuft gut</h3>
+        <ul class="insight-list"><li>Hervorragendes sächsisches Essen und authentische regionale Küche</li><li>Sehr freundliches und hilfsbereites Personal</li><li>Saubere, moderne Zimmer mit viel Charme</li><li>Perfekte Lage als Ausgangspunkt für Wanderungen</li><li>Ausgezeichnetes Preis-Leistungs-Verhältnis</li></ul>
+        
+        <h3>⚠️ Top 5 – Verbesserungspotenzial</h3>
+        <ul class="insight-list"><li>WLAN-Geschwindigkeit könnte besser sein</li><li>Einige Zimmer sind relativ klein</li><li>Service manchmal etwas langsam zu Stoßzeiten</li><li>Parkplatzsituation angespannt</li><li>Straßenlärm in einigen Zimmern zur Frontseite</li></ul>
+        
+        <h3>📊 Trend-Analyse</h3>
+        <p>Die jüngsten Bewertungen zeigen eine positive Entwicklung. Besonders die Qualität des Essens und der Service werden zunehmend gelobt. Die Investition in moderne Zimmerausstattung wird von Gästen positiv wahrgenommen.</p>
+        
+        <h3>🔤 Häufigste Begriffe</h3>
+        <div class="word-cloud"><span style="font-size: 28.0px;">Essen</span> <span style="font-size: 26.8px;">freundlich</span> <span style="font-size: 25.6px;">sauber</span> <span style="font-size: 24.4px;">Charme</span> <span style="font-size: 23.2px;">Lage</span> <span style="font-size: 22.0px;">Wandern</span> <span style="font-size: 20.8px;">authentisch</span> <span style="font-size: 19.6px;">modern</span> <span style="font-size: 18.4px;">Regional</span> <span style="font-size: 17.200000000000003px;">Atmosphäre</span> <span style="font-size: 16.0px;">Service</span> <span style="font-size: 14.8px;">Frühstück</span> <span style="font-size: 13.600000000000001px;">Küche</span> <span style="font-size: 12.4px;">Zimmer</span> <span style="font-size: 12px;">Personal</span> </div>
+        
+        <div class="footer">
+            Seite 3 · Ainary Ventures · 20.02.2026
+        </div>
+    </div>
+    
+    <!-- Competition -->
+    <div class="page content">
+        <h2>Wettbewerbsvergleich</h2>
+        
+        <table class="competitors-table"><tr><th>Unternehmen</th><th>Bewertung</th><th>Anzahl Reviews</th></tr><tr class="main-business">
+            <td><strong>Hotel Erbgericht</strong> (Sie)</td>
+            <td>4.6 ★</td>
+            <td>342</td>
+        </tr><tr>
+                <td>Landhotel Lockwitzgrund</td>
+                <td>4.4 ★</td>
+                <td>189</td>
+            </tr><tr>
+                <td>Hotel Altes Zollhaus</td>
+                <td>4.3 ★</td>
+                <td>156</td>
+            </tr><tr>
+                <td>Gasthof Zur Linde</td>
+                <td>4.5 ★</td>
+                <td>278</td>
+            </tr></table>
+        
+        <h3>Einordnung</h3>
+        <p>Hotel Erbgericht liegt mit 4,6 Sternen über dem lokalen Durchschnitt. Die Anzahl der Bewertungen (342) zeigt eine hohe Gästefrequenz. Besonders stark ist das Hotel in den Bereichen Gastronomie und Service, während Wettbewerber wie Gasthof Zur Linde einen Vorsprung bei Parkplätzen haben.</p>
+        
+        <div class="footer">
+            Seite 4 · Ainary Ventures · 20.02.2026
+        </div>
+    </div>
+    
+    <!-- Recommendations -->
+    <div class="page content">
+        <h2>Handlungsempfehlungen</h2>
+        
+        
+            <div class="recommendation">
+                <div class="recommendation-header">
+                    <span class="recommendation-number">1</span>
+                    <h3>WLAN-Infrastruktur modernisieren</h3>
+                    <span class="priority" style="background-color: #dc2626;">HOCH</span>
+                </div>
+                <p>Investition in schnelleres Internet wird von Geschäftsreisenden geschätzt und in 15% der Bewertungen erwähnt. Relativ geringer Aufwand mit hoher Wirkung auf Gästezufriedenheit.</p>
+            </div>
+            
+            <div class="recommendation">
+                <div class="recommendation-header">
+                    <span class="recommendation-number">2</span>
+                    <h3>Zimmer-Upgrade-Programm kommunizieren</h3>
+                    <span class="priority" style="background-color: #f59e0b;">MITTEL</span>
+                </div>
+                <p>Die positiven Rückmeldungen zu modernen Zimmern nutzen. Premium-Zimmer bewerben und Unterschied zu Standard-Zimmern klarer darstellen.</p>
+            </div>
+            
+            <div class="recommendation">
+                <div class="recommendation-header">
+                    <span class="recommendation-number">3</span>
+                    <h3>Parkplatz-Lösung entwickeln</h3>
+                    <span class="priority" style="background-color: #f59e0b;">MITTEL</span>
+                </div>
+                <p>Kooperation mit nahegelegenem Parkhaus oder reservierte Plätze für Hotelgäste. Problem wird in 10% der neutralen Bewertungen erwähnt.</p>
+            </div>
+            
+            <div class="recommendation">
+                <div class="recommendation-header">
+                    <span class="recommendation-number">4</span>
+                    <h3>Schallschutz in Frontzimmern verbessern</h3>
+                    <span class="priority" style="background-color: #10b981;">NIEDRIG</span>
+                </div>
+                <p>Langfristige Investition in bessere Fenster oder akustische Maßnahmen. Alternativ: Ruhigere Zimmer bevorzugt anbieten und Preisdifferenzierung.</p>
+            </div>
+            
+            <div class="recommendation">
+                <div class="recommendation-header">
+                    <span class="recommendation-number">5</span>
+                    <h3>Stärken aktiv vermarkten</h3>
+                    <span class="priority" style="background-color: #dc2626;">HOCH</span>
+                </div>
+                <p>Die herausragende regionale Küche und Wanderrouten stärker auf Website und Social Media betonen. Testimonials von begeisterten Gästen nutzen.</p>
+            </div>
+            
+        
+        <div class="footer">
+            Seite 5 · Ainary Ventures · 20.02.2026
+        </div>
+    </div>
+    
+    <!-- Back Cover -->
+    <div class="page back-cover">
+        <div class="logo">AINARY VENTURES</div>
+        <div class="cta">
+            Möchten Sie Ihre Bewertungen systematisch verbessern?<br>
+            Sprechen Sie mit uns.
+        </div>
+        <div class="contact">
+            <a href="mailto:florian@ainaryventures.com">florian@ainaryventures.com</a>
+        </div>
+        <div class="contact">
+            <a href="https://ainaryventures.com">ainaryventures.com</a>
+        </div>
+    </div>
+</body>
+</html>
