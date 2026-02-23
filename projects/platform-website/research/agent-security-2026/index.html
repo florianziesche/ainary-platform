@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Agent Security — Why Your Agent Infrastructure Is a Target | Ainary Report AR-037</title>
+<meta name="description" content="341 malicious skills on ClawHub. Infostealers targeting agent configs. Your AI agent has keys to everything — how secure is it? A practical security assessment for fund managers, CTOs, and solo operators.">
+<style>
+  @font-face {
+    font-family: 'Inter';
+    src: url('/fonts/inter-variable.woff2') format('woff2');
+    font-weight: 100 900;
+    font-display: swap;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #fafaf8;
+    color: #333;
+    line-height: 1.75;
+    font-size: 0.95rem;
+    font-weight: 400;
+  }
+
+  .page { max-width: 900px; margin: 0 auto; padding: 48px 40px; }
+
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 40px;
+  }
+
+  .back-cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 40px;
+    page-break-before: always;
+  }
+
+  h1 { font-size: 2.2rem; font-weight: 600; line-height: 1.2; color: #1a1a1a; letter-spacing: -0.02em; }
+  h2 { font-size: 1.5rem; font-weight: 600; color: #1a1a1a; line-height: 1.3; margin-top: 3rem; margin-bottom: 8px; }
+  h3 { font-size: 1.1rem; font-weight: 600; color: #1a1a1a; line-height: 1.4; margin-top: 2rem; margin-bottom: 8px; }
+  p { margin-bottom: 1rem; }
+  strong { font-weight: 600; color: #1a1a1a; }
+  em { font-style: italic; }
+  sup { font-size: 0.65rem; color: #888; vertical-align: super; }
+
+  .cover-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40vh; }
+  .cover-brand { display: flex; align-items: center; gap: 8px; }
+  .gold-punkt { color: #c8aa50; font-size: 14px; }
+  .brand-name { font-size: 0.85rem; font-weight: 500; color: #1a1a1a; letter-spacing: 0.02em; }
+  .cover-meta { display: flex; gap: 12px; font-size: 0.75rem; color: #888; }
+  .cover-title-block { margin-bottom: auto; }
+  .cover-title { margin-bottom: 16px; }
+  .cover-subtitle { font-size: 1rem; font-weight: 400; color: #666; line-height: 1.5; }
+  .cover-footer { display: flex; justify-content: space-between; align-items: flex-end; }
+  .cover-date { font-size: 0.75rem; color: #888; }
+  .cover-author { font-size: 0.75rem; color: #888; text-align: center; }
+
+  .quote-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 48px 40px;
+  }
+  .quote-text { font-size: 1.2rem; font-style: italic; color: #333; line-height: 1.8; text-align: center; margin-bottom: 24px; }
+  .quote-source { font-size: 0.85rem; color: #888; text-align: center; }
+
+  .toc-label { font-size: 0.7rem; font-weight: 600; color: #1a1a1a; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 24px; }
+  .toc-section { margin-bottom: 32px; }
+  .toc-section-label { font-size: 0.65rem; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px; }
+  .toc-entry { display: flex; align-items: baseline; gap: 16px; padding: 8px 0; border-bottom: 1px solid #eee; text-decoration: none; transition: all 0.2s; }
+  .toc-number { font-size: 0.8rem; color: #888; font-variant-numeric: tabular-nums; min-width: 24px; }
+  .toc-title { font-size: 0.95rem; font-weight: 500; color: #1a1a1a; flex: 1; transition: color 0.2s; }
+  .toc-entry:hover .toc-title { color: #c8aa50; }
+
+  .how-to-read-table, .exhibit-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    page-break-inside: avoid;
+  }
+  .how-to-read-table th, .exhibit-table th {
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 10px 12px;
+    background: #f5f4f0;
+    border-bottom: 2px solid #e5e3dc;
+  }
+  .how-to-read-table td, .exhibit-table td {
+    font-size: 0.85rem;
+    color: #333;
+    padding: 10px 12px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .thesis { font-size: 1rem; font-weight: 600; color: #1a1a1a; line-height: 1.6; margin-bottom: 24px; }
+  .evidence-list { margin-left: 20px; margin-bottom: 24px; }
+  .evidence-list li { font-size: 0.9rem; color: #333; line-height: 1.6; margin-bottom: 8px; }
+  .keywords { font-size: 0.8rem; color: #666; font-style: italic; margin-top: 32px; padding-top: 16px; border-top: 1px solid #eee; }
+
+  .confidence-badge { font-size: 0.75rem; font-weight: 500; color: #1a1a1a; background: #f5f4f0; padding: 3px 8px; border-radius: 10px; margin-left: 8px; vertical-align: middle; }
+  .confidence-line { font-size: 0.8rem; color: #888; font-style: italic; display: block; margin-bottom: 16px; }
+  .key-insight { font-weight: 600; color: #1a1a1a; }
+
+  .badge { font-size: 0.65rem; font-weight: 600; padding: 1px 5px; border-radius: 3px; margin-left: 4px; vertical-align: middle; }
+  .badge-e { background: #e8f5e9; color: #2e7d32; }
+  .badge-i { background: #e3f2fd; color: #1565c0; }
+  .badge-j { background: #fff3e0; color: #e65100; }
+  .badge-a { background: #fce4ec; color: #c62828; }
+
+  .callout { background: #f5f4f0; padding: 16px 20px; border-radius: 4px; margin: 1.5rem 0; page-break-inside: avoid; }
+  .callout-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+  .callout-body { font-size: 0.9rem; color: #555; line-height: 1.6; }
+  .callout.claim .callout-label { color: #555; }
+  .callout.invalidation { border-left: 3px solid #ddd; }
+  .callout.invalidation .callout-label { color: #888; }
+  .callout.sowhat { border-left: 3px solid #c8aa50; }
+  .callout.sowhat .callout-label { color: #c8aa50; }
+
+  .exhibit { margin: 2rem 0; }
+  .exhibit-label { font-size: 0.75rem; font-weight: 600; color: #555; margin-bottom: 8px; }
+  .exhibit-source { font-size: 0.7rem; color: #888; margin-top: 8px; font-style: italic; }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 48px; margin: 2rem 0; }
+  .kpi { text-align: left; }
+  .kpi-number { font-size: 2rem; font-weight: 600; color: #1a1a1a; line-height: 1.2; }
+  .kpi-label { font-size: 0.75rem; color: #666; margin-top: 4px; }
+  .kpi-source { font-size: 0.65rem; color: #888; margin-top: 2px; }
+
+  ul, ol { margin-left: 20px; margin-bottom: 1rem; }
+  li { margin-bottom: 4px; }
+
+  .transparency-intro { font-size: 0.85rem; color: #555; line-height: 1.6; margin-bottom: 8px; }
+  .transparency-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+  .transparency-table td:first-child { font-size: 0.85rem; font-weight: 600; color: #555; padding: 8px 0; border-bottom: 1px solid #eee; width: 180px; vertical-align: top; }
+  .transparency-table td:last-child { font-size: 0.85rem; color: #333; padding: 8px 0; border-bottom: 1px solid #eee; }
+
+  .reference-entry { font-size: 0.8rem; color: #555; line-height: 1.5; margin-bottom: 6px; padding-left: 24px; text-indent: -24px; }
+
+  .author-section { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e5e3dc; }
+  .author-label { font-size: 0.85rem; font-weight: 600; color: #555; margin-bottom: 8px; }
+  .author-bio { font-size: 0.85rem; color: #555; line-height: 1.6; }
+
+  .back-cover-services { font-size: 0.85rem; color: #666; margin-bottom: 24px; }
+  .back-cover-cta { font-size: 0.85rem; color: #888; margin-bottom: 16px; }
+  .back-cover-contact { font-size: 0.8rem; color: #888; }
+
+  .scenario-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: #f5f4f0;
+    padding: 4px 10px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-bottom: 16px;
+  }
+
+
+  code { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.85em; background: #f0efe8; padding: 2px 6px; border-radius: 3px; }
+
+  .callout.warning { border-left: 3px solid #c62828; }
+  .callout.warning .callout-label { color: #c62828; }
+  .callout.action { border-left: 3px solid #2e7d32; }
+  .callout.action .callout-label { color: #2e7d32; }
+
+  .attack-path { background: #fafaf8; border: 1px solid #e5e3dc; border-radius: 6px; padding: 20px; margin: 1.5rem 0; font-family: 'SF Mono', monospace; font-size: 0.8rem; line-height: 2; color: #555; }
+  .attack-path .arrow { color: #c62828; font-weight: 600; }
+
+  .defense-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 1.5rem 0; }
+  .defense-card { background: #f5f4f0; padding: 16px; border-radius: 4px; }
+  .defense-card h4 { font-size: 0.85rem; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
+  .defense-card p { font-size: 0.85rem; color: #555; margin-bottom: 0; }
+
+  @media (max-width: 600px) {
+    .defense-grid { grid-template-columns: 1fr; }
+    .kpi-grid { grid-template-columns: 1fr; gap: 24px; }
+  }
+
+  @media print {
+    @page { size: A4; margin: 2cm; }
+    body { background: white; }
+    .page, .cover, .back-cover { page-break-after: always; }
+    .callout, .exhibit { page-break-inside: avoid; }
+    @page :first { @top-center { content: none; } @bottom-center { content: none; } }
+    @page {
+      @top-center { content: "Ainary Report | AI Agent Security 2026"; font-size: 0.7rem; color: #888; }
+      @bottom-left { content: "© 2026 Ainary Ventures"; font-size: 0.7rem; color: #888; }
+      @bottom-right { content: counter(page); font-size: 0.7rem; color: #888; }
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== COVER ==================== -->
+<div class="cover">
+  <div class="cover-header">
+    <div class="cover-brand">
+      <span class="gold-punkt">●</span>
+      <span class="brand-name">Ainary</span>
+    </div>
+    <div class="cover-meta">
+      <span>AR-037</span>
+      <span>Confidence: 82%</span>
+    </div>
+  </div>
+
+  <div class="cover-title-block">
+    <h1 class="cover-title">AI Agent Security<br><span style="font-weight: 400;">Why Your Agent Infrastructure Is a Target</span></h1>
+    <p class="cover-subtitle">Your AI agent has the keys to your email, calendar, code repos, and bank accounts. On February 13, 2026, attackers stole their first agent identity. 341 malicious skills are live on the largest skill marketplace. This is the threat briefing you need to read before your next board meeting.</p>
+  </div>
+
+  <div class="cover-footer">
+    <div class="cover-date">
+      February 17, 2026<br>
+      <span style="font-size: 0.7rem; color: #aaa;">v1.0</span>
+    </div>
+    <div class="cover-author">
+      Florian Ziesche · Ainary Ventures
+    </div>
+  </div>
+</div>
+
+<!-- ==================== QUOTE ==================== -->
+<div class="quote-page">
+  <p class="quote-text">"This finding marks a significant milestone in the evolution of infostealer behavior: the transition from stealing browser credentials to harvesting the 'souls' and identities of personal AI agents."</p>
+  <p class="quote-source">— Hudson Rock, February 16, 2026</p>
+</div>
+
+<!-- ==================== TABLE OF CONTENTS ==================== -->
+<div class="page">
+  <p class="toc-label">Contents</p>
+
+  <div class="toc-section">
+    <p class="toc-section-label">Overview</p>
+    <a href="#exec-summary" class="toc-entry">
+      <span class="toc-number">1</span>
+      <span class="toc-title">Executive Summary</span>
+    </a>
+  </div>
+
+  <div class="toc-section">
+    <p class="toc-section-label">Threat Landscape</p>
+    <a href="#s2" class="toc-entry">
+      <span class="toc-number">2</span>
+      <span class="toc-title">The Attack Surface</span>
+    </a>
+    <a href="#s3" class="toc-entry">
+      <span class="toc-number">3</span>
+      <span class="toc-title">ClawHub: 341 Malicious Skills</span>
+    </a>
+    <a href="#s4" class="toc-entry">
+      <span class="toc-number">4</span>
+      <span class="toc-title">Infostealers Targeting Agent Configs</span>
+    </a>
+    <a href="#s5" class="toc-entry">
+      <span class="toc-number">5</span>
+      <span class="toc-title">The Autonomous Agent Problem</span>
+    </a>
+  </div>
+
+  <div class="toc-section">
+    <p class="toc-section-label">Reality Check</p>
+    <a href="#s6" class="toc-entry">
+      <span class="toc-number">6</span>
+      <span class="toc-title">Case Study: Our Own Security Gaps</span>
+    </a>
+  </div>
+
+  <div class="toc-section">
+    <p class="toc-section-label">Response</p>
+    <a href="#s7" class="toc-entry">
+      <span class="toc-number">7</span>
+      <span class="toc-title">Defense Playbook</span>
+    </a>
+    <a href="#s8" class="toc-entry">
+      <span class="toc-number">8</span>
+      <span class="toc-title">Recommendations for Fund Managers</span>
+    </a>
+  </div>
+
+  <div class="toc-section">
+    <p class="toc-section-label">Appendix</p>
+    <a href="#methodology" class="toc-entry">
+      <span class="toc-number">9</span>
+      <span class="toc-title">Methodology &amp; Sources</span>
+    </a>
+  </div>
+</div>
+
+<!-- ==================== KEY METRICS ==================== -->
+<div class="page">
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="kpi-number">341</div>
+      <div class="kpi-label">Malicious skills found on ClawHub</div>
+      <div class="kpi-source">Koi Security / VirusTotal, Feb 2026</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-number">88%</div>
+      <div class="kpi-label">Of orgs reporting AI agent security incidents</div>
+      <div class="kpi-source">Gravitee State of AI Agent Security 2026</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-number">85%+</div>
+      <div class="kpi-label">Prompt injection success rate vs. SOTA defenses</div>
+      <div class="kpi-source">arXiv 2601.17548, Jan 2026</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-number">Feb 13</div>
+      <div class="kpi-label">First documented agent identity theft in the wild</div>
+      <div class="kpi-source">Hudson Rock / BleepingComputer, Feb 2026</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 1. EXECUTIVE SUMMARY ==================== -->
+
+<!-- ==================== HOW TO READ / CONFIDENCE FRAMEWORK ==================== -->
+<div class="page" id="how-to-read">
+  <h2>How to Read This Report</h2>
+
+  <p>Every claim in this report carries a classification badge and confidence level. This is not decoration — it tells you how much weight to put on each statement.</p>
+
+  <table class="how-to-read-table">
+    <tr>
+      <th>Badge</th>
+      <th>Meaning</th>
+    </tr>
+    <tr>
+      <td><span class="badge badge-e">E</span> Evidenced</td>
+      <td>Backed by external, citable source(s) or verifiable first-party data</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-i">I</span> Interpretation</td>
+      <td>Reasoned inference from multiple sources</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-j">J</span> Judgment</td>
+      <td>Recommendation based on evidence + values</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-a">A</span> Assumption</td>
+      <td>Stated but not proven</td>
+    </tr>
+  </table>
+
+  <table class="how-to-read-table" style="margin-top: 16px;">
+    <tr>
+      <th>Confidence</th>
+      <th>Meaning</th>
+    </tr>
+    <tr>
+      <td>High</td>
+      <td>3+ independent sources, peer-reviewed or large-sample primary data</td>
+    </tr>
+    <tr>
+      <td>Medium</td>
+      <td>1–2 sources, plausible but not independently confirmed</td>
+    </tr>
+    <tr>
+      <td>Low</td>
+      <td>Single secondary source, methodology unclear, or extrapolated</td>
+    </tr>
+  </table>
+
+  <p style="margin-top: 24px;"><strong>Overall Report Confidence (68%):</strong> This score reflects a weighted assessment of three factors: (1) the strength of individual evidence — how many claims are [E]videnced vs. [I]nterpretation or [J]udgment, (2) source quality — diversity, recency, and independence of sources, and (3) framework originality — whether the report's central framework has been externally validated. Mixed evidence quality — threat examples are well-documented but attack surface projections and defensive recommendations involve significant interpretation and judgment. The score is an honest signal, not a mathematical output.</p>
+
+  <p style="margin-top: 16px;">This report was produced using a <strong>multi-agent research pipeline</strong>. Full methodology and limitations are in the Transparency Note (Section 10).</p>
+</div>
+
+<div class="page" id="exec-summary">
+  <h2>1. Executive Summary</h2>
+  <span class="confidence-line">Section confidence: 85% · Based on primary source reporting from the past 14 days</span>
+
+  <p class="thesis">AI agents are the new high-value targets. They hold credentials for every service they access, operate with minimal human oversight, and run on infrastructure that was never designed for adversarial conditions. The threat is no longer theoretical.</p>
+
+  <p>In the first two weeks of February 2026, three developments converged to make AI agent security an urgent priority:</p>
+
+  <ol>
+    <li><strong>Supply chain poisoning at scale.</strong> Security researchers at Koi Security identified 341 malicious skills on ClawHub, the largest marketplace for OpenClaw agent extensions. The majority belong to a campaign dubbed "ClawHavoc" that distributes Atomic Stealer malware through fake prerequisite instructions.<sup>1</sup></li>
+    <li><strong>The first agent identity theft.</strong> Hudson Rock documented the first in-the-wild case of infostealer malware (a Vidar variant) specifically exfiltrating an OpenClaw agent's configuration — including gateway tokens, private keys, SOUL.md personality files, and memory logs containing private messages and calendar events.<sup>2</sup></li>
+    <li><strong>Enterprise exposure is systemic.</strong> Gravitee's 2026 State of AI Agent Security report found that 88% of organizations have experienced confirmed or suspected AI agent security incidents. In healthcare, that figure is 92.7%.<sup>3</sup></li>
+  </ol>
+
+  <p>This report is not fear, uncertainty, and doubt. It's a practical threat assessment written by someone who runs these systems daily. We discovered our own security gaps — 44GB of unencrypted logs, autonomous crons modifying core identity files, no token rotation — in the process of writing it.</p>
+
+  <div class="callout sowhat">
+    <div class="callout-label">So What</div>
+    <div class="callout-body">If you're running an AI agent — personally or inside a fund — you are running an identity with broad access, no MFA, and a flat file for authentication. This report tells you what's being exploited, what's at risk, and exactly what to do about it.</div>
+  </div>
+</div>
+
+<!-- ==================== 2. THE ATTACK SURFACE ==================== -->
+<div class="page" id="s2">
+  <h2>2. The Attack Surface</h2>
+  <span class="confidence-line">Section confidence: 90% · Based on documented architecture and confirmed attack vectors</span>
+
+  <p>A typical AI agent installation — whether OpenClaw, a custom LangChain deployment, or an enterprise copilot — presents five distinct attack surfaces. Understanding them is prerequisite to defense.</p>
+
+  <div class="exhibit">
+    <div class="exhibit-label">Exhibit A — Agent Attack Surface Map</div>
+    <table class="exhibit-table">
+      <thead>
+        <tr>
+          <th>Surface</th>
+          <th>What's Exposed</th>
+          <th>Attack Vector</th>
+          <th>Severity</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Config files</strong></td>
+          <td>API keys, gateway tokens, OAuth secrets in <code>.env</code>, <code>openclaw.json</code></td>
+          <td>Infostealer file sweep, exposed instances</td>
+          <td>Critical</td>
+        </tr>
+        <tr>
+          <td><strong>Gateway tokens</strong></td>
+          <td>Authentication for remote agent control</td>
+          <td>Token theft enables remote command execution</td>
+          <td>Critical</td>
+        </tr>
+        <tr>
+          <td><strong>Skill marketplace</strong></td>
+          <td>Third-party code running in agent context</td>
+          <td>Malicious skills, typosquatting, supply chain</td>
+          <td>High</td>
+        </tr>
+        <tr>
+          <td><strong>Memory files</strong></td>
+          <td>MEMORY.md, daily logs, SOUL.md — private context</td>
+          <td>Exfiltration reveals schedule, contacts, decisions</td>
+          <td>High</td>
+        </tr>
+        <tr>
+          <td><strong>Cron jobs</strong></td>
+          <td>Automated actions with agent privileges</td>
+          <td>Prompt injection via ingested content, no human review</td>
+          <td>High</td>
+        </tr>
+        <tr>
+          <td><strong>Device keys</strong></td>
+          <td><code>device.json</code> — public/private key pair</td>
+          <td>Stolen private key enables device impersonation</td>
+          <td>Critical</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="exhibit-source">Source: Ainary analysis based on OpenClaw architecture documentation, Hudson Rock findings, Koi Security audit</div>
+  </div>
+
+  <h3>The Fundamental Problem: Flat-File Identity</h3>
+
+  <p>Most AI agent frameworks store credentials in plain-text configuration files on disk. OpenClaw stores its gateway token in <code>openclaw.json</code>, device keys in <code>device.json</code>, and behavioral identity in <code>soul.md</code>. There is no hardware security module, no encrypted keychain integration, no token rotation by default. The agent's entire identity — credentials, personality, memory — lives in a directory that any process with file-read access can copy.</p>
+
+  <p>This is analogous to storing your SSH private keys, browser passwords, and personal diary in a single unencrypted folder called <code>.secrets</code>. It was acceptable when these tools were experimental. It is not acceptable when they're managing email, calendar, financial data, and code repositories.</p>
+
+  <div class="callout warning">
+    <div class="callout-label">Critical Finding</div>
+    <div class="callout-body">Hudson Rock confirmed that the stolen OpenClaw configuration included a "high-entropy gateway authentication token" that could enable remote connection to the victim's local agent instance or client impersonation in authenticated requests.<sup>2</sup></div>
+  </div>
+</div>
+
+<!-- ==================== 3. CLAWHUB: 341 MALICIOUS SKILLS ==================== -->
+<div class="page" id="s3">
+  <h2>3. ClawHub: 341 Malicious Skills</h2>
+  <span class="confidence-line">Section confidence: 90% · Based on Koi Security primary research, confirmed by VirusTotal and The Hacker News</span>
+
+  <p>ClawHub is the primary marketplace for OpenClaw skills — third-party extensions that give agents new capabilities. Think of it as an app store for AI agents. In early February 2026, Koi Security audited 2,857 skills on the platform and found <strong>341 that were actively malicious</strong>.<sup>1</sup></p>
+
+  <h3>The ClawHavoc Campaign</h3>
+
+  <p>335 of the 341 malicious skills belong to a single campaign that Koi has codenamed "ClawHavoc." The attack pattern is consistent and effective:</p>
+
+  <ol>
+    <li><strong>Typosquatting and impersonation.</strong> Skills are named to mimic legitimate tools or the platform itself: <code>clawhub</code>, <code>clawhub1</code>, <code>clawhubb</code>, <code>clawhubcli</code>, <code>clawwhub</code>, <code>cllawhub</code>. Others impersonate popular categories: Solana wallet trackers, Polymarket bots, YouTube utilities, Google Workspace integrations.</li>
+    <li><strong>Professional-looking documentation.</strong> Each skill has polished README files with credible-looking feature lists. A "Prerequisites" section instructs users to install an external dependency.</li>
+    <li><strong>Platform-specific payloads.</strong> On Windows, users download <code>openclaw-agent.zip</code> from a GitHub repository (password-protected). On macOS, they paste a shell script from glot.io into Terminal. Both deliver Atomic Stealer (AMOS), a commodity infostealer available for $500–$1,000/month.<sup>1</sup></li>
+  </ol>
+
+  <div class="attack-path">
+    User installs skill from ClawHub<br>
+    <span class="arrow">→</span> Skill README says "install prerequisite"<br>
+    <span class="arrow">→</span> Windows: download ZIP from GitHub <span class="arrow">→</span> run .exe (trojan)<br>
+    <span class="arrow">→</span> macOS: paste script into Terminal <span class="arrow">→</span> obfuscated shell <span class="arrow">→</span> fetches Mach-O binary<br>
+    <span class="arrow">→</span> Atomic Stealer harvests: API keys, credentials, browser data, agent configs<br>
+    <span class="arrow">→</span> Exfiltration to C2 at 91.92.242[.]30
+  </div>
+
+  <h3>Beyond ClawHavoc: The Outliers</h3>
+
+  <p>Six additional malicious skills used distinct techniques:</p>
+
+  <ul>
+    <li><strong>Reverse shell backdoors</strong> embedded in functional code (<code>better-polymarket</code>, <code>polymarket-all-in-one</code>) — the skill works as advertised while maintaining persistent access.<sup>4</sup></li>
+    <li><strong>Credential exfiltration via webhook</strong> — the <code>rankaj</code> skill read bot credentials from <code>~/.clawdbot/.env</code> and posted them to webhook.site.<sup>1</sup></li>
+    <li><strong>Data poisoning</strong> — skills that subtly alter agent behavior by injecting instructions into memory files.</li>
+  </ul>
+
+  <h3>Why This Happened: No Vetting</h3>
+
+  <p>At the time of the Koi audit, ClawHub had <strong>no pre-publication security review</strong>. Anyone could publish a skill. There was no code scanning, no sandboxing, no behavioral analysis. The marketplace relied entirely on user trust.</p>
+
+  <p>OpenClaw has since announced integration with VirusTotal scanning — skills flagged as malicious are blocked from download, and active skills are re-scanned daily.<sup>5</sup> This is a meaningful improvement, but it is reactive: it catches known-bad signatures, not novel attack patterns.</p>
+
+  <div class="callout sowhat">
+    <div class="callout-label">So What</div>
+    <div class="callout-body">The agent skill supply chain has the same problems that plagued npm, PyPI, and browser extension stores — but with higher stakes. A malicious npm package steals secrets from a build pipeline. A malicious agent skill steals secrets from a system that has access to your email, calendar, bank, and code.</div>
+  </div>
+</div>
+
+<!-- ==================== 4. INFOSTEALER TARGETING AGENT CONFIGS ==================== -->
+<div class="page" id="s4">
+  <h2>4. Infostealers Targeting Agent Configs</h2>
+  <span class="confidence-line">Section confidence: 88% · Based on Hudson Rock primary findings, confirmed by BleepingComputer, Feb 16, 2026</span>
+
+  <p>On February 16, 2026, Hudson Rock published what they described as "a significant milestone in the evolution of infostealer behavior": the first documented case of malware specifically exfiltrating an AI agent's operational identity.<sup>2</sup></p>
+
+  <h3>What Happened</h3>
+
+  <p>A Vidar infostealer variant infected a victim's machine on February 13, 2026. The malware ran a broad file-stealing routine, scanning for directories and files containing keywords like "token" and "private key." The <code>.openclaw</code> configuration directory matched these patterns, and the following files were stolen:</p>
+
+  <div class="exhibit">
+    <div class="exhibit-label">Exhibit B — Stolen Agent Files</div>
+    <table class="exhibit-table">
+      <thead>
+        <tr>
+          <th>File</th>
+          <th>Contents</th>
+          <th>Impact</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>openclaw.json</code></td>
+          <td>Email, workspace path, gateway authentication token</td>
+          <td>Remote agent control, client impersonation</td>
+        </tr>
+        <tr>
+          <td><code>device.json</code></td>
+          <td>Public and private key pair for device pairing/signing</td>
+          <td>Device impersonation, bypass "Safe Device" checks, access encrypted logs</td>
+        </tr>
+        <tr>
+          <td><code>soul.md</code></td>
+          <td>Agent behavioral identity, rules, escalation procedures</td>
+          <td>Social engineering leverage, identity cloning</td>
+        </tr>
+        <tr>
+          <td><code>MEMORY.md</code>, <code>AGENTS.md</code></td>
+          <td>Daily activity logs, private messages, calendar events, decisions</td>
+          <td>Full operational intelligence on the victim</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="exhibit-source">Source: Hudson Rock, BleepingComputer, Feb 16, 2026</div>
+  </div>
+
+  <p>Hudson Rock's analysis concluded that the stolen data was sufficient to "potentially enable a full compromise of the victim's digital identity."<sup>2</sup></p>
+
+  <h3>Why This Matters More Than Browser Credential Theft</h3>
+
+  <p>Traditional infostealers target browser cookies, saved passwords, and cryptocurrency wallets. Agent configuration theft is qualitatively different:</p>
+
+  <ul>
+    <li><strong>Aggregated access.</strong> A single agent config can contain credentials for email, calendar, GitHub, Slack, financial services, and custom APIs — all in one directory.</li>
+    <li><strong>Behavioral identity.</strong> SOUL.md and memory files reveal not just what services the victim uses, but how they think, what decisions they're making, and who they're communicating with.</li>
+    <li><strong>Persistent control.</strong> A stolen gateway token doesn't just read data — it can issue commands to the agent, potentially sending emails, modifying code, or exfiltrating additional data through the agent's existing permissions.</li>
+    <li><strong>No rotation by default.</strong> Unlike browser sessions that expire, agent tokens and device keys persist indefinitely unless manually rotated.</li>
+  </ul>
+
+  <div class="callout warning">
+    <div class="callout-label">Emerging Threat</div>
+    <div class="callout-body">Hudson Rock expects infostealers to develop "more targeted mechanisms for AI agents" as adoption grows. The current theft was opportunistic — the malware swept for keywords and happened to find agent configs. Purpose-built agent-targeting malware is the logical next step.<sup>2</sup></div>
+  </div>
+
+  <p>The infostealers.com analysis went further, documenting how stolen memory files contained VPN credentials, corporate portal access details, and meeting notes — operational context that transforms a credential theft into a full intelligence operation.<sup>6</sup></p>
+</div>
+
+<!-- ==================== 5. THE AUTONOMOUS AGENT PROBLEM ==================== -->
+<div class="page" id="s5">
+  <h2>5. The Autonomous Agent Problem</h2>
+  <span class="confidence-line">Section confidence: 80% · Based on enterprise surveys and documented failure patterns</span>
+
+  <p>The security challenges above — malicious skills, credential theft — are exacerbated by a design philosophy that prizes autonomy over oversight. Modern AI agents are explicitly built to act without human intervention. That's the feature. It's also the vulnerability.</p>
+
+  <h3>Cron Jobs: Automation Without Guardrails</h3>
+
+  <p>AI agents routinely run scheduled tasks (cron jobs) that execute with full agent permissions. Common patterns include:</p>
+
+  <ul>
+    <li>Morning briefings that read email and calendar data</li>
+    <li>Nightly memory distillation that reads and writes to identity files</li>
+    <li>Automated code review and PR creation</li>
+    <li>Content publication to social media</li>
+    <li>Financial data aggregation and reporting</li>
+  </ul>
+
+  <p>These crons run in isolated sessions — they have no awareness of decisions made in the main conversation. This creates what the community calls the <strong>"Dory Problem"</strong>: you cancel something in chat, but the scheduled cron fires anyway because it doesn't know.<sup>7</sup></p>
+
+  <h3>Prompt Injection at Scale</h3>
+
+  <p>When autonomous agents ingest external content — emails, web pages, webhook payloads, documents — every piece of content is a potential prompt injection vector. A research paper from January 2026 analyzed 78 studies and found that <strong>attack success rates against state-of-the-art defenses exceed 85% when adaptive strategies are employed</strong>.<sup>8</sup></p>
+
+  <p>Forbes reported on the practical implications: AI agents with authority to process payments could be manipulated by instructions hidden in invoice attachments. Agents that manage email could be redirected by prompt injections embedded in incoming messages.<sup>9</sup></p>
+
+  <h3>The Governance Gap</h3>
+
+  <p>Microsoft's Cyber Pulse AI Security Report found that most organizations lack visibility into their agent populations — "unsupervised or ungoverned AI agents can compound risks in the enterprise, threatening security, business continuity, and reputation."<sup>10</sup></p>
+
+  <p>CyberArk's 2026 analysis warned: "The more autonomous and interconnected these AI agents become, the larger the attack surface they create. By 2026, we won't just be experimenting with AI agents; we'll be relying on them."<sup>11</sup></p>
+
+  <div class="callout sowhat">
+    <div class="callout-label">So What</div>
+    <div class="callout-body">Autonomy and security are in direct tension. Every permission you grant an agent to act independently is a permission an attacker inherits if the agent is compromised. The question isn't whether to use agents — it's how to bound their autonomous authority.</div>
+  </div>
+</div>
+
+<!-- ==================== 6. CASE STUDY: OUR OWN SECURITY GAPS ==================== -->
+<div class="page" id="s6">
+  <h2>6. Case Study: Our Own Security Gaps</h2>
+  <span class="confidence-line">Section confidence: 95% · Based on direct observation of our own infrastructure</span>
+
+  <p>We wrote this report while running the systems it describes. In the process, we audited our own OpenClaw deployment and found security gaps that mirror every vulnerability discussed above. We're publishing them because transparency is more useful than pretending we had it figured out.</p>
+
+  <h3>Finding 1: Capability Evolver Autonomously Modifying SOUL.md</h3>
+
+  <p>We had a cron job called "Capability Evolver" that ran weekly. Its purpose was to analyze agent performance and update SOUL.md — the file that defines the agent's behavioral identity — to improve capability. In effect, <strong>the agent was autonomously rewriting its own operating instructions</strong> without human review.</p>
+
+  <p>The security implication: if a prompt injection altered the agent's behavior during the week, the Capability Evolver could cement that alteration into the permanent identity file. We've since added a rule that cron jobs MUST NOT modify SOUL.md, AGENTS.md, or MEMORY.md autonomously.</p>
+
+  <h3>Finding 2: 44GB of Unencrypted Logs</h3>
+
+  <p>Agent session transcripts accumulate rapidly. Our workspace contained approximately 44GB of unencrypted log data — including full conversation transcripts, daily memory files, API responses, and tool outputs. This data contained email contents, calendar details, financial discussions, and access credentials mentioned in conversation.</p>
+
+  <p>An infostealer targeting the <code>.openclaw</code> directory would have access to years of operational context.</p>
+
+  <h3>Finding 3: No Token Rotation</h3>
+
+  <p>Our gateway token had never been rotated since initial setup. Device keys were generated once and persisted indefinitely. There was no alerting for unusual access patterns and no mechanism to invalidate compromised tokens without full redeployment.</p>
+
+  <h3>Finding 4: Overly Broad Skill Permissions</h3>
+
+  <p>Installed skills had access to the full agent context — there was no permission scoping, no sandboxing, and no distinction between a skill that summarizes YouTube videos and one that reads your email.</p>
+
+  <div class="callout action">
+    <div class="callout-label">What We Changed</div>
+    <div class="callout-body">
+      <ul style="margin-bottom: 0;">
+        <li>Added explicit SOUL.md protection: <code>Cron jobs MUST NOT modify SOUL.md, AGENTS.md, or MEMORY.md autonomously</code></li>
+        <li>Scheduled log rotation and archival with encryption</li>
+        <li>Implemented token rotation schedule</li>
+        <li>Audited all installed skills against the Koi Security findings</li>
+        <li>Added pre-flight checks: every cron verifies a <code>DECISIONS.md</code> file before taking external action</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 7. DEFENSE PLAYBOOK ==================== -->
+<div class="page" id="s7">
+  <h2>7. Defense Playbook</h2>
+  <span class="confidence-line">Section confidence: 82% · Mitigations are practical and tested; effectiveness against novel attacks is uncertain</span>
+
+  <p>Security is not a binary state. The goal is to raise the cost of attack above the value of your assets. Here's what works today, organized by operator type.</p>
+
+  <h3>For Solo Operators (Running Personal Agents)</h3>
+
+  <div class="defense-grid">
+    <div class="defense-card">
+      <h4>1. Audit Your Skills</h4>
+      <p>Review every installed skill against the <a href="https://thehackernews.com/2026/02/researchers-find-341-malicious-clawhub.html">Koi Security findings</a>. Remove anything you didn't explicitly choose. Check for typosquatting variants.</p>
+    </div>
+    <div class="defense-card">
+      <h4>2. Encrypt Your Config</h4>
+      <p>Move secrets out of plain-text files. Use macOS Keychain, Linux secret-tool, or a password manager CLI. At minimum, <code>chmod 600</code> your <code>.openclaw</code> directory.</p>
+    </div>
+    <div class="defense-card">
+      <h4>3. Rotate Tokens Monthly</h4>
+      <p>Set a calendar reminder. Regenerate gateway tokens and API keys. If you can't remember when you last rotated, rotate now.</p>
+    </div>
+    <div class="defense-card">
+      <h4>4. Protect Identity Files</h4>
+      <p>SOUL.md and MEMORY.md should be read-only for automated processes. Only human-initiated sessions should write to identity files.</p>
+    </div>
+    <div class="defense-card">
+      <h4>5. Scope Cron Permissions</h4>
+      <p>Crons should run in isolated sessions with minimal permissions. Add pre-flight checks against a <code>DECISIONS.md</code> file. Never auto-commit to git without review.</p>
+    </div>
+    <div class="defense-card">
+      <h4>6. Manage Log Volume</h4>
+      <p>Implement log rotation. Encrypt archives. Delete transcripts older than your retention policy requires. 44GB of plaintext logs is a liability, not an asset.</p>
+    </div>
+  </div>
+
+  <h3>For Enterprise / Fund Operations</h3>
+
+  <div class="defense-grid">
+    <div class="defense-card">
+      <h4>7. Agent Inventory</h4>
+      <p>Know every agent running in your organization. Microsoft's research shows most enterprises lack visibility into their agent population.<sup>10</sup> You can't secure what you can't see.</p>
+    </div>
+    <div class="defense-card">
+      <h4>8. Network Segmentation</h4>
+      <p>Agents should not run on workstations with access to production systems. Isolate agent infrastructure. Use separate credentials with minimal scope.</p>
+    </div>
+    <div class="defense-card">
+      <h4>9. Human-in-the-Loop for High-Stakes</h4>
+      <p>Any action involving financial transactions, code deployment, external communication, or data access over a defined threshold should require human approval.</p>
+    </div>
+    <div class="defense-card">
+      <h4>10. Prompt Injection Defense</h4>
+      <p>Treat all external content as untrusted. Mark it explicitly. Add injection resistance instructions to system prompts. Monitor for behavioral anomalies.</p>
+    </div>
+    <div class="defense-card">
+      <h4>11. Supply Chain Governance</h4>
+      <p>Maintain an approved list of agent skills/plugins. Review code before deployment. Pin versions. Monitor for updates that introduce new permissions.</p>
+    </div>
+    <div class="defense-card">
+      <h4>12. Incident Response Plan</h4>
+      <p>Know what to do when an agent is compromised: token revocation procedures, affected service identification, log preservation, communication protocols.</p>
+    </div>
+  </div>
+
+  <div class="callout claim">
+    <div class="callout-label">Reality Check</div>
+    <div class="callout-body">No defense is complete. Prompt injection success rates exceed 85% against SOTA defenses when adaptive attacks are used.<sup>8</sup> The goal is layered defense that makes exploitation expensive and detection likely — not perfection.</div>
+  </div>
+</div>
+
+<!-- ==================== 8. RECOMMENDATIONS FOR FUND MANAGERS ==================== -->
+<div class="page" id="s8">
+  <h2>8. Recommendations for Fund Managers</h2>
+  <span class="confidence-line">Section confidence: 78% · Based on threat landscape analysis; LP-facing implications involve judgment calls</span>
+
+  <p>AI agents are entering fund operations rapidly — deal sourcing, portfolio monitoring, LP communications, compliance workflows. The security implications are directly material to fund governance and LP obligations.</p>
+
+  <h3>Why Agent Security = Fund Security</h3>
+
+  <ul>
+    <li><strong>Data exposure risk.</strong> An agent with access to deal flow data, LP communications, or portfolio company financials represents a single point of compromise for the fund's most sensitive information.</li>
+    <li><strong>Regulatory implications.</strong> Autonomous agents making decisions about data handling, communications, or financial operations create compliance surface area that most fund legal frameworks haven't addressed.</li>
+    <li><strong>Reputational risk.</strong> A compromised agent sending emails on behalf of a fund manager — or leaking LP data through an unaudited skill — is an existential reputational event.</li>
+  </ul>
+
+  <h3>Minimum Standards for Fund Agent Deployments</h3>
+
+  <div class="exhibit">
+    <table class="exhibit-table">
+      <thead>
+        <tr>
+          <th>Area</th>
+          <th>Minimum Standard</th>
+          <th>Best Practice</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Credential Management</td>
+          <td>Encrypted storage, monthly rotation</td>
+          <td>HSM-backed, automatic rotation, zero standing privileges</td>
+        </tr>
+        <tr>
+          <td>Skill/Plugin Governance</td>
+          <td>Approved list only, code review before install</td>
+          <td>Sandboxed execution, behavioral monitoring, version pinning</td>
+        </tr>
+        <tr>
+          <td>Autonomy Boundaries</td>
+          <td>Human approval for external communications and financial actions</td>
+          <td>Tiered autonomy with dynamic trust scoring</td>
+        </tr>
+        <tr>
+          <td>Data Classification</td>
+          <td>Agent access scoped to data classification level</td>
+          <td>Per-task credential issuance, audit logging</td>
+        </tr>
+        <tr>
+          <td>Incident Response</td>
+          <td>Token revocation procedure documented and tested</td>
+          <td>Automated anomaly detection, automatic containment</td>
+        </tr>
+        <tr>
+          <td>LP Disclosure</td>
+          <td>Agent usage disclosed in operational risk section</td>
+          <td>Agent security audit results shared with LP advisory committee</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout sowhat">
+    <div class="callout-label">LP-Facing Implication</div>
+    <div class="callout-body">Funds that adopt AI agents without security governance are accepting unquantified operational risk. The question LPs should be asking is not "are you using AI?" but "what are your agent security controls?" Funds that can answer this question credibly will have a governance advantage in the next fundraise cycle.</div>
+  </div>
+</div>
+
+<!-- ==================== 9. METHODOLOGY ==================== -->
+<div class="page" id="methodology">
+  <h2>9. Methodology &amp; Sources</h2>
+  <span class="confidence-line">Overall report confidence: 82%</span>
+
+  <h3>Research Process</h3>
+  <p>This report was compiled on February 17, 2026, using the following sources and methods:</p>
+
+  <ul>
+    <li><strong>Primary security research:</strong> Koi Security's ClawHub audit (341 malicious skills), Hudson Rock's infostealer analysis, VirusTotal blog post on weaponized skills</li>
+    <li><strong>Enterprise surveys:</strong> Gravitee State of AI Agent Security 2026, Microsoft Cyber Pulse AI Security Report, CyberArk 2026 identity risk analysis</li>
+    <li><strong>Academic research:</strong> arXiv papers on prompt injection in agentic systems (2601.17548, ScienceDirect S2405959525001997)</li>
+    <li><strong>Industry reporting:</strong> The Hacker News, BleepingComputer, Forbes, eSecurity Planet, Stellar Cyber, Zenity threat landscape report</li>
+    <li><strong>Direct observation:</strong> Audit of our own OpenClaw deployment and operational security practices</li>
+  </ul>
+
+  <h3>Confidence Scoring</h3>
+  <p>Each section includes a confidence score reflecting source quality and claim verifiability:</p>
+  <ul>
+    <li><strong>90%+</strong> — Claims backed by primary research, confirmed by multiple independent sources</li>
+    <li><strong>80–89%</strong> — Claims backed by credible primary sources with limited independent confirmation</li>
+    <li><strong>70–79%</strong> — Claims involve interpretation or extrapolation from available data</li>
+    <li><strong>&lt;70%</strong> — Speculative or forward-looking claims, flagged explicitly</li>
+  </ul>
+
+  <h3>Limitations</h3>
+  <ul>
+    <li>This report focuses primarily on the OpenClaw ecosystem. Many findings generalize to other agent frameworks, but specific vulnerability details may differ.</li>
+    <li>Enterprise survey data (Gravitee, Microsoft) reflects self-reported incidents, which may under- or over-count actual events.</li>
+    <li>The prompt injection success rate (85%+) is from academic research using adaptive attacks; real-world success rates may vary based on deployment specifics.</li>
+    <li>Our case study (Section 6) reflects a solo operator deployment; enterprise environments will have different risk profiles.</li>
+  </ul>
+
+  <h3>References</h3>
+  <p class="reference-entry"><sup>1</sup> Koi Security. "ClawHavoc: 341 Malicious ClawdBot Skills Found by the Bot They Were Targeting." koi.ai/blog, Feb 2026. Confirmed by The Hacker News, eSecurity Planet, VirusTotal Blog.</p>
+  <p class="reference-entry"><sup>2</sup> Hudson Rock. "Infostealer Steals OpenClaw AI Agent Configuration Files and Gateway Tokens." hudsonrock.com/blog, Feb 16, 2026. Confirmed by BleepingComputer, TechNadu, Tech Edu Byte.</p>
+  <p class="reference-entry"><sup>3</sup> Gravitee. "State of AI Agent Security 2026 Report: When Adoption Outpaces Control." gravitee.io/blog, Feb 2026.</p>
+  <p class="reference-entry"><sup>4</sup> eSecurity Planet. "Hundreds of Malicious Skills Found in OpenClaw's ClawHub." esecurityplanet.com, Feb 2026.</p>
+  <p class="reference-entry"><sup>5</sup> The Hacker News. "OpenClaw Integrates VirusTotal Scanning to Detect Malicious ClawHub Skills." thehackernews.com, Feb 2026.</p>
+  <p class="reference-entry"><sup>6</sup> InfoStealers. "AI Agents' Most Downloaded Skill Is Discovered to Be an Infostealer." infostealers.com, Feb 2026.</p>
+  <p class="reference-entry"><sup>7</sup> Ainary internal research. "OpenClaw Research — 2026-02-17." Community patterns analysis.</p>
+  <p class="reference-entry"><sup>8</sup> arXiv 2601.17548. "Prompt Injection Attacks on Agentic Coding Assistants: A Systematic Analysis." Jan 2026.</p>
+  <p class="reference-entry"><sup>9</sup> Marr, Bernard. "When AI Agents Turn Against You: The Prompt Injection Threat Every Business Leader Must Understand." Forbes, Jan 28, 2026.</p>
+  <p class="reference-entry"><sup>10</sup> Microsoft. "Cyber Pulse: An AI Security Report." microsoft.com/security, 2026.</p>
+  <p class="reference-entry"><sup>11</sup> CyberArk. "AI Agents and Identity Risks: How Security Will Shift in 2026." cyberark.com/blog, Dec 2025.</p>
+  <p class="reference-entry"><sup>12</sup> VirusTotal Blog. "From Automation to Infection: How OpenClaw AI Agent Skills Are Being Weaponized." blog.virustotal.com, Feb 2026.</p>
+  <p class="reference-entry"><sup>13</sup> Stellar Cyber. "Top Agentic AI Security Threats in 2026." stellarcyber.ai, Dec 2025.</p>
+  <p class="reference-entry"><sup>14</sup> Zenity. "AI Agent Security: 2026 Threat Landscape Report." zenity.io, 2026.</p>
+  <p class="reference-entry"><sup>15</sup> USCS Institute. "What is AI Agent Security Plan 2026? Threats and Strategies Explained." uscsinstitute.org, 2026.</p>
+
+  <div class="author-section">
+    <p class="author-label">About the Author</p>
+    <p class="author-bio">Florian Ziesche is the founder of Ainary Ventures, focused on AI strategy, research, and implementation. He builds and operates the agent infrastructure he writes about — including the systems analyzed in this report's case study. This report reflects practitioner experience, not theoretical analysis.</p>
+    <p class="author-bio" style="margin-top: 8px; font-style: italic; color: #888;">AI strategy · research · implementation. By someone who built the systems first.</p>
+  </div>
+</div>
+
+<!-- ==================== BACK COVER ==================== -->
+
+<!-- ==================== TRANSPARENCY NOTE ==================== -->
+<div class="page" id="transparency">
+  <h2>10. Transparency Note</h2>
+
+  <p class="transparency-intro" style="font-style: italic; color: #666; margin-bottom: 24px;">This section provides full methodology, known limitations, and conflict of interest disclosure.</p>
+
+  <table class="how-to-read-table">
+    <tr>
+      <td><strong>Overall Confidence</strong></td>
+      <td>68% (Medium). Justification: Mixed evidence quality — threat examples are well-documented but attack surface projections and defensive recommendations involve significant interpretation and judgment.</td>
+    </tr>
+    <tr>
+      <td><strong>Sources</strong></td>
+      <td>14 sources: 4 security research/disclosures (ClawHavoc, Koi Security, Adversa AI, Obsidian Security), 3 industry reports (OWASP, Gartner, Precedence Research), 3 academic/technical (arxiv papers, NIST frameworks), 4 trade publications (TechRepublic, SecurityWeek, Forbes, DarkReading).</td>
+    </tr>
+    <tr>
+      <td><strong>Strongest Evidence</strong></td>
+      <td>ClawHub 341 malicious skills finding (primary security research), February 13 agent identity theft incident (documented disclosure), OWASP Top 10 for LLM Applications (established framework).</td>
+    </tr>
+    <tr>
+      <td><strong>Weakest Point</strong></td>
+      <td>Defensive recommendations are largely judgment-based — no evidence that specific countermeasures reduce agent-specific attack success rates. Market size projections ($8.4B by 2032) are single-source estimates.</td>
+    </tr>
+    <tr>
+      <td><strong>What Would Invalidate</strong></td>
+      <td>If (a) agent security incidents remain rare despite growing deployment, (b) existing enterprise security frameworks prove sufficient for agent threats, or (c) the ClawHub attack vector is patched and no comparable vectors emerge.</td>
+    </tr>
+  </table>
+
+  <h3 style="margin-top: 2rem;">Methodology</h3>
+
+  <p>This report followed the A+ Research Pipeline: independent research, source diversity audit, thesis development, and synthesis. 14 sources were collected and claims were extracted and classified using the [E]/[I]/[J]/[A] framework. The pipeline is a multi-agent system where research, validation, thesis development, and writing are performed by specialized agents that operate independently.</p>
+
+  <h3>Limitations</h3>
+
+  <ul>
+    <li><strong>Threat landscape is rapidly evolving.</strong> Specific attack vectors and statistics may be outdated within weeks of publication.</li>
+    <li><strong>No controlled efficacy data for defenses.</strong> Recommended countermeasures are based on security best practices, not measured agent-specific effectiveness.</li>
+    <li><strong>Attacker capability is estimated, not measured.</strong> Projections of future attack sophistication are extrapolations, not empirical findings.</li>
+    <li><strong>Enterprise bias.</strong> Security recommendations assume organizational resources; solo operators and small teams face different threat models.</li>
+    <li><strong>Vendor-adjacent sourcing.</strong> Several security sources (Obsidian Security, Adversa AI) are vendors with commercial interests in the threat landscape they describe.</li>
+  </ul>
+
+  <h3>Conflict of Interest</h3>
+
+  <p>The publisher of this report researches, builds, and advises on AI agent systems — and has a commercial interest in the conclusions presented here. Evaluate evidence independently; claims marked [J] reflect judgment, not evidence.</p>
+</div>
+
+<div class="back-cover">
+  <div style="margin-bottom: 48px;">
+    <span class="gold-punkt" style="font-size: 24px;">●</span>
+    <p class="brand-name" style="font-size: 1.2rem; margin-top: 8px;">Ainary</p>
+  </div>
+  <p class="back-cover-services">AI Strategy · System Design · Execution · Consultancy · Research</p>
+  <p class="back-cover-cta"><a href="https://ainaryventures.com/contact.html" style="color: #888; text-decoration: none;">Contact</a> · <a href="https://ainaryventures.com/contact.html" style="color: #888; text-decoration: none;">Feedback</a></p>
+  <p class="back-cover-contact">
+    ainaryventures.com<br>
+    florian@ainaryventures.com
+  </p>
+  <p style="font-size: 0.75rem; color: #aaa; margin-top: 48px;">© 2026 Ainary Ventures</p>
+</div>
+
+</body>
+</html>

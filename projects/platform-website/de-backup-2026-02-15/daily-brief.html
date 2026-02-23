@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Intelligence Brief — AI Signals That Matter | Ainary</title>
+  <meta name="description" content="Daily AI intelligence brief. Multiple sources scanned, filtered to the signals that matter. By Florian Ziesche.">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-page: #08080c;
+      --bg-surface: #111116;
+      --bg-elevated: #1a1a22;
+      --text-primary: #ededf0;
+      --text-secondary: #8b8b95;
+      --text-muted: #55555e;
+      --border-default: rgba(255,255,255,0.06);
+      --border-hover: rgba(255,255,255,0.12);
+      --accent: #c8aa50;
+      --accent-hover: #d4b85c;
+      --accent-muted: rgba(200,170,80,0.15);
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',-apple-system,sans-serif; background:var(--bg-page); color:var(--text-primary); -webkit-font-smoothing:antialiased; }
+    .container { max-width:800px; margin:0 auto; padding:0 24px; }
+
+    /* Nav */
+    .nav { position:sticky; top:0; z-index:100; background:rgba(8,8,12,0.85); backdrop-filter:blur(12px); border-bottom:1px solid var(--border-default); }
+    .nav-container { max-width:1200px; margin:0 auto; padding:0 24px; height:56px; display:flex; align-items:center; justify-content:space-between; }
+    .nav-logo { font-weight:600; font-size:1rem; text-decoration:none; color:inherit; display:flex; align-items:center; }
+    .nav-links { display:flex; gap:32px; }
+    .nav-link { color:var(--text-secondary); text-decoration:none; font-size:0.8rem; font-weight:400; transition:color 0.15s; }
+    .nav-link:hover { color:var(--text-primary); }
+    .btn-primary { background:var(--accent); color:#ffffff; border:none; padding:8px 16px; border-radius:8px; font-size:0.8rem; font-weight:500; cursor:pointer; text-decoration:none; transition:background 0.15s; }
+    .btn-primary:hover { background:var(--accent-hover); }
+    .logo-dot-wrap { position:relative; display:inline-block; width:10px; height:10px; margin-right:6px; vertical-align:middle; }
+    .logo-dot { width:10px; height:10px; border-radius:50%; background:var(--accent); position:relative; z-index:3; display:block; }
+    .logo-dot-ring1 { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:18px; height:18px; border-radius:50%; background:rgba(200,170,80,0.20); z-index:2; }
+    .logo-dot-ring2 { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:26px; height:26px; border-radius:50%; background:rgba(200,170,80,0.05); z-index:1; animation: logo-pulse 3s ease-in-out infinite; }
+
+    /* Header */
+    .brief-header { padding:100px 0 60px; text-align:center; }
+    .brief-header h1 { font-size:2.5rem; font-weight:600; letter-spacing:-0.02em; margin-bottom:12px; }
+    .brief-subtitle { color:var(--text-secondary); font-size:0.95rem; line-height:1.6; }
+    .brief-date { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--text-muted); margin-top:16px; }
+
+    /* Tabs */
+    .tabs { display:flex; gap:4px; margin-bottom:32px; border-bottom:1px solid var(--border-default); padding-bottom:0; }
+    .tab { background:none; border:none; color:var(--text-muted); font-size:0.8rem; font-weight:400; padding:10px 16px; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; transition:all 0.15s; }
+    .tab:hover { color:var(--text-secondary); }
+    .tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+
+    /* Signals List */
+    .signals-list { display:flex; flex-direction:column; gap:0; }
+    .signal-item { padding:24px 0; border-bottom:1px solid var(--border-default); }
+    .signal-item:first-child { border-top:1px solid var(--border-default); }
+    .signal-meta { display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+    .signal-source { font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--accent); letter-spacing:0.04em; text-transform:uppercase; }
+    .signal-time { font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--text-muted); }
+    .signal-relevance { font-family:'JetBrains Mono',monospace; font-size:0.6rem; margin-left:auto; }
+    .signal-title { font-size:1.05rem; font-weight:500; margin-bottom:8px; line-height:1.4; }
+    .signal-insight { color:var(--text-secondary); font-size:0.85rem; line-height:1.6; margin-bottom:8px; }
+    .signal-sowhat { color:var(--text-secondary); font-size:0.85rem; line-height:1.6; margin-bottom:8px; }
+    .signal-sowhat strong { color:var(--text-primary); font-weight:600; }
+    .signal-prediction { font-size:0.8rem; color:var(--text-secondary); margin-top:8px; }
+    .signal-prediction strong { color:var(--text-primary); }
+    .signal-readmore { display:inline-block; margin-top:10px; color:var(--accent); font-size:0.85rem; font-weight:500; text-decoration:none; }
+    .signal-readmore:hover { color:var(--accent-hover); }
+    .signal-readmore-note { font-size:0.7rem; color:var(--text-muted); margin-top:2px; }
+
+    /* Trends */
+    .trends-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:24px; }
+    .trend-item { padding:20px 0; border-bottom:1px solid var(--border-default); }
+    .trend-label { font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--text-muted); letter-spacing:0.04em; text-transform:uppercase; margin-bottom:6px; }
+    .trend-title { font-size:0.95rem; font-weight:500; margin-bottom:6px; }
+    .trend-desc { font-size:0.8rem; color:var(--text-secondary); line-height:1.6; }
+
+    /* Section spacing */
+    .section { padding:60px 0; }
+    .section-title { font-size:1.3rem; font-weight:500; margin-bottom:6px; }
+    .section-subtitle { color:var(--text-secondary); font-size:0.85rem; margin-bottom:24px; }
+    .tab-content { display:none; }
+    .tab-content.active { display:block; }
+
+    /* Cross-link */
+    .cross-link { padding:48px 0; text-align:center; border-top:1px solid var(--border-default); }
+    .cross-link p { color:var(--text-muted); font-size:0.8rem; margin-bottom:6px; }
+    .cross-link a { color:var(--accent); font-size:0.85rem; text-decoration:none; font-weight:500; }
+
+    /* Footer */
+    .footer { padding:60px 0 30px; border-top:1px solid var(--border-default); }
+    .footer .container { max-width:1200px; }
+    .footer-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:40px; margin-bottom:40px; }
+    .footer-column h4 { font-size:0.75rem; font-weight:500; margin-bottom:16px; letter-spacing:0.04em; }
+    .footer-links { display:flex; flex-direction:column; gap:10px; }
+    .footer-link { color:var(--text-muted); text-decoration:none; font-size:0.8rem; transition:color 0.15s; }
+    .footer-link:hover { color:var(--text-secondary); }
+    .footer-bottom { padding-top:24px; border-top:1px solid var(--border-default); text-align:center; }
+    .footer-copyright { color:var(--text-muted); font-size:0.7rem; }
+
+    @media (max-width:768px) {
+      .brief-header h1 { font-size:2rem; }
+      .trends-grid { grid-template-columns:1fr; }
+      .footer-grid { grid-template-columns:repeat(2,1fr); }
+      .tabs { overflow-x:auto; }
+    }
+    @media (max-width:640px) {
+      .nav-links { display:none; }
+      .nav-auth {
+        display: none !important;
+      }
+      
+      /* Hamburger button */
+      .hamburger {
+        display: flex !important;
+        flex-direction: column;
+        gap: 5px;
+        cursor: pointer;
+        padding: 8px;
+        z-index: 1001;
+      }
+      .hamburger span {
+        display: block;
+        width: 20px;
+        height: 1.5px;
+        background: var(--text-primary);
+        transition: all 0.3s ease;
+      }
+      .hamburger.active span:nth-child(1) {
+        transform: rotate(45deg) translate(4.5px, 4.5px);
+      }
+      .hamburger.active span:nth-child(2) {
+        opacity: 0;
+      }
+      .hamburger.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(4.5px, -4.5px);
+      }
+      
+      /* Mobile menu overlay */
+      .mobile-menu {
+        display: none;
+        position: fixed;
+        top: 56px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(8, 8, 12, 0.97);
+        backdrop-filter: blur(20px);
+        z-index: 999;
+        padding: 32px 24px;
+        flex-direction: column;
+        gap: 24px;
+      }
+      .mobile-menu.open {
+        display: flex;
+      }
+      .mobile-menu a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: 1.1rem;
+        font-weight: 500;
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+      }
+      .mobile-menu a:hover {
+        color: var(--text-primary);
+      }
+      .mobile-menu .btn-primary {
+        display: inline-block;
+        text-align: center;
+        margin-top: 8px;
+        color: #fff !important;
+        border-bottom: none;
+      }
+      .container, .section-container {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+      }
+      
+      section {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+      }
+      
+      [style*="display:flex"][style*="gap:24px"][style*="justify-content:center"] { flex-wrap:wrap !important; gap:12px !important; }
+      .footer-grid { grid-template-columns:1fr; }
+      .nav-links { display:none; }
+      .nav-auth {
+        display: none !important;
+      }
+      
+      /* Hamburger button */
+      .hamburger {
+        display: flex !important;
+        flex-direction: column;
+        gap: 5px;
+        cursor: pointer;
+        padding: 8px;
+        z-index: 1001;
+      }
+      .hamburger span {
+        display: block;
+        width: 20px;
+        height: 1.5px;
+        background: var(--text-primary);
+        transition: all 0.3s ease;
+      }
+      .hamburger.active span:nth-child(1) {
+        transform: rotate(45deg) translate(4.5px, 4.5px);
+      }
+      .hamburger.active span:nth-child(2) {
+        opacity: 0;
+      }
+      .hamburger.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(4.5px, -4.5px);
+      }
+      
+      /* Mobile menu overlay */
+      .mobile-menu {
+        display: none;
+        position: fixed;
+        top: 56px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(8, 8, 12, 0.97);
+        backdrop-filter: blur(20px);
+        z-index: 999;
+        padding: 32px 24px;
+        flex-direction: column;
+        gap: 24px;
+      }
+      .mobile-menu.open {
+        display: flex;
+      }
+      .mobile-menu a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: 1.1rem;
+        font-weight: 500;
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+      }
+      .mobile-menu a:hover {
+        color: var(--text-primary);
+      }
+      .mobile-menu .btn-primary {
+        display: inline-block;
+        text-align: center;
+        margin-top: 8px;
+        color: #fff !important;
+        border-bottom: none;
+      }
+    }
+    @keyframes logo-pulse {
+      0%, 100% { opacity:1; transform:translate(-50%,-50%) scale(1); }
+      50% { opacity:0.5; transform:translate(-50%,-50%) scale(1.3); }
+    }
+  </style>
+  
+  <!-- SEO -->
+  <link rel="canonical" href="https://ainary.com/daily-brief.html">
+  
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Daily Intelligence Brief",
+    "description": "Custom AI intelligence reports every morning. Track competitors, trends, and market signals. Know more. Decide faster.",
+    "url": "https://ainary.com/daily-brief.html",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Ainary"
+    }
+  }
+  </script>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo"><span class="logo-dot-wrap"><span class="logo-dot-ring2"></span><span class="logo-dot-ring1"></span><span class="logo-dot"></span></span>Ainary</a>
+      <div class="nav-links">
+        <a href="tools.html" class="nav-link">Anwendungsfälle</a>
+        <a href="daily-brief.html" class="nav-link" style="color:var(--text-primary);">Tägliches Briefing</a>
+        <a href="blog.html" class="nav-link">Blog</a>
+        <a href="pricing.html" class="nav-link">Preise</a>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;">
+        <a href="../index.html" style="color:var(--text-secondary);font-size:0.75rem;text-decoration:none;font-weight:400;margin-right:8px;">EN</a><a href="../login.html" class="nav-link">Anmelden</a>
+        <a href="../signup.html" class="btn-primary">Registrieren</a>
+      </div>
+      <!-- Hamburger (mobile only) -->
+      <div class="hamburger" style="display:none;" onclick="document.querySelector('.hamburger').classList.toggle('active');document.querySelector('.mobile-menu').classList.toggle('open');"><span></span><span></span><span></span></div>
+    </div>
+  </nav>
+  <!-- Mobile menu overlay -->
+  <div class="mobile-menu">
+    <a href="tools.html">Anwendungsfälle</a>
+    <a href="daily-brief.html">Tägliches Briefing</a>
+    <a href="blog.html">Blog</a>
+    <a href="pricing.html">Preise</a>
+    <a href="../login.html">Anmelden</a>
+    <a href="../signup.html" class="btn-primary" style="padding:12px 24px;font-size:0.9rem;">Registrieren</a>
+    <a href="../daily-brief.html" style="font-size:0.85rem;color:var(--text-muted);">🌐 English</a>
+  </div>
+
+  <section class="brief-header">
+    <div class="container">
+      <h1>Tägliches Briefing</h1>
+      <p class="brief-subtitle">Mehrere Quellen gescannt. Die Signale, die zählen — jeden Morgen.<br><span style="color:var(--text-muted);font-size:0.85rem;">Dies ist ein Auszug. Der Newsletter enthält tiefere Einblicke, Querverbindungen und Muster, die Sie hier nicht finden.</span></p>
+      <div style="display:flex;gap:24px;justify-content:center;margin-top:16px;">
+        <a href="https://finitematter.substack.com/" target="_blank" style="color:var(--text-secondary);font-size:0.8rem;text-decoration:none;font-weight:400;">Wöchentlichen Newsletter abonnieren →</a>
+        <a href="blog.html" style="color:var(--text-secondary);font-size:0.8rem;text-decoration:none;font-weight:400;">Mein Blog lesen →</a>
+        <a href="#trends" style="color:var(--text-muted);font-size:0.8rem;text-decoration:none;font-weight:400;">Trends dieser Woche ↓</a>
+      </div>
+      <p class="brief-date">Donnerstag, 12. Februar 2026</p>
+    </div>
+  </section>
+
+  <!-- Today's Signals -->
+  <section>
+    <div class="container">
+      <div style="padding-bottom:16px;border-bottom:1px solid var(--border-default);margin-bottom:16px;">
+        <a href="../signup.html" class="signal-readmore" style="margin:0;">Vollständiger Report in deinem Postfach. (Demnächst)</a>
+        <p class="signal-readmore-note">Vollständiger Report in deinem Postfach.</p>
+      </div>
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('ai-tech')">AI &amp; Tech</button>
+        <button class="tab" onclick="switchTab('enterprise')">Unternehmen</button>
+        <button class="tab" onclick="switchTab('startups')">Startups >Startups &amp; VC<amp; VC</button>
+        <button class="tab" onclick="switchTab('tools')">Tools</button>
+      </div>
+
+      <!-- AI & Tech -->
+      <div class="tab-content active" id="tab-ai-tech">
+        <div class="signals-list">
+          <div class="signal-item">
+            <div class="signal-meta">
+              <span class="signal-source">ArXiv</span>
+              <span class="signal-time">2h ago</span>
+              <span class="signal-relevance" style="color:var(--text-primary);">●●●</span>
+            </div>
+            <h3 class="signal-title">Anthropic veröffentlicht Multi-Agent Orchestration Framework</h3>
+            <p class="signal-insight">Signale deuten auf dezentrale Agent-Koordination. Frühindikator für Enterprise-Adoption in Q2.</p>
+            <p class="signal-sowhat"><strong>So What:</strong> Wer Agent-Workflows baut: Setzt auf Orchestration Layer — nicht auf monolithische Agents. Der Markt konvergiert auf modulare Architekturen.</p>
+            <div class="signal-prediction">
+              <strong>Prediction:</strong> 3+ große Cloud-Anbieter liefern native Multi-Agent-Orchestrierung bis Q3 2026. <span style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--text-muted);">Confidence: ●●● · 6 months</span>
+            </div>
+          </div>
+
+          <div class="signal-item">
+            <div class="signal-meta">
+              <span class="signal-source">Hacker News</span>
+              <span class="signal-time">3h ago</span>
+              <span class="signal-relevance" style="color:var(--text-primary);">●●●</span>
+            </div>
+            <h3 class="signal-title">Meta öffnet interne AI Red-Teaming Tools für die Öffentlichkeit</h3>
+            <p class="signal-insight">Safety-Tooling wird zur Commodity. Senkt die Hürde für Startups in regulierten Bereichen.</p>
+            <p class="signal-sowhat"><strong>So What:</strong> Safety ist kein Wettbewerbsvorteil mehr — es ist Grundvoraussetzung. Gewinner sind die, die sicher UND schnell liefern.</p>
+          </div>
+
+          <div class="signal-item">
+            <div class="signal-meta">
+              <span class="signal-source">Reddit</span>
+              <span class="signal-time">5h ago</span>
+              <span class="signal-relevance" style="color:var(--text-secondary);">●●<span style="opacity:0.3">●</span></span>
+            </div>
+            <h3 class="signal-title">3 Senior Tesla-Ingenieure wechseln zu Rivian — Pattern Match zu 2022</h3>
+            <p class="signal-insight">Beim letzten Mal (2022) startete Rivian 8 Monate später ihre Flottenplattform.</p>
+            <p class="signal-sowhat"><strong>So What:</strong> Talentmigration ist der zuverlässigste Frühindikator für Produkt-Pivots. Wer Rivian bewertet: Das ist ein Kaufsignal.</p>
+            <div class="signal-prediction">
+              <strong>Prediction:</strong> Rivian kündigt Enterprise-Flottenplattform oder B2B-Pivot bis Q3 2026 an. <span style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--text-muted);">Confidence: ●●● · 8 months</span>
+            </div>
+          </div>
+
+          <div class="signal-item">
+            <div class="signal-meta">
+              <span class="signal-source">GitHub</span>
+              <span class="signal-time">8h ago</span>
+              <span class="signal-relevance" style="color:var(--text-primary);">●●●</span>
+            </div>
+            <h3 class="signal-title">Rust-basierte LLM Inference Engine erreicht Produktion im großen Maßstab</h3>
+            <p class="signal-insight">Performance-first Alternativen gewinnen an Boden. Python-Ökosystem bekommt echte Konkurrenz bei Inference.</p>
+            <p class="signal-sowhat"><strong>So What:</strong> Wenn deine Inference-Kosten >30% der COGS sind: Jetzt Rust-basierte Alternativen evaluieren. First Mover erreichen 40-60% Kostenreduktion.</p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Enterprise -->
+      <div class="tab-content" id="tab-enterprise">
+        <div class="signals-list">
+
+          <div class="signal-item">
+            <div class="signal-meta">
+              <span class="signal-source">News Wire</span>
+              <span class="signal-time">1h ago</span>
+              <span class="signal-relevance" style="color:var(--text-primary);">●●●</span>
+            </div>
+            <h3 class="signal-title">Deutsche Bank setzt AI Agents für Trade Settlement ein</h3>
+            <p class="signal-insight">Erste große europäische Bank mit autonomen Agent-Workflows. Regulatorischer Präzedenzfall wird geschaffen.</p>
+            <p class="signal-sowhat"><strong>So What:</strong> Das Compliance-Argument gegen AI Agents hat seine stärkste Karte verloren. Wenn die Deutsche Bank BaFin-Freigabe bekommt, kann jedes europäische Unternehmen das.</p>
+            <div class="signal-prediction">
+              <strong>Prediction:</strong> 5+ europäische Banken setzen autonome Agent-Workflows bis Ende 2026 ein. <span style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--text-muted);">Confidence: ●● · 10 months</span>
+            </div>
+          </div>
+
+          <div class="signal-item">
+            <div class="signal-meta">
+              <span class="signal-source">Industry Report</span>
+              <span class="signal-time">4h ago</span>
+              <span class="signal-relevance" style="color:var(--text-secondary);">●●<span style="opacity:0.3">●</span></span>
+            </div>
+            <h3 class="signal-title">Enterprise AI-Ausgaben verschieben sich von Piloten zu Produktion</h3>
+            <p class="signal-insight">Budget-Umschichtung von Experimenten zu Deployment. Beratungsumsätze unter Druck.</p>
+            <p class="signal-sowhat"><strong>So What:</strong> "Proof of Concept" reicht nicht mehr. Unternehmen wollen produktionsreife AI oder nichts.</p>
+          </div>
+
+          <div class="signal-item">
+            <div class="signal-meta">
+              <span class="signal-source">SEC Filing</span>
+              <span class="signal-time">6h ago</span>
+              <span class="signal-relevance" style="color:var(--text-primary);">●●●</span>
+            </div>
+            <h3 class="signal-title">Salesforce übernimmt Agent-Infrastruktur-Startup für 340 Mio. USD</h3>
+            <p class="signal-insight">Enterprise-Plattformen konsolidieren Agent-Tooling. Build-vs-Buy verschiebt sich Richtung Buy.</p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Startups & VC -->
+      <div class="tab-content" id="tab-startups">
+        <div class="signals-list">
+
+          <div class="signal-item">
+            <div class="signal-meta">
+              <span class="signal-source">News Wire</span>
+              <span class="signal-time">2h ago</span>
+              <span class="signal-relevance" style="color:var(--text-primary);">●●●</span>
+            </div>
+            <h3 class="signal-title">YC W26 Batch: 41% AI-fokussiert, Vertical AI dominiert</h3>
+            <p class="signal-insight">Horizontale AI-Plays werden zur Commodity. Smart Money fließt in domänenspezifische Anwendungen.</p>
+            <p class="signal-sowhat"><strong>So What:</strong> Das "AI Wrapper"-Fenster schließt sich. Nur vertikal-spezifische, tief integrierte AI-Produkte rechtfertigen ab jetzt Venture Capital.</p>
+          </div>
+
+          <div class="signal-item">
+            <div class="signal-meta">
+              <span class="signal-source">Hacker News</span>
+              <span class="signal-time">5h ago</span>
+              <span class="signal-relevance" style="color:var(--text-primary);">●●●</span>
+            </div>
+            <h3 class="signal-title">Seed-Runden für AI Startups im Schnitt 4,2 Mio. USD, +60% YoY</h3>
+            <p class="signal-insight">Kapital reichlich vorhanden, aber konzentriert. Pre-Seed schwieriger, Seed einfacher für AI-native Teams.</p>
+          </div>
+
+          <div class="signal-item">
+            <div class="signal-meta">
+              <span class="signal-source">GitHub</span>
+              <span class="signal-time">10h ago</span>
+              <span class="signal-relevance" style="color:var(--text-primary);">●●●</span>
+            </div>
+            <h3 class="signal-title">Open-Source Agent Framework erreicht 50K Stars in 3 Monaten</h3>
+            <p class="signal-insight">Developer-Mindshare verschiebt sich zu Agent-first Architekturen. Infrastruktur-Layer festigt sich.</p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Tools -->
+      <div class="tab-content" id="tab-tools">
+        <div class="signals-list">
+
+          <div class="signal-item">
+            <div class="signal-meta">
+              <span class="signal-source">Product Hunt</span>
+              <span class="signal-time">1h ago</span>
+              <span class="signal-relevance" style="color:var(--text-primary);">●●●</span>
+            </div>
+            <h3 class="signal-title">AI Code Review Tool sammelt 28 Mio. USD nach viralem Launch</h3>
+            <p class="signal-insight">Developer Tooling bleibt heiß. Code-Qualität + Sicherheit ist der Hebel.</p>
+          </div>
+
+          <div class="signal-item">
+            <div class="signal-meta">
+              <span class="signal-source">Hacker News</span>
+              <span class="signal-time">4h ago</span>
+              <span class="signal-relevance" style="color:var(--text-secondary);">●●<span style="opacity:0.3">●</span></span>
+            </div>
+            <h3 class="signal-title">Notion startet nativen AI Agent Marketplace</h3>
+            <p class="signal-insight">Plattformen ergänzen Agent-Ökosysteme. Third-Party Agent-Distribution wird realistisch.</p>
+          </div>
+
+          <div class="signal-item">
+            <div class="signal-meta">
+              <span class="signal-source">GitHub</span>
+              <span class="signal-time">6h ago</span>
+              <span class="signal-relevance" style="color:var(--text-primary);">●●●</span>
+            </div>
+            <h3 class="signal-title">Browser-Automatisierung-Framework erhält Enterprise-Update</h3>
+            <p class="signal-insight">Web Agents bewegen sich von Demo zu Produktion. Enterprise-Compliance-Features signalisieren Reife.</p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Weekly Trends -->
+  <section class="section" id="trends" style="border-top:2px solid var(--border-hover);margin-top:60px;padding-top:60px;">
+    <div class="container">
+      <h2 style="font-size:1.5rem;font-weight:500;margin-bottom:6px;">Trends dieser Woche</h2>
+      <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:24px;">Was der Markt diskutiert — und was es bedeutet.</p>
+
+      <div class="signals-list">
+        <div class="signal-item">
+          <div class="signal-meta">
+            <span class="signal-source" style="color:var(--accent);">Accelerating</span>
+            <span class="signal-time">Week 7</span>
+          </div>
+          <h3 class="signal-title">Multi-Agent Systeme → Produktion</h3>
+          <p class="signal-insight">Dritte Woche in Folge mit steigenden Erwähnungen. Von Research Papers zu Deployment-Ankündigungen. 12 Signale diese Woche, +40%.</p>
+        </div>
+
+        <div class="signal-item">
+          <div class="signal-meta">
+            <span class="signal-source">Emerging</span>
+            <span class="signal-time">Week 7</span>
+          </div>
+          <h3 class="signal-title">AI Safety → Commodity</h3>
+          <p class="signal-insight">Open-Source Safety-Tools von Meta und Google entfernen Wettbewerbsvorteile. Red-Teaming wird Grundvoraussetzung, kein Differenzierungsmerkmal.</p>
+        </div>
+
+        <div class="signal-item">
+          <div class="signal-meta">
+            <span class="signal-source">Declining</span>
+            <span class="signal-time">Week 7</span>
+          </div>
+          <h3 class="signal-title">RAG-Only Architekturen</h3>
+          <p class="signal-insight">Verliert Boden an agentic Architekturen. Markt verschiebt sich von "finden und zusammenfassen" zu "finden, denken und handeln". -60% vom Peak.</p>
+        </div>
+
+        <div class="signal-item">
+          <div class="signal-meta">
+            <span class="signal-source">Stable</span>
+            <span class="signal-time">Week 7</span>
+          </div>
+          <h3 class="signal-title">Inference-Kostenoptimierung</h3>
+          <p class="signal-insight">Rust-basierte Engines, Quantisierungs-Verbesserungen, Edge Deployment — alles konvergiert auf 10x Kostenreduktion innerhalb von 12 Monaten.</p>
+        </div>
+      </div>
+
+      <div style="margin-top:24px;">
+        <p style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--accent);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:6px;">So What</p>
+        <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.6;">Der Markt bewegt sich von "AI kann eine Sache gut" zu "AI-Systeme koordinieren, erinnern und denken". Wenn deine Strategie auf RAG-Pipelines oder Prompt-Bibliotheken basiert — sie hat eine Haltbarkeit von 6 Monaten.</p>
+      </div>
+    </div>
+  </section>
+
+
+  <div id="shared-cta"></div>
+  <script src="shared-cta.js"></script>
+
+
+  <script>
+    function switchTab(id) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById('tab-' + id).classList.add('active');
+    }
+  </script>
+
+</body>
+</html>
