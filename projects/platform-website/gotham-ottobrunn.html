@@ -1856,6 +1856,196 @@ document.getElementById('search-input').addEventListener('input', function() {
 function buildStatusBar() {
   document.getElementById('status-left').innerHTML = Object.keys(KB).length + ' Entities · ' + NEWS.length + ' News · ' + HYPOTHESES.length + ' Hypothesen · ' + PATTERNS.length + ' Patterns';
   document.getElementById('status-right').innerHTML = TENANT.name + ' · v22';
+
+// =====================================================
+// ANALYTICS — Deep Event Tracking
+// =====================================================
+var _aiq = []; // analytics queue
+var _ais = Date.now(); // session start
+var _ait = null; // current tab timer
+var _aiTabStart = 0;
+var _aiCurrentTab = 'briefing';
+var _aiScrollMax = {};
+var _aiEndpoint = null; // set via TENANT.analyticsEndpoint or fallback
+
+// Detect endpoint
+try { _aiEndpoint = TENANT.analyticsEndpoint || 'https://ainaryventures.com/api/track'; } catch(e){}
+
+function _aiTrack(evt, data) {
+  var payload = {
+    e: evt,
+    t: Date.now(),
+    s: _ais,
+    u: (USER||{}).name || 'unknown',
+    tn: (TENANT||{}).name || 'unknown',
+    d: data || {}
+  };
+  _aiq.push(payload);
+  try { localStorage.setItem('_ai_events', JSON.stringify(_aiq)); } catch(e){}
+  // Send to endpoint if available
+  if (_aiEndpoint) {
+    try { navigator.sendBeacon(_aiEndpoint, JSON.stringify(payload)); } catch(e){}
+  }
+}
+
+// Track auth
+var _origCheckAuth = checkAuth;
+checkAuth = function() {
+  var pw = document.getElementById('auth-input').value.toLowerCase().trim();
+  _origCheckAuth();
+  // If gate is now hidden, auth succeeded
+  setTimeout(function(){
+    if (document.getElementById('auth-gate').style.display === 'none') {
+      _aiTrack('auth', { method: 'password', ua: navigator.userAgent, screen: screen.width+'x'+screen.height, lang: navigator.language, ref: document.referrer });
+    }
+  }, 100);
+};
+
+// Track tab switches
+var _origSwitchView = switchView;
+switchView = function(view) {
+  // End timer on previous tab
+  if (_aiCurrentTab && _aiTabStart) {
+    _aiTrack('tab_leave', { tab: _aiCurrentTab, duration_ms: Date.now() - _aiTabStart, scroll_max: _aiScrollMax[_aiCurrentTab] || 0 });
+  }
+  _aiCurrentTab = view;
+  _aiTabStart = Date.now();
+  _origSwitchView(view);
+  _aiTrack('tab_enter', { tab: view });
+};
+
+// Track entity views
+var _origShowEntity = showEntity;
+showEntity = function(id, el) {
+  _aiTrack('entity_view', { entity: id, name: (KB[id]||{}).name, from_tab: _aiCurrentTab });
+  _origShowEntity(id, el);
+};
+
+// Track news detail
+var _origShowNewsDetail = showNewsDetail;
+showNewsDetail = function(idx) {
+  var n = NEWS[idx] || {};
+  _aiTrack('news_detail', { idx: idx, title: (n.title||'').substring(0,60), source: n.source });
+  _origShowNewsDetail(idx);
+};
+
+// Track org detail
+var _origShowOrgDetail = showOrgDetail;
+showOrgDetail = function(party) {
+  _aiTrack('org_detail', { party: party });
+  _origShowOrgDetail(party);
+};
+
+// Track talking point copies
+var _origCopyTP = copyTP;
+copyTP = function(btn) {
+  var section = btn.closest('.tp-section');
+  var topic = section ? section.querySelector('.tp-topic') : null;
+  var text = btn.previousElementSibling ? btn.previousElementSibling.textContent.substring(0,80) : '';
+  _aiTrack('copy_talking_point', { topic: topic ? topic.textContent : '', text: text });
+  _origCopyTP(btn);
+};
+
+// Track topic drilldowns
+var _origToggleTopic = toggleTopic;
+toggleTopic = function(idx) {
+  var topic = (SENTIMENT.topics && SENTIMENT.topics[idx]) ? SENTIMENT.topics[idx].name : idx;
+  _aiTrack('topic_drilldown', { idx: idx, topic: topic });
+  _origToggleTopic(idx);
+};
+
+// Track support/chat
+var _origToggleChat = toggleChat;
+toggleChat = function() {
+  _aiTrack('support_toggle', { action: document.getElementById('chat-overlay').classList.contains('open') ? 'close' : 'open' });
+  _origToggleChat();
+};
+
+// Track support message send
+var _origSendChat = sendChat;
+sendChat = function() {
+  var q = document.getElementById('chat-input').value.trim();
+  if (q) _aiTrack('support_message', { text: q.substring(0,200) });
+  _origSendChat();
+};
+
+// Track entity actions
+var _origExportEntity = exportEntity;
+exportEntity = function(id) { _aiTrack('entity_action', { action: 'export', entity: id }); _origExportEntity(id); };
+var _origShareEntity = shareEntity;
+shareEntity = function(id) { _aiTrack('entity_action', { action: 'share', entity: id }); _origShareEntity(id); };
+
+// Track bookmark action
+var _origBookmarkAction = bookmarkAction;
+bookmarkAction = function(idx, btn) { _aiTrack('action_bookmark', { idx: idx }); _origBookmarkAction(idx, btn); };
+
+// Track scroll depth per tab
+window.addEventListener('scroll', function() {
+  var pct = Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
+  if (!_aiScrollMax[_aiCurrentTab] || pct > _aiScrollMax[_aiCurrentTab]) {
+    _aiScrollMax[_aiCurrentTab] = pct;
+  }
+}, { passive: true });
+
+// Track session end
+window.addEventListener('beforeunload', function() {
+  var duration = Date.now() - _ais;
+  var tabSummary = {};
+  // Count tab visits from queue
+  for (var i=0; i<_aiq.length; i++) {
+    if (_aiq[i].e === 'tab_leave') {
+      var tab = _aiq[i].d.tab;
+      if (!tabSummary[tab]) tabSummary[tab] = { visits: 0, total_ms: 0, max_scroll: 0 };
+      tabSummary[tab].visits++;
+      tabSummary[tab].total_ms += _aiq[i].d.duration_ms || 0;
+      tabSummary[tab].max_scroll = Math.max(tabSummary[tab].max_scroll, _aiq[i].d.scroll_max || 0);
+    }
+  }
+  _aiTrack('session_end', {
+    duration_ms: duration,
+    total_events: _aiq.length,
+    tabs: tabSummary,
+    scroll_max: _aiScrollMax
+  });
+});
+
+// Track visibility changes (tab hidden/visible)
+document.addEventListener('visibilitychange', function() {
+  _aiTrack('visibility', { state: document.visibilityState });
+});
+
+// Track link clicks on external URLs
+document.addEventListener('click', function(e) {
+  var a = e.target.closest('a[href^="http"]');
+  if (a && a.hostname !== location.hostname) {
+    _aiTrack('external_link', { url: a.href, text: (a.textContent||'').substring(0,60) });
+  }
+}, true);
+
+// Console helper: type _aiReport() in browser console to see all events
+window._aiReport = function() {
+  var events;
+  try { events = JSON.parse(localStorage.getItem('_ai_events') || '[]'); } catch(e) { events = _aiq; }
+  console.table(events.map(function(e) {
+    return { event: e.e, time: new Date(e.t).toLocaleTimeString(), data: JSON.stringify(e.d).substring(0,100) };
+  }));
+  // Summary
+  var tabs = {};
+  var entities = {};
+  var copies = 0;
+  for (var i=0; i<events.length; i++) {
+    if (events[i].e === 'tab_enter') tabs[events[i].d.tab] = (tabs[events[i].d.tab]||0) + 1;
+    if (events[i].e === 'entity_view') entities[events[i].d.name] = (entities[events[i].d.name]||0) + 1;
+    if (events[i].e === 'copy_talking_point') copies++;
+  }
+  console.log('\n📊 SUMMARY:');
+  console.log('Total events:', events.length);
+  console.log('Session duration:', events.length > 1 ? Math.round((events[events.length-1].t - events[0].t)/1000) + 's' : 'n/a');
+  console.log('Tab visits:', tabs);
+  console.log('Entity views:', entities);
+  console.log('Talking points copied:', copies);
+  return events;
+};
 }
 
 // =====================================================
