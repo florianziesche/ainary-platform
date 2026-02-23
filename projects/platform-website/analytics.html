@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Analytics — Ainary Intelligence</title>
+<style>
+:root{--bg:#0d1117;--surface:#161b22;--surface2:#1c2128;--border:#30363d;--text:#e6edf3;--text2:#8b949e;--muted:#484f58;--accent:#d4a847;--red:#f85149;--green:#3fb950;--amber:#d29922;--blue:#58a6ff;--purple:#bc8cff;--f:system-ui,-apple-system,sans-serif;--m:'SF Mono',Consolas,monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font:400 13px var(--f);min-height:100vh}
+.header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.header h1{font:600 14px var(--m);letter-spacing:.1em;color:var(--accent)}
+.header .meta{font:400 11px var(--f);color:var(--text2)}
+.refresh{font:500 11px var(--m);padding:6px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text);cursor:pointer}
+.refresh:hover{border-color:var(--accent)}
+.main{max-width:1200px;margin:0 auto;padding:20px 24px}
+.kpi-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:24px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:14px;text-align:center}
+.kpi .val{font:700 24px var(--m);color:var(--text)}
+.kpi .label{font:400 9px var(--m);color:var(--text2);margin-top:4px;letter-spacing:.08em;text-transform:uppercase}
+.session-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:18px;margin-bottom:16px}
+.session-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.session-user{font:600 15px var(--f);color:var(--text)}
+.session-meta{font:400 11px var(--f);color:var(--text2)}
+.session-duration{font:700 18px var(--m);color:var(--accent);text-align:right}
+.session-time{font:400 10px var(--m);color:var(--text2)}
+.section-title{font:600 9px var(--m);color:var(--text2);letter-spacing:.1em;text-transform:uppercase;margin:14px 0 8px}
+.journey{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.journey .step{font:500 10px var(--m);padding:3px 8px;border-radius:3px;background:var(--surface2);color:var(--text2)}
+.journey .step.strategy{background:#d4a84720;color:var(--accent)}
+.journey .step.entity{background:#58a6ff20;color:var(--blue)}
+.journey .step.action{background:#3fb95020;color:var(--green)}
+.journey .step.support{background:#bc8cff20;color:var(--purple)}
+.journey .arrow{color:var(--muted);font-size:9px}
+.scroll-bars{display:flex;gap:12px;flex-wrap:wrap}
+.scroll-bar{width:80px}
+.scroll-bar .bar-bg{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.scroll-bar .bar-fill{height:100%;border-radius:3px}
+.scroll-bar .bar-label{font:400 9px var(--m);color:var(--text2);margin-top:3px;display:flex;justify-content:space-between}
+.entity-chips{display:flex;gap:4px;flex-wrap:wrap}
+.entity-chip{font:500 10px var(--m);padding:3px 8px;border-radius:3px;background:var(--blue)15;color:var(--blue);border:1px solid var(--blue)30}
+.tp-badge{font:600 11px var(--m);color:var(--green);padding:4px 10px;background:var(--green)15;border-radius:4px;display:inline-block}
+.event-timeline{max-height:300px;overflow-y:auto;border:1px solid var(--border);border-radius:4px;margin-top:8px}
+.event-row{display:flex;gap:10px;padding:5px 10px;border-bottom:1px solid var(--border);font:400 10px var(--m)}
+.event-row:hover{background:var(--surface2)}
+.event-row .time{color:var(--text2);min-width:60px}
+.event-row .type{min-width:110px;font-weight:600}
+.event-row .type.tab_enter,.event-row .type.tab_leave{color:var(--blue)}
+.event-row .type.entity_view{color:var(--accent)}
+.event-row .type.copy_talking_point{color:var(--green)}
+.event-row .type.support_message{color:var(--purple)}
+.event-row .type.visibility{color:var(--muted)}
+.event-row .detail{color:var(--text2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.empty{text-align:center;padding:60px;color:var(--text2);font:400 13px var(--f)}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.tabs-heatmap{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.tab-heat{text-align:center;padding:10px;border-radius:4px;border:1px solid var(--border)}
+.tab-heat .name{font:500 10px var(--m);color:var(--text2);margin-top:4px}
+.tab-heat .time{font:700 14px var(--m)}
+.tab-heat .visits{font:400 9px var(--m);color:var(--text2)}
+.no-auth{display:flex;align-items:center;justify-content:center;min-height:80vh}
+.auth-box{text-align:center;max-width:300px}
+.auth-box input{width:100%;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--text);font:400 12px var(--m);text-align:center;margin:12px 0}
+.auth-box button{font:600 11px var(--m);padding:8px 20px;background:var(--accent);color:#000;border:none;border-radius:4px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div id="auth-screen" class="no-auth">
+<div class="auth-box">
+<div style="font:600 10px var(--m);letter-spacing:.12em;color:var(--accent);margin-bottom:4px">ANALYTICS</div>
+<div style="font:400 11px var(--f);color:var(--text2);margin-bottom:16px">Ainary Intelligence — Event Dashboard</div>
+<input type="password" id="auth-key" placeholder="API Key" onkeydown="if(event.key==='Enter')doAuth()">
+<button onclick="doAuth()">UNLOCK</button>
+</div>
+</div>
+
+<div id="dashboard" style="display:none">
+<div class="header">
+<div>
+<h1>AINARY ANALYTICS</h1>
+<div class="meta" id="header-meta">Lade...</div>
+</div>
+<div style="display:flex;gap:8px;align-items:center">
+<span class="live-dot"></span>
+<span style="font:500 10px var(--m);color:var(--green)">LIVE</span>
+<button class="refresh" onclick="loadData()">↻ Refresh</button>
+<button class="refresh" onclick="autoRefresh()">Auto 30s</button>
+</div>
+</div>
+<div class="main" id="main-content"></div>
+</div>
+
+<script>
+var API = 'https://ainaryventures.com/api/track';
+var KEY = '';
+var autoTimer = null;
+
+function doAuth() {
+  KEY = document.getElementById('auth-key').value.trim();
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display = '';
+  loadData();
+}
+
+// Allow key in URL: ?key=xxx
+(function(){
+  var p = new URLSearchParams(location.search);
+  if (p.get('key')) { KEY = p.get('key'); doAuth(); }
+})();
+
+function autoRefresh() {
+  if (autoTimer) { clearInterval(autoTimer); autoTimer = null; return; }
+  autoTimer = setInterval(loadData, 30000);
+}
+
+function loadData() {
+  fetch(API + '?key=' + KEY + '&format=raw')
+    .then(function(r) { return r.json(); })
+    .then(render)
+    .catch(function(e) { document.getElementById('main-content').innerHTML = '<div class="empty">Error: '+e.message+'</div>'; });
+}
+
+function render(data) {
+  var events = (data.events || []).filter(function(e) { return e.e !== 'init' && e.e !== 'test_persistent'; });
+  
+  // Group sessions
+  var sessions = {};
+  for (var i=0; i<events.length; i++) {
+    var ev = events[i];
+    var sid = ev.s || 'unknown';
+    if (!sessions[sid]) sessions[sid] = { events: [], user: ev.u, start: ev.ts, ip: ev.ip, ua: ev.ua };
+    sessions[sid].events.push(ev);
+  }
+  
+  // Global stats
+  var totalSessions = Object.keys(sessions).length;
+  var totalTabs = 0, totalEntities = 0, totalCopies = 0, totalSupport = 0;
+  for (var sid in sessions) {
+    var s = sessions[sid];
+    for (var j=0; j<s.events.length; j++) {
+      if (s.events[j].e === 'tab_enter') totalTabs++;
+      if (s.events[j].e === 'entity_view') totalEntities++;
+      if (s.events[j].e === 'copy_talking_point') totalCopies++;
+      if (s.events[j].e === 'support_message') totalSupport++;
+    }
+  }
+  
+  document.getElementById('header-meta').textContent = events.length + ' Events · ' + totalSessions + ' Sessions · Letztes Update: ' + new Date().toLocaleTimeString('de-DE');
+  
+  var h = '';
+  
+  // KPIs
+  h += '<div class="kpi-grid">';
+  h += kpi(totalSessions, 'Sessions', '--blue');
+  h += kpi(events.length, 'Events', '--text');
+  h += kpi(totalTabs, 'Tab-Wechsel', '--accent');
+  h += kpi(totalEntities, 'Entity-Views', '--blue');
+  h += kpi(totalCopies, 'TP Kopiert', totalCopies > 0 ? '--green' : '--muted');
+  h += kpi(totalSupport, 'Support-Msgs', totalSupport > 0 ? '--purple' : '--muted');
+  h += '</div>';
+  
+  // Sessions (newest first)
+  var sids = Object.keys(sessions).sort(function(a,b) { return (sessions[b].start||0) - (sessions[a].start||0); });
+  
+  for (var si=0; si<sids.length; si++) {
+    var s = sessions[sids[si]];
+    var evts = s.events;
+    
+    // Stats
+    var tabs = {}, tabDurations = {}, entities = [], copies = [], news = [], scrollMax = {}, supportMsgs = [];
+    var duration = 0;
+    var authEvt = null;
+    
+    for (var j=0; j<evts.length; j++) {
+      var e = evts[j];
+      if (e.e === 'auth') authEvt = e;
+      if (e.e === 'tab_enter') tabs[e.d.tab] = (tabs[e.d.tab]||0) + 1;
+      if (e.e === 'tab_leave') {
+        tabDurations[e.d.tab] = (tabDurations[e.d.tab]||0) + (e.d.duration_ms||0);
+        if (e.d.scroll_max > (scrollMax[e.d.tab]||0)) scrollMax[e.d.tab] = e.d.scroll_max;
+      }
+      if (e.e === 'entity_view') entities.push(e.d);
+      if (e.e === 'copy_talking_point') copies.push(e.d);
+      if (e.e === 'news_detail') news.push(e.d);
+      if (e.e === 'support_message') supportMsgs.push(e.d.text);
+      if (e.e === 'session_end') duration = e.d.duration_ms;
+    }
+    if (!duration && evts.length > 1) duration = evts[evts.length-1].ts - evts[0].ts;
+    var durStr = duration > 60000 ? Math.round(duration/60000)+'m '+Math.round((duration%60000)/1000)+'s' : Math.round(duration/1000)+'s';
+    
+    // Device
+    var device = '?';
+    if (s.ua) {
+      if (s.ua.includes('iPhone')) device = '📱 iPhone';
+      else if (s.ua.includes('iPad')) device = '📱 iPad';
+      else if (s.ua.includes('Android')) device = '📱 Android';
+      else if (s.ua.includes('Macintosh')) device = '💻 Mac';
+      else if (s.ua.includes('Windows')) device = '💻 Windows';
+      else if (s.ua.includes('Linux')) device = '💻 Linux';
+      else if (s.ua.includes('curl')) device = '🔧 curl';
+    }
+    
+    var screen = authEvt && authEvt.d && authEvt.d.screen ? authEvt.d.screen : '';
+    
+    h += '<div class="session-card">';
+    
+    // Header
+    h += '<div class="session-header">';
+    h += '<div><div class="session-user">'+(s.user||'Unbekannt')+'</div>';
+    h += '<div class="session-meta">'+device+(screen?' · '+screen:'')+' · '+(s.ip||'?')+'</div></div>';
+    h += '<div><div class="session-duration">'+durStr+'</div>';
+    h += '<div class="session-time">'+new Date(s.start).toLocaleString('de-DE')+'</div></div>';
+    h += '</div>';
+    
+    // Tab Heatmap
+    h += '<div class="section-title">Verweildauer pro Tab</div>';
+    h += '<div class="tabs-heatmap">';
+    var tabList = ['briefing','entity','graph','compare','strategy'];
+    var tabNames = {briefing:'Briefing',entity:'Dossier',graph:'Netzwerk',compare:'Vergleich',strategy:'Strategie'};
+    var maxDur = 0;
+    for (var t in tabDurations) if (tabDurations[t] > maxDur) maxDur = tabDurations[t];
+    for (var ti=0; ti<tabList.length; ti++) {
+      var tn = tabList[ti];
+      var dur = tabDurations[tn] || 0;
+      var vis = tabs[tn] || 0;
+      var pct = maxDur > 0 ? dur/maxDur : 0;
+      var col = dur === 0 ? 'var(--muted)' : pct > 0.6 ? 'var(--green)' : pct > 0.3 ? 'var(--amber)' : 'var(--text2)';
+      h += '<div class="tab-heat" style="background:'+(dur>0?col+'10':'var(--surface2)')+'">';
+      h += '<div class="time" style="color:'+col+'">'+(dur > 60000 ? Math.round(dur/60000)+'m' : dur > 0 ? Math.round(dur/1000)+'s' : '—')+'</div>';
+      h += '<div class="name">'+tabNames[tn]+'</div>';
+      h += '<div class="visits">'+(vis > 0 ? vis+'× besucht' : 'nicht besucht')+'</div>';
+      h += '</div>';
+    }
+    h += '</div>';
+    
+    // Journey
+    h += '<div class="section-title">User Journey</div>';
+    h += '<div class="journey">';
+    for (var j2=0; j2<evts.length; j2++) {
+      var e = evts[j2];
+      if (e.e === 'tab_enter') {
+        var cls = e.d.tab === 'strategy' ? 'strategy' : '';
+        h += '<span class="step '+cls+'">'+(tabNames[e.d.tab]||e.d.tab)+'</span><span class="arrow">→</span>';
+      }
+      if (e.e === 'entity_view') {
+        h += '<span class="step entity">'+(e.d.name||e.d.entity)+'</span><span class="arrow">→</span>';
+      }
+      if (e.e === 'copy_talking_point') {
+        h += '<span class="step action">📋 TP kopiert</span><span class="arrow">→</span>';
+      }
+      if (e.e === 'support_message') {
+        h += '<span class="step support">💬 Support</span><span class="arrow">→</span>';
+      }
+      if (e.e === 'news_detail') {
+        h += '<span class="step">📰 '+(e.d.title||'').substring(0,25)+'</span><span class="arrow">→</span>';
+      }
+    }
+    h += '</div>';
+    
+    // Scroll depth
+    if (Object.keys(scrollMax).length > 0) {
+      h += '<div class="section-title">Scroll-Tiefe</div>';
+      h += '<div class="scroll-bars">';
+      for (var st in scrollMax) {
+        var sp = scrollMax[st] || 0;
+        var sc = sp > 75 ? 'var(--green)' : sp > 40 ? 'var(--amber)' : 'var(--red)';
+        h += '<div class="scroll-bar">';
+        h += '<div class="bar-bg"><div class="bar-fill" style="width:'+sp+'%;background:'+sc+'"></div></div>';
+        h += '<div class="bar-label"><span>'+(tabNames[st]||st)+'</span><span style="color:'+sc+'">'+sp+'%</span></div>';
+        h += '</div>';
+      }
+      h += '</div>';
+    }
+    
+    // Entities
+    if (entities.length > 0) {
+      h += '<div class="section-title">Angesehene Personen</div>';
+      h += '<div class="entity-chips">';
+      var uniq = {};
+      for (var ei=0; ei<entities.length; ei++) {
+        var en = entities[ei].name || entities[ei].entity;
+        uniq[en] = (uniq[en]||0) + 1;
+      }
+      for (var en in uniq) {
+        h += '<span class="entity-chip">'+en+' ×'+uniq[en]+'</span>';
+      }
+      h += '</div>';
+    }
+    
+    // Talking Points
+    if (copies.length > 0) {
+      h += '<div class="section-title" style="color:var(--green)">✓ Talking Points kopiert</div>';
+      for (var ci=0; ci<copies.length; ci++) {
+        h += '<div class="tp-badge">"'+(copies[ci].text||'').substring(0,60)+'..."</div> ';
+      }
+    }
+    
+    // News
+    if (news.length > 0) {
+      h += '<div class="section-title">Geöffnete Artikel</div>';
+      for (var ni=0; ni<news.length; ni++) {
+        h += '<div style="font:400 11px var(--f);color:var(--text2);padding:3px 0">📰 '+(news[ni].title||'')+' <span style="color:var(--muted)">('+(news[ni].source||'')+')</span></div>';
+      }
+    }
+    
+    // Support
+    if (supportMsgs.length > 0) {
+      h += '<div class="section-title" style="color:var(--purple)">Support-Nachrichten</div>';
+      for (var sm=0; sm<supportMsgs.length; sm++) {
+        h += '<div style="font:400 11px var(--f);color:var(--text);padding:6px 10px;background:var(--purple)10;border-radius:4px;margin-bottom:4px;border-left:3px solid var(--purple)">"'+supportMsgs[sm]+'"</div>';
+      }
+    }
+    
+    // Full event log
+    h += '<details style="margin-top:12px"><summary style="font:500 10px var(--m);color:var(--muted);cursor:pointer">Alle '+evts.length+' Events anzeigen</summary>';
+    h += '<div class="event-timeline">';
+    for (var j4=0; j4<evts.length; j4++) {
+      var ev = evts[j4];
+      var time = new Date(ev.ts).toLocaleTimeString('de-DE');
+      h += '<div class="event-row">';
+      h += '<span class="time">'+time+'</span>';
+      h += '<span class="type '+ev.e+'">'+ev.e+'</span>';
+      h += '<span class="detail">'+JSON.stringify(ev.d||{}).substring(0,120)+'</span>';
+      h += '</div>';
+    }
+    h += '</div></details>';
+    
+    h += '</div>'; // session card
+  }
+  
+  if (sids.length === 0) {
+    h += '<div class="empty">Noch keine Besucher. Warte auf den ersten Login.</div>';
+  }
+  
+  document.getElementById('main-content').innerHTML = h;
+}
+
+function kpi(val, label, color) {
+  return '<div class="kpi"><div class="val" style="color:var('+color+')">'+val+'</div><div class="label">'+label+'</div></div>';
+}
+</script>
+</body>
+</html>
