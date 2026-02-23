@@ -354,5 +354,36 @@
       }
     });
   </script>
+<script>
+// Pre-fill form from URL params (used by Gotham support)
+(function(){
+  var p = new URLSearchParams(window.location.search);
+  if (p.has('name')) document.getElementById('name').value = decodeURIComponent(p.get('name'));
+  if (p.has('email')) document.getElementById('email').value = decodeURIComponent(p.get('email'));
+  if (p.has('message')) document.getElementById('message').value = decodeURIComponent(p.get('message'));
+  if (p.has('topic')) {
+    var topicEl = document.getElementById('topic');
+    var topicVal = decodeURIComponent(p.get('topic'));
+    // Try to match existing option, otherwise add custom one
+    var matched = false;
+    for (var i=0; i<topicEl.options.length; i++) {
+      if (topicEl.options[i].value === topicVal || topicEl.options[i].text === topicVal) {
+        topicEl.selectedIndex = i; matched = true; break;
+      }
+    }
+    if (!matched) {
+      var opt = document.createElement('option');
+      opt.value = topicVal; opt.text = topicVal; opt.selected = true;
+      topicEl.appendChild(opt);
+    }
+    // Show form fields (they might be hidden until topic is selected)
+    if (typeof handleTopicChange === 'function') handleTopicChange();
+    var fields = document.getElementById('form-fields');
+    if (fields) fields.style.display = '';
+    var cal = document.getElementById('calendly-section');
+    if (cal) cal.style.display = 'none';
+  }
+})();
+</script>
 </body>
 </html>
