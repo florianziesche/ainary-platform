@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Intel — Ainary</title>
+<style>
+:root{--bg:#0a0b0f;--surface:#12141a;--surface2:#181b23;--border:#252830;--text:#e2e4ea;--text2:#8b8f9e;--muted:#4a4e5c;--accent:#d4a847;--red:#f85149;--green:#3fb950;--amber:#d29922;--blue:#58a6ff;--purple:#bc8cff;--f:system-ui,-apple-system,sans-serif;--m:'SF Mono',Consolas,'JetBrains Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font:400 12px var(--f);min-height:100vh}
+
+/* Auth */
+.auth-screen{position:fixed;inset:0;background:var(--bg);z-index:10000;display:flex;align-items:center;justify-content:center}
+.auth-box{text-align:center;max-width:280px}
+.auth-box input{width:100%;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--text);font:12px var(--m);text-align:center;margin:12px 0;outline:none}
+.auth-box input:focus{border-color:var(--accent)}
+.auth-box button{font:600 10px var(--m);padding:8px 20px;background:var(--accent);color:#000;border:none;border-radius:4px;cursor:pointer;letter-spacing:.05em}
+.auth-error{font:11px var(--f);color:var(--red);height:16px;margin-top:4px}
+
+/* Layout */
+.header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.header h1{font:600 11px var(--m);letter-spacing:.12em;color:var(--accent)}
+.header-right{display:flex;gap:8px;align-items:center}
+.btn{font:500 10px var(--m);padding:5px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:3px;color:var(--text2);cursor:pointer}
+.btn:hover{border-color:var(--accent);color:var(--text)}
+.live{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.main{max-width:1000px;margin:0 auto;padding:20px}
+
+/* Cards */
+.visitor-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;margin-bottom:16px;overflow:hidden}
+.visitor-header{padding:14px 16px;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--border)}
+.visitor-name{font:600 14px var(--f);color:var(--text)}
+.badge{font:600 8px var(--m);padding:2px 6px;border-radius:2px;margin-left:6px;vertical-align:middle}
+.badge-ext{background:var(--green)20;color:var(--green)}
+.badge-you{background:var(--blue)20;color:var(--blue)}
+.badge-hot{background:var(--red)20;color:var(--red)}
+.visitor-meta{font:11px var(--f);color:var(--text2);margin-top:3px;line-height:1.6}
+.visitor-duration{text-align:right}
+.visitor-duration .dur{font:700 20px var(--m);color:var(--accent)}
+.visitor-duration .time{font:11px var(--m);color:var(--text2)}
+
+.visitor-body{padding:16px}
+
+/* Sections */
+.section{font:600 8px var(--m);letter-spacing:.1em;color:var(--text2);text-transform:uppercase;margin:16px 0 8px}
+.section:first-child{margin-top:0}
+
+/* Tab heatmap */
+.tab-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.tab-cell{padding:8px;border-radius:4px;text-align:center;border:1px solid var(--border)}
+.tab-cell .val{font:700 14px var(--m)}
+.tab-cell .name{font:10px var(--m);color:var(--text2);margin-top:2px}
+.tab-cell .visits{font:9px var(--m);color:var(--muted);margin-top:1px}
+
+/* Journey */
+.journey{display:flex;flex-wrap:wrap;gap:3px;align-items:center}
+.j-step{font:500 9px var(--m);padding:2px 7px;border-radius:2px;background:var(--surface2);color:var(--text2)}
+.j-step.entity{background:var(--blue)15;color:var(--blue)}
+.j-step.graph{background:var(--accent)15;color:var(--accent)}
+.j-step.strategy{background:var(--green)15;color:var(--green)}
+.j-step.support{background:var(--purple)15;color:var(--purple)}
+.j-step.copy{background:var(--green)15;color:var(--green)}
+.j-arrow{color:var(--muted);font-size:8px}
+
+/* Insights */
+.insight{font:11px var(--f);padding:7px 10px;border-radius:4px;margin-bottom:5px;border-left:3px solid;line-height:1.4}
+.insight strong{font-weight:600}
+
+/* Scroll bars */
+.scroll-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.scroll-label{font:10px var(--m);color:var(--text2);min-width:70px}
+.scroll-track{flex:1;height:5px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.scroll-fill{height:100%;border-radius:3px}
+.scroll-pct{font:10px var(--m);min-width:30px;text-align:right}
+
+/* Entity chips */
+.entity-chip{font:500 10px var(--m);padding:2px 8px;border-radius:2px;background:var(--blue)12;color:var(--blue);border:1px solid var(--blue)25;display:inline-block;margin:2px}
+
+/* Event log */
+.event-log{max-height:250px;overflow-y:auto;border:1px solid var(--border);border-radius:4px}
+.ev-row{display:flex;gap:8px;padding:4px 8px;border-bottom:1px solid var(--border);font:10px var(--m)}
+.ev-row:hover{background:var(--surface2)}
+.ev-time{color:var(--text2);min-width:55px}
+.ev-type{min-width:90px;font-weight:600}
+.ev-detail{color:var(--text2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* KPI row */
+.kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:10px;text-align:center}
+.kpi .v{font:700 20px var(--m)}
+.kpi .l{font:9px var(--m);color:var(--text2);margin-top:2px;letter-spacing:.06em;text-transform:uppercase}
+
+/* Prognose bar */
+.prognose{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface2);border-radius:4px;margin-top:8px}
+.prognose-bar{display:flex;gap:2px}
+.prognose-bar span{width:14px;height:14px;border-radius:2px}
+.prognose-label{font:11px var(--f);color:var(--text2)}
+</style>
+</head>
+<body>
+
+<div id="auth-screen" class="auth-screen">
+<div class="auth-box">
+<div style="font:600 9px var(--m);letter-spacing:.14em;color:var(--accent)">INTEL</div>
+<div style="font:11px var(--f);color:var(--text2);margin:6px 0 14px">Ainary Visitor Intelligence</div>
+<input type="password" id="auth-key" placeholder="Passwort" onkeydown="if(event.key==='Enter')doAuth()">
+<button onclick="doAuth()">UNLOCK</button>
+<div class="auth-error" id="auth-err"></div>
+</div>
+</div>
+
+<div id="app" style="display:none">
+<div class="header">
+<div>
+<h1>VISITOR INTELLIGENCE</h1>
+<div style="font:10px var(--f);color:var(--text2)" id="h-meta">Lade...</div>
+</div>
+<div class="header-right">
+<span class="live"></span>
+<span style="font:500 9px var(--m);color:var(--green)">LIVE</span>
+<button class="btn" onclick="loadData()">↻ Refresh</button>
+<button class="btn" id="auto-btn" onclick="toggleAuto()">Auto 30s</button>
+</div>
+</div>
+<div class="main" id="content"></div>
+</div>
+
+<script>
+var API='https://ainaryventures.com/api/track';
+var KEY='';
+var autoTimer=null;
+var geoCache={};
+var YOUR_IP='91.2.110.113';
+
+function doAuth(){
+  var k=document.getElementById('auth-key').value.trim();
+  // hash check: intel2026
+  var h=0;for(var i=0;i<k.length;i++){h=((h<<5)-h)+k.charCodeAt(i);h|=0;}
+  if(h===957498498||h===495484632||k==='ainary2026'){
+    KEY='ainary2026';
+    document.getElementById('auth-screen').style.display='none';
+    document.getElementById('app').style.display='';
+    loadData();
+  } else {
+    document.getElementById('auth-err').textContent='Falsches Passwort';
+    setTimeout(function(){document.getElementById('auth-err').textContent=''},2000);
+  }
+}
+// URL key
+(function(){var p=new URLSearchParams(location.search);if(p.get('key')){KEY=p.get('key');document.getElementById('auth-screen').style.display='none';document.getElementById('app').style.display='';loadData();}})();
+
+function toggleAuto(){
+  if(autoTimer){clearInterval(autoTimer);autoTimer=null;document.getElementById('auto-btn').textContent='Auto 30s';return;}
+  autoTimer=setInterval(loadData,30000);
+  document.getElementById('auto-btn').textContent='Auto ■';
+}
+
+function geo(ip,cb){
+  if(geoCache[ip])return cb(geoCache[ip]);
+  fetch('http://ip-api.com/json/'+ip+'?fields=status,city,regionName,country,isp,org,mobile,proxy')
+    .then(function(r){return r.json()})
+    .then(function(d){geoCache[ip]=d;cb(d)})
+    .catch(function(){cb({})});
+}
+
+function loadData(){
+  fetch(API+'?key='+KEY+'&format=raw')
+    .then(function(r){return r.json()})
+    .then(function(data){
+      var evts=(data.events||[]).filter(function(e){return e.e!=='init'&&e.e!=='test_persistent'});
+      var ips={};
+      for(var i=0;i<evts.length;i++)if(evts[i].ip)ips[evts[i].ip]=true;
+      var list=Object.keys(ips),pending=list.length;
+      if(!pending)return render(evts);
+      for(var j=0;j<list.length;j++)geo(list[j],function(){pending--;if(pending<=0)render(evts);});
+    })
+    .catch(function(e){document.getElementById('content').innerHTML='<div style="color:var(--red);padding:40px;text-align:center">'+e.message+'</div>';});
+}
+
+function render(events){
+  // Group sessions by IP (better identification than session ID)
+  var visitors={};
+  for(var i=0;i<events.length;i++){
+    var e=events[i], ip=e.ip||'?';
+    if(!visitors[ip])visitors[ip]={events:[],user:e.u,start:e.ts,ip:ip,ua:e.ua};
+    visitors[ip].events.push(e);
+    if(e.ts<visitors[ip].start)visitors[ip].start=e.ts;
+  }
+  
+  // Global KPIs
+  var totalVisitors=Object.keys(visitors).length;
+  var extVisitors=Object.keys(visitors).filter(function(ip){return ip!==YOUR_IP}).length;
+  var totalEvents=events.length;
+  var totalTabs=events.filter(function(e){return e.e==='tab_enter'}).length;
+  var totalEntities=events.filter(function(e){return e.e==='entity_view'}).length;
+  var totalCopies=events.filter(function(e){return e.e==='copy_talking_point'}).length;
+  
+  document.getElementById('h-meta').textContent=events.length+' Events · '+totalVisitors+' Besucher · '+extVisitors+' extern · '+new Date().toLocaleTimeString('de-DE');
+  
+  var h='';
+  
+  // KPIs
+  h+='<div class="kpi-row">';
+  h+='<div class="kpi"><div class="v" style="color:var(--text)">'+totalVisitors+'</div><div class="l">Besucher</div></div>';
+  h+='<div class="kpi"><div class="v" style="color:var(--green)">'+extVisitors+'</div><div class="l">Extern</div></div>';
+  h+='<div class="kpi"><div class="v" style="color:var(--text2)">'+totalEvents+'</div><div class="l">Events</div></div>';
+  h+='<div class="kpi"><div class="v" style="color:var(--blue)">'+totalTabs+'</div><div class="l">Tab-Wechsel</div></div>';
+  h+='<div class="kpi"><div class="v" style="color:var(--accent)">'+totalEntities+'</div><div class="l">Entity Views</div></div>';
+  h+='<div class="kpi"><div class="v" style="color:'+(totalCopies>0?'var(--green)':'var(--muted)')+'">'+totalCopies+'</div><div class="l">TP Kopiert</div></div>';
+  h+='</div>';
+  
+  // Sort: external visitors first, then by time
+  var vKeys=Object.keys(visitors).sort(function(a,b){
+    var aExt=a!==YOUR_IP?1:0, bExt=b!==YOUR_IP?1:0;
+    if(aExt!==bExt)return bExt-aExt;
+    return visitors[b].start-visitors[a].start;
+  });
+  
+  var tabNames={briefing:'Briefing',entity:'Dossier',graph:'Netzwerk',compare:'Vergleich',strategy:'Strategie'};
+  
+  for(var vi=0;vi<vKeys.length;vi++){
+    var v=visitors[vKeys[vi]];
+    var evts=v.events;
+    var isYou=v.ip===YOUR_IP;
+    var g=geoCache[v.ip]||{};
+    
+    // Stats
+    var tabs={},tabDur={},entities=[],copies=[],news=[],scrollMax={},supportMsgs=[];
+    var duration=0,authEvt=null,authCount=0;
+    
+    for(var j=0;j<evts.length;j++){
+      var e=evts[j];
+      if(e.e==='auth'){authEvt=e;authCount++;}
+      if(e.e==='tab_enter')tabs[e.d.tab]=(tabs[e.d.tab]||0)+1;
+      if(e.e==='tab_leave'){tabDur[e.d.tab]=(tabDur[e.d.tab]||0)+(e.d.duration_ms||0);if(e.d.scroll_max>(scrollMax[e.d.tab]||0))scrollMax[e.d.tab]=e.d.scroll_max;}
+      if(e.e==='entity_view')entities.push(e.d);
+      if(e.e==='copy_talking_point')copies.push(e.d);
+      if(e.e==='news_detail')news.push(e.d);
+      if(e.e==='support_message')supportMsgs.push(e.d.text);
+      if(e.e==='session_end')duration=e.d.duration_ms;
+    }
+    if(!duration&&evts.length>1)duration=evts[evts.length-1].ts-evts[0].ts;
+    var durStr=duration>60000?Math.round(duration/60000)+'m '+Math.round((duration%60000)/1000)+'s':Math.round(duration/1000)+'s';
+    
+    // Device
+    var device='Unbekannt';
+    if(v.ua){
+      if(v.ua.includes('iPhone'))device='📱 iPhone';
+      else if(v.ua.includes('Android'))device='📱 Android';
+      else if(v.ua.includes('Macintosh'))device='💻 Mac';
+      else if(v.ua.includes('Windows'))device='💻 Windows';
+    }
+    var screen=authEvt&&authEvt.d&&authEvt.d.screen?authEvt.d.screen:'';
+    var loc=g.city?(g.city+(g.regionName?', '+g.regionName:'')):'';
+    var isp=g.org||g.isp||'';
+    
+    // Interest score
+    var score=0;
+    score+=Math.min(duration/60000*2,10); // max 10 for 5min
+    score+=Object.keys(tabs).length*2; // 2 per tab
+    score+=entities.length*3; // 3 per entity
+    score+=copies.length*10; // 10 per copy
+    score+=supportMsgs.length*8; // 8 per support msg
+    var scoreLabel=score>=15?'🔥 Heiß':score>=8?'🟢 Warm':score>=3?'🟡 Mittel':'⚪ Kalt';
+    var scoreColor=score>=15?'var(--red)':score>=8?'var(--green)':score>=3?'var(--amber)':'var(--muted)';
+    
+    h+='<div class="visitor-card">';
+    
+    // Header
+    h+='<div class="visitor-header">';
+    h+='<div>';
+    h+='<div class="visitor-name">'+(v.user||'Unbekannt');
+    h+=isYou?'<span class="badge badge-you">DU</span>':'<span class="badge badge-ext">EXTERN</span>';
+    if(score>=15)h+='<span class="badge badge-hot">HOT</span>';
+    h+='</div>';
+    h+='<div class="visitor-meta">'+device+(screen?' · '+screen:'')+(g.mobile?' · 📶 Mobil':'')+(g.proxy?' · ⚠️ VPN':'')+'</div>';
+    if(loc)h+='<div class="visitor-meta">📍 '+loc+(isp?' · '+isp:'')+'</div>';
+    h+='<div class="visitor-meta" style="font-family:var(--m);font-size:10px">IP: '+v.ip+'</div>';
+    h+='</div>';
+    h+='<div class="visitor-duration"><div class="dur">'+durStr+'</div><div class="time">'+new Date(v.start).toLocaleString('de-DE')+'</div></div>';
+    h+='</div>';
+    
+    h+='<div class="visitor-body">';
+    
+    // Interest Score
+    h+='<div class="prognose">';
+    h+='<div class="prognose-bar">';
+    for(var si=0;si<5;si++){
+      var fill=score>=(si+1)*3?scoreColor:'var(--surface2)';
+      h+='<span style="background:'+fill+'"></span>';
+    }
+    h+='</div>';
+    h+='<div class="prognose-label"><strong style="color:'+scoreColor+'">'+scoreLabel+'</strong> — Interest Score: '+Math.round(score)+'/25</div>';
+    h+='</div>';
+    
+    // Tab Heatmap
+    h+='<div class="section">Verweildauer pro Tab</div>';
+    h+='<div class="tab-grid">';
+    var allTabs=['briefing','entity','graph','compare','strategy'];
+    var maxTD=0;for(var t in tabDur)if(tabDur[t]>maxTD)maxTD=tabDur[t];
+    for(var ti=0;ti<allTabs.length;ti++){
+      var tn=allTabs[ti],dur2=tabDur[tn]||0,vis=tabs[tn]||0;
+      var pct=maxTD>0?dur2/maxTD:0;
+      var col=dur2===0?'var(--muted)':pct>0.6?'var(--green)':pct>0.3?'var(--amber)':'var(--text2)';
+      h+='<div class="tab-cell" style="background:'+(dur2>0?col+'08':'var(--surface2)')+'">';
+      h+='<div class="val" style="color:'+col+'">'+(dur2>60000?Math.round(dur2/60000)+'m':dur2>0?Math.round(dur2/1000)+'s':'—')+'</div>';
+      h+='<div class="name">'+tabNames[tn]+'</div>';
+      h+='<div class="visits">'+(vis>0?vis+'×':'—')+'</div>';
+      h+='</div>';
+    }
+    h+='</div>';
+    
+    // Journey
+    h+='<div class="section">Journey</div>';
+    h+='<div class="journey">';
+    for(var j2=0;j2<evts.length;j2++){
+      var e=evts[j2];
+      if(e.e==='tab_enter'){h+='<span class="j-step '+(e.d.tab||'')+'">'+(tabNames[e.d.tab]||e.d.tab)+'</span><span class="j-arrow">→</span>';}
+      if(e.e==='entity_view'){h+='<span class="j-step entity">👤 '+(e.d.name||e.d.entity)+'</span><span class="j-arrow">→</span>';}
+      if(e.e==='copy_talking_point'){h+='<span class="j-step copy">📋 TP</span><span class="j-arrow">→</span>';}
+      if(e.e==='support_message'){h+='<span class="j-step support">💬</span><span class="j-arrow">→</span>';}
+    }
+    h+='</div>';
+    
+    // Scroll Depth
+    if(Object.keys(scrollMax).length>0){
+      h+='<div class="section">Scroll-Tiefe</div>';
+      for(var st in scrollMax){
+        var sp=scrollMax[st]||0;
+        var sc=sp>75?'var(--green)':sp>40?'var(--amber)':'var(--red)';
+        h+='<div class="scroll-row"><span class="scroll-label">'+tabNames[st]+'</span><div class="scroll-track"><div class="scroll-fill" style="width:'+sp+'%;background:'+sc+'"></div></div><span class="scroll-pct" style="color:'+sc+'">'+sp+'%</span></div>';
+      }
+    }
+    
+    // Entities
+    if(entities.length>0){
+      h+='<div class="section">Personen angesehen</div>';
+      var uniqE={};for(var ei=0;ei<entities.length;ei++){var en=entities[ei].name||entities[ei].entity;uniqE[en]=(uniqE[en]||0)+1;}
+      for(var en in uniqE)h+='<span class="entity-chip">'+en+' ×'+uniqE[en]+'</span>';
+    }
+    
+    // Copies
+    if(copies.length>0){
+      h+='<div class="section" style="color:var(--green)">✓ Talking Points kopiert</div>';
+      for(var ci=0;ci<copies.length;ci++){
+        h+='<div style="font:11px var(--f);color:var(--text2);padding:4px 0;border-bottom:1px solid var(--border)">"'+(copies[ci].text||'').substring(0,80)+'..."</div>';
+      }
+    }
+    
+    // Support
+    if(supportMsgs.length>0){
+      h+='<div class="section" style="color:var(--purple)">Support-Nachrichten</div>';
+      for(var sm=0;sm<supportMsgs.length;sm++){
+        h+='<div style="font:11px var(--f);color:var(--text);padding:6px 10px;background:var(--purple)10;border-radius:4px;margin-bottom:4px;border-left:3px solid var(--purple)">"'+supportMsgs[sm]+'"</div>';
+      }
+    }
+    
+    // Auto-Insights
+    h+='<div class="section" style="color:var(--accent)">🧠 Insights</div>';
+    
+    if(duration>180000)h+='<div class="insight" style="border-color:var(--green);background:var(--green)08;color:var(--green)">🟢 <strong>Hohe Verweildauer</strong> ('+durStr+') — ernsthaftes Interesse</div>';
+    else if(duration>60000)h+='<div class="insight" style="border-color:var(--amber);background:var(--amber)08;color:var(--amber)">🟡 <strong>Moderate Verweildauer</strong> ('+durStr+') — hat sich umgeschaut</div>';
+    else if(duration>0)h+='<div class="insight" style="border-color:var(--muted);background:var(--surface2);color:var(--text2)">⚪ <strong>Kurzer Besuch</strong> ('+durStr+') — erster Eindruck</div>';
+    
+    var maxTab='',maxD=0;for(var mt in tabDur)if(tabDur[mt]>maxD){maxD=tabDur[mt];maxTab=mt;}
+    if(maxTab)h+='<div class="insight" style="border-color:var(--blue);background:var(--blue)08;color:var(--blue)">📊 <strong>Fokus: '+(tabNames[maxTab]||maxTab)+'</strong> ('+(maxD>60000?Math.round(maxD/60000)+'m ':'')+Math.round((maxD%60000)/1000)+'s) — das interessiert am meisten</div>';
+    
+    if(copies.length>0)h+='<div class="insight" style="border-color:var(--green);background:var(--green)08;color:var(--green)">✅ <strong>'+copies.length+' Talking Points kopiert</strong> — nutzt das Produkt OPERATIV</div>';
+    if(supportMsgs.length>0)h+='<div class="insight" style="border-color:var(--purple);background:var(--purple)08;color:var(--purple)">💬 <strong>'+supportMsgs.length+' Support-Nachricht(en)</strong> — SOFORT antworten!</div>';
+    if(authCount>1)h+='<div class="insight" style="border-color:var(--green);background:var(--green)08;color:var(--green)">🔄 <strong>'+authCount+'× eingeloggt</strong> — kam zurück oder hat Seite neu geladen</div>';
+    if(v.ua&&(v.ua.includes('Android')||v.ua.includes('iPhone')))h+='<div class="insight" style="border-color:var(--muted);background:var(--surface2);color:var(--text2)">📱 <strong>Mobil</strong> — unterwegs/Couch. Desktop-Besuch = höheres Interesse</div>';
+    if(!isYou&&loc)h+='<div class="insight" style="border-color:var(--accent);background:var(--accent)08;color:var(--accent)">🌍 <strong>Externer Besucher</strong> aus '+loc+'</div>';
+    
+    // Next step recommendation
+    h+='<div class="section">Empfohlene Aktion</div>';
+    if(copies.length>0){
+      h+='<div class="insight" style="border-color:var(--green);background:var(--green)12;color:var(--green)">🎯 <strong>ANRUFEN.</strong> Er nutzt das Produkt bereits operativ. Conversion-Chance hoch.</div>';
+    } else if(supportMsgs.length>0){
+      h+='<div class="insight" style="border-color:var(--purple);background:var(--purple)12;color:var(--purple)">💬 <strong>Support beantworten.</strong> Innerhalb von 2h. Zeigt Professionalität.</div>';
+    } else if(duration>120000){
+      h+='<div class="insight" style="border-color:var(--accent);background:var(--accent)12;color:var(--accent)">📞 <strong>Follow-up senden.</strong> Hohes Interesse, braucht einen Nudge.</div>';
+    } else if(!isYou&&duration>0){
+      h+='<div class="insight" style="border-color:var(--text2);background:var(--surface2);color:var(--text2)">⏳ <strong>Abwarten.</strong> Erster Eindruck, Ball liegt bei ihm. Wenn kein Response in 48h → Follow-up.</div>';
+    }
+    
+    // Event log
+    h+='<details style="margin-top:12px"><summary style="font:500 9px var(--m);color:var(--muted);cursor:pointer">Alle '+evts.length+' Events</summary>';
+    h+='<div class="event-log">';
+    for(var j4=0;j4<evts.length;j4++){
+      var ev=evts[j4];
+      var time=new Date(ev.ts).toLocaleTimeString('de-DE');
+      h+='<div class="ev-row"><span class="ev-time">'+time+'</span><span class="ev-type" style="color:'+(
+        ev.e==='auth'?'var(--accent)':ev.e.includes('tab')?'var(--blue)':ev.e==='entity_view'?'var(--accent)':ev.e==='copy_talking_point'?'var(--green)':ev.e==='support_message'?'var(--purple)':'var(--text2)'
+      )+'">'+ev.e+'</span><span class="ev-detail">'+JSON.stringify(ev.d||{}).substring(0,100)+'</span></div>';
+    }
+    h+='</div></details>';
+    
+    h+='</div></div>'; // body + card
+  }
+  
+  if(vKeys.length===0)h+='<div style="text-align:center;padding:60px;color:var(--text2)">Noch keine Besucher.</div>';
+  
+  document.getElementById('content').innerHTML=h;
+}
+</script>
+</body>
+</html>
