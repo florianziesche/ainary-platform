@@ -358,11 +358,13 @@ setTimeout(function(){document.getElementById('auth-input').focus()},100);
       <div class="tab" data-view="graph" onclick="switchView('graph')">Netzwerk</div>
       <div class="tab" data-view="compare" onclick="switchView('compare')">Vergleich</div>
       <div class="tab" data-view="strategy" onclick="switchView('strategy')">Strategie</div>
+      <div class="tab" data-view="analytics" onclick="switchView('analytics')" id="analytics-tab" style="display:none">Analytics</div>
     </div>
 
     <div id="briefing-view" class="canvas"></div>
     <div id="entity-view" class="canvas" style="display:none"></div>
     <div id="graph-view"><div class="tooltip" id="graph-tooltip"></div></div>
+    <div id="analytics-view" class="canvas" style="display:none"></div>
     <div id="compare-view" class="canvas" style="display:none"></div>
     <div id="strategy-view" class="canvas" style="display:none"></div>
   </div>
@@ -623,9 +625,9 @@ function sortTopic(idx, by) {
 function switchView(view) {
   currentView = view;
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === view));
-  const views = ['briefing','entity','graph','compare','strategy'];
-  views.forEach(v => {
-    const el = document.getElementById(v + '-view');
+  var views = ['briefing','entity','graph','compare','strategy','analytics'];
+  views.forEach(function(v) {
+    var el = document.getElementById(v + '-view');
     if (el) el.style.display = (v === view) ? (v === 'graph' ? 'block' : '') : 'none';
   });
   if (view === 'briefing') renderBriefing();
@@ -633,6 +635,7 @@ function switchView(view) {
   if (view === 'graph' && !graphInitialized) { renderGraph(); graphInitialized = true; }
   if (view === 'compare') renderCompare();
   if (view === 'strategy') renderStrategy();
+  if (view === 'analytics') renderAnalytics();
 }
 
 // =====================================================
@@ -1856,6 +1859,202 @@ document.getElementById('search-input').addEventListener('input', function() {
 function buildStatusBar() {
   document.getElementById('status-left').innerHTML = Object.keys(KB).length + ' Entities · ' + NEWS.length + ' News · ' + HYPOTHESES.length + ' Hypothesen · ' + PATTERNS.length + ' Patterns';
   document.getElementById('status-right').innerHTML = TENANT.name + ' · v22';
+
+// =====================================================
+// ANALYTICS TAB (admin only: ?admin in URL)
+// =====================================================
+if (location.search.includes('admin')) {
+  document.getElementById('analytics-tab').style.display = '';
+}
+
+function renderAnalytics() {
+  var el = document.getElementById('analytics-view');
+  el.innerHTML = '<div style="padding:20px;font:400 7pt var(--f);color:var(--muted)">Lade Analytics...</div>';
+  
+  var endpoint = _aiEndpoint ? _aiEndpoint.replace('/track','/track') : 'https://ainaryventures.com/api/track';
+  fetch(endpoint + '?key=ainary2026&format=raw')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var events = data.events || [];
+      // Group by session
+      var sessions = {};
+      for (var i=0; i<events.length; i++) {
+        var ev = events[i];
+        var sid = ev.s || 'unknown';
+        if (!sessions[sid]) sessions[sid] = { events: [], user: ev.u, start: ev.ts, ip: ev.ip, ua: ev.ua };
+        sessions[sid].events.push(ev);
+      }
+      
+      var h = '<div style="max-width:900px;margin:0 auto;padding:20px 0">';
+      h += '<div style="font:600 10pt var(--m);color:var(--text);margin-bottom:4px">ANALYTICS</div>';
+      h += '<div style="font:400 6.5pt var(--f);color:var(--muted);margin-bottom:20px">'+events.length+' Events · '+Object.keys(sessions).length+' Sessions · Live-Daten</div>';
+      
+      // Session cards
+      var sKeys = Object.keys(sessions).sort(function(a,b) { return sessions[b].start - sessions[a].start; });
+      for (var si=0; si<sKeys.length; si++) {
+        var s = sessions[sKeys[si]];
+        var evts = s.events;
+        if (evts.length <= 1 && evts[0] && evts[0].e === 'test') continue; // skip test
+        
+        // Compute stats
+        var tabs = {};
+        var entities = [];
+        var copies = 0;
+        var newsClicks = [];
+        var supportMsgs = [];
+        var duration = 0;
+        var authEvt = null;
+        var scrollMax = {};
+        
+        for (var j=0; j<evts.length; j++) {
+          var e = evts[j];
+          if (e.e === 'auth') authEvt = e;
+          if (e.e === 'tab_enter') tabs[e.d.tab] = (tabs[e.d.tab]||0) + 1;
+          if (e.e === 'tab_leave') {
+            if (!scrollMax[e.d.tab] || e.d.scroll_max > scrollMax[e.d.tab]) scrollMax[e.d.tab] = e.d.scroll_max;
+          }
+          if (e.e === 'entity_view') entities.push(e.d.name || e.d.entity);
+          if (e.e === 'copy_talking_point') copies++;
+          if (e.e === 'news_detail') newsClicks.push(e.d.title);
+          if (e.e === 'support_message') supportMsgs.push(e.d.text);
+          if (e.e === 'session_end') duration = e.d.duration_ms;
+        }
+        
+        if (!duration && evts.length > 1) duration = evts[evts.length-1].ts - evts[0].ts;
+        var durStr = duration > 0 ? (duration > 60000 ? Math.round(duration/60000)+'m '+Math.round((duration%60000)/1000)+'s' : Math.round(duration/1000)+'s') : 'aktiv';
+        
+        // Device from UA
+        var device = 'Unbekannt';
+        if (s.ua) {
+          if (s.ua.includes('iPhone')) device = '📱 iPhone';
+          else if (s.ua.includes('iPad')) device = '📱 iPad';
+          else if (s.ua.includes('Android')) device = '📱 Android';
+          else if (s.ua.includes('Macintosh')) device = '💻 Mac';
+          else if (s.ua.includes('Windows')) device = '💻 Windows';
+          else if (s.ua.includes('Linux')) device = '💻 Linux';
+        }
+        
+        // Screen from auth event
+        var screen = authEvt && authEvt.d.screen ? authEvt.d.screen : '';
+        
+        h += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:16px;margin-bottom:12px">';
+        
+        // Header
+        h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">';
+        h += '<div><div style="font:600 8pt var(--m);color:var(--text)">'+(s.user||'Unbekannt')+'</div>';
+        h += '<div style="font:400 6pt var(--m);color:var(--muted)">'+device+(screen?' · '+screen:'')+' · IP: '+(s.ip||'?')+'</div></div>';
+        h += '<div style="text-align:right"><div style="font:600 8pt var(--m);color:var(--accent)">'+durStr+'</div>';
+        h += '<div style="font:400 6pt var(--m);color:var(--muted)">'+new Date(s.start).toLocaleString('de-DE')+'</div></div>';
+        h += '</div>';
+        
+        // KPI row
+        h += '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px">';
+        var kpis = [
+          ['Events', evts.length, 'var(--text)'],
+          ['Tabs', Object.keys(tabs).length+'/5', 'var(--blue)'],
+          ['Entities', entities.length, 'var(--accent)'],
+          ['TP kopiert', copies, copies>0?'var(--green)':'var(--muted)'],
+          ['News', newsClicks.length, 'var(--text)']
+        ];
+        for (var ki=0; ki<kpis.length; ki++) {
+          h += '<div style="text-align:center;padding:8px;background:var(--bg);border-radius:4px">';
+          h += '<div style="font:700 10pt var(--m);color:'+kpis[ki][2]+'">'+kpis[ki][1]+'</div>';
+          h += '<div style="font:400 5pt var(--m);color:var(--muted);margin-top:2px">'+kpis[ki][0]+'</div></div>';
+        }
+        h += '</div>';
+        
+        // Tab journey (visual)
+        h += '<div style="margin-bottom:12px"><div style="font:600 6pt var(--m);color:var(--text2);margin-bottom:6px;letter-spacing:.08em">TAB-JOURNEY</div>';
+        h += '<div style="display:flex;gap:4px;flex-wrap:wrap">';
+        var tabNames = {briefing:'Briefing',entity:'Dossier',graph:'Netzwerk',compare:'Vergleich',strategy:'Strategie'};
+        for (var j2=0; j2<evts.length; j2++) {
+          if (evts[j2].e === 'tab_enter') {
+            var tn = tabNames[evts[j2].d.tab] || evts[j2].d.tab;
+            var tc = evts[j2].d.tab === 'strategy' ? 'var(--accent)' : 'var(--muted)';
+            h += '<span style="font:500 5.5pt var(--m);padding:2px 6px;border-radius:2px;background:'+tc+'15;color:'+tc+'">'+tn+'</span>';
+            h += '<span style="color:var(--muted);font-size:5pt">→</span>';
+          }
+          if (evts[j2].e === 'entity_view') {
+            h += '<span style="font:500 5.5pt var(--m);padding:2px 6px;border-radius:2px;background:var(--accent)15;color:var(--accent)">'+(evts[j2].d.name||evts[j2].d.entity)+'</span>';
+            h += '<span style="color:var(--muted);font-size:5pt">→</span>';
+          }
+        }
+        h += '</div></div>';
+        
+        // Scroll depth per tab
+        if (Object.keys(scrollMax).length > 0) {
+          h += '<div style="margin-bottom:12px"><div style="font:600 6pt var(--m);color:var(--text2);margin-bottom:6px;letter-spacing:.08em">SCROLL-TIEFE</div>';
+          h += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+          for (var st in scrollMax) {
+            var sp = scrollMax[st] || 0;
+            var sc = sp > 75 ? 'var(--green)' : sp > 40 ? 'var(--amber)' : 'var(--red)';
+            h += '<div style="text-align:center"><div style="width:40px;height:40px;border-radius:50%;border:3px solid '+sc+';display:flex;align-items:center;justify-content:center;font:700 7pt var(--m);color:'+sc+'">'+sp+'%</div>';
+            h += '<div style="font:400 5pt var(--m);color:var(--muted);margin-top:2px">'+(tabNames[st]||st)+'</div></div>';
+          }
+          h += '</div></div>';
+        }
+        
+        // Entities viewed
+        if (entities.length > 0) {
+          h += '<div style="margin-bottom:12px"><div style="font:600 6pt var(--m);color:var(--text2);margin-bottom:4px;letter-spacing:.08em">ENTITIES ANGESEHEN</div>';
+          h += '<div style="display:flex;gap:4px;flex-wrap:wrap">';
+          var uniqEnt = entities.filter(function(v,i,a){return a.indexOf(v)===i;});
+          for (var ei=0; ei<uniqEnt.length; ei++) {
+            var cnt = entities.filter(function(x){return x===uniqEnt[ei]}).length;
+            h += '<span style="font:500 6pt var(--m);padding:2px 8px;border-radius:2px;background:var(--accent)15;color:var(--accent)">'+uniqEnt[ei]+' ×'+cnt+'</span>';
+          }
+          h += '</div></div>';
+        }
+        
+        // Talking points copied
+        if (copies > 0) {
+          h += '<div style="margin-bottom:12px"><div style="font:600 6pt var(--m);color:var(--green);letter-spacing:.08em">✓ '+copies+' TALKING POINTS KOPIERT</div>';
+          for (var j3=0; j3<evts.length; j3++) {
+            if (evts[j3].e === 'copy_talking_point') {
+              h += '<div style="font:400 6pt var(--f);color:var(--text2);padding:4px 0;border-bottom:1px solid var(--border)">"'+(evts[j3].d.text||'').substring(0,80)+'..."</div>';
+            }
+          }
+          h += '</div>';
+        }
+        
+        // Support messages
+        if (supportMsgs.length > 0) {
+          h += '<div style="margin-bottom:12px"><div style="font:600 6pt var(--m);color:var(--blue);letter-spacing:.08em">SUPPORT-NACHRICHTEN</div>';
+          for (var sm=0; sm<supportMsgs.length; sm++) {
+            h += '<div style="font:400 6pt var(--f);color:var(--text);padding:6px;background:var(--bg);border-radius:4px;margin-top:4px">"'+supportMsgs[sm]+'"</div>';
+          }
+          h += '</div>';
+        }
+        
+        // Event timeline (collapsed by default)
+        h += '<details style="margin-top:8px"><summary style="font:500 6pt var(--m);color:var(--muted);cursor:pointer;letter-spacing:.06em">ALLE '+evts.length+' EVENTS</summary>';
+        h += '<div style="margin-top:6px;max-height:300px;overflow-y:auto">';
+        for (var j4=0; j4<evts.length; j4++) {
+          var ev2 = evts[j4];
+          var time = new Date(ev2.ts).toLocaleTimeString('de-DE');
+          h += '<div style="font:400 5.5pt var(--m);color:var(--text2);padding:3px 0;border-bottom:1px solid var(--border);display:flex;gap:8px">';
+          h += '<span style="color:var(--muted);min-width:50px">'+time+'</span>';
+          h += '<span style="font-weight:600;min-width:80px">'+ev2.e+'</span>';
+          h += '<span style="color:var(--muted)">'+JSON.stringify(ev2.d||{}).substring(0,100)+'</span>';
+          h += '</div>';
+        }
+        h += '</div></details>';
+        
+        h += '</div>'; // session card end
+      }
+      
+      if (sKeys.length === 0 || (sKeys.length === 1 && sessions[sKeys[0]].events.length <= 1)) {
+        h += '<div style="text-align:center;padding:40px;color:var(--muted);font:400 7pt var(--f)">Noch keine Besucher-Events. Warte auf den ersten Login.</div>';
+      }
+      
+      h += '<div style="text-align:center;margin-top:16px"><button onclick="renderAnalytics()" style="font:500 6pt var(--m);padding:6px 16px;background:var(--surface);border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--text)">↻ Aktualisieren</button></div>';
+      h += '</div>';
+      el.innerHTML = h;
+    })
+    .catch(function(err) {
+      el.innerHTML = '<div style="padding:20px;color:var(--red);font:400 7pt var(--f)">Fehler: '+err.message+'</div>';
+    });
+}
 
 // =====================================================
 // ANALYTICS — Deep Event Tracking
