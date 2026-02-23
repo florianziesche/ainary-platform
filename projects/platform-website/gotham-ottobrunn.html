@@ -317,8 +317,30 @@ document.getElementById('auth-input').style.borderColor='var(--red)';
 setTimeout(function(){document.getElementById('auth-error').style.opacity='0';document.getElementById('auth-input').style.borderColor='var(--border)'},2000);
 }
 }
-// Auto-login if already authenticated this session
-try{if(sessionStorage.getItem('ai-auth')==='1')document.getElementById('auth-gate').style.display='none'}catch(e){}
+// Token-based auth: ?u=TOKEN skips login, identifies user
+// Admin mode: ?admin skips login, shows analytics tab
+(function(){
+  var p = new URLSearchParams(location.search);
+  var token = p.get('u');
+  var isAdmin = p.has('admin');
+  
+  // Token → user mapping (Palantir-style: link = identity)
+  var TOKEN_MAP = {
+    'fs-7x3': { name: 'Florian Schardt', role: 'prospect' },
+    'demo': { name: 'Demo-User', role: 'demo' }
+  };
+  
+  if (token && TOKEN_MAP[token]) {
+    document.getElementById('auth-gate').style.display = 'none';
+    try { sessionStorage.setItem('ai-auth', '1'); sessionStorage.setItem('ai-token', token); } catch(e) {}
+  } else if (isAdmin) {
+    document.getElementById('auth-gate').style.display = 'none';
+    try { sessionStorage.setItem('ai-auth', '1'); sessionStorage.setItem('ai-token', 'admin'); } catch(e) {}
+  } else {
+    // Auto-login if already authenticated this session
+    try { if (sessionStorage.getItem('ai-auth') === '1') document.getElementById('auth-gate').style.display = 'none'; } catch(e) {}
+  }
+})();
 // Auto-focus
 setTimeout(function(){document.getElementById('auth-input').focus()},100);
 </script>
@@ -2076,11 +2098,17 @@ var _aiEndpoint = null; // set via TENANT.analyticsEndpoint or fallback
 try { _aiEndpoint = TENANT.analyticsEndpoint || 'https://ainaryventures.com/api/track'; } catch(e){}
 
 function _aiTrack(evt, data) {
+  // Resolve identity: token > USER.name > unknown
+  var token = '';
+  try { token = sessionStorage.getItem('ai-token') || ''; } catch(e){}
+  var identity = token === 'admin' ? 'Admin (Florian Z.)' : (USER||{}).name || 'unknown';
+  
   var payload = {
     e: evt,
     t: Date.now(),
     s: _ais,
-    u: (USER||{}).name || 'unknown',
+    u: identity,
+    tk: token, // token for reliable identification
     tn: (TENANT||{}).name || 'unknown',
     d: data || {}
   };
@@ -2092,12 +2120,20 @@ function _aiTrack(evt, data) {
   }
 }
 
-// Track auth
+// Track auth (password or token)
+(function(){
+  var token = '';
+  try { token = sessionStorage.getItem('ai-token') || ''; } catch(e){}
+  if (token) {
+    // Token-based login — track immediately
+    _aiTrack('auth', { method: token === 'admin' ? 'admin' : 'token', token: token, ua: navigator.userAgent, screen: screen.width+'x'+screen.height, lang: navigator.language, ref: document.referrer });
+  }
+})();
+
 var _origCheckAuth = checkAuth;
 checkAuth = function() {
   var pw = document.getElementById('auth-input').value.toLowerCase().trim();
   _origCheckAuth();
-  // If gate is now hidden, auth succeeded
   setTimeout(function(){
     if (document.getElementById('auth-gate').style.display === 'none') {
       _aiTrack('auth', { method: 'password', ua: navigator.userAgent, screen: screen.width+'x'+screen.height, lang: navigator.language, ref: document.referrer });
