@@ -116,10 +116,30 @@ function autoRefresh() {
   autoTimer = setInterval(loadData, 30000);
 }
 
+var geoCache = {};
+function geoLookup(ip, cb) {
+  if (geoCache[ip]) return cb(geoCache[ip]);
+  fetch('https://ip-api.com/json/' + ip + '?fields=status,city,regionName,country,isp,org,mobile,proxy')
+    .then(function(r) { return r.json(); })
+    .then(function(d) { geoCache[ip] = d; cb(d); })
+    .catch(function() { cb({}); });
+}
+
 function loadData() {
   fetch(API + '?key=' + KEY + '&format=raw')
     .then(function(r) { return r.json(); })
-    .then(render)
+    .then(function(data) {
+      // Geo-lookup all unique IPs, then render
+      var events = (data.events || []).filter(function(e) { return e.e !== 'init' && e.e !== 'test_persistent'; });
+      var ips = {};
+      for (var i=0; i<events.length; i++) if (events[i].ip) ips[events[i].ip] = true;
+      var ipList = Object.keys(ips);
+      var pending = ipList.length;
+      if (pending === 0) return render(data);
+      for (var j=0; j<ipList.length; j++) {
+        geoLookup(ipList[j], function() { pending--; if (pending <= 0) render(data); });
+      }
+    })
     .catch(function(e) { document.getElementById('main-content').innerHTML = '<div class="empty">Error: '+e.message+'</div>'; });
 }
 
@@ -209,8 +229,23 @@ function render(data) {
     
     // Header
     h += '<div class="session-header">';
-    h += '<div><div class="session-user">'+(s.user||'Unbekannt')+'</div>';
-    h += '<div class="session-meta">'+device+(screen?' · '+screen:'')+' · '+(s.ip||'?')+'</div></div>';
+    // Geo info
+    var geo = geoCache[s.ip] || {};
+    var loc = geo.city ? geo.city + (geo.regionName ? ', '+geo.regionName : '') : '';
+    var isp = geo.org || geo.isp || '';
+    var mobileTag = geo.mobile ? ' · 📶 Mobil' : '';
+    var proxyTag = geo.proxy ? ' · ⚠️ Proxy/VPN' : '';
+    
+    // Identify visitor
+    var visitorLabel = s.user || 'Unbekannt';
+    var visitorBadge = '';
+    if (s.ip === '91.2.110.113') { visitorBadge = '<span style="font:500 8px var(--m);padding:2px 6px;border-radius:2px;background:var(--blue)20;color:var(--blue);margin-left:6px">DU</span>'; }
+    else { visitorBadge = '<span style="font:500 8px var(--m);padding:2px 6px;border-radius:2px;background:var(--green)20;color:var(--green);margin-left:6px">EXTERN</span>'; }
+    
+    h += '<div><div class="session-user">'+visitorLabel+visitorBadge+'</div>';
+    h += '<div class="session-meta">'+device+(screen?' · '+screen:'')+mobileTag+proxyTag+'</div>';
+    if (loc) h += '<div class="session-meta" style="margin-top:2px">📍 '+loc+(isp?' · '+isp:'')+'</div>';
+    h += '<div class="session-meta" style="margin-top:2px;font-family:var(--m)">IP: '+(s.ip||'?')+'</div></div>';
     h += '<div><div class="session-duration">'+durStr+'</div>';
     h += '<div class="session-time">'+new Date(s.start).toLocaleString('de-DE')+'</div></div>';
     h += '</div>';
@@ -313,6 +348,63 @@ function render(data) {
         h += '<div style="font:400 11px var(--f);color:var(--text);padding:6px 10px;background:var(--purple)10;border-radius:4px;margin-bottom:4px;border-left:3px solid var(--purple)">"'+supportMsgs[sm]+'"</div>';
       }
     }
+    
+    // AUTO-INSIGHTS
+    h += '<div class="section-title" style="color:var(--accent)">🧠 Auto-Insights</div>';
+    h += '<div style="display:flex;flex-direction:column;gap:6px">';
+    
+    // Insight: Duration
+    var totalDur = duration || 0;
+    if (totalDur > 180000) h += '<div style="font:400 11px var(--f);color:var(--green);padding:6px 10px;background:var(--green)10;border-radius:4px;border-left:3px solid var(--green)">🟢 <strong>Hohe Verweildauer</strong> ('+durStr+') — ernsthaftes Interesse</div>';
+    else if (totalDur > 60000) h += '<div style="font:400 11px var(--f);color:var(--amber);padding:6px 10px;background:var(--amber)10;border-radius:4px;border-left:3px solid var(--amber)">🟡 <strong>Moderate Verweildauer</strong> ('+durStr+') — hat sich umgeschaut</div>';
+    else if (totalDur > 0) h += '<div style="font:400 11px var(--f);color:var(--text2);padding:6px 10px;background:var(--surface2);border-radius:4px;border-left:3px solid var(--muted)">⚪ <strong>Kurzer Besuch</strong> ('+durStr+') — erster Eindruck, evtl. Handy</div>';
+    
+    // Insight: Which tabs got attention
+    var maxTab = '', maxDur = 0;
+    for (var mt in tabDurations) { if (tabDurations[mt] > maxDur) { maxDur = tabDurations[mt]; maxTab = mt; } }
+    if (maxTab) {
+      var tabLabel = {briefing:'Briefing',entity:'Dossier',graph:'Netzwerk',compare:'Vergleich',strategy:'Strategie'}[maxTab] || maxTab;
+      h += '<div style="font:400 11px var(--f);color:var(--blue);padding:6px 10px;background:var(--blue)10;border-radius:4px;border-left:3px solid var(--blue)">📊 <strong>Meiste Zeit in: '+tabLabel+'</strong> ('+(maxDur>60000?Math.round(maxDur/60000)+'m ':'')+Math.round((maxDur%60000)/1000)+'s) — das ist was ihn interessiert</div>';
+    }
+    
+    // Insight: Entities
+    if (entities.length > 0) {
+      var uniqE = {};
+      for (var ei2=0;ei2<entities.length;ei2++) { var en2=entities[ei2].name||entities[ei2].entity; uniqE[en2]=(uniqE[en2]||0)+1; }
+      var topEntity = Object.keys(uniqE).sort(function(a,b){return uniqE[b]-uniqE[a]})[0];
+      h += '<div style="font:400 11px var(--f);color:var(--accent);padding:6px 10px;background:var(--accent)10;border-radius:4px;border-left:3px solid var(--accent)">👤 <strong>Fokus-Person: '+topEntity+'</strong> ('+uniqE[topEntity]+'× angesehen)</div>';
+    }
+    
+    // Insight: Copies
+    if (copies.length > 0) {
+      h += '<div style="font:400 11px var(--f);color:var(--green);padding:6px 10px;background:var(--green)10;border-radius:4px;border-left:3px solid var(--green)">✅ <strong>'+copies.length+' Talking Points kopiert</strong> — nutzt das Produkt OPERATIV</div>';
+    }
+    
+    // Insight: Support
+    if (supportMsgs.length > 0) {
+      h += '<div style="font:400 11px var(--f);color:var(--purple);padding:6px 10px;background:var(--purple)10;border-radius:4px;border-left:3px solid var(--purple)">💬 <strong>'+supportMsgs.length+' Support-Nachricht(en)</strong> — aktives Engagement, SOFORT antworten</div>';
+    }
+    
+    // Insight: Device
+    if (s.ua && s.ua.includes('Android')) {
+      h += '<div style="font:400 11px var(--f);color:var(--text2);padding:6px 10px;background:var(--surface2);border-radius:4px;border-left:3px solid var(--muted)">📱 <strong>Mobil (Android)</strong> — unterwegs oder Couch. Desktop-Besuch = höheres Interesse</div>';
+    } else if (s.ua && s.ua.includes('iPhone')) {
+      h += '<div style="font:400 11px var(--f);color:var(--text2);padding:6px 10px;background:var(--surface2);border-radius:4px;border-left:3px solid var(--muted)">📱 <strong>Mobil (iPhone)</strong> — unterwegs oder Couch. Desktop-Besuch = höheres Interesse</div>';
+    }
+    
+    // Insight: Re-auth (came back)
+    var authCount = evts.filter(function(e){return e.e==='auth'}).length;
+    if (authCount > 1) {
+      h += '<div style="font:400 11px var(--f);color:var(--green);padding:6px 10px;background:var(--green)10;border-radius:4px;border-left:3px solid var(--green)">🔄 <strong>'+authCount+'× eingeloggt</strong> — ist zurückgekommen oder hat Seite neu geladen (Interesse!)</div>';
+    }
+    
+    // Insight: Not your IP
+    if (s.ip && s.ip !== '91.2.110.113') {
+      var geoLabel = (geoCache[s.ip] && geoCache[s.ip].city) ? geoCache[s.ip].city : 'unbekannt';
+      h += '<div style="font:400 11px var(--f);color:var(--accent);padding:6px 10px;background:var(--accent)15;border-radius:4px;border-left:3px solid var(--accent)">🌍 <strong>Externer Besucher</strong> aus '+geoLabel+' — nicht deine IP!</div>';
+    }
+    
+    h += '</div>';
     
     // Full event log
     h += '<details style="margin-top:12px"><summary style="font:500 10px var(--m);color:var(--muted);cursor:pointer">Alle '+evts.length+' Events anzeigen</summary>';
