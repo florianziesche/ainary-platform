@@ -435,7 +435,7 @@ setTimeout(function(){document.getElementById('auth-input').focus()},100);
 const urlParams = new URLSearchParams(window.location.search);
 const CITY_ID = urlParams.get('city') || 'bamberg';
 let TENANT = {}, KB = {}, GRAPH = {nodes:[],links:[]};
-let NEWS = [], HYPOTHESES = [], SENTIMENT = {}, PATTERNS = [], ACTIONS = [], FORECAST = {}, THEMEN = {}, SOCIAL = {}, STICHWAHL = {};
+let NEWS = [], HYPOTHESES = [], SENTIMENT = {}, PATTERNS = [], ACTIONS = [], FORECAST = {}, THEMEN = {}, SOCIAL = {}, STICHWAHL = {}, YOUTUBE = {};
 
 (async function loadCityData() {
   try {
@@ -459,6 +459,7 @@ let NEWS = [], HYPOTHESES = [], SENTIMENT = {}, PATTERNS = [], ACTIONS = [], FOR
     FORECAST = data.forecast || {};
     THEMEN = data.themen || {};
     SOCIAL = data.social || {};
+    YOUTUBE = data.youtube || {};
     STICHWAHL = data.stichwahl_prediction || {};
     // Init the app
     if (typeof initApp === 'function') initApp();
@@ -1920,6 +1921,57 @@ function renderStrategy() {
       h += '</div>';
     }
     h += '</div>';
+  }
+
+  // YouTube Intelligence
+  if (YOUTUBE.candidates && YOUTUBE.candidates.length) {
+    h += '<div style="margin-top:24px"></div>';
+    h += '<div class="canvas-title">YouTube Intelligence <span class="ct-badge" style="background:var(--red)">🎬 ' + YOUTUBE.candidates.length + ' KANDIDATEN</span></div>';
+    h += '<div style="font:400 6pt var(--m);color:var(--muted);margin-bottom:8px">Stand: ' + (YOUTUBE.scraped || '') + ' · Quelle: YouTube Data API v3</div>';
+    // Bar chart
+    var ytMax = 0;
+    for (var yi=0; yi<YOUTUBE.candidates.length; yi++) { if (YOUTUBE.candidates[yi].video_count > ytMax) ytMax = YOUTUBE.candidates[yi].video_count; }
+    for (var yi=0; yi<YOUTUBE.candidates.length; yi++) {
+      var yc = YOUTUBE.candidates[yi];
+      var ytW = ytMax > 0 ? (yc.video_count / ytMax * 100) : 0;
+      var ytColor = yc.has_own_channel ? 'var(--red)' : 'var(--blue)';
+      var ytBadge = yc.has_own_channel ? ' <span style="font:600 5pt var(--m);padding:1px 4px;border-radius:2px;background:var(--red)15;color:var(--red)">EIGENER KANAL</span>' : '';
+      h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
+      h += '<div style="width:100px;font:500 7pt var(--m);color:var(--text2);text-align:right;flex-shrink:0">' + yc.name + '</div>';
+      h += '<div style="flex:1;height:16px;background:var(--bg2);border-radius:3px;overflow:hidden;position:relative">';
+      h += '<div style="width:' + ytW + '%;height:100%;background:' + ytColor + '30;border-left:2px solid ' + ytColor + '"></div>';
+      h += '</div>';
+      h += '<div style="width:60px;font:700 7pt var(--m);color:' + ytColor + '">' + yc.video_count + ' Videos' + ytBadge + '</div>';
+      h += '</div>';
+    }
+    // Top videos
+    if (YOUTUBE.candidates.some(function(c){ return c.top_videos && c.top_videos.length; })) {
+      h += '<div style="margin-top:10px;font:600 6pt var(--m);color:var(--accent);text-transform:uppercase;letter-spacing:0.5px">Neueste Videos</div>';
+      for (var yi=0; yi<YOUTUBE.candidates.length; yi++) {
+        var yc = YOUTUBE.candidates[yi];
+        if (yc.top_videos) {
+          for (var yv=0; yv<Math.min(yc.top_videos.length, 1); yv++) {
+            var vid = yc.top_videos[yv];
+            h += '<div style="margin:4px 0;padding:4px 6px;background:var(--bg2);border-radius:3px;font:400 6pt var(--m)">';
+            h += '<a href="' + vid.url + '" target="_blank" style="color:var(--accent);text-decoration:none">▶ ' + vid.title.substring(0,60) + '</a>';
+            h += ' <span style="color:var(--muted)">· ' + vid.channel + ' · ' + vid.published + '</span>';
+            h += '</div>';
+          }
+        }
+      }
+    }
+    // City videos
+    if (YOUTUBE.city_videos && YOUTUBE.city_videos.length) {
+      h += '<div style="margin-top:8px;font:600 6pt var(--m);color:var(--accent);text-transform:uppercase;letter-spacing:0.5px">Stadt-Berichterstattung</div>';
+      for (var ci=0; ci<YOUTUBE.city_videos.length; ci++) {
+        var cv = YOUTUBE.city_videos[ci];
+        h += '<div style="margin:3px 0;padding:3px 6px;background:var(--bg2);border-radius:3px;font:400 6pt var(--m)">';
+        h += '<a href="' + cv.url + '" target="_blank" style="color:var(--blue);text-decoration:none">▶ ' + cv.title.substring(0,60) + '</a>';
+        h += ' <span style="color:var(--muted)">· ' + cv.channel + '</span>';
+        h += '</div>';
+      }
+    }
+    h += '';
   }
 
   // Stichwahl Prediction (Red Diamond)
