@@ -1169,12 +1169,16 @@ function renderBriefing() {
   h += '<div style="font:500 7pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:1px">Kandidaten</div>';
   h += '</div>';
   h += '</div>';
-  // Mini forecast bars
+  // Mini forecast bars — read from FORECAST.kandidaten, not KB
   var topKands = kandidaten.slice(0,3);
+  var forecastLookup = {};
+  for (var fli=0; fli<(FORECAST.kandidaten||[]).length; fli++) { var fl = FORECAST.kandidaten[fli]; forecastLookup[fl.id] = fl; }
   for (var fbi=0; fbi<topKands.length; fbi++) {
     var fk = KB[topKands[fbi]];
-    var fMax = (fk.forecast||{}).max || 30;
-    var fMin = (fk.forecast||{}).min || 10;
+    var fkForecast = forecastLookup[topKands[fbi]] || {};
+    var fMax = fkForecast.max || (fk.forecast||{}).max || 0;
+    var fMin = fkForecast.min || (fk.forecast||{}).min || 0;
+    if (!fMax && !fMin) continue; // Skip if no forecast data
     var fColor = fbi===0?'var(--blue)':fbi===1?'var(--green)':'var(--amber)';
     h += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">';
     h += '<div style="width:100px;font:500 8pt var(--m);color:var(--text2);text-align:right">'+fk.name.split(' ').pop()+'</div>';
@@ -1200,7 +1204,10 @@ function renderBriefing() {
   h += '<div style="font:700 8pt var(--m);color:'+trustColor+'">'+trustLabel+' ('+trustScore+'/100)</div>';
   h += '</div>';
   h += '<div style="height:4px;background:var(--surface2);border-radius:2px;overflow:hidden"><div style="width:'+trustScore+'%;height:100%;background:'+trustColor+';border-radius:2px"></div></div>';
-  h += '<div style="font:400 6.5pt var(--m);color:var(--muted);margin-top:4px">'+keys.length+' Akteure · '+totalQuellen+' Quellen · '+NEWS.length+' Meldungen · Methode: strukturelle Analyse, keine Umfragen</div>';
+  h += '<div style="font:400 6.5pt var(--m);color:var(--muted);margin-top:4px">'+keys.length+' Akteure · '+totalQuellen+' Quellen · '+NEWS.length+' Meldungen</div>';
+  // Forecast method + gaps transparent
+  if (FORECAST.method) h += '<div style="font:400 6.5pt var(--f);color:var(--muted);margin-top:4px;line-height:1.5">Methode: '+FORECAST.method+'</div>';
+  if (FORECAST.gaps) h += '<div style="font:400 6.5pt var(--f);color:var(--amber);margin-top:2px;line-height:1.5">'+FORECAST.gaps+'</div>';
   h += '</div>';
   h += '</div>';
   h += '</div>';
@@ -2292,6 +2299,11 @@ function renderStrategy() {
   // ═══ BLOCK 2: SZENARIEN (Was kann passieren?) ═══
   h += '<div style="margin-bottom:24px">';
   h += '<div class="canvas-title">Szenarien <span class="ct-badge" style="background:var(--amber)">WAS-WENN-ANALYSE</span></div>';
+  // Datenbasis + Methode für Szenarien
+  h += '<div style="font:400 7.5pt var(--f);color:var(--text2);line-height:1.6;margin-bottom:12px">';
+  if (FORECAST.method) h += FORECAST.method + ' ';
+  if (FORECAST.gaps) h += '<span style="color:var(--amber)">' + FORECAST.gaps + '</span>';
+  h += '</div>';
 
   // Stichwahl-Szenarien
   if (SCENARIOS && SCENARIOS.length) {
@@ -2320,6 +2332,12 @@ function renderStrategy() {
           var r2 = sc.results[ri2];
           h += '<div style="font:400 7pt var(--f);color:var(--accent);margin-bottom:3px">→ <strong>'+(r2.name||'')+':</strong> '+(r2.outcome||'')+'</div>';
         }
+        h += '</div>';
+      }
+      // So What — was bedeutet das für den Kandidaten
+      if (sc.soWhat) {
+        h += '<div style="margin-top:8px;padding:8px 10px;background:var(--blue)08;border-left:2px solid var(--blue);border-radius:0 4px 4px 0">';
+        h += '<div style="font:500 7pt var(--f);color:var(--accent);line-height:1.5">→ Was bedeutet das: '+sc.soWhat+'</div>';
         h += '</div>';
       }
       h += '</div>';
