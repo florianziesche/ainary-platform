@@ -2197,12 +2197,141 @@ function renderGraph() {
 function renderCompare() {
   const el = document.getElementById('compare-view');
   let h = '';
-  // Matrix section
+
+  const keys = Object.keys(KB);
+  const kandidaten = keys.filter(k => KB[k].role && (KB[k].role.includes('Kandidat') || KB[k].role.includes('Bürgermeister')));
+  const fcLookup = {};
+  for (var fi=0; fi<(FORECAST.kandidaten||[]).length; fi++) { var fc = FORECAST.kandidaten[fi]; fcLookup[fc.id] = fc; }
+
+  // ═══ KANDIDATEN-DOSSIERS (1 Karte pro Kandidat, volle Tiefe) ═══
+  h += '<div class="canvas-title">Kandidaten-Dossiers <span class="ct-badge" style="background:var(--accent)">'+kandidaten.length+' PROFILE</span></div>';
+  h += '<div style="font:400 7.5pt var(--f);color:var(--text2);margin-bottom:16px;line-height:1.6">Jedes Profil enthält: Stärken, Schwächen, Prognose, Wahlkampf-Einschätzung und datenbasierte Empfehlung. Confidence-Score zeigt Datenlage.</div>';
+
+  var kandAlpha = kandidaten.slice().sort(function(a,b){ return KB[a].name.localeCompare(KB[b].name); });
+  for (var ci=0; ci<kandAlpha.length; ci++) {
+    var ck = kandAlpha[ci];
+    var ce = KB[ck];
+    var cfk = fcLookup[ck] || {};
+    var partyColor = (ce.party||'').includes('CSU') ? '#2D72D2' : (ce.party||'').includes('SPD') ? '#CD4246' : (ce.party||'').includes('Grün') ? '#238551' : (ce.party||'').includes('AfD') ? '#8E292C' : '#8F99A8';
+    var riskColor = ce.risk > 40 ? 'var(--red)' : ce.risk > 25 ? 'var(--amber)' : 'var(--green)';
+
+    // Compute campaign assessment from data
+    var strengths = (ce.steckbrief||{}).staerken || ce.strengths || [];
+    var weaknesses = (ce.steckbrief||{}).schwaechen || ce.weaknesses || [];
+    var controvs = (ce.controversies||[]);
+    var quellenCount = (ce.quellen||[]).length;
+    var sentData = SENTIMENT.entities ? SENTIMENT.entities[ck] : null;
+    var sentScore = sentData ? sentData.sent : 0;
+    var sentTrend = sentData ? sentData.trend : '';
+
+    // Generate "Wahlkampf-Einschätzung" from data
+    var assessment = '';
+    if (cfk.zentral) {
+      if (cfk.zentral >= 35) assessment += 'Klarer Favorit mit strukturellem Vorteil. ';
+      else if (cfk.zentral >= 25) assessment += 'Ernsthafter Herausforderer mit Chancen auf Stichwahl. ';
+      else if (cfk.zentral >= 15) assessment += 'Außenseiter — braucht Mobilisierungseffekt. ';
+      else assessment += 'Geringe Chancen ohne überraschende Dynamik. ';
+    }
+    if (controvs.length >= 2) assessment += 'Kontroversen ('+(controvs.map(function(c){return c.title||''}).join(', '))+') könnten zum Problem werden. ';
+    else if (controvs.length === 0) assessment += 'Keine relevanten Kontroversen — sauberes Profil. ';
+    if (sentScore > 0.3) assessment += 'Positive Medienresonanz stärkt Position. ';
+    else if (sentScore < -0.3) assessment += 'Negative Medienresonanz belastet Wahlkampf. ';
+
+    // Generate recommendation based on cross-learning patterns
+    var recommendation = '';
+    for (var pi=0; pi<PATTERNS.length; pi++) {
+      var pat = PATTERNS[pi];
+      if ((pat.entities||[]).includes(ck) && pat.soWhat) {
+        recommendation = pat.soWhat;
+        break;
+      }
+    }
+    if (!recommendation) {
+      if (cfk.zentral >= 35) recommendation = 'Position halten: Amtsbonus ausspielen, Kontroversen nicht selbst thematisieren, Sachpolitik betonen.';
+      else if (cfk.zentral >= 20) recommendation = 'Differenzierung verstärken: Klares Alleinstellungsmerkmal kommunizieren, Mobilisierung im eigenen Lager forcieren.';
+      else recommendation = 'Überraschungsmoment suchen: Unkonventionelle Themen besetzen, Medienaufmerksamkeit durch klare Positionen erzeugen.';
+    }
+
+    // Confidence = data coverage
+    var dataConf = Math.min(100, Math.round(quellenCount * 8 + (controvs.length > 0 ? 15 : 0) + (cfk.zentral ? 20 : 0) + (sentData ? 15 : 0)));
+    var confColor = dataConf >= 70 ? 'var(--green)' : dataConf >= 40 ? 'var(--amber)' : 'var(--red)';
+    var confLabel = dataConf >= 70 ? 'HOHE DATENLAGE' : dataConf >= 40 ? 'MITTLERE DATENLAGE' : 'LÜCKENHAFTE DATENLAGE';
+
+    h += '<div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid '+partyColor+';border-radius:4px;margin-bottom:16px;overflow:hidden">';
+    // Header
+    h += '<div style="padding:16px 18px;display:flex;justify-content:space-between;align-items:flex-start;cursor:pointer" onclick="showEntity(\''+ck+'\')">';
+    h += '<div>';
+    h += '<div style="font:700 12pt var(--f);color:var(--text)">'+ce.name+'</div>';
+    h += '<div style="font:400 7pt var(--m);color:var(--muted);margin-top:2px">'+ce.party+' · '+(ce.role||'')+'</div>';
+    h += '</div>';
+    h += '<div style="text-align:right">';
+    if (cfk.min && cfk.max) h += '<div style="font:700 14pt var(--m);color:'+partyColor+'">'+cfk.min+'–'+cfk.max+'%</div>';
+    h += '<div style="font:500 6pt var(--m);color:'+confColor+'">'+confLabel+' ('+dataConf+'%)</div>';
+    h += '</div></div>';
+
+    // Body
+    h += '<div style="padding:0 18px 16px">';
+
+    // Summary
+    if (ce.summary) h += '<div style="font:400 8.5pt var(--f);color:var(--text2);line-height:1.7;margin-bottom:12px">'+ce.summary+'</div>';
+
+    // Stärken + Schwächen side by side
+    h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">';
+    // Stärken
+    h += '<div style="padding:10px;background:var(--green)08;border:1px solid var(--green)20;border-radius:4px">';
+    h += '<div style="font:600 6pt var(--m);color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Stärken</div>';
+    if (strengths.length) {
+      for (var si=0; si<strengths.length; si++) h += '<div style="font:400 7pt var(--f);color:var(--text2);margin-bottom:3px;line-height:1.4">+ '+strengths[si]+'</div>';
+    } else {
+      // Fallback from properties
+      var props = ce.properties || [];
+      for (var pi2=0; pi2<Math.min(props.length,3); pi2++) {
+        if (props[pi2].key && props[pi2].value) h += '<div style="font:400 7pt var(--f);color:var(--text2);margin-bottom:3px">+ '+props[pi2].key+': '+props[pi2].value+'</div>';
+      }
+    }
+    h += '</div>';
+    // Schwächen / Risiken
+    h += '<div style="padding:10px;background:var(--red)08;border:1px solid var(--red)20;border-radius:4px">';
+    h += '<div style="font:600 6pt var(--m);color:var(--red);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Risiken</div>';
+    if (weaknesses.length) {
+      for (var wi=0; wi<weaknesses.length; wi++) h += '<div style="font:400 7pt var(--f);color:var(--text2);margin-bottom:3px;line-height:1.4">− '+weaknesses[wi]+'</div>';
+    } else if (controvs.length) {
+      for (var ci2=0; ci2<Math.min(controvs.length,3); ci2++) h += '<div style="font:400 7pt var(--f);color:var(--text2);margin-bottom:3px">− '+(controvs[ci2].title||'')+'</div>';
+    } else {
+      h += '<div style="font:400 7pt var(--f);color:var(--muted)">Keine bekannten Risiken</div>';
+    }
+    h += '</div></div>';
+
+    // Wahlkampf-Einschätzung (So What)
+    h += '<div style="padding:12px;background:var(--surface2);border-radius:4px;margin-bottom:10px">';
+    h += '<div style="font:600 6pt var(--m);color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Wahlkampf-Einschätzung</div>';
+    h += '<div style="font:400 8pt var(--f);color:var(--text);line-height:1.6">'+assessment+'</div>';
+    h += '</div>';
+
+    // Empfehlung (Cross-Learning)
+    h += '<div style="padding:12px;background:var(--blue)08;border-left:3px solid var(--blue);border-radius:0 4px 4px 0">';
+    h += '<div style="font:600 6pt var(--m);color:var(--blue);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Strategische Option (Cross-Learning)</div>';
+    h += '<div style="font:400 8pt var(--f);color:var(--text2);line-height:1.6">'+recommendation+'</div>';
+    h += '</div>';
+
+    // Data indicators
+    h += '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">';
+    h += '<span style="font:400 5.5pt var(--m);color:var(--muted);padding:2px 6px;background:var(--surface);border:1px solid var(--border);border-radius:2px">'+quellenCount+' Quellen</span>';
+    h += '<span style="font:400 5.5pt var(--m);color:var(--muted);padding:2px 6px;background:var(--surface);border:1px solid var(--border);border-radius:2px">'+controvs.length+' Kontroversen</span>';
+    h += '<span style="font:400 5.5pt var(--m);color:var(--muted);padding:2px 6px;background:var(--surface);border:1px solid var(--border);border-radius:2px">Risiko '+ce.risk+'</span>';
+    if (sentData) h += '<span style="font:400 5.5pt var(--m);color:'+(sentScore>0?'var(--green)':'var(--red)')+';padding:2px 6px;background:var(--surface);border:1px solid var(--border);border-radius:2px">Sentiment '+(sentScore>0?'+':'')+sentScore+'</span>';
+    h += '</div>';
+
+    h += '</div></div>'; // close body + card
+  }
+
+  // ═══ VERGLEICHS-MATRIX (kompakt) ═══
   h += renderMatrixHTML();
-  // Kontroversen-Heatmap
+  // ═══ KONTROVERSEN-HEATMAP ═══
   h += renderHeatmapHTML();
-  // Hypotheses section
+  // ═══ HYPOTHESEN ═══
   h += renderHypothesesHTML();
+
   el.innerHTML = h;
 }
 
