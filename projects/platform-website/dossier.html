@@ -1126,62 +1126,202 @@ function togglePatternDetail(idx) {
 function renderBriefing() {
   const el = document.getElementById('briefing-view');
   const keys = Object.keys(KB);
-  const topRisk = keys.sort((a, b) => KB[b].risk - KB[a].risk).slice(0, 3);
-  const lastName = USER.name.split(' ').pop();
+  const kandidaten = keys.filter(k => KB[k].role && (KB[k].role.includes('Kandidat') || KB[k].role.includes('Bürgermeister')));
+  const sortedByRisk = keys.slice().sort((a, b) => KB[b].risk - KB[a].risk);
+
+  // Compute days to election
+  // Parse DD.MM.YYYY or ISO date
+  var wahlStr = TENANT.wahl || '2026-03-08';
+  var wahlParts = wahlStr.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+  var wahlDate = wahlParts ? new Date(wahlParts[3] + '-' + wahlParts[2] + '-' + wahlParts[1]) : new Date(wahlStr);
+  var wbDays = WEEKLYBRIEF.daysToElection || Math.max(0, Math.ceil((wahlDate - new Date()) / 86400000));
+  var daysColor = wbDays <= 7 ? 'var(--red)' : wbDays <= 14 ? 'var(--amber)' : 'var(--green)';
+  var stichwahlPct = FORECAST.stichwahlConf || 50;
 
   let h = '';
-  // E/I/J/A Legend
-  h += '<div class="ev-legend"><span><span class="ev ev-e">E</span> Belegt</span><span><span class="ev ev-i">I</span> Abgeleitet</span><span><span class="ev ev-j">J</span> Einschätzung</span><span><span class="ev ev-a">A</span> Annahme</span></div>';
-  h += '<div class="briefing-hero">';
-  var greetHour = new Date().getHours();
-  var greetText = greetHour < 12 ? 'Guten Morgen' : greetHour < 18 ? 'Guten Tag' : 'Guten Abend';
-  h += '<div class="briefing-greeting">' + greetText + (lastName !== 'Besucher' ? ', <strong>Herr ' + lastName + '</strong>' : '') + '</div>';
-  h += '<div class="briefing-subtitle"><span class="ev ev-e">E</span> ' + keys.length + ' Dossiers analysiert · ' + NEWS.length + ' aktuelle Meldungen · ' + HYPOTHESES.length + ' aktive Hypothesen</div>';
-  h += '</div>';
 
-  // KPI Row
-  var totalQuellen = 0, totalKontroversen = 0, totalConnections = 0;
-  for (var kk in KB) {
-    totalQuellen += (KB[kk].quellen || []).length;
-    totalKontroversen += (KB[kk].controversies || []).length + (KB[kk].contradictions || []).length;
-    totalConnections += (KB[kk].connections || []).length;
+  // ═══ BLOCK 1: LAGEBEURTEILUNG (1 Absatz, neutral, faktenbasiert) ═══
+  h += '<div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:6px;padding:16px 20px;margin-bottom:16px">';
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">';
+  h += '<div style="font:700 10pt var(--f);color:var(--text)">Lagebeurteilung ' + (TENANT.gemeinde||'') + '</div>';
+  h += '<div style="font:700 11pt var(--m);color:' + daysColor + '">' + wbDays + ' Tage bis Wahl</div>';
+  h += '</div>';
+  // Auto-generate summary from data
+  var kandNames = kandidaten.slice(0,3).map(function(k){ return KB[k].name + ' (' + KB[k].party + ')'; }).join(', ');
+  var summaryText = WEEKLYBRIEF.summary || (wbDays + ' Tage vor der Wahl in ' + (TENANT.gemeinde||'') + '. ' + kandidaten.length + ' Kandidaten im Rennen. Stichwahl-Wahrscheinlichkeit: ' + stichwahlPct + '%.');
+  h += '<div style="font:400 8pt var(--f);color:var(--text);line-height:1.6;margin-bottom:10px">' + summaryText + '</div>';
+  h += '<div style="font:400 6.5pt var(--f);color:var(--muted);line-height:1.5">';
+  var totalQuellen = 0; for (var kk in KB) totalQuellen += (KB[kk].quellen || []).length;
+  h += '<span class="ev ev-e">E</span> ' + keys.length + ' Akteure analysiert · ' + totalQuellen + ' Quellen · ' + NEWS.length + ' aktuelle Meldungen · Stand: ' + new Date().toLocaleDateString('de-DE');
+  h += '</div></div>';
+
+  // ═══ BLOCK 2: HANDLUNGSRELEVANTE ENTWICKLUNGEN (was ist diese Woche passiert + was bedeutet es) ═══
+  h += '<div style="margin-bottom:16px">';
+  h += '<div class="canvas-title">Handlungsrelevante Entwicklungen</div>';
+  // Combine alerts + top patterns + insights into max 5 actionable items
+  var actionItems = [];
+  // From alerts (highest priority)
+  for (var ai=0; ai<(TENANT.alerts||[]).length && actionItems.length < 5; ai++) {
+    var al = TENANT.alerts[ai];
+    actionItems.push({title: al.title, detail: al.meta, severity: al.priority, entity: al.entity, source: 'alert', soWhat: al.soWhat||''});
   }
-  totalConnections += (GRAPH.links || []).length;
-  h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-bottom:16px">';
-  var kpis = [
-    {val:keys.length, label:'Dossiers', delta:'Aktuell', color:'var(--text)', click:"switchView('entity')"},
-    {val:totalQuellen, label:'Quellen', delta:'verifiziert', color:'var(--text)', click:""},
-    {val:(GRAPH.nodes||[]).length, label:'Akteure', delta:(GRAPH.links||[]).length+' Verbindungen', color:'var(--text)', click:"switchView('graph')"},
-    {val:totalKontroversen, label:'Kontroversen', delta:(function(){var s=0;for(var x in KB)s+=(KB[x].contradictions||[]).length;return s})() + ' Widersprüche', color:'var(--red)', click:"switchView('compare')"},
-    {val:HYPOTHESES.length, label:'Hypothesen', delta:'aktiv', color:'var(--accent)', click:"switchView('compare')"},
-    {val:ACTIONS.length, label:'Aktionen', delta:'empfohlen', color:'var(--green)', click:"switchView('strategy')"}
-  ];
-  for (var ki=0; ki<kpis.length; ki++) {
-    var kp = kpis[ki];
-    h += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:10px 12px;cursor:pointer;transition:border-color .15s" onclick="' + kp.click + '" onmouseover="this.style.borderColor=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border)\'">';
-    h += '<div style="font:700 18pt var(--m);color:' + kp.color + '">' + kp.val + '</div>';
-    h += '<div style="font:500 6.5pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:.06em">' + kp.label + '</div>';
-    h += '<div style="font:400 5.5pt var(--m);color:var(--muted);margin-top:2px">' + kp.delta + '</div>';
+  // From patterns (cross-city intelligence)
+  for (var pi=0; pi<PATTERNS.length && actionItems.length < 5; pi++) {
+    var pat = PATTERNS[pi];
+    actionItems.push({title: pat.label, detail: pat.soWhat || pat.meaning, severity: pat.severity, entity: (pat.entities||[])[0], source: 'pattern', soWhat: pat.meaning||''});
+  }
+  // From social insights
+  for (var si=0; si<(SOCIAL.insights||[]).length && actionItems.length < 5; si++) {
+    var ins = SOCIAL.insights[si];
+    if (ins.soWhat) actionItems.push({title: ins.title||'', detail: ins.body||ins.text||'', severity: ins.severity||'MITTEL', source: 'social', soWhat: ins.soWhat||''});
+  }
+  for (var aii=0; aii<actionItems.length; aii++) {
+    var item = actionItems[aii];
+    var itemColor = item.severity === 'KRITISCH' ? 'var(--red)' : item.severity === 'HOCH' ? 'var(--red)' : item.severity === 'MITTEL' ? 'var(--amber)' : 'var(--muted)';
+    var sourceLabel = item.source === 'alert' ? 'AKTUELL' : item.source === 'pattern' ? 'MUSTER' : 'ANALYSE';
+    h += '<div style="padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-left:3px solid ' + itemColor + ';border-radius:4px;margin-bottom:6px">';
+    h += '<div style="display:flex;justify-content:space-between;align-items:flex-start">';
+    h += '<div style="flex:1">';
+    h += '<div style="font:600 7.5pt var(--f);color:var(--text);margin-bottom:3px">' + item.title + '</div>';
+    h += '<div style="font:400 6.5pt var(--f);color:var(--text2);line-height:1.5">' + (item.detail||'') + '</div>';
+    if (item.soWhat) h += '<div style="font:500 6pt var(--f);color:var(--accent);margin-top:3px;line-height:1.4">→ Einordnung: ' + item.soWhat + '</div>';
     h += '</div>';
+    h += '<div style="font:600 5pt var(--m);color:' + itemColor + ';padding:2px 6px;background:' + itemColor + '15;border-radius:2px;flex-shrink:0;margin-left:8px">' + sourceLabel + '</div>';
+    h += '</div></div>';
   }
   h += '</div>';
 
-  // Active Alerts
-  if (TENANT.alerts && TENANT.alerts.length) {
-    h += '<div class="canvas-title">Aktive Alerts <span class="ct-badge" style="background:var(--red)">' + TENANT.alerts.length + '</span></div>';
-    for (var ai=0; ai<TENANT.alerts.length; ai++) {
-      var al = TENANT.alerts[ai];
-      var alColor = al.priority === 'KRITISCH' ? 'var(--red)' : al.priority === 'HOCH' ? 'var(--amber)' : 'var(--muted)';
-      h += '<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-left:3px solid ' + alColor + ';border-radius:4px;margin-bottom:6px;cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor=\'' + alColor + '\'" onmouseout="this.style.borderColor=\'var(--border)\'"';
-      if (al.entity) h += ' onclick="showEntity(\'' + al.entity + '\')"';
-      h += '>';
-      h += '<div style="font:700 8pt var(--f);color:' + alColor + ';flex-shrink:0">●</div>';
-      h += '<div style="flex:1"><div style="font:600 7.5pt var(--f);color:var(--text)">' + al.title + '</div>';
-      h += '<div style="font:400 5.5pt var(--m);color:var(--muted)">' + al.meta + '</div></div>';
-      h += '<div style="font:400 8pt var(--f);color:var(--accent)">→</div>';
+  // ═══ BLOCK 3: KANDIDATEN-VERGLEICH (Stärken/Schwächen, neutral) ═══
+  h += '<div style="margin-bottom:16px">';
+  h += '<div class="canvas-title">Kandidaten im Überblick <span class="ct-badge" style="background:var(--gold)">' + kandidaten.length + ' KANDIDATEN</span></div>';
+  for (var ci=0; ci<kandidaten.length; ci++) {
+    var ck = kandidaten[ci];
+    var ce = KB[ck];
+    var riskColor = ce.risk > 40 ? 'var(--red)' : ce.risk > 25 ? 'var(--amber)' : 'var(--green)';
+    var partyColor = ce.party === 'CSU' ? '#0a4d8c' : ce.party === 'SPD' ? '#c0392b' : (ce.party||'').includes('Grün') ? '#4a8c3f' : ce.party === 'AfD' ? '#8b1a1a' : 'var(--muted)';
+    // Find forecast data for this candidate
+    var fk = (FORECAST.kandidaten||[]).find(function(f){ return f.id === ck || (f.name||'').toLowerCase().includes(ck); });
+    // Find momentum data
+    var mk = ((SOCIAL.momentum_index||{}).candidates||[]).find(function(m){ return (m.name||'').toLowerCase().includes(ck) || (m.name||'').toLowerCase().includes(ce.name.split(' ').pop().toLowerCase()); });
+
+    h += '<div style="padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-left:3px solid ' + partyColor + ';border-radius:4px;margin-bottom:8px;cursor:pointer" onclick="showEntity(\'' + ck + '\')">';
+    h += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">';
+    h += '<div><div style="font:600 8.5pt var(--f);color:var(--text)">' + ce.name + '</div>';
+    h += '<div style="font:400 6pt var(--m);color:var(--muted)">' + ce.party + ' · ' + (ce.role||'') + '</div></div>';
+    h += '<div style="display:flex;gap:6px;align-items:center">';
+    if (fk) h += '<div style="font:600 7pt var(--m);color:var(--text);padding:2px 6px;background:var(--surface2);border-radius:3px">' + fk.min + '-' + fk.max + '%</div>';
+    if (mk) h += '<div style="font:600 7pt var(--m);color:var(--accent);padding:2px 6px;background:var(--accent)15;border-radius:3px">Momentum ' + (mk.composite_score||mk.score||0) + '</div>';
+    h += '</div></div>';
+    // Summary — full text, no truncation
+    h += '<div style="font:400 6.5pt var(--f);color:var(--text2);line-height:1.5;margin-bottom:6px">' + (ce.summary||'') + '</div>';
+    // Key indicators row
+    h += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+    h += '<span style="font:500 5.5pt var(--m);color:' + riskColor + ';padding:1px 5px;background:' + riskColor + '10;border-radius:2px">Risiko ' + ce.risk + '</span>';
+    h += '<span style="font:500 5.5pt var(--m);color:var(--muted);padding:1px 5px;background:var(--surface2);border-radius:2px">' + (ce.quellen||[]).length + ' Quellen</span>';
+    h += '<span style="font:500 5.5pt var(--m);color:var(--muted);padding:1px 5px;background:var(--surface2);border-radius:2px">' + (ce.controversies||[]).length + ' Kontroversen</span>';
+    h += '</div></div>';
+  }
+  h += '</div>';
+
+  // ═══ BLOCK 4: ZENTRALE THEMEN (was die Wähler bewegt + Einordnung) ═══
+  h += '<div style="margin-bottom:16px">';
+  h += '<div class="canvas-title">Zentrale Themen <span class="ct-badge" style="background:var(--blue)">Was die Wähler bewegt</span></div>';
+  var themenItems = (THEMEN.radar && THEMEN.radar.length) ? THEMEN.radar.slice().sort(function(a,b){return (b.relevanz||0)-(a.relevanz||0)}).slice(0,5) : [];
+  if (!themenItems.length && SENTIMENT.topics) {
+    themenItems = SENTIMENT.topics.slice(0,5).map(function(t){ return {label: t.name, relevanz: Math.abs(t.pct||50), beschreibung: t.desc||'', trend: t.pct > 0 ? 'positiv' : 'kritisch'}; });
+  }
+  for (var ti=0; ti<themenItems.length; ti++) {
+    var th = themenItems[ti];
+    var thColor = (th.relevanz||0) >= 80 ? 'var(--red)' : (th.relevanz||0) >= 60 ? 'var(--amber)' : 'var(--green)';
+    h += '<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:4px;margin-bottom:4px">';
+    h += '<div style="width:4px;height:28px;border-radius:2px;background:' + thColor + ';flex-shrink:0"></div>';
+    h += '<div style="flex:1">';
+    h += '<div style="font:600 7pt var(--f);color:var(--text)">' + (th.label||th.topic||'') + '</div>';
+    if (th.beschreibung) h += '<div style="font:400 6pt var(--f);color:var(--text2);margin-top:1px">' + th.beschreibung + '</div>';
+    h += '</div>';
+    h += '<div style="text-align:right;flex-shrink:0">';
+    h += '<div style="font:700 8pt var(--m);color:' + thColor + '">' + (th.relevanz||'') + '</div>';
+    h += '<div style="font:400 5pt var(--m);color:var(--muted)">' + (th.trend||'') + '</div>';
+    h += '</div></div>';
+  }
+  h += '</div>';
+
+  // ═══ BLOCK 5: SZENARIEN UND PROGNOSE (Wie kann die Wahl ausgehen) ═══
+  if (FORECAST && FORECAST.kandidaten && FORECAST.kandidaten.length) {
+    h += '<div style="margin-bottom:16px">';
+    h += '<div class="canvas-title">Szenarien und Prognose <span class="ct-badge" style="background:var(--accent)">' + (FORECAST.wahltermin||'') + '</span></div>';
+    h += '<div style="padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:6px">';
+    // Stichwahl probability headline
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">';
+    h += '<div style="font:600 8pt var(--f);color:var(--text)">Stichwahl-Wahrscheinlichkeit</div>';
+    var swColor = stichwahlPct >= 70 ? 'var(--red)' : stichwahlPct >= 40 ? 'var(--amber)' : 'var(--green)';
+    h += '<div style="font:700 12pt var(--m);color:' + swColor + '">' + stichwahlPct + '%</div>';
+    h += '</div>';
+    // Candidate forecast bars
+    for (var fi=0; fi<FORECAST.kandidaten.length; fi++) {
+      var fk = FORECAST.kandidaten[fi];
+      var fColor = (fk.partei||'').includes('CSU') ? '#0a4d8c' : (fk.partei||'').includes('SPD') ? '#c0392b' : (fk.partei||'').includes('Grün') ? '#4a8c3f' : 'var(--muted)';
+      h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
+      h += '<div style="width:100px;font:500 7pt var(--f);color:var(--text)">' + (fk.name||'').split(' ').pop() + '</div>';
+      h += '<div style="flex:1;height:18px;background:var(--surface2);border-radius:3px;overflow:hidden;position:relative">';
+      if (fk.min && fk.max) {
+        h += '<div style="position:absolute;left:' + fk.min + '%;width:' + (fk.max - fk.min) + '%;height:100%;background:' + fColor + '35;border-radius:3px"></div>';
+        h += '<div style="position:absolute;left:' + (fk.zentral||fk.min) + '%;width:2px;height:100%;background:' + fColor + '"></div>';
+      }
+      // 50% threshold
+      h += '<div style="position:absolute;left:50%;width:1px;height:100%;background:var(--red);opacity:0.3"></div>';
+      h += '</div>';
+      h += '<div style="width:70px;font:500 6.5pt var(--m);color:var(--text2);text-align:right">' + (fk.min||'?') + '-' + (fk.max||'?') + '%</div>';
       h += '</div>';
     }
+    // Method + gaps = transparency
+    if (FORECAST.method || FORECAST.gaps) {
+      h += '<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font:400 5.5pt var(--f);color:var(--muted);line-height:1.5">';
+      if (FORECAST.method) h += '<div>Methode: ' + FORECAST.method + '</div>';
+      if (FORECAST.gaps) h += '<div style="color:var(--amber);margin-top:2px">Einschränkung: ' + FORECAST.gaps + '</div>';
+      h += '</div>';
+    }
+    // Named scenarios (from SCENARIOS array)
+    if (SCENARIOS && SCENARIOS.length) {
+      h += '<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">';
+      h += '<div style="font:600 7pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Szenarien</div>';
+      for (var sci=0; sci<SCENARIOS.length; sci++) {
+        var sc = SCENARIOS[sci];
+        var scProb = sc.probability || sc.conf || 0;
+        var scColor = scProb >= 40 ? 'var(--accent)' : scProb >= 20 ? 'var(--amber)' : 'var(--muted)';
+        h += '<div style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-left:3px solid ' + scColor + ';border-radius:4px;margin-bottom:6px">';
+        h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+        h += '<div style="font:600 7.5pt var(--f);color:var(--text)">' + (sc.title||'Szenario '+(sci+1)) + '</div>';
+        h += '<div style="font:700 8pt var(--m);color:' + scColor + '">' + scProb + '%</div>';
+        h += '</div>';
+        h += '<div style="font:400 6.5pt var(--f);color:var(--text2);line-height:1.5;margin-bottom:4px">' + (sc.description||sc.body||'') + '</div>';
+        // Conditions
+        if (sc.conditions && sc.conditions.length) {
+          h += '<div style="font:400 5.5pt var(--f);color:var(--muted);margin-bottom:3px">Bedingungen:</div>';
+          for (var cci=0; cci<sc.conditions.length; cci++) {
+            h += '<div style="font:400 5.5pt var(--f);color:var(--text2);padding-left:8px">· ' + sc.conditions[cci] + '</div>';
+          }
+        }
+        // Results
+        if (sc.results && sc.results.length) {
+          h += '<div style="margin-top:4px">';
+          for (var ri=0; ri<sc.results.length; ri++) {
+            var r = sc.results[ri];
+            h += '<div style="font:400 5.5pt var(--f);color:var(--accent);margin-top:2px">→ ' + (r.name||'') + ': ' + (r.outcome||'') + '</div>';
+          }
+          h += '</div>';
+        }
+        h += '</div>';
+      }
+      h += '</div>';
+    }
+    h += '</div></div>';
   }
+
+  // ═══ DEEP DIVE SECTION (collapsed by default) ═══
+  h += '<div style="margin-top:20px;padding-top:16px;border-top:2px solid var(--border)">';
+  h += '<div class="canvas-title" style="cursor:pointer" onclick="document.getElementById(\'deep-dive\').style.display=document.getElementById(\'deep-dive\').style.display===\'none\'?\'\':\'none\'">Detailanalyse <span style="font:400 7pt var(--m);color:var(--accent)">▼ ein-/ausblenden</span></div>';
+  h += '<div id="deep-dive">';
 
   // Weekly Brief mini (in Briefing) — §1.1: hide if no data, never show "0 Prioritäten"
   if (WEEKLYBRIEF && (WEEKLYBRIEF.summary || (WEEKLYBRIEF.priorities||[]).length > 0)) {
@@ -1222,7 +1362,7 @@ function renderBriefing() {
   // Top risk cards
   h += '<div class="canvas-title">Jetzt relevant</div>';
   h += '<div class="briefing-grid">';
-  for (const k of topRisk) {
+  for (const k of sortedByRisk.slice(0, 3)) {
     const e = KB[k];
     const riskColor = e.risk > 40 ? 'var(--red)' : e.risk > 25 ? 'var(--amber)' : 'var(--green)';
     h += '<div class="briefing-card clickable" onclick="showEntity(\'' + k + '\')">';
@@ -1546,6 +1686,8 @@ function renderBriefing() {
     h += '<div class="hypo-conf-bar"><div class="hypo-conf-fill" style="width:' + conf + '%;background:var(--accent)"></div></div>';
     h += '</div>';
   }
+
+  h += '</div></div>'; // close deep-dive + border section
 
   el.innerHTML = h;
 }
