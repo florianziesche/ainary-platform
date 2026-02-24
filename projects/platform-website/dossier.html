@@ -437,33 +437,186 @@ const CITY_ID = urlParams.get('city') || 'bamberg';
 let TENANT = {}, KB = {}, GRAPH = {nodes:[],links:[]};
 let NEWS = [], HYPOTHESES = [], SENTIMENT = {}, PATTERNS = [], ACTIONS = [], FORECAST = {}, THEMEN = {}, SOCIAL = {}, STICHWAHL = {}, YOUTUBE = {};
 
+// ═══ SAFE STRING HELPER — use everywhere instead of raw concatenation ═══
+function S(val, fallback) { return (val != null && val !== '') ? val : (fallback || ''); }
+
+// ═══ NORMALIZE CITY DATA — one place, all defaults, rendering never crashes ═══
+function normalizeCity(d) {
+  // Tenant
+  d.tenant = d.tenant || {};
+  d.tenant.gemeinde = d.tenant.gemeinde || '';
+  d.tenant.name = d.tenant.name || d.tenant.gemeinde || '';
+  d.tenant.organisationen = d.tenant.organisationen || [];
+  d.tenant.alerts = d.tenant.alerts || [];
+  d.tenant.gemeinderat2020 = d.tenant.gemeinderat2020 || [];
+  d.tenant.strukturdaten = d.tenant.strukturdaten || {};
+
+  // KB (entities)
+  d.kb = d.kb || {};
+  for (var k in d.kb) {
+    var e = d.kb[k];
+    e.name = e.name || k;
+    e.role = e.role || e.rolle || '';
+    e.party = e.party || e.partei || '';
+    e.summary = e.summary || e.beschreibung || '';
+    e.risk = typeof e.risk === 'number' ? e.risk : 30;
+    e.trust = e.trust || 5;
+    e.sources = e.sources || 0;
+    e.color = e.color || 'var(--muted)';
+    e.properties = e.properties || [];
+    e.connections = e.connections || [];
+    e.controversies = e.controversies || [];
+    e.timeline = e.timeline || [];
+    e.steckbrief = e.steckbrief || {};
+    e.karriere = e.karriere || [];
+    e.zitate = e.zitate || [];
+    e.quellen = e.quellen || [];
+    e.trustScore = e.trustScore || {};
+  }
+
+  // Graph
+  d.graph = d.graph || {nodes:[], links:[]};
+  d.graph.nodes = d.graph.nodes || [];
+  d.graph.links = d.graph.links || [];
+  for (var i=0; i<d.graph.nodes.length; i++) {
+    var n = d.graph.nodes[i];
+    n.r = n.r || n.size || 12;
+    n.label = n.label || n.id || '';
+    n.sub = n.sub || '';
+  }
+
+  // News
+  d.news = d.news || [];
+  for (var i=0; i<d.news.length; i++) {
+    var n = d.news[i];
+    n.source = n.source || '';
+    n.date = n.date || '';
+    n.body = n.body || '';
+    n.sentiment = n.sentiment || 'NEU';
+    n.impact = n.impact || 'NIEDRIG';
+    n.entities = n.entities || [];
+  }
+
+  // Hypotheses
+  d.hypotheses = d.hypotheses || [];
+
+  // Sentiment
+  d.sentiment = d.sentiment || {};
+  d.sentiment.topics = d.sentiment.topics || [];
+  for (var i=0; i<d.sentiment.topics.length; i++) {
+    var t = d.sentiment.topics[i];
+    t.name = t.name || t.topic || t.label || 'Thema';
+    t.pct = typeof t.pct === 'number' ? t.pct : Math.round((t.valence||0)*100);
+    t.posts = t.posts || [];
+    t.desc = t.desc || '';
+    t.volume = t.volume || 'NIEDRIG';
+  }
+
+  // Patterns
+  d.patterns = d.patterns || [];
+  for (var i=0; i<d.patterns.length; i++) {
+    var p = d.patterns[i];
+    p.label = p.label || p.titel || '';
+    p.meaning = p.meaning || p.beschreibung || '';
+    p.soWhat = p.soWhat || p.cross_city || '';
+    p.invalidateIf = p.invalidateIf || '';
+    p.evidenceTags = p.evidenceTags || [{type:'J'}];
+    p.severity = p.severity || 'NIEDRIG';
+    p.confidence = p.confidence || 50;
+    p.entities = p.entities || [];
+  }
+
+  // Actions
+  d.actions = d.actions || [];
+
+  // Forecast
+  d.forecast = d.forecast || {};
+  d.forecast.kandidaten = d.forecast.kandidaten || [];
+  d.forecast.historie = d.forecast.historie || [];
+  d.forecast.stichwahlConf = d.forecast.stichwahlConf || d.forecast.confidence || 50;
+  d.forecast.stichwahlRange = d.forecast.stichwahlRange || {min:30, max:55};
+  d.forecast.wahltermin = d.forecast.wahltermin || '';
+  d.forecast.stichwahl = d.forecast.stichwahl || '';
+  d.forecast.keyfactors = d.forecast.keyfactors || [];
+  for (var i=0; i<d.forecast.kandidaten.length; i++) {
+    var k = d.forecast.kandidaten[i];
+    k.tag = k.tag || 'I';
+    k.min = k.min || 0;
+    k.max = k.max || 0;
+    k.zentral = k.zentral || 0;
+  }
+
+  // Themen
+  d.themen = d.themen || {};
+  d.themen.radar = d.themen.radar || [];
+
+  // Social
+  d.social = d.social || {};
+  d.social.kandidaten = d.social.kandidaten || [];
+  d.social.insights = d.social.insights || [];
+  d.social.google_trends = d.social.google_trends || {};
+  d.social.momentum_index = d.social.momentum_index || {};
+  d.social.momentum_index.source = d.social.momentum_index.source || 'Composite Score';
+  d.social.momentum_index.candidates = d.social.momentum_index.candidates || [];
+  for (var i=0; i<d.social.insights.length; i++) {
+    var ins = d.social.insights[i];
+    ins.title = ins.title || ins.type || 'Insight';
+    ins.body = ins.body || ins.text || '';
+    ins.severity = ins.severity || 'NIEDRIG';
+  }
+
+  // YouTube
+  d.youtube = d.youtube || {};
+  d.youtube.candidates = d.youtube.candidates || [];
+  d.youtube.city_videos = d.youtube.city_videos || [];
+
+  // Scenarios
+  d.scenarios = d.scenarios || [];
+  for (var i=0; i<d.scenarios.length; i++) {
+    d.scenarios[i].results = d.scenarios[i].results || {};
+    d.scenarios[i].name = d.scenarios[i].name || '';
+    d.scenarios[i].desc = d.scenarios[i].desc || '';
+    d.scenarios[i].label = d.scenarios[i].label || 'possible';
+  }
+
+  // Weekly Brief
+  d.weekly_brief = d.weekly_brief || {};
+  d.weekly_brief.priorities = d.weekly_brief.priorities || [];
+  d.weekly_brief.watchItems = d.weekly_brief.watchItems || [];
+  d.weekly_brief.summary = d.weekly_brief.summary || '';
+  d.weekly_brief.title = d.weekly_brief.title || '';
+
+  // Talking Points
+  d.talking_points = d.talking_points || [];
+}
+
 (async function loadCityData() {
   try {
     const resp = await fetch('data/cities/' + CITY_ID + '.json?t=' + Date.now());
     if (!resp.ok) throw new Error('City not found: ' + CITY_ID);
     const data = await resp.json();
-    TENANT = data.tenant || {};
-    KB = data.kb || {};
-    GRAPH = data.graph || {nodes:[],links:[]};
-    // Update page title
-    document.title = 'Dossier: ' + (TENANT.gemeinde || CITY_ID);
-    // Update breadcrumb
-    var bc = document.getElementById('bc-city');
-    if (bc) bc.textContent = TENANT.gemeinde || CITY_ID;
-    // Load additional data
-    NEWS = data.news || [];
-    HYPOTHESES = data.hypotheses || [];
-    SENTIMENT = data.sentiment || {};
-    PATTERNS = data.patterns || [];
-    ACTIONS = data.actions || [];
-    FORECAST = data.forecast || {};
-    THEMEN = data.themen || {};
-    SOCIAL = data.social || {};
-    YOUTUBE = data.youtube || {};
+    // ═══ NORMALIZE DATA (Palantir-pattern: one place, all defaults) ═══
+    normalizeCity(data);
+    TENANT = data.tenant;
+    KB = data.kb;
+    GRAPH = data.graph;
+    NEWS = data.news;
+    HYPOTHESES = data.hypotheses;
+    SENTIMENT = data.sentiment;
+    PATTERNS = data.patterns;
+    ACTIONS = data.actions;
+    FORECAST = data.forecast;
+    THEMEN = data.themen;
+    SOCIAL = data.social;
+    YOUTUBE = data.youtube;
     STICHWAHL = data.stichwahl_prediction || {};
     TALKINGPOINTS = data.talking_points || [];
     SCENARIOS = data.scenarios || [];
     WEEKLYBRIEF = data.weekly_brief || {};
+    // Update page title + breadcrumb
+    document.title = 'Dossier: ' + (TENANT.gemeinde || CITY_ID);
+    var bc = document.getElementById('bc-city');
+    if (bc) bc.textContent = TENANT.gemeinde || CITY_ID;
     // Init the app
     if (typeof initApp === 'function') initApp();
   } catch(e) {
