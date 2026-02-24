@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lead Radar — Ainary Intelligence</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◆</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+--bg:#fafafa;--surface:#fff;--surface2:#f5f5f3;
+--border:#d0d0d0;--border2:#e8e8e8;
+--text:#1a1a1a;--text2:#444;--muted:#777;--light:#bbb;
+--gold:#9d7f3b;--gold-hover:#b8972e;
+--red:#c0392b;--amber:#b45309;--green:#2d8a4e;--blue:#2563eb;--purple:#7c3aed;
+--red-bg:rgba(192,57,43,0.08);--amber-bg:rgba(180,83,9,0.08);--green-bg:rgba(45,138,78,0.08);--blue-bg:rgba(37,99,235,0.08);
+--accent:var(--gold);
+--f:'Inter',-apple-system,sans-serif;--m:'JetBrains Mono',monospace
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--f);color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;height:100vh;overflow:hidden;display:flex;flex-direction:column}
+::selection{background:var(--accent);color:var(--bg)}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* Login */
+.login-overlay{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.login-box{text-align:center}
+.login-logo{font-family:var(--m);font-size:10pt;font-weight:700;letter-spacing:.2em;color:var(--accent);margin-bottom:24px}
+.login-sub{font-size:8pt;color:var(--muted);margin-bottom:16px}
+.login-input{font:400 9pt var(--m);padding:8px 16px;border:1px solid var(--border);border-radius:4px;background:var(--surface);color:var(--text);width:220px;text-align:center;outline:none}
+.login-input:focus{border-color:var(--accent)}
+.login-input::placeholder{color:var(--light)}
+.login-err{font:400 7pt var(--m);color:var(--red);margin-top:8px;height:16px}
+.login-foot{font:400 6pt var(--m);color:var(--light);margin-top:32px}
+
+/* Topbar */
+.topbar{height:36px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.topbar-logo{font-family:var(--m);font-size:8pt;font-weight:700;letter-spacing:.15em;color:var(--accent)}
+.topbar-sep{color:var(--border2)}
+.topbar-env{font-family:var(--m);font-size:6pt;color:var(--muted);letter-spacing:.1em}
+.topbar-right{display:flex;align-items:center;gap:14px;font-family:var(--m);font-size:6.5pt;color:var(--muted)}
+.topbar-live{display:flex;align-items:center;gap:4px;color:var(--green)}
+.live-pulse{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* Content */
+.content{flex:1;overflow-y:auto;padding:20px 24px}
+
+/* KPIs */
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px}
+.kpi{background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:12px 14px;text-align:center}
+.kpi-val{font-family:var(--m);font-size:16pt;font-weight:700;margin-bottom:2px}
+.kpi-label{font-size:7pt;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.kpi-sub{font-family:var(--m);font-size:6pt;color:var(--light);margin-top:2px}
+
+/* Filters */
+.filter-row{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.filter-btn{font-family:var(--m);font-size:6.5pt;padding:4px 10px;border:1px solid var(--border2);border-radius:3px;color:var(--muted);cursor:pointer;background:none;transition:all .12s}
+.filter-btn:hover,.filter-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(157,127,59,0.04)}
+.filter-sep{width:1px;height:18px;background:var(--border2);margin:0 4px}
+.search-box{font:400 7pt var(--m);padding:4px 10px;border:1px solid var(--border2);border-radius:3px;background:var(--surface);color:var(--text);width:180px;outline:none;margin-left:auto}
+.search-box:focus{border-color:var(--accent)}
+.search-box::placeholder{color:var(--light)}
+
+/* Table */
+.t-wrap{border:1px solid var(--border2);border-radius:6px;overflow:auto;background:var(--surface)}
+table{width:100%;border-collapse:collapse;font-size:7.5pt;min-width:1100px}
+thead{background:var(--surface2);position:sticky;top:0;z-index:2}
+th{font-family:var(--m);font-size:5.5pt;font-weight:600;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none}
+th:hover{color:var(--accent)}
+th .sort-arrow{margin-left:3px;font-size:5pt}
+td{padding:7px 10px;border-bottom:1px solid var(--border2);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover{background:rgba(157,127,59,0.02)}
+tr.highlight{background:rgba(45,138,78,0.03)}
+
+/* City name */
+.city-name{font-weight:600;color:var(--text);cursor:pointer;text-decoration:none}
+.city-name:hover{color:var(--accent);text-decoration:underline}
+.city-bl{font-family:var(--m);font-size:6pt;color:var(--light);margin-left:4px}
+
+/* Score bar */
+.score-wrap{display:flex;align-items:center;gap:5px}
+.score-bar{height:5px;border-radius:3px;background:var(--border2);width:40px;overflow:hidden}
+.score-fill{height:100%;border-radius:3px}
+.score-val{font-family:var(--m);font-size:7pt;font-weight:600;min-width:18px}
+
+/* Status badge */
+.badge{font-family:var(--m);font-size:5.5pt;padding:2px 7px;border-radius:3px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.badge-live{background:var(--green-bg);color:var(--green)}
+.badge-pending{background:var(--amber-bg);color:var(--amber)}
+.badge-new{background:rgba(0,0,0,0.04);color:var(--muted)}
+
+/* Next step */
+.next-step{font-size:7pt;color:var(--text2);max-width:180px}
+.next-step.urgent{color:var(--red);font-weight:500}
+
+/* Links */
+.link-btn{font-family:var(--m);font-size:5.5pt;padding:2px 6px;border:1px solid var(--border2);border-radius:3px;color:var(--muted);text-decoration:none;cursor:pointer;background:none;transition:all .1s;display:inline-block;margin-right:3px}
+.link-btn:hover{border-color:var(--accent);color:var(--accent)}
+.link-btn.primary{border-color:var(--green);color:var(--green)}
+.link-btn.primary:hover{background:var(--green-bg)}
+
+/* Preis */
+.preis{font-family:var(--m);font-size:7pt;font-weight:600}
+.preis-grund{font-size:6pt;color:var(--light);max-width:120px}
+
+/* Budget */
+.digi-budget{font-size:7pt}
+.digi-budget.has-budget{color:var(--green);font-weight:500}
+
+/* Kontakt */
+.kontakt{font-size:7pt;color:var(--text2);max-width:130px}
+.kontakt.missing{color:var(--light);font-style:italic}
+
+/* Wahl */
+.wahl{font-family:var(--m);font-size:7pt}
+.wahl.soon{color:var(--red);font-weight:600}
+
+/* Status bar */
+.statusbar{height:22px;background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;font:400 6pt var(--m);color:var(--light);flex-shrink:0}
+
+/* Section title */
+.section-title{font-family:var(--m);font-size:6.5pt;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.section-title .ct-badge{font-size:5pt;padding:2px 6px;border-radius:2px;color:#fff;font-weight:700}
+
+/* Priority section */
+.priority-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-bottom:24px}
+.p-card{background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:12px 14px;border-left:3px solid var(--border)}
+.p-card.hot{border-left-color:var(--red)}
+.p-card.warm{border-left-color:var(--amber)}
+.p-card .p-city{font-weight:600;font-size:8.5pt;margin-bottom:2px}
+.p-card .p-action{font-size:7.5pt;color:var(--text2);margin-bottom:4px}
+.p-card .p-meta{font-family:var(--m);font-size:6pt;color:var(--muted);display:flex;gap:10px}
+.p-card .p-deadline{color:var(--red);font-weight:500}
+
+@media(max-width:900px){
+  .kpi-row{grid-template-columns:repeat(3,1fr)}
+  .content{padding:12px}
+  .priority-cards{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-overlay" id="login-overlay">
+<div class="login-box">
+  <div class="login-logo">AINARY</div>
+  <div class="login-sub">Lead Radar — Sales Intelligence</div>
+  <input class="login-input" id="login-pw" type="password" placeholder="Passwort" autofocus
+    onkeydown="if(event.key==='Enter')tryLogin()">
+  <div class="login-err" id="login-err"></div>
+  <div class="login-foot">Alle Daten aus öffentlich zugänglichen Quellen</div>
+</div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar" id="main-ui" style="display:none">
+  <div class="topbar-left">
+    <span class="topbar-logo">AINARY</span>
+    <span class="topbar-sep">·</span>
+    <span class="topbar-env">LEAD RADAR</span>
+  </div>
+  <div class="topbar-right">
+    <span class="topbar-live"><span class="live-pulse"></span> LIVE</span>
+    <span id="topbar-date"></span>
+    <span>28 LEADS</span>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content" id="main-content" style="display:none">
+
+  <!-- PRIORITY ACTIONS -->
+  <div class="section-title">Prioritäten <span class="ct-badge" style="background:var(--red)">JETZT</span> <span style="font-weight:400;color:var(--light);text-transform:none;letter-spacing:0">— Bayern-Wahl in <span id="countdown"></span> Tagen</span></div>
+  <div class="priority-cards" id="priority-cards"></div>
+
+  <!-- KPIs -->
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-val" id="kpi-total">28</div><div class="kpi-label">Städte</div><div class="kpi-sub">im Radar</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--green)" id="kpi-live">4</div><div class="kpi-label">Live</div><div class="kpi-sub">Analyse verfügbar</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--amber)" id="kpi-pending">3</div><div class="kpi-label">Pending</div><div class="kpi-sub">In Bearbeitung</div></div>
+    <div class="kpi"><div class="kpi-val" id="kpi-pipeline">€0</div><div class="kpi-label">Pipeline</div><div class="kpi-sub">Gesamt-Potenzial</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--red)" id="kpi-wahl">08.03</div><div class="kpi-label">Nächste Wahl</div><div class="kpi-sub">Bayern Kommunal</div></div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filter-row">
+    <button class="filter-btn active" onclick="setFilter('bl','all')">Alle</button>
+    <button class="filter-btn" onclick="setFilter('bl','BY')">Bayern</button>
+    <button class="filter-btn" onclick="setFilter('bl','SN')">Sachsen</button>
+    <button class="filter-btn" onclick="setFilter('bl','rest')">Bundesweit</button>
+    <div class="filter-sep"></div>
+    <button class="filter-btn active" onclick="setFilter('st','all')">Alle Status</button>
+    <button class="filter-btn" onclick="setFilter('st','live')">Live</button>
+    <button class="filter-btn" onclick="setFilter('st','pending')">Pending</button>
+    <button class="filter-btn" onclick="setFilter('st','new')">New</button>
+    <input class="search-box" id="search" placeholder="Suche: Stadt, Kontakt..." oninput="applyFilters()">
+  </div>
+
+  <!-- TABLE -->
+  <div class="t-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th onclick="sortBy('name')">Stadt <span class="sort-arrow"></span></th>
+          <th onclick="sortBy('ew')">EW <span class="sort-arrow"></span></th>
+          <th onclick="sortBy('score')">Score <span class="sort-arrow"></span></th>
+          <th onclick="sortBy('status')">Status</th>
+          <th onclick="sortBy('wahl')">Wahl</th>
+          <th>Digi-Budget</th>
+          <th>Kontakt</th>
+          <th>Nächster Schritt</th>
+          <th onclick="sortBy('preis')">Preis</th>
+          <th>Links</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- STATUS BAR -->
+<div class="statusbar" id="statusbar" style="display:none">
+  <div>Alle Daten aus öffentlich zugänglichen Quellen · Keine Gewähr für Vollständigkeit</div>
+  <div id="status-right">Vertraulich — nur für den Empfänger bestimmt</div>
+</div>
+
+<script>
+const PASSWORD = 'ainary2026';
+const WAHL_DATE = new Date('2026-03-08');
+
+const CITIES = [
+  {name:'Bamberg',bl:'BY',ew:78000,score:90,status:'live',wahl:'08.03.2026',digiBudget:'€15,75M Smart City',kontakt:'Smart City Büro Bamberg',nextStep:'Demo anbieten nach Stichwahl (22.03)',gothamUrl:'gotham-bamberg.html',dashUrl:'digi-dashboard.html',preis:490,grund:'8 Kandidaten + Skandale'},
+  {name:'Regensburg',bl:'BY',ew:155000,score:85,status:'live',wahl:'08.03.2026',digiBudget:'Smart City Staffel 1',kontakt:'Smart City Koordination',nextStep:'Gotham-Analyse #3 starten',gothamUrl:'gotham-regensburg.html',dashUrl:'digi-dashboard.html',preis:490,grund:'12 Kandidaten, höchste Dichte'},
+  {name:'Ottobrunn',bl:'BY',ew:22000,score:80,status:'live',wahl:'08.03.2026',digiBudget:'—',kontakt:'Schardt (BM-Kandidat)',nextStep:'Follow-up 27.02',gothamUrl:'gotham-ottobrunn.html',dashUrl:null,preis:490,grund:'Pilotkunde Schardt'},
+  {name:'Glashütte',bl:'SN',ew:6800,score:17,status:'live',wahl:'—',digiBudget:'—',kontakt:'BM Gleißberg',nextStep:'Pilot läuft',gothamUrl:null,dashUrl:null,preis:0,grund:'Pilotkunde'},
+  {name:'Nürnberg',bl:'BY',ew:520000,score:70,status:'pending',wahl:'08.03.2026',digiBudget:'Smart City Staffel 2',kontakt:'identifizieren',nextStep:'Franken-Bundle: Bamberg+Nürnberg+Erlangen',gothamUrl:null,dashUrl:'digi-dashboard.html',preis:490,grund:'Bayerns #2, König vs Brehm'},
+  {name:'Dippoldiswalde',bl:'SN',ew:14500,score:83,status:'pending',wahl:'—',digiBudget:'—',kontakt:'—',nextStep:'Report generieren (kommune-generator)',gothamUrl:null,dashUrl:null,preis:290,grund:'Nahe Glashütte, Cross-Sell'},
+  {name:'LK München',bl:'BY',ew:350000,score:65,status:'pending',wahl:'08.03.2026',digiBudget:'Ismaning Staffel 3',kontakt:'LRA München',nextStep:'Cross-Reference Ottobrunn',gothamUrl:null,dashUrl:'digi-dashboard.html',preis:490,grund:'Reichster LK + Smart City'},
+  {name:'Konstanz',bl:'BW',ew:84800,score:74,status:'new',wahl:'—',digiBudget:'—',kontakt:'—',nextStep:'—',gothamUrl:null,dashUrl:null,preis:290,grund:''},
+  {name:'Jena',bl:'TH',ew:111400,score:72,status:'new',wahl:'—',digiBudget:'—',kontakt:'—',nextStep:'—',gothamUrl:null,dashUrl:null,preis:290,grund:''},
+  {name:'Norderstedt',bl:'SH',ew:81400,score:71,status:'new',wahl:'—',digiBudget:'—',kontakt:'—',nextStep:'—',gothamUrl:null,dashUrl:null,preis:290,grund:''},
+  {name:'Radebeul',bl:'SN',ew:34000,score:70,status:'new',wahl:'—',digiBudget:'—',kontakt:'—',nextStep:'—',gothamUrl:null,dashUrl:null,preis:290,grund:''},
+  {name:'Marburg',bl:'HE',ew:76400,score:68,status:'new',wahl:'—',digiBudget:'—',kontakt:'—',nextStep:'—',gothamUrl:null,dashUrl:null,preis:290,grund:''},
+  {name:'Freital',bl:'SN',ew:39500,score:67,status:'new',wahl:'—',digiBudget:'—',kontakt:'—',nextStep:'—',gothamUrl:null,dashUrl:null,preis:290,grund:''},
+  {name:'Lüneburg',bl:'NI',ew:78000,score:66,status:'new',wahl:'—',digiBudget:'—',kontakt:'—',nextStep:'—',gothamUrl:null,dashUrl:null,preis:290,grund:''},
+  {name:'Worms',bl:'RP',ew:83500,score:65,status:'new',wahl:'—',digiBudget:'—',kontakt:'—',nextStep:'—',gothamUrl:null,dashUrl:null,preis:290,grund:''},
+  {name:'Trier',bl:'RP',ew:111500,score:63,status:'new',wahl:'—',digiBudget:'—',kontakt:'—',nextStep:'—',gothamUrl:null,dashUrl:null,preis:290,grund:''},
+  {name:'Freiberg',bl:'SN',ew:40600,score:62,status:'new',wahl:'—',digiBudget:'—',kontakt:'—',nextStep:'—',gothamUrl:null,dashUrl:null,preis:290,grund:''},
+  {name:'Erlangen',bl:'BY',ew:115000,score:60,status:'new',wahl:'08.03.2026',digiBudget:'—',kontakt:'Nachfolger-Kandidaten',nextStep:'Franken-Bundle',gothamUrl:null,dashUrl:'digi-dashboard.html',preis:490,grund:'Generationenwechsel + Tech'},
+  {name:'Pirna',bl:'SN',ew:39000,score:60,status:'new',wahl:'—',digiBudget:'—',kontakt:'—',nextStep:'—',gothamUrl:null,dashUrl:null,preis:290,grund:''},
+  {name:'Schwäbisch Hall',bl:'BW',ew:42000,score:60,status:'new',wahl:'—',digiBudget:'—',kontakt:'—',nextStep:'—',gothamUrl:null,dashUrl:null,preis:290,grund:''},
+  {name:'Bautzen',bl:'SN',ew:38800,score:58,status:'new',wahl:'—',digiBudget:'—',kontakt:'—',nextStep:'—',gothamUrl:null,dashUrl:null,preis:290,grund:''},
+  {name:'Meißen',bl:'SN',ew:28000,score:55,status:'new',wahl:'—',digiBudget:'—',kontakt:'—',nextStep:'—',gothamUrl:null,dashUrl:null,preis:290,grund:''},
+  {name:'Neu-Ulm',bl:'BY',ew:60000,score:55,status:'new',wahl:'08.03.2026',digiBudget:'Smart City Staffel 2',kontakt:'Herausforderer identifizieren',nextStep:'OB-Nachfolger recherchieren',gothamUrl:null,dashUrl:'digi-dashboard.html',preis:490,grund:'24J OB Pattern'},
+  {name:'Görlitz',bl:'SN',ew:56000,score:52,status:'new',wahl:'—',digiBudget:'—',kontakt:'—',nextStep:'—',gothamUrl:null,dashUrl:null,preis:290,grund:''},
+  {name:'Altenberg',bl:'SN',ew:8200,score:50,status:'new',wahl:'—',digiBudget:'—',kontakt:'—',nextStep:'—',gothamUrl:null,dashUrl:null,preis:290,grund:''},
+  {name:'Greifswald',bl:'MV',ew:59400,score:48,status:'new',wahl:'—',digiBudget:'—',kontakt:'—',nextStep:'—',gothamUrl:null,dashUrl:null,preis:290,grund:''},
+  {name:'Augsburg',bl:'BY',ew:300000,score:45,status:'new',wahl:'08.03.2026',digiBudget:'—',kontakt:'—',nextStep:'Nur wenn Kapazität',gothamUrl:null,dashUrl:'digi-dashboard.html',preis:290,grund:'Stabil, kein Smart City'},
+  {name:'Gersheim',bl:'SL',ew:6400,score:30,status:'new',wahl:'—',digiBudget:'—',kontakt:'—',nextStep:'—',gothamUrl:null,dashUrl:null,preis:290,grund:''}
+];
+
+// Priorities: top actions sorted by urgency
+const PRIORITIES = [
+  {city:'Ottobrunn',action:'Schardt Follow-up senden',deadline:'27.02',cls:'hot',score:80,grund:'Pilotkunde — erster Referenz-Punkt'},
+  {city:'Regensburg',action:'Gotham-Analyse #3 starten',deadline:'25.02',cls:'hot',score:85,grund:'12 Kandidaten + Smart City + Wolbergs'},
+  {city:'Bamberg',action:'Demo nach Stichwahl anbieten',deadline:'22.03',cls:'warm',score:90,grund:'€15,75M Budget, 8 Kandidaten'},
+  {city:'Nürnberg',action:'Franken-Bundle definieren: Bamberg+Nürnberg+Erlangen',deadline:'01.03',cls:'warm',score:70,grund:'3×€490 = €1.470 Paketpreis'},
+  {city:'Smart City',action:'Beauftragte aller 5 SC-Kommunen identifizieren',deadline:'28.02',cls:'hot',score:0,grund:'Wärmste Leads — kennen Datenprodukte'}
+];
+
+let filterBl = 'all';
+let filterSt = 'all';
+let sortCol = 'score';
+let sortDir = -1; // descending
+
+function tryLogin() {
+  var pw = document.getElementById('login-pw').value;
+  if (pw === PASSWORD) {
+    document.getElementById('login-overlay').style.display = 'none';
+    document.getElementById('main-ui').style.display = '';
+    document.getElementById('main-content').style.display = '';
+    document.getElementById('statusbar').style.display = '';
+    init();
+  } else {
+    document.getElementById('login-err').textContent = 'Falsches Passwort';
+  }
+}
+
+function init() {
+  // Date
+  var now = new Date();
+  var opts = {day:'2-digit',month:'2-digit',year:'numeric'};
+  document.getElementById('topbar-date').textContent = now.toLocaleDateString('de-DE',opts);
+
+  // Countdown
+  var diff = Math.ceil((WAHL_DATE - now) / (1000*60*60*24));
+  document.getElementById('countdown').textContent = diff;
+
+  // KPIs
+  var live = CITIES.filter(c=>c.status==='live').length;
+  var pending = CITIES.filter(c=>c.status==='pending').length;
+  var pipeline = CITIES.reduce((s,c)=>s+c.preis,0);
+  document.getElementById('kpi-total').textContent = CITIES.length;
+  document.getElementById('kpi-live').textContent = live;
+  document.getElementById('kpi-pending').textContent = pending;
+  document.getElementById('kpi-pipeline').textContent = '€'+pipeline.toLocaleString('de-DE');
+
+  // Priorities
+  renderPriorities();
+  renderTable();
+}
+
+function renderPriorities() {
+  var el = document.getElementById('priority-cards');
+  var h = '';
+  PRIORITIES.forEach(function(p) {
+    h += '<div class="p-card '+p.cls+'">';
+    h += '<div class="p-city">'+p.city+'</div>';
+    h += '<div class="p-action">→ '+p.action+'</div>';
+    h += '<div class="p-meta"><span class="p-deadline">⏰ '+p.deadline+'</span><span>'+p.grund+'</span></div>';
+    h += '</div>';
+  });
+  el.innerHTML = h;
+}
+
+function setFilter(type, val) {
+  if (type === 'bl') filterBl = val;
+  if (type === 'st') filterSt = val;
+  // Update button states
+  document.querySelectorAll('.filter-btn').forEach(function(btn) {
+    var onclick = btn.getAttribute('onclick') || '';
+    if (type === 'bl' && onclick.includes("'bl'")) {
+      btn.classList.toggle('active', onclick.includes("'"+val+"'"));
+    }
+    if (type === 'st' && onclick.includes("'st'")) {
+      btn.classList.toggle('active', onclick.includes("'"+val+"'"));
+    }
+  });
+  applyFilters();
+}
+
+function applyFilters() {
+  renderTable();
+}
+
+function sortBy(col) {
+  if (sortCol === col) { sortDir *= -1; } else { sortCol = col; sortDir = -1; }
+  renderTable();
+}
+
+function getFiltered() {
+  var q = (document.getElementById('search').value || '').toLowerCase();
+  return CITIES.filter(function(c) {
+    if (filterBl !== 'all') {
+      if (filterBl === 'rest') { if (['BY','SN'].includes(c.bl)) return false; }
+      else { if (c.bl !== filterBl) return false; }
+    }
+    if (filterSt !== 'all' && c.status !== filterSt) return false;
+    if (q) {
+      var hay = (c.name+' '+c.bl+' '+c.kontakt+' '+c.nextStep+' '+c.digiBudget).toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  }).sort(function(a,b) {
+    var va = a[sortCol], vb = b[sortCol];
+    if (typeof va === 'number') return (va - vb) * sortDir;
+    va = (va||'').toString(); vb = (vb||'').toString();
+    return va.localeCompare(vb) * sortDir;
+  });
+}
+
+function renderTable() {
+  var rows = getFiltered();
+  var h = '';
+  rows.forEach(function(c) {
+    var isLive = c.status === 'live';
+    var isPending = c.status === 'pending';
+    var rowCls = isLive ? 'highlight' : '';
+
+    // Score color
+    var sColor = c.score > 70 ? 'var(--green)' : c.score > 40 ? 'var(--amber)' : 'var(--red)';
+    var sFill = c.score > 70 ? 'high' : c.score > 40 ? 'mid' : 'low';
+
+    // Status badge
+    var badgeCls = isLive ? 'badge-live' : isPending ? 'badge-pending' : 'badge-new';
+    var badgeTxt = c.status.toUpperCase();
+
+    // City link
+    var cityHref = c.gothamUrl || c.dashUrl || '#';
+    var cityTarget = (c.gothamUrl || c.dashUrl) ? ' target="_blank"' : '';
+
+    // Wahl
+    var wahlCls = c.wahl !== '—' ? 'soon' : '';
+
+    // Budget
+    var budgetCls = c.digiBudget !== '—' ? 'has-budget' : '';
+
+    // Kontakt
+    var kontaktCls = (!c.kontakt || c.kontakt === '—' || c.kontakt === 'identifizieren') ? 'missing' : '';
+
+    // Next step urgency
+    var nsUrgent = c.nextStep.includes('27.02') || c.nextStep.includes('25.02') || c.nextStep.includes('Follow-up');
+
+    // Preis
+    var preisDisplay = c.preis === 0 ? 'Pilot' : '€'+c.preis;
+
+    h += '<tr class="'+rowCls+'">';
+    h += '<td><a class="city-name" href="'+cityHref+'"'+cityTarget+'>'+c.name+'</a><span class="city-bl">'+c.bl+'</span></td>';
+    h += '<td style="font-family:var(--m);font-size:7pt;color:var(--text2)">'+(c.ew>=1000?(c.ew/1000).toFixed(c.ew>=100000?0:1)+'K':c.ew)+'</td>';
+    h += '<td><div class="score-wrap"><div class="score-bar"><div class="score-fill" style="width:'+c.score+'%;background:'+sColor+'"></div></div><span class="score-val" style="color:'+sColor+'">'+c.score+'</span></div></td>';
+    h += '<td><span class="badge '+badgeCls+'">'+badgeTxt+'</span></td>';
+    h += '<td><span class="wahl '+wahlCls+'">'+c.wahl+'</span></td>';
+    h += '<td><span class="digi-budget '+budgetCls+'">'+c.digiBudget+'</span></td>';
+    h += '<td><span class="kontakt '+kontaktCls+'">'+(c.kontakt||'—')+'</span></td>';
+    h += '<td><span class="next-step'+(nsUrgent?' urgent':'')+'">'+c.nextStep+'</span></td>';
+    h += '<td><div class="preis">'+preisDisplay+'</div>'+(c.grund?'<div class="preis-grund">'+c.grund+'</div>':'')+'</td>';
+    h += '<td>';
+    if (c.gothamUrl) h += '<a class="link-btn primary" href="'+c.gothamUrl+'" target="_blank">Dossier</a>';
+    if (c.dashUrl) h += '<a class="link-btn" href="'+c.dashUrl+'" target="_blank">Briefing</a>';
+    h += '</td>';
+    h += '</tr>';
+  });
+  document.getElementById('table-body').innerHTML = h;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('login-pw').focus();
+});
+</script>
+</body>
+</html>
