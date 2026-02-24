@@ -859,6 +859,156 @@ function shareEntity(id) {
   if (navigator.clipboard) { navigator.clipboard.writeText(url); toast('Link kopiert: ' + KB[id].name); }
   else toast('Link: ' + url);
 }
+function updateScatter() {
+  var xAxis = document.getElementById('scatter-x').value;
+  var yAxis = document.getElementById('scatter-y').value;
+  var keys = Object.keys(KB);
+  var kands = keys.filter(function(k){ return KB[k].role && (KB[k].role.includes('Kandidat') || KB[k].role.includes('Bürgermeister')); });
+  var fcL = {};
+  for (var i=0;i<(FORECAST.kandidaten||[]).length;i++) fcL[FORECAST.kandidaten[i].id] = FORECAST.kandidaten[i];
+
+  var axisLabels = {digital:'Digitale Sichtbarkeit',quellen:'Quellenabdeckung',risk:'Risiko-Score',controversies:'Kontroversen',strength:'Wahlstärke'};
+
+  // Compute values
+  var points = [];
+  for (var ki=0;ki<kands.length;ki++) {
+    var ck=kands[ki], ce=KB[ck], cfk=fcL[ck]||{};
+    var ytD=(YOUTUBE.candidates||[]).find(function(y){return (y.name||'').toLowerCase().includes(ck)});
+    var vals = {
+      digital: ((ytD||{}).video_count||0)*3+(ce.quellen||[]).length*5+((ce.social||{}).mentions||0),
+      quellen: (ce.quellen||[]).length,
+      risk: ce.risk||0,
+      controversies: (ce.controversies||[]).length,
+      strength: cfk.zentral||20
+    };
+    var pColor=(ce.party||'').includes('CSU')?'#2D72D2':(ce.party||'').includes('SPD')?'#CD4246':(ce.party||'').includes('Grün')?'#238551':'#8F99A8';
+    points.push({id:ck, name:ce.name, short:ce.name.split(' ').pop(), party:ce.party, color:pColor, x:vals[xAxis]||0, y:vals[yAxis]||0, r:6+(ce.quellen||[]).length*0.4});
+  }
+
+  // Normalize
+  var xMax=1,yMax=1;
+  for(var i=0;i<points.length;i++){if(points[i].x>xMax)xMax=points[i].x;if(points[i].y>yMax)yMax=points[i].y;}
+
+  var svg='<svg viewBox="0 0 400 280" style="width:100%;height:auto;overflow:visible">';
+  svg+='<rect x="40" y="10" width="350" height="220" fill="none" stroke="var(--border)" stroke-width="0.5"/>';
+  svg+='<line x1="40" y1="120" x2="390" y2="120" stroke="var(--border)" stroke-width="0.3" stroke-dasharray="4"/>';
+  svg+='<line x1="215" y1="10" x2="215" y2="230" stroke="var(--border)" stroke-width="0.3" stroke-dasharray="4"/>';
+  svg+='<text x="215" y="258" text-anchor="middle" fill="var(--muted)" style="font:500 6pt var(--m)">'+(axisLabels[xAxis]||xAxis)+' →</text>';
+  svg+='<text x="12" y="120" text-anchor="middle" fill="var(--muted)" style="font:500 6pt var(--m)" transform="rotate(-90,12,120)">'+(axisLabels[yAxis]||yAxis)+' →</text>';
+
+  for(var i=0;i<points.length;i++){
+    var p=points[i];
+    var cx=40+(xMax>0?p.x/xMax:0.5)*350;
+    var cy=230-(yMax>0?p.y/yMax:0.5)*220;
+    var cr=Math.min(p.r,18);
+    // Tooltip data
+    var tip=p.name+' ('+p.party+')\\n'+(axisLabels[xAxis])+': '+p.x+'\\n'+(axisLabels[yAxis])+': '+p.y;
+    svg+='<circle cx="'+cx+'" cy="'+cy+'" r="'+cr+'" fill="'+p.color+'40" stroke="'+p.color+'" stroke-width="1.5" style="cursor:pointer;transition:r .2s" onmouseover="this.setAttribute(\'r\','+(cr+4)+');showScatterTip(evt,\''+tip.replace(/'/g,"\\'")+'\')" onmouseout="this.setAttribute(\'r\','+cr+');hideScatterTip()" onclick="showEntity(\''+p.id+'\')"/>';
+    svg+='<text x="'+cx+'" y="'+(cy-cr-4)+'" text-anchor="middle" fill="var(--text)" style="font:600 6pt var(--f);cursor:pointer;pointer-events:none">'+p.short+'</text>';
+  }
+  svg+='</svg>';
+  svg+='<div id="scatter-tip" style="display:none;position:fixed;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:8px 10px;font:400 7pt var(--m);color:var(--text);white-space:pre-line;pointer-events:none;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,0.3)"></div>';
+  document.getElementById('scatter-container').innerHTML=svg;
+}
+function showScatterTip(evt,text){var t=document.getElementById('scatter-tip');if(!t)return;t.style.display='block';t.textContent=text;t.style.left=(evt.clientX+12)+'px';t.style.top=(evt.clientY-10)+'px';}
+function hideScatterTip(){var t=document.getElementById('scatter-tip');if(t)t.style.display='none';}
+
+function updateFlow() {
+  var sel = document.getElementById('flow-matchup').value;
+  var parts = sel.split('|');
+  var leftId = parts[0], rightId = parts[1];
+  var leftE = KB[leftId], rightE = KB[rightId];
+  if (!leftE || !rightE) return;
+
+  var keys = Object.keys(KB);
+  var kands = keys.filter(function(k){ return KB[k].role && (KB[k].role.includes('Kandidat') || KB[k].role.includes('Bürgermeister')); });
+  var fcL = {};
+  for (var i=0;i<(FORECAST.kandidaten||[]).length;i++) fcL[FORECAST.kandidaten[i].id] = FORECAST.kandidaten[i];
+
+  var leftColor = (leftE.party||'').includes('CSU')?'#2D72D2':(leftE.party||'').includes('SPD')?'#CD4246':(leftE.party||'').includes('Grün')?'#238551':'#8F99A8';
+  var rightColor = (rightE.party||'').includes('CSU')?'#2D72D2':(rightE.party||'').includes('SPD')?'#CD4246':(rightE.party||'').includes('Grün')?'#238551':'#8F99A8';
+
+  // Collect all candidates with forecast
+  var sources = [];
+  for (var si=0;si<kands.length;si++) {
+    var sfk = fcL[kands[si]]||{};
+    if (sfk.zentral) sources.push({id:kands[si], name:KB[kands[si]].name.split(' ').pop(), party:KB[kands[si]].party, pct:sfk.zentral});
+  }
+  sources.sort(function(a,b){return b.pct-a.pct;});
+
+  // Estimate transfer: same party/block → same finalist, opposite → other
+  var leftTotal = 0, rightTotal = 0;
+  var svg = '<svg viewBox="0 0 420 '+(Math.max(sources.length*35+20,140))+'" style="width:100%;height:auto">';
+
+  var yOff = 15;
+  for (var si=0;si<sources.length;si++) {
+    var s = sources[si];
+    var sColor = (s.party||'').includes('CSU')?'#2D72D2':(s.party||'').includes('SPD')?'#CD4246':(s.party||'').includes('Grün')?'#238551':'#8F99A8';
+    var barH = Math.max(s.pct * 0.6, 10);
+
+    // Transfer logic: party affinity
+    var toLeft = 0, toRight = 0;
+    if (s.id === leftId) { toLeft = s.pct; }
+    else if (s.id === rightId) { toRight = s.pct; }
+    else {
+      // Estimate based on political proximity
+      var isConservative = (s.party||'').includes('CSU') || (s.party||'').includes('CDU') || (s.party||'').includes('FW') || (s.party||'').includes('AfD');
+      var isProgressive = (s.party||'').includes('SPD') || (s.party||'').includes('Grün') || (s.party||'').includes('ÖDP') || (s.party||'').includes('Linke');
+      var leftConservative = (leftE.party||'').includes('CSU') || (leftE.party||'').includes('CDU');
+      var rightConservative = (rightE.party||'').includes('CSU') || (rightE.party||'').includes('CDU');
+
+      if (isConservative && leftConservative) { toLeft = s.pct * 0.7; toRight = s.pct * 0.3; }
+      else if (isConservative && rightConservative) { toLeft = s.pct * 0.3; toRight = s.pct * 0.7; }
+      else if (isProgressive && !leftConservative) { toLeft = s.pct * 0.65; toRight = s.pct * 0.35; }
+      else if (isProgressive && !rightConservative) { toLeft = s.pct * 0.35; toRight = s.pct * 0.65; }
+      else { toLeft = s.pct * 0.5; toRight = s.pct * 0.5; }
+    }
+    leftTotal += toLeft; rightTotal += toRight;
+
+    // Left bar
+    svg += '<rect x="10" y="'+yOff+'" width="60" height="'+barH+'" rx="2" fill="'+sColor+'60" stroke="'+sColor+'" stroke-width="0.5" style="cursor:pointer" onclick="showEntity(\''+s.id+'\')"/>';
+    svg += '<text x="75" y="'+(yOff+barH/2+3)+'" fill="var(--text2)" style="font:500 6pt var(--m);cursor:pointer" onclick="showEntity(\''+s.id+'\')">'+s.name+' ('+s.pct+'%)</text>';
+
+    // Flow to left finalist
+    var leftTargetY = 30;
+    var rightTargetY = Math.max(sources.length*35-30, 90);
+    if (toLeft > 0) {
+      var lw = Math.max(toLeft * 0.25, 1);
+      svg += '<path d="M70 '+(yOff+barH/2)+' C180 '+(yOff+barH/2)+' 250 '+leftTargetY+' 320 '+leftTargetY+'" fill="none" stroke="'+leftColor+'50" stroke-width="'+lw+'" style="transition:stroke-width .3s"/>';
+    }
+    if (toRight > 0) {
+      var rw = Math.max(toRight * 0.25, 1);
+      svg += '<path d="M70 '+(yOff+barH/2)+' C180 '+(yOff+barH/2)+' 250 '+rightTargetY+' 320 '+rightTargetY+'" fill="none" stroke="'+rightColor+'50" stroke-width="'+rw+'" style="transition:stroke-width .3s"/>';
+    }
+    yOff += barH + 8;
+  }
+
+  // Right: two finalist boxes with projected totals
+  var leftPct = Math.round(leftTotal / (leftTotal+rightTotal) * 100);
+  var rightPct = 100 - leftPct;
+  var leftTargetY2 = 30;
+  var rightTargetY2 = Math.max(sources.length*35-30, 90);
+
+  svg += '<rect x="320" y="'+(leftTargetY2-18)+'" width="90" height="36" rx="4" fill="'+leftColor+'20" stroke="'+leftColor+'" stroke-width="1.5" style="cursor:pointer" onclick="showEntity(\''+leftId+'\')"/>';
+  svg += '<text x="365" y="'+(leftTargetY2-2)+'" text-anchor="middle" fill="var(--text)" style="font:600 7pt var(--f)">'+leftE.name.split(' ').pop()+'</text>';
+  svg += '<text x="365" y="'+(leftTargetY2+12)+'" text-anchor="middle" fill="'+leftColor+'" style="font:700 9pt var(--m)">~'+leftPct+'%</text>';
+
+  svg += '<rect x="320" y="'+(rightTargetY2-18)+'" width="90" height="36" rx="4" fill="'+rightColor+'20" stroke="'+rightColor+'" stroke-width="1.5" style="cursor:pointer" onclick="showEntity(\''+rightId+'\')"/>';
+  svg += '<text x="365" y="'+(rightTargetY2-2)+'" text-anchor="middle" fill="var(--text)" style="font:600 7pt var(--f)">'+rightE.name.split(' ').pop()+'</text>';
+  svg += '<text x="365" y="'+(rightTargetY2+12)+'" text-anchor="middle" fill="'+rightColor+'" style="font:700 9pt var(--m)">~'+rightPct+'%</text>';
+
+  svg += '</svg>';
+
+  // So What
+  var winner = leftPct > rightPct ? leftE.name.split(' ').pop() : rightE.name.split(' ').pop();
+  var delta = Math.abs(leftPct - rightPct);
+  svg += '<div style="margin-top:8px;padding:8px 10px;background:var(--blue)08;border-left:2px solid var(--blue);border-radius:0 4px 4px 0">';
+  svg += '<div style="font:500 7pt var(--f);color:var(--accent);line-height:1.5">→ Projektion: '+winner+' gewinnt mit ~'+delta+' Punkten Vorsprung. '+(delta<10?'Knappes Rennen — Mobilisierung entscheidet.':'Klarer struktureller Vorteil.')+'</div>';
+  svg += '</div>';
+
+  document.getElementById('flow-container').innerHTML = svg;
+}
+
 function runSimulation() {
   var wb = parseInt(document.getElementById('sim-wb').value);
   var ab = parseInt(document.getElementById('sim-ab').value);
@@ -2632,93 +2782,49 @@ function renderStrategy() {
 
   h += '</div>';
 
-  // --- KANDIDATEN-POSITIONIERUNG (SVG Scatter) ---
+  // --- KANDIDATEN-POSITIONIERUNG (Interactive SVG Scatter) ---
   h += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:16px;margin-bottom:16px">';
-  h += '<div style="font:600 8pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Kandidaten-Positionierung</div>';
-  h += '<div style="font:400 7pt var(--f);color:var(--text2);margin-bottom:10px">X: Digitale Sichtbarkeit · Y: Strukturelle Wahlstärke · Größe: Quellenabdeckung</div>';
-  h += '<svg id="sim-scatter" viewBox="0 0 400 250" style="width:100%;height:auto;overflow:visible">';
-  // Grid
-  h += '<rect x="40" y="10" width="350" height="220" fill="none" stroke="var(--border)" stroke-width="0.5"/>';
-  h += '<line x1="40" y1="120" x2="390" y2="120" stroke="var(--border)" stroke-width="0.3" stroke-dasharray="4"/>';
-  h += '<line x1="215" y1="10" x2="215" y2="230" stroke="var(--border)" stroke-width="0.3" stroke-dasharray="4"/>';
-  // Axis labels
-  h += '<text x="215" y="248" text-anchor="middle" fill="var(--muted)" style="font:500 6pt var(--m)">Digitale Sichtbarkeit →</text>';
-  h += '<text x="12" y="120" text-anchor="middle" fill="var(--muted)" style="font:500 6pt var(--m)" transform="rotate(-90,12,120)">Wahlstärke →</text>';
-  // Quadrant labels
-  h += '<text x="128" y="30" text-anchor="middle" fill="var(--muted)" style="font:400 5pt var(--m);opacity:0.5">Digital schwach / Stark</text>';
-  h += '<text x="303" y="30" text-anchor="middle" fill="var(--muted)" style="font:400 5pt var(--m);opacity:0.5">Digital stark / Stark</text>';
-  h += '<text x="128" y="225" text-anchor="middle" fill="var(--muted)" style="font:400 5pt var(--m);opacity:0.5">Digital schwach / Schwach</text>';
-  h += '<text x="303" y="225" text-anchor="middle" fill="var(--muted)" style="font:400 5pt var(--m);opacity:0.5">Digital stark / Schwach</text>';
-
-  // Plot candidates
-  var fcLookup = {};
-  for (var fci=0; fci<(FORECAST.kandidaten||[]).length; fci++) { var fc = FORECAST.kandidaten[fci]; fcLookup[fc.id] = fc; }
-  for (var ki=0; ki<kandidaten.length; ki++) {
-    var ck = kandidaten[ki];
-    var ce = KB[ck];
-    var cfk = fcLookup[ck] || {};
-    // X = digital presence (YouTube + social mentions + quellen)
-    var ytData = (YOUTUBE.candidates||[]).find(function(y){ return (y.name||"").toLowerCase().includes(ck); });
-    var digitalScore = ((ytData||{}).video_count||0) * 3 + (ce.quellen||[]).length * 5 + ((ce.social||{}).mentions||0);
-    var maxDigital = 150; // normalize
-    var cx = 40 + Math.min(digitalScore / maxDigital, 1) * 350;
-    // Y = electoral strength (forecast zentral inverted for SVG)
-    var ey = cfk.zentral || 20;
-    var cy = 230 - (ey / 60 * 220);
-    // Size = quellen coverage
-    var cr = 6 + (ce.quellen||[]).length * 0.5;
-    var pColor = (ce.party||"").includes("CSU") ? "#2D72D2" : (ce.party||"").includes("SPD") ? "#CD4246" : (ce.party||"").includes("Grün") ? "#238551" : "#8F99A8";
-    h += '<circle cx="'+cx+'" cy="'+cy+'" r="'+Math.min(cr,18)+'" fill="'+pColor+'40" stroke="'+pColor+'" stroke-width="1.5" style="cursor:pointer" onclick="showEntity(\''+ck+'\')"/>';
-    h += '<text x="'+cx+'" y="'+(cy-Math.min(cr,18)-4)+'" text-anchor="middle" fill="var(--text)" style="font:600 6pt var(--f);cursor:pointer" onclick="showEntity(\''+ck+'\')">'+ce.name.split(" ").pop()+'</text>';
-  }
-  h += '</svg>';
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">';
+  h += '<div style="font:600 8pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:1px">Kandidaten-Positionierung</div>';
+  // Axis selector
+  h += '<div style="display:flex;gap:4px">';
+  h += '<select id="scatter-x" onchange="updateScatter()" style="font:500 6pt var(--m);padding:3px 6px;background:var(--surface2);color:var(--text2);border:1px solid var(--border);border-radius:3px;cursor:pointer">';
+  h += '<option value="digital">X: Digitale Sichtbarkeit</option>';
+  h += '<option value="quellen">X: Quellenabdeckung</option>';
+  h += '<option value="risk">X: Risiko-Score</option>';
+  h += '<option value="controversies">X: Kontroversen</option>';
+  h += '</select>';
+  h += '<select id="scatter-y" onchange="updateScatter()" style="font:500 6pt var(--m);padding:3px 6px;background:var(--surface2);color:var(--text2);border:1px solid var(--border);border-radius:3px;cursor:pointer">';
+  h += '<option value="strength">Y: Wahlstärke</option>';
+  h += '<option value="quellen">Y: Quellenabdeckung</option>';
+  h += '<option value="risk">Y: Risiko-Score</option>';
+  h += '<option value="digital">Y: Digitale Sichtbarkeit</option>';
+  h += '</select>';
+  h += '</div></div>';
+  h += '<div id="scatter-container"></div>';
   h += '</div>';
 
-  // --- WÄHLERFLUSS-DIAGRAMM (Stichwahl) ---
-  if (STICHWAHL.likely_matchup) {
-    h += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:16px">';
-    h += '<div style="font:600 8pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Wählerfluss-Projektion (Stichwahl)</div>';
-    h += '<div style="font:400 7pt var(--f);color:var(--text2);margin-bottom:10px">Geschätzte Wählerwanderung bei ' + STICHWAHL.likely_matchup + '</div>';
-
-    // Build simple flow visualization
-    var matchup = STICHWAHL.likely_matchup || '';
-    var swKands = matchup.split(' vs. ').map(function(n){ return n.trim(); });
-    var leftName = swKands[0] || 'Kandidat A';
-    var rightName = swKands[1] || 'Kandidat B';
-
-    h += '<svg viewBox="0 0 400 160" style="width:100%;height:auto">';
-    // Source parties on left
-    var sources = [];
-    for (var si=0; si<kandidaten.length; si++) {
-      var sk = KB[kandidaten[si]];
-      var sfk = fcLookup[kandidaten[si]] || {};
-      if (sfk.zentral) sources.push({name: sk.name.split(" ").pop(), party: sk.party, pct: sfk.zentral, id: kandidaten[si]});
+  // --- WÄHLERFLUSS-DIAGRAMM (Interactive — Stichwahl-Paarung wählbar) ---
+  h += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:16px">';
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">';
+  h += '<div style="font:600 8pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:1px">Wählerfluss-Projektion</div>';
+  // Matchup selector
+  h += '<select id="flow-matchup" onchange="updateFlow()" style="font:500 6.5pt var(--m);padding:4px 8px;background:var(--surface2);color:var(--text2);border:1px solid var(--border);border-radius:3px;cursor:pointer">';
+  var fcLookup2 = {};
+  for (var fci2=0; fci2<(FORECAST.kandidaten||[]).length; fci2++) { fcLookup2[FORECAST.kandidaten[fci2].id] = FORECAST.kandidaten[fci2]; }
+  // Generate all possible matchup pairs from top 3
+  var topFc = (FORECAST.kandidaten||[]).slice(0,3);
+  for (var mi=0; mi<topFc.length; mi++) {
+    for (var mj=mi+1; mj<topFc.length; mj++) {
+      var sel = (STICHWAHL.likely_matchup||'').includes(topFc[mi].name.split(' ').pop()) && (STICHWAHL.likely_matchup||'').includes(topFc[mj].name.split(' ').pop()) ? ' selected' : '';
+      h += '<option value="'+topFc[mi].id+'|'+topFc[mj].id+'"'+sel+'>'+topFc[mi].name.split(' ').pop()+' vs. '+topFc[mj].name.split(' ').pop()+'</option>';
     }
-    sources.sort(function(a,b){ return b.pct - a.pct; });
-    var yOff = 10;
-    for (var si=0; si<sources.length; si++) {
-      var s = sources[si];
-      var barH = Math.max(s.pct * 0.8, 8);
-      var sColor = (s.party||"").includes("CSU") ? "#2D72D2" : (s.party||"").includes("SPD") ? "#CD4246" : (s.party||"").includes("Grün") ? "#238551" : "#8F99A8";
-      // Left bar
-      h += '<rect x="10" y="'+yOff+'" width="60" height="'+barH+'" rx="2" fill="'+sColor+'60" stroke="'+sColor+'" stroke-width="0.5"/>';
-      h += '<text x="75" y="'+(yOff+barH/2+3)+'" fill="var(--text2)" style="font:500 5.5pt var(--m)">'+s.name+' ('+s.pct+'%)</text>';
-      // Flow lines to right
-      var goesLeft = (s.party||"").includes("CSU") || matchup.includes(s.name);
-      var targetY = goesLeft ? 30 : 100;
-      h += '<path d="M70 '+(yOff+barH/2)+' C200 '+(yOff+barH/2)+' 250 '+targetY+' 310 '+targetY+'" fill="none" stroke="'+sColor+'40" stroke-width="'+Math.max(barH*0.3,1.5)+'"/>';
-      yOff += barH + 6;
-    }
-    // Right: two target blocks
-    h += '<rect x="310" y="15" width="80" height="40" rx="4" fill="var(--blue)20" stroke="var(--blue)" stroke-width="1"/>';
-    h += '<text x="350" y="38" text-anchor="middle" fill="var(--text)" style="font:600 7pt var(--f)">'+leftName.split(" ").pop()+'</text>';
-    h += '<rect x="310" y="85" width="80" height="40" rx="4" fill="var(--green)20" stroke="var(--green)" stroke-width="1"/>';
-    h += '<text x="350" y="108" text-anchor="middle" fill="var(--text)" style="font:600 7pt var(--f)">'+rightName.split(" ").pop()+'</text>';
-    h += '</svg>';
-
-    h += '<div style="font:400 6pt var(--f);color:var(--muted);margin-top:6px;font-style:italic">Projektion basierend auf Parteizugehörigkeit und historischen Wählerwanderungsmustern. Keine empirischen Transferdaten verfügbar.</div>';
-    h += '</div>';
   }
+  h += '</select>';
+  h += '</div>';
+  h += '<div id="flow-container"></div>';
+  h += '<div style="font:400 6pt var(--f);color:var(--muted);margin-top:6px;font-style:italic">Projektion basierend auf Parteizugehörigkeit und historischen Wählerwanderungsmustern. Klicken Sie auf Kandidaten für Details.</div>';
+  h += '</div>';
 
   h += '</div>'; // close Block 2B
 
@@ -2836,8 +2942,10 @@ function renderStrategy() {
   h += '</div>'; // close Block 3
 
   el.innerHTML = h;
-  // Initialize simulation on render
+  // Initialize all interactive elements
   if (document.getElementById('sim-wb')) runSimulation();
+  if (document.getElementById('scatter-container')) updateScatter();
+  if (document.getElementById('flow-container')) updateFlow();
 }
 
 // =====================================================
