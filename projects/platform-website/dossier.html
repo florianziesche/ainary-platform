@@ -803,14 +803,78 @@ function buildIntelFeed() {
 function buildPatterns() {
   const el = document.getElementById('detected-patterns');
   let html = '';
-  for (const p of PATTERNS) {
-    html += '<div class="pattern clickable" onclick="switchView(\'strategy\')">';
-    html += '<div class="pattern-title">' + p.label + '</div>';
-    html += '<div class="pattern-body">' + p.meaning.substring(0, 150) + (p.meaning.length > 150 ? '...' : '') + '</div>';
-    html += '<div class="pattern-conf">' + (p.confidence || 50) + '%</div>';
-    html += '</div>';
+  for (var pi=0; pi<PATTERNS.length; pi++) {
+    var p = PATTERNS[pi];
+    var conf = p.confidence || 50;
+    var confColor = conf >= 80 ? 'var(--green)' : conf >= 60 ? 'var(--amber)' : 'var(--red)';
+    var confLabel = conf >= 90 ? 'BEWIESEN' : conf >= 70 ? 'STARK' : conf >= 50 ? 'MESSBAR' : 'SCHWACH';
+    var sevColor = p.severity === 'HOCH' ? 'var(--red)' : p.severity === 'MITTEL' ? 'var(--amber)' : 'var(--muted)';
+    
+    html += '<div class="pattern clickable" onclick="togglePatternDetail(' + pi + ')" style="cursor:pointer;position:relative">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center">';
+    html += '<div class="pattern-title">' + (p.id || 'P-' + pi) + ': ' + p.label + '</div>';
+    html += '<div style="display:flex;gap:6px;align-items:center">';
+    if (p.severity) html += '<span style="font:600 5pt var(--m);padding:2px 5px;border-radius:2px;background:' + sevColor + '15;color:' + sevColor + '">' + p.severity + '</span>';
+    html += '<span style="font:700 7pt var(--m);color:' + confColor + '">' + conf + '%</span>';
+    html += '<span style="font:400 6pt var(--m);color:var(--muted)">▼</span>';
+    html += '</div></div>';
+    html += '<div class="pattern-body" style="margin-top:4px">' + p.meaning.substring(0, 120) + (p.meaning.length > 120 ? '…' : '') + '</div>';
+    
+    // Expandable detail section (hidden by default)
+    html += '<div id="pattern-detail-' + pi + '" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">';
+    
+    // Full meaning
+    html += '<div style="font:500 6.5pt var(--m);color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Warum das wichtig ist</div>';
+    html += '<div style="font:400 7pt var(--f);color:var(--text);line-height:1.6;margin-bottom:10px">' + p.meaning + '</div>';
+    
+    // Evidence
+    if (p.evidenceTags && p.evidenceTags.length) {
+      html += '<div style="font:500 6.5pt var(--m);color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Evidence</div>';
+      html += '<div style="display:flex;gap:4px;margin-bottom:10px">';
+      for (var ei=0; ei<p.evidenceTags.length; ei++) {
+        var et = p.evidenceTags[ei];
+        var evColor = et.type === 'E' ? 'var(--green)' : et.type === 'J' ? 'var(--amber)' : 'var(--red)';
+        var evLabel = et.type === 'E' ? 'Empirisch belegt' : et.type === 'J' ? 'Journalistisch gestützt' : 'Indiz';
+        html += '<span style="font:600 5.5pt var(--m);padding:2px 6px;border-radius:2px;background:' + evColor + '15;color:' + evColor + '">' + et.type + ' · ' + evLabel + '</span>';
+      }
+      html += '</div>';
+    }
+    
+    // Confidence reasoning
+    html += '<div style="font:500 6.5pt var(--m);color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Confidence: ' + conf + '% — ' + confLabel + '</div>';
+    html += '<div style="height:4px;background:var(--bg2);border-radius:2px;margin-bottom:4px;overflow:hidden"><div style="width:' + conf + '%;height:100%;background:' + confColor + '"></div></div>';
+    
+    // Invalidate condition
+    if (p.invalidateIf) {
+      html += '<div style="margin-top:8px;padding:6px 8px;background:var(--red)08;border-left:2px solid var(--red);border-radius:0 3px 3px 0">';
+      html += '<span style="font:600 5.5pt var(--m);color:var(--red)">⚠ Entkräftet wenn:</span> ';
+      html += '<span style="font:400 6pt var(--f);color:var(--text2)">' + p.invalidateIf + '</span></div>';
+    }
+    
+    // So What
+    if (p.soWhat) {
+      html += '<div style="margin-top:8px;padding:6px 8px;background:var(--accent)08;border-left:2px solid var(--accent);border-radius:0 3px 3px 0">';
+      html += '<span style="font:600 5.5pt var(--m);color:var(--accent)">→ So What:</span> ';
+      html += '<span style="font:400 6pt var(--f);color:var(--text)">' + p.soWhat + '</span></div>';
+    }
+    
+    // Related entities
+    if (p.entities && p.entities.length) {
+      html += '<div style="margin-top:8px;display:flex;gap:4px;flex-wrap:wrap">';
+      for (var ri=0; ri<p.entities.length; ri++) {
+        html += '<span style="font:500 5.5pt var(--m);padding:2px 8px;border-radius:10px;background:var(--accent)15;color:var(--accent);cursor:pointer" onclick="event.stopPropagation();showEntity(\'' + p.entities[ri] + '\')">' + p.entities[ri] + '</span>';
+      }
+      html += '</div>';
+    }
+    
+    html += '</div>'; // end detail
+    html += '</div>'; // end pattern
   }
   el.innerHTML = html;
+}
+function togglePatternDetail(idx) {
+  var el = document.getElementById('pattern-detail-' + idx);
+  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
 }
 
 // =====================================================
