@@ -2221,7 +2221,13 @@ function renderStrategy() {
   const el = document.getElementById('strategy-view');
   let h = '';
 
-  // Cross-Patterns (from Insights)
+  // ═══ PALANTIR STRATEGY: 3 Blöcke — Analyse → Szenarien → Handlungsoptionen ═══
+
+  // ═══ BLOCK 1: STRATEGISCHE ANALYSE (Wo stehen wir?) ═══
+  h += '<div style="margin-bottom:24px">';
+  h += '<div class="canvas-title">Strategische Analyse</div>';
+  
+  // Erkannte Muster (Cross-Patterns)
   h += '<div class="canvas-title">Cross-Learning Intelligence <span class="ct-badge" style="background:var(--accent)">META-ANALYSE</span></div>';
   for (var pi2=0; pi2<PATTERNS.length; pi2++) {
     var pat = PATTERNS[pi2];
@@ -2269,9 +2275,70 @@ function renderStrategy() {
     h += '</div>';
   }
 
-  // Actions (v21-level: evidence, linked metrics, action buttons, datenbasis)
-  h += '<div style="margin-top:24px"></div>';
-  h += '<div class="canvas-title">Handlungsempfehlungen <span class="ct-badge" style="background:var(--accent)">' + ACTIONS.length + ' AKTIONEN · DATENBASIERT</span></div>';
+  h += '</div>'; // close Block 1
+
+  // ═══ BLOCK 2: SZENARIEN (Was kann passieren?) ═══
+  h += '<div style="margin-bottom:24px">';
+  h += '<div class="canvas-title">Szenarien <span class="ct-badge" style="background:var(--amber)">WAS-WENN-ANALYSE</span></div>';
+
+  // Stichwahl-Szenarien
+  if (SCENARIOS && SCENARIOS.length) {
+    h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:16px">';
+    for (var si2=0; si2<SCENARIOS.length; si2++) {
+      var sc = SCENARIOS[si2];
+      var scProb = sc.probability || sc.conf || 0;
+      var scBorder = scProb >= 40 ? 'var(--green)' : scProb >= 20 ? 'var(--amber)' : 'var(--muted)';
+      h += '<div style="background:var(--surface);border:1px solid var(--border);border-top:3px solid '+scBorder+';border-radius:6px;padding:14px">';
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
+      h += '<div style="font:600 6pt var(--m);color:'+scBorder+';text-transform:uppercase;letter-spacing:.08em">SZENARIO '+(si2+1)+'</div>';
+      h += '<div style="font:700 10pt var(--m);color:'+scBorder+'">'+scProb+'%</div>';
+      h += '</div>';
+      h += '<div style="font:600 9pt var(--f);color:var(--text);margin-bottom:6px">'+(sc.title||sc.name||'')+'</div>';
+      h += '<div style="font:400 7.5pt var(--f);color:var(--text2);line-height:1.6;margin-bottom:8px">'+(sc.description||sc.desc||'')+'</div>';
+      if (sc.conditions && sc.conditions.length) {
+        h += '<div style="font:600 6pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Bedingungen</div>';
+        for (var ci2=0; ci2<sc.conditions.length; ci2++) {
+          h += '<div style="font:400 7pt var(--f);color:var(--text2);padding-left:10px;margin-bottom:2px">· '+sc.conditions[ci2]+'</div>';
+        }
+      }
+      if (sc.results && sc.results.length) {
+        h += '<div style="margin-top:8px;padding-top:6px;border-top:1px solid var(--border)">';
+        h += '<div style="font:600 6pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Auswirkungen</div>';
+        for (var ri2=0; ri2<sc.results.length; ri2++) {
+          var r2 = sc.results[ri2];
+          h += '<div style="font:400 7pt var(--f);color:var(--accent);margin-bottom:3px">→ <strong>'+(r2.name||'')+':</strong> '+(r2.outcome||'')+'</div>';
+        }
+        h += '</div>';
+      }
+      h += '</div>';
+    }
+    h += '</div>';
+  }
+
+  // Stichwahl-Prognose
+  if (STICHWAHL.probability) {
+    var swProb2 = STICHWAHL.probability;
+    var swColor2 = swProb2 >= 80 ? 'var(--red)' : swProb2 >= 50 ? 'var(--amber)' : 'var(--green)';
+    h += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:14px;margin-bottom:12px">';
+    h += '<div style="display:flex;align-items:center;gap:16px;margin-bottom:8px">';
+    h += '<div style="font:800 28pt var(--m);color:'+swColor2+'">'+swProb2+'%</div>';
+    h += '<div><div style="font:600 9pt var(--f);color:var(--text)">Stichwahl-Wahrscheinlichkeit</div>';
+    h += '<div style="font:400 7pt var(--f);color:var(--text2);margin-top:2px">'+STICHWAHL.reason+'</div></div>';
+    h += '</div>';
+    h += '<div style="height:8px;background:var(--surface2);border-radius:4px;overflow:hidden"><div style="width:'+swProb2+'%;height:100%;background:'+swColor2+';border-radius:4px"></div></div>';
+    if (STICHWAHL.likely_matchup) h += '<div style="font:400 7pt var(--f);color:var(--text2);margin-top:6px">Wahrscheinlichstes Duell: <strong>'+STICHWAHL.likely_matchup+'</strong></div>';
+    if (STICHWAHL.wildcard) h += '<div style="font:400 7pt var(--f);color:var(--amber);margin-top:4px">Wildcard: '+STICHWAHL.wildcard+'</div>';
+    h += '</div>';
+  }
+  h += '</div>'; // close Block 2
+
+  // ═══ BLOCK 3: HANDLUNGSOPTIONEN (Was tun?) ═══
+  h += '<div style="margin-bottom:24px">';
+  h += '<div class="canvas-title">Handlungsoptionen <span class="ct-badge" style="background:var(--accent)">DATENBASIERT</span></div>';
+
+  // Actions
+  h += '<div style="font:400 8pt var(--f);color:var(--text2);margin-bottom:12px;line-height:1.6">Handlungsoptionen basierend auf Dossier-Analyse, Stimmungsdaten und Wahlmuster. Neutral formuliert — keine Parteiempfehlung.</div>';
+  h += '<div class="canvas-title">Handlungsempfehlungen <span class="ct-badge" style="background:var(--accent)">' + ACTIONS.length + ' AKTIONEN</span></div>';
   h += '<div style="font:400 7pt var(--f);color:var(--text2);margin-bottom:12px;line-height:1.5">Empfehlungen basierend auf Dossier-Analyse, Stimmungsdaten und Wahlmuster. Priorisiert nach Impact und Dringlichkeit.</div>';
   for (var ai2=0; ai2<ACTIONS.length; ai2++) {
     var a = ACTIONS[ai2];
@@ -2376,215 +2443,7 @@ function renderStrategy() {
     }
   }
 
-  // ═══ SCENARIOS ═══
-  if (SCENARIOS && (SCENARIOS||[]).length) {
-    h += '<div style="margin-top:24px"></div>';
-    h += '<div class="canvas-title">Stichwahl-Szenarien <span class="ct-badge" style="background:var(--amber)">WAS-WENN</span></div>';
-    h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">';
-    for (var si2=0;si2<(SCENARIOS||[]).length;si2++) {
-      var sc = SCENARIOS[si2];
-      var scBorder = sc.label==='best'||sc.label==='stichwahl_win'?'var(--green)':sc.label==='worst'?'var(--red)':'var(--amber)';
-      var scLabel = sc.label==='best'?'BESTES SZENARIO':sc.label==='worst'?'SCHLECHTESTES':sc.label==='stichwahl_win'?'STICHWAHL-SIEG':'WAHRSCHEINLICH';
-      h += '<div style="background:var(--surface);border:1px solid var(--border);border-top:3px solid '+scBorder+';border-radius:6px;padding:12px">';
-      h += '<div style="font:600 5.5pt var(--m);color:'+scBorder+';text-transform:uppercase;letter-spacing:.08em">'+scLabel+'</div>';
-      h += '<div style="font:600 8pt var(--f);color:var(--text);margin:4px 0">'+sc.name+'</div>';
-      h += '<div style="font:400 6.5pt var(--f);color:var(--text2);margin-bottom:8px">'+sc.desc+'</div>';
-      // Result bars
-      var rKeys = Object.keys(sc.results || {});
-      for (var ri2=0;ri2<rKeys.length;ri2++) {
-        var rk = rKeys[ri2];
-        if (rk==='stichwahl') continue;
-        var rv = sc.results[rk];
-        var rColor = rk==='schardt'?'var(--red)':rk==='loderer'?'var(--blue)':rk==='matella'?'var(--green)':rk==='afd'?'var(--red)':'var(--muted)';
-        h += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">';
-        h += '<div style="width:50px;font:400 6pt var(--m);color:var(--muted);text-transform:capitalize">'+rk+'</div>';
-        h += '<div style="flex:1;height:6px;background:var(--border);border-radius:3px"><div style="height:100%;border-radius:3px;background:'+rColor+';width:'+rv+'%"></div></div>';
-        h += '<div style="font:600 6.5pt var(--m);color:var(--text);min-width:24px;text-align:right">'+rv+'%</div>';
-        h += '</div>';
-      }
-      if (sc.results && sc.results.stichwahl !== undefined) {
-        var stColor = sc.results.stichwahl > 50 ? 'var(--red)' : sc.results.stichwahl > 30 ? 'var(--amber)' : 'var(--green)';
-        h += '<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border);font:600 7pt var(--m);color:'+stColor+'">Stichwahl: '+sc.results.stichwahl+'%</div>';
-      }
-      if (sc.note) h += '<div style="font:400 5.5pt var(--f);color:var(--muted);margin-top:4px">'+sc.note+'</div>';
-      h += '</div>';
-    }
-    h += '</div>';
-  }
-
-  // YouTube Intelligence
-  if (YOUTUBE.candidates && YOUTUBE.candidates.length) {
-    h += '<div style="margin-top:24px"></div>';
-    h += '<div class="canvas-title">YouTube Intelligence <span class="ct-badge" style="background:var(--red)">▶ ' + YOUTUBE.candidates.length + ' KANDIDATEN</span></div>';
-    h += '<div style="font:400 6pt var(--m);color:var(--muted);margin-bottom:8px">Stand: ' + (YOUTUBE.scraped || '') + ' · Quelle: YouTube Data API v3</div>';
-    // Bar chart
-    var ytMax = 0;
-    for (var yi=0; yi<YOUTUBE.candidates.length; yi++) { if (YOUTUBE.candidates[yi].video_count > ytMax) ytMax = YOUTUBE.candidates[yi].video_count; }
-    for (var yi=0; yi<YOUTUBE.candidates.length; yi++) {
-      var yc = YOUTUBE.candidates[yi];
-      var ytW = ytMax > 0 ? (yc.video_count / ytMax * 100) : 0;
-      var ytColor = yc.has_own_channel ? 'var(--red)' : 'var(--blue)';
-      var ytBadge = yc.has_own_channel ? ' <span style="font:600 5pt var(--m);padding:1px 4px;border-radius:2px;background:var(--red)15;color:var(--red)">EIGENER KANAL</span>' : '';
-      h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
-      h += '<div style="width:100px;font:500 7pt var(--m);color:var(--text2);text-align:right;flex-shrink:0">' + yc.name + '</div>';
-      h += '<div style="flex:1;height:16px;background:var(--bg2);border-radius:3px;overflow:hidden;position:relative">';
-      h += '<div style="width:' + ytW + '%;height:100%;background:' + ytColor + '30;border-left:2px solid ' + ytColor + '"></div>';
-      h += '</div>';
-      h += '<div style="width:60px;font:700 7pt var(--m);color:' + ytColor + '">' + yc.video_count + ' Videos' + ytBadge + '</div>';
-      h += '</div>';
-    }
-    // Top videos
-    if (YOUTUBE.candidates.some(function(c){ return c.top_videos && c.top_videos.length; })) {
-      h += '<div style="margin-top:10px;font:600 6pt var(--m);color:var(--accent);text-transform:uppercase;letter-spacing:0.5px">Neueste Videos</div>';
-      for (var yi=0; yi<YOUTUBE.candidates.length; yi++) {
-        var yc = YOUTUBE.candidates[yi];
-        if (yc.top_videos) {
-          for (var yv=0; yv<Math.min(yc.top_videos.length, 1); yv++) {
-            var vid = yc.top_videos[yv];
-            h += '<div style="margin:4px 0;padding:4px 6px;background:var(--bg2);border-radius:3px;font:400 6pt var(--m)">';
-            h += '<a href="' + vid.url + '" target="_blank" style="color:var(--accent);text-decoration:none">▶ ' + vid.title.substring(0,60) + '</a>';
-            h += ' <span style="color:var(--muted)">· ' + vid.channel + ' · ' + vid.published + '</span>';
-            h += '</div>';
-          }
-        }
-      }
-    }
-    // YouTube Insight (Red Diamond)
-    if (YOUTUBE.insight) {
-      h += '<div style="margin-top:10px;padding:8px 10px;background:var(--red)08;border-left:2px solid var(--red);border-radius:0 4px 4px 0">';
-      h += '<div style="font:700 6pt var(--m);color:var(--red);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">◆ Red Diamond — YouTube Intelligence</div>';
-      h += '<div style="font:400 6.5pt var(--m);color:var(--text2);line-height:1.5">' + YOUTUBE.insight + '</div>';
-      if (YOUTUBE.cross_platform_gap) {
-        h += '<div style="margin-top:4px;font:500 6pt var(--m);color:var(--accent)">Cross-Platform: ' + YOUTUBE.cross_platform_gap + '</div>';
-      }
-      h += '</div>';
-    }
-    // City videos
-    if (YOUTUBE.city_videos && YOUTUBE.city_videos.length) {
-      h += '<div style="margin-top:8px;font:600 6pt var(--m);color:var(--accent);text-transform:uppercase;letter-spacing:0.5px">Stadt-Berichterstattung</div>';
-      for (var ci=0; ci<YOUTUBE.city_videos.length; ci++) {
-        var cv = YOUTUBE.city_videos[ci];
-        h += '<div style="margin:3px 0;padding:3px 6px;background:var(--bg2);border-radius:3px;font:400 6pt var(--m)">';
-        h += '<a href="' + cv.url + '" target="_blank" style="color:var(--blue);text-decoration:none">▶ ' + cv.title.substring(0,60) + '</a>';
-        h += ' <span style="color:var(--muted)">· ' + cv.channel + '</span>';
-        h += '</div>';
-      }
-    }
-    h += '';
-  }
-
-  // Stichwahl Prediction (Red Diamond)
-  if (STICHWAHL.probability) {
-    var swProb = STICHWAHL.probability;
-    var swColor = swProb >= 80 ? 'var(--red)' : swProb >= 50 ? 'var(--amber)' : 'var(--green)';
-    var swEmoji = '<span style="color:' + (swProb >= 80 ? 'var(--red)' : swProb >= 50 ? 'var(--amber)' : 'var(--green)') + '">●</span>';
-    h += '<div style="margin-top:24px"></div>';
-    h += '<div class="canvas-title">Stichwahl-Prognose <span class="ct-badge" style="background:' + swColor + '">◆ PREDICTION</span></div>';
-    h += '<div class="entity-card"><div class="entity-body">';
-    // Big probability number
-    h += '<div style="display:flex;align-items:center;gap:16px;margin-bottom:12px">';
-    h += '<div style="font:800 32pt var(--m);color:' + swColor + '">' + swProb + '%</div>';
-    h += '<div><div style="font:600 9pt var(--f);color:var(--text)">Stichwahl-Wahrscheinlichkeit</div>';
-    h += '<div style="font:400 7pt var(--f);color:var(--text2);margin-top:2px">' + STICHWAHL.reason + '</div></div>';
-    h += '</div>';
-    // Progress bar
-    h += '<div style="height:10px;background:var(--surface2);border-radius:5px;overflow:hidden;margin-bottom:12px">';
-    h += '<div style="width:' + swProb + '%;height:100%;background:' + swColor + ';border-radius:5px;transition:width 1s"></div>';
-    h += '</div>';
-    // Details grid
-    h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
-    h += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:8px 10px">';
-    h += '<div style="font:600 6pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Voraussichtliches Duell</div>';
-    h += '<div style="font:500 7.5pt var(--f);color:var(--text);margin-top:3px">' + STICHWAHL.likely_matchup + '</div>';
-    h += '</div>';
-    h += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:8px 10px">';
-    h += '<div style="font:600 6pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Digitaler Vorteil</div>';
-    h += '<div style="font:500 7.5pt var(--f);color:var(--accent);margin-top:3px">' + STICHWAHL.digital_advantage + '</div>';
-    h += '</div>';
-    h += '</div>';
-    if (STICHWAHL.wildcard) {
-      h += '<div style="margin-top:8px;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-left:2px solid var(--amber);border-radius:3px">';
-      h += '<div style="font:600 6pt var(--m);color:var(--amber);margin-bottom:3px">» WILDCARD</div>';
-      h += '<div style="font:400 6.5pt var(--f);color:var(--text2)">' + STICHWAHL.wildcard + '</div>';
-      h += '</div>';
-    }
-    h += '</div></div>';
-  }
-
-  // Overview Cards (v21-style)
-  if (SENTIMENT.overview) {
-    h += '<div style="margin-top:24px"></div>';
-    h += '<div class="canvas-title">Stimmungsbild <span class="ct-badge" style="background:var(--blue)">ÜBERSICHT</span></div>';
-    h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:16px">';
-    var ovKeys = Object.keys(SENTIMENT.overview);
-    for (var oi=0;oi<ovKeys.length;oi++) {
-      var ov = SENTIMENT.overview[ovKeys[oi]];
-      var ovc = (ov.pct||0) < 0 ? 'var(--red)' : 'var(--green)';
-      h += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:10px 12px">';
-      h += '<div style="font:700 16pt var(--m);color:'+ovc+'">'+((ov.pct||0)>0?'+':'')+(ov.pct||0)+'%</div>';
-      h += '<div style="font:500 6.5pt var(--m);color:var(--text);margin-top:2px">'+ov.label+'</div>';
-      h += '<div style="font:400 5.5pt var(--m);color:var(--muted)">'+ov.n+' Beiträge · '+ov.trend+'</div>';
-      h += '</div>';
-    }
-    h += '</div>';
-  }
-
-  // Topic Sentiment with Drill-Down
-  if (SENTIMENT.topics && SENTIMENT.topics.length) {
-    h += '<div class="canvas-title">Themen-Sentiment <span class="ct-badge" style="background:var(--blue)">' + SENTIMENT.topics.length + ' TOPICS · ' + SENTIMENT.topics.reduce(function(s,t){return s+(t.posts||[]).length},0) + ' POSTS</span></div>';
-    for (var ti=0; ti<SENTIMENT.topics.length; ti++) {
-      var t = SENTIMENT.topics[ti];
-      var tpct = t.pct || t.sentiment || 0;
-      var tColor = tpct < -50 ? 'var(--red)' : tpct < 0 ? 'var(--amber)' : 'var(--green)';
-      var tPosts = t.posts || [];
-      h += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;margin-bottom:10px;overflow:hidden">';
-      // Header — always visible, clickable
-      h += '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer" onclick="toggleTopic('+ti+')">';
-      h += '<div style="flex:1">';
-      h += '<div style="font:600 8pt var(--f);color:var(--text)">'+t.name+' <span style="font:400 6pt var(--m);color:var(--accent);text-decoration:underline">('+tPosts.length+' Beiträge →)</span></div>';
-      // Bar
-      h += '<div style="height:4px;background:var(--border);border-radius:2px;margin-top:4px;width:100%"><div style="height:100%;border-radius:2px;background:'+tColor+';width:'+Math.min(Math.abs(tpct),100)+'%;transition:width .4s"></div></div>';
-      h += '</div>';
-      h += '<div style="font:700 10pt var(--m);color:'+tColor+';min-width:40px;text-align:right"><span class="ev ev-i">I</span> '+(tpct>0?'+':'')+tpct+'%</div>';
-      h += '<div id="topic-arrow-'+ti+'" style="font:400 8pt var(--f);color:var(--muted);transition:transform .2s">▼</div>';
-      h += '</div>';
-      // Theme chips
-      if (t.topThemes && t.topThemes.length) {
-        h += '<div style="display:flex;gap:3px;flex-wrap:wrap;padding:0 14px 6px">';
-        for (var ci=0;ci<t.topThemes.length;ci++) h += '<span style="font:400 5.5pt var(--m);padding:2px 5px;background:var(--surface2);border-radius:2px;color:var(--text2)">'+t.topThemes[ci]+'</span>';
-        h += '</div>';
-      }
-      // Drill-Down — hidden by default
-      h += '<div id="topic-detail-'+ti+'" style="display:none;border-top:1px solid var(--border)">';
-      // Sort controls
-      h += '<div style="display:flex;gap:6px;padding:8px 14px;flex-wrap:wrap;align-items:center">';
-      h += '<span style="font:500 6pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Sortieren:</span>';
-      var sorts = [["date","Datum"],["sentiment","Sentiment"],["source","Quelle"]];
-      for (var si=0;si<sorts.length;si++) {
-        h += '<button onclick="sortTopic('+ti+',\''+sorts[si][0]+'\')" style="font:500 6pt var(--m);padding:3px 8px;border-radius:3px;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted)">'+sorts[si][1]+'</button>';
-      }
-      h += '</div>';
-      // Posts
-      h += '<div id="topic-posts-'+ti+'" style="padding:0 14px 10px">';
-      for (var pi=0;pi<tPosts.length;pi++) {
-        var p = tPosts[pi];
-        var pc = (p.sent||0) > 0.3 ? 'var(--green)' : (p.sent||0) < -0.5 ? 'var(--red)' : (p.sent||0) < -0.2 ? 'var(--amber)' : 'var(--muted)';
-        var pl = (p.sent||0) > 0.3 ? 'POS' : (p.sent||0) < -0.5 ? 'NEG' : (p.sent||0) < -0.2 ? 'MIX' : 'NEU';
-        h += '<div style="padding:6px 0;border-bottom:1px solid var(--border)">';
-        h += '<div style="display:flex;align-items:flex-start;gap:6px">';
-        h += '<span style="font:400 5.5pt var(--m);color:var(--muted);min-width:16px">'+(pi+1)+'.</span>';
-        h += '<div style="flex:1">';
-        h += '<div style="font:400 7pt var(--f);color:var(--text);line-height:1.4">"'+p.text+'"</div>';
-        h += '<div style="display:flex;gap:8px;margin-top:3px;font:400 5.5pt var(--m);color:var(--muted)">';
-        h += '<span style="color:'+pc+';font-weight:600">'+pl+'</span>';
-        h += '<span>'+p.src+'</span>';
-        h += '<span>'+(p.date||'')+'</span>';
-        if (p.cat) h += '<span style="padding:1px 4px;background:var(--surface2);border-radius:2px">'+p.cat+'</span>';
-        h += '</div></div></div></div>';
-      }
-      h += '</div></div></div>';
-    }
-  }
+  h += '</div>'; // close Block 3
 
   el.innerHTML = h;
 }
