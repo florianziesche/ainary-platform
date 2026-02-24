@@ -1086,6 +1086,80 @@ function renderBriefing() {
     h += '</div></div>';
   }
 
+  // Google Trends Intelligence
+  if (SOCIAL.google_trends && SOCIAL.google_trends.comparison) {
+    var gt = SOCIAL.google_trends;
+    var gtCands = Object.keys(gt.comparison);
+    h += '<div class="canvas-title">Google Trends Intelligence <span class="ct-badge" style="background:var(--accent)">LIVE</span></div>';
+    h += '<div class="entity-card"><div class="entity-body">';
+    h += '<div style="font:400 6pt var(--m);color:var(--muted);margin-bottom:8px">' + gt.source + ' · Stand: ' + gt.updated + '</div>';
+    var maxGT = 0;
+    for (var gi=0; gi<gtCands.length; gi++) { var gv = gt.comparison[gtCands[gi]].recent || 0; if (gv > maxGT) maxGT = gv; }
+    for (var gi=0; gi<gtCands.length; gi++) {
+      var gName = gtCands[gi];
+      var gData = gt.comparison[gName];
+      var gPct = maxGT > 0 ? Math.round((gData.recent / maxGT) * 100) : 0;
+      var gTrend = gData.trend_pct || 0;
+      var gTrendColor = gTrend > 50 ? 'var(--green)' : gTrend < -10 ? 'var(--red)' : 'var(--muted)';
+      var gTrendArrow = gTrend > 50 ? '📈' : gTrend < -10 ? '📉' : '➡️';
+      h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
+      h += '<div style="width:120px;font:500 7pt var(--f);color:var(--text)">' + gName.split(' ').pop() + '</div>';
+      h += '<div style="flex:1;height:18px;background:var(--surface2);border-radius:3px;overflow:hidden;position:relative">';
+      h += '<div style="width:' + gPct + '%;height:100%;background:var(--accent)30;border-radius:3px;transition:width .5s"></div>';
+      h += '<div style="position:absolute;right:6px;top:50%;transform:translateY(-50%);font:600 6.5pt var(--m);color:var(--text)">Suchinteresse: ' + gData.recent + '</div>';
+      h += '</div>';
+      h += '<div style="width:60px;text-align:right;font:600 6.5pt var(--m);color:' + gTrendColor + '">' + (gTrend > 0 ? '+' : '') + gTrend + '% ' + gTrendArrow + '</div>';
+      h += '</div>';
+    }
+    if (gt.insight) {
+      h += '<div style="margin-top:8px;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-left:2px solid var(--accent);border-radius:3px">';
+      h += '<div style="font:600 6pt var(--m);color:var(--accent);margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em">💎 Red Diamond Insight</div>';
+      h += '<div style="font:400 6.5pt var(--f);color:var(--text2);line-height:1.5">' + gt.insight + '</div>';
+      h += '</div>';
+    }
+    h += '</div></div>';
+  }
+
+  // Momentum Index
+  if (SOCIAL.momentum_index && SOCIAL.momentum_index.candidates) {
+    var mi = SOCIAL.momentum_index;
+    var miCands = Object.keys(mi.candidates);
+    h += '<div class="canvas-title">Momentum Index <span class="ct-badge" style="background:var(--red)">COMPOSITE</span></div>';
+    h += '<div class="entity-card"><div class="entity-body">';
+    h += '<div style="font:400 6pt var(--m);color:var(--muted);margin-bottom:8px">' + mi.source + '</div>';
+    for (var mii=0; mii<miCands.length; mii++) {
+      var miName = miCands[mii];
+      var miData = mi.candidates[miName];
+      var miScore = miData.score || 0;
+      var miComps = miData.components || {};
+      h += '<div style="margin-bottom:10px">';
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+      h += '<div style="font:600 7.5pt var(--f);color:var(--text)">' + miName + '</div>';
+      h += '<div style="font:700 9pt var(--m);color:var(--accent)">' + miScore + '/100</div>';
+      h += '</div>';
+      h += '<div style="height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;margin-bottom:4px">';
+      h += '<div style="width:' + miScore + '%;height:100%;background:linear-gradient(90deg,var(--accent),var(--blue));border-radius:4px;transition:width .5s"></div>';
+      h += '</div>';
+      // Component bars
+      var compNames = {'engagement':'Engagement','growth':'Wachstum','search_interest':'Suchinteresse','activity':'Aktivität','cross_platform':'Cross-Platform'};
+      h += '<div style="display:flex;gap:4px;flex-wrap:wrap">';
+      for (var ck in miComps) {
+        var cv = miComps[ck];
+        var cl = compNames[ck] || ck;
+        var cc = cv >= 80 ? 'var(--green)' : cv >= 50 ? 'var(--amber)' : 'var(--red)';
+        h += '<div style="font:400 5.5pt var(--m);color:' + cc + ';padding:2px 5px;background:var(--surface);border-radius:2px;border:1px solid var(--border)">' + cl + ' ' + cv + '</div>';
+      }
+      h += '</div></div>';
+    }
+    if (mi.verdict) {
+      h += '<div style="margin-top:6px;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-left:2px solid var(--red);border-radius:3px">';
+      h += '<div style="font:600 6pt var(--m);color:var(--red);margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em">⚔️ Verdict</div>';
+      h += '<div style="font:400 6.5pt var(--f);color:var(--text2);line-height:1.5">' + mi.verdict + '</div>';
+      h += '</div>';
+    }
+    h += '</div></div>';
+  }
+
   // Themen-Radar (absorbed from Stimmung) — fallback for cities without rich themen section
   if ((!THEMEN.radar || !THEMEN.radar.length) && SENTIMENT.topics && SENTIMENT.topics.length) {
     h += '<div class="canvas-title">Themen-Radar <span class="ct-badge" style="background:var(--blue)">' + SENTIMENT.topics.length + ' TOPICS</span></div>';

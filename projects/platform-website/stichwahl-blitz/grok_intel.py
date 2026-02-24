@@ -11,7 +11,7 @@ Usage:
 Requires: XAI_API_KEY environment variable
 """
 
-import json, sys, os
+import json, sys, os, urllib.error
 from datetime import datetime
 from pathlib import Path
 
@@ -50,9 +50,13 @@ def query_grok(prompt, system_prompt=None):
     )
     
     try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
+        with urllib.request.urlopen(req, timeout=60) as resp:
             data = json.loads(resp.read())
             return data["choices"][0]["message"]["content"]
+    except urllib.error.HTTPError as e:
+        body = e.read().decode()
+        print(f"❌ Grok API error {e.code}: {body}")
+        return None
     except Exception as e:
         print(f"❌ Grok API error: {e}")
         return None
