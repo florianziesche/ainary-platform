@@ -51,6 +51,7 @@ from datetime import datetime
 from pathlib import Path
 
 JOURNAL_PATH = os.path.join(os.path.dirname(__file__), 'learning-journal.json')
+CROSS_INSIGHTS_PATH = os.path.join(os.path.dirname(__file__), 'cross-city-insights.json')
 
 
 def load_journal():
@@ -477,6 +478,22 @@ def reflect_and_log(filepath, full=False):
     print(f"  Feedback loops:    {len(journal['runs'])} total runs logged")
     print(f"  Cross-deployment:  {len(all_analyses)} cities analyzed")
     print(f"{'─' * 60}")
+
+    # Cross-City Insights (if available)
+    if os.path.exists(CROSS_INSIGHTS_PATH):
+        with open(CROSS_INSIGHTS_PATH) as f:
+            xci = json.load(f)
+        patterns = xci.get("patterns", [])
+        if patterns:
+            print(f"\n{'─' * 60}")
+            print(f"🌐 CROSS-CITY PATTERNS ({len(patterns)} tracked):")
+            for p in patterns:
+                status_icon = {"CONFIRMED": "✅", "CONFIRMED_PARTIAL": "🟡", "TESTING": "🔬", "REJECTED": "❌"}.get(p["status"], "?")
+                print(f"   {status_icon} [{p['id']}] {p['title']} ({p['confidence']}%)")
+                if "refined_hypothesis" in p:
+                    print(f"      → {p['refined_hypothesis'][:100]}...")
+                if "test_next" in p:
+                    print(f"      Test: {', '.join(p['test_next'][:3])}")
 
     # Save journal
     save_journal(journal)
