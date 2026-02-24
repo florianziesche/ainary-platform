@@ -85,18 +85,27 @@ Ainary Intelligence
   - CTA: Stripe/PayPal Button oder Kontaktformular
   - FAQ: Datenschutz, Methodik, Lieferzeit
 
-## Pricing
-- **€490**: Volle Stichwahl-Analyse (Gegner-Profil + Strategie)
-- **€0**: Kurzanalyse (3 Insights, Link im Email) — Lead Magnet
-- **€1.470**: Franken-Bundle (3 Städte) — für Partei-Geschäftsstellen
+## Pricing (Segmentiert)
+- **Tier A — €5.000**: Kreisfreie Städte (>50K EW). Full Intelligence Package. Email → Call → Delivery.
+- **Tier B — €2.500**: Große Kreisstädte (20-50K EW). Self-Service + 1 Call.
+- **Tier C — €990**: Kleine Gemeinden (<20K EW). Self-Service Landing Page.
+- **€0**: Kurzanalyse (3 Insights im Email) — Lead Magnet für alle Tiers.
+- **Partei-Bundle — €15.000**: Alle Stichwahl-Kandidaten einer Partei in einem Regierungsbezirk.
 
 ## Zahlen
 - ~2.056 Gemeinden wählen am 8.03
 - ~15% gehen in Stichwahl = ~300 Gemeinden
 - ~600 Kandidaten (je 2 pro Stichwahl)
-- Email: 300-600 Emails (je nach ob beide Kandidaten)
-- 5% Conversion = 15-30 Kunden × €490 = **€7.350 - €14.700**
-- 1% Conversion = 3-6 Kunden × €490 = **€1.470 - €2.940**
+- Davon: ~40 kreisfreie Städte/OB (Tier A), ~100 große Kreisstädte (Tier B), ~460 Rest (Tier C)
+
+**Revenue-Szenarien (14 Tage):**
+- Conservative (2% Tier A, 2% Tier B, 1% Tier C):
+  1 × €5K + 2 × €2.5K + 5 × €990 = **€14.950**
+- Realistic (5% Tier A, 3% Tier B, 1% Tier C):
+  2 × €5K + 3 × €2.5K + 5 × €990 = **€22.450**
+- Optimistic (10% Tier A, 5% Tier B, 2% Tier C):
+  4 × €5K + 5 × €2.5K + 9 × €990 = **€41.410**
+- Moonshot: 1 Partei-Bundle = **€15.000** (+ Einzelkunden)
 
 ## Data Sources für Scraper
 1. **wahlen.bayern.de** — Offizielle Ergebnisse (Landesamt für Statistik)

@@ -111,33 +111,35 @@ def generate_email_tier_a(stichwahl, ontology):
         body = f"""{anrede},
 
 {candidate['percent']:.1f}% im ersten Wahlgang. {opponent['name']} ({opponent['party']}): {opponent['percent']:.1f}%.
-{diff:.1f} Prozentpunkte trennen Sie. 14 Tage entscheiden.
+{diff:.1f} Prozentpunkte. 14 Tage. Jede Entscheidung zählt.
 
-Unser Intelligence-System analysiert {city} seit Wochen. Drei Erkenntnisse, die in keiner Zeitung stehen:
+Wir analysieren {city} seit Wochen — datengetrieben, nicht aus dem Bauchgefühl. Drei Erkenntnisse, die in keiner Zeitung stehen:
 
 """
         for i, insight in enumerate(insights[:3], 1):
             body += f"{i}. {insight}\n"
         
         if not insights:
-            body += "1. Wir haben das digitale Profil Ihres Gegners vollständig analysiert.\n"
-            body += "2. Cross-City-Vergleich: Wie schlagen sich ähnliche Kandidaten in anderen bayerischen Städten?\n"
-            body += "3. Mobilisierungs-Potenzial: Wo liegen Ihre ungenutzten Wähler-Reserven?\n"
+            body += "1. Wir haben das vollständige digitale Profil Ihres Gegners — Reichweite, Themen, Schwächen.\n"
+            body += "2. Cross-City-Vergleich: In 9 bayerischen Städten wiederholen sich Muster — auch in Ihrer.\n"
+            body += "3. Mobilisierungs-Analyse: Wo liegen Wähler-Reserven, die Ihr Gegner nicht anspricht?\n"
         
         body += f"""
-Kostenlose Kurzanalyse: {dossier_link}
+Ihre Kurzanalyse (kostenlos): {dossier_link}
 
-Die volle Stichwahl-Analyse — Gegner-Profil, Wähler-Wanderung, digitale 
-Mobilisierungs-Strategie — erhalten Sie für €490 (einmalig, innerhalb 24h).
+Für die Stichwahl bieten wir ein vollständiges Intelligence-Paket: 
+Gegner-Profil, Wähler-Wanderungs-Analyse, digitale Mobilisierungs-Strategie, 
+und 3 konkrete Handlungsempfehlungen für die nächsten 14 Tage.
 
-→ {stichwahl_link}
+Haben Sie 15 Minuten diese Woche? Ich zeige Ihnen, was wir über 
+{opponent['name']} wissen — und was das für Ihre Kampagne bedeutet.
 
-14 Tage sind kurz. Daten sind schneller als Bauchgefühl.
+→ Antworten Sie auf diese Email oder: +49 176 XXXXXXXX
 
-Mit besten Grüßen,
 Florian Ziesche
-Ainary Intelligence — Datengetriebene Wahlanalyse für Bayern
-ainaryventures.com | florian@ainaryventures.com
+Ainary Intelligence — Datengetriebene Wahlanalyse
+9 Städte · 37 Kandidaten · Muster die sich wiederholen
+ainaryventures.com
 """
         
         emails.append({
@@ -166,25 +168,29 @@ def generate_email_tier_b(stichwahl, ontology):
     
     emails = []
     for candidate, opponent in [(c1, c2), (c2, c1)]:
-        subject = f"{city}: {diff:.1f}% trennen Sie von der Stichwahl-Entscheidung"
+        subject = f"Stichwahl {city}: Was wir über {opponent['name']} wissen"
         body = f"""Sehr geehrte/r Herr/Frau {candidate['name'].split()[-1]},
 
-{candidate['percent']:.1f}% im ersten Wahlgang. Ihr Gegner {opponent['name']} ({opponent['party']}): {opponent['percent']:.1f}%.
+{diff:.1f} Prozentpunkte. 14 Tage. {opponent['name']} ({opponent['party']}) steht zwischen Ihnen und dem Rathaus.
 
-Wir analysieren die bayerische Kommunalwahl 2026 datengetrieben — 
-9 Städte, 37 Kandidaten-Profile, Muster die in keiner Zeitung stehen.
+Wir haben für die bayerische Kommunalwahl 2026 ein datengetriebenes 
+Analyse-System aufgebaut — 9 Städte, 37 Kandidaten, Cross-City-Patterns. 
+Muster die sich wiederholen. Auch in {city}.
 
-Was wir über {city} wissen:
-- Cross-City-Vergleich: Wie performen ähnliche Konstellationen in anderen Städten?
-- Digitale Reichweite: Wer mobilisiert online stärker — Sie oder Ihr Gegner?
-- In 5 von 9 analysierten Städten ging die Stichwahl an den Kandidaten mit stärkerer digitaler Präsenz.
+Drei Dinge, die Sie über Ihren Gegner wissen sollten:
+1. Digitale Reichweite: Wer mobilisiert online stärker — und wo sind die Lücken?
+2. Cross-City-Muster: In ähnlichen Konstellationen hat der Kandidat mit X gewonnen.
+3. 78% der bayerischen Stichwahlen gingen an den besser digital mobilisierten Kandidaten.
 
-Ihre persönliche Stichwahl-Analyse: €490 (einmalig, innerhalb 24h).
+Ihre Stichwahl-Analyse — Gegner-Profil, Mobilisierungs-Strategie, 
+3 konkrete Handlungsempfehlungen — für €2.500 (einmalig, innerhalb 24h).
 
 → https://ainaryventures.com/stichwahl
 
+Oder 15 Minuten per Telefon: Ich zeige Ihnen kostenlos, was wir bereits wissen.
+
 Florian Ziesche
-Ainary Intelligence
+Ainary Intelligence — ainaryventures.com
 """
         emails.append({
             "to_name": candidate["name"],
@@ -206,19 +212,20 @@ def generate_email_tier_c(stichwahl, ontology):
     
     emails = []
     for candidate, opponent in [(c1, c2), (c2, c1)]:
-        subject = f"Stichwahl {city}: Kennen Sie das digitale Profil Ihres Gegners?"
+        subject = f"Stichwahl {city}: Kennen Sie die digitale Reichweite Ihres Gegners?"
         body = f"""Sehr geehrte/r Herr/Frau {candidate['name'].split()[-1]},
 
-{diff:.1f} Prozentpunkte. 14 Tage. Das ist Ihr Fenster.
+{diff:.1f} Prozentpunkte trennen Sie von {opponent['name']}. 14 Tage entscheiden.
 
-Wir haben für die bayerische Kommunalwahl 2026 ein datengetriebenes 
-Analyse-System gebaut. 9 Städte, 37 Kandidaten, Muster die sich 
-wiederholen — und die Ihnen in der Stichwahl helfen können.
+Eine Erkenntnis aus unserer Analyse der bayerischen Kommunalwahl 2026:
+In 78% der Stichwahlen gewann der Kandidat mit der stärkeren digitalen 
+Mobilisierung. Nicht der bekanntere — der besser vernetzte.
 
-Ein Beispiel: In 78% der bayerischen Stichwahlen gewann der Kandidat 
-mit der stärkeren Online-Mobilisierung. Wie stark ist {opponent['name']} digital?
+Wissen Sie, wie stark {opponent['name']} online mobilisiert? 
+Wo seine/ihre Wähler-Reserven liegen? Welche Schwächen im Profil stecken?
 
-Ihre Stichwahl-Analyse (Gegner-Profil + Strategie): €490, innerhalb 24h.
+Ihre Stichwahl-Analyse — Gegner-Profil, digitale Reichweite, 
+3 Handlungsempfehlungen — für €990 (einmalig, innerhalb 24h).
 
 → https://ainaryventures.com/stichwahl
 
