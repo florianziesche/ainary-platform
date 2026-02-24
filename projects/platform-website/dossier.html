@@ -552,9 +552,17 @@ function normalizeCity(d) {
     k.zentral = k.zentral || 0;
   }
 
-  // Themen
+  // Themen — normalize field names (code expects label/relevanz/beschreibung)
   d.themen = d.themen || {};
   d.themen.radar = d.themen.radar || [];
+  for (var tri=0; tri<d.themen.radar.length; tri++) {
+    var tr = d.themen.radar[tri];
+    tr.label = tr.label || tr.topic || tr.name || '';
+    tr.relevanz = tr.relevanz || tr.relevance || 50;
+    tr.beschreibung = tr.beschreibung || tr.soWhat || tr.description || '';
+    tr.trend = tr.trend || 'stabil';
+    tr.positionen = tr.positionen || {};
+  }
 
   // Social
   d.social = d.social || {};
@@ -592,8 +600,21 @@ function normalizeCity(d) {
   d.weekly_brief.summary = d.weekly_brief.summary || '';
   d.weekly_brief.title = d.weekly_brief.title || '';
 
-  // Talking Points
+  // Talking Points — normalize: points can be strings or objects
   d.talking_points = d.talking_points || [];
+  for (var tpi=0; tpi<d.talking_points.length; tpi++) {
+    var tp = d.talking_points[tpi];
+    tp.topic = tp.topic || '';
+    tp.points = tp.points || [];
+    for (var pti=0; pti<tp.points.length; pti++) {
+      if (typeof tp.points[pti] === 'string') {
+        tp.points[pti] = { text: tp.points[pti], ev: 'I', source: '' };
+      }
+      tp.points[pti].text = tp.points[pti].text || '';
+      tp.points[pti].ev = tp.points[pti].ev || 'I';
+      tp.points[pti].source = tp.points[pti].source || tp.points[pti].src || '';
+    }
+  }
 }
 
 (async function loadCityData() {
@@ -983,7 +1004,7 @@ function buildPatterns() {
     html += '<span style="font:700 7pt var(--m);color:' + confColor + '">' + conf + '%</span>';
     html += '<span style="font:400 6pt var(--m);color:var(--muted)">▼</span>';
     html += '</div></div>';
-    html += '<div class="pattern-body" style="margin-top:4px">' + p.meaning.substring(0, 120) + (p.meaning.length > 120 ? '…' : '') + '</div>';
+    html += '<div class="pattern-body" style="margin-top:4px">' + (p.meaning.length > 120 ? p.meaning.substring(0, p.meaning.lastIndexOf(' ', 120)) + ' ...' : p.meaning) + '</div>';
     
     // Expandable detail section (hidden by default)
     html += '<div id="pattern-detail-' + pi + '" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">';
@@ -1012,7 +1033,7 @@ function buildPatterns() {
     // Invalidate condition
     if (p.invalidateIf) {
       html += '<div style="margin-top:8px;padding:6px 8px;background:var(--red)08;border-left:2px solid var(--red);border-radius:0 3px 3px 0">';
-      html += '<span style="font:600 5.5pt var(--m);color:var(--red)">⚠ Entkräftet wenn:</span> ';
+      html += '<span style="font:600 5.5pt var(--m);color:var(--red)">! Entkräftet wenn:</span> ';
       html += '<span style="font:400 6pt var(--f);color:var(--text2)">' + p.invalidateIf + '</span></div>';
     }
     
@@ -1055,7 +1076,9 @@ function renderBriefing() {
   // E/I/J/A Legend
   h += '<div class="ev-legend"><span><span class="ev ev-e">E</span> Belegt</span><span><span class="ev ev-i">I</span> Abgeleitet</span><span><span class="ev ev-j">J</span> Einschätzung</span><span><span class="ev ev-a">A</span> Annahme</span></div>';
   h += '<div class="briefing-hero">';
-  h += '<div class="briefing-greeting">Guten Tag, <strong>Herr ' + lastName + '</strong></div>';
+  var greetHour = new Date().getHours();
+  var greetText = greetHour < 12 ? 'Guten Morgen' : greetHour < 18 ? 'Guten Tag' : 'Guten Abend';
+  h += '<div class="briefing-greeting">' + greetText + (lastName !== 'Besucher' ? ', <strong>Herr ' + lastName + '</strong>' : '') + '</div>';
   h += '<div class="briefing-subtitle"><span class="ev ev-e">E</span> ' + keys.length + ' Dossiers analysiert · ' + NEWS.length + ' aktuelle Meldungen · ' + HYPOTHESES.length + ' aktive Hypothesen</div>';
   h += '</div>';
 
@@ -1103,16 +1126,37 @@ function renderBriefing() {
     }
   }
 
-  // Weekly Brief mini (in Briefing)
-  if (WEEKLYBRIEF) {
+  // Weekly Brief mini (in Briefing) — §1.1: hide if no data, never show "0 Prioritäten"
+  if (WEEKLYBRIEF && (WEEKLYBRIEF.summary || (WEEKLYBRIEF.priorities||[]).length > 0)) {
+    var wbPriorities = WEEKLYBRIEF.priorities || [];
+    var wbDays = WEEKLYBRIEF.daysToElection || Math.max(0, Math.ceil((new Date(TENANT.wahl || '2026-03-08') - new Date()) / 86400000));
+    var daysColor = wbDays <= 7 ? 'var(--red)' : wbDays <= 14 ? 'var(--amber)' : 'var(--green)';
     h += '<div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:12px;margin-bottom:12px">';
     h += '<div style="display:flex;justify-content:space-between;align-items:center">';
-    h += '<div style="font:600 8pt var(--f);color:var(--text)">Diese Woche: '+(WEEKLYBRIEF.priorities||[]).length+' Priorit\u00e4ten</div>';
-    h += '<div style="font:700 9pt var(--m);color:var(--red)">'+(WEEKLYBRIEF.daysToElection||0)+' Tage bis Wahl</div>';
+    if (wbPriorities.length > 0) {
+      h += '<div style="font:600 8pt var(--f);color:var(--text)">Diese Woche: '+wbPriorities.length+' Priorit\u00e4ten</div>';
+    } else {
+      h += '<div style="font:600 8pt var(--f);color:var(--text)">'+(WEEKLYBRIEF.title || 'Lage-Briefing')+'</div>';
+    }
+    h += '<div style="font:700 9pt var(--m);color:'+daysColor+'">'+wbDays+' Tage bis Wahl</div>';
     h += '</div>';
-    for (var bwi=0;bwi<(WEEKLYBRIEF.priorities||[]).length;bwi++) {
-      var bwp = (WEEKLYBRIEF.priorities||[])[bwi];
-      h += '<div style="font:400 6.5pt var(--f);color:var(--text2);margin-top:4px"><strong style="color:var(--accent)">'+bwp.nr+'.</strong> '+bwp.action+' <span style="color:var(--red);font-weight:500">('+bwp.deadline+')</span></div>';
+    if (WEEKLYBRIEF.summary) {
+      h += '<div style="font:400 7pt var(--f);color:var(--text2);margin-top:6px;line-height:1.5">'+WEEKLYBRIEF.summary+'</div>';
+    }
+    for (var bwi=0;bwi<wbPriorities.length;bwi++) {
+      var bwp = wbPriorities[bwi];
+      var bwText = bwp.text || bwp.action || '';
+      var bwUrgency = bwp.urgency || bwp.deadline || '';
+      var bwColor = (bwUrgency === 'HOCH' || bwUrgency === 'HIGH') ? 'var(--red)' : (bwUrgency === 'MITTEL' || bwUrgency === 'MEDIUM') ? 'var(--amber)' : 'var(--muted)';
+      h += '<div style="font:400 6.5pt var(--f);color:var(--text2);margin-top:4px"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+bwColor+';margin-right:6px;vertical-align:middle"></span>'+bwText+' <span style="color:'+bwColor+';font-weight:500">('+bwUrgency+')</span></div>';
+    }
+    if (WEEKLYBRIEF.watchItems && WEEKLYBRIEF.watchItems.length > 0) {
+      h += '<div style="margin-top:8px;padding-top:6px;border-top:1px solid var(--border);font:600 5.5pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Beobachten</div>';
+      for (var wi2=0;wi2<WEEKLYBRIEF.watchItems.length;wi2++) {
+        var wItem = WEEKLYBRIEF.watchItems[wi2];
+        var wText = typeof wItem === 'string' ? wItem : (wItem.text || '');
+        h += '<div style="font:400 6pt var(--f);color:var(--text2);margin-top:2px">→ '+wText+'</div>';
+      }
     }
     h += '<div style="text-align:right;margin-top:6px"><span style="font:500 5.5pt var(--m);color:var(--accent);cursor:pointer;text-decoration:underline" onclick="switchView(\'strategy\')">Vollst\u00e4ndiges Briefing \u2192</span></div>';
     h += '</div>';
@@ -1306,7 +1350,7 @@ function renderBriefing() {
       }
       h += '</div>';
       h += '<div style="width:18px;text-align:center">';
-      if (ig.handle) h += '<span style="font:400 7pt var(--f);cursor:pointer;color:var(--accent)" title="@' + ig.handle + '">📷</span>';
+      if (ig.handle) h += '<span style="font:400 7pt var(--f);cursor:pointer;color:var(--accent)" title="@' + ig.handle + '">[IG]</span>';
       h += '</div></div>';
     }
     // Insights
@@ -1342,7 +1386,7 @@ function renderBriefing() {
       var gPct = maxGT > 0 ? Math.round((gData.recent / maxGT) * 100) : 0;
       var gTrend = gData.trend_pct || 0;
       var gTrendColor = gTrend > 50 ? 'var(--green)' : gTrend < -10 ? 'var(--red)' : 'var(--muted)';
-      var gTrendArrow = gTrend > 50 ? '📈' : gTrend < -10 ? '📉' : '➡️';
+      var gTrendArrow = '<span style="color:' + (gTrend > 50 ? 'var(--green)' : gTrend < -10 ? 'var(--red)' : 'var(--muted)') + '">' + (gTrend > 50 ? '▲' : gTrend < -10 ? '▼' : '→') + '</span>';
       h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
       h += '<div style="width:120px;font:500 7pt var(--f);color:var(--text)">' + gName.split(' ').pop() + '</div>';
       h += '<div style="flex:1;height:18px;background:var(--surface2);border-radius:3px;overflow:hidden;position:relative">';
@@ -1354,7 +1398,7 @@ function renderBriefing() {
     }
     if (gt.insight) {
       h += '<div style="margin-top:8px;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-left:2px solid var(--accent);border-radius:3px">';
-      h += '<div style="font:600 6pt var(--m);color:var(--accent);margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em">💎 Red Diamond Insight</div>';
+      h += '<div style="font:600 6pt var(--m);color:var(--accent);margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em">◆ Red Diamond Insight</div>';
       h += '<div style="font:400 6.5pt var(--f);color:var(--text2);line-height:1.5">' + gt.insight + '</div>';
       h += '</div>';
     }
@@ -2121,7 +2165,7 @@ function renderStrategy() {
         h += '<span class="related-pill" style="padding:1px 5px;font-size:5pt;cursor:pointer" onclick="copyTP(this)" data-text="'+pt.text.replace(/"/g,"&quot;")+'">Kopieren</span>';
         h += '</div></div>';
       }
-      h += '<div style="font:400 6pt var(--f);color:var(--muted);padding-top:6px">\ud83c\udfaf '+(tp.context||'')+'</div>';
+      h += '<div style="font:400 6pt var(--f);color:var(--muted);padding-top:6px"><span style="color:var(--accent)">◆</span> '+(tp.context||'')+'</div>';
       h += '</div></div>';
     }
   }
@@ -2165,7 +2209,7 @@ function renderStrategy() {
   // YouTube Intelligence
   if (YOUTUBE.candidates && YOUTUBE.candidates.length) {
     h += '<div style="margin-top:24px"></div>';
-    h += '<div class="canvas-title">YouTube Intelligence <span class="ct-badge" style="background:var(--red)">🎬 ' + YOUTUBE.candidates.length + ' KANDIDATEN</span></div>';
+    h += '<div class="canvas-title">YouTube Intelligence <span class="ct-badge" style="background:var(--red)">▶ ' + YOUTUBE.candidates.length + ' KANDIDATEN</span></div>';
     h += '<div style="font:400 6pt var(--m);color:var(--muted);margin-bottom:8px">Stand: ' + (YOUTUBE.scraped || '') + ' · Quelle: YouTube Data API v3</div>';
     // Bar chart
     var ytMax = 0;
@@ -2202,7 +2246,7 @@ function renderStrategy() {
     // YouTube Insight (Red Diamond)
     if (YOUTUBE.insight) {
       h += '<div style="margin-top:10px;padding:8px 10px;background:var(--red)08;border-left:2px solid var(--red);border-radius:0 4px 4px 0">';
-      h += '<div style="font:700 6pt var(--m);color:var(--red);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">💎 Red Diamond — YouTube Intelligence</div>';
+      h += '<div style="font:700 6pt var(--m);color:var(--red);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">◆ Red Diamond — YouTube Intelligence</div>';
       h += '<div style="font:400 6.5pt var(--m);color:var(--text2);line-height:1.5">' + YOUTUBE.insight + '</div>';
       if (YOUTUBE.cross_platform_gap) {
         h += '<div style="margin-top:4px;font:500 6pt var(--m);color:var(--accent)">Cross-Platform: ' + YOUTUBE.cross_platform_gap + '</div>';
@@ -2227,9 +2271,9 @@ function renderStrategy() {
   if (STICHWAHL.probability) {
     var swProb = STICHWAHL.probability;
     var swColor = swProb >= 80 ? 'var(--red)' : swProb >= 50 ? 'var(--amber)' : 'var(--green)';
-    var swEmoji = swProb >= 80 ? '🔴' : swProb >= 50 ? '🟡' : '🟢';
+    var swEmoji = '<span style="color:' + (swProb >= 80 ? 'var(--red)' : swProb >= 50 ? 'var(--amber)' : 'var(--green)') + '">●</span>';
     h += '<div style="margin-top:24px"></div>';
-    h += '<div class="canvas-title">Stichwahl-Prognose <span class="ct-badge" style="background:' + swColor + '">💎 PREDICTION</span></div>';
+    h += '<div class="canvas-title">Stichwahl-Prognose <span class="ct-badge" style="background:' + swColor + '">◆ PREDICTION</span></div>';
     h += '<div class="entity-card"><div class="entity-body">';
     // Big probability number
     h += '<div style="display:flex;align-items:center;gap:16px;margin-bottom:12px">';
@@ -2254,7 +2298,7 @@ function renderStrategy() {
     h += '</div>';
     if (STICHWAHL.wildcard) {
       h += '<div style="margin-top:8px;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-left:2px solid var(--amber);border-radius:3px">';
-      h += '<div style="font:600 6pt var(--m);color:var(--amber);margin-bottom:3px">⚡ WILDCARD</div>';
+      h += '<div style="font:600 6pt var(--m);color:var(--amber);margin-bottom:3px">» WILDCARD</div>';
       h += '<div style="font:400 6.5pt var(--f);color:var(--text2)">' + STICHWAHL.wildcard + '</div>';
       h += '</div>';
     }
@@ -2481,12 +2525,12 @@ function renderAnalytics() {
         // Device from UA
         var device = 'Unbekannt';
         if (s.ua) {
-          if (s.ua.includes('iPhone')) device = '📱 iPhone';
-          else if (s.ua.includes('iPad')) device = '📱 iPad';
-          else if (s.ua.includes('Android')) device = '📱 Android';
-          else if (s.ua.includes('Macintosh')) device = '💻 Mac';
-          else if (s.ua.includes('Windows')) device = '💻 Windows';
-          else if (s.ua.includes('Linux')) device = '💻 Linux';
+          if (s.ua.includes('iPhone')) device = '[M] iPhone';
+          else if (s.ua.includes('iPad')) device = '[M] iPad';
+          else if (s.ua.includes('Android')) device = '[M] Android';
+          else if (s.ua.includes('Macintosh')) device = '[D] Mac';
+          else if (s.ua.includes('Windows')) device = '[D] Windows';
+          else if (s.ua.includes('Linux')) device = '[D] Linux';
         }
         
         // Screen from auth event
@@ -2806,7 +2850,7 @@ window._aiReport = function() {
     if (events[i].e === 'entity_view') entities[events[i].d.name] = (entities[events[i].d.name]||0) + 1;
     if (events[i].e === 'copy_talking_point') copies++;
   }
-  console.log('\n📊 SUMMARY:');
+  console.log('\n[S] SUMMARY:');
   console.log('Total events:', events.length);
   console.log('Session duration:', events.length > 1 ? Math.round((events[events.length-1].t - events[0].t)/1000) + 's' : 'n/a');
   console.log('Tab visits:', tabs);
