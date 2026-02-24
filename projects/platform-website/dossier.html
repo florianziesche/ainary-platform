@@ -342,7 +342,7 @@ setTimeout(function(){document.getElementById('auth-error').style.opacity='0';do
   }
 })();
 // Auto-focus
-setTimeout(function(){document.getElementById('auth-input').focus()},100);
+setTimeout(function(){try{document.getElementById('auth-input').focus()}catch(e){}},100);
 </script>
 
 <!-- TOP BAR -->
@@ -488,16 +488,21 @@ let graphInitialized = false;
 // INITIALIZATION
 // =====================================================
 function initApp() {
-  document.getElementById('topbar-tenant').textContent = TENANT.name || CITY_ID;
+  try { document.getElementById('topbar-tenant').textContent = TENANT.name || CITY_ID; } catch(e) { console.warn('initApp topbar:', e.message); }
   document.title = 'Dossier: ' + (TENANT.gemeinde || CITY_ID);
   var bc = document.getElementById('bc-city');
   if (bc) bc.textContent = TENANT.gemeinde || CITY_ID;
-  buildOntology();
-  buildIntelFeed();
-  buildPatterns();
-  buildChat();
-  buildStatusBar();
-  renderBriefing();
+  var steps = [
+    ['buildOntology', buildOntology],
+    ['buildIntelFeed', buildIntelFeed],
+    ['buildPatterns', buildPatterns],
+    ['buildChat', buildChat],
+    ['buildStatusBar', buildStatusBar],
+    ['renderBriefing', renderBriefing]
+  ];
+  for (var i=0; i<steps.length; i++) {
+    try { steps[i][1](); } catch(e) { console.error('initApp ' + steps[i][0] + ':', e.message); }
+  }
 }
 
 // =====================================================
@@ -970,7 +975,7 @@ function renderBriefing() {
 
   // Forecast / Stichwahl card
   if (FORECAST) {
-    h += '<div class="canvas-title">Wahlprognose ' + FORECAST.wahltermin + '</div>';
+    h += '<div class="canvas-title">Wahlprognose ' + (FORECAST.wahltermin||'') + '</div>';
     h += '<div class="entity-card"><div class="entity-body">';
     // Stichwahl range indicator
     var swR = FORECAST.stichwahlRange || {min:30,max:55};
@@ -996,7 +1001,7 @@ function renderBriefing() {
     h += '<div style="display:flex;justify-content:space-between;font:400 5pt var(--m);color:var(--muted)">';
     h += '<span>0%</span><span>10</span><span>20</span><span>30</span><span>40</span><span>50</span><span>60</span><span>70</span><span>80</span><span>90</span><span>100%</span>';
     h += '</div>';
-    h += '<div style="font:400 6.5pt var(--m);color:var(--muted);margin-top:6px">Stichwahl am ' + FORECAST.stichwahl + ' falls kein Kandidat >50% · Spanne: ' + swR.min + '-' + swR.max + '% · Confidence: ' + FORECAST.stichwahlConf + '%</div>';
+    h += '<div style="font:400 6.5pt var(--m);color:var(--muted);margin-top:6px">Stichwahl am ' + (FORECAST.stichwahl||'') + ' falls kein Kandidat >50% · Spanne: ' + swR.min + '-' + swR.max + '% · Confidence: ' + (FORECAST.stichwahlConf||'?') + '%</div>';
     h += '</div>';
     // Candidate bars
     for (const k of FORECAST.kandidaten) {
@@ -1009,7 +1014,7 @@ function renderBriefing() {
       // Central estimate
       h += '<div style="position:absolute;left:' + k.zentral + '%;width:2px;height:100%;background:' + barColor + '"></div>';
       h += '</div>';
-      h += '<div style="width:70px;font:500 6.5pt var(--m);color:var(--text2);text-align:right"><span class="ev ev-' + k.tag.toLowerCase() + '">' + k.tag + '</span> ' + k.min + '-' + k.max + '%</div>';
+      h += '<div style="width:70px;font:500 6.5pt var(--m);color:var(--text2);text-align:right"><span class="ev ev-' + (k.tag||'i').toLowerCase() + '">' + (k.tag||'?') + '</span> ' + (k.min||'?') + '-' + (k.max||'?') + '%</div>';
       h += '</div>';
     }
     // 50% threshold line label
@@ -1017,23 +1022,30 @@ function renderBriefing() {
     h += '<div style="width:90px"></div>';
     h += '<div style="flex:1;position:relative;height:12px"><div style="position:absolute;left:50%;transform:translateX(-50%);font:400 5pt var(--m);color:var(--red)">50% (Stichwahl-Schwelle)</div></div>';
     h += '<div style="width:70px"></div></div>';
-    // Historic trend
-    h += '<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border)">';
-    h += '<div style="font:600 6pt var(--m);color:var(--muted);margin-bottom:6px">LODERER-TREND (BM-WAHLEN)</div>';
-    h += '<div style="display:flex;gap:12px;align-items:flex-end">';
-    for (const w of FORECAST.historie.filter(h => h.wg === 1)) {
-      const barH = Math.round(w.loderer * 0.8);
-      const c = w.stichwahl ? 'var(--amber)' : 'var(--green)';
-      h += '<div style="text-align:center"><div style="font:500 7pt var(--m);color:var(--text)">' + w.loderer + '%</div>';
-      h += '<div style="width:36px;height:' + barH + 'px;background:' + c + ';border-radius:2px 2px 0 0;margin:2px auto"></div>';
-      h += '<div style="font:400 5pt var(--m);color:var(--muted)">' + w.jahr + (w.stichwahl ? '*' : '') + '</div></div>';
-    }
-    // 2026 forecast
-    h += '<div style="text-align:center"><div style="font:500 7pt var(--m);color:var(--amber)">~47%?</div>';
-    h += '<div style="width:36px;height:38px;background:var(--amber);border-radius:2px 2px 0 0;margin:2px auto;opacity:0.5;border:1px dashed var(--amber)"></div>';
-    h += '<div style="font:400 5pt var(--m);color:var(--amber)">2026</div></div>';
-    h += '</div></div>';
-    h += '</div></div>';
+    // Historic trend (dynamic: uses first candidate key from historie)
+    if (FORECAST.historie && FORECAST.historie.length) {
+      var firstH = (FORECAST.historie||[])[0];
+      // Find the candidate key (not 'jahr', 'wg', 'stichwahl')
+      var hKeys = Object.keys(firstH).filter(function(k){ return k!=='jahr'&&k!=='wg'&&k!=='stichwahl'; });
+      if (hKeys.length) {
+        var hKey = hKeys[0];
+        h += '<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border)">';
+        h += '<div style="font:600 6pt var(--m);color:var(--muted);margin-bottom:6px">' + hKey.toUpperCase() + '-TREND (BM-WAHLEN)</div>';
+        h += '<div style="display:flex;gap:12px;align-items:flex-end">';
+        for (var hi2=0; hi2<(FORECAST.historie||[]).length; hi2++) {
+          var w = (FORECAST.historie||[])[hi2];
+          if (w.wg !== 1) continue;
+          var wVal = w[hKey] || 0;
+          var barH = Math.round(wVal * 0.8);
+          var c = w.stichwahl ? 'var(--amber)' : 'var(--green)';
+          h += '<div style="text-align:center"><div style="font:500 7pt var(--m);color:var(--text)">' + wVal + '%</div>';
+          h += '<div style="width:36px;height:' + barH + 'px;background:' + c + ';border-radius:2px 2px 0 0;margin:2px auto"></div>';
+          h += '<div style="font:400 5pt var(--m);color:var(--muted)">' + (w.jahr||'') + (w.stichwahl ? '*' : '') + '</div></div>';
+        }
+        h += '</div></div>';
+        h += '</div></div>';
+      } else { h += '</div></div>'; }
+    } else { h += '</div></div>'; }
   }
 
   // Latest news
@@ -1146,8 +1158,8 @@ function renderBriefing() {
         var ins = SOCIAL.insights[ii];
         var insColor = ins.severity === 'HOCH' ? 'var(--red)' : ins.severity === 'MITTEL' ? 'var(--amber)' : 'var(--muted)';
         h += '<div style="padding:6px 8px;background:var(--surface);border:1px solid var(--border);border-left:2px solid ' + insColor + ';border-radius:3px;margin-bottom:4px">';
-        h += '<div style="font:600 6.5pt var(--f);color:var(--text)">' + ins.title + '</div>';
-        h += '<div style="font:400 5.5pt var(--f);color:var(--text2);margin-top:2px">' + ins.body + '</div>';
+        h += '<div style="font:600 6.5pt var(--f);color:var(--text)">' + (ins.title||ins.type||'Insight') + '</div>';
+        h += '<div style="font:400 5.5pt var(--f);color:var(--text2);margin-top:2px">' + (ins.body||ins.text||'') + '</div>';
         if (ins.soWhat) h += '<div style="font:500 5.5pt var(--f);color:var(--accent);margin-top:2px">→ ' + ins.soWhat + '</div>';
         h += '</div>';
       }
@@ -1196,7 +1208,7 @@ function renderBriefing() {
     var miCands = Object.keys(mi.candidates);
     h += '<div class="canvas-title">Momentum Index <span class="ct-badge" style="background:var(--red)">COMPOSITE</span></div>';
     h += '<div class="entity-card"><div class="entity-body">';
-    h += '<div style="font:400 6pt var(--m);color:var(--muted);margin-bottom:8px">' + mi.source + '</div>';
+    h += '<div style="font:400 6pt var(--m);color:var(--muted);margin-bottom:8px">' + (mi.source||'Composite Score: IG 30% + Trends 20% + YT 15% + Activity 15%') + '</div>';
     for (var mii=0; mii<miCands.length; mii++) {
       var miName = miCands[mii];
       var miData = mi.candidates[miName];
@@ -1533,11 +1545,11 @@ function showEntity(id, el) {
   if (FORECAST && FORECAST.kandidaten) {
     const fk = FORECAST.kandidaten.find(k => k.id === id);
     if (fk) {
-      h += '<div class="canvas-title">Wahlprognose ' + FORECAST.wahltermin + '</div>';
+      h += '<div class="canvas-title">Wahlprognose ' + (FORECAST.wahltermin||'') + '</div>';
       h += '<div class="entity-card"><div class="entity-body">';
       const barColor = fk.partei === 'CSU' ? '#0a4d8c' : fk.partei === 'SPD' ? '#c0392b' : fk.partei === 'Grüne' ? '#4a8c3f' : fk.partei === 'AfD' ? '#2a5298' : 'var(--muted)';
       h += '<div style="display:flex;align-items:center;gap:16px;margin-bottom:10px">';
-      h += '<div style="font:700 24pt var(--m);color:' + barColor + '"><span class="ev ev-' + fk.tag.toLowerCase() + '">' + fk.tag + '</span> ' + fk.zentral + '%</div>';
+      h += '<div style="font:700 24pt var(--m);color:' + barColor + '"><span class="ev ev-' + (fk.tag||'i').toLowerCase() + '">' + (fk.tag||'?') + '</span> ' + (fk.zentral||'?') + '%</div>';
       h += '<div><div style="font:600 8pt var(--f)">Prognose ' + fk.name + '</div>';
       h += '<div style="font:400 6pt var(--m);color:var(--muted)">Spanne: ' + fk.min + '-' + fk.max + '% · Confidence: ' + fk.conf + '%</div></div>';
       h += '</div>';
@@ -1553,7 +1565,7 @@ function showEntity(id, el) {
         h += '<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">';
         h += '<div style="font:600 6pt var(--m);color:var(--muted);margin-bottom:6px">HISTORISCHER TREND</div>';
         h += '<div style="display:flex;gap:10px;align-items:flex-end">';
-        for (const w of FORECAST.historie.filter(h => h.wg === 1)) {
+        for (const w of (FORECAST.historie||[]).filter(h => h.wg === 1)) {
           const bH = Math.round(w.loderer * 0.6);
           h += '<div style="text-align:center"><div style="font:500 6pt var(--m);color:var(--text)"><span class="ev ev-e">E</span> ' + w.loderer + '%</div>';
           h += '<div style="width:28px;height:' + bH + 'px;background:' + (w.stichwahl ? 'var(--amber)' : '#0a4d8c') + ';border-radius:2px 2px 0 0;margin:2px auto"></div>';
@@ -1738,7 +1750,7 @@ function renderMatrixHTML() {
     {label: 'Karriere', fn: k => '<span class="ev ev-e">E</span> ' + (KB[k].karriere || []).length + ' Stationen'},
     {label: 'Sentiment', fn: k => { const s = SENTIMENT.entities[k]; return s ? '<span class="ev ev-i">I</span> ' + (s.sent > 0 ? '+' : '') + s.sent : '—'; }},
     {label: 'Trend', fn: k => { const s = SENTIMENT.entities[k]; return s ? '<span class="ev ev-i">I</span> ' + s.trend : '—'; }},
-    {label: 'Prognose 1.WG', fn: k => { if (!FORECAST || !FORECAST.kandidaten) return '—'; const f = FORECAST.kandidaten.find(c => c.id === k); return f ? '<span class="ev ev-' + f.tag.toLowerCase() + '">' + f.tag + '</span> ' + f.min + '-' + f.max + '%' : '—'; }},
+    {label: 'Prognose 1.WG', fn: k => { if (!FORECAST || !FORECAST.kandidaten) return '—'; const f = FORECAST.kandidaten.find(c => c.id === k); return f ? '<span class="ev ev-' + (f.tag||'i').toLowerCase() + '">' + f.tag + '</span> ' + f.min + '-' + f.max + '%' : '—'; }},
   ];
 
   for (const row of rows) {
@@ -1816,7 +1828,7 @@ function renderStrategy() {
       h += '<div class="insight-evidence">';
       for (var ei=0;ei<pat.evidenceTags.length;ei++) {
         var et = pat.evidenceTags[ei];
-        h += '<span class="ev ev-'+et.type.toLowerCase()+'">'+et.type+'</span>';
+        h += '<span class="ev ev-'+(et.type||'i').toLowerCase()+'">'+et.type+'</span>';
       }
       h += '</div>';
     }
@@ -1912,7 +1924,7 @@ function renderStrategy() {
       var wp = (WEEKLYBRIEF.priorities||[])[wi];
       h += '<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">';
       h += '<div style="font:700 14pt var(--m);color:var(--accent);min-width:24px">'+wp.nr+'</div>';
-      h += '<div style="flex:1"><div style="font:600 7.5pt var(--f);color:var(--text)"><span class="ev ev-'+wp.ev.toLowerCase()+'">'+wp.ev+'</span> '+wp.action+'</div>';
+      h += '<div style="flex:1"><div style="font:600 7.5pt var(--f);color:var(--text)"><span class="ev ev-'+(wp.ev||'i').toLowerCase()+'">'+wp.ev+'</span> '+wp.action+'</div>';
       h += '<div style="font:400 6.5pt var(--f);color:var(--text2);margin-top:2px">'+wp.why+'</div>';
       h += '<div style="font:500 5.5pt var(--m);color:var(--red);margin-top:2px">Deadline: '+wp.deadline+'</div>';
       h += '</div></div>';
@@ -1945,7 +1957,7 @@ function renderStrategy() {
         h += '<div style="padding:10px 0;border-bottom:1px solid var(--border)">';
         h += '<div style="font:400 7.5pt var(--f);color:var(--text);line-height:1.5;font-style:italic">\u201e'+pt.text+'\u201c</div>';
         h += '<div style="display:flex;gap:8px;margin-top:4px;font:400 5.5pt var(--m);color:var(--muted)">';
-        h += '<span class="ev ev-'+pt.ev.toLowerCase().charAt(0)+'">'+pt.ev+'</span>';
+        h += '<span class="ev ev-'+(pt.ev||'i').toLowerCase().charAt(0)+'">'+pt.ev+'</span>';
         h += '<span>Quelle: '+((pt.source||pt.src||''))+'</span>';
         h += '<span class="related-pill" style="padding:1px 5px;font-size:5pt;cursor:pointer" onclick="copyTP(this)" data-text="'+pt.text.replace(/"/g,"&quot;")+'">Kopieren</span>';
         h += '</div></div>';
@@ -2192,7 +2204,7 @@ function toggleChat() {
 
 function askChat(q) {
   document.getElementById('chat-input').value = q + ': ';
-  document.getElementById('chat-input').focus();
+  try{document.getElementById('chat-input').focus()}catch(e){};
 }
 
 function sendChat() {
