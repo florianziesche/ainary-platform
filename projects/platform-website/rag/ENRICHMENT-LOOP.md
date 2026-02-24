@@ -3,25 +3,44 @@
 ## Prinzip: Jeder Lauf macht das Dossier besser, nie schlechter.
 
 ```
-┌─────────────────────────────────────────────────────┐
-│                  ENRICHMENT LOOP                     │
-│                                                     │
-│  ┌──────────┐   ┌──────────┐   ┌──────────┐       │
-│  │  ANALYZE  │──▶│ RESEARCH │──▶│  MERGE   │       │
-│  │  (Gaps)   │   │ (Search) │   │ (Delta)  │       │
-│  └────┬─────┘   └──────────┘   └────┬─────┘       │
-│       │                              │              │
-│       │         ┌──────────┐         │              │
-│       └────────▶│ VALIDATE │◀────────┘              │
-│                 │ (Gate)   │                        │
-│                 └────┬─────┘                        │
-│                      │                              │
-│                 ┌────▼─────┐                        │
-│                 │  TRACK   │                        │
-│                 │ (Score↑) │                        │
-│                 └──────────┘                        │
-└─────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│                    COMPOUND INTELLIGENCE LOOP                 │
+│                                                              │
+│  ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌─────────┐ │
+│  │  ANALYZE  │──▶│ RESEARCH │──▶│  MERGE   │──▶│VALIDATE │ │
+│  │  (Gaps)   │   │ (Search) │   │ (Delta)  │   │ (Gate)  │ │
+│  └────┬─────┘   └──────────┘   └──────────┘   └────┬────┘ │
+│       │                                              │      │
+│       │         ┌──────────────────┐                 │      │
+│       │         │     REFLECT      │◀────────────────┘      │
+│       │         │ (Self-Improve)   │                        │
+│       │         └────────┬─────────┘                        │
+│       │                  │                                   │
+│       │    ┌─────────────▼──────────────┐                   │
+│       │    │     LEARNING JOURNAL       │                   │
+│       │    │  (Compound Meta-Knowledge) │                   │
+│       │    └─────────────┬──────────────┘                   │
+│       │                  │                                   │
+│       │    ┌─────────────▼──────────────┐                   │
+│       └────│    CROSS-CITY TRANSFER     │                   │
+│            │ (What Bamberg teaches      │                   │
+│            │  Passau teaches Regensburg) │                   │
+│            └────────────────────────────┘                   │
+└──────────────────────────────────────────────────────────────┘
 ```
+
+## Why This Works (Palantir-Parallele)
+
+| Palantir Foundry | Unser System | Warum es funktioniert |
+|---|---|---|
+| **Ontology** | JSON Schema (11 Sektionen) | Daten ohne Struktur = Noise. Struktur erzwingt Qualität. |
+| **Pipeline** | enrich_city.py → validate → deploy | Reproduzierbar. Jeder Lauf gleich. Keine manuelle Varianz. |
+| **AIP Hypothesis** | hypotheses[] + reflect.py | System TESTET Annahmen statt sie zu speichern. |
+| **Feedback Loop** | learning-journal.json | Jeder Run hinterlässt Meta-Wissen für den nächsten. |
+| **Cross-Deployment** | Cross-City Pattern Transfer | Was in Bamberg stimmt → Hypothese für Passau → Test. |
+| **Human-in-Loop** | Florian reviewed → agenttrust update | System + Mensch > System allein. |
+
+**Palantirs Kern-Einsicht:** Der Wert liegt nicht in den Daten, sondern in den **Beziehungen zwischen Daten**. Unser Graph + Connections + Patterns SIND das Produkt. Rohe Fakten kann jeder googlen. Die Verknüpfung ist der Moat.
 
 ## 5 Mechanismen die Verbesserung erzwingen
 
@@ -79,18 +98,36 @@ Jede Property hat `src`. Gleiche Fakten aus 3 Quellen → Confidence steigt.
 | Entity dünn | < 5 Properties | Targeted search |
 | Widerspruch | Zwei Quellen widersprechen | Flag + Investigation |
 
-## Cron Agent Spec
+## Cron Agent Spec (6-Step Loop)
 
 ```
 Schedule: Täglich 08:00 CET (Mo-Fr), stündlich 7 Tage vor Wahl
 Task per Stadt:
-  1. python3 rag/enrich_city.py data/cities/{city}.json --report
-  2. Für jeden HIGH-Gap: web_search mit generierter Query
-  3. Ergebnisse in JSON mergen
-  4. python3 rag/validate_city.py data/cities/{city}.json
-  5. Wenn Score gestiegen: commit + deploy
-  6. Wenn Score gesunken: ALERT (nicht deployen)
+  1. python3 rag/enrich_city.py data/cities/{city}.json --report     # Was fehlt?
+  2. Für jeden HIGH-Gap: web_search mit generierter Query              # Recherche
+  3. python3 rag/enrich_city.py data/cities/{city}.json --merge patch  # Merge
+  4. python3 rag/validate_city.py data/cities/{city}.json              # Gate
+  5. python3 rag/reflect.py data/cities/{city}.json --full             # Self-Improve
+  6. Wenn Score ≥ vorher: commit + deploy. Sonst: ALERT.               # Ship
 ```
+
+## reflect.py — Das Herzstück
+
+```bash
+python3 rag/reflect.py data/cities/passau.json --full
+```
+
+Output:
+- **Entity Depth Bars**: Visuell sofort sehen wer dünn ist
+- **Improvement Hypotheses**: Testbare Vorhersagen für den nächsten Lauf
+- **Cross-City Learnings**: Was Bamberg uns über Passau lehrt
+- **Palantir Health Check**: Ontology-Abdeckung, Feedback-Loop-Status
+
+Learning Journal (`rag/learning-journal.json`) akkumuliert:
+- Welche Search-Strategien funktionieren (und welche nicht)
+- Welche Quellen pro Region am ergiebigsten sind
+- Welche Entity-Felder systematisch fehlen
+- Welche Cross-City-Patterns sich bestätigen
 
 ## Integration mit RAG Pipeline
 
