@@ -465,12 +465,25 @@ function normalizeCity(d) {
     e.color = e.color || 'var(--muted)';
     e.properties = e.properties || [];
     e.connections = e.connections || [];
+    for (var ci=0; ci<e.connections.length; ci++) {
+      var c = e.connections[ci];
+      c.target = c.target || c.to || '';
+      c.label = c.label || c.type || c.context || '';
+      c.desc = c.desc || c.context || '';
+    }
     e.controversies = e.controversies || [];
     e.timeline = e.timeline || [];
     e.steckbrief = e.steckbrief || {};
     e.karriere = e.karriere || [];
     e.zitate = e.zitate || [];
     e.quellen = e.quellen || [];
+    for (var qi=0; qi<e.quellen.length; qi++) {
+      var q = e.quellen[qi];
+      q.name = q.name || q.url || q.typ || 'Quelle';
+      q.url = q.url || '';
+      q.typ = q.typ || '';
+      q.trust = q.trust || 5;
+    }
     e.trustScore = e.trustScore || {};
   }
 
@@ -535,21 +548,45 @@ function normalizeCity(d) {
   // Actions
   d.actions = d.actions || [];
 
-  // Forecast
+  // Forecast — normalize different schemas
   d.forecast = d.forecast || {};
   d.forecast.kandidaten = d.forecast.kandidaten || [];
   d.forecast.historie = d.forecast.historie || [];
   d.forecast.stichwahlConf = d.forecast.stichwahlConf || d.forecast.confidence || 50;
   d.forecast.stichwahlRange = d.forecast.stichwahlRange || {min:30, max:55};
   d.forecast.wahltermin = d.forecast.wahltermin || '';
+  // stichwahl can be a string ("22.03.2026") or an object ({datum, wahrscheinlichkeit, ...})
+  if (typeof d.forecast.stichwahl === 'object' && d.forecast.stichwahl !== null) {
+    var sw = d.forecast.stichwahl;
+    d.forecast.stichwahlConf = d.forecast.stichwahlConf || Math.round((sw.wahrscheinlichkeit || 0.5) * 100);
+    d.forecast.stichwahl = sw.datum || '22.03.2026';
+    if (sw.favorit) d.forecast.stichwahlSzenario = sw.favorit;
+    if (sw.begründung) d.forecast.stichwahlBegründung = sw.begründung;
+  }
   d.forecast.stichwahl = d.forecast.stichwahl || '';
   d.forecast.keyfactors = d.forecast.keyfactors || [];
+  // Normalize kandidaten — some have "prozent_1wg" string, some have min/max/zentral
   for (var i=0; i<d.forecast.kandidaten.length; i++) {
     var k = d.forecast.kandidaten[i];
+    k.name = k.name || '';
+    k.partei = k.partei || '';
     k.tag = k.tag || 'I';
+    // Parse "38-45%" format into min/max/zentral
+    if (k.prozent_1wg && typeof k.prozent_1wg === 'string' && !k.min) {
+      var match = k.prozent_1wg.match(/(\d+)[^\d]+(\d+)/);
+      if (match) {
+        k.min = parseInt(match[1]);
+        k.max = parseInt(match[2]);
+        k.zentral = Math.round((k.min + k.max) / 2);
+      }
+    }
     k.min = k.min || 0;
     k.max = k.max || 0;
-    k.zentral = k.zentral || 0;
+    k.zentral = k.zentral || Math.round((k.min + k.max) / 2);
+    // Extract id from name if missing
+    if (!k.id && k.name) {
+      k.id = k.name.split(' ')[0].split('(')[0].trim().toLowerCase().replace(/[^a-z]/g,'');
+    }
   }
 
   // Themen — normalize field names (code expects label/relevanz/beschreibung)
@@ -593,12 +630,32 @@ function normalizeCity(d) {
     d.scenarios[i].label = d.scenarios[i].label || 'possible';
   }
 
-  // Weekly Brief
+  // Weekly Brief — normalize priorities format
   d.weekly_brief = d.weekly_brief || {};
   d.weekly_brief.priorities = d.weekly_brief.priorities || [];
   d.weekly_brief.watchItems = d.weekly_brief.watchItems || [];
   d.weekly_brief.summary = d.weekly_brief.summary || '';
   d.weekly_brief.title = d.weekly_brief.title || '';
+  d.weekly_brief.week = d.weekly_brief.week || d.weekly_brief.date || '';
+  d.weekly_brief.headline = d.weekly_brief.headline || d.weekly_brief.title || '';
+  d.weekly_brief.daysToElection = d.weekly_brief.daysToElection || 0;
+  // Normalize priorities: can be {text, urgency} or {nr, action, why, deadline, ev}
+  for (var wpi=0; wpi<d.weekly_brief.priorities.length; wpi++) {
+    var wp = d.weekly_brief.priorities[wpi];
+    wp.nr = wp.nr || (wpi + 1);
+    wp.action = wp.action || wp.text || '';
+    wp.why = wp.why || '';
+    wp.deadline = wp.deadline || wp.urgency || '';
+    wp.ev = wp.ev || 'I';
+    wp.text = wp.text || wp.action || '';
+    wp.urgency = wp.urgency || wp.deadline || '';
+  }
+  // Normalize watchItems: can be strings or objects
+  for (var wwi=0; wwi<d.weekly_brief.watchItems.length; wwi++) {
+    if (typeof d.weekly_brief.watchItems[wwi] === 'object') {
+      d.weekly_brief.watchItems[wwi] = d.weekly_brief.watchItems[wwi].text || '';
+    }
+  }
 
   // Talking Points — normalize: points can be strings or objects
   d.talking_points = d.talking_points || [];
@@ -1754,7 +1811,7 @@ function showEntity(id, el) {
       h += '<div style="display:flex;align-items:center;gap:16px;margin-bottom:10px">';
       h += '<div style="font:700 24pt var(--m);color:' + barColor + '"><span class="ev ev-' + (fk.tag||'i').toLowerCase() + '">' + (fk.tag||'?') + '</span> ' + (fk.zentral||'?') + '%</div>';
       h += '<div><div style="font:600 8pt var(--f)">Prognose ' + fk.name + '</div>';
-      h += '<div style="font:400 6pt var(--m);color:var(--muted)">Spanne: ' + fk.min + '-' + fk.max + '% · Confidence: ' + fk.conf + '%</div></div>';
+      h += '<div style="font:400 6pt var(--m);color:var(--muted)">Spanne: ' + fk.min + '-' + fk.max + '% · Confidence: ' + (fk.conf||FORECAST.stichwahlConf||'?') + '%</div></div>';
       h += '</div>';
       // Bar
       h += '<div style="height:20px;background:var(--surface2);border-radius:3px;overflow:hidden;position:relative;margin-bottom:8px">';
