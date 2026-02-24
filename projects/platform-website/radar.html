@@ -236,7 +236,7 @@ tr.highlight{background:rgba(45,138,78,0.03)}
 const PASSWORD = 'ainary2026';
 const WAHL_DATE = new Date('2026-03-08');
 
-const CITIES = [
+let CITIES = [
   {name:'Bamberg',bl:'BY',ew:78000,score:90,status:'live',wahl:'08.03.2026',digiBudget:'€15,75M Smart City',kontakt:'Smart City Büro Bamberg',nextStep:'Demo anbieten nach Stichwahl (22.03)',gothamUrl:'gotham-bamberg.html',dashUrl:'digi-dashboard.html',preis:490,grund:'8 Kandidaten + Skandale'},
   {name:'Regensburg',bl:'BY',ew:155000,score:85,status:'live',wahl:'08.03.2026',digiBudget:'Smart City Staffel 1',kontakt:'Smart City Koordination',nextStep:'Gotham-Analyse #3 starten',gothamUrl:'gotham-regensburg.html',dashUrl:'digi-dashboard.html',preis:490,grund:'12 Kandidaten, höchste Dichte'},
   {name:'Ottobrunn',bl:'BY',ew:22000,score:80,status:'live',wahl:'08.03.2026',digiBudget:'—',kontakt:'Schardt (BM-Kandidat)',nextStep:'Follow-up 27.02',gothamUrl:'gotham-ottobrunn.html',dashUrl:null,preis:490,grund:'Pilotkunde Schardt'},
@@ -431,8 +431,28 @@ function renderTable() {
   document.getElementById('table-body').innerHTML = h;
 }
 
+// Load dynamic data from radar-data.json (falls back to hardcoded)
+function loadRadarData() {
+  fetch('radar-data.json?t='+Date.now())
+    .then(function(r){return r.json()})
+    .then(function(data){
+      if(data && data.cities && data.cities.length > 0) {
+        CITIES = data.cities.map(function(c){
+          c.preis = c.preis || 0;
+          c.gothamUrl = c.gothamUrl || null;
+          c.dashUrl = c.dashUrl || null;
+          return c;
+        });
+        document.getElementById('status-right').textContent = 'Daten: '+data.updated+' · '+CITIES.length+' Leads · Vertraulich';
+        if(document.getElementById('main-content').style.display !== 'none') init();
+      }
+    })
+    .catch(function(){/* fallback to hardcoded */});
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('login-pw').focus();
+  loadRadarData();
 });
 </script>
 </body>
