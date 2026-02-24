@@ -99,7 +99,7 @@ def analyze_city(filepath):
         "file": filepath,
         "timestamp": datetime.now().isoformat(),
         "entity_count": len(kb),
-        "current_score": score_history[-1]["score"] if score_history else 0,
+        "current_score": (score_history[-1]["score"] if isinstance(score_history[-1], dict) else score_history[-1]) if score_history else 0,
         "version": meta.get("version", 0),
         "sections_present": [],
         "sections_missing": [],
