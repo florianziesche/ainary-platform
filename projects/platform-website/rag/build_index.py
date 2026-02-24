@@ -249,6 +249,50 @@ def main():
         # Entity chunks
         for eid, entity in kb.items():
             all_chunks.extend(chunk_entity(city_id, eid, entity, tenant))
+        
+        city_name = tenant.get("gemeinde", city_id)
+        
+        # News chunks
+        news = data.get("news", [])
+        if news:
+            news_lines = [f"{city_name} — Nachrichten:"]
+            for n in news:
+                news_lines.append(f"- [{n.get('date','')}] {n.get('title','')} ({n.get('source','')}) — {n.get('body','')}")
+            all_chunks.append({"id": f"{city_id}/news", "city": city_id, "entity": "_city", "type": "news", "text": "\n".join(news_lines), "name": city_name})
+        
+        # Hypotheses
+        hypotheses = data.get("hypotheses", [])
+        if hypotheses:
+            hyp_lines = [f"{city_name} — Hypothesen/Szenarien:"]
+            for h in hypotheses:
+                hyp_lines.append(f"- {h.get('title','')}: {h.get('summary','')} [Conf: {h.get('confidence','')}%]")
+            all_chunks.append({"id": f"{city_id}/hypotheses", "city": city_id, "entity": "_city", "type": "hypotheses", "text": "\n".join(hyp_lines), "name": city_name})
+        
+        # Forecast
+        forecast = data.get("forecast", {})
+        if forecast and forecast.get("kandidaten"):
+            fc_lines = [f"{city_name} — Prognose ({forecast.get('method','')}, Conf: {forecast.get('confidence','')}%):"]
+            for k in forecast.get("kandidaten", []):
+                fc_lines.append(f"- {k.get('name','')} ({k.get('partei','')}): {k.get('min','')}-{k.get('max','')}%, zentral {k.get('zentral','')}%")
+            for s in forecast.get("scenarios", []):
+                fc_lines.append(f"- Szenario: {s.get('label','')} — {s.get('probability','')}")
+            all_chunks.append({"id": f"{city_id}/forecast", "city": city_id, "entity": "_city", "type": "forecast", "text": "\n".join(fc_lines), "name": city_name})
+        
+        # Actions
+        actions = data.get("actions", [])
+        if actions:
+            act_lines = [f"{city_name} — Handlungsempfehlungen:"]
+            for a in actions:
+                act_lines.append(f"- [{a.get('priority','')}] {a.get('title','')}: {a.get('body','')} (Deadline: {a.get('urgency','')})")
+            all_chunks.append({"id": f"{city_id}/actions", "city": city_id, "entity": "_city", "type": "actions", "text": "\n".join(act_lines), "name": city_name})
+        
+        # Sentiment
+        sentiment = data.get("sentiment", {})
+        if sentiment and sentiment.get("topics"):
+            sent_lines = [f"{city_name} — Stimmungsbild: {sentiment.get('overall','')}"]
+            for topic in sentiment.get("topics", []):
+                sent_lines.append(f"- {topic.get('topic','')}: {topic.get('desc','')} [Valenz: {topic.get('valence','')}]")
+            all_chunks.append({"id": f"{city_id}/sentiment", "city": city_id, "entity": "_city", "type": "sentiment", "text": "\n".join(sent_lines), "name": city_name})
     
     print(f"Total chunks: {len(all_chunks)}")
     
