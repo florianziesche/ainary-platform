@@ -1189,7 +1189,20 @@ function renderBriefing() {
   var summaryText = WEEKLYBRIEF.summary || (wbDays + ' Tage vor der Wahl in ' + (TENANT.gemeinde||'') + '. ' + kandidaten.length + ' Kandidaten im Rennen. Stichwahl-Wahrscheinlichkeit: ' + stichwahlPct + '%.');
   h += '<div style="font:400 8.5pt var(--f);color:var(--text2);line-height:1.7;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">' + summaryText + '</div>';
   var totalQuellen = 0; for (var kk in KB) totalQuellen += (KB[kk].quellen || []).length;
-  h += '<div style="font:400 7pt var(--m);color:var(--muted);margin-top:6px">' + keys.length + ' Akteure · ' + totalQuellen + ' Quellen · ' + NEWS.length + ' Meldungen · Stand: ' + new Date().toLocaleDateString('de-DE') + '</div>';
+  // Trust System — Datenbasis transparent machen
+  var trustScore = Math.min(100, Math.round((totalQuellen/40*30) + (NEWS.length/8*20) + (keys.length/5*20) + ((HYPOTHESES.length>0?1:0)*15) + ((SCENARIOS.length>0?1:0)*15)));
+  var trustColor = trustScore >= 80 ? 'var(--green)' : trustScore >= 50 ? 'var(--amber)' : 'var(--red)';
+  var trustLabel = trustScore >= 80 ? 'HOCH' : trustScore >= 50 ? 'MITTEL' : 'NIEDRIG';
+  h += '<div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:16px">';
+  h += '<div style="flex:1">';
+  h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">';
+  h += '<div style="font:600 7pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:1px">Vertrauenswürdigkeit</div>';
+  h += '<div style="font:700 8pt var(--m);color:'+trustColor+'">'+trustLabel+' ('+trustScore+'/100)</div>';
+  h += '</div>';
+  h += '<div style="height:4px;background:var(--surface2);border-radius:2px;overflow:hidden"><div style="width:'+trustScore+'%;height:100%;background:'+trustColor+';border-radius:2px"></div></div>';
+  h += '<div style="font:400 6.5pt var(--m);color:var(--muted);margin-top:4px">'+keys.length+' Akteure · '+totalQuellen+' Quellen · '+NEWS.length+' Meldungen · Methode: strukturelle Analyse, keine Umfragen</div>';
+  h += '</div>';
+  h += '</div>';
   h += '</div>';
 
   // ═══ BLOCK 2: HANDLUNGSRELEVANTE ENTWICKLUNGEN (was ist diese Woche passiert + was bedeutet es) ═══
@@ -1646,45 +1659,7 @@ function renderBriefing() {
     h += '</div></div>';
   }
 
-  // Momentum Index
-  if (SOCIAL.momentum_index && SOCIAL.momentum_index.candidates) {
-    var mi = SOCIAL.momentum_index;
-    var miCands = Object.keys(mi.candidates);
-    h += '<div class="canvas-title">Momentum Index <span class="ct-badge" style="background:var(--red)">COMPOSITE</span></div>';
-    h += '<div class="entity-card"><div class="entity-body">';
-    h += '<div style="font:400 6pt var(--m);color:var(--muted);margin-bottom:8px">' + (mi.source||'Composite Score: IG 30% + Trends 20% + YT 15% + Activity 15%') + '</div>';
-    for (var mii=0; mii<miCands.length; mii++) {
-      var miName = miCands[mii];
-      var miData = mi.candidates[miName];
-      var miScore = miData.score || 0;
-      var miComps = miData.components || {};
-      h += '<div style="margin-bottom:10px">';
-      h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
-      h += '<div style="font:600 7.5pt var(--f);color:var(--text)">' + miName + '</div>';
-      h += '<div style="font:700 9pt var(--m);color:var(--accent)">' + miScore + '/100</div>';
-      h += '</div>';
-      h += '<div style="height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;margin-bottom:4px">';
-      h += '<div style="width:' + miScore + '%;height:100%;background:linear-gradient(90deg,var(--accent),var(--blue));border-radius:4px;transition:width .5s"></div>';
-      h += '</div>';
-      // Component bars
-      var compNames = {'engagement':'Engagement','growth':'Wachstum','search_interest':'Suchinteresse','activity':'Aktivität','cross_platform':'Cross-Platform'};
-      h += '<div style="display:flex;gap:4px;flex-wrap:wrap">';
-      for (var ck in miComps) {
-        var cv = miComps[ck];
-        var cl = compNames[ck] || ck;
-        var cc = cv >= 80 ? 'var(--green)' : cv >= 50 ? 'var(--amber)' : 'var(--red)';
-        h += '<div style="font:400 5.5pt var(--m);color:' + cc + ';padding:2px 5px;background:var(--surface);border-radius:2px;border:1px solid var(--border)">' + cl + ' ' + cv + '</div>';
-      }
-      h += '</div></div>';
-    }
-    if (mi.verdict) {
-      h += '<div style="margin-top:6px;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-left:2px solid var(--red);border-radius:3px">';
-      h += '<div style="font:600 6pt var(--m);color:var(--red);margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em">⚔️ Verdict</div>';
-      h += '<div style="font:400 6.5pt var(--f);color:var(--text2);line-height:1.5">' + mi.verdict + '</div>';
-      h += '</div>';
-    }
-    h += '</div></div>';
-  }
+  // Momentum Index — REMOVED: shows zeros without IG/Google data. Weniger ist mehr.
 
   // Themen-Radar (absorbed from Stimmung) — fallback for cities without rich themen section
   if ((!THEMEN.radar || !THEMEN.radar.length) && SENTIMENT.topics && SENTIMENT.topics.length) {
