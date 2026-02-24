@@ -1141,16 +1141,16 @@ function renderBriefing() {
   let h = '';
 
   // ═══ BLOCK 1: LAGEBEURTEILUNG (1 Absatz, neutral, faktenbasiert) ═══
-  h += '<div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:6px;padding:16px 20px;margin-bottom:16px">';
+  h += '<div style="background:linear-gradient(135deg,var(--surface) 0%,rgba(157,127,59,0.04) 100%);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:6px;padding:20px 24px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,0.04)">';
   h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">';
-  h += '<div style="font:700 10pt var(--f);color:var(--text)">Lagebeurteilung ' + (TENANT.gemeinde||'') + '</div>';
+  h += '<div style="font:700 12pt var(--f);color:var(--text)">Lagebeurteilung ' + (TENANT.gemeinde||'') + '</div>';
   h += '<div style="font:700 11pt var(--m);color:' + daysColor + '">' + wbDays + ' Tage bis Wahl</div>';
   h += '</div>';
   // Auto-generate summary from data
   var kandNames = kandidaten.slice(0,3).map(function(k){ return KB[k].name + ' (' + KB[k].party + ')'; }).join(', ');
   var summaryText = WEEKLYBRIEF.summary || (wbDays + ' Tage vor der Wahl in ' + (TENANT.gemeinde||'') + '. ' + kandidaten.length + ' Kandidaten im Rennen. Stichwahl-Wahrscheinlichkeit: ' + stichwahlPct + '%.');
-  h += '<div style="font:400 8pt var(--f);color:var(--text);line-height:1.6;margin-bottom:10px">' + summaryText + '</div>';
-  h += '<div style="font:400 6.5pt var(--f);color:var(--muted);line-height:1.5">';
+  h += '<div style="font:400 9pt var(--f);color:var(--text);line-height:1.7;margin-bottom:12px">' + summaryText + '</div>';
+  h += '<div style="font:400 7.5pt var(--f);color:var(--muted);line-height:1.5">';
   var totalQuellen = 0; for (var kk in KB) totalQuellen += (KB[kk].quellen || []).length;
   h += '<span class="ev ev-e">E</span> ' + keys.length + ' Akteure analysiert · ' + totalQuellen + ' Quellen · ' + NEWS.length + ' aktuelle Meldungen · Stand: ' + new Date().toLocaleDateString('de-DE');
   h += '</div></div>';
@@ -1175,27 +1175,34 @@ function renderBriefing() {
     var ins = SOCIAL.insights[si];
     if (ins.soWhat) actionItems.push({title: ins.title||'', detail: ins.body||ins.text||'', severity: ins.severity||'MITTEL', source: 'social', soWhat: ins.soWhat||''});
   }
+  var maxVisible = 3;
   for (var aii=0; aii<actionItems.length; aii++) {
+    if (aii === maxVisible) h += '<div id="more-entwicklungen" style="display:none">';
     var item = actionItems[aii];
     var itemColor = item.severity === 'KRITISCH' ? 'var(--red)' : item.severity === 'HOCH' ? 'var(--red)' : item.severity === 'MITTEL' ? 'var(--amber)' : 'var(--muted)';
     var sourceLabel = item.source === 'alert' ? 'AKTUELL' : item.source === 'pattern' ? 'MUSTER' : 'ANALYSE';
     h += '<div style="padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-left:3px solid ' + itemColor + ';border-radius:4px;margin-bottom:6px">';
     h += '<div style="display:flex;justify-content:space-between;align-items:flex-start">';
     h += '<div style="flex:1">';
-    h += '<div style="font:600 7.5pt var(--f);color:var(--text);margin-bottom:3px">' + item.title + '</div>';
-    h += '<div style="font:400 6.5pt var(--f);color:var(--text2);line-height:1.5">' + (item.detail||'') + '</div>';
-    if (item.soWhat) h += '<div style="font:500 6pt var(--f);color:var(--accent);margin-top:3px;line-height:1.4">→ Einordnung: ' + item.soWhat + '</div>';
+    h += '<div style="font:600 8.5pt var(--f);color:var(--text);margin-bottom:3px">' + item.title + '</div>';
+    h += '<div style="font:400 8pt var(--f);color:var(--text2);line-height:1.5">' + (item.detail||'') + '</div>';
+    if (item.soWhat) h += '<div style="font:500 7pt var(--f);color:var(--accent);margin-top:3px;line-height:1.4">→ Einordnung: ' + item.soWhat + '</div>';
     h += '</div>';
     h += '<div style="font:600 5pt var(--m);color:' + itemColor + ';padding:2px 6px;background:' + itemColor + '15;border-radius:2px;flex-shrink:0;margin-left:8px">' + sourceLabel + '</div>';
     h += '</div></div>';
+  }
+  if (actionItems.length > maxVisible) {
+    h += '</div>'; // close more-entwicklungen
+    h += '<div style="text-align:center;padding:8px"><span style="font:500 7.5pt var(--m);color:var(--accent);cursor:pointer;text-decoration:underline" onclick="var el=document.getElementById(\'more-entwicklungen\');if(el.style.display===\'none\'){el.style.display=\'\';this.textContent=\'Weniger anzeigen\'}else{el.style.display=\'none\';this.textContent=\''+(actionItems.length-maxVisible)+' weitere Entwicklungen anzeigen\'}">' + (actionItems.length - maxVisible) + ' weitere Entwicklungen anzeigen</span></div>';
   }
   h += '</div>';
 
   // ═══ BLOCK 3: KANDIDATEN-VERGLEICH (Stärken/Schwächen, neutral) ═══
   h += '<div style="margin-bottom:16px">';
-  h += '<div class="canvas-title">Kandidaten im Überblick <span class="ct-badge" style="background:var(--gold)">' + kandidaten.length + ' KANDIDATEN</span></div>';
-  for (var ci=0; ci<kandidaten.length; ci++) {
-    var ck = kandidaten[ci];
+  var kandAlpha = kandidaten.slice().sort(function(a,b){ return KB[a].name.localeCompare(KB[b].name); });
+  h += '<div class="canvas-title">Kandidaten im Überblick <span class="ct-badge" style="background:var(--gold)">' + kandAlpha.length + ' KANDIDATEN</span></div>';
+  for (var ci=0; ci<kandAlpha.length; ci++) {
+    var ck = kandAlpha[ci];
     var ce = KB[ck];
     var riskColor = ce.risk > 40 ? 'var(--red)' : ce.risk > 25 ? 'var(--amber)' : 'var(--green)';
     var partyColor = ce.party === 'CSU' ? '#0a4d8c' : ce.party === 'SPD' ? '#c0392b' : (ce.party||'').includes('Grün') ? '#4a8c3f' : ce.party === 'AfD' ? '#8b1a1a' : 'var(--muted)';
@@ -1206,14 +1213,14 @@ function renderBriefing() {
 
     h += '<div style="padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-left:3px solid ' + partyColor + ';border-radius:4px;margin-bottom:8px;cursor:pointer" onclick="showEntity(\'' + ck + '\')">';
     h += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">';
-    h += '<div><div style="font:600 8.5pt var(--f);color:var(--text)">' + ce.name + '</div>';
+    h += '<div><div style="font:600 10pt var(--f);color:var(--text)">' + ce.name + '</div>';
     h += '<div style="font:400 6pt var(--m);color:var(--muted)">' + ce.party + ' · ' + (ce.role||'') + '</div></div>';
     h += '<div style="display:flex;gap:6px;align-items:center">';
     if (fk) h += '<div style="font:600 7pt var(--m);color:var(--text);padding:2px 6px;background:var(--surface2);border-radius:3px">' + fk.min + '-' + fk.max + '%</div>';
     if (mk) h += '<div style="font:600 7pt var(--m);color:var(--accent);padding:2px 6px;background:var(--accent)15;border-radius:3px">Momentum ' + (mk.composite_score||mk.score||0) + '</div>';
     h += '</div></div>';
     // Summary — full text, no truncation
-    h += '<div style="font:400 6.5pt var(--f);color:var(--text2);line-height:1.5;margin-bottom:6px">' + (ce.summary||'') + '</div>';
+    h += '<div style="font:400 8pt var(--f);color:var(--text2);line-height:1.6;margin-bottom:8px">' + (ce.summary||'') + '</div>';
     // Key indicators row
     h += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
     h += '<span style="font:500 5.5pt var(--m);color:' + riskColor + ';padding:1px 5px;background:' + riskColor + '10;border-radius:2px">Risiko ' + ce.risk + '</span>';
@@ -1236,8 +1243,8 @@ function renderBriefing() {
     h += '<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:4px;margin-bottom:4px">';
     h += '<div style="width:4px;height:28px;border-radius:2px;background:' + thColor + ';flex-shrink:0"></div>';
     h += '<div style="flex:1">';
-    h += '<div style="font:600 7pt var(--f);color:var(--text)">' + (th.label||th.topic||'') + '</div>';
-    if (th.beschreibung) h += '<div style="font:400 6pt var(--f);color:var(--text2);margin-top:1px">' + th.beschreibung + '</div>';
+    h += '<div style="font:600 8.5pt var(--f);color:var(--text)">' + (th.label||th.topic||'') + '</div>';
+    if (th.beschreibung) h += '<div style="font:400 7.5pt var(--f);color:var(--text2);margin-top:2px;line-height:1.5">' + th.beschreibung + '</div>';
     h += '</div>';
     h += '<div style="text-align:right;flex-shrink:0">';
     h += '<div style="font:700 8pt var(--m);color:' + thColor + '">' + (th.relevanz||'') + '</div>';
@@ -1291,10 +1298,10 @@ function renderBriefing() {
         var scColor = scProb >= 40 ? 'var(--accent)' : scProb >= 20 ? 'var(--amber)' : 'var(--muted)';
         h += '<div style="padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-left:3px solid ' + scColor + ';border-radius:4px;margin-bottom:6px">';
         h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
-        h += '<div style="font:600 7.5pt var(--f);color:var(--text)">' + (sc.title||'Szenario '+(sci+1)) + '</div>';
+        h += '<div style="font:600 8.5pt var(--f);color:var(--text)">' + (sc.title||'Szenario '+(sci+1)) + '</div>';
         h += '<div style="font:700 8pt var(--m);color:' + scColor + '">' + scProb + '%</div>';
         h += '</div>';
-        h += '<div style="font:400 6.5pt var(--f);color:var(--text2);line-height:1.5;margin-bottom:4px">' + (sc.description||sc.body||'') + '</div>';
+        h += '<div style="font:400 8pt var(--f);color:var(--text2);line-height:1.6;margin-bottom:6px">' + (sc.description||sc.body||'') + '</div>';
         // Conditions
         if (sc.conditions && sc.conditions.length) {
           h += '<div style="font:400 5.5pt var(--f);color:var(--muted);margin-bottom:3px">Bedingungen:</div>';
@@ -1319,9 +1326,9 @@ function renderBriefing() {
   }
 
   // ═══ DEEP DIVE SECTION (collapsed by default) ═══
-  h += '<div style="margin-top:20px;padding-top:16px;border-top:2px solid var(--border)">';
-  h += '<div class="canvas-title" style="cursor:pointer" onclick="document.getElementById(\'deep-dive\').style.display=document.getElementById(\'deep-dive\').style.display===\'none\'?\'\':\'none\'">Detailanalyse <span style="font:400 7pt var(--m);color:var(--accent)">▼ ein-/ausblenden</span></div>';
-  h += '<div id="deep-dive">';
+  h += '<div style="margin-top:24px;padding-top:16px;border-top:2px solid var(--border)">';
+  h += '<div class="canvas-title" style="cursor:pointer" onclick="var dd=document.getElementById(\'deep-dive\');var arr=document.getElementById(\'dd-arrow\');if(dd.style.display===\'none\'){dd.style.display=\'\';arr.textContent=\'▼\'}else{dd.style.display=\'none\';arr.textContent=\'▶\'}">Quellenanalyse und Rohdaten <span id="dd-arrow" style="font:400 7pt var(--m);color:var(--accent)">▶</span></div>';
+  h += '<div id="deep-dive" style="display:none">';
 
   // Weekly Brief mini (in Briefing) — §1.1: hide if no data, never show "0 Prioritäten"
   if (WEEKLYBRIEF && (WEEKLYBRIEF.summary || (WEEKLYBRIEF.priorities||[]).length > 0)) {
