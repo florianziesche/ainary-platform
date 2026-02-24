@@ -117,8 +117,8 @@ We're at 28 cities. JSON files on a CDN is the right choice until we have a reas
 
 1. ✅ radar-data.json created (28 cities)
 2. ✅ radar.html loads JSON dynamically
-3. ⬜ Extract Gotham data → data/cities/{id}.json
-4. ⬜ Build dossier.html template (replaces 4 gotham-*.html)
+3. ✅ Extract Gotham data → data/cities/{id}.json (bamberg, regensburg, ottobrunn, internal)
+4. ✅ Build dossier.html template (replaces 4 gotham-*.html, loads via ?city=X)
 5. ⬜ Build dashboard.html template (replaces digi-dashboard.html)
 6. ⬜ Legacy redirects (old URLs still work)
 7. ⬜ Kommune-generator outputs to data/cities/
