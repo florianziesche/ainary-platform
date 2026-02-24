@@ -4,10 +4,13 @@
 
 | Task contains... | Load ONLY these | Do NOT load |
 |------------------|----------------|-------------|
-| Website, CSS, HTML, Deploy | `standards/WEBSITE-DESIGN-GUIDE.md` + `standards/BRAND.md` | RESEARCH-PROTOCOL, CONTENT-VOICE |
+| Website, CSS, HTML, Deploy | `standards/WEBSITE-DESIGN-GUIDE.md` + `standards/BRAND.md` + `projects/platform-website/DATA-SCHEMA.md` | RESEARCH-PROTOCOL, CONTENT-VOICE |
+| Dossier, Dashboard, dossier.html, Platform | `projects/platform-website/DEV-STANDARD.md` → `projects/platform-website/PRODUCT-SPEC.md` (§-Nr identifizieren) → `node test_dossier.js` VOR und NACH jeder Änderung | Alles andere |
+| X, Twitter, Post, Tweet | `memory/knowledge/x-algorithm-rules.md` (1-2/day, story, no links, morning approval) | BRAND, RESEARCH-PROTOCOL |
 | Research, Analyse, Report | `standards/RESEARCH-PROTOCOL.md` | BRAND, WEBSITE-DESIGN-GUIDE |
 | Content, Post, Artikel, LinkedIn | `standards/CONTENT-VOICE.md` | RESEARCH-PROTOCOL, BRAND |
 | Dokument, PDF, LaTeX, Report | `skills/report-design/SKILL.md` | WEBSITE-DESIGN-GUIDE |
+| Outreach, Email, Send | `outreach/TEMPLATES.md` + `outreach/PLAN.md` | BRAND, WEBSITE-DESIGN-GUIDE |
 | Email, Outreach, Pitch, Message | `standards/FLORIAN.md` | BRAND, RESEARCH-PROTOCOL |
 | Bewerbung, VC Application | `skills/vc-application/SKILL.md` | CONTENT-VOICE |
 | Entscheidung, Strategie, Trade-off | `TWIN.md` (full) | all standards |
