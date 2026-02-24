@@ -859,6 +859,88 @@ function shareEntity(id) {
   if (navigator.clipboard) { navigator.clipboard.writeText(url); toast('Link kopiert: ' + KB[id].name); }
   else toast('Link: ' + url);
 }
+function runSimulation() {
+  var wb = parseInt(document.getElementById('sim-wb').value);
+  var ab = parseInt(document.getElementById('sim-ab').value);
+  var sk = parseInt(document.getElementById('sim-sk').value);
+  var pm = parseInt(document.getElementById('sim-pm').value);
+  // Update labels
+  document.getElementById('sim-wb-val').textContent = wb + '%';
+  document.getElementById('sim-ab-val').textContent = ab + '%';
+  document.getElementById('sim-sk-val').textContent = sk + '%';
+  document.getElementById('sim-pm-val').textContent = pm + '%';
+
+  // Simulation model: calculate candidate scores based on parameters
+  var fkands = (FORECAST.kandidaten || []).slice(0, 5);
+  if (!fkands.length) { document.getElementById('sim-result').innerHTML = '<div style="font:400 8pt var(--f);color:var(--muted)">Keine Prognosedaten verfügbar.</div>'; return; }
+
+  var results = [];
+  for (var i = 0; i < fkands.length; i++) {
+    var fk = fkands[i];
+    var base = fk.zentral || ((fk.min||0) + (fk.max||0)) / 2;
+    var isIncumbent = i === 0; // first candidate usually incumbent/frontrunner
+    var isProgressive = (fk.partei||'').includes('Grün') || (fk.partei||'').includes('SPD');
+    var hasControversy = KB[fk.id] && (KB[fk.id].controversies||[]).length > 1;
+
+    // Effects
+    var score = base;
+    // Wahlbeteiligung: high = helps progressive, low = helps incumbent
+    if (isIncumbent) score += (50 - wb) * 0.15;
+    else if (isProgressive) score += (wb - 50) * 0.12;
+    // Amtsbonus
+    if (isIncumbent) score += (ab - 50) * 0.12;
+    else score -= (ab - 50) * 0.04;
+    // Skandal-Effekt: hurts those with controversies
+    if (hasControversy) score -= sk * 0.08;
+    else score += sk * 0.02;
+    // Progressive Mobilisierung
+    if (isProgressive) score += (pm - 50) * 0.1;
+    else score -= (pm - 50) * 0.03;
+
+    score = Math.max(5, Math.min(55, Math.round(score * 10) / 10));
+    var pColor = (fk.partei||'').includes('CSU') ? '#2D72D2' : (fk.partei||'').includes('SPD') ? '#CD4246' : (fk.partei||'').includes('Grün') ? '#238551' : 'var(--muted)';
+    results.push({ name: (fk.name||'').split(' ').pop(), score: score, party: fk.partei, color: pColor, full: fk.name });
+  }
+  results.sort(function(a, b) { return b.score - a.score; });
+  var maxScore = results[0].score;
+
+  var rh = '';
+  // Winner highlight
+  rh += '<div style="text-align:center;margin-bottom:14px">';
+  rh += '<div style="font:800 24pt var(--m);color:' + results[0].color + '">' + results[0].score + '%</div>';
+  rh += '<div style="font:600 8pt var(--f);color:var(--text)">' + results[0].full + '</div>';
+  rh += '<div style="font:400 6pt var(--m);color:var(--muted)">Simulierter Erstplatzierter</div>';
+  rh += '</div>';
+
+  // All bars
+  for (var ri = 0; ri < results.length; ri++) {
+    var r = results[ri];
+    var barW = (r.score / 60 * 100);
+    rh += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
+    rh += '<div style="width:70px;font:500 7pt var(--m);color:var(--text2);text-align:right">' + r.name + '</div>';
+    rh += '<div style="flex:1;height:14px;background:var(--surface2);border-radius:3px;overflow:hidden">';
+    rh += '<div style="width:' + barW + '%;height:100%;background:' + r.color + '60;border-radius:3px;transition:width .3s"></div>';
+    rh += '</div>';
+    rh += '<div style="width:40px;font:700 7pt var(--m);color:' + r.color + '">' + r.score + '%</div>';
+    rh += '</div>';
+  }
+
+  // Stichwahl assessment
+  var stichProb = results[0].score < 50 ? 'sehr wahrscheinlich' : 'unwahrscheinlich';
+  var stichColor = results[0].score < 50 ? 'var(--amber)' : 'var(--green)';
+  rh += '<div style="margin-top:12px;padding:8px 10px;background:var(--surface2);border-radius:4px">';
+  rh += '<div style="font:600 7pt var(--f);color:' + stichColor + '">Stichwahl: ' + stichProb + '</div>';
+  rh += '<div style="font:400 6pt var(--f);color:var(--muted);margin-top:2px">' + results[0].name + ' vs. ' + results[1].name + ' (Δ ' + Math.round((results[0].score - results[1].score) * 10) / 10 + ' Punkte)</div>';
+  rh += '</div>';
+
+  // Intelligence hint
+  rh += '<div style="margin-top:8px;padding:8px 10px;background:var(--blue)08;border-left:2px solid var(--blue);border-radius:0 4px 4px 0">';
+  rh += '<div style="font:500 6.5pt var(--f);color:var(--accent);line-height:1.5">→ Unser Intelligence-Service liefert die Eingangsdaten für diese Simulation: Echtzeit-Medienmonitoring, Social-Media-Analyse, historische Wahlmuster.</div>';
+  rh += '</div>';
+
+  document.getElementById('sim-result').innerHTML = rh;
+}
+
 function bookmarkAction(idx, btn) {
   if (!btn) return;
   if (btn.classList.contains('active')) { btn.classList.remove('active'); btn.textContent='○ Vormerken'; toast('Aktion entfernt'); }
@@ -2241,6 +2323,9 @@ function renderHypothesesHTML() {
 function renderStrategy() {
   const el = document.getElementById('strategy-view');
   let h = '';
+  // Derive kandidaten (same logic as renderBriefing)
+  const keys = Object.keys(KB);
+  const kandidaten = keys.filter(k => KB[k].role && (KB[k].role.includes('Kandidat') || KB[k].role.includes('Bürgermeister')));
 
   // ═══ PALANTIR STRATEGY: 3 Blöcke — Analyse → Szenarien → Handlungsoptionen ═══
 
@@ -2364,6 +2449,146 @@ function renderStrategy() {
   }
   h += '</div>'; // close Block 2
 
+  // ═══ BLOCK 2B: SIMULATION + VISUALISIERUNG (Palantir-style) ═══
+  h += '<div style="margin-bottom:24px">';
+  h += '<div class="canvas-title">Simulation <span class="ct-badge" style="background:var(--blue)">INTERAKTIV</span></div>';
+  h += '<div style="font:400 7.5pt var(--f);color:var(--text2);margin-bottom:16px;line-height:1.6">Verschieben Sie die Parameter, um Szenarien zu simulieren. Die Prognose passt sich in Echtzeit an.</div>';
+
+  // --- STICHWAHL SIMULATOR ---
+  h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">';
+
+  // Left: Sliders
+  h += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:16px">';
+  h += '<div style="font:600 8pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Parameter</div>';
+
+  // Slider: Wahlbeteiligung
+  h += '<div style="margin-bottom:14px">';
+  h += '<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font:500 7.5pt var(--f);color:var(--text)">Wahlbeteiligung</span><span id="sim-wb-val" style="font:700 8pt var(--m);color:var(--accent)">50%</span></div>';
+  h += '<input type="range" id="sim-wb" min="30" max="70" value="50" style="width:100%;accent-color:var(--blue)" oninput="runSimulation()">';
+  h += '<div style="display:flex;justify-content:space-between;font:400 5.5pt var(--m);color:var(--muted)"><span>niedrig (30%)</span><span>hoch (70%)</span></div>';
+  h += '</div>';
+
+  // Slider: Amtsbonus-Effekt
+  h += '<div style="margin-bottom:14px">';
+  h += '<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font:500 7.5pt var(--f);color:var(--text)">Amtsbonus / Bekanntheitsgrad</span><span id="sim-ab-val" style="font:700 8pt var(--m);color:var(--accent)">50%</span></div>';
+  h += '<input type="range" id="sim-ab" min="0" max="100" value="50" style="width:100%;accent-color:var(--blue)" oninput="runSimulation()">';
+  h += '<div style="display:flex;justify-content:space-between;font:400 5.5pt var(--m);color:var(--muted)"><span>schwach</span><span>stark</span></div>';
+  h += '</div>';
+
+  // Slider: Skandal-Effekt
+  h += '<div style="margin-bottom:14px">';
+  h += '<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font:500 7.5pt var(--f);color:var(--text)">Skandal-/Kontroverse-Effekt</span><span id="sim-sk-val" style="font:700 8pt var(--m);color:var(--accent)">30%</span></div>';
+  h += '<input type="range" id="sim-sk" min="0" max="100" value="30" style="width:100%;accent-color:var(--blue)" oninput="runSimulation()">';
+  h += '<div style="display:flex;justify-content:space-between;font:400 5.5pt var(--m);color:var(--muted)"><span>kein Effekt</span><span>wahlentscheidend</span></div>';
+  h += '</div>';
+
+  // Slider: Progressive Mobilisierung
+  h += '<div style="margin-bottom:4px">';
+  h += '<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font:500 7.5pt var(--f);color:var(--text)">Progressive Mobilisierung</span><span id="sim-pm-val" style="font:700 8pt var(--m);color:var(--accent)">50%</span></div>';
+  h += '<input type="range" id="sim-pm" min="0" max="100" value="50" style="width:100%;accent-color:var(--blue)" oninput="runSimulation()">';
+  h += '<div style="display:flex;justify-content:space-between;font:400 5.5pt var(--m);color:var(--muted)"><span>gespalten</span><span>vereint</span></div>';
+  h += '</div>';
+
+  h += '</div>';
+
+  // Right: Live Result
+  h += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:16px">';
+  h += '<div style="font:600 8pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Simuliertes Ergebnis</div>';
+  h += '<div id="sim-result"></div>';
+  h += '</div>';
+
+  h += '</div>';
+
+  // --- KANDIDATEN-POSITIONIERUNG (SVG Scatter) ---
+  h += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:16px;margin-bottom:16px">';
+  h += '<div style="font:600 8pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Kandidaten-Positionierung</div>';
+  h += '<div style="font:400 7pt var(--f);color:var(--text2);margin-bottom:10px">X: Digitale Sichtbarkeit · Y: Strukturelle Wahlstärke · Größe: Quellenabdeckung</div>';
+  h += '<svg id="sim-scatter" viewBox="0 0 400 250" style="width:100%;height:auto;overflow:visible">';
+  // Grid
+  h += '<rect x="40" y="10" width="350" height="220" fill="none" stroke="var(--border)" stroke-width="0.5"/>';
+  h += '<line x1="40" y1="120" x2="390" y2="120" stroke="var(--border)" stroke-width="0.3" stroke-dasharray="4"/>';
+  h += '<line x1="215" y1="10" x2="215" y2="230" stroke="var(--border)" stroke-width="0.3" stroke-dasharray="4"/>';
+  // Axis labels
+  h += '<text x="215" y="248" text-anchor="middle" fill="var(--muted)" style="font:500 6pt var(--m)">Digitale Sichtbarkeit →</text>';
+  h += '<text x="12" y="120" text-anchor="middle" fill="var(--muted)" style="font:500 6pt var(--m)" transform="rotate(-90,12,120)">Wahlstärke →</text>';
+  // Quadrant labels
+  h += '<text x="128" y="30" text-anchor="middle" fill="var(--muted)" style="font:400 5pt var(--m);opacity:0.5">Digital schwach / Stark</text>';
+  h += '<text x="303" y="30" text-anchor="middle" fill="var(--muted)" style="font:400 5pt var(--m);opacity:0.5">Digital stark / Stark</text>';
+  h += '<text x="128" y="225" text-anchor="middle" fill="var(--muted)" style="font:400 5pt var(--m);opacity:0.5">Digital schwach / Schwach</text>';
+  h += '<text x="303" y="225" text-anchor="middle" fill="var(--muted)" style="font:400 5pt var(--m);opacity:0.5">Digital stark / Schwach</text>';
+
+  // Plot candidates
+  var fcLookup = {};
+  for (var fci=0; fci<(FORECAST.kandidaten||[]).length; fci++) { var fc = FORECAST.kandidaten[fci]; fcLookup[fc.id] = fc; }
+  for (var ki=0; ki<kandidaten.length; ki++) {
+    var ck = kandidaten[ki];
+    var ce = KB[ck];
+    var cfk = fcLookup[ck] || {};
+    // X = digital presence (YouTube + social mentions + quellen)
+    var ytData = (YOUTUBE.candidates||[]).find(function(y){ return (y.name||"").toLowerCase().includes(ck); });
+    var digitalScore = ((ytData||{}).video_count||0) * 3 + (ce.quellen||[]).length * 5 + ((ce.social||{}).mentions||0);
+    var maxDigital = 150; // normalize
+    var cx = 40 + Math.min(digitalScore / maxDigital, 1) * 350;
+    // Y = electoral strength (forecast zentral inverted for SVG)
+    var ey = cfk.zentral || 20;
+    var cy = 230 - (ey / 60 * 220);
+    // Size = quellen coverage
+    var cr = 6 + (ce.quellen||[]).length * 0.5;
+    var pColor = (ce.party||"").includes("CSU") ? "#2D72D2" : (ce.party||"").includes("SPD") ? "#CD4246" : (ce.party||"").includes("Grün") ? "#238551" : "#8F99A8";
+    h += '<circle cx="'+cx+'" cy="'+cy+'" r="'+Math.min(cr,18)+'" fill="'+pColor+'40" stroke="'+pColor+'" stroke-width="1.5" style="cursor:pointer" onclick="showEntity(\''+ck+'\')"/>';
+    h += '<text x="'+cx+'" y="'+(cy-Math.min(cr,18)-4)+'" text-anchor="middle" fill="var(--text)" style="font:600 6pt var(--f);cursor:pointer" onclick="showEntity(\''+ck+'\')">'+ce.name.split(" ").pop()+'</text>';
+  }
+  h += '</svg>';
+  h += '</div>';
+
+  // --- WÄHLERFLUSS-DIAGRAMM (Stichwahl) ---
+  if (STICHWAHL.likely_matchup) {
+    h += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:16px">';
+    h += '<div style="font:600 8pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Wählerfluss-Projektion (Stichwahl)</div>';
+    h += '<div style="font:400 7pt var(--f);color:var(--text2);margin-bottom:10px">Geschätzte Wählerwanderung bei ' + STICHWAHL.likely_matchup + '</div>';
+
+    // Build simple flow visualization
+    var matchup = STICHWAHL.likely_matchup || '';
+    var swKands = matchup.split(' vs. ').map(function(n){ return n.trim(); });
+    var leftName = swKands[0] || 'Kandidat A';
+    var rightName = swKands[1] || 'Kandidat B';
+
+    h += '<svg viewBox="0 0 400 160" style="width:100%;height:auto">';
+    // Source parties on left
+    var sources = [];
+    for (var si=0; si<kandidaten.length; si++) {
+      var sk = KB[kandidaten[si]];
+      var sfk = fcLookup[kandidaten[si]] || {};
+      if (sfk.zentral) sources.push({name: sk.name.split(" ").pop(), party: sk.party, pct: sfk.zentral, id: kandidaten[si]});
+    }
+    sources.sort(function(a,b){ return b.pct - a.pct; });
+    var yOff = 10;
+    for (var si=0; si<sources.length; si++) {
+      var s = sources[si];
+      var barH = Math.max(s.pct * 0.8, 8);
+      var sColor = (s.party||"").includes("CSU") ? "#2D72D2" : (s.party||"").includes("SPD") ? "#CD4246" : (s.party||"").includes("Grün") ? "#238551" : "#8F99A8";
+      // Left bar
+      h += '<rect x="10" y="'+yOff+'" width="60" height="'+barH+'" rx="2" fill="'+sColor+'60" stroke="'+sColor+'" stroke-width="0.5"/>';
+      h += '<text x="75" y="'+(yOff+barH/2+3)+'" fill="var(--text2)" style="font:500 5.5pt var(--m)">'+s.name+' ('+s.pct+'%)</text>';
+      // Flow lines to right
+      var goesLeft = (s.party||"").includes("CSU") || matchup.includes(s.name);
+      var targetY = goesLeft ? 30 : 100;
+      h += '<path d="M70 '+(yOff+barH/2)+' C200 '+(yOff+barH/2)+' 250 '+targetY+' 310 '+targetY+'" fill="none" stroke="'+sColor+'40" stroke-width="'+Math.max(barH*0.3,1.5)+'"/>';
+      yOff += barH + 6;
+    }
+    // Right: two target blocks
+    h += '<rect x="310" y="15" width="80" height="40" rx="4" fill="var(--blue)20" stroke="var(--blue)" stroke-width="1"/>';
+    h += '<text x="350" y="38" text-anchor="middle" fill="var(--text)" style="font:600 7pt var(--f)">'+leftName.split(" ").pop()+'</text>';
+    h += '<rect x="310" y="85" width="80" height="40" rx="4" fill="var(--green)20" stroke="var(--green)" stroke-width="1"/>';
+    h += '<text x="350" y="108" text-anchor="middle" fill="var(--text)" style="font:600 7pt var(--f)">'+rightName.split(" ").pop()+'</text>';
+    h += '</svg>';
+
+    h += '<div style="font:400 6pt var(--f);color:var(--muted);margin-top:6px;font-style:italic">Projektion basierend auf Parteizugehörigkeit und historischen Wählerwanderungsmustern. Keine empirischen Transferdaten verfügbar.</div>';
+    h += '</div>';
+  }
+
+  h += '</div>'; // close Block 2B
+
   // ═══ BLOCK 3: HANDLUNGSOPTIONEN (Was tun?) ═══
   h += '<div style="margin-bottom:24px">';
   h += '<div class="canvas-title">Handlungsoptionen <span class="ct-badge" style="background:var(--accent)">DATENBASIERT</span></div>';
@@ -2478,6 +2703,8 @@ function renderStrategy() {
   h += '</div>'; // close Block 3
 
   el.innerHTML = h;
+  // Initialize simulation on render
+  if (document.getElementById('sim-wb')) runSimulation();
 }
 
 // =====================================================
