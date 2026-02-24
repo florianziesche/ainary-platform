@@ -3,71 +3,218 @@
   "_version": 2,
   "_updated": "2026-02-25",
   "_palantir_parallel": "This is our Ontology. Palantir's Foundry Ontology defines what objects exist, what properties they have, and how they relate. Our schema does the same for political intelligence. Change the ontology → all deployments adapt.",
-  
   "sections": {
-    "tenant":     {"required": true, "description": "City metadata, Gemeinderat, Strukturdaten, Alerts"},
-    "kb":         {"required": true, "description": "Knowledge Base — entity dossiers (candidates, incumbents)"},
-    "graph":      {"required": true, "description": "Network graph — nodes + links"},
-    "news":       {"required": true, "description": "Current news items", "min_items": 5},
-    "hypotheses": {"required": true, "description": "Testable predictions about election outcome", "min_items": 2},
-    "sentiment":  {"required": true, "description": "Overall sentiment + topic-level sentiment"},
-    "patterns":   {"required": true, "description": "Cross-entity patterns (e.g. SPD-Ära-End pattern)", "min_items": 2},
-    "actions":    {"required": true, "description": "Recommended actions (outreach, monitoring)", "min_items": 2},
-    "forecast":   {"required": true, "description": "Election forecast with scenarios + confidence"},
-    "themen":     {"required": true, "description": "Themen-Radar: ranked topics with candidate positions", "min_items": 5},
-    "social":     {"required": true, "description": "Social media profiles + insights", "min_kandidaten": 3}
+    "tenant": {
+      "required": true,
+      "description": "City metadata, Gemeinderat, Strukturdaten, Alerts"
+    },
+    "kb": {
+      "required": true,
+      "description": "Knowledge Base — entity dossiers (candidates, incumbents)"
+    },
+    "graph": {
+      "required": true,
+      "description": "Network graph — nodes + links"
+    },
+    "news": {
+      "required": true,
+      "description": "Current news items",
+      "min_items": 5
+    },
+    "hypotheses": {
+      "required": true,
+      "description": "Testable predictions about election outcome",
+      "min_items": 2
+    },
+    "sentiment": {
+      "required": true,
+      "description": "Overall sentiment + topic-level sentiment"
+    },
+    "patterns": {
+      "required": true,
+      "description": "Cross-entity patterns (e.g. SPD-Ära-End pattern)",
+      "min_items": 2
+    },
+    "actions": {
+      "required": true,
+      "description": "Recommended actions (outreach, monitoring)",
+      "min_items": 2
+    },
+    "forecast": {
+      "required": true,
+      "description": "Election forecast with scenarios + confidence"
+    },
+    "themen": {
+      "required": true,
+      "description": "Themen-Radar: ranked topics with candidate positions",
+      "min_items": 5
+    },
+    "social": {
+      "required": true,
+      "description": "Social media profiles + insights",
+      "min_kandidaten": 3
+    },
+    "youtube": {
+      "label": "YouTube Intelligence",
+      "required": false,
+      "description": "YouTube-Präsenz der Kandidaten: Video-Anzahl, eigener Kanal, Top-Videos, Red Diamond Insight, Cross-Platform-Gap. Automatisch via YouTube Data API v3.",
+      "auto_fill_query": "{city} OB-Kandidaten YouTube Kanal Kommunalwahl 2026",
+      "fields": {
+        "source": "string (YouTube Data API v3)",
+        "scraped": "date (YYYY-MM-DD)",
+        "candidates": [
+          {
+            "name": "string",
+            "video_count": "number",
+            "has_own_channel": "boolean",
+            "top_videos": [
+              {
+                "title": "string",
+                "channel": "string",
+                "url": "string",
+                "published": "date"
+              }
+            ]
+          }
+        ],
+        "city_videos": [
+          {
+            "title": "string",
+            "channel": "string",
+            "url": "string",
+            "published": "date"
+          }
+        ],
+        "insight": "string — Red Diamond YouTube Insight (per city)",
+        "cross_platform_gap": "string — Cross-platform analysis (YT vs IG vs Google Trends)"
+      }
+    }
   },
-
   "entity_schema": {
-    "required_fields": ["name", "role", "party", "summary", "properties", "connections", "quellen", "trustScore", "steckbrief", "karriere", "zitate"],
+    "required_fields": [
+      "name",
+      "role",
+      "party",
+      "summary",
+      "properties",
+      "connections",
+      "quellen",
+      "trustScore",
+      "steckbrief",
+      "karriere",
+      "zitate"
+    ],
     "summary_min_words": 50,
     "properties_min": 5,
     "connections_min": 2,
     "quellen_min": 3,
     "karriere_min": 3,
     "zitate_min": 1,
-    "steckbrief_fields": ["alter", "beruf", "familienstand", "wohnort", "partei", "ausbildung"],
+    "steckbrief_fields": [
+      "alter",
+      "beruf",
+      "familienstand",
+      "wohnort",
+      "partei",
+      "ausbildung"
+    ],
     "steckbrief_required_filled": 4
   },
-
   "tenant_schema": {
-    "required_fields": ["gemeinde", "typ", "wahl", "ew", "regierungsbezirk", "organisationen", "alerts", "gemeinderat2020", "strukturdaten"],
+    "required_fields": [
+      "gemeinde",
+      "typ",
+      "wahl",
+      "ew",
+      "regierungsbezirk",
+      "organisationen",
+      "alerts",
+      "gemeinderat2020",
+      "strukturdaten"
+    ],
     "alerts_min": 3,
     "organisationen_min": 3
   },
-
   "themen_schema": {
-    "required_fields": ["title", "source", "lastUpdated", "radar"],
+    "required_fields": [
+      "title",
+      "source",
+      "lastUpdated",
+      "radar"
+    ],
     "radar_item": {
-      "required": ["id", "label", "relevanz", "trend", "beschreibung"],
-      "optional": ["positionen", "quelle", "color"]
+      "required": [
+        "id",
+        "label",
+        "relevanz",
+        "trend",
+        "beschreibung"
+      ],
+      "optional": [
+        "positionen",
+        "quelle",
+        "color"
+      ]
     },
     "auto_fill_strategy": "Search '[city] Kommunalwahl 2026 Themen Wahlkampf' + party websites + local newspaper Wahlserie"
   },
-
   "social_schema": {
-    "required_fields": ["title", "lastUpdated", "kandidaten", "insights"],
+    "required_fields": [
+      "title",
+      "lastUpdated",
+      "kandidaten",
+      "insights"
+    ],
     "kandidat_item": {
-      "required": ["id", "name", "partei", "assessment"],
-      "platforms": ["instagram", "facebook", "website", "tiktok"],
-      "instagram_fields": ["handle", "followers", "posts", "bio", "snapshot"]
+      "required": [
+        "id",
+        "name",
+        "partei",
+        "assessment"
+      ],
+      "platforms": [
+        "instagram",
+        "facebook",
+        "website",
+        "tiktok"
+      ],
+      "instagram_fields": [
+        "handle",
+        "followers",
+        "posts",
+        "bio",
+        "snapshot"
+      ]
     },
     "auto_fill_strategy": "Search '[candidate name] [city] Instagram' for each entity in kb"
   },
-
   "forecast_schema": {
-    "required_fields": ["wahltermin", "stichwahl", "stichwahlConf", "kandidaten", "historie", "scenarios", "keyfactors"],
+    "required_fields": [
+      "wahltermin",
+      "stichwahl",
+      "stichwahlConf",
+      "kandidaten",
+      "historie",
+      "scenarios",
+      "keyfactors"
+    ],
     "kandidat_forecast": {
-      "required": ["id", "name", "partei", "min", "max", "zentral", "conf"]
+      "required": [
+        "id",
+        "name",
+        "partei",
+        "min",
+        "max",
+        "zentral",
+        "conf"
+      ]
     }
   },
-
   "quality_thresholds": {
     "PASS": 80,
     "DEPLOY": 90,
     "GOLD": 100
   },
-
   "auto_fill_queries": {
     "entity_summary": "\"{name}\" {party} {city} Biografie Kandidat Kommunalwahl 2026",
     "entity_karriere": "\"{name}\" Werdegang Karriere Lebenslauf Beruf Ausbildung",
@@ -81,7 +228,6 @@
     "gemeinderat": "{city} Stadtrat Gemeinderat Sitze Parteien Ergebnis 2020",
     "forecast_history": "{city} OB-Wahl Ergebnis 2020 2014 Stichwahl Prozent"
   },
-
   "propagation_rules": {
     "on_schema_change": "ALL cities re-validated. New required sections → gap queued for ALL cities.",
     "on_city_improvement": "If new pattern found in city X → test as hypothesis in ALL other cities.",

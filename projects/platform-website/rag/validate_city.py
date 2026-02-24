@@ -271,6 +271,19 @@ def calculate_score(data):
     # +1 per graph link above minimum
     bonus += max(0, len(links) - MIN_LINKS)
 
+    # YouTube Intelligence bonus
+    youtube = data.get("youtube", {})
+    yt_candidates = youtube.get("candidates", [])
+    if yt_candidates:
+        bonus += 2  # +2 for having YouTube data
+        bonus += min(len(yt_candidates), 3)  # +1 per candidate, max 3
+        if youtube.get("insight"):
+            bonus += 1  # +1 for Red Diamond insight
+        if youtube.get("cross_platform_gap"):
+            bonus += 1  # +1 for cross-platform analysis
+        if any(c.get("has_own_channel") for c in yt_candidates):
+            bonus += 1  # +1 if any candidate has own channel
+
     return base + bonus
 
 
