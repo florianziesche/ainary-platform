@@ -52,11 +52,13 @@ TENANT_SCHEMA = {
 
 DOSSIER_SCHEMA = {
     "sections": ["tenant", "kb", "graph", "news", "hypotheses", "sentiment",
-                 "patterns", "actions", "forecast"],
+                 "patterns", "actions", "forecast", "themen", "social"],
     "news_min": 5,
     "hypotheses_min": 2,
     "patterns_min": 2,
     "actions_min": 2,
+    "themen_min": 5,
+    "social_kandidaten_min": 3,
 }
 
 # ─── Freshness Decay ───────────────────────────────────────────────

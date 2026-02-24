@@ -435,7 +435,7 @@ setTimeout(function(){document.getElementById('auth-input').focus()},100);
 const urlParams = new URLSearchParams(window.location.search);
 const CITY_ID = urlParams.get('city') || 'bamberg';
 let TENANT = {}, KB = {}, GRAPH = {nodes:[],links:[]};
-let NEWS = [], HYPOTHESES = [], SENTIMENT = {}, PATTERNS = [], ACTIONS = [], FORECAST = {};
+let NEWS = [], HYPOTHESES = [], SENTIMENT = {}, PATTERNS = [], ACTIONS = [], FORECAST = {}, THEMEN = {}, SOCIAL = {};
 
 (async function loadCityData() {
   try {
@@ -457,6 +457,8 @@ let NEWS = [], HYPOTHESES = [], SENTIMENT = {}, PATTERNS = [], ACTIONS = [], FOR
     PATTERNS = data.patterns || [];
     ACTIONS = data.actions || [];
     FORECAST = data.forecast || {};
+    THEMEN = data.themen || {};
+    SOCIAL = data.social || {};
     // Init the app
     if (typeof initApp === 'function') initApp();
   } catch(e) {
@@ -1001,8 +1003,91 @@ function renderBriefing() {
   }
   h += '</div></div>';
 
-  // Themen-Radar (absorbed from Stimmung)
-  if (SENTIMENT.topics && SENTIMENT.topics.length) {
+  // NEW: Rich Themen-Radar (from themen section)
+  if (THEMEN.radar && THEMEN.radar.length) {
+    h += '<div class="canvas-title">Themen-Radar <span class="ct-badge" style="background:var(--blue)">' + THEMEN.radar.length + ' THEMEN</span></div>';
+    h += '<div class="entity-card"><div class="entity-body">';
+    h += '<div style="font:400 6pt var(--m);color:var(--muted);margin-bottom:8px">Quelle: ' + (THEMEN.source || '') + ' · Stand: ' + (THEMEN.lastUpdated || '') + '</div>';
+    var sortedThemen = THEMEN.radar.slice().sort(function(a,b){return b.relevanz - a.relevanz});
+    for (var ti=0; ti<sortedThemen.length; ti++) {
+      var th = sortedThemen[ti];
+      var thColor = th.relevanz >= 85 ? 'var(--red)' : th.relevanz >= 70 ? 'var(--amber)' : 'var(--green)';
+      var trendIcon = th.trend === 'steigend' ? '↑' : th.trend === 'fallend' ? '↓' : '→';
+      h += '<div style="margin-bottom:10px;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-left:3px solid ' + thColor + ';border-radius:4px">';
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+      h += '<div style="font:600 7.5pt var(--f);color:var(--text)">' + th.label + '</div>';
+      h += '<div style="display:flex;align-items:center;gap:6px">';
+      h += '<span style="font:500 6pt var(--m);color:' + thColor + '">' + trendIcon + ' ' + th.trend + '</span>';
+      h += '<span style="font:700 8pt var(--m);color:' + thColor + '">' + th.relevanz + '</span>';
+      h += '</div></div>';
+      h += '<div style="height:4px;background:var(--surface2);border-radius:2px;margin-bottom:4px"><div style="height:100%;width:' + th.relevanz + '%;background:' + thColor + ';border-radius:2px"></div></div>';
+      h += '<div style="font:400 6pt var(--f);color:var(--text2);line-height:1.4">' + th.beschreibung + '</div>';
+      // Candidate positions
+      if (th.positionen && Object.keys(th.positionen).length > 0) {
+        h += '<div style="margin-top:6px;padding-top:5px;border-top:1px solid var(--border)">';
+        for (var pid in th.positionen) {
+          var pName = KB[pid] ? KB[pid].name.split(' ').pop() : pid;
+          var pParty = KB[pid] ? KB[pid].party : '';
+          h += '<div style="font:400 5.5pt var(--f);color:var(--muted);margin-top:2px"><strong style="color:var(--text)">' + pName + '</strong> (' + pParty + '): ' + th.positionen[pid] + '</div>';
+        }
+        h += '</div>';
+      }
+      h += '</div>';
+    }
+    h += '</div></div>';
+  }
+
+  // NEW: Social Media Intelligence
+  if (SOCIAL.kandidaten && SOCIAL.kandidaten.length) {
+    h += '<div class="canvas-title">Social Media Intelligence <span class="ct-badge" style="background:var(--blue)">' + SOCIAL.kandidaten.length + ' PROFILE</span></div>';
+    h += '<div class="entity-card"><div class="entity-body">';
+    h += '<div style="font:400 6pt var(--m);color:var(--muted);margin-bottom:8px">Stand: ' + (SOCIAL.lastUpdated || '') + ' · Plattformen: ' + (SOCIAL.platforms || []).join(', ') + '</div>';
+    // Bar chart of followers
+    var maxFollowers = 0;
+    for (var si=0; si<SOCIAL.kandidaten.length; si++) {
+      var sf = (SOCIAL.kandidaten[si].instagram || {}).followers || 0;
+      if (sf > maxFollowers) maxFollowers = sf;
+    }
+    for (var si=0; si<SOCIAL.kandidaten.length; si++) {
+      var sk = SOCIAL.kandidaten[si];
+      var ig = sk.instagram || {};
+      var followers = ig.followers || 0;
+      var barPct = maxFollowers > 0 ? Math.round((followers / maxFollowers) * 100) : 0;
+      var skPartyColor = sk.partei === 'CSU' ? '#0a4d8c' : sk.partei === 'SPD' ? '#c0392b' : sk.partei === 'Grüne' ? '#4a8c3f' : 'var(--muted)';
+      h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">';
+      h += '<div style="width:90px;font:500 7pt var(--f);color:var(--text);cursor:pointer" onclick="showEntity(\'' + sk.id + '\')">' + sk.name.split(' ').pop() + '</div>';
+      h += '<div style="flex:1;height:20px;background:var(--surface2);border-radius:3px;overflow:hidden;position:relative">';
+      if (followers > 0) {
+        h += '<div style="width:' + barPct + '%;height:100%;background:' + skPartyColor + '40;border-radius:3px"></div>';
+        h += '<div style="position:absolute;right:6px;top:50%;transform:translateY(-50%);font:600 6.5pt var(--m);color:var(--text)">' + followers.toLocaleString() + ' Follower</div>';
+      } else {
+        h += '<div style="position:absolute;right:6px;top:50%;transform:translateY(-50%);font:400 6pt var(--m);color:var(--muted)">Keine Daten</div>';
+      }
+      h += '</div>';
+      h += '<div style="width:18px;text-align:center">';
+      if (ig.handle) h += '<span style="font:400 7pt var(--f);cursor:pointer;color:var(--accent)" title="@' + ig.handle + '">📷</span>';
+      h += '</div></div>';
+    }
+    // Insights
+    if (SOCIAL.insights && SOCIAL.insights.length) {
+      h += '<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">';
+      h += '<div style="font:600 6.5pt var(--m);color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Key Insights</div>';
+      for (var ii=0; ii<SOCIAL.insights.length; ii++) {
+        var ins = SOCIAL.insights[ii];
+        var insColor = ins.severity === 'HOCH' ? 'var(--red)' : ins.severity === 'MITTEL' ? 'var(--amber)' : 'var(--muted)';
+        h += '<div style="padding:6px 8px;background:var(--surface);border:1px solid var(--border);border-left:2px solid ' + insColor + ';border-radius:3px;margin-bottom:4px">';
+        h += '<div style="font:600 6.5pt var(--f);color:var(--text)">' + ins.title + '</div>';
+        h += '<div style="font:400 5.5pt var(--f);color:var(--text2);margin-top:2px">' + ins.body + '</div>';
+        if (ins.soWhat) h += '<div style="font:500 5.5pt var(--f);color:var(--accent);margin-top:2px">→ ' + ins.soWhat + '</div>';
+        h += '</div>';
+      }
+      h += '</div>';
+    }
+    h += '</div></div>';
+  }
+
+  // Themen-Radar (absorbed from Stimmung) — fallback for cities without rich themen section
+  if ((!THEMEN.radar || !THEMEN.radar.length) && SENTIMENT.topics && SENTIMENT.topics.length) {
     h += '<div class="canvas-title">Themen-Radar <span class="ct-badge" style="background:var(--blue)">' + SENTIMENT.topics.length + ' TOPICS</span></div>';
     h += '<div class="entity-card"><div class="entity-body">';
     for (var bti=0; bti<SENTIMENT.topics.length; bti++) {
