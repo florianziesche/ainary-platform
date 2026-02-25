@@ -392,7 +392,11 @@ setTimeout(function(){document.getElementById('auth-error').style.opacity='0';do
         // Blur hypothesis details
         '.hypothesis-detail, .hypo-text { filter:blur(5px); user-select:none; }',
         // Hide the embed banner bottom overlap  
-        '.demo-banner { display:none; }'
+        '.demo-banner { display:none; }',
+        // Quellenanalyse: show header only, hide toggle/content
+        '#deep-dive-toggle, #deep-dive-content, .deep-dive-body { display:none !important; }',
+        // Themen radar: show names+scores only, hide description text
+        '.topic-desc, .topic-body, .topic-detail { display:none !important; }'
       ].join('\n');
       document.head.appendChild(embedStyle);
       // Post-render: blur Einordnungen and strategy details by content
@@ -404,10 +408,14 @@ setTimeout(function(){document.getElementById('auth-error').style.opacity='0';do
             el.style.filter = 'blur(5px)';
             el.style.userSelect = 'none';
           }
-          // Blur soWhat paragraphs
+          // Blur soWhat paragraphs  
           if (el.style && el.style.color && el.style.color.includes('accent') && t.length > 30) {
             el.style.filter = 'blur(5px)';
             el.style.userSelect = 'none';
+          }
+          // Hide topic description texts (keep only name + score)
+          if (el.parentElement && el.parentElement.classList && el.parentElement.classList.contains('topic-row') && t.length > 40) {
+            el.style.display = 'none';
           }
         });
         // Blur all content after "Quellenanalyse" header
@@ -453,7 +461,7 @@ setTimeout(function(){try{document.getElementById('auth-input').focus()}catch(e)
   </div>
   <div class="search-wrap">
     <span class="search-icon">&#9906;</span>
-    <input class="search-input" id="search-input" placeholder="Suche: Person, Thema, Kontroverse..." autocomplete="off">
+    <input class="search-input" id="search-input" placeholder="Suche: Person, Thema, Risikosignal..." autocomplete="off">
     <div class="search-results" id="search-results"></div>
   </div>
   <div class="topbar-right">
@@ -838,14 +846,14 @@ function normalizeCity(d) {
       replaceList.push(['Klaus Stieringer', 'Person X']);
       // Also anonymize specific controversy names
       replaceList.push(['Masken-Untersuchungsausschuss', 'Untersuchungsausschuss']);
-      replaceList.push(['Masken-Affäre', 'Kontroverse 1']);
-      replaceList.push(['Masken-Deal', 'Kontroverse 1']);
-      replaceList.push(['Masken-Altlast', 'Kontroverse 1']);
+      replaceList.push(['Masken-Affäre', 'Risikosignal 1']);
+      replaceList.push(['Masken-Deal', 'Risikosignal 1']);
+      replaceList.push(['Masken-Altlast', 'Risikosignal 1']);
       replaceList.push(['MASKEN-ALTLAST', 'KONTROVERSE-1']);
-      replaceList.push(['Boni-Affäre', 'Kontroverse 2']);
-      replaceList.push(['Rathaus-Untreue', 'Kontroverse 2']);
-      replaceList.push(['Rathaus-Affäre', 'Kontroverse 2']);
-      replaceList.push(['Emix-Deal', 'Kontroverse 1']);
+      replaceList.push(['Boni-Affäre', 'Risikosignal 2']);
+      replaceList.push(['Rathaus-Untreue', 'Risikosignal 2']);
+      replaceList.push(['Rathaus-Affäre', 'Risikosignal 2']);
+      replaceList.push(['Emix-Deal', 'Risikosignal 1']);
       replaceList.push(['Emix', 'Firma X']);
       replaceList.push(['Masken', 'Beschaffungs']);
       replaceList.push(['Spahn', 'Minister X']);
@@ -898,11 +906,11 @@ function normalizeCity(d) {
         var qCount = (entry.quellen||[]).length || '?';
         var cCount = (entry.controversies||[]).length;
         var kCount = (entry.karriere||[]).length;
-        entry.summary = 'Kandidat ' + lbl + ' · ' + (entry.party||'Partei') + ' · ' + qCount + ' Quellen · ' + cCount + ' Kontroversen · ' + kCount + ' Karrierestationen. Vollständige Analyse mit Zugang verfügbar.';
+        entry.summary = 'Kandidat ' + lbl + ' · ' + (entry.party||'Partei') + ' · ' + qCount + ' Quellen · ' + cCount + ' Risikosignale · ' + kCount + ' Karrierestationen. Vollständige Analyse mit Zugang verfügbar.';
         entry.zitate = [];
         entry.social = {};
         // Keep controversy TITLE + SEVERITY visible, blur CONTENT
-        entry.controversies = (entry.controversies||[]).map(function(c,i) { return { title: c.title || ('Kontroverse ' + (i+1)), text: 'Inhalt nur mit Zugang verfügbar.', severity: c.severity, ev_tag: c.ev_tag, conf: c.conf }; });
+        entry.controversies = (entry.controversies||[]).map(function(c,i) { return { title: c.title || ('Risikosignal ' + (i+1)), text: 'Inhalt nur mit Zugang verfügbar.', severity: c.severity, ev_tag: c.ev_tag, conf: c.conf }; });
         entry.contradictions = [];
         if (entry.karriere) entry.karriere = [{jahr: kCount + ' Stationen', text:'Vollständige Karriere mit Zugang verfügbar.'}];
         if (entry.properties) entry.properties = entry.properties.map(function(p) {
@@ -1069,7 +1077,7 @@ var _watchlist = [];
 var _annotations = {};
 function exportEntity(id) {
   var e = KB[id]; if (!e) return;
-  toast('Export wird vorbereitet: ' + e.name + ' — ' + (e.quellen||[]).length + ' Quellen, ' + (e.controversies||[]).length + ' Kontroversen');
+  toast('Export wird vorbereitet: ' + e.name + ' — ' + (e.quellen||[]).length + ' Quellen, ' + (e.controversies||[]).length + ' Risikosignale');
   setTimeout(function(){ toast('PDF-Export: In der Vollversion verfügbar. Kontaktieren Sie uns.'); }, 1500);
 }
 function watchEntity(id) {
@@ -1096,7 +1104,7 @@ function updateScatter() {
   var fcL = {};
   for (var i=0;i<(FORECAST.kandidaten||[]).length;i++) fcL[FORECAST.kandidaten[i].id] = FORECAST.kandidaten[i];
 
-  var axisLabels = {digital:'Digitale Sichtbarkeit',quellen:'Quellenabdeckung',risk:'Risiko-Score',controversies:'Kontroversen',strength:'Wahlstärke'};
+  var axisLabels = {digital:'Digitale Sichtbarkeit',quellen:'Quellenabdeckung',risk:'Risiko-Score',controversies:'Risikosignale',strength:'Wahlstärke'};
 
   // Compute values
   var points = [];
@@ -1745,7 +1753,7 @@ function renderBriefing() {
     h += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
     h += '<span style="font:500 5.5pt var(--m);color:' + riskColor + ';padding:1px 5px;background:' + riskColor + '10;border-radius:2px">Risiko ' + ce.risk + '</span>';
     h += '<span style="font:500 5.5pt var(--m);color:var(--muted);padding:1px 5px;background:var(--surface2);border-radius:2px">' + (ce.quellen||[]).length + ' Quellen</span>';
-    h += '<span style="font:500 5.5pt var(--m);color:var(--muted);padding:1px 5px;background:var(--surface2);border-radius:2px">' + (ce.controversies||[]).length + ' Kontroversen</span>';
+    h += '<span style="font:500 5.5pt var(--m);color:var(--muted);padding:1px 5px;background:var(--surface2);border-radius:2px">' + (ce.controversies||[]).length + '  Risikosignale</span>';
     // CTA: Vollständiges Dossier anfragen
     h += '<a href="https://ainaryventures.com/contact.html?ref=dossier&city='+encodeURIComponent(TENANT.gemeinde||'')+'&kandidat='+encodeURIComponent(ce.name)+'" style="font:600 6pt var(--m);color:var(--surface);padding:4px 10px;background:#F6F7F9;border-radius:4px;text-decoration:none;white-space:nowrap;transition:all .15s" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1">Vollständiges Dossier anfragen →</a>';
     h += '</div></div>';
@@ -2279,7 +2287,7 @@ function showEntity(id, el) {
 
   // Controversies
   if (p.controversies && p.controversies.length) {
-    h += '<div class="canvas-title">Kontroversen <span class="ct-badge" style="background:var(--red)">' + p.controversies.length + '</span></div>';
+    h += '<div class="canvas-title">Risikosignale <span class="ct-badge" style="background:var(--red)">' + p.controversies.length + '</span></div>';
     h += '<div class="entity-card"><div class="entity-body">';
     for (const c of p.controversies) {
       const sev = c.severity === 'SCHWERWIEGEND' ? 'var(--red)' : c.severity === 'MITTEL' ? 'var(--amber)' : 'var(--muted)';
@@ -2613,8 +2621,8 @@ function renderCompare() {
       else if (cfk.zentral >= 15) assessment += 'Außenseiter — braucht Mobilisierungseffekt. ';
       else assessment += 'Geringe Chancen ohne überraschende Dynamik. ';
     }
-    if (controvs.length >= 2) assessment += 'Kontroversen ('+(controvs.map(function(c){return c.title||''}).join(', '))+') könnten zum Problem werden. ';
-    else if (controvs.length === 0) assessment += 'Keine relevanten Kontroversen — sauberes Profil. ';
+    if (controvs.length >= 2) assessment += 'Risikosignale ('+(controvs.map(function(c){return c.title||''}).join(', '))+') könnten zum Problem werden. ';
+    else if (controvs.length === 0) assessment += 'Keine relevanten Risikosignale — sauberes Profil. ';
     if (sentScore > 0.3) assessment += 'Positive Medienresonanz stärkt Position. ';
     else if (sentScore < -0.3) assessment += 'Negative Medienresonanz belastet Wahlkampf. ';
 
@@ -2628,7 +2636,7 @@ function renderCompare() {
       }
     }
     if (!recommendation) {
-      if (cfk.zentral >= 35) recommendation = 'Position halten: Amtsbonus ausspielen, Kontroversen nicht selbst thematisieren, Sachpolitik betonen.';
+      if (cfk.zentral >= 35) recommendation = 'Position halten: Amtsbonus ausspielen, Risikosignale nicht selbst thematisieren, Sachpolitik betonen.';
       else if (cfk.zentral >= 20) recommendation = 'Differenzierung verstärken: Klares Alleinstellungsmerkmal kommunizieren, Mobilisierung im eigenen Lager forcieren.';
       else recommendation = 'Überraschungsmoment suchen: Unkonventionelle Themen besetzen, Medienaufmerksamkeit durch klare Positionen erzeugen.';
     }
@@ -2698,7 +2706,7 @@ function renderCompare() {
     // Data indicators
     h += '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">';
     h += '<span style="font:400 5.5pt var(--m);color:var(--muted);padding:2px 6px;background:var(--surface);border:1px solid var(--border);border-radius:2px">'+quellenCount+' Quellen</span>';
-    h += '<span style="font:400 5.5pt var(--m);color:var(--muted);padding:2px 6px;background:var(--surface);border:1px solid var(--border);border-radius:2px">'+controvs.length+' Kontroversen</span>';
+    h += '<span style="font:400 5.5pt var(--m);color:var(--muted);padding:2px 6px;background:var(--surface);border:1px solid var(--border);border-radius:2px">'+controvs.length+'  Risikosignale</span>';
     h += '<span style="font:400 5.5pt var(--m);color:var(--muted);padding:2px 6px;background:var(--surface);border:1px solid var(--border);border-radius:2px">Risiko '+ce.risk+'</span>';
     if (sentData) h += '<span style="font:400 5.5pt var(--m);color:'+(sentScore>0?'var(--green)':'var(--red)')+';padding:2px 6px;background:var(--surface);border:1px solid var(--border);border-radius:2px">Sentiment '+(sentScore>0?'+':'')+sentScore+'</span>';
     // CTA: Vollständiges Dossier anfragen
@@ -2721,7 +2729,7 @@ function renderCompare() {
 function renderHeatmapHTML() {
   var keys = Object.keys(KB);
   var h = '<div style="margin-top:24px"></div>';
-  h += '<div class="canvas-title">Kontroversen-Heatmap <span class="ct-badge" style="background:var(--red)">MUSTER</span></div>';
+  h += '<div class="canvas-title">Risikosignal-Heatmap <span class="ct-badge" style="background:var(--red)">MUSTER</span></div>';
   h += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:14px">';
   for (var ki=0; ki<keys.length; ki++) {
     var k = keys[ki], e = KB[k];
@@ -2769,7 +2777,7 @@ function renderMatrixHTML() {
     {label: 'Risk Score', fn: k => '<div class="cell-score" style="color:' + (KB[k].risk > 40 ? 'var(--red)' : KB[k].risk > 25 ? 'var(--amber)' : 'var(--green)') + '"><span class="ev ev-j">J</span> ' + KB[k].risk + '</div>'},
     {label: 'Partei', fn: k => '<span class="ev ev-e">E</span> ' + (KB[k].party || '—')},
     {label: 'Rolle', fn: k => '<span class="ev ev-e">E</span> ' + (KB[k].role || '—')},
-    {label: 'Kontroversen', fn: k => '<span class="ev ev-e">E</span> ' + ((KB[k].controversies || []).length + (KB[k].contradictions || []).length)},
+    {label: 'Risikosignale', fn: k => '<span class="ev ev-e">E</span> ' + ((KB[k].controversies || []).length + (KB[k].contradictions || []).length)},
     {label: 'Quellen', fn: k => '<span class="ev ev-e">E</span> ' + (KB[k].quellen || []).length},
     {label: 'Karriere', fn: k => '<span class="ev ev-e">E</span> ' + (KB[k].karriere || []).length + ' Stationen'},
     {label: 'Sentiment', fn: k => { const s = SENTIMENT.entities[k]; return s ? '<span class="ev ev-i">I</span> ' + (s.sent > 0 ? '+' : '') + s.sent : '—'; }},
@@ -2989,7 +2997,7 @@ function renderStrategy() {
 
   // Slider: Skandal-Effekt
   h += '<div style="margin-bottom:14px">';
-  h += '<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font:500 7.5pt var(--f);color:var(--text)">Skandal-/Kontroverse-Effekt</span><span id="sim-sk-val" style="font:700 8pt var(--m);color:var(--accent)">30%</span></div>';
+  h += '<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font:500 7.5pt var(--f);color:var(--text)">Skandal-Effekt</span><span id="sim-sk-val" style="font:700 8pt var(--m);color:var(--accent)">30%</span></div>';
   h += '<input type="range" id="sim-sk" min="0" max="100" value="30" style="width:100%;accent-color:var(--blue)" oninput="runSimulation()">';
   h += '<div style="display:flex;justify-content:space-between;font:400 5.5pt var(--m);color:var(--muted)"><span>kein Effekt</span><span>wahlentscheidend</span></div>';
   h += '</div>';
@@ -3021,7 +3029,7 @@ function renderStrategy() {
   h += '<option value="digital">X: Digitale Sichtbarkeit</option>';
   h += '<option value="quellen">X: Quellenabdeckung</option>';
   h += '<option value="risk">X: Risiko-Score</option>';
-  h += '<option value="controversies">X: Kontroversen</option>';
+  h += '<option value="controversies">X: Risikosignale</option>';
   h += '</select>';
   h += '<select id="scatter-y" onchange="updateScatter()" style="font:500 6pt var(--m);padding:3px 6px;background:var(--surface2);color:var(--text2);border:1px solid var(--border);border-radius:3px;cursor:pointer">';
   h += '<option value="strength">Y: Wahlstärke</option>';
@@ -3109,7 +3117,7 @@ function renderStrategy() {
   var totalP = SENTIMENT.topics ? SENTIMENT.topics.reduce(function(s,t){return s+(t.posts||[]).length},0) : 0;
   h += '<div class="data-basis"><div class="data-basis-title">Datenbasis dieser Empfehlungen</div>';
   h += '<div class="data-basis-body">';
-  h += Object.keys(KB).length+' Dossiers · '+totalK+' Kontroversen · '+totalQ+' Quellen · '+HYPOTHESES.length+' Hypothesen · '+totalP+' Stimmungsanalysen · '+NEWS.length+' News<br>';
+  h += Object.keys(KB).length+' Dossiers · '+totalK+' Risikosignale · '+totalQ+' Quellen · '+HYPOTHESES.length+' Hypothesen · '+totalP+' Stimmungsanalysen · '+NEWS.length+' News<br>';
   h += 'Quellen: SZ München, Merkur, tz München, Abgeordnetenwatch, Wikipedia, Partei-Websites<br>';
   h += 'Zeitraum: 30 Tage · Aktualisiert: '+new Date().toLocaleDateString('de-DE');
   h += '</div></div>';

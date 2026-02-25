@@ -155,7 +155,7 @@ async function runTests() {
         const undefs = (text.match(/\bundefined\b/g) || []).length;
         const nans = (text.match(/\bNaN\b/g) || []).length;
         const hasMatrix = html.includes('matrix-table') || html.includes('Vergleichs-Matrix');
-        const hasHeatmap = html.includes('Kontroversen-Heatmap');
+        const hasHeatmap = html.includes('Risikosignal-Heatmap');
         const hasHypotheses = html.includes('Hypothesen');
 
         // Count matrix cells with "—" vs "undefined"
