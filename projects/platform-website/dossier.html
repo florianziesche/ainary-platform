@@ -422,6 +422,21 @@ setTimeout(function(){document.getElementById('auth-error').style.opacity='0';do
         var dd = document.getElementById('deep-dive');
         if (dd) { dd.style.filter = 'blur(6px)'; dd.style.userSelect = 'none'; }
       }, 2000);
+      // Anonymize topic descriptions in DOM (€15,75M, smartcity.bamberg.de etc identify the city)
+      function stripTopicDetails() {
+        // Find all elements containing € amounts, .de URLs, or specific identifiers
+        document.querySelectorAll('div, span, p, td').forEach(function(el) {
+          var t = el.textContent || '';
+          // Blur any element mentioning specific amounts, URLs, or identifying details
+          if (/€[\d,.]+[MK]?\b/.test(t) || /\w+\.\w+\.de/.test(t) || /smartcity|Bundesförderung|Förderprogramm/.test(t)) {
+            if (el.children.length === 0 || el.childNodes.length <= 2) {
+              el.style.filter = 'blur(6px)';
+              el.style.userSelect = 'none';
+            }
+          }
+        });
+      }
+      setTimeout(stripTopicDetails, 2000);
       // Re-apply after tab switches
       document.addEventListener('click', function(e) {
         if (e.target && e.target.getAttribute && e.target.getAttribute('data-tab')) {
@@ -432,6 +447,7 @@ setTimeout(function(){document.getElementById('auth-error').style.opacity='0';do
                 el.style.filter = 'blur(5px)'; el.style.userSelect = 'none';
               }
             });
+            stripTopicDetails();
           }, 1000);
         }
       });
