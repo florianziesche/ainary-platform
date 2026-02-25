@@ -396,7 +396,9 @@ setTimeout(function(){document.getElementById('auth-error').style.opacity='0';do
         // Quellenanalyse: show header only, hide toggle/content
         '#deep-dive-toggle, #deep-dive-content, .deep-dive-body { display:none !important; }',
         // Themen radar: show names+scores only, hide description text
-        '.topic-desc, .topic-body, .topic-detail { display:none !important; }'
+        '.topic-desc, .topic-body, .topic-detail { display:none !important; }',
+        // Talking Points: blur content (concrete recommendations = highest value)
+        '.tp-card, .talking-point { filter:blur(6px); user-select:none; pointer-events:none; }'
       ].join('\n');
       document.head.appendChild(embedStyle);
       // Post-render: blur Einordnungen and strategy details by content
@@ -423,6 +425,30 @@ setTimeout(function(){document.getElementById('auth-error').style.opacity='0';do
         if (dd) { dd.style.filter = 'blur(6px)'; dd.style.userSelect = 'none'; }
       }, 2000);
       // Anonymize topic descriptions in DOM (€15,75M, smartcity.bamberg.de etc identify the city)
+      function blurTalkingPoints() {
+        document.querySelectorAll('div').forEach(function(el) {
+          var t = el.textContent || '';
+          if (t.includes('Talking Point kopiert') || el.getAttribute('onclick') && el.getAttribute('onclick').includes('copyTP')) {
+            el.style.filter = 'blur(6px)';
+            el.style.userSelect = 'none';
+            el.style.pointerEvents = 'none';
+          }
+        });
+        // Blur all elements after "Talking Points" header
+        var tpHeaders = document.querySelectorAll('.canvas-title');
+        tpHeaders.forEach(function(h) {
+          if (h.textContent.includes('Talking Points')) {
+            var sib = h.nextElementSibling;
+            while (sib) {
+              if (sib.classList && sib.classList.contains('canvas-title')) break;
+              sib.style.filter = 'blur(6px)';
+              sib.style.userSelect = 'none';
+              sib.style.pointerEvents = 'none';
+              sib = sib.nextElementSibling;
+            }
+          }
+        });
+      }
       function stripTopicDetails() {
         // Find all elements containing € amounts, .de URLs, or specific identifiers
         document.querySelectorAll('div, span, p, td').forEach(function(el) {
@@ -437,6 +463,7 @@ setTimeout(function(){document.getElementById('auth-error').style.opacity='0';do
         });
       }
       setTimeout(stripTopicDetails, 2000);
+      setTimeout(blurTalkingPoints, 2500);
       // Re-apply after tab switches
       document.addEventListener('click', function(e) {
         if (e.target && e.target.getAttribute && e.target.getAttribute('data-tab')) {
@@ -448,6 +475,7 @@ setTimeout(function(){document.getElementById('auth-error').style.opacity='0';do
               }
             });
             stripTopicDetails();
+            blurTalkingPoints();
           }, 1000);
         }
       });
