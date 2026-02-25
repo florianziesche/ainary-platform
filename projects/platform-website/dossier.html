@@ -334,8 +334,10 @@ setTimeout(function(){document.getElementById('auth-error').style.opacity='0';do
     'demo': { name: 'Demo-User', role: 'demo' }
   };
   
-  // Demo mode: ?demo=1 skips auth, blurs candidate names
+  // Demo mode: ?demo=1 skips auth, anonymizes data
+  // Embed mode: ?embed=1 adds extra blur for blog embedding
   var isDemo = p.has('demo');
+  var isEmbed = p.has('embed');
   if (isDemo) {
     document.getElementById('auth-gate').style.display = 'none';
     try { sessionStorage.setItem('ai-auth', '1'); sessionStorage.setItem('ai-token', 'demo'); } catch(e) {}
@@ -367,8 +369,65 @@ setTimeout(function(){document.getElementById('auth-error').style.opacity='0';do
     // Demo banner
     var banner = document.createElement('div');
     banner.className = 'demo-banner';
-    banner.innerHTML = 'Demo-Ansicht. Personenbezogene Daten ausgeblendet. <a href="/de/contact.html?topic=beta">Vollständigen Zugang anfragen →</a>';
+    banner.innerHTML = 'Demo-Ansicht. Personenbezogene Daten ausgeblendet. <a href="/contact.html">Vollständigen Zugang anfragen →</a>';
     document.body.appendChild(banner);
+    // Embed mode: aggressive content blurring (show structure, hide value)
+    if (isEmbed) {
+      var embedStyle = document.createElement('style');
+      embedStyle.textContent = [
+        // Blur ALL Einordnungen (the actual analytical value)
+        '[style*="Einordnung"], .einordnung, .so-what, .assessment { filter:blur(5px); user-select:none; pointer-events:none; }',
+        // Blur Quellenanalyse/Rohdaten content (keep headers)
+        '#deep-dive, .deep-dive-content, .rohdaten-body { filter:blur(6px); user-select:none; }',
+        // Blur all entity card bodies in profile tab
+        '.entity-body { filter:blur(5px); user-select:none; pointer-events:none; }',
+        // Keep headers/titles visible everywhere
+        '.canvas-title, .section-title, h2, h3 { filter:none !important; }',
+        // Strategy: keep Szenarien + Simulation visible, blur rest
+        '.strategy-assessment, .datenbasis-body, .handlungsoptionen-body { filter:blur(5px); user-select:none; }',
+        // Hide left sidebar content (keep structure)
+        '.sidebar-entity-list { filter:blur(4px); user-select:none; }',
+        // Hide intel feed article bodies
+        '.intel-body, .news-snippet { filter:blur(5px); user-select:none; }',
+        // Blur hypothesis details
+        '.hypothesis-detail, .hypo-text { filter:blur(5px); user-select:none; }',
+        // Hide the embed banner bottom overlap  
+        '.demo-banner { display:none; }'
+      ].join('\n');
+      document.head.appendChild(embedStyle);
+      // Post-render: blur Einordnungen and strategy details by content
+      setTimeout(function() {
+        document.querySelectorAll('div, span, p').forEach(function(el) {
+          var t = el.textContent || '';
+          // Blur Einordnungen
+          if (t.startsWith('→ Einordnung:') || t.startsWith('Einordnung:')) {
+            el.style.filter = 'blur(5px)';
+            el.style.userSelect = 'none';
+          }
+          // Blur soWhat paragraphs
+          if (el.style && el.style.color && el.style.color.includes('accent') && t.length > 30) {
+            el.style.filter = 'blur(5px)';
+            el.style.userSelect = 'none';
+          }
+        });
+        // Blur all content after "Quellenanalyse" header
+        var dd = document.getElementById('deep-dive');
+        if (dd) { dd.style.filter = 'blur(6px)'; dd.style.userSelect = 'none'; }
+      }, 2000);
+      // Re-apply after tab switches
+      document.addEventListener('click', function(e) {
+        if (e.target && e.target.getAttribute && e.target.getAttribute('data-tab')) {
+          setTimeout(function() {
+            document.querySelectorAll('div, span, p').forEach(function(el) {
+              var t = el.textContent || '';
+              if (t.startsWith('→ Einordnung:') || t.startsWith('Einordnung:')) {
+                el.style.filter = 'blur(5px)'; el.style.userSelect = 'none';
+              }
+            });
+          }, 1000);
+        }
+      });
+    }
   } else if (token && TOKEN_MAP[token]) {
     document.getElementById('auth-gate').style.display = 'none';
     try { sessionStorage.setItem('ai-auth', '1'); sessionStorage.setItem('ai-token', token); } catch(e) {}
