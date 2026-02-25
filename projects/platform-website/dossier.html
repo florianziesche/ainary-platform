@@ -803,17 +803,27 @@ function normalizeCity(d) {
       }
       data = JSON.parse(jsonStr);
       // NOW clean up KB structure
+      var demoSummaries = [
+        'Kandidat/in der stärksten Partei. Bringt Erfahrung aus Landes- und Kommunalpolitik mit. Details nur mit Zugang verfügbar.',
+        'Kandidat/in mit kommunaler Verankerung und progressivem Profil. Gilt als stärkste/r Herausforderer/in. Details nur mit Zugang verfügbar.',
+        'Kandidat/in mit lokalem Profil und Basis-Wahlkampf. Muss sich gegen etablierte Konkurrenz durchsetzen. Details nur mit Zugang verfügbar.',
+        'Erfahrene/r Amtsträger/in mit langer Amtszeit. Details nur mit Zugang verfügbar.',
+        'Partei-Kandidatur mit programmatischem Fokus. Details nur mit Zugang verfügbar.'
+      ];
       var newKb = {}; idx2 = 0;
       for (var k in data.kb) {
         var lbl = labels[idx2] || String.fromCharCode(65+idx2);
         var entry = data.kb[k];
         entry.name = 'Kandidat ' + lbl;
         entry.image = ''; entry.foto = '';
+        entry.summary = demoSummaries[idx2] || 'Details nur mit Zugang verfügbar.';
         entry.zitate = [];
         entry.social = {};
-        if (entry.karriere) entry.karriere = entry.karriere.map(function(k3) { return { jahr: k3.jahr, text: 'Position in öffentlichem Amt' }; });
+        entry.controversies = (entry.controversies||[]).map(function(c,i) { return { title: 'Kontroverse ' + (i+1), text: 'Details nur mit Zugang verfügbar.', severity: c.severity, ev_tag: c.ev_tag, conf: c.conf }; });
+        entry.contradictions = [];
+        if (entry.karriere) entry.karriere = [{jahr:'—', text:'Karriere nur mit Zugang verfügbar.'}];
         if (entry.properties) entry.properties = entry.properties.map(function(p) {
-          if (['Alter','Beruf','Wohnort','Familienstand','Kinder','Geburtsdatum','Geburtsort'].indexOf(p.label) >= 0) return { label: p.label, value: '—' };
+          if (['Alter','Beruf','Wohnort','Familienstand','Kinder','Geburtsdatum','Geburtsort','Partei-Funktion','Social Media'].indexOf(p.label) >= 0) return { label: p.label, value: '—' };
           return p;
         });
         newKb['kandidat_' + lbl.toLowerCase()] = entry;
