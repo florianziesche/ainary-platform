@@ -11,7 +11,11 @@
 
   const pathname = window.location.pathname;
   const inDE = pathname.includes('/de/');
-  const prefix = isDE ? (inDE ? '' : 'de/') : (inDE ? '../' : '');
+  const inBlog = pathname.includes('/blog/');
+  // From /blog/ subdir, prefix must go up one level first
+  const prefix = isDE
+    ? (inDE ? '' : (inBlog ? '../de/' : 'de/'))
+    : (inDE ? '../' : (inBlog ? '../' : ''));
   const page = pathname.split('/').pop() || 'index.html';
 
   function activeClass(target) {
