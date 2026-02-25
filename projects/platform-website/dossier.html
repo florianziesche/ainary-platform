@@ -721,6 +721,85 @@ function normalizeCity(d) {
     const data = await resp.json();
     // ═══ NORMALIZE DATA (Palantir-pattern: one place, all defaults) ═══
     normalizeCity(data);
+    // ═══ DEMO MODE: Anonymize all personal data before rendering ═══
+    if (window.DEMO_MODE) {
+      var labels = ['A','B','C','D','E','F','G','H','I','J'];
+      var nameMap = {}; var idx = 0;
+      // Build name map from KB (candidates)
+      for (var k in data.kb) {
+        var orig = data.kb[k].name || k;
+        var lbl = labels[idx] || String.fromCharCode(65+idx);
+        nameMap[k] = 'Kandidat ' + lbl;
+        nameMap[orig] = 'Kandidat ' + lbl;
+        // Also map surname only
+        var parts = orig.split(' ');
+        if (parts.length > 1) nameMap[parts[parts.length-1]] = 'Kandidat ' + lbl;
+        idx++;
+      }
+      function anon(s) {
+        if (!s || typeof s !== 'string') return s;
+        for (var name in nameMap) {
+          if (name.length < 3) continue;
+          s = s.split(name).join(nameMap[name]);
+        }
+        return s;
+      }
+      function anonObj(o) {
+        if (!o) return o;
+        if (typeof o === 'string') return anon(o);
+        if (Array.isArray(o)) return o.map(anonObj);
+        if (typeof o === 'object') {
+          var r = {};
+          for (var k2 in o) r[k2] = anonObj(o[k2]);
+          return r;
+        }
+        return o;
+      }
+      // Anonymize KB entries
+      var newKb = {};
+      idx = 0;
+      for (var k in data.kb) {
+        var lbl = labels[idx] || String.fromCharCode(65+idx);
+        var entry = JSON.parse(JSON.stringify(data.kb[k]));
+        entry.name = 'Kandidat ' + lbl;
+        entry.image = ''; entry.foto = '';
+        entry.zitate = []; // Remove all quotes
+        entry.social = {}; // Remove social links
+        // Anonymize controversy texts but keep structure
+        if (entry.controversies) entry.controversies = entry.controversies.map(function(c) {
+          return { title: 'Kontroverse ' + (entry.controversies.indexOf(c)+1), text: 'Details nur mit Zugang verfügbar.', severity: c.severity, ev_tag: c.ev_tag, conf: c.conf };
+        });
+        if (entry.contradictions) entry.contradictions = entry.contradictions.map(function(w) {
+          return { title: 'Widerspruch ' + (entry.contradictions.indexOf(w)+1), type: w.type, typeLabel: w.typeLabel, said: 'Nur mit Zugang.', did: 'Nur mit Zugang.', source_said: '', source_did: '' };
+        });
+        // Anonymize career
+        if (entry.karriere) entry.karriere = entry.karriere.map(function(k3) { return { jahr: k3.jahr, text: 'Position in ' + (k3.text && k3.text.includes('Partei') ? 'Partei' : 'öffentlichem Amt') }; });
+        // Anonymize properties - keep labels but genericize values
+        if (entry.properties) entry.properties = entry.properties.map(function(p) {
+          if (['Alter','Beruf','Wohnort','Familienstand','Kinder','Geburtsdatum','Geburtsort'].indexOf(p.label) >= 0) return { label: p.label, value: '—' };
+          return p;
+        });
+        newKb['kandidat_' + lbl.toLowerCase()] = entry;
+        idx++;
+      }
+      data.kb = newKb;
+      // Anonymize all text fields in other sections
+      data.news = (data.news||[]).map(function(n) { n.title = anon(n.title); n.summary = anon(n.summary); n.text = anon(n.text); return n; });
+      data.hypotheses = (data.hypotheses||[]).map(function(h2) { h2.text = anon(h2.text); h2.title = anon(h2.title); return h2; });
+      if (data.sentiment && data.sentiment.topics) data.sentiment.topics = data.sentiment.topics.map(function(t) { t.summary = anon(t.summary); return t; });
+      data.scenarios = (data.scenarios||[]).map(function(sc) { sc.title = anon(sc.title); sc.description = anon(sc.description); sc.soWhat = anon(sc.soWhat); return sc; });
+      data.talking_points = (data.talking_points||[]).map(function(tp) { tp.title = anon(tp.title); tp.body = anon(tp.body); return tp; });
+      if (data.weekly_brief) { data.weekly_brief.lage = anon(data.weekly_brief.lage); data.weekly_brief.fazit = anon(data.weekly_brief.fazit); }
+      if (data.social && data.social.insights) data.social.insights = data.social.insights.map(function(si) { si.title = anon(si.title); si.body = anon(si.body); return si; });
+      if (data.patterns) data.patterns = data.patterns.map(function(pa) { pa.description = anon(pa.description); pa.soWhat = anon(pa.soWhat); return pa; });
+      if (data.graph) {
+        data.graph.nodes = (data.graph.nodes||[]).map(function(n) { n.id = anon(n.id); n.label = anon(n.label); n.name = anon(n.name); return n; });
+        data.graph.links = (data.graph.links||[]).map(function(l) { l.source = anon(l.source); l.target = anon(l.target); l.label = anon(l.label); return l; });
+      }
+      if (data.themen) data.themen = data.themen.map(function(th) { th.zusammenfassung = anon(th.zusammenfassung); return th; });
+      if (data.forecast) { for (var fk in data.forecast) { if (typeof data.forecast[fk] === 'string') data.forecast[fk] = anon(data.forecast[fk]); } }
+      if (data.stichwahl_prediction) { for (var sk in data.stichwahl_prediction) { if (typeof data.stichwahl_prediction[sk] === 'string') data.stichwahl_prediction[sk] = anon(data.stichwahl_prediction[sk]); } }
+    }
     TENANT = data.tenant;
     KB = data.kb;
     GRAPH = data.graph;
