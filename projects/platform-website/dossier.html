@@ -835,12 +835,17 @@ function normalizeCity(d) {
         var entry = data.kb[k];
         entry.name = 'Kandidat ' + lbl;
         entry.image = ''; entry.foto = '';
-        entry.summary = demoSummaries[idx2] || 'Details nur mit Zugang verfügbar.';
+        // Show STRUCTURE, hide CONTENT (Information Gap)
+        var qCount = (entry.quellen||[]).length || '?';
+        var cCount = (entry.controversies||[]).length;
+        var kCount = (entry.karriere||[]).length;
+        entry.summary = 'Kandidat ' + lbl + ' · ' + (entry.party||'Partei') + ' · ' + qCount + ' Quellen · ' + cCount + ' Kontroversen · ' + kCount + ' Karrierestationen. Vollständige Analyse mit Zugang verfügbar.';
         entry.zitate = [];
         entry.social = {};
-        entry.controversies = (entry.controversies||[]).map(function(c,i) { return { title: 'Kontroverse ' + (i+1), text: 'Details nur mit Zugang verfügbar.', severity: c.severity, ev_tag: c.ev_tag, conf: c.conf }; });
+        // Keep controversy TITLE + SEVERITY visible, blur CONTENT
+        entry.controversies = (entry.controversies||[]).map(function(c,i) { return { title: c.title || ('Kontroverse ' + (i+1)), text: 'Inhalt nur mit Zugang verfügbar.', severity: c.severity, ev_tag: c.ev_tag, conf: c.conf }; });
         entry.contradictions = [];
-        if (entry.karriere) entry.karriere = [{jahr:'—', text:'Karriere nur mit Zugang verfügbar.'}];
+        if (entry.karriere) entry.karriere = [{jahr: kCount + ' Stationen', text:'Vollständige Karriere mit Zugang verfügbar.'}];
         if (entry.properties) entry.properties = entry.properties.map(function(p) {
           if (['Alter','Beruf','Wohnort','Familienstand','Kinder','Geburtsdatum','Geburtsort','Partei-Funktion','Social Media'].indexOf(p.label) >= 0) return { label: p.label, value: '—' };
           return p;
