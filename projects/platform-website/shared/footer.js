@@ -54,6 +54,14 @@
   const termsLink = prefix + 'terms.html';
   const imprintLink = prefix + 'imprint.html';
 
+  // Inject Vercel Web Analytics (once)
+  if (!document.querySelector('script[src*="_vercel/insights"]')) {
+    var s = document.createElement('script');
+    s.defer = true;
+    s.src = '/_vercel/insights/script.js';
+    document.head.appendChild(s);
+  }
+
   el.innerHTML = `
     <!-- CTA Section -->
     <section style="padding:100px 0 80px;text-align:center;border-top:1px solid rgba(255,255,255,0.06);">
