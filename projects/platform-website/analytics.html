@@ -1,438 +1,229 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex, nofollow">
-<title>Analytics — Ainary Intelligence</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Ainary · Analytics</title>
 <style>
-:root{--bg:#0d1117;--surface:#161b22;--surface2:#1c2128;--border:#30363d;--text:#e6edf3;--text2:#8b949e;--muted:#484f58;--accent:#d4a847;--red:#f85149;--green:#3fb950;--amber:#d29922;--blue:#58a6ff;--purple:#bc8cff;--f:system-ui,-apple-system,sans-serif;--m:'SF Mono',Consolas,monospace}
+:root{--bg:#0a0a0e;--surface:#111418;--border:rgba(255,255,255,0.08);--text:#ededf0;--muted:#8b8b95;--dim:#55555e;--gold:#e8c84a;--blue:#2D72D2;--green:#238551;--red:#CD4246;--f:Inter,system-ui,sans-serif;--m:'JetBrains Mono',monospace}
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--text);font:400 13px var(--f);min-height:100vh}
-.header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.header h1{font:600 14px var(--m);letter-spacing:.1em;color:var(--accent)}
-.header .meta{font:400 11px var(--f);color:var(--text2)}
-.refresh{font:500 11px var(--m);padding:6px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text);cursor:pointer}
-.refresh:hover{border-color:var(--accent)}
-.main{max-width:1200px;margin:0 auto;padding:20px 24px}
-.kpi-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:24px}
-.kpi{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:14px;text-align:center}
-.kpi .val{font:700 24px var(--m);color:var(--text)}
-.kpi .label{font:400 9px var(--m);color:var(--text2);margin-top:4px;letter-spacing:.08em;text-transform:uppercase}
-.session-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:18px;margin-bottom:16px}
-.session-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
-.session-user{font:600 15px var(--f);color:var(--text)}
-.session-meta{font:400 11px var(--f);color:var(--text2)}
-.session-duration{font:700 18px var(--m);color:var(--accent);text-align:right}
-.session-time{font:400 10px var(--m);color:var(--text2)}
-.section-title{font:600 9px var(--m);color:var(--text2);letter-spacing:.1em;text-transform:uppercase;margin:14px 0 8px}
-.journey{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
-.journey .step{font:500 10px var(--m);padding:3px 8px;border-radius:3px;background:var(--surface2);color:var(--text2)}
-.journey .step.strategy{background:#d4a84720;color:var(--accent)}
-.journey .step.entity{background:#58a6ff20;color:var(--blue)}
-.journey .step.action{background:#3fb95020;color:var(--green)}
-.journey .step.support{background:#bc8cff20;color:var(--purple)}
-.journey .arrow{color:var(--muted);font-size:9px}
-.scroll-bars{display:flex;gap:12px;flex-wrap:wrap}
-.scroll-bar{width:80px}
-.scroll-bar .bar-bg{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
-.scroll-bar .bar-fill{height:100%;border-radius:3px}
-.scroll-bar .bar-label{font:400 9px var(--m);color:var(--text2);margin-top:3px;display:flex;justify-content:space-between}
-.entity-chips{display:flex;gap:4px;flex-wrap:wrap}
-.entity-chip{font:500 10px var(--m);padding:3px 8px;border-radius:3px;background:var(--blue)15;color:var(--blue);border:1px solid var(--blue)30}
-.tp-badge{font:600 11px var(--m);color:var(--green);padding:4px 10px;background:var(--green)15;border-radius:4px;display:inline-block}
-.event-timeline{max-height:300px;overflow-y:auto;border:1px solid var(--border);border-radius:4px;margin-top:8px}
-.event-row{display:flex;gap:10px;padding:5px 10px;border-bottom:1px solid var(--border);font:400 10px var(--m)}
-.event-row:hover{background:var(--surface2)}
-.event-row .time{color:var(--text2);min-width:60px}
-.event-row .type{min-width:110px;font-weight:600}
-.event-row .type.tab_enter,.event-row .type.tab_leave{color:var(--blue)}
-.event-row .type.entity_view{color:var(--accent)}
-.event-row .type.copy_talking_point{color:var(--green)}
-.event-row .type.support_message{color:var(--purple)}
-.event-row .type.visibility{color:var(--muted)}
-.event-row .detail{color:var(--text2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.empty{text-align:center;padding:60px;color:var(--text2);font:400 13px var(--f)}
-.live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.tabs-heatmap{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-.tab-heat{text-align:center;padding:10px;border-radius:4px;border:1px solid var(--border)}
-.tab-heat .name{font:500 10px var(--m);color:var(--text2);margin-top:4px}
-.tab-heat .time{font:700 14px var(--m)}
-.tab-heat .visits{font:400 9px var(--m);color:var(--text2)}
-.no-auth{display:flex;align-items:center;justify-content:center;min-height:80vh}
-.auth-box{text-align:center;max-width:300px}
-.auth-box input{width:100%;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:4px;color:var(--text);font:400 12px var(--m);text-align:center;margin:12px 0}
-.auth-box button{font:600 11px var(--m);padding:8px 20px;background:var(--accent);color:#000;border:none;border-radius:4px;cursor:pointer}
+body{background:var(--bg);color:var(--text);font:400 14px/1.6 var(--f);min-height:100vh}
+.header{padding:20px 32px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.header h1{font:600 16px var(--f);display:flex;align-items:center;gap:8px}
+.header h1::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--gold)}
+.live{font:400 10px var(--m);color:var(--green);display:flex;align-items:center;gap:6px}
+.live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding:24px 32px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:20px}
+.card-label{font:400 11px var(--m);color:var(--dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.card-value{font:600 28px var(--f);color:var(--text)}
+.card-sub{font:400 11px var(--f);color:var(--muted);margin-top:4px}
+.section{padding:0 32px 24px}
+.section-title{font:600 13px var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px}
+table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+th{font:500 11px var(--m);color:var(--dim);text-transform:uppercase;letter-spacing:.06em;padding:12px 16px;text-align:left;border-bottom:1px solid var(--border)}
+td{font:400 13px var(--f);color:var(--text);padding:10px 16px;border-bottom:1px solid var(--border)}
+tr:last-child td{border-bottom:none}
+.bar{height:4px;border-radius:2px;background:var(--blue);display:inline-block;vertical-align:middle;margin-left:8px}
+.tag{font:400 10px var(--m);padding:2px 6px;border-radius:3px;background:rgba(45,114,210,.15);color:var(--blue)}
+.tag-green{background:rgba(35,133,81,.15);color:var(--green)}
+.tag-gold{background:rgba(232,200,74,.15);color:var(--gold)}
+.tag-red{background:rgba(205,66,70,.15);color:var(--red)}
+.empty{text-align:center;padding:40px;color:var(--dim);font:400 13px var(--f)}
+.refresh{font:400 11px var(--m);color:var(--dim);cursor:pointer;padding:4px 10px;border:1px solid var(--border);border-radius:4px;background:none}
+.refresh:hover{border-color:var(--muted);color:var(--muted)}
+#auth-gate{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999}
+#auth-box{text-align:center}
+#auth-box input{width:240px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font:400 13px var(--m);text-align:center;outline:none}
+#auth-box button{margin-top:12px;padding:8px 24px;background:var(--gold);color:#111;border:none;border-radius:6px;font:600 12px var(--m);cursor:pointer}
+@media(max-width:768px){.grid{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
 
-<div id="auth-screen" class="no-auth">
-<div class="auth-box">
-<div style="font:600 10px var(--m);letter-spacing:.12em;color:var(--accent);margin-bottom:4px">ANALYTICS</div>
-<div style="font:400 11px var(--f);color:var(--text2);margin-bottom:16px">Ainary Intelligence — Event Dashboard</div>
-<input type="password" id="auth-key" placeholder="API Key" onkeydown="if(event.key==='Enter')doAuth()">
-<button onclick="doAuth()">UNLOCK</button>
+<div id="auth-gate">
+<div id="auth-box">
+<div style="font:600 14px var(--f);margin-bottom:16px">Ainary Analytics</div>
+<input id="pw" type="password" placeholder="Admin-Passwort" onkeydown="if(event.key==='Enter')authCheck()">
+<br><button onclick="authCheck()">ZUGANG</button>
 </div>
 </div>
 
-<div id="dashboard" style="display:none">
+<div id="app" style="display:none">
 <div class="header">
-<div>
-<h1>AINARY ANALYTICS</h1>
-<div class="meta" id="header-meta">Lade...</div>
+  <h1>Ainary Analytics</h1>
+  <div style="display:flex;gap:16px;align-items:center">
+    <span class="live">LIVE</span>
+    <button class="refresh" onclick="loadData()">↻ Refresh</button>
+    <span id="last-update" style="font:400 10px var(--m);color:var(--dim)"></span>
+  </div>
 </div>
-<div style="display:flex;gap:8px;align-items:center">
-<span class="live-dot"></span>
-<span style="font:500 10px var(--m);color:var(--green)">LIVE</span>
-<button class="refresh" onclick="loadData()">↻ Refresh</button>
-<button class="refresh" onclick="autoRefresh()">Auto 30s</button>
+
+<div class="grid" id="kpis"></div>
+
+<div class="section">
+  <div class="section-title">Besucher-Sessions (Dossier Tracking)</div>
+  <table>
+    <thead><tr><th>IP</th><th>Browser</th><th>Erster Besuch</th><th>Letzter Besuch</th><th>Dauer</th><th>Events</th><th>Tabs</th></tr></thead>
+    <tbody id="sessions"></tbody>
+  </table>
 </div>
+
+<div class="section" style="margin-top:24px">
+  <div class="section-title">Event-Log (letzte 50)</div>
+  <table>
+    <thead><tr><th>Zeit</th><th>IP</th><th>Event</th><th>Details</th></tr></thead>
+    <tbody id="events"></tbody>
+  </table>
 </div>
-<div class="main" id="main-content"></div>
+
+<div class="section" style="margin-top:24px">
+  <div class="section-title">Newsletter Subscribers</div>
+  <table>
+    <thead><tr><th>Email</th><th>Quelle</th><th>Datum</th></tr></thead>
+    <tbody id="subs"></tbody>
+  </table>
+</div>
 </div>
 
 <script>
-var API = 'https://ainaryventures.com/api/track';
-var KEY = '';
-var autoTimer = null;
+var MY_IP = '91.2.110.113';
 
-function doAuth() {
-  KEY = document.getElementById('auth-key').value.trim();
-  document.getElementById('auth-screen').style.display = 'none';
-  document.getElementById('dashboard').style.display = '';
-  loadData();
-}
-
-// Allow key in URL: ?key=xxx
-(function(){
-  var p = new URLSearchParams(location.search);
-  if (p.get('key')) { KEY = p.get('key'); doAuth(); }
-})();
-
-function autoRefresh() {
-  if (autoTimer) { clearInterval(autoTimer); autoTimer = null; return; }
-  autoTimer = setInterval(loadData, 30000);
-}
-
-var geoCache = {};
-function geoLookup(ip, cb) {
-  if (geoCache[ip]) return cb(geoCache[ip]);
-  fetch('https://ip-api.com/json/' + ip + '?fields=status,city,regionName,country,isp,org,mobile,proxy')
-    .then(function(r) { return r.json(); })
-    .then(function(d) { geoCache[ip] = d; cb(d); })
-    .catch(function() { cb({}); });
-}
-
-function loadData() {
-  fetch(API + '?key=' + KEY + '&format=raw')
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      // Geo-lookup all unique IPs, then render
-      var events = (data.events || []).filter(function(e) { return e.e !== 'init' && e.e !== 'test_persistent'; });
-      var ips = {};
-      for (var i=0; i<events.length; i++) if (events[i].ip) ips[events[i].ip] = true;
-      var ipList = Object.keys(ips);
-      var pending = ipList.length;
-      if (pending === 0) return render(data);
-      for (var j=0; j<ipList.length; j++) {
-        geoLookup(ipList[j], function() { pending--; if (pending <= 0) render(data); });
-      }
-    })
-    .catch(function(e) { document.getElementById('main-content').innerHTML = '<div class="empty">Error: '+e.message+'</div>'; });
-}
-
-function render(data) {
-  var events = (data.events || []).filter(function(e) { return e.e !== 'init' && e.e !== 'test_persistent'; });
-  
-  // Group sessions
-  var sessions = {};
-  for (var i=0; i<events.length; i++) {
-    var ev = events[i];
-    var sid = ev.s || 'unknown';
-    if (!sessions[sid]) sessions[sid] = { events: [], user: ev.u, start: ev.ts, ip: ev.ip, ua: ev.ua };
-    sessions[sid].events.push(ev);
+function authCheck(){
+  if(document.getElementById('pw').value==='ainary2026'){
+    document.getElementById('auth-gate').style.display='none';
+    document.getElementById('app').style.display='block';
+    loadData();
   }
-  
-  // Global stats
-  var totalSessions = Object.keys(sessions).length;
-  var totalTabs = 0, totalEntities = 0, totalCopies = 0, totalSupport = 0;
-  for (var sid in sessions) {
-    var s = sessions[sid];
-    for (var j=0; j<s.events.length; j++) {
-      if (s.events[j].e === 'tab_enter') totalTabs++;
-      if (s.events[j].e === 'entity_view') totalEntities++;
-      if (s.events[j].e === 'copy_talking_point') totalCopies++;
-      if (s.events[j].e === 'support_message') totalSupport++;
-    }
-  }
-  
-  document.getElementById('header-meta').textContent = events.length + ' Events · ' + totalSessions + ' Sessions · Letztes Update: ' + new Date().toLocaleTimeString('de-DE');
-  
-  var h = '';
-  
-  // KPIs
-  h += '<div class="kpi-grid">';
-  h += kpi(totalSessions, 'Sessions', '--blue');
-  h += kpi(events.length, 'Events', '--text');
-  h += kpi(totalTabs, 'Tab-Wechsel', '--accent');
-  h += kpi(totalEntities, 'Entity-Views', '--blue');
-  h += kpi(totalCopies, 'TP Kopiert', totalCopies > 0 ? '--green' : '--muted');
-  h += kpi(totalSupport, 'Support-Msgs', totalSupport > 0 ? '--purple' : '--muted');
-  h += '</div>';
-  
-  // Sessions (newest first)
-  var sids = Object.keys(sessions).sort(function(a,b) { return (sessions[b].start||0) - (sessions[a].start||0); });
-  
-  for (var si=0; si<sids.length; si++) {
-    var s = sessions[sids[si]];
-    var evts = s.events;
-    
-    // Stats
-    var tabs = {}, tabDurations = {}, entities = [], copies = [], news = [], scrollMax = {}, supportMsgs = [];
-    var duration = 0;
-    var authEvt = null;
-    
-    for (var j=0; j<evts.length; j++) {
-      var e = evts[j];
-      if (e.e === 'auth') authEvt = e;
-      if (e.e === 'tab_enter') tabs[e.d.tab] = (tabs[e.d.tab]||0) + 1;
-      if (e.e === 'tab_leave') {
-        tabDurations[e.d.tab] = (tabDurations[e.d.tab]||0) + (e.d.duration_ms||0);
-        if (e.d.scroll_max > (scrollMax[e.d.tab]||0)) scrollMax[e.d.tab] = e.d.scroll_max;
-      }
-      if (e.e === 'entity_view') entities.push(e.d);
-      if (e.e === 'copy_talking_point') copies.push(e.d);
-      if (e.e === 'news_detail') news.push(e.d);
-      if (e.e === 'support_message') supportMsgs.push(e.d.text);
-      if (e.e === 'session_end') duration = e.d.duration_ms;
-    }
-    if (!duration && evts.length > 1) duration = evts[evts.length-1].ts - evts[0].ts;
-    var durStr = duration > 60000 ? Math.round(duration/60000)+'m '+Math.round((duration%60000)/1000)+'s' : Math.round(duration/1000)+'s';
-    
-    // Device
-    var device = '?';
-    if (s.ua) {
-      if (s.ua.includes('iPhone')) device = '📱 iPhone';
-      else if (s.ua.includes('iPad')) device = '📱 iPad';
-      else if (s.ua.includes('Android')) device = '📱 Android';
-      else if (s.ua.includes('Macintosh')) device = '💻 Mac';
-      else if (s.ua.includes('Windows')) device = '💻 Windows';
-      else if (s.ua.includes('Linux')) device = '💻 Linux';
-      else if (s.ua.includes('curl')) device = '🔧 curl';
-    }
-    
-    var screen = authEvt && authEvt.d && authEvt.d.screen ? authEvt.d.screen : '';
-    
-    h += '<div class="session-card">';
-    
-    // Header
-    h += '<div class="session-header">';
-    // Geo info
-    var geo = geoCache[s.ip] || {};
-    var loc = geo.city ? geo.city + (geo.regionName ? ', '+geo.regionName : '') : '';
-    var isp = geo.org || geo.isp || '';
-    var mobileTag = geo.mobile ? ' · 📶 Mobil' : '';
-    var proxyTag = geo.proxy ? ' · ⚠️ Proxy/VPN' : '';
-    
-    // Identify visitor
-    var visitorLabel = s.user || 'Unbekannt';
-    var visitorBadge = '';
-    if (s.ip === '91.2.110.113') { visitorBadge = '<span style="font:500 8px var(--m);padding:2px 6px;border-radius:2px;background:var(--blue)20;color:var(--blue);margin-left:6px">DU</span>'; }
-    else { visitorBadge = '<span style="font:500 8px var(--m);padding:2px 6px;border-radius:2px;background:var(--green)20;color:var(--green);margin-left:6px">EXTERN</span>'; }
-    
-    h += '<div><div class="session-user">'+visitorLabel+visitorBadge+'</div>';
-    h += '<div class="session-meta">'+device+(screen?' · '+screen:'')+mobileTag+proxyTag+'</div>';
-    if (loc) h += '<div class="session-meta" style="margin-top:2px">📍 '+loc+(isp?' · '+isp:'')+'</div>';
-    h += '<div class="session-meta" style="margin-top:2px;font-family:var(--m)">IP: '+(s.ip||'?')+'</div></div>';
-    h += '<div><div class="session-duration">'+durStr+'</div>';
-    h += '<div class="session-time">'+new Date(s.start).toLocaleString('de-DE')+'</div></div>';
-    h += '</div>';
-    
-    // Tab Heatmap
-    h += '<div class="section-title">Verweildauer pro Tab</div>';
-    h += '<div class="tabs-heatmap">';
-    var tabList = ['briefing','entity','graph','compare','strategy'];
-    var tabNames = {briefing:'Briefing',entity:'Dossier',graph:'Netzwerk',compare:'Vergleich',strategy:'Strategie'};
-    var maxDur = 0;
-    for (var t in tabDurations) if (tabDurations[t] > maxDur) maxDur = tabDurations[t];
-    for (var ti=0; ti<tabList.length; ti++) {
-      var tn = tabList[ti];
-      var dur = tabDurations[tn] || 0;
-      var vis = tabs[tn] || 0;
-      var pct = maxDur > 0 ? dur/maxDur : 0;
-      var col = dur === 0 ? 'var(--muted)' : pct > 0.6 ? 'var(--green)' : pct > 0.3 ? 'var(--amber)' : 'var(--text2)';
-      h += '<div class="tab-heat" style="background:'+(dur>0?col+'10':'var(--surface2)')+'">';
-      h += '<div class="time" style="color:'+col+'">'+(dur > 60000 ? Math.round(dur/60000)+'m' : dur > 0 ? Math.round(dur/1000)+'s' : '—')+'</div>';
-      h += '<div class="name">'+tabNames[tn]+'</div>';
-      h += '<div class="visits">'+(vis > 0 ? vis+'× besucht' : 'nicht besucht')+'</div>';
-      h += '</div>';
-    }
-    h += '</div>';
-    
-    // Journey
-    h += '<div class="section-title">User Journey</div>';
-    h += '<div class="journey">';
-    for (var j2=0; j2<evts.length; j2++) {
-      var e = evts[j2];
-      if (e.e === 'tab_enter') {
-        var cls = e.d.tab === 'strategy' ? 'strategy' : '';
-        h += '<span class="step '+cls+'">'+(tabNames[e.d.tab]||e.d.tab)+'</span><span class="arrow">→</span>';
-      }
-      if (e.e === 'entity_view') {
-        h += '<span class="step entity">'+(e.d.name||e.d.entity)+'</span><span class="arrow">→</span>';
-      }
-      if (e.e === 'copy_talking_point') {
-        h += '<span class="step action">📋 TP kopiert</span><span class="arrow">→</span>';
-      }
-      if (e.e === 'support_message') {
-        h += '<span class="step support">💬 Support</span><span class="arrow">→</span>';
-      }
-      if (e.e === 'news_detail') {
-        h += '<span class="step">📰 '+(e.d.title||'').substring(0,25)+'</span><span class="arrow">→</span>';
-      }
-    }
-    h += '</div>';
-    
-    // Scroll depth
-    if (Object.keys(scrollMax).length > 0) {
-      h += '<div class="section-title">Scroll-Tiefe</div>';
-      h += '<div class="scroll-bars">';
-      for (var st in scrollMax) {
-        var sp = scrollMax[st] || 0;
-        var sc = sp > 75 ? 'var(--green)' : sp > 40 ? 'var(--amber)' : 'var(--red)';
-        h += '<div class="scroll-bar">';
-        h += '<div class="bar-bg"><div class="bar-fill" style="width:'+sp+'%;background:'+sc+'"></div></div>';
-        h += '<div class="bar-label"><span>'+(tabNames[st]||st)+'</span><span style="color:'+sc+'">'+sp+'%</span></div>';
-        h += '</div>';
-      }
-      h += '</div>';
-    }
-    
-    // Entities
-    if (entities.length > 0) {
-      h += '<div class="section-title">Angesehene Personen</div>';
-      h += '<div class="entity-chips">';
-      var uniq = {};
-      for (var ei=0; ei<entities.length; ei++) {
-        var en = entities[ei].name || entities[ei].entity;
-        uniq[en] = (uniq[en]||0) + 1;
-      }
-      for (var en in uniq) {
-        h += '<span class="entity-chip">'+en+' ×'+uniq[en]+'</span>';
-      }
-      h += '</div>';
-    }
-    
-    // Talking Points
-    if (copies.length > 0) {
-      h += '<div class="section-title" style="color:var(--green)">✓ Talking Points kopiert</div>';
-      for (var ci=0; ci<copies.length; ci++) {
-        h += '<div class="tp-badge">"'+(copies[ci].text||'').substring(0,60)+'..."</div> ';
-      }
-    }
-    
-    // News
-    if (news.length > 0) {
-      h += '<div class="section-title">Geöffnete Artikel</div>';
-      for (var ni=0; ni<news.length; ni++) {
-        h += '<div style="font:400 11px var(--f);color:var(--text2);padding:3px 0">📰 '+(news[ni].title||'')+' <span style="color:var(--muted)">('+(news[ni].source||'')+')</span></div>';
-      }
-    }
-    
-    // Support
-    if (supportMsgs.length > 0) {
-      h += '<div class="section-title" style="color:var(--purple)">Support-Nachrichten</div>';
-      for (var sm=0; sm<supportMsgs.length; sm++) {
-        h += '<div style="font:400 11px var(--f);color:var(--text);padding:6px 10px;background:var(--purple)10;border-radius:4px;margin-bottom:4px;border-left:3px solid var(--purple)">"'+supportMsgs[sm]+'"</div>';
-      }
-    }
-    
-    // AUTO-INSIGHTS
-    h += '<div class="section-title" style="color:var(--accent)">🧠 Auto-Insights</div>';
-    h += '<div style="display:flex;flex-direction:column;gap:6px">';
-    
-    // Insight: Duration
-    var totalDur = duration || 0;
-    if (totalDur > 180000) h += '<div style="font:400 11px var(--f);color:var(--green);padding:6px 10px;background:var(--green)10;border-radius:4px;border-left:3px solid var(--green)">🟢 <strong>Hohe Verweildauer</strong> ('+durStr+') — ernsthaftes Interesse</div>';
-    else if (totalDur > 60000) h += '<div style="font:400 11px var(--f);color:var(--amber);padding:6px 10px;background:var(--amber)10;border-radius:4px;border-left:3px solid var(--amber)">🟡 <strong>Moderate Verweildauer</strong> ('+durStr+') — hat sich umgeschaut</div>';
-    else if (totalDur > 0) h += '<div style="font:400 11px var(--f);color:var(--text2);padding:6px 10px;background:var(--surface2);border-radius:4px;border-left:3px solid var(--muted)">⚪ <strong>Kurzer Besuch</strong> ('+durStr+') — erster Eindruck, evtl. Handy</div>';
-    
-    // Insight: Which tabs got attention
-    var maxTab = '', maxDur = 0;
-    for (var mt in tabDurations) { if (tabDurations[mt] > maxDur) { maxDur = tabDurations[mt]; maxTab = mt; } }
-    if (maxTab) {
-      var tabLabel = {briefing:'Briefing',entity:'Dossier',graph:'Netzwerk',compare:'Vergleich',strategy:'Strategie'}[maxTab] || maxTab;
-      h += '<div style="font:400 11px var(--f);color:var(--blue);padding:6px 10px;background:var(--blue)10;border-radius:4px;border-left:3px solid var(--blue)">📊 <strong>Meiste Zeit in: '+tabLabel+'</strong> ('+(maxDur>60000?Math.round(maxDur/60000)+'m ':'')+Math.round((maxDur%60000)/1000)+'s) — das ist was ihn interessiert</div>';
-    }
-    
-    // Insight: Entities
-    if (entities.length > 0) {
-      var uniqE = {};
-      for (var ei2=0;ei2<entities.length;ei2++) { var en2=entities[ei2].name||entities[ei2].entity; uniqE[en2]=(uniqE[en2]||0)+1; }
-      var topEntity = Object.keys(uniqE).sort(function(a,b){return uniqE[b]-uniqE[a]})[0];
-      h += '<div style="font:400 11px var(--f);color:var(--accent);padding:6px 10px;background:var(--accent)10;border-radius:4px;border-left:3px solid var(--accent)">👤 <strong>Fokus-Person: '+topEntity+'</strong> ('+uniqE[topEntity]+'× angesehen)</div>';
-    }
-    
-    // Insight: Copies
-    if (copies.length > 0) {
-      h += '<div style="font:400 11px var(--f);color:var(--green);padding:6px 10px;background:var(--green)10;border-radius:4px;border-left:3px solid var(--green)">✅ <strong>'+copies.length+' Talking Points kopiert</strong> — nutzt das Produkt OPERATIV</div>';
-    }
-    
-    // Insight: Support
-    if (supportMsgs.length > 0) {
-      h += '<div style="font:400 11px var(--f);color:var(--purple);padding:6px 10px;background:var(--purple)10;border-radius:4px;border-left:3px solid var(--purple)">💬 <strong>'+supportMsgs.length+' Support-Nachricht(en)</strong> — aktives Engagement, SOFORT antworten</div>';
-    }
-    
-    // Insight: Device
-    if (s.ua && s.ua.includes('Android')) {
-      h += '<div style="font:400 11px var(--f);color:var(--text2);padding:6px 10px;background:var(--surface2);border-radius:4px;border-left:3px solid var(--muted)">📱 <strong>Mobil (Android)</strong> — unterwegs oder Couch. Desktop-Besuch = höheres Interesse</div>';
-    } else if (s.ua && s.ua.includes('iPhone')) {
-      h += '<div style="font:400 11px var(--f);color:var(--text2);padding:6px 10px;background:var(--surface2);border-radius:4px;border-left:3px solid var(--muted)">📱 <strong>Mobil (iPhone)</strong> — unterwegs oder Couch. Desktop-Besuch = höheres Interesse</div>';
-    }
-    
-    // Insight: Re-auth (came back)
-    var authCount = evts.filter(function(e){return e.e==='auth'}).length;
-    if (authCount > 1) {
-      h += '<div style="font:400 11px var(--f);color:var(--green);padding:6px 10px;background:var(--green)10;border-radius:4px;border-left:3px solid var(--green)">🔄 <strong>'+authCount+'× eingeloggt</strong> — ist zurückgekommen oder hat Seite neu geladen (Interesse!)</div>';
-    }
-    
-    // Insight: Not your IP
-    if (s.ip && s.ip !== '91.2.110.113') {
-      var geoLabel = (geoCache[s.ip] && geoCache[s.ip].city) ? geoCache[s.ip].city : 'unbekannt';
-      h += '<div style="font:400 11px var(--f);color:var(--accent);padding:6px 10px;background:var(--accent)15;border-radius:4px;border-left:3px solid var(--accent)">🌍 <strong>Externer Besucher</strong> aus '+geoLabel+' — nicht deine IP!</div>';
-    }
-    
-    h += '</div>';
-    
-    // Full event log
-    h += '<details style="margin-top:12px"><summary style="font:500 10px var(--m);color:var(--muted);cursor:pointer">Alle '+evts.length+' Events anzeigen</summary>';
-    h += '<div class="event-timeline">';
-    for (var j4=0; j4<evts.length; j4++) {
-      var ev = evts[j4];
-      var time = new Date(ev.ts).toLocaleTimeString('de-DE');
-      h += '<div class="event-row">';
-      h += '<span class="time">'+time+'</span>';
-      h += '<span class="type '+ev.e+'">'+ev.e+'</span>';
-      h += '<span class="detail">'+JSON.stringify(ev.d||{}).substring(0,120)+'</span>';
-      h += '</div>';
-    }
-    h += '</div></details>';
-    
-    h += '</div>'; // session card
-  }
-  
-  if (sids.length === 0) {
-    h += '<div class="empty">Noch keine Besucher. Warte auf den ersten Login.</div>';
-  }
-  
-  document.getElementById('main-content').innerHTML = h;
+}
+// Auto-auth via URL param
+if(new URLSearchParams(location.search).get('key')==='ainary2026'){
+  document.getElementById('auth-gate').style.display='none';
+  document.getElementById('app').style.display='block';
+  setTimeout(loadData,100);
 }
 
-function kpi(val, label, color) {
-  return '<div class="kpi"><div class="val" style="color:var('+color+')">'+val+'</div><div class="label">'+label+'</div></div>';
+function loadData(){
+  document.getElementById('last-update').textContent='Loading...';
+  Promise.all([
+    fetch('/api/track?admin=ainary2026').then(r=>r.json()).catch(()=>({events:[],count:0})),
+    fetch('/api/subscribe?admin=ainary2026').then(r=>r.text()).catch(()=>'')
+  ]).then(function(results){
+    var track = results[0];
+    var subsRaw = results[1];
+    renderKPIs(track);
+    renderSessions(track);
+    renderEvents(track);
+    renderSubs(subsRaw);
+    document.getElementById('last-update').textContent='Updated: '+new Date().toLocaleTimeString('de-DE');
+  });
 }
+
+function renderKPIs(data){
+  var events = data.events||[];
+  var ips = {};
+  events.forEach(function(e){ ips[e.ip]=1; });
+  var uniqueIPs = Object.keys(ips).filter(function(ip){ return ip!==MY_IP; }).length;
+  var totalEvents = events.filter(function(e){ return e.ip!==MY_IP; }).length;
+  var sessionEnds = events.filter(function(e){ return e.e==='session_end'&&e.ip!==MY_IP; });
+  var avgDuration = 0;
+  if(sessionEnds.length){
+    var total=0;
+    sessionEnds.forEach(function(e){total+=(e.d&&e.d.duration_ms)||0;});
+    avgDuration=Math.round(total/sessionEnds.length/60000);
+  }
+  var tabVisits={};
+  sessionEnds.forEach(function(e){
+    if(e.d&&e.d.tabs){
+      Object.keys(e.d.tabs).forEach(function(t){
+        tabVisits[t]=(tabVisits[t]||0)+e.d.tabs[t].visits;
+      });
+    }
+  });
+  var topTab=Object.keys(tabVisits).sort(function(a,b){return tabVisits[b]-tabVisits[a];})[0]||'—';
+
+  document.getElementById('kpis').innerHTML=
+    kpiCard('Externe Besucher',uniqueIPs,'Ohne eigene IP')+
+    kpiCard('Events',totalEvents,'Externe Events')+
+    kpiCard('Ø Session-Dauer',avgDuration+' min',sessionEnds.length+' Sessions')+
+    kpiCard('Top Tab',topTab,tabVisits[topTab]?tabVisits[topTab]+' Besuche':'—');
+}
+
+function kpiCard(label,value,sub){
+  return '<div class="card"><div class="card-label">'+label+'</div><div class="card-value">'+value+'</div><div class="card-sub">'+sub+'</div></div>';
+}
+
+function renderSessions(data){
+  var events = data.events||[];
+  var byIP={};
+  events.forEach(function(e){
+    if(e.ip===MY_IP)return;
+    if(!byIP[e.ip])byIP[e.ip]={events:0,first:e.ts,last:e.ts,ua:e.ua,tabs:{},sessions:{}};
+    byIP[e.ip].events++;
+    byIP[e.ip].sessions[e.s]=1;
+    if(e.ts<byIP[e.ip].first)byIP[e.ip].first=e.ts;
+    if(e.ts>byIP[e.ip].last)byIP[e.ip].last=e.ts;
+    if(e.e==='session_end'&&e.d&&e.d.tabs){
+      Object.keys(e.d.tabs).forEach(function(t){
+        byIP[e.ip].tabs[t]=(byIP[e.ip].tabs[t]||0)+e.d.tabs[t].visits;
+      });
+    }
+  });
+  var html='';
+  var entries=Object.entries(byIP).sort(function(a,b){return b[1].last-a[1].last;});
+  if(!entries.length){html='<tr><td colspan="7" class="empty">Keine externen Besucher seit letztem Cold Start</td></tr>';}
+  entries.forEach(function(pair){
+    var ip=pair[0],v=pair[1];
+    var browser=v.ua.includes('Chrome')?'Chrome':v.ua.includes('Safari')?'Safari':v.ua.includes('Firefox')?'Firefox':'Other';
+    var os=v.ua.includes('Mac')?'Mac':v.ua.includes('Windows')?'Windows':v.ua.includes('Linux')?'Linux':'Other';
+    var dur=Math.round((v.last-v.first)/60000);
+    var tabs=Object.keys(v.tabs).map(function(t){return '<span class="tag">'+t+' ('+v.tabs[t]+')</span>';}).join(' ')||'<span style="color:var(--dim)">—</span>';
+    html+='<tr><td style="font-family:var(--m);font-size:11px">'+ip+'</td><td>'+browser+'/'+os+'</td><td>'+new Date(v.first).toLocaleString('de-DE',{timeZone:'Europe/Berlin'})+'</td><td>'+new Date(v.last).toLocaleString('de-DE',{timeZone:'Europe/Berlin'})+'</td><td>'+dur+' min</td><td>'+v.events+'</td><td>'+tabs+'</td></tr>';
+  });
+  document.getElementById('sessions').innerHTML=html;
+}
+
+function renderEvents(data){
+  var events=(data.events||[]).filter(function(e){return e.ip!==MY_IP;}).slice(-50).reverse();
+  var html='';
+  if(!events.length){html='<tr><td colspan="4" class="empty">Keine Events</td></tr>';}
+  events.forEach(function(e){
+    var time=new Date(e.ts).toLocaleString('de-DE',{timeZone:'Europe/Berlin'});
+    var tag=e.e==='session_end'?'tag-green':e.e==='auth'?'tag-gold':'tag';
+    var details='';
+    if(e.e==='session_end'&&e.d){
+      var dur=Math.round((e.d.duration_ms||0)/60000);
+      details=dur+'min, '+e.d.total_events+' events';
+      if(e.d.tabs){details+=', Tabs: '+Object.keys(e.d.tabs).join(', ');}
+    }else if(e.e==='visibility'&&e.d){
+      details=e.d.state;
+    }else if(e.d){
+      details=JSON.stringify(e.d).substring(0,80);
+    }
+    html+='<tr><td style="font-family:var(--m);font-size:11px;white-space:nowrap">'+time+'</td><td style="font-family:var(--m);font-size:11px">'+e.ip+'</td><td><span class="tag '+tag+'">'+e.e+'</span></td><td style="font-size:12px;color:var(--muted)">'+details+'</td></tr>';
+  });
+  document.getElementById('events').innerHTML=html;
+}
+
+function renderSubs(raw){
+  var html='';
+  if(!raw||!raw.trim()){html='<tr><td colspan="3" class="empty">Keine Subscribers</td></tr>';}
+  else{
+    var lines=raw.trim().split('\n').reverse();
+    lines.forEach(function(line){
+      try{
+        var s=JSON.parse(line);
+        html+='<tr><td style="font-family:var(--m);font-size:12px">'+s.email+'</td><td><span class="tag">'+s.source+'</span></td><td style="font-size:12px;color:var(--muted)">'+new Date(s.ts).toLocaleString('de-DE',{timeZone:'Europe/Berlin'})+'</td></tr>';
+      }catch(e){}
+    });
+  }
+  document.getElementById('subs').innerHTML=html;
+}
+
+// Auto-refresh every 30s
+setInterval(function(){if(document.getElementById('app').style.display!=='none')loadData();},30000);
 </script>
 </body>
 </html>
