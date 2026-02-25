@@ -334,7 +334,21 @@ setTimeout(function(){document.getElementById('auth-error').style.opacity='0';do
     'demo': { name: 'Demo-User', role: 'demo' }
   };
   
-  if (token && TOKEN_MAP[token]) {
+  // Demo mode: ?demo=1 skips auth, blurs candidate names
+  var isDemo = p.has('demo');
+  if (isDemo) {
+    document.getElementById('auth-gate').style.display = 'none';
+    try { sessionStorage.setItem('ai-auth', '1'); sessionStorage.setItem('ai-token', 'demo'); } catch(e) {}
+    // Inject demo blur CSS
+    var demoStyle = document.createElement('style');
+    demoStyle.textContent = '.entity-name, .kb-name, .kandidat-name, [data-kandidat] .name, .scatter-label, .flow-label { filter:blur(4px); pointer-events:none; } .demo-banner { position:fixed; bottom:0; left:0; right:0; z-index:9999; background:rgba(17,20,24,0.95); border-top:1px solid #2D72D2; padding:12px 24px; text-align:center; font:500 13px Inter,sans-serif; color:#F6F7F9; } .demo-banner a { color:#4d9cf8; text-decoration:none; margin-left:8px; }';
+    document.head.appendChild(demoStyle);
+    // Add demo banner
+    var banner = document.createElement('div');
+    banner.className = 'demo-banner';
+    banner.innerHTML = 'Demo-Ansicht. Kandidatennamen sind ausgeblendet.<a href="/de/contact.html?topic=beta">Vollständigen Zugang anfragen →</a>';
+    document.body.appendChild(banner);
+  } else if (token && TOKEN_MAP[token]) {
     document.getElementById('auth-gate').style.display = 'none';
     try { sessionStorage.setItem('ai-auth', '1'); sessionStorage.setItem('ai-token', token); } catch(e) {}
   } else if (isAdmin) {
