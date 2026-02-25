@@ -339,14 +339,31 @@ setTimeout(function(){document.getElementById('auth-error').style.opacity='0';do
   if (isDemo) {
     document.getElementById('auth-gate').style.display = 'none';
     try { sessionStorage.setItem('ai-auth', '1'); sessionStorage.setItem('ai-token', 'demo'); } catch(e) {}
-    // Inject demo blur CSS
+    // Inject demo mode: hide ALL personal data (names, photos, quotes, properties)
+    window.DEMO_MODE = true;
     var demoStyle = document.createElement('style');
-    demoStyle.textContent = '.entity-name, .kb-name, .kandidat-name, [data-kandidat] .name, .scatter-label, .flow-label { filter:blur(4px); pointer-events:none; } .demo-banner { position:fixed; bottom:0; left:0; right:0; z-index:9999; background:rgba(17,20,24,0.95); border-top:1px solid #2D72D2; padding:12px 24px; text-align:center; font:500 13px Inter,sans-serif; color:#F6F7F9; } .demo-banner a { color:#4d9cf8; text-decoration:none; margin-left:8px; }';
+    demoStyle.textContent = [
+      // Hide ALL candidate names everywhere
+      '.entity-name, .kb-name, .kandidat-name, [data-kandidat] .name, .scatter-label, .flow-label, .kb-card h3, .briefing-kandidat-name, .kandidat-header .name { filter:blur(6px); user-select:none; pointer-events:none; }',
+      // Hide photos, quotes, personal properties
+      '.kb-card img, .kb-photo, .kandidat-photo, .kandidat-img { filter:blur(12px); }',
+      '.kb-quote, .zitat, blockquote.kandidat { display:none; }',
+      '.kb-properties, .kandidat-steckbrief, .property-list { filter:blur(6px); user-select:none; }',
+      // Hide career details
+      '.kb-karriere, .karriere-list, .karriere-timeline { filter:blur(6px); user-select:none; }',
+      // Hide social media handles/links
+      '.kb-social, .social-links, .kandidat-social { display:none; }',
+      // Keep visible: party, structural data, charts, methodology, scenarios
+      // Demo banner
+      '.demo-banner { position:fixed; bottom:0; left:0; right:0; z-index:9999; background:rgba(17,20,24,0.97); border-top:1px solid #2D72D2; padding:14px 24px; text-align:center; font:500 13px Inter,sans-serif; color:#F6F7F9; backdrop-filter:blur(8px); }',
+      '.demo-banner a { color:#4d9cf8; text-decoration:none; font-weight:600; margin-left:8px; }',
+      '.demo-banner a:hover { text-decoration:underline; }'
+    ].join('\n');
     document.head.appendChild(demoStyle);
-    // Add demo banner
+    // Demo banner
     var banner = document.createElement('div');
     banner.className = 'demo-banner';
-    banner.innerHTML = 'Demo-Ansicht. Kandidatennamen sind ausgeblendet.<a href="/de/contact.html?topic=beta">Vollständigen Zugang anfragen →</a>';
+    banner.innerHTML = 'Demo-Ansicht. Personenbezogene Daten ausgeblendet. <a href="/de/contact.html?topic=beta">Vollständigen Zugang anfragen →</a>';
     document.body.appendChild(banner);
   } else if (token && TOKEN_MAP[token]) {
     document.getElementById('auth-gate').style.display = 'none';
