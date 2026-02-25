@@ -276,11 +276,22 @@
   <div class="fade-in" style="margin:40px 0; padding:32px; border:1px solid var(--border); border-radius:12px; background:var(--surface); text-align:center;">
     <div style="font:600 16px var(--f); color:var(--text); margin-bottom:8px;">Get Results on March 8</div>
     <div style="font:400 13px/1.5 var(--f); color:var(--muted); margin-bottom:20px;">We'll compare our predictions live with the results. One email, no spam.</div>
-    <form action="https://finitematter.substack.com/api/v1/free?nojs=true" method="POST" style="display:flex;gap:8px;max-width:400px;margin:0 auto;flex-wrap:wrap;justify-content:center;">
-      <input type="hidden" name="source" value="election-intelligence">
-      <input type="email" name="email" placeholder="deine@email.com" required style="flex:1;min-width:180px;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font:400 14px var(--f);outline:none;">
-      <button type="submit" style="padding:10px 20px;background:var(--gold);color:#111;border:none;border-radius:6px;font:500 14px var(--f);cursor:pointer;white-space:nowrap;">Notify Me</button>
-    </form>
+    <div id="subscribe-form" style="display:flex;gap:8px;max-width:400px;margin:0 auto;flex-wrap:wrap;justify-content:center;">
+      <input type="email" id="sub-email" placeholder="your@email.com" required style="flex:1;min-width:180px;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font:400 14px var(--f);outline:none;">
+      <button onclick="subscribeFn()" id="sub-btn" style="padding:10px 20px;background:var(--gold);color:#111;border:none;border-radius:6px;font:500 14px var(--f);cursor:pointer;white-space:nowrap;">Notify Me</button>
+    </div>
+    <div id="sub-ok" style="display:none;font:500 13px var(--f);color:var(--green);margin-top:12px;">✓ Subscribed. We'll reach out on March 8.</div>
+    <script>
+    function subscribeFn(){
+      var email=document.getElementById('sub-email').value;
+      var btn=document.getElementById('sub-btn');
+      if(!email||!email.includes('@'))return;
+      btn.textContent='...';btn.disabled=true;
+      fetch('/api/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,source:'election-intelligence-en'})})
+      .then(function(){document.getElementById('subscribe-form').style.display='none';document.getElementById('sub-ok').style.display='block';})
+      .catch(function(){btn.textContent='Error';});
+    }
+    </script>
   </div>
 
   <!-- Share (Stripe-pattern: 3 icons, monochrome, horizontal) -->
