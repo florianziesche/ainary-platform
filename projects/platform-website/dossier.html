@@ -2212,7 +2212,8 @@ function renderBriefing() {
       h += '<div class="sent-topic" style="cursor:pointer" onclick="switchView(\'strategy\');setTimeout(function(){toggleTopic('+bti+')},100)">';
       h += '<div class="sent-topic-name">' + t.name + ' <span style="font:400 5.5pt var(--m);color:var(--accent);text-decoration:underline">('+tPostsN+' Beiträge →)</span></div>';
       h += '<div class="sent-topic-bar"><div class="sent-topic-fill" style="width:' + Math.min(100, Math.abs(tpctB) + 10) + '%;background:' + tColorB + '"></div></div>';
-      h += '<div class="sent-topic-pct" style="color:' + tColorB + '"><span class="ev ev-i">I</span> ' + (tpctB > 0 ? '+' : '') + tpctB + '%</div>';
+      h += '<div class="sent-topic-pct" style="color:' + tColorB + '"><span class="ev ev-'+(t.eija||'i').toLowerCase()+'">'+(t.eija||'I')+'</span> ' + (tpctB > 0 ? '+' : '') + tpctB + '%</div>';
+      if (t.confidence) h += '<div style="font:400 5.5pt var(--f);color:var(--muted);margin-top:2px">Sicherheit: '+t.confidence+'% · '+((t.ableitung||'').substring(0,120))+(t.ableitung&&t.ableitung.length>120?'...':'')+'</div>';
       h += '</div>';
     }
     h += '</div></div>';
@@ -2867,6 +2868,8 @@ function renderHypothesesHTML() {
     h += '<div class="hypo-card-header"><div class="hypo-card-title">' + hyp.title + '</div>';
     h += '<div class="hypo-card-status" style="background:' + statusColor + '15;color:' + statusColor + '">' + (hyp.status || 'OPEN') + '</div></div>';
     h += '<div class="hypo-body"><span class="ev ev-a">A</span> ' + (hyp.summary || hyp.body || '') + '</div>';
+    if (hyp.ableitung) h += '<div style="font:400 6.5pt var(--f);color:var(--muted);line-height:1.5;margin:6px 0;padding:6px 8px;background:var(--surface2);border-radius:3px;border-left:2px solid var(--accent)"><strong>Herleitung:</strong> '+hyp.ableitung+'</div>';
+    if (hyp.invalidierung) h += '<div style="font:400 6.5pt var(--f);color:var(--red);line-height:1.5;margin:2px 0 6px;padding:4px 8px"><strong>Entkräftet wenn:</strong> '+hyp.invalidierung+'</div>';
 
     // Confidence bar
     h += '<div class="hypo-conf-bar"><div class="hypo-conf-fill" style="width:' + conf + '%;background:' + confColor + '"></div></div>';
@@ -3006,6 +3009,12 @@ function renderStrategy() {
         h += '<div style="font:500 7pt var(--f);color:var(--accent);line-height:1.5">→ Was bedeutet das: '+sc.soWhat+'</div>';
         h += '</div>';
       }
+      if (sc.ableitung) {
+        h += '<div style="font:400 6pt var(--f);color:var(--muted);line-height:1.5;margin-top:6px;padding:4px 8px;background:var(--surface2);border-radius:3px"><strong>Herleitung:</strong> '+sc.ableitung+'</div>';
+      }
+      if (sc.confidence_begründung) {
+        h += '<div style="font:400 6pt var(--f);color:var(--amber);line-height:1.5;margin-top:2px;padding:2px 8px"><strong>Unsicherheit:</strong> '+sc.confidence_begründung+'</div>';
+      }
       h += '</div>';
     }
     h += '</div>';
@@ -3138,6 +3147,12 @@ function renderStrategy() {
       h += '<div class="act-card-title"><span class="ev ev-e">E</span> Muster: '+op.pattern+'</div>';
       h += '<div class="act-card-body"><strong>Evidenz:</strong> '+op.evidenz+'</div>';
       h += '<div class="act-card-evidence" style="border-left:2px solid var(--green);padding-left:8px;margin-top:6px"><span class="ev ev-j">→</span> <strong>Counter:</strong> '+op.counter+'</div>';
+      if (op.confidence || op.ableitung) {
+        h += '<div style="font:400 6pt var(--f);color:var(--muted);margin-top:4px;line-height:1.4">';
+        if (op.confidence) h += '<span style="background:'+(op.confidence>=80?'var(--green)':op.confidence>=60?'var(--amber)':'var(--red)')+'15;color:'+(op.confidence>=80?'var(--green)':op.confidence>=60?'var(--amber)':'var(--red)')+';padding:1px 4px;border-radius:2px;font:500 5.5pt var(--m)">'+op.confidence+'% sicher</span> ';
+        if (op.ableitung) h += op.ableitung;
+        h += '</div>';
+      }
       h += '</div>';
     }
     // Stichwahl-Strategie
