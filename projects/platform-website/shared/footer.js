@@ -12,7 +12,11 @@
   // Determine path prefix for links
   const path = window.location.pathname;
   const inDE = path.includes('/de/');
-  const prefix = isDE ? (inDE ? '' : 'de/') : (inDE ? '../' : '');
+  const inBlog = path.includes('/blog/');
+  // From /blog/ subdir, prefix must go up one level first
+  const prefix = isDE
+    ? (inDE ? '' : (inBlog ? '../de/' : 'de/'))
+    : (inDE ? '../' : (inBlog ? '../' : ''));
 
   const t = {
     cta: isDE ? 'Bessere Entscheidungen fangen hier an.' : 'Better decisions start here.',
