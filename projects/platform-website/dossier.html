@@ -1554,9 +1554,9 @@ function buildIntelFeed() {
     var n = NEWS[fi];
     var cls = n.sentiment==='NEG' ? 'feed-alert' : '';
     html += '<div class="feed-item ' + cls + '" onclick="showNewsDetail('+fi+')" style="cursor:pointer">';
-    html += '<div class="feed-source">' + n.source + ' · ' + n.date + '</div>';
+    html += '<div class="feed-source">' + n.source + ' · ' + n.date + (n.url ? ' · <a href="'+n.url+'" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent);text-decoration:underline">Quelle</a>' : '') + '</div>';
     html += '<div class="feed-title">' + n.title + '</div>';
-    html += '<div class="feed-body">' + (n.body || '').substring(0, 100) + '...</div>';
+    html += '<div class="feed-body">' + (n.body || n.summary || '').substring(0, 100) + '...</div>';
     html += '</div>';
   }
   el.innerHTML = html;
@@ -1737,7 +1737,7 @@ function renderBriefing() {
   // From alerts (highest priority)
   for (var ai=0; ai<(TENANT.alerts||[]).length && actionItems.length < 5; ai++) {
     var al = TENANT.alerts[ai];
-    actionItems.push({title: al.title, detail: al.meta, severity: al.priority, entity: al.entity, source: 'alert', soWhat: al.soWhat||''});
+    actionItems.push({title: al.title, detail: al.meta, severity: al.priority, entity: al.entity, source: 'alert', soWhat: al.soWhat||'', url: al.url||''});
   }
   // From patterns (cross-city intelligence)
   for (var pi=0; pi<PATTERNS.length && actionItems.length < 5; pi++) {
@@ -1755,14 +1755,19 @@ function renderBriefing() {
     var item = actionItems[aii];
     var itemColor = item.severity === 'KRITISCH' ? 'var(--red)' : item.severity === 'HOCH' ? 'var(--red)' : item.severity === 'MITTEL' ? 'var(--amber)' : 'var(--muted)';
     var sourceLabel = item.source === 'alert' ? 'AKTUELL' : item.source === 'pattern' ? 'MUSTER' : 'ANALYSE';
-    h += '<div style="padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-left:3px solid ' + itemColor + ';border-radius:4px;margin-bottom:6px">';
+    var entityClick = item.entity && KB[item.entity] ? 'showEntity(\''+item.entity+'\')' : '';
+    h += '<div style="padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-left:3px solid ' + itemColor + ';border-radius:4px;margin-bottom:6px;'+(entityClick?'cursor:pointer':'')+'transition:background .15s" '+(entityClick?'onclick="'+entityClick+'" onmouseover="this.style.background=\'var(--surface2)\'" onmouseout="this.style.background=\'var(--surface)\'"':'')+'>';
     h += '<div style="display:flex;justify-content:space-between;align-items:flex-start">';
     h += '<div style="flex:1">';
     h += '<div style="font:600 8.5pt var(--f);color:var(--text);margin-bottom:3px">' + item.title + '</div>';
     h += '<div style="font:400 8pt var(--f);color:var(--text2);line-height:1.5">' + (item.detail||'') + '</div>';
     if (item.soWhat) h += '<div style="font:500 7pt var(--f);color:var(--accent);margin-top:3px;line-height:1.4">→ Einordnung: ' + item.soWhat + '</div>';
+    if (item.url) h += '<div style="margin-top:4px"><a href="'+item.url+'" target="_blank" onclick="event.stopPropagation()" style="font:500 6.5pt var(--m);color:var(--muted);text-decoration:underline">Quelle →</a></div>';
     h += '</div>';
-    h += '<div style="font:600 5pt var(--m);color:' + itemColor + ';padding:2px 6px;background:' + itemColor + '15;border-radius:2px;flex-shrink:0;margin-left:8px">' + sourceLabel + '</div>';
+    h += '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;margin-left:8px">';
+    h += '<div style="font:600 5pt var(--m);color:' + itemColor + ';padding:2px 6px;background:' + itemColor + '15;border-radius:2px">' + sourceLabel + '</div>';
+    if (item.entity && KB[item.entity]) h += '<div style="font:400 5.5pt var(--m);color:var(--accent);text-decoration:underline dotted">'+KB[item.entity].name.split(' ').pop()+' →</div>';
+    h += '</div>';
     h += '</div></div>';
   }
   if (actionItems.length > maxVisible) {
