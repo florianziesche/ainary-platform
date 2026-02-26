@@ -1727,6 +1727,7 @@ function renderBriefing() {
   // Forecast method + gaps transparent
   if (FORECAST.method) h += '<div style="font:400 6.5pt var(--f);color:var(--muted);margin-top:4px;line-height:1.5">Methode: '+FORECAST.method+'</div>';
   if (FORECAST.gaps) h += '<div style="font:400 6.5pt var(--f);color:var(--amber);margin-top:2px;line-height:1.5">'+FORECAST.gaps+'</div>';
+  if (FORECAST.trustSystem) { var ts=FORECAST.trustSystem; var tsE=(ts.eija||'J').split('+')[0].trim(); var tsC=ts.confidence||50; var tsCol=tsC>=70?'var(--green)':tsC>=40?'var(--amber)':'var(--red)'; h += '<div style="margin-top:4px;display:flex;align-items:center;gap:5px;flex-wrap:wrap"><span class="ev ev-'+tsE.toLowerCase()+'">'+tsE+'</span><span style="font:500 5.5pt var(--m);color:'+tsCol+'">'+tsC+'% sicher</span><span style="font:400 5.5pt var(--f);color:var(--muted)">'+ts.trustNote+'</span></div>'; }
   h += '</div>';
   h += '</div>';
   h += '</div>';
@@ -1739,12 +1740,12 @@ function renderBriefing() {
   // From alerts (highest priority)
   for (var ai=0; ai<(TENANT.alerts||[]).length && actionItems.length < 5; ai++) {
     var al = TENANT.alerts[ai];
-    actionItems.push({title: al.title, detail: al.meta, severity: al.priority, entity: al.entity, source: 'alert', soWhat: al.soWhat||'', url: al.url||''});
+    actionItems.push({title: al.title, detail: al.meta, severity: al.priority||al.severity, entity: al.entity, source: 'alert', soWhat: al.soWhat||'', url: al.url||'', eija: al.eija, confidence: al.confidence, trustNote: al.trustNote});
   }
   // From patterns (cross-city intelligence)
   for (var pi=0; pi<PATTERNS.length && actionItems.length < 5; pi++) {
     var pat = PATTERNS[pi];
-    actionItems.push({title: pat.label, detail: pat.soWhat || pat.meaning, severity: pat.severity, entity: (pat.entities||[])[0], source: 'pattern', soWhat: pat.meaning||''});
+    actionItems.push({title: pat.label, detail: pat.soWhat || pat.meaning, severity: pat.severity, entity: (pat.entities||[])[0], source: 'pattern', soWhat: pat.meaning||'', eija: pat.eija, confidence: pat.confidence, trustNote: pat.trustNote});
   }
   // From social insights
   for (var si=0; si<(SOCIAL.insights||[]).length && actionItems.length < 5; si++) {
@@ -1764,6 +1765,17 @@ function renderBriefing() {
     h += '<div style="font:600 8.5pt var(--f);color:var(--text);margin-bottom:3px">' + item.title + '</div>';
     h += '<div style="font:400 8pt var(--f);color:var(--text2);line-height:1.5">' + (item.detail||'') + '</div>';
     if (item.soWhat) h += '<div style="font:500 7pt var(--f);color:var(--accent);margin-top:3px;line-height:1.4">→ Einordnung: ' + item.soWhat + '</div>';
+    // EIJA Trust Badge
+    if (item.eija || item.confidence) {
+      var eijaL = (item.eija||'I').split('+')[0].trim();
+      var eijaConf = item.confidence || 50;
+      var eijaCol = eijaConf>=80?'var(--green)':eijaConf>=60?'var(--amber)':'var(--red)';
+      h += '<div style="margin-top:4px;display:flex;align-items:center;gap:5px;flex-wrap:wrap">';
+      h += '<span class="ev ev-'+eijaL.toLowerCase()+'">'+eijaL+'</span>';
+      h += '<span style="font:500 5.5pt var(--m);color:'+eijaCol+'">'+eijaConf+'% sicher</span>';
+      if (item.trustNote) h += '<span style="font:400 5.5pt var(--f);color:var(--muted)">'+item.trustNote+'</span>';
+      h += '</div>';
+    }
     if (item.url) h += '<div style="margin-top:4px"><a href="'+item.url+'" target="_blank" onclick="event.stopPropagation()" style="font:500 6.5pt var(--m);color:var(--muted);text-decoration:underline">Quelle →</a></div>';
     h += '</div>';
     h += '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;margin-left:8px">';
@@ -2932,7 +2944,12 @@ function renderStrategy() {
     h += '<div class="insight-card">';
     h += '<div class="insight-card-head"><div class="insight-card-title">' + pat.label + '</div>';
     h += '<span class="insight-conf" style="background:' + confColor + '15;color:' + confColor + '">' + conf + '% · ' + confLabel + '</span></div>';
-    h += '<div class="insight-body"><span class="ev ev-i">I</span> ' + pat.meaning + '</div>';
+    var patEija = (pat.eija || 'I').split('+')[0].trim();
+    h += '<div class="insight-body"><span class="ev ev-'+patEija.toLowerCase()+'">'+patEija+'</span> ' + pat.meaning + '</div>';
+    // Trust note
+    if (pat.trustNote) {
+      h += '<div style="font:400 5.5pt var(--f);color:var(--muted);margin-top:3px;padding:2px 8px;line-height:1.5">ℹ︎ '+pat.trustNote+'</div>';
+    }
     // Evidence tags
     if (pat.evidenceTags) {
       h += '<div class="insight-evidence">';
@@ -3021,6 +3038,17 @@ function renderStrategy() {
       }
       if (sc.confidence_begründung) {
         h += '<div style="font:400 6pt var(--f);color:var(--amber);line-height:1.5;margin-top:2px;padding:2px 8px"><strong>Unsicherheit:</strong> '+sc.confidence_begründung+'</div>';
+      }
+      // EIJA Trust Badge + trustNote
+      if (sc.eija || sc.trustNote) {
+        var scEija = (sc.eija||'J').split('+')[0].trim();
+        var scConf = sc.confidence || scProb;
+        var scConfCol = scConf>=70?'var(--green)':scConf>=40?'var(--amber)':'var(--red)';
+        h += '<div style="margin-top:6px;padding:4px 8px;background:var(--bg);border-radius:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">';
+        h += '<span class="ev ev-'+scEija.toLowerCase()+'">'+scEija+'</span>';
+        h += '<span style="font:500 5.5pt var(--m);color:'+scConfCol+'">'+scConf+'% sicher</span>';
+        if (sc.trustNote) h += '<span style="font:400 5.5pt var(--f);color:var(--muted)">'+sc.trustNote+'</span>';
+        h += '</div>';
       }
       h += '</div>';
     }
