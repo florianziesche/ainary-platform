@@ -1,6 +1,6 @@
 // Persistent tracking via Upstash Redis (survives cold starts)
-const KV_URL = process.env.KV_REST_API_URL;
-const KV_TOKEN = process.env.KV_REST_API_TOKEN;
+const KV_URL = process.env.KV_REST_API_URL || process.env.STORAGE_KV_REST_API_URL;
+const KV_TOKEN = process.env.KV_REST_API_TOKEN || process.env.STORAGE_KV_REST_API_TOKEN;
 const MAX_EVENTS = 5000;
 const LIST_KEY = 'track:events';
 
