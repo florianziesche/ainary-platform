@@ -1,46 +1,46 @@
-// Persistent tracking via /tmp file (survives warm instances, lost on cold start)
-// + sends copy to Google Sheet via Apps Script for permanent storage
-import { readFileSync, writeFileSync, appendFileSync } from 'fs';
+// Persistent tracking via Upstash Redis (survives cold starts)
+const KV_URL = process.env.KV_REST_API_URL;
+const KV_TOKEN = process.env.KV_REST_API_TOKEN;
+const MAX_EVENTS = 5000;
+const LIST_KEY = 'track:events';
 
-const EVENTS_FILE = '/tmp/ai-track-events.json';
-const MAX_EVENTS = 2000;
-
-function loadEvents() {
-  try {
-    return JSON.parse(readFileSync(EVENTS_FILE, 'utf8'));
-  } catch(e) {
-    return [];
-  }
+async function redisFetch(cmd) {
+  const resp = await fetch(`${KV_URL}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${KV_TOKEN}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(cmd),
+  });
+  return resp.json();
 }
 
-function saveEvent(event) {
-  try {
-    appendFileSync(EVENTS_FILE, JSON.stringify(event) + '\n');
-  } catch(e) {}
+async function pushEvent(event) {
+  // RPUSH + LTRIM to cap at MAX_EVENTS
+  await redisFetch(['RPUSH', LIST_KEY, JSON.stringify(event)]);
+  await redisFetch(['LTRIM', LIST_KEY, -MAX_EVENTS, -1]);
 }
 
-function allEvents() {
-  try {
-    const raw = readFileSync(EVENTS_FILE, 'utf8').trim();
-    if (!raw) return [];
-    return raw.split('\n').map(l => { try { return JSON.parse(l); } catch(e) { return null; } }).filter(Boolean);
-  } catch(e) {
-    return [];
-  }
+async function getEvents(limit = 500) {
+  const res = await redisFetch(['LRANGE', LIST_KEY, -limit, -1]);
+  return (res.result || []).map(s => { try { return JSON.parse(s); } catch(e) { return null; } }).filter(Boolean);
 }
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
+  if (!KV_URL || !KV_TOKEN) {
+    return res.status(500).json({ error: 'Redis not configured' });
+  }
+
   const ip = (req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown').split(',')[0].trim();
   const ua = (req.headers['user-agent'] || '').substring(0, 120);
 
-  // GET: return all stored events
+  // GET: return stored events
   if (req.method === 'GET') {
-    const events = allEvents();
+    const limit = parseInt(req.query.limit) || 500;
+    const events = await getEvents(limit);
     return res.status(200).json({ events, count: events.length });
   }
 
@@ -65,9 +65,7 @@ export default function handler(req, res) {
     d: payload.d || {}
   };
 
-  saveEvent(event);
-
-  // Also log for vercel logs
+  await pushEvent(event);
   console.log(JSON.stringify({ ...event, ua: ua.substring(0, 60) }));
 
   res.status(200).json({ ok: true });
