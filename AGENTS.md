@@ -15,6 +15,8 @@
 | Bewerbung, VC Application | `skills/vc-application/SKILL.md` | CONTENT-VOICE |
 | Entscheidung, Strategie, Trade-off | `TWIN.md` (full) | all standards |
 | Sub-Agent spawnen | `SUB-AGENT-CONTEXT.md` | — |
+| Verify, Verification, Share, Passwort teilen | `standards/Q3-VERIFICATION-PIPELINE.md` | CONTENT-VOICE |
+| City JSON, neues Dossier, Deep Research Output | `standards/Q3-VERIFICATION-PIPELINE.md` + `projects/platform-website/DEV-STANDARD.md` | BRAND |
 | Presentation, Slides | `skills/presentation-design/SKILL.md` | RESEARCH-PROTOCOL |
 | Heartbeat | `ref/HEARTBEAT.md` | all standards |
 

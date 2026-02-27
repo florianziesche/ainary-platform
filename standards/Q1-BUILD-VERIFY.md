@@ -13,6 +13,8 @@ Jede Änderung an Frontend (HTML/CSS/JS) oder Backend (API Endpoints) der Ainary
 **Nur bei Content-Tasks (LinkedIn, Emails, Reports, Carousels):**
 - [ ] Quelldaten geladen? (Original sources, research notes, verified-truths.md)
 - [ ] Namen korrekt? (Cross-check gegen sources)
+
+**Bei City-Dossier-Shares:** → `standards/Q3-VERIFICATION-PIPELINE.md` (PFLICHT vor jedem Passwort-Share)
 - [ ] Zahlen korrekt? (Cross-check gegen sources)
 - [ ] Affiliationen korrekt? (Partei, Firma, Rolle)
 - [ ] Kein Claim ohne Quelle oder "unverified"-Tag

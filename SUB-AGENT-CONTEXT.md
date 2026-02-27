@@ -350,3 +350,11 @@ python3 /Users/florianziesche/.openclaw/workspace/scripts/agenttrust-score.py up
     - **See:** `skills/capability-evolver/llm-as-judge-workflow.md` (full workflow documentation)
     - **Integration:** Also added to `standards/Q1-BUILD-VERIFY.md` as Step 0 (fact verify BEFORE design) and Step 8 (LLM Judge BEFORE delivery)
     - **Pattern:** Build-Verify Rule existed BUT wasn't enforced for fact-checking. LLM as Judge = automated enforcement gate. Rules in text files ≠ rules in execution.
+
+17. **Q3 Verification Pipeline — PFLICHT vor jedem Dossier-Share** (2026-02-27)
+    - **Trigger:** City JSON fertig, Passwort wird geteilt, Deep Research Agent liefert
+    - **Rule:** Opus Verification Agent muss ALLE Claims einzeln mit web_search prüfen (2-3 Quellen pro Claim). Corrections als JSON-Patch. Apply + Key-Check + Test.
+    - **Why:** Nürnberg: 7 kritische Fehler in "fertigem" Dossier. König als Jurist (Bankkaufmann), Geburtsjahr 9 Jahre daneben, Walthelm als BM (Stadträtin), Bitkom Nr. 1 (Nr. 8). Ein Nürnberg-Insider hätte sofort gesehen: "Die wissen nicht wovon sie reden."
+    - **Pattern:** Deep Research Agents produzieren IMMER Fehler. Geburtsjahre, Berufe, Amtstitel, Rankings. Nicht weil der Agent schlecht ist — weil Sekundärquellen falsch/veraltet sind. Nur Primärquellen (offizielle Websites, Wikipedia-Listen) sind zuverlässig.
+    - **Process:** `standards/Q3-VERIFICATION-PIPELINE.md`
+    - **Penalty:** -10 Trust für Dossier-Share ohne Verification. Nicht verhandelbar.
