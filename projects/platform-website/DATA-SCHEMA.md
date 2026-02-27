@@ -608,11 +608,20 @@ node test_dossier.js
 ## Neue Stadt anlegen — Checkliste
 
 1. [ ] `data/cities/{city_id}.json` erstellen
-2. [ ] Alle 15 Sektionen befüllen (min required fields)
+2. [ ] Alle 18 Sektionen befüllen (min required fields)
 3. [ ] `rag/validate_city.py {city_id}` → PASS
 4. [ ] `radar-data.json` aktualisieren
 5. [ ] `node test_dossier.js` → alle Städte PASS
-6. [ ] `vercel --prod` → Deploy
+6. [ ] Q3 Verification Pipeline durchlaufen (`standards/Q3-VERIFICATION-PIPELINE.md`)
+7. [ ] Q4 Parity Check gegen Benchmark-Stadt (`standards/Q4-COMPOUNDING-QUALITY.md`)
+8. [ ] `vercel --prod` → Deploy
+
+### Pflichtfelder für kundenseitige Dossiers (ab 2026-02-27)
+- `quellenverzeichnis[]` — min 15 Quellen mit id, name, url, typ, trust
+- `claim_ledger[]` — min 10 Claims mit id, claim, sources, confidence, if_wrong
+- `contradictions_register[]` — alle bekannten Widersprüche dokumentiert
+- Individueller Risk Score pro Kandidat (nicht Default 50)
+- Q3 Verification bestanden
 7. [ ] Live-URL testen mit `&admin` Parameter
 
 ---

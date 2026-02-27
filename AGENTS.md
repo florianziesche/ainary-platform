@@ -17,6 +17,7 @@
 | Sub-Agent spawnen | `SUB-AGENT-CONTEXT.md` | — |
 | Verify, Verification, Share, Passwort teilen | `standards/Q3-VERIFICATION-PIPELINE.md` | CONTENT-VOICE |
 | City JSON, neues Dossier, Deep Research Output | `standards/Q3-VERIFICATION-PIPELINE.md` + `projects/platform-website/DEV-STANDARD.md` | BRAND |
+| Quality, Parity, Compounding, Benchmark | `standards/Q4-COMPOUNDING-QUALITY.md` | CONTENT-VOICE |
 | Presentation, Slides | `skills/presentation-design/SKILL.md` | RESEARCH-PROTOCOL |
 | Heartbeat | `ref/HEARTBEAT.md` | all standards |
 
