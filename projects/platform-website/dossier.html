@@ -838,6 +838,21 @@ function normalizeCity(d) {
   d.weekly_brief.title = d.weekly_brief.title || '';
   d.weekly_brief.week = d.weekly_brief.week || d.weekly_brief.date || '';
   d.weekly_brief.headline = d.weekly_brief.headline || d.weekly_brief.title || '';
+
+  // Asset Builder fields (claim ledger, contradictions, enhanced sources)
+  d.claim_ledger = d.claim_ledger || [];
+  d.contradictions_register = d.contradictions_register || [];
+  d.quellenverzeichnis = d.quellenverzeichnis || [];
+  // Normalize this_answers + sources on patterns/hypotheses
+  for (var pi2=0; pi2<d.patterns.length; pi2++) {
+    d.patterns[pi2].this_answers = d.patterns[pi2].this_answers || '';
+    d.patterns[pi2].sources = d.patterns[pi2].sources || [];
+    d.patterns[pi2].if_wrong = d.patterns[pi2].if_wrong || '';
+  }
+  for (var hi2=0; hi2<d.hypotheses.length; hi2++) {
+    d.hypotheses[hi2].this_answers = d.hypotheses[hi2].this_answers || '';
+    d.hypotheses[hi2].sources = d.hypotheses[hi2].sources || [];
+  }
   d.weekly_brief.daysToElection = d.weekly_brief.daysToElection || 0;
   // Normalize priorities: can be {text, urgency} or {nr, action, why, deadline, ev}
   for (var wpi=0; wpi<d.weekly_brief.priorities.length; wpi++) {
@@ -1031,6 +1046,8 @@ function normalizeCity(d) {
     STICHWAHL = data.stichwahl_prediction || {};
     TALKINGPOINTS = data.talking_points || [];
     SCENARIOS = data.scenarios || [];
+    CLAIM_LEDGER = data.claim_ledger || [];
+    CONTRADICTIONS = data.contradictions_register || [];
     WEEKLYBRIEF = data.weekly_brief || {};
     OPPONENT_PLAYBOOK = data.opponentPlaybook || null;
     // Update page title + breadcrumb
@@ -1048,6 +1065,8 @@ function normalizeCity(d) {
 var USER = { name: 'Besucher', role: 'viewer' };
 let TALKINGPOINTS = [];
 let SCENARIOS = [];
+let CLAIM_LEDGER = [];
+let CONTRADICTIONS = [];
 let WEEKLYBRIEF = {};
 let OPPONENT_PLAYBOOK = null;
 
@@ -1946,6 +1965,43 @@ function renderBriefing() {
       if (FORECAST.gaps) h += '<div style="color:var(--amber);margin-top:2px">Einschränkung: ' + FORECAST.gaps + '</div>';
       h += '</div>';
     }
+    // Claim Ledger (Asset Builder)
+    if (typeof CLAIM_LEDGER !== 'undefined' && CLAIM_LEDGER.length) {
+      h += '<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">';
+      h += '<div class="canvas-title">Claim Ledger <span class="ct-badge" style="background:var(--accent)">'+CLAIM_LEDGER.length+' CLAIMS</span></div>';
+      for (var cli=0; cli<CLAIM_LEDGER.length; cli++) {
+        var cl = CLAIM_LEDGER[cli];
+        var clConf = cl.confidence === 'High' ? 'var(--green)' : cl.confidence === 'Med' ? 'var(--amber)' : 'var(--red)';
+        h += '<div style="padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-left:3px solid '+clConf+';border-radius:4px;margin-bottom:6px">';
+        h += '<div style="display:flex;justify-content:space-between;align-items:center">';
+        h += '<div style="font:500 7pt var(--f);color:var(--text)">'+(cl.id||'CL-'+cli)+': '+cl.claim+'</div>';
+        h += '<span style="font:500 5.5pt var(--m);color:'+clConf+'">'+cl.confidence+'</span>';
+        h += '</div>';
+        if (cl.this_answers) h += '<div style="font:400 6pt var(--f);color:var(--accent);font-style:italic;margin-top:3px">↳ "'+cl.this_answers+'"</div>';
+        if (cl.sources && cl.sources.length) h += '<div style="font:400 5.5pt var(--m);color:var(--muted);margin-top:2px">Quellen: '+cl.sources.join(', ')+'</div>';
+        if (cl.if_wrong) h += '<div style="font:400 5.5pt var(--f);color:var(--red);margin-top:2px">⚠ '+cl.if_wrong+'</div>';
+        if (cl.contradictions) h += '<div style="font:400 5.5pt var(--f);color:var(--amber);margin-top:2px">↔ '+cl.contradictions+'</div>';
+        h += '</div>';
+      }
+      h += '</div>';
+    }
+
+    // Contradiction Register
+    if (typeof CONTRADICTIONS !== 'undefined' && CONTRADICTIONS.length) {
+      h += '<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">';
+      h += '<div class="canvas-title">Widersprüche <span class="ct-badge" style="background:var(--amber)">'+CONTRADICTIONS.length+'</span></div>';
+      for (var cri=0; cri<CONTRADICTIONS.length; cri++) {
+        var cr = CONTRADICTIONS[cri];
+        h += '<div style="padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--amber);border-radius:4px;margin-bottom:6px">';
+        h += '<div style="font:500 7pt var(--f);color:var(--text)">'+cr.conflict+'</div>';
+        if (cr.why_differ) h += '<div style="font:400 6pt var(--f);color:var(--text2);margin-top:3px">Ursache: '+cr.why_differ+'</div>';
+        if (cr.impact) h += '<div style="font:400 6pt var(--f);color:var(--amber);margin-top:2px">Impact: '+cr.impact+'</div>';
+        if (cr.resolution) h += '<div style="font:400 6pt var(--f);color:var(--muted);margin-top:2px">Lösung: '+cr.resolution+'</div>';
+        h += '</div>';
+      }
+      h += '</div>';
+    }
+
     // Named scenarios (from SCENARIOS array)
     if (SCENARIOS && SCENARIOS.length) {
       h += '<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">';
@@ -3012,6 +3068,18 @@ function renderStrategy() {
     // Entkräftet wenn
     if (pat.invalidateIf) {
       h += '<div class="insight-invalidate"><strong>Entkräftet wenn:</strong> '+pat.invalidateIf+'</div>';
+    }
+    // This answers (Asset Builder)
+    if (pat.this_answers) {
+      h += '<div style="font:400 6pt var(--f);color:var(--accent);margin-top:4px;font-style:italic">↳ Beantwortet: "'+pat.this_answers+'"</div>';
+    }
+    // Source references
+    if (pat.sources && pat.sources.length) {
+      h += '<div style="font:400 5.5pt var(--m);color:var(--muted);margin-top:3px">Quellen: '+pat.sources.join(', ')+'</div>';
+    }
+    // If wrong
+    if (pat.if_wrong) {
+      h += '<div style="font:400 5.5pt var(--f);color:var(--red);margin-top:2px">⚠ Wenn falsch: '+pat.if_wrong+'</div>';
     }
     // So what
     if (pat.soWhat) {

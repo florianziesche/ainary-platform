@@ -618,3 +618,68 @@ node test_dossier.js
 ---
 
 *Dieses Dokument ist verbindlich. Schema-Abweichungen führen zu Rendering-Fehlern.*
+
+
+## 16. Claim Ledger (NEU — Asset Builder Integration)
+
+```json
+"claim_ledger": [
+  {
+    "id": "CL-001",
+    "claim": "string — Die Behauptung",
+    "this_answers": "string — Welche Frage beantwortet das?",
+    "section": "string — forecast|pattern|hypothesis",
+    "classification": "E|I|J|A|Derived",
+    "confidence": "High|Med|Low",
+    "sources": ["S01", "S03"],
+    "if_wrong": "string — Konsequenz wenn falsch",
+    "if_low": "string — Was würde Confidence erhöhen?",
+    "contradictions": "string — Bekannte Widersprüche"
+  }
+]
+```
+
+## 17. Contradiction Register (NEU)
+
+```json
+"contradictions": [
+  {
+    "id": "CR-001",
+    "conflict": "string — Was widerspricht sich?",
+    "sources_involved": ["S03", "S07"],
+    "why_differ": "string — Warum unterscheiden sich die Quellen?",
+    "impact": "string — Wie beeinflusst es die Analyse?",
+    "resolution": "string — Was würde den Widerspruch auflösen?"
+  }
+]
+```
+
+## 18. Enhanced Quellenverzeichnis (Upgrade)
+
+```json
+"quellenverzeichnis": [
+  {
+    "id": "S01",
+    "name": "string",
+    "url": "string",
+    "accessDate": "YYYY-MM-DD",
+    "typ": "A1|A2|B1|B2|C",
+    "trust": 0-100,
+    "supports": ["pattern-cp1", "forecast-stichwahl"],
+    "caveats": "string — Einschränkungen der Quelle"
+  }
+]
+```
+
+## Asset Builder Field Extensions (alle Sections)
+
+Folgende Felder können in `patterns`, `hypotheses`, `news`, `talking_points`, `scenarios` ergänzt werden:
+
+```json
+{
+  "this_answers": "string",
+  "classification": "E|I|J|A|Derived|Operational",
+  "sources": ["S01", "S03"],
+  "if_wrong": "string"
+}
+```
