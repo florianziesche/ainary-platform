@@ -659,7 +659,24 @@ function normalizeCity(d) {
     e.role = e.role || e.rolle || '';
     e.party = e.party || e.partei || '';
     e.summary = e.summary || e.beschreibung || '';
-    e.risk = typeof e.risk === 'number' ? e.risk : 30;
+    // Palantir composite risk score (auto-calculate if default 50 or missing)
+    if (typeof e.risk !== 'number' || e.risk === 50 || e.risk === 30) {
+      var _rs = 0;
+      var _contros = (e.controversies || []).length;
+      if (_contros >= 3) _rs += 30; else _rs += _contros * 10;
+      var _quellen = (e.quellen || []).length;
+      if (_quellen < 3) _rs += 10; else if (_quellen < 5) _rs += 5;
+      var _sum = (e.summary || '').toLowerCase();
+      var _isAmtsinhaber = _sum.includes('bürgermeister') && (_sum.includes('seit 20') || _sum.includes('amtsinhaber') || _sum.includes('amtszeit'));
+      if (!_isAmtsinhaber && (_sum.includes('erstantritt') || _sum.includes('erstmals') || _sum.includes('quereinsteiger') || _sum.includes('zum ersten mal'))) _rs += 15;
+      else if (_sum.includes('zum zweiten mal') || _sum.includes('zweiter antritt') || _sum.includes('tritt erneut an')) _rs += 5;
+      var _party = (e.party || '');
+      if (_party.includes('AfD')) _rs += 25;
+      else if (_party.includes('Freie Wähler') || _party.includes('Parteifreie') || _party.includes('ÖDP') || _party.includes('Linke')) _rs += 5;
+      e.risk = Math.min(100, _rs);
+    } else {
+      e.risk = e.risk;
+    }
     e.trust = e.trust || 5;
     e.sources = e.sources || 0;
     e.color = e.color || 'var(--muted)';
