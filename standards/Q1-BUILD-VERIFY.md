@@ -7,7 +7,17 @@ Wir bauen Features und sagen "live" — ohne sie jemals im Browser zu prüfen. B
 ## Geltungsbereich
 Jede Änderung an Frontend (HTML/CSS/JS) oder Backend (API Endpoints) der Ainary Platform.
 
-## Der Prozess (7 Schritte, nicht optional)
+## Der Prozess (9 Schritte, nicht optional)
+
+### 0. FACT VERIFY (VOR Design/Content — NEU ab 2026-02-27)
+**Nur bei Content-Tasks (LinkedIn, Emails, Reports, Carousels):**
+- [ ] Quelldaten geladen? (Original sources, research notes, verified-truths.md)
+- [ ] Namen korrekt? (Cross-check gegen sources)
+- [ ] Zahlen korrekt? (Cross-check gegen sources)
+- [ ] Affiliationen korrekt? (Partei, Firma, Rolle)
+- [ ] Kein Claim ohne Quelle oder "unverified"-Tag
+
+**Why:** Vermeidet "sieht professionell aus, aber Fakten falsch" (Carousel Bug Feb 27).
 
 ### 1. SPEC (VOR dem Code)
 - Was ändere ich? Welche Buttons/Views sind betroffen?
@@ -57,10 +67,46 @@ Prüfen:
 ### 7. COMMIT + PUSH
 Erst JETZT. Nicht vorher. Commit-Message enthält: was geändert, was getestet.
 
-## Checkliste (vor jedem Commit)
+### 8. LLM AS JUDGE (VOR externem Send — NEU ab 2026-02-27)
+**Nur bei External Content (LinkedIn, Emails, Reports):**
+
+Run self-audit prompt:
+```
+You are an expert fact-checker. Evaluate the following content:
+
+[GENERATED CONTENT]
+
+Your task:
+1. Accuracy Check: Names, numbers, dates, affiliations correct?
+2. Source Verification: Claims sourced or unsourced?
+3. Fabrication Detection: Invented statistics or fake data?
+4. Confidence Score: Rate overall accuracy (0-100).
+
+Original sources:
+[SOURCE DATA]
+
+Return:
+- Score: X/100
+- Issues Found: [List errors, unsourced claims, fabrications]
+- Recommendation: [SHIP / FIX / BLOCK]
+```
+
+**Decision Gate:**
+- Score ≥ 90 + No fabrications → SHIP
+- Score 70-89 OR unsourced claims → FIX
+- Score < 70 OR fabrications → BLOCK (manual review)
+
+**Why:** Catches factual errors BEFORE delivery (not after).
+**See:** `skills/capability-evolver/llm-as-judge-workflow.md`
+
+### 9. DELIVER
+External send (Telegram, Email, LinkedIn). Erst jetzt. Nicht vorher.
+
+## Checkliste (vor jedem Commit/Send)
 
 | # | Check | Methode |
 |---|-------|---------|
+| 0 | **Fakten verifiziert** (Content only) | Cross-check Namen/Zahlen/Affiliationen gegen sources |
 | 1 | Backend startet fehlerfrei | `python3 -c "import app"` |
 | 2 | Health Endpoint antwortet | `curl localhost:8080/api/health` |
 | 3 | Geänderte View öffnet korrekt | Browser Screenshot |
@@ -68,6 +114,8 @@ Erst JETZT. Nicht vorher. Commit-Message enthält: was geändert, was getestet.
 | 5 | Kein JS-Error in Console | Browser Console Check |
 | 6 | View-Wechsel funktioniert (switchView) | Hin und zurück navigieren |
 | 7 | Context Panel zeigt richtigen Inhalt | In jeder betroffenen View prüfen |
+| 8 | **LLM Judge Score ≥ 90** (External content only) | Self-audit prompt, score < 90 → FIX |
+| 9 | Delivered (External send executed) | Telegram/Email/LinkedIn confirmed |
 
 ## Failure Modes (was schief gehen kann)
 
@@ -102,8 +150,16 @@ Jeder Sub-Agent der UI-Code ändert MUSS am Ende:
 ```
 
 ## Quality Gate
-- 7/7 Checks bestanden = COMMIT erlaubt
+**Platform Changes (UI/API):**
+- 7/7 Checks (1-7) bestanden = COMMIT erlaubt
 - <7/7 = Fix zuerst, dann erneut durch die Checkliste
+
+**External Content (LinkedIn, Email, Reports):**
+- 4/4 Checks (0, 8, 9) bestanden = SEND erlaubt
+- Step 0 (Fact Verify) skipped → HIGH RISK (Carousel Bug Feb 27)
+- Step 8 (LLM Judge) score < 90 → FIX or BLOCK
+
+**Universal Rule:**
 - Kein "ich bin sicher dass es geht" — BEWEISEN.
 
 ## Metriken

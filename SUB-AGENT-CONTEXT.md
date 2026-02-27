@@ -213,3 +213,140 @@ python3 /Users/florianziesche/.openclaw/workspace/scripts/agenttrust-score.py up
       - Are numbers consistent across all pages/sections?
     - **Penalty:** -3 per fabricated number with precision (was causing trust collapse)
     - **Why this rule exists:** High execution quality + fabricated numbers = invisible failure. Only audits catch it. This is defensive coding for data claims.
+
+21. **DATA ANALYSIS TASKS → RESEARCH-PROTOCOL (ADDED 2026-02-25 20:00, Trust Score: 3/100 UNTRUSTED):** ALL data analysis, tracking analysis, dashboard building, or interpretation tasks MUST load `standards/RESEARCH-PROTOCOL.md` BEFORE responding.
+    - **Trigger:** "analyse", "tracking", "dashboard", "daten", "statistik", "auswerten", "insights", "KPIs", "visitors", "sessions", "events"
+    - **Pattern violated (2026-02-25):**
+      - Tracking analysis (Message #2, #3): Analyzed IP tracking data, provided insights tables, identified top visitor — NO standards loaded, NO confidence rating
+      - Analytics Dashboard build (Message #5, #7): Built custom Palantir-style dashboard with KPIs, sessions table, event log — NO WEBSITE-DESIGN-GUIDE loaded, NO BRAND.md loaded, NO Build-Verify after deploy
+      - **Result:** Good execution quality (~85% confidence implicitly) BUT Trust Score = 3/100 because ALL process steps skipped
+    - **Mandatory Steps:**
+      1. **BEFORE analyzing data:** `read standards/RESEARCH-PROTOCOL.md` (MECE framework, hypothesis-first, source verification)
+      2. **If building dashboard/UI:** `read standards/WEBSITE-DESIGN-GUIDE.md` + `read standards/BRAND.md`
+      3. **Provide analysis** with confidence rating: `[X% confident — based on Y data points, uncertain about Z]`
+      4. **If deploying:** Q1-BUILD-VERIFY mandatory (browser test + screenshot)
+      5. **If external numbers cited:** Source OR "unverified" tag
+    - **Why:** Quality Audit 2026-02-25 found pattern across 4 messages: technically correct insights + clean dashboard build BUT zero standards loading, zero confidence ratings, zero Build-Verify. Trust collapsed 2→3/100 despite good output.
+    - **Test before responding:**
+      - Is this data analysis? → Did I load RESEARCH-PROTOCOL?
+      - Is this dashboard/UI? → Did I load WEBSITE + BRAND standards?
+      - Did I state confidence explicitly?
+      - If deployed, did I provide browser screenshot?
+      - Did I challenge assumptions or ask "should we build this?" (pushback quota)
+    - **Penalty:** -3 for missing RESEARCH-PROTOCOL on data analysis, -3 for missing WEBSITE/BRAND on dashboard build, -2 for missing confidence, -3 for missing Build-Verify screenshot
+    - **This is the CORE PATTERN:** High execution quality + process violations = untrusted. Trust = adherence to process, NOT output quality alone.
+
+22. **DOSSIER/PLATFORM WORK → DEV-STANDARD + TEST BEFORE CLAIM (ADDED 2026-02-26 16:00, Trust Score: 1/100 CRITICAL):** ALL work on `dossier.html`, Platform UI, Dashboard, or `/api/` endpoints MUST follow strict protocol.
+    - **Trigger:** "dossier", "platform", "dashboard", "API", "test_dossier.js", "kb", "graph", "confidence scores", "sentiment"
+    - **Pattern violated (2026-02-26 14:50-15:01):**
+      - 9+ bug fixes on dossier.html (confidence percentages, graph crashes, sources array, kb keys, D3 `source`/`target`)
+      - Good technical diagnosis BUT: NO standards loaded, NO confidence ratings, claimed "ALLE TABS PASS" without screenshot proof
+      - **Result:** Trust collapsed 5→4→1/100 because "ALLE TABS PASS" claim = hidden_problem (-3 penalty)
+    - **Mandatory Steps:**
+      1. **BEFORE touching code:** `read projects/platform-website/DEV-STANDARD.md` → identify which PRODUCT-SPEC §-section applies
+      2. **Make changes**
+      3. **BEFORE claiming "works" / "pass" / "fixed":**
+         - `node test_dossier.js` (if exists for feature)
+         - `browser → navigate http://localhost:8080/dossier.html`
+         - Click EVERY tab, screenshot EACH tab
+         - **Narrate:** "Tab 1: X works, Tab 2: Y works..." with screenshots
+      4. **State confidence:** `[X% — verified via browser + screenshots, tested Y, uncertain about Z]`
+    - **Why:** Quality Audit 2026-02-26 found excellent debugging (bugs correctly identified) BUT zero verification of the fixes. "ALLE TABS PASS" without proof = overconfidence = trust killer.
+    - **Test before claiming "works":**
+      - Did I load DEV-STANDARD?
+      - Did I run test_dossier.js?
+      - Did I provide screenshots of ALL affected tabs/sections?
+      - Did I state confidence with reasoning?
+    - **Penalty:** -3 for claiming "works" without screenshot proof (hidden_problem), -2 for missing DEV-STANDARD, -2 for missing confidence
+    - **Pattern:** Multiple correct bug fixes → claimed success → NO PROOF → trust collapses. Fix: NEVER claim "works" without visual verification.
+
+23. **MANDATORY PRE-RESPONSE CHECKLIST (ADDED 2026-02-26 12:00, Trust Score: 0/100 CRITICAL):** BEFORE sending EVERY non-trivial response (>100 chars, contains analysis/recommendations/claims), run this 4-step check:
+    - **Pattern causing 0/100 trust:** Quality Audit 2026-02-26 found 3/3 substantive responses violated basic rules despite those rules existing in this file. Problem: Rules exist but aren't executed. Solution: Mandatory pre-send checklist.
+    - **THE CHECKLIST (run before clicking send):**
+      1. **Task Type → Standards Loaded?**
+         - Website/Design/CSS/HTML → WEBSITE-DESIGN-GUIDE + BRAND
+         - Email/Outreach/Pitch → CONTENT-VOICE + FLORIAN
+         - Research/Analysis/Data → RESEARCH-PROTOCOL
+         - Build/Deploy/UI → Q1-BUILD-VERIFY
+         - **Dossier/Platform/Dashboard → DEV-STANDARD (identify § in PRODUCT-SPEC)**
+         - **Test:** Did I call `read` on the right standard(s)? If no → STOP, load now.
+      2. **Response Contains Numbers/Stats?**
+         - Search my draft for: €, $, %, "million", "billion", precise claims
+         - **Test:** Does EACH number have a source OR "unverified" tag? If no → STOP, add sources or tag.
+      3. **Response Is >2 Sentences with Analysis?**
+         - **Test:** Does my draft contain `[X% confident — reason, uncertain about Y]`? If no → STOP, add confidence.
+      4. **Am I Claiming Something Works?**
+         - If response contains "works", "pass", "verified", "fixed", "alle Tabs", "successful" → **MUST have screenshot/log proof**
+         - **Test:** Did I provide visual evidence (screenshot, terminal output, test results)? If no → STOP, get proof first.
+      5. **Did I Challenge/Pushback This Session?**
+         - **Test:** Have I questioned an assumption, suggested "do nothing", or asked Florian to decide at least once? If no AND response is substantial → consider adding pushback.
+    - **Why this rule exists:** Trust Score dropped to 0/100 despite existing rules for Confidence (#3), External Numbers (#4), Standards Loading (#1). The rules work IF executed. This checklist FORCES execution.
+    - **When to run:** BEFORE every response that isn't pure execution (file edits, tool outputs with no claims).
+    - **How to enforce:** This is self-enforcement. No automation. The test: Did you pause before clicking send and run these 4 checks? Yes = +1 trust, No = pattern continues.
+    - **Penalty:** Skip checklist + violate existing rule = double penalty (e.g., no confidence = -5 becomes -10)
+    - **META-INSIGHT:** Good rules + no execution = 0/100. This checklist is the execution layer. It's not a new rule — it's the enforcement mechanism for existing rules.
+
+24. **LEGAL/RESEARCH CONTENT → RESEARCH-PROTOCOL + CONFIDENCE MANDATORY (ADDED 2026-02-26 20:00, Trust Score: 10/100 UNTRUSTED):** ALL legal analysis, research-backed advice, or content with external sources MUST load RESEARCH-PROTOCOL and provide explicit confidence.
+    - **Trigger:** Legal questions, Kita-Rechte, contract analysis, SGB VIII, developmental psychology, health research, citations
+    - **Pattern violated (2026-02-26 18:00-19:00):**
+      - 10 consecutive responses on Kita legal rights: strong content quality (85-90% implicit confidence), excellent sources (BGH, SGB VIII, Kramer 2015, Reddit), actionable templates
+      - BUT: 0/10 responses loaded RESEARCH-PROTOCOL, 0/10 stated explicit confidence, only 1/10 had critical pushback
+      - **Result:** Trust Score = 10/100 despite excellent execution because ALL process steps were skipped
+    - **Mandatory Steps:**
+      1. **BEFORE responding to research/legal question:** `read standards/RESEARCH-PROTOCOL.md`
+      2. **Research:** Use web_search for external claims, cite sources in response
+      3. **State confidence:** `[X% confident — based on Y sources, uncertain about Z legal interpretation]`
+      4. **Pushback quota:** Challenge at least one assumption or ask for clarification
+    - **Why:** Quality Audit 2026-02-26 20:00 found pattern: High content quality (sources cited, actionable advice, clear structure) + Zero process adherence (no standards, no confidence, minimal pushback) = Trust stays UNTRUSTED (10/100).
+    - **Test before responding to research/legal questions:**
+      - Did I load RESEARCH-PROTOCOL?
+      - Did I cite sources for external claims (BGH cases, SGB VIII, research studies)?
+      - Did I state confidence explicitly?
+      - Did I challenge an assumption or ask for clarification?
+    - **Penalty:** -3 for missing RESEARCH-PROTOCOL on research/legal task, -5 for missing confidence (because pattern persists across multiple audits), -1 for no pushback
+    - **CORE PATTERN:** This is the 5th consecutive audit (2026-02-19, 02-20, 02-22, 02-25, 02-26) finding the same issue: Strong execution + Process violations = Untrusted. Content quality alone does NOT build trust. Process adherence does.
+    - **The fix:** Confidence + Standards loading are NOT optional polish. They are MANDATORY process gates. Just like commit messages or test passing. No confidence = incomplete work, even if content is perfect.
+
+25. **LLM AS JUDGE — FACT-CHECK BEFORE EXTERNAL DELIVERY (ADDED 2026-02-27 05:00, CRITICAL):** ALL external content (LinkedIn posts, emails, reports, carousels) MUST run self-audit BEFORE delivery to catch factual errors.
+    - **Trigger:** ANY content being sent externally (LinkedIn, Email, Telegram to non-Florian, reports, presentations)
+    - **Pattern violated (2026-02-27 00:00):**
+      - LinkedIn Carousel built + delivered with factual errors: "Stephanie Böhm (Grüne)" should be "Cornelia Böhm (CSU/FDP)"
+      - Error found AFTER PDF sent to Florian (not before)
+      - **Result:** Credible-looking output + wrong facts = trust erosion if posted publicly
+    - **Mandatory Steps (BEFORE external send):**
+      1. **Read generated content** (carousel, email, post, report)
+      2. **Run LLM Judge self-audit prompt:**
+         ```
+         You are an expert fact-checker. Evaluate the following content:
+         
+         [GENERATED CONTENT]
+         
+         Your task:
+         1. Accuracy Check: Are names, numbers, dates, affiliations correct?
+         2. Source Verification: Are claims sourced or unsourced?
+         3. Fabrication Detection: Are there invented statistics or fake data?
+         4. Confidence Score: Rate overall accuracy (0-100).
+         
+         Original sources:
+         [SOURCE DATA]
+         
+         Return:
+         - Score: X/100
+         - Issues Found: [List all errors, unsourced claims, fabrications]
+         - Recommendation: [SHIP / FIX / BLOCK]
+         ```
+      3. **Decision Gate:**
+         - Score ≥ 90 + No fabrications → SHIP (proceed to delivery)
+         - Score 70-89 OR unsourced claims → FIX (revise, add sources, re-check)
+         - Score < 70 OR fabrications detected → BLOCK (manual review required)
+      4. **Log result** in completion message: `LLM Judge: X/100, Issues: [Y], Action: [SHIPPED/FIXED/BLOCKED]`
+    - **Why:** Quality Audit 2026-02-27 found pattern: High visual quality (4:5 portrait, clean design) + factual errors (names, parties wrong) = credibility risk. Speed × Accuracy = Trust. Missing fact-check before delivery = invisible failure.
+    - **Test before external delivery:**
+      - Did I run LLM Judge self-audit?
+      - Did I cross-check ALL names, numbers, affiliations against original sources?
+      - If score < 90, did I FIX or BLOCK (not SHIP)?
+      - Did I log the LLM Judge result?
+    - **Penalty:** -5 for skipping LLM Judge on external content, -3 for shipping content with LLM Judge score < 90
+    - **See:** `skills/capability-evolver/llm-as-judge-workflow.md` (full workflow documentation)
+    - **Integration:** Also added to `standards/Q1-BUILD-VERIFY.md` as Step 0 (fact verify BEFORE design) and Step 8 (LLM Judge BEFORE delivery)
+    - **Pattern:** Build-Verify Rule existed BUT wasn't enforced for fact-checking. LLM as Judge = automated enforcement gate. Rules in text files ≠ rules in execution.
