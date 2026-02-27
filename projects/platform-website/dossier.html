@@ -1057,6 +1057,9 @@ function normalizeCity(d) {
     CLAIM_LEDGER = data.claim_ledger || [];
     CONTRADICTIONS = data.contradictions_register || [];
     WEEKLYBRIEF = data.weekly_brief || {};
+    // Build SOURCE_MAP for clickable S-IDs
+    SOURCE_MAP = {};
+    (data.quellenverzeichnis || []).forEach(function(q) { if (q.id) SOURCE_MAP[q.id] = q; });
     OPPONENT_PLAYBOOK = data.opponentPlaybook || null;
     // Update page title + breadcrumb
     document.title = 'Dossier: ' + (TENANT.gemeinde || CITY_ID);
@@ -1077,6 +1080,17 @@ let CLAIM_LEDGER = [];
 let CONTRADICTIONS = [];
 let WEEKLYBRIEF = {};
 let OPPONENT_PLAYBOOK = null;
+let SOURCE_MAP = {};
+
+// Render S-IDs as clickable links
+function renderSourceLinks(sourceIds) {
+  if (!sourceIds || !sourceIds.length) return '';
+  return sourceIds.map(function(sid) {
+    var s = SOURCE_MAP[sid];
+    if (s && s.url) return '<a href="'+s.url+'" target="_blank" rel="noopener" style="color:var(--accent);font:500 6pt var(--m);text-decoration:none;border-bottom:1px dotted var(--accent);margin-right:4px" title="'+(s.name||sid).replace(/"/g,'&quot;')+' ('+(s.typ||'')+', Trust: '+(s.trust||'')+')">'+sid+'</a>';
+    return '<span style="color:var(--muted);font:500 6pt var(--m);margin-right:4px">'+sid+'</span>';
+  }).join(' ');
+}
 
 // =====================================================
 // STATE
@@ -1986,7 +2000,7 @@ function renderBriefing() {
         h += '<span style="font:500 5.5pt var(--m);color:'+clConf+'">'+cl.confidence+'</span>';
         h += '</div>';
         if (cl.this_answers) h += '<div style="font:400 6pt var(--f);color:var(--accent);font-style:italic;margin-top:3px">↳ "'+cl.this_answers+'"</div>';
-        if (cl.sources && cl.sources.length) h += '<div style="font:400 5.5pt var(--m);color:var(--muted);margin-top:2px">Quellen: '+cl.sources.join(', ')+'</div>';
+        if (cl.sources && cl.sources.length) h += '<div style="font:400 5.5pt var(--m);color:var(--muted);margin-top:2px">Quellen: '+renderSourceLinks(cl.sources)+'</div>';
         if (cl.if_wrong) h += '<div style="font:400 5.5pt var(--f);color:var(--red);margin-top:2px">⚠ '+cl.if_wrong+'</div>';
         if (cl.contradictions) h += '<div style="font:400 5.5pt var(--f);color:var(--amber);margin-top:2px">↔ '+cl.contradictions+'</div>';
         h += '</div>';
@@ -3083,7 +3097,7 @@ function renderStrategy() {
     }
     // Source references
     if (pat.sources && pat.sources.length) {
-      h += '<div style="font:400 5.5pt var(--m);color:var(--muted);margin-top:3px">Quellen: '+pat.sources.join(', ')+'</div>';
+      h += '<div style="font:400 5.5pt var(--m);color:var(--muted);margin-top:3px">Quellen: '+renderSourceLinks(pat.sources)+'</div>';
     }
     // If wrong
     if (pat.if_wrong) {
@@ -3444,6 +3458,26 @@ function renderStrategy() {
   }
 
   h += '</div>'; // close Block 3
+
+  // ═══ QUELLENVERZEICHNIS (clickable sources) ═══
+  var qvEntries = Object.keys(SOURCE_MAP);
+  if (qvEntries.length) {
+    h += '<div style="margin-top:18px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:6px">';
+    h += '<div class="canvas-title">Quellenverzeichnis <span class="ct-badge" style="background:var(--accent)">'+qvEntries.length+' QUELLEN</span></div>';
+    h += '<div style="display:grid;gap:4px;margin-top:8px">';
+    qvEntries.sort().forEach(function(sid) {
+      var s = SOURCE_MAP[sid];
+      var trustColor = s.trust === 'Hoch' ? 'var(--green)' : s.trust === 'Mittel' ? 'var(--amber)' : 'var(--muted)';
+      h += '<div style="display:flex;align-items:baseline;gap:8px;padding:4px 6px;border-radius:3px;background:var(--surface2)">';
+      h += '<span style="font:600 6pt var(--m);color:var(--accent);min-width:28px">'+sid+'</span>';
+      if (s.url) h += '<a href="'+s.url+'" target="_blank" rel="noopener" style="font:400 6.5pt var(--f);color:var(--text);text-decoration:none;flex:1;border-bottom:1px dotted var(--border)">'+(s.name||s.url)+'</a>';
+      else h += '<span style="font:400 6.5pt var(--f);color:var(--text);flex:1">'+(s.name||'—')+'</span>';
+      h += '<span style="font:500 5pt var(--m);color:'+trustColor+'">'+( s.trust||'')+'</span>';
+      h += '<span style="font:400 5pt var(--m);color:var(--muted)">'+(s.typ||'')+'</span>';
+      h += '</div>';
+    });
+    h += '</div></div>';
+  }
 
   el.innerHTML = h;
   // Initialize all interactive elements
