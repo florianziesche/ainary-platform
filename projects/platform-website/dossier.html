@@ -753,7 +753,13 @@ function normalizeCity(d) {
   }
 
   // Actions
-  d.actions = d.actions || [];
+  d.actions = (d.actions || []).map(function(a, i) {
+    a.title = a.title || a.action || a.text || ('Aktion ' + (i+1));
+    a.body = a.body || a.text || a.action || '';
+    a.priority = a.priority || 'MITTEL';
+    a.ev = a.ev || 'J';
+    return a;
+  });
 
   // Forecast — normalize different schemas
   d.forecast = d.forecast || {};
@@ -849,7 +855,13 @@ function normalizeCity(d) {
 
   // Asset Builder fields (claim ledger, contradictions, enhanced sources)
   d.claim_ledger = d.claim_ledger || [];
-  d.contradictions_register = d.contradictions_register || [];
+  d.contradictions_register = (d.contradictions_register || []).map(function(cr) {
+    cr.conflict = cr.conflict || ((cr.claim_a || cr.source_a || '') + ' vs. ' + (cr.claim_b || cr.source_b || ''));
+    cr.why_differ = cr.why_differ || cr.explanation || '';
+    cr.impact = cr.impact || '';
+    cr.resolution = cr.resolution || cr.our_position || '';
+    return cr;
+  });
   d.quellenverzeichnis = d.quellenverzeichnis || [];
   // Normalize this_answers + sources on patterns/hypotheses
   for (var pi2=0; pi2<d.patterns.length; pi2++) {
@@ -858,6 +870,7 @@ function normalizeCity(d) {
     d.patterns[pi2].if_wrong = d.patterns[pi2].if_wrong || '';
   }
   for (var hi2=0; hi2<d.hypotheses.length; hi2++) {
+    d.hypotheses[hi2].title = d.hypotheses[hi2].title || d.hypotheses[hi2].label || ('Hypothese ' + (hi2+1));
     d.hypotheses[hi2].this_answers = d.hypotheses[hi2].this_answers || '';
     d.hypotheses[hi2].sources = d.hypotheses[hi2].sources || [];
   }
