@@ -309,12 +309,26 @@ body{font-family:var(--f);color:var(--text);background:var(--bg);-webkit-font-sm
 </div>
 </div>
 <script>
+// Password → User mapping for personalized greeting
+var AUTH_USER_MAP = {
+  'stamp2026': {name: 'Herr Stamp', role: 'Kandidat'},
+  'gk-bamberg': {name: 'Herr Glüsenkamp', role: 'Kandidat'},
+  'ff-augsburg': {name: 'Herr Dr. Freund', role: 'Kandidat'},
+  'stadt-fuerth': {name: 'Frau Kramer', role: 'Pressestelle'},
+  'fuerth2026': {name: '', role: 'Analyse'},
+  'bamberg2026': {name: '', role: 'Analyse'},
+  'passau2026': {name: '', role: 'Analyse'},
+  'nuernberg2026': {name: '', role: 'Analyse'},
+  'friedberg2026': {name: '', role: 'Analyse'},
+  'ainary2026': {name: '', role: 'Admin'}
+};
 function checkAuth(){
 var pw=document.getElementById('auth-input').value.toLowerCase().trim();
 var hash=0;for(var i=0;i<pw.length;i++){hash=((hash<<5)-hash)+pw.charCodeAt(i);hash|=0;}
 if(hash===467107016||hash===-684972188||hash===1888659165||hash===-130356139||hash===2049766125||hash===1856638514||hash===665950855||hash===-1473779980||hash===1042708790||hash===2017763141){
 document.getElementById('auth-gate').style.display='none';
-try{sessionStorage.setItem('ai-auth','1')}catch(e){}
+try{sessionStorage.setItem('ai-auth','1');sessionStorage.setItem('ai-user',JSON.stringify(AUTH_USER_MAP[pw]||{}))}catch(e){}
+initGreeting();
 }else{
 document.getElementById('auth-error').style.opacity='1';
 document.getElementById('auth-input').style.borderColor='var(--red)';
@@ -494,6 +508,36 @@ setTimeout(function(){document.getElementById('auth-error').style.opacity='0';do
 })();
 // Auto-focus
 setTimeout(function(){try{document.getElementById('auth-input').focus()}catch(e){}},100);
+
+// Greeting + Clock + Demo badge
+function initGreeting() {
+  var user = {};
+  try { user = JSON.parse(sessionStorage.getItem('ai-user') || '{}'); } catch(e) {}
+  var h = new Date().getHours();
+  var greet = h < 12 ? 'Guten Morgen' : h < 17 ? 'Guten Tag' : 'Guten Abend';
+  var el = document.getElementById('topbar-greeting');
+  if (el && user.name) el.textContent = greet + ', ' + user.name;
+  else if (el) el.textContent = greet;
+  // Show demo badge for non-admin users
+  var badge = document.getElementById('topbar-demo-badge');
+  var isAdmin = new URLSearchParams(location.search).has('admin');
+  if (badge && !isAdmin && user.role !== 'Admin') badge.style.display = '';
+  // Clock
+  function updateClock() {
+    var now = new Date();
+    var dd = String(now.getDate()).padStart(2,'0');
+    var mm = String(now.getMonth()+1).padStart(2,'0');
+    var yy = now.getFullYear();
+    var hh = String(now.getHours()).padStart(2,'0');
+    var mi = String(now.getMinutes()).padStart(2,'0');
+    var cel = document.getElementById('topbar-clock');
+    if (cel) cel.textContent = dd + '.' + mm + '.' + yy + ' · ' + hh + ':' + mi;
+  }
+  updateClock();
+  setInterval(updateClock, 30000);
+}
+// Auto-init if already logged in
+try { if (sessionStorage.getItem('ai-auth') === '1') setTimeout(initGreeting, 500); } catch(e) {}
 </script>
 
 <!-- TOP BAR -->
@@ -509,6 +553,9 @@ setTimeout(function(){try{document.getElementById('auth-input').focus()}catch(e)
     <div class="search-results" id="search-results"></div>
   </div>
   <div class="topbar-right">
+    <span id="topbar-greeting" style="font:400 6.5pt var(--f);color:var(--text2)"></span>
+    <span id="topbar-clock" style="font:500 6.5pt var(--m);color:var(--muted)"></span>
+    <span id="topbar-demo-badge" style="display:none;font:500 5.5pt var(--m);padding:2px 6px;border-radius:2px;background:var(--amber)15;color:var(--amber);border:1px solid var(--amber)30;letter-spacing:.05em">DEMO · BEFRISTET</span>
     <span class="topbar-live"></span>
     <button class="topbar-chat" onclick="window.location.href='contact.html?topic=sonstig&city='+encodeURIComponent(new URLSearchParams(window.location.search).get('city')||'')">Support</button>
   </div>
