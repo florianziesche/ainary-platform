@@ -777,6 +777,14 @@ function normalizeCity(d) {
     a.body = a.body || a.text || a.action || '';
     a.priority = a.priority || 'MITTEL';
     a.ev = a.ev || 'J';
+    // Evidence chain: why → evidence → sources → metrics
+    // body = what to do, evidence = why it works (data-backed)
+    if (!a.body && a.why) a.body = a.why;
+    if (!a.evidence && a.why && a.body !== a.why) a.evidence = a.why;
+    a.rationale = a.rationale || '';
+    a.sources = a.sources || [];
+    a.metrics = a.metrics || [];
+    a.deadline = a.deadline || '';
     return a;
   });
 
@@ -3397,6 +3405,14 @@ function renderStrategy() {
     if (a.evidence) {
       h += '<div class="act-card-evidence"><span class="ev ev-e">E</span> ' + a.evidence + '</div>';
     }
+    // Sources (clickable S-IDs)
+    if (a.sources && a.sources.length) {
+      h += '<div style="margin-top:4px;font:400 6pt var(--m);color:var(--muted)">Quellen: ' + renderSourceLinks(a.sources) + '</div>';
+    }
+    // Deadline
+    if (a.deadline) {
+      h += '<div style="margin-top:3px;font:500 6pt var(--m);color:var(--amber)">⏱ Deadline: ' + a.deadline + '</div>';
+    }
     // Metrics with links
     if (a.metrics) {
       h += '<div class="act-card-metrics">';
@@ -3428,10 +3444,22 @@ function renderStrategy() {
   var totalQ = 0; for (var dq in KB) totalQ += (KB[dq].quellen||[]).length;
   var totalK = 0; for (var dk in KB) totalK += (KB[dk].controversies||[]).length;
   var totalP = SENTIMENT.topics ? SENTIMENT.topics.reduce(function(s,t){return s+(t.posts||[]).length},0) : 0;
+  // Dynamic data basis from actual sources
+  var qvCount = Object.keys(SOURCE_MAP).length;
+  var clCount = (typeof CLAIM_LEDGER !== 'undefined') ? CLAIM_LEDGER.length : 0;
+  var crCount = (typeof CONTRADICTIONS !== 'undefined') ? CONTRADICTIONS.length : 0;
+  // Collect unique source names from quellenverzeichnis or news
+  var sourceNames = [];
+  for (var sid in SOURCE_MAP) { var sn = (SOURCE_MAP[sid].name||'').split(' — ')[0].split(' – ')[0]; if (sn && sourceNames.indexOf(sn)===-1 && sourceNames.length < 8) sourceNames.push(sn); }
+  if (!sourceNames.length) { var seenSrc={}; for (var nsi=0;nsi<NEWS.length;nsi++) { var ns=NEWS[nsi].source||''; if (ns && !seenSrc[ns]) { sourceNames.push(ns); seenSrc[ns]=1; } } }
   h += '<div class="data-basis"><div class="data-basis-title">Datenbasis dieser Empfehlungen</div>';
   h += '<div class="data-basis-body">';
-  h += Object.keys(KB).length+' Dossiers · '+totalK+' Risikosignale · '+totalQ+' Quellen · '+HYPOTHESES.length+' Hypothesen · '+totalP+' Stimmungsanalysen · '+NEWS.length+' News<br>';
-  h += 'Quellen: SZ München, Merkur, tz München, Abgeordnetenwatch, Wikipedia, Partei-Websites<br>';
+  h += Object.keys(KB).length+' Akteure · '+totalK+' Risikosignale · '+totalQ+' Quellen · '+HYPOTHESES.length+' Hypothesen · '+PATTERNS.length+' Muster · '+NEWS.length+' News';
+  if (qvCount) h += ' · '+qvCount+' verifizierte Quellen';
+  if (clCount) h += ' · '+clCount+' Claims';
+  if (crCount) h += ' · '+crCount+' Widersprüche geprüft';
+  h += '<br>';
+  if (sourceNames.length) h += 'Quellen: '+sourceNames.join(', ')+'<br>';
   h += 'Zeitraum: 30 Tage · Aktualisiert: '+new Date().toLocaleDateString('de-DE');
   h += '</div></div>';
 
