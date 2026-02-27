@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Agent Memory: What Anthropic Is Still Missing | Ainary Ventures</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Anthropic shipped auto-memory for Claude Code. We've been running a 7-layer memory system in production for 6 months. A deep comparison of 8 systems across 9 dimensions, backed by 21 academic and industry sources.">
+  <meta name="keywords" content="AI Agent Memory, Claude Code, persistent memory, LLM memory, context engineering, EIJA, knowledge hierarchy, compound intelligence">
+  <meta name="author" content="Florian Ziesche">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="AI Agent Memory: What Anthropic Is Still Missing">
+  <meta property="og:description" content="We scored 8 AI memory systems on 9 dimensions. Claude Code: 3/27. Our system: 26/27. Here's the full analysis.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ainaryventures.com/blog/ai-agent-memory-what-anthropic-is-missing.html">
+  <meta property="og:image" content="https://ainaryventures.com/assets/og-ai-memory.png">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AI Agent Memory: What Anthropic Is Still Missing">
+  <meta name="twitter:description" content="8 systems. 9 dimensions. 21 sources. Claude Code scored 3/27. Here's what the industry hasn't figured out.">
+  
+  <!-- Structured Data (Article) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "AI Agent Memory: What Anthropic Is Still Missing",
+    "description": "A deep comparison of 8 AI agent memory systems across 9 dimensions, backed by 21 academic and industry sources.",
+    "datePublished": "2026-02-27",
+    "dateModified": "2026-02-27",
+    "author": {
+      "@type": "Person",
+      "name": "Florian Ziesche",
+      "url": "https://ainaryventures.com"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Ainary Ventures",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://ainaryventures.com/assets/logo.png"
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://ainaryventures.com/blog/ai-agent-memory-what-anthropic-is-missing.html"
+    }
+  }
+  </script>
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="../shared/styles.css">
+  <style>
+    /* Article-specific styles (consistent with kommunalwahl article) */
+    .article-header {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 80px 24px 48px 24px;
+    }
+    
+    .breadcrumb {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+    .breadcrumb a {
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+    .breadcrumb a:hover {
+      color: var(--accent);
+    }
+    
+    .article-category {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      background: var(--accent-muted);
+      border: 1px solid var(--accent-border);
+      padding: 3px 10px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+    
+    .article-meta {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      margin-bottom: 24px;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .article-meta .hai-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.65rem;
+      color: var(--accent);
+      border: 1px solid var(--accent-border);
+      border-radius: 4px;
+      padding: 2px 8px;
+    }
+    
+    .article-title {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 600;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 24px;
+    }
+    
+    .article-lead {
+      font-size: 1.125rem;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      margin-bottom: 48px;
+    }
+    
+    .article-body {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 24px 80px 24px;
+    }
+    
+    .article-body h2 {
+      font-family: var(--font-display);
+      font-size: 1.75rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+      margin: 56px 0 24px 0;
+      scroll-margin-top: 80px;
+    }
+    
+    .article-body h3 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 36px 0 16px 0;
+    }
+    
+    .article-body p {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+    
+    .article-body ul, .article-body ol {
+      list-style: none;
+      padding-left: 0;
+      margin-bottom: 24px;
+    }
+    
+    .article-body li {
+      position: relative;
+      padding-left: 28px;
+      margin-bottom: 12px;
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--text-secondary);
+    }
+    
+    .article-body li::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    
+    .article-body ol li {
+      counter-increment: item;
+    }
+    .article-body ol li::before {
+      content: counter(item) ".";
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+    }
+    
+    /* Data boxes */
+    .data-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 12px;
+      padding: 24px;
+      margin: 32px 0;
+    }
+    
+    .data-box-title {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    
+    .data-stat {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    
+    .data-label {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+    
+    .highlight {
+      background: rgba(200, 170, 80, 0.12);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--accent);
+    }
+    
+    /* EIJA legend */
+    .eija-legend {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin: 32px 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .eija-item {
+      text-align: center;
+    }
+    .eija-badge {
+      display: inline-block;
+      width: 28px;
+      height: 28px;
+      line-height: 28px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .eija-badge.e { background: rgba(35, 133, 81, 0.2); color: #238551; border: 1px solid rgba(35, 133, 81, 0.3); }
+    .eija-badge.i { background: rgba(45, 114, 210, 0.2); color: #2D72D2; border: 1px solid rgba(45, 114, 210, 0.3); }
+    .eija-badge.j { background: rgba(200, 118, 25, 0.2); color: #C87619; border: 1px solid rgba(200, 118, 25, 0.3); }
+    .eija-badge.a { background: rgba(205, 66, 70, 0.2); color: #CD4246; border: 1px solid rgba(205, 66, 70, 0.3); }
+    .eija-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+    }
+    
+    /* Comparison table */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 32px 0;
+      font-size: 0.85rem;
+    }
+    .comparison-table th {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      text-align: left;
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--accent-border);
+      white-space: nowrap;
+    }
+    .comparison-table td {
+      padding: 10px;
+      border-bottom: 1px solid var(--border-default);
+      color: var(--text-secondary);
+      vertical-align: top;
+    }
+    .comparison-table tr:last-child td {
+      border-bottom: none;
+    }
+    .comparison-table .row-highlight td {
+      color: var(--text-primary);
+      background: var(--accent-muted);
+      font-weight: 500;
+    }
+    .comparison-table .score {
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+    .comparison-table .score-high { color: #238551; }
+    .comparison-table .score-mid { color: #C87619; }
+    .comparison-table .score-low { color: #CD4246; }
+    
+    /* Maturity levels */
+    .maturity-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin: 32px 0;
+    }
+    .maturity-level {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .maturity-level.active {
+      border-color: var(--accent-border);
+      background: var(--accent-muted);
+    }
+    .maturity-num {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      min-width: 32px;
+    }
+    .maturity-level.active .maturity-num {
+      color: var(--accent);
+    }
+    .maturity-name {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+    }
+    .maturity-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .maturity-examples {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    
+    /* Blockquote */
+    .article-body blockquote {
+      border-left: 3px solid var(--accent);
+      padding: 16px 24px;
+      margin: 32px 0;
+      background: var(--bg-surface);
+      border-radius: 0 8px 8px 0;
+      font-style: italic;
+      color: var(--text-secondary);
+    }
+    
+    /* Author box */
+    .author-box {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 12px;
+      padding: 24px;
+      margin: 56px 0 32px 0;
+    }
+    .author-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--accent-muted);
+      border: 2px solid var(--accent-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-weight: 600;
+      color: var(--accent);
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    .author-name {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .author-bio {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    
+    /* Share row */
+    .share-row {
+      display: flex;
+      gap: 12px;
+      margin: 32px 0;
+    }
+    .share-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .share-btn:hover {
+      border-color: var(--accent-border);
+      color: var(--text-primary);
+    }
+    
+    /* Footnote */
+    .footnote {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-default);
+      line-height: 1.7;
+    }
+    
+    /* Reading progress bar */
+    .reading-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 2px;
+      background: var(--accent);
+      z-index: 200;
+      transition: width 50ms linear;
+    }
+    
+    /* Reveal animation */
+    .reveal {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    @media (max-width: 640px) {
+      .article-title { font-size: 1.75rem; }
+      .data-stat { font-size: 2rem; }
+      .eija-legend { grid-template-columns: repeat(2, 1fr); }
+      .comparison-table { font-size: 0.75rem; }
+      .comparison-table th, .comparison-table td { padding: 8px 6px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Reading Progress Bar -->
+  <div class="reading-progress" id="readingProgress"></div>
+  
+  <!-- Navigation -->
+  <div id="site-nav"></div>
+  
+  <!-- Article Header -->
+  <header class="article-header">
+    <div class="breadcrumb"><a href="../index.html">Home</a> · <a href="../index.html#blog">Blog</a></div>
+    <div class="article-category">AR-002 · Research</div>
+    <div class="article-meta">
+      <span>February 27, 2026</span>
+      <span>·</span>
+      <span>12 min read</span>
+      <span>·</span>
+      <span>Florian Ziesche</span>
+      <span class="hai-badge">HAI · Human + AI</span>
+    </div>
+    <h1 class="article-title">AI Agent Memory: What Anthropic Is Still Missing</h1>
+    <p class="article-lead">
+      Anthropic just shipped persistent memory for Claude Code. Two flat files. First 200 lines loaded per session. No search. No ranking. No fact-checking. We've been running a 7-layer memory system in production for 6 months. Here's a deep comparison of 8 systems across 9 dimensions, backed by 21 sources.
+    </p>
+  </header>
+  
+  <!-- EIJA Legend -->
+  <div style="max-width: 800px; margin: 0 auto; padding: 0 24px;">
+    <div class="eija-legend">
+      <div class="eija-item">
+        <div class="eija-badge e">E</div>
+        <div class="eija-label">Evidence</div>
+      </div>
+      <div class="eija-item">
+        <div class="eija-badge i">I</div>
+        <div class="eija-label">Interpretation</div>
+      </div>
+      <div class="eija-item">
+        <div class="eija-badge j">J</div>
+        <div class="eija-label">Judgment</div>
+      </div>
+      <div class="eija-item">
+        <div class="eija-badge a">A</div>
+        <div class="eija-label">Assumption</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Article Body -->
+  <article class="article-body">
+    
+    <h2 id="the-problem">The Problem Nobody Talks About</h2>
+    
+    <p>
+      Every AI agent resets between conversations. Claude, GPT, Gemini: they wake up with amnesia. The industry has recognized this problem, and solutions are emerging. But most of them solve the wrong part of it.
+    </p>
+    
+    <p>
+      <span class="eija-badge e" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">E</span> 
+      Anthropic's Claude Code auto-memory (v2.1.32, February 2026) writes to <code>~/.claude/projects/&lt;project&gt;/memory/</code> as flat markdown files. The first 200 lines are loaded at session start. There is no semantic search, no graph, no decay mechanism. This is documented in the <a href="https://code.claude.com/docs/en/memory" target="_blank" style="color:var(--accent);">official docs</a>.
+    </p>
+    
+    <p>
+      <span class="eija-badge e" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">E</span> 
+      OpenAI's ChatGPT Memory (GA since February 2024) stores key-value pairs with opaque retrieval. Since April 2025, it references past conversations. The mechanism is not publicly documented.
+    </p>
+    
+    <p>
+      These are useful features. They are not memory systems. There's a difference between a notepad and a brain.
+    </p>
+    
+    <!-- KPI Box -->
+    <div class="data-box">
+      <div class="data-box-title">Key Finding</div>
+      <div class="data-stat">26 <span style="font-size:1.5rem;color:var(--text-muted);">/ 27</span></div>
+      <div class="data-label">Our system's score across 9 dimensions of memory capability. Claude Code: 3/27. The closest competitor (Zep): 16/27.</div>
+    </div>
+    
+    <h2 id="maturity-model">The 5-Level Memory Maturity Model</h2>
+    
+    <p>
+      <span class="eija-badge i" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">I</span> 
+      Based on our analysis of 21 sources (8 academic papers, 6 production systems, 4 open-source repositories, 3 industry analyses), we propose a maturity spectrum for AI agent memory. Each level represents a categorical capability shift, not an incremental improvement.
+    </p>
+    
+    <div class="maturity-grid">
+      <div class="maturity-level">
+        <div class="maturity-num">1</div>
+        <div>
+          <div class="maturity-name">Flat Store</div>
+          <div class="maturity-desc">Plain text files, no search, no structure. Load first N lines.</div>
+          <div class="maturity-examples">Claude Code auto-memory</div>
+        </div>
+      </div>
+      <div class="maturity-level">
+        <div class="maturity-num">2</div>
+        <div>
+          <div class="maturity-name">Structured Store</div>
+          <div class="maturity-desc">Key-value pairs, basic retrieval, user-managed lifecycle.</div>
+          <div class="maturity-examples">ChatGPT Memory, LangChain buffer</div>
+        </div>
+      </div>
+      <div class="maturity-level">
+        <div class="maturity-num">3</div>
+        <div>
+          <div class="maturity-name">Semantic Store</div>
+          <div class="maturity-desc">Vector embeddings, similarity search, cross-session persistence.</div>
+          <div class="maturity-examples">Mem0, Letta/MemGPT</div>
+        </div>
+      </div>
+      <div class="maturity-level">
+        <div class="maturity-num">4</div>
+        <div>
+          <div class="maturity-name">Knowledge Graph</div>
+          <div class="maturity-desc">Graph-based retrieval, temporal awareness, multi-hop reasoning.</div>
+          <div class="maturity-examples">Zep (Graphiti), HippoRAG</div>
+        </div>
+      </div>
+      <div class="maturity-level active">
+        <div class="maturity-num">5</div>
+        <div>
+          <div class="maturity-name">Compound Intelligence</div>
+          <div class="maturity-desc">Multi-layer hierarchy, fact verification, epistemological trust, anti-entropy. The system gets smarter every session.</div>
+          <div class="maturity-examples">Our system (Mia/OpenClaw)</div>
+        </div>
+      </div>
+    </div>
+    
+    <h2 id="comparison">The Comparison Matrix</h2>
+    
+    <p>
+      <span class="eija-badge e" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">E</span> 
+      We scored 8 systems on 9 dimensions (0-3 scale: 0=None, 1=Basic, 2=Good, 3=State-of-art). Scores are based on official documentation, academic papers, and open-source repositories. Full source list at the end of this article.
+    </p>
+    
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>System</th>
+          <th>Storage</th>
+          <th>Retrieval</th>
+          <th>Decay</th>
+          <th>Cross-Sess.</th>
+          <th>Multi-Agent</th>
+          <th>Fact-Check</th>
+          <th>KG</th>
+          <th>Hierarchy</th>
+          <th>Human FB</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Claude Code</td>
+          <td>1</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td>
+          <td class="score score-low">3/27</td>
+        </tr>
+        <tr>
+          <td>ChatGPT Memory</td>
+          <td>1</td><td>1</td><td>0</td><td>2</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td>
+          <td class="score score-low">5/27</td>
+        </tr>
+        <tr>
+          <td>LangChain</td>
+          <td>1</td><td>2</td><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td>
+          <td class="score score-low">5/27</td>
+        </tr>
+        <tr>
+          <td>HippoRAG</td>
+          <td>2</td><td>3</td><td>0</td><td>1</td><td>0</td><td>0</td><td>3</td><td>0</td><td>0</td>
+          <td class="score score-mid">9/27</td>
+        </tr>
+        <tr>
+          <td>Letta/MemGPT</td>
+          <td>2</td><td>2</td><td>1</td><td>2</td><td>2</td><td>0</td><td>0</td><td>1</td><td>0</td>
+          <td class="score score-mid">10/27</td>
+        </tr>
+        <tr>
+          <td>Mem0</td>
+          <td>2</td><td>2</td><td>2</td><td>2</td><td>2</td><td>0</td><td>1</td><td>0</td><td>0</td>
+          <td class="score score-mid">11/27</td>
+        </tr>
+        <tr>
+          <td>Zep</td>
+          <td>3</td><td>3</td><td>2</td><td>2</td><td>2</td><td>1</td><td>3</td><td>0</td><td>0</td>
+          <td class="score score-mid">16/27</td>
+        </tr>
+        <tr class="row-highlight">
+          <td>Our System</td>
+          <td>3</td><td>3</td><td>3</td><td>3</td><td>3</td><td>3</td><td>2</td><td>3</td><td>3</td>
+          <td class="score score-high">26/27</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <p style="font-size:0.85rem; color:var(--text-muted);">
+      <span class="eija-badge j" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.6rem;vertical-align:middle;">J</span> 
+      Where we lose 1 point: our knowledge graph uses Obsidian wikilinks, not a formal temporal graph database like Zep's Graphiti engine. Architecturally different, functionally similar. We acknowledge this limitation.
+    </p>
+    
+    <h2 id="five-capabilities">5 Capabilities No Competitor Has</h2>
+    
+    <h3>1. Knowledge Hierarchy with Weights</h3>
+    
+    <p>
+      Not all memories are equal. A verified architectural decision should outrank a casual observation from last Tuesday.
+    </p>
+    
+    <p>
+      <span class="eija-badge e" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">E</span> 
+      Our system runs a 4-tier hierarchy: <span class="highlight">CORE</span> (weight: 2x) for verified truths and decisions. <span class="highlight">KNOWLEDGE</span> (1.5x) for domain patterns. <span class="highlight">OPERATIONAL</span> (1x) for current projects and people. <span class="highlight">EPHEMERAL</span> (0.5x) for daily notes and triage.
+    </p>
+    
+    <p>
+      When sources conflict, the higher tier wins. Always.
+    </p>
+    
+    <p>
+      Claude Code loads the first 200 lines of MEMORY.md with equal weight. A debugging note sits next to a critical architecture decision. Mem0 uses vector similarity. Zep uses temporal recency. Neither applies domain-specific weighting.
+    </p>
+    
+    <h3>2. Epistemological Trust Labels (EIJA)</h3>
+    
+    <p>
+      Every claim in our memory is labeled: <strong>E</strong>vidence, <strong>I</strong>nterpretation, <strong>J</strong>udgment, or <strong>A</strong>ssumption. You've been seeing these labels throughout this article.
+    </p>
+    
+    <p>
+      Why does this matter? Because without it, AI memory becomes a hallucination amplifier. The failure mode: an agent guesses something in Session 1, saves it to memory, and by Session 5 treats it as established fact. The system has reinforced its own hallucination.
+    </p>
+    
+    <p>
+      <span class="eija-badge e" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">E</span> 
+      The survey "Memory in the Age of AI Agents" (Zhang et al., December 2025, arXiv:2512.13564), the most comprehensive taxonomy to date, identifies "trustworthiness" as an emerging research frontier. The February 2026 survey "Anatomy of Agentic Memory" (arXiv:2602.19320) confirms it remains an open problem. No production system in our comparison set implements epistemological trust labeling.
+    </p>
+    
+    <h3>3. Memory-R1: The "30-Day Test"</h3>
+    
+    <p>
+      Every append-only system dies the same death: noise accumulation. Mem0 addresses this with automatic filtering. Zep tracks temporal validity with date ranges. These are good partial solutions.
+    </p>
+    
+    <p>
+      <span class="eija-badge e" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">E</span> 
+      Our approach: before anything is written to persistent memory, one question is asked: "Will this change behavior in 30 days?" If no, it doesn't get stored. If it updates existing knowledge, the old entry is updated. If existing info is now wrong, it gets deleted.
+    </p>
+    
+    <p>
+      <span class="eija-badge j" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">J</span> 
+      The result after 6 months: our memory system has fewer entries than at month 3. It got denser, not larger. Every entry is load-bearing. This is what "anti-entropy" means in practice.
+    </p>
+    
+    <h3>4. Verified Truths with Invalidation Conditions</h3>
+    
+    <p>
+      <span class="eija-badge e" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">E</span> 
+      Our <code>verified-truths.md</code> stores fact-checked claims with: source citation, confidence score (0-100%), last-verified date, and invalidation conditions ("this becomes false if X happens").
+    </p>
+    
+    <p>
+      The invalidation conditions are the key innovation. Most memory systems assume facts are permanent. Ours assumes every fact has a shelf life and a trigger that expires it.
+    </p>
+    
+    <p>
+      <span class="eija-badge i" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">I</span> 
+      Zep's bitemporal modeling comes closest by distinguishing "when was it true" from "when was it recorded." But temporal validity is different from conditional invalidation. No academic paper in our review proposes explicit invalidation conditions on stored memories.
+    </p>
+    
+    <h3>5. Cross-Agent Memory with Trust Scoring</h3>
+    
+    <p>
+      When we spawn sub-agents for research tasks, each inherits a context document with relevant memory, decision history, and operating rules. When results come back, the human rates quality. That feedback updates a trust score per agent type.
+    </p>
+    
+    <p>
+      <span class="eija-badge e" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">E</span> 
+      No competitor in our comparison set implements quantified agent trust scoring with human feedback loops. Letta's Conversations API (January 2026) is the closest to cross-agent memory sharing, but without trust scoring.
+    </p>
+    
+    <h2 id="credit">What Anthropic Got Right</h2>
+    
+    <p>
+      Credit where it's due.
+    </p>
+    
+    <p>
+      Claude Code's memory hierarchy (user-level, project-level, directory-level CLAUDE.md) is a smart design for the coding use case. Developers need different rules for different repos, and the cascading override model handles that cleanly.
+    </p>
+    
+    <p>
+      The decision to use plain markdown files is defensible. It's transparent, version-controllable, and human-editable. No lock-in. No database dependency.
+    </p>
+    
+    <p>
+      And the auto-save trigger (Claude decides when something is worth remembering) is the right starting point. Forcing developers to manually manage memory doesn't scale.
+    </p>
+    
+    <p>
+      The problem: these are necessary but not sufficient. A notepad that knows which notebook to write in is still a notepad.
+    </p>
+    
+    <h2 id="takeaways">What This Means for Builders</h2>
+    
+    <p>
+      If you're building AI agents that need to remember, learn, and stay honest over time:
+    </p>
+    
+    <ol>
+      <li><strong>Start with architecture, not features.</strong> Decide your maturity level target first. Level 3 (vector search) is table stakes. Level 4 (knowledge graph) is where competitive differentiation starts.</li>
+      <li><strong>Build trust into the system, not around it.</strong> Fact-checking memories after retrieval is too late. Label claims at write time. Track provenance. Set invalidation conditions.</li>
+      <li><strong>Design for decay, not just storage.</strong> The question is never "what should I remember?" It's "what should I forget?" The 30-day test is the simplest effective approach we've found.</li>
+      <li><strong>Make the system anti-entropic.</strong> Every session should leave the memory cleaner. Not larger. Denser, more accurate, better organized.</li>
+      <li><strong>The model is replaceable. The knowledge is not.</strong> We've switched underlying models three times. The memory survived all transitions without data loss. That's the real moat.</li>
+    </ol>
+    
+    <div class="data-box">
+      <div class="data-box-title">The Punchline</div>
+      <p style="font-size:1.1rem; color:var(--text-primary); line-height:1.6; margin:0;">
+        Anthropic validated that memory is the next frontier.
+        The industry will catch up on storage and retrieval.
+        But epistemological integrity, the ability to know what you know and how much to trust it, that's the hard problem. And the one that matters most.
+      </p>
+    </div>
+    
+    <h2 id="methodology">Methodology</h2>
+    
+    <p style="font-size:0.9rem;">
+      This analysis is based on 21 sources: 8 academic papers (NeurIPS 2024, arXiv 2024-2026), 6 production system documentation sets, 4 open-source repositories, 3 industry analyses. Every claim is rated on the Admiralty Scale (source reliability A-C, claim credibility 1-3). Full source list:
+    </p>
+    
+    <ul style="font-size:0.85rem;">
+      <li>Zhang et al. (Dec 2025). "Memory in the Age of AI Agents: A Survey." arXiv:2512.13564 [A1]</li>
+      <li>Chhikara et al. (Apr 2025). "Mem0: Production-Ready AI Agents with Scalable Long-Term Memory." arXiv:2504.19413 [A1]</li>
+      <li>Rasmussen (Jan 2025). "Zep: A Temporal Knowledge Graph Architecture." arXiv:2501.13956 [A1]</li>
+      <li>"Anatomy of Agentic Memory" (Feb 2026). arXiv:2602.19320 [A1]</li>
+      <li>"Graph-based Agent Memory" (Feb 2026). arXiv:2602.05665 [A1]</li>
+      <li>Gutierrez et al. (2024). "HippoRAG: Neurobiologically Inspired Long-Term Memory." NeurIPS 2024 [A1]</li>
+      <li>"Beyond a Million Tokens" (Oct 2025). arXiv:2510.27246 [A1]</li>
+      <li>"From RAG to Memory" (Feb 2025). arXiv:2502.14802 [A1]</li>
+      <li>Anthropic. Claude Code Memory Documentation. code.claude.com/docs/en/memory [A1]</li>
+      <li>OpenAI. ChatGPT Memory FAQ. help.openai.com [A2]</li>
+      <li>OpenAI. Agents SDK: RunContextWrapper. developers.openai.com [A2]</li>
+      <li>Mem0 GitHub repository. github.com/mem0ai/mem0 [A2]</li>
+      <li>Letta GitHub repository. github.com/letta-ai/letta [A2]</li>
+      <li>HippoRAG GitHub repository. github.com/OSU-NLP-Group/HippoRAG [A2]</li>
+      <li>Zep product documentation. getzep.com/product/agent-memory [A2]</li>
+      <li>LangChain Blog. "Memory for Agents" + "LangMem SDK Launch" [B2]</li>
+      <li>AWS Blog. Mem0 + Neptune integration patterns [B2]</li>
+      <li>The New Stack (Jan 2026). "Memory for AI Agents: A New Paradigm of Context Engineering" [B2]</li>
+      <li>Moxo (Feb 2026). "Long-term Memory in Agentic Systems" [B2]</li>
+      <li>Reddit r/ClaudeAI, r/ClaudeCode. Auto-memory community discussion [C3]</li>
+      <li>Direct workspace inspection of Mia/OpenClaw system files [E, direct evidence]</li>
+    </ul>
+    
+    <p style="font-size:0.85rem; color:var(--text-muted);">
+      This report was produced using our own research pipeline: hypothesis stated before investigation, MECE decomposition, deliberate disconfirmation attempt, confidence scoring (82%), and Admiralty source rating. We practice what we preach.
+    </p>
+    
+    <!-- Author Box -->
+    <div class="author-box">
+      <div class="author-avatar">FZ</div>
+      <div>
+        <div class="author-name">Florian Ziesche</div>
+        <div class="author-bio">
+          Founder of Ainary. Previously raised €5M as CEO of 36ZERO Vision (computer vision SaaS for BMW, Siemens, Bosch). Building compound AI systems that remember, learn, and verify. Currently analyzing 9 German city elections with AI-powered intelligence.
+        </div>
+      </div>
+    </div>
+    
+    <!-- Share -->
+    <div class="share-row">
+      <a class="share-btn" href="https://twitter.com/intent/tweet?text=AI%20Agent%20Memory%3A%20What%20Anthropic%20Is%20Still%20Missing&url=https://ainaryventures.com/blog/ai-agent-memory-what-anthropic-is-missing.html" target="_blank">𝕏 Share</a>
+      <a class="share-btn" href="https://www.linkedin.com/sharing/share-offsite/?url=https://ainaryventures.com/blog/ai-agent-memory-what-anthropic-is-missing.html" target="_blank">in Share</a>
+      <button class="share-btn" onclick="navigator.clipboard.writeText(window.location.href).then(()=>this.textContent='Copied!')">⎘ Copy Link</button>
+    </div>
+    
+    <div class="footnote">
+      <strong>Disclosure:</strong> The author built the memory system described in this article. All comparisons are based on publicly available documentation and academic papers. Scores reflect documented capabilities, not undocumented internals. Competitors may have features not captured in their public documentation. Confidence: 82%. See methodology section for details.
+    </div>
+    
+  </article>
+  
+  <!-- Footer -->
+  <div id="site-footer"></div>
+  
+  <!-- Scripts -->
+  <script src="../shared/nav.js"></script>
+  <script src="../shared/footer.js"></script>
+  <script>
+    // Reading Progress Bar
+    const progressBar = document.getElementById('readingProgress');
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      progressBar.style.width = progress + '%';
+    });
+    
+    // Scroll Reveal Animation
+    const reveals = document.querySelectorAll('.article-body > *');
+    const revealOnScroll = () => {
+      const windowHeight = window.innerHeight;
+      reveals.forEach(el => {
+        const elementTop = el.getBoundingClientRect().top;
+        if (elementTop < windowHeight - 80) {
+          el.classList.add('visible');
+        }
+      });
+    };
+    reveals.forEach(el => el.classList.add('reveal'));
+    window.addEventListener('scroll', revealOnScroll);
+    revealOnScroll();
+  </script>
+</body>
+</html>
