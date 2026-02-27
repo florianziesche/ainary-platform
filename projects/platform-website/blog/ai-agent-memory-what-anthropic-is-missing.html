@@ -773,83 +773,158 @@
 
     <h2 id="five-capabilities">5 Unsolved Problems in Agent Memory</h2>
     
-    <h3>1. Knowledge Hierarchy with Weights</h3>
     
-    <p>
-      Not all memories are equal. A verified architectural decision should outrank a casual observation from last Tuesday.
-    </p>
-    
-    <p>
-      <span class="eija-badge e" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">E</span> 
-      Our system runs a 4-tier hierarchy: <span class="highlight">CORE</span> (weight: 2x) for verified truths and decisions. <span class="highlight">KNOWLEDGE</span> (1.5x) for domain patterns. <span class="highlight">OPERATIONAL</span> (1x) for current projects and people. <span class="highlight">EPHEMERAL</span> (0.5x) for daily notes and triage.
-    </p>
-    
-    <p>
-      When sources conflict, the higher tier wins. Always.
-    </p>
-    
-    <p>
-      Claude Code loads the first 200 lines of MEMORY.md with equal weight. A debugging note sits next to a critical architecture decision. Mem0 uses vector similarity. Zep uses temporal recency. Neither applies domain-specific weighting.
-    </p>
-    
-    <h3>2. Epistemological Trust Labels (EIJA)</h3>
-    
-    <p>
-      Every claim in our memory is labeled: <strong>E</strong>vidence, <strong>I</strong>nterpretation, <strong>J</strong>udgment, or <strong>A</strong>ssumption. You've been seeing these labels throughout this article.
-    </p>
-    
-    <p>
-      Why does this matter? Because without it, AI memory becomes a hallucination amplifier. The failure mode: an agent guesses something in Session 1, saves it to memory, and by Session 5 treats it as established fact. The system has reinforced its own hallucination.
-    </p>
-    
-    <p>
-      <span class="eija-badge e" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">E</span> 
-      The survey "Memory in the Age of AI Agents" (Zhang et al., December 2025, arXiv:2512.13564), the most comprehensive taxonomy to date, identifies "trustworthiness" as an emerging research frontier. The February 2026 survey "Anatomy of Agentic Memory" (arXiv:2602.19320) confirms it remains an open problem. Based on our analysis of 21 sources, no production system currently implements epistemological trust labeling. This is a self-developed system, empirically tested across hundreds of sessions, and it is improving and evolving. While the research community discusses trust in memory as an unsolved problem, this system is running in production.
-    </p>
-    
-    <h3>3. Memory-R1: The "30-Day Test"</h3>
-    
-    <p>
-      Every append-only system dies the same death: noise accumulation. Mem0 addresses this with automatic filtering. Zep tracks temporal validity with date ranges. These are good partial solutions.
-    </p>
-    
-    <p>
-      <span class="eija-badge e" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">E</span> 
-      Our approach: before anything is written to persistent memory, one question is asked: "Will this change behavior in 30 days?" If no, it doesn't get stored. If it updates existing knowledge, the old entry is updated. If existing info is now wrong, it gets deleted.
-    </p>
-    
-    <p>
-      <span class="eija-badge j" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">J</span> 
-      The result: as the system matures, it accumulates fewer but higher-quality entries. It gets denser, not larger. Every entry is load-bearing. This is what "anti-entropy" means in practice.
-    </p>
-    
-    <h3>4. Verified Truths with Invalidation Conditions</h3>
-    
-    <p>
-      <span class="eija-badge e" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">E</span> 
-      Our <code>verified-truths.md</code> stores fact-checked claims with: source citation, confidence score (0-100%), last-verified date, and invalidation conditions ("this becomes false if X happens").
-    </p>
-    
-    <p>
-      The invalidation conditions are the key innovation. Most memory systems assume facts are permanent. Ours assumes every fact has a shelf life and a trigger that expires it.
-    </p>
-    
-    <p>
-      <span class="eija-badge i" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">I</span> 
-      Zep's bitemporal modeling comes closest by distinguishing "when was it true" from "when was it recorded." But temporal validity is different from conditional invalidation. No academic paper in our review proposes explicit invalidation conditions on stored memories.
-    </p>
-    
-    <h3>5. Cross-Agent Memory with Trust Scoring</h3>
-    
-    <p>
-      When we spawn sub-agents for research tasks, each inherits a context document with relevant memory, decision history, and operating rules. When results come back, the human rates quality. That feedback updates a trust score per agent type.
-    </p>
-    
-    <p>
-      <span class="eija-badge e" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">E</span> 
-      Based on our review of 21 sources, no system in production implements quantified agent trust scoring with human feedback loops. Letta's Conversations API (January 2026) is the closest to cross-agent memory sharing, but without trust scoring. This capability does not exist in the current state of the art.
-    </p>
-    
+    <div style="margin:40px 0;">
+      <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="8" y="36" width="32" height="4" rx="1" fill="rgba(255,255,255,0.08)"/>
+      <rect x="12" y="28" width="24" height="4" rx="1" fill="rgba(255,255,255,0.12)"/>
+      <rect x="16" y="20" width="16" height="4" rx="1" fill="rgba(255,255,255,0.18)"/>
+      <rect x="20" y="12" width="8" height="4" rx="1" fill="#e8c84a"/>
+    </svg>
+        <h3 style="margin:0 !important;">1. Knowledge Hierarchy with Weights</h3>
+      </div>
+      <div style="margin-left:64px;">
+        <div style="margin-bottom:16px;">
+          <div style="font:600 10px var(--font-mono, monospace); color:rgba(255,255,255,0.3); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px;">Problem</div>
+          <p style="margin-bottom:0;">Not all memories are equal. A verified architectural decision should outrank a casual observation from last Tuesday. But every system we tested treats memories as flat: Claude Code loads the first 200 lines with equal weight. Mem0 ranks by vector similarity. Zep by temporal recency. None applies domain-specific weighting.</p>
+        </div>
+        <div style="margin-bottom:16px;">
+          <div style="font:600 10px var(--font-mono, monospace); color:var(--accent, #e8c84a); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px;">Our Approach</div>
+          <p style="margin-bottom:0;">
+            <span class="eija-badge e" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">E</span> 
+            A 4-tier hierarchy: <span class="highlight">CORE</span> (2x weight) for verified truths and decisions. <span class="highlight">KNOWLEDGE</span> (1.5x) for domain patterns. <span class="highlight">OPERATIONAL</span> (1x) for current projects and people. <span class="highlight">EPHEMERAL</span> (0.5x) for daily notes. When sources conflict, the higher tier wins. Always.
+          </p>
+        </div>
+        <div style="padding:12px 16px; background:rgba(232,200,74,0.04); border-left:2px solid var(--accent, #e8c84a); border-radius:0 4px 4px 0;">
+          <div style="font:600 10px var(--font-mono, monospace); color:var(--accent, #e8c84a); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:4px;">What it improves</div>
+          <div style="font:400 0.95rem/1.6 var(--font-body, Inter, sans-serif); color:var(--text-secondary, #8a8f98);">The agent stops treating a debugging note as equally important as a critical architecture decision. Retrieval quality improves because the system knows what matters, not just what's similar.</div>
+        </div>
+      </div>
+    </div>
+
+
+    <div style="margin:40px 0;">
+      <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="24" cy="24" r="14" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+      <circle cx="24" cy="24" r="8" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+      <circle cx="24" cy="24" r="3" fill="#e8c84a"/>
+      <text x="24" y="27" text-anchor="middle" style="font:700 8px monospace; fill:#111418;">E</text>
+    </svg>
+        <h3 style="margin:0 !important;">2. Epistemological Trust Labels (EIJA)</h3>
+      </div>
+      <div style="margin-left:64px;">
+        <div style="margin-bottom:16px;">
+          <div style="font:600 10px var(--font-mono, monospace); color:rgba(255,255,255,0.3); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px;">Problem</div>
+          <p style="margin-bottom:0;">Without distinguishing fact from guess, AI memory becomes a hallucination amplifier. The failure mode: an agent guesses something in Session 1, saves it, and by Session 5 treats it as established fact. The system has reinforced its own hallucination.</p>
+        </div>
+        <div style="margin-bottom:16px;">
+          <div style="font:600 10px var(--font-mono, monospace); color:var(--accent, #e8c84a); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px;">Our Approach</div>
+          <p style="margin-bottom:0;">
+            <span class="eija-badge e" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">E</span> 
+            Every claim is labeled: <strong>E</strong>vidence, <strong>I</strong>nterpretation, <strong>J</strong>udgment, or <strong>A</strong>ssumption. You've seen these labels throughout this article. The survey "Memory in the Age of AI Agents" (Zhang et al., December 2025, arXiv:2512.13564) identifies "trustworthiness" as an emerging research frontier. The February 2026 survey (arXiv:2602.19320) confirms it remains an open problem.
+          </p>
+        </div>
+        <div style="padding:12px 16px; background:rgba(232,200,74,0.04); border-left:2px solid var(--accent, #e8c84a); border-radius:0 4px 4px 0;">
+          <div style="font:600 10px var(--font-mono, monospace); color:var(--accent, #e8c84a); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:4px;">What it improves</div>
+          <div style="font:400 0.95rem/1.6 var(--font-body, Inter, sans-serif); color:var(--text-secondary, #8a8f98);">The agent can distinguish what it knows from what it guessed. Self-reinforced hallucination breaks because assumptions stay labeled as assumptions, no matter how many sessions pass.</div>
+        </div>
+      </div>
+    </div>
+
+
+    <div style="margin:40px 0;">
+      <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <line x1="8" y1="36" x2="40" y2="36" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+      <polyline points="8,32 16,28 24,18 32,22 40,12" stroke="#e8c84a" stroke-width="2" fill="none"/>
+      <line x1="24" y1="18" x2="24" y2="36" stroke="rgba(255,255,255,0.06)" stroke-width="1" stroke-dasharray="2,2"/>
+    </svg>
+        <h3 style="margin:0 !important;">3. Memory-R1: The "30-Day Test"</h3>
+      </div>
+      <div style="margin-left:64px;">
+        <div style="margin-bottom:16px;">
+          <div style="font:600 10px var(--font-mono, monospace); color:rgba(255,255,255,0.3); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px;">Problem</div>
+          <p style="margin-bottom:0;">Every append-only system dies the same death: noise accumulation. The more you store, the harder it gets to find what matters. Mem0 addresses this with automatic filtering. Zep tracks temporal validity. Good partial solutions, but the fundamental problem remains: systems get larger, not denser.</p>
+        </div>
+        <div style="margin-bottom:16px;">
+          <div style="font:600 10px var(--font-mono, monospace); color:var(--accent, #e8c84a); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px;">Our Approach</div>
+          <p style="margin-bottom:0;">
+            <span class="eija-badge j" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">J</span> 
+            Before anything is written to persistent memory, one question: "Will this change behavior in 30 days?" If no, it doesn't get stored. If it updates existing knowledge, the old entry is replaced. If existing info is now wrong, it gets deleted.
+          </p>
+        </div>
+        <div style="padding:12px 16px; background:rgba(232,200,74,0.04); border-left:2px solid var(--accent, #e8c84a); border-radius:0 4px 4px 0;">
+          <div style="font:600 10px var(--font-mono, monospace); color:var(--accent, #e8c84a); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:4px;">What it improves</div>
+          <div style="font:400 0.95rem/1.6 var(--font-body, Inter, sans-serif); color:var(--text-secondary, #8a8f98);">The system accumulates fewer but higher-quality entries over time. It gets denser, not larger. Every entry is load-bearing. This is what anti-entropy means in practice.</div>
+        </div>
+      </div>
+    </div>
+
+
+    <div style="margin:40px 0;">
+      <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="12" y="14" width="24" height="20" rx="2" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+      <line x1="12" y1="22" x2="36" y2="22" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <circle cx="18" cy="18" r="2" fill="#238551"/>
+      <circle cx="30" cy="18" r="2" fill="#CD4246"/>
+      <text x="24" y="31" text-anchor="middle" style="font:600 7px monospace; fill:#e8c84a;">if X→∅</text>
+    </svg>
+        <h3 style="margin:0 !important;">4. Verified Truths with Invalidation Conditions</h3>
+      </div>
+      <div style="margin-left:64px;">
+        <div style="margin-bottom:16px;">
+          <div style="font:600 10px var(--font-mono, monospace); color:rgba(255,255,255,0.3); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px;">Problem</div>
+          <p style="margin-bottom:0;">Most memory systems assume facts are permanent. But facts expire. A product price changes. A team member leaves. A strategy shifts. Without explicit expiration logic, stale facts poison future decisions.</p>
+        </div>
+        <div style="margin-bottom:16px;">
+          <div style="font:600 10px var(--font-mono, monospace); color:var(--accent, #e8c84a); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px;">Our Approach</div>
+          <p style="margin-bottom:0;">
+            <span class="eija-badge e" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">E</span> 
+            <code>verified-truths.md</code> stores fact-checked claims with: source citation, confidence score (0-100%), last-verified date, and invalidation conditions ("this becomes false if X happens"). Zep's bitemporal modeling comes closest, distinguishing "when was it true" from "when was it recorded." But temporal validity is different from conditional invalidation.
+          </p>
+        </div>
+        <div style="padding:12px 16px; background:rgba(232,200,74,0.04); border-left:2px solid var(--accent, #e8c84a); border-radius:0 4px 4px 0;">
+          <div style="font:600 10px var(--font-mono, monospace); color:var(--accent, #e8c84a); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:4px;">What it improves</div>
+          <div style="font:400 0.95rem/1.6 var(--font-body, Inter, sans-serif); color:var(--text-secondary, #8a8f98);">Facts have shelf lives and triggers that expire them. The system knows not just what is true, but under what conditions it stops being true.</div>
+        </div>
+      </div>
+    </div>
+
+
+    <div style="margin:40px 0;">
+      <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="16" cy="24" r="6" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+      <circle cx="32" cy="24" r="6" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+      <circle cx="24" cy="14" r="6" stroke="#e8c84a" stroke-width="1.5"/>
+      <line x1="20" y1="19" x2="16" y2="24" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <line x1="28" y1="19" x2="32" y2="24" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <line x1="22" y1="24" x2="26" y2="24" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+    </svg>
+        <h3 style="margin:0 !important;">5. Cross-Agent Memory with Trust Scoring</h3>
+      </div>
+      <div style="margin-left:64px;">
+        <div style="margin-bottom:16px;">
+          <div style="font:600 10px var(--font-mono, monospace); color:rgba(255,255,255,0.3); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px;">Problem</div>
+          <p style="margin-bottom:0;">When you spawn sub-agents for tasks, how do you know which results to trust? Most multi-agent systems share context but don't track quality. Every agent's output is treated equally, regardless of past performance.</p>
+        </div>
+        <div style="margin-bottom:16px;">
+          <div style="font:600 10px var(--font-mono, monospace); color:var(--accent, #e8c84a); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px;">Our Approach</div>
+          <p style="margin-bottom:0;">
+            <span class="eija-badge e" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">E</span> 
+            Each sub-agent inherits a context document with relevant memory, decisions, and rules. When results come back, the human rates quality. That feedback updates a trust score per agent type. Letta's Conversations API (January 2026) is closest to cross-agent sharing, but without trust scoring.
+          </p>
+        </div>
+        <div style="padding:12px 16px; background:rgba(232,200,74,0.04); border-left:2px solid var(--accent, #e8c84a); border-radius:0 4px 4px 0;">
+          <div style="font:600 10px var(--font-mono, monospace); color:var(--accent, #e8c84a); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:4px;">What it improves</div>
+          <div style="font:400 0.95rem/1.6 var(--font-body, Inter, sans-serif); color:var(--text-secondary, #8a8f98);">Over time, the system learns which agent configurations produce reliable results. Resource allocation improves because high-trust agents get harder tasks.</div>
+        </div>
+      </div>
+    </div>
+
     <h2 id="comparison">The Comparison Matrix</h2>
     
     <p>
