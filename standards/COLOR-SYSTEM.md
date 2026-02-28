@@ -1,55 +1,80 @@
-# COLOR-SYSTEM.md — Ainary Design Tokens (NOT NEGOTIABLE)
+# COLOR-SYSTEM.md — Ainary Design System (Research-Based)
 
-*Inspired by Linear (monochrom) + Blueprint (semantic intent). No decorative colors.*
+*Based on: Palantir Blueprint (semantic intent), Linear (monochrome + sparse color), 
+60-30-10 Rule (UX Collective), Color Psychology (IxDF, HakunaMatata 2026).*
+
+## The 60-30-10 Rule Applied
+
+| Proportion | Role | Our Implementation |
+|---|---|---|
+| **60%** | Dominant | `#08080c` background + `#111116` surfaces |
+| **30%** | Secondary | `#ededf0` / `#8b8b95` / `#55555e` (grey text hierarchy) |
+| **10%** | Accent | `#c8aa50` (gold) + 4 semantic colors (EIJA) |
 
 ## Background & Surfaces
 | Token | Hex | Usage |
 |---|---|---|
-| `--bg-page` | `#08080c` | Page background, everywhere |
+| `--bg-page` | `#08080c` | Every page background |
 | `--bg-surface` | `#111116` | Cards, boxes, elevated surfaces |
 | `--border-default` | `rgba(255,255,255,0.06)` | Borders, dividers |
 
-## Typography
+## Typography Colors
 | Token | Hex | Usage |
 |---|---|---|
 | `--text-primary` | `#ededf0` | H1, H2, H3, bold, headings |
-| `--text-secondary` | `#8b8b95` | Body text (p, li, spans) |
-| `--text-muted` | `#55555e` | Captions, footnotes, timestamps, meta |
+| `--text-secondary` | `#8b8b95` | Body text (p, li) |
+| `--text-muted` | `#55555e` | Meta, labels, captions, timestamps |
 
-## Brand
+## Brand Accent
 | Token | Hex | Usage |
 |---|---|---|
-| `--accent` | `#c8aa50` | CTAs, KPIs, our system in charts, brand dot |
+| `--accent` | `#c8aa50` | CTAs, KPIs, our system in charts, brand dot, box left-borders |
 
-Gold is reserved for: CTA buttons/links, KPI numbers, "our system" line in comparison charts, the Ainary dot. Nothing else.
+Gold appears ONLY on: CTA buttons, KPI numbers, "our system" in comparison charts, 
+Ainary dot, left-border on boxes, gradient blobs. **Max 3-5 gold elements per viewport.**
 
-## Semantic Intent (EIJA only)
-| Token | Hex | Intent | EIJA |
-|---|---|---|---|
-| `--green` | `#238551` | Evidenced, verified | E badge |
-| `--blue` | `#2D72D2` | Interpretation, analytical | I badge, category tags |
-| `--orange` | `#C87619` | Judgment, caution | J badge |
-| `--red` | `#CD4246` | Assumption, unverified | A badge |
+## Semantic Colors (Blueprint Intent Model)
 
-These 4 colors appear ONLY in EIJA badges. Not in grid borders, card decorations, or arbitrary groupings.
+*Source: Palantir Blueprint — "Each core color is mapped to what we call a visual intent."*
+*Source: Color Psychology — "Green = trust/verified, Blue = analytical, Orange = caution, Red = danger"*
 
-## UI Elements
-| Element | Color | Rule |
+| Color | Hex | Intent | EIJA | Other Uses |
+|---|---|---|---|---|
+| **Green** | `#238551` | Success / Verified | E badge | "Human + AI" badge |
+| **Blue** | `#2D72D2` | Primary / Analytical | I badge | Category tags (EI-001, CI-001), "More from" tags |
+| **Orange** | `#C87619` | Warning / Judgment | J badge | — |
+| **Red** | `#CD4246` | Danger / Unverified | A badge | — |
+
+**These 4 colors appear ONLY where they carry semantic meaning.**
+Never for decoration, grid borders, icon coloring, or arbitrary grouping.
+
+### EIJA Badge Style
+```css
+/* All 4 badges: same structure, different color */
+display: inline-block;
+font: 700 11px/1 var(--font-mono);
+width: 22px; height: 22px;
+border-radius: 4px;
+text-align: center;
+line-height: 22px;
+
+/* E */ background: rgba(35,133,81,0.15); color: #238551;
+/* I */ background: rgba(45,114,210,0.15); color: #2D72D2;
+/* J */ background: rgba(200,118,25,0.15); color: #C87619;
+/* A */ background: rgba(205,66,70,0.15); color: #CD4246;
+```
+
+## UI Element Rules
+
+| Element | Color | Why |
 |---|---|---|
-| Category tag (EI-001, CI-001) | `--blue` | Always blue, no background, uppercase mono |
-| "Human + AI" badge | `--green` + green border | Always green, small mono text |
-| Card borders | `--border-default` | Grey only. No colored top-borders. |
-| Section dividers | Gold dot or `--border-default` | Subtle |
-| Links | `--accent` or underline | Interactive = gold |
-| Hover states | opacity or lighter shade | No new colors |
-
-## Rules
-1. **No color without semantic meaning.** If a color doesn't map to this table, it's wrong.
-2. **No meaning with two colors.** Each concept = one color everywhere.
-3. **Grey is the default.** When in doubt, use grey tones.
-4. **Gold is scarce.** Max 3-5 gold elements per viewport. Overuse kills impact.
-5. **No page-level :root overrides.** All colors come from shared/styles.css.
-6. **EIJA colors never used decoratively.** Green border on a card ≠ "looks nice". Green = Evidenced.
+| Category tag (EI-001, CI-001) | Blue `#2D72D2` | Navigational = Blueprint "primary intent" |
+| "Human + AI" badge | Green `#238551` + green border | Quality signal = Blueprint "success intent" |
+| Box left-border | Gold `#c8aa50` | Brand accent, consistent |
+| Card borders | `--border-default` (grey) | Neutral container |
+| Links | Gold or underline | Interactive |
+| SVG graphics | `rgba(255,255,255,0.1-0.35)` | Monochrome, no semantic color |
+| Labels (PROBLEM, OUR APPROACH) | `--text-muted` | Structural, not decorative |
 
 ## Fonts
 | Token | Value | Usage |
@@ -57,58 +82,75 @@ These 4 colors appear ONLY in EIJA badges. Not in grid borders, card decorations
 | `--font-body` | `Inter, -apple-system, system-ui, sans-serif` | All body text |
 | `--font-mono` | `JetBrains Mono, monospace` | Code, badges, category tags, meta |
 
-No other fonts. No font-size overrides per page.
-
-## Box System (2 types only)
-
-### 1. Blockquote
-```css
-border-left: 2px solid var(--accent);  /* #c8aa50 */
-padding-left: 24px;
-background: none;
-```
-**When:** Quotes, metaphors, pulled text. Always italic.
-
-### 2. Data Box
-```css
-background: var(--bg-surface);  /* #111116 */
-border: 1px solid rgba(255,255,255,0.06);
-border-radius: 8px;
-padding: 20px 24px;
-```
-**When:** Tables, KPIs, legends, grids, code — anything structurally different from prose.
-
-### Rules
-- **One left-border color: gold (`#c8aa50`).** No blue, no green, no red. Always gold, always consistent.
-- **No box without different information.** If the content is just another paragraph, leave it as text.
-- **Max 3 boxes per article.** More = noise. If you need a 4th, one of the first 3 is wrong.
-- **No repeated box patterns.** If the same box template appears 3+ times, it's visual noise.
-- **Blockquote ≠ Data Box.** Don't mix: italic quoted text never goes in a surface box.
-
-## Border Radius
+## Border Radius (from Linear: "8px-spacing scale")
 | Value | When |
 |---|---|
 | `8px` | All content boxes, cards, data boxes |
-| `50%` | Circles only (dots, avatars) |
-| `3px` | Small inline badges (EIJA, tags) |
+| `3px-4px` | Small inline badges (EIJA, tags) |
 | `6px` | Buttons |
+| `50%` | Circles only (dots, avatars) |
 
-No `12px`, `16px`, `100px` on content boxes. No mixing.
+No 10px, 12px, 16px, 100px on content boxes.
 
-## Gradient Blobs (ambient background)
-Gold blob uses `#c8aa50 → #a08030 → transparent`. Allowed exception: gradient spectrum uses intermediate values. These are NOT design tokens — they're render artifacts.
+## Box System (2 types)
 
-## macOS Traffic Lights
-`#ff5f57` / `#ffbd2e` / `#28c840` — allowed ONLY inside monitor mockup chrome. Nowhere else.
+### Blockquote
+```css
+border-left: 2px solid var(--accent); /* gold */
+padding-left: 24px;
+background: none;
+font-style: italic;
+```
+**When:** Quotes, pulled text.
 
-## Labels (PROBLEM, OUR APPROACH, etc.)
-Use `--text-muted` (#55555e). NOT gold. Labels are structural, not decorative.
+### Data Box
+```css
+background: var(--bg-surface);
+border: 1px solid rgba(255,255,255,0.06);
+border-left: 3px solid var(--accent); /* gold */
+border-radius: 8px;
+padding: 20px 24px;
+```
+**When:** Tables, KPIs, legends — structurally different from prose.
 
-## What This Replaces
-- No more `--text: #F6F7F9` overrides (use `#ededf0`)
-- No more `--bg: #111418` or `#1C2127` surfaces (use `#111116`)
-- No more colored EIJA badges (all grey)
-- No more colored left-borders (all gold)
-- No more inconsistent white values
-- No more arbitrary color groupings
-- No more per-page `:root` overrides
+### Box Rules
+- One left-border color: **gold only**. No blue, green, red borders.
+- No box without different information than surrounding text.
+- Max 3 boxes per article. More = noise.
+- No repeated box pattern 3+ times.
+
+## Article Header Format (all articles)
+```
+← Building in Public                     (--text-muted, mono, link)
+COMPOUND INTELLIGENCE · CI-001            (#2D72D2, mono, uppercase, no border)
+Florian Ziesche · Feb 27, 2026 · 12 Min  Human + AI
+                                          (#238551 badge with green border)
+Article Title                             (H1, --text-primary, LEFT-aligned)
+Lead text...                              (--text-secondary)
+```
+
+## "More from" Section
+- Layout per context: Cards with SVG thumbnails OR list-style — both OK
+- Category tags in "More from": Blue `#2D72D2`
+- Consistent tokens regardless of layout choice
+
+## Ambient Background
+Every page: 2 fixed gradient blobs (Gold `#c8aa50→#a08030→transparent` + 
+Silver `#ffffff→#e8f0ff→transparent`), `position:fixed`, `mix-blend-mode:screen`,
+`opacity: 0.06-0.1`, drifting animation 90s.
+
+## Shared Components (mandatory on every page)
+| Component | File |
+|---|---|
+| Styles | `shared/styles.css` |
+| Nav | `shared/nav.js` → `#site-nav` |
+| Footer | `shared/footer.js` → `#site-footer` |
+
+**No page may override `:root` variables from shared/styles.css.**
+
+## Decision Framework
+Before adding ANY color to ANY element, ask:
+1. Is this color in the table above? → No = don't use it.
+2. Does this color carry semantic meaning here? → No = use grey.
+3. Would removing this color lose information? → No = remove it.
+4. Would Palantir Blueprint assign an "intent" here? → Map to the right intent.
