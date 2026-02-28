@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bayern Kommunalwahl 2026 — Prediction Scorecard</title>
+<style>
+:root {
+  --bg: #0a0e17; --surface: #111827; --border: #1e293b;
+  --text: #e2e8f0; --muted: #64748b; --accent: #3b82f6;
+  --green: #10b981; --red: #ef4444; --yellow: #f59e0b;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 2rem; }
+h1 { font-size: 1.8rem; margin-bottom: 0.3rem; }
+.subtitle { color: var(--muted); margin-bottom: 2rem; font-size: 0.9rem; }
+.stats { display: flex; gap: 2rem; margin-bottom: 2rem; flex-wrap: wrap; }
+.stat { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.5rem; }
+.stat-num { font-size: 2rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+.stat-label { color: var(--muted); font-size: 0.8rem; }
+table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+th { background: var(--surface); color: var(--muted); padding: 0.6rem; text-align: left; border-bottom: 2px solid var(--border); font-weight: 600; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.05em; position: sticky; top: 0; }
+td { padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--border); }
+tr:hover { background: rgba(59,130,246,0.05); }
+.tag { padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+.tag-ja { background: rgba(59,130,246,0.15); color: var(--accent); }
+.tag-nein { background: rgba(100,116,139,0.15); color: var(--muted); }
+.confidence { font-family: 'JetBrains Mono', monospace; }
+.bar { height: 6px; border-radius: 3px; background: var(--border); }
+.bar-fill { height: 100%; border-radius: 3px; background: var(--accent); }
+.result-input { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 4px 8px; border-radius: 4px; width: 60px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; }
+.score-correct { color: var(--green); font-weight: 700; }
+.score-wrong { color: var(--red); font-weight: 700; }
+.methodology { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-top: 2rem; font-size: 0.85rem; color: var(--muted); }
+.methodology h3 { color: var(--text); margin-bottom: 0.5rem; }
+.eija { font-size: 0.7rem; padding: 1px 5px; border-radius: 3px; font-weight: 600; }
+.eija-e { background: rgba(16,185,129,0.15); color: var(--green); }
+.eija-j { background: rgba(245,158,11,0.15); color: var(--yellow); }
+.eija-i { background: rgba(59,130,246,0.15); color: var(--accent); }
+.eija-a { background: rgba(239,68,68,0.15); color: var(--red); }
+@media (max-width: 768px) { body { padding: 1rem; } .stats { gap: 1rem; } .stat { padding: 0.8rem; } }
+</style>
+</head>
+<body>
+
+<h1>Bayern Kommunalwahl 2026 — Prediction Scorecard</h1>
+<p class="subtitle">40 OB/BM-Wahlen | 10.000 Monte-Carlo-Simulationen pro Stadt | Ainary Ventures Intelligence</p>
+
+<div class="stats">
+  <div class="stat"><div class="stat-num" id="total-cities">40</div><div class="stat-label">Städte</div></div>
+  <div class="stat"><div class="stat-num" id="stw-predicted">36</div><div class="stat-label">Stichwahl prognostiziert</div></div>
+  <div class="stat"><div class="stat-num" id="score-correct">—</div><div class="stat-label">Richtig (nach Wahlabend)</div></div>
+  <div class="stat"><div class="stat-num" id="accuracy">—</div><div class="stat-label">Trefferquote</div></div>
+</div>
+
+<table id="scorecard">
+<thead>
+<tr>
+  <th>Stadt</th>
+  <th>Stichwahl?</th>
+  <th>MC-Simulation</th>
+  <th>Favorit R1</th>
+  <th>Gewinnwahrsch.</th>
+  <th>Stichwahl-Matchup</th>
+  <th>Ergebnis</th>
+  <th>Score</th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
+
+<div class="methodology">
+<h3>Methodik <span class="eija eija-e">E</span></h3>
+<p><strong>Datengrundlage:</strong> 50 Städte, 1.730 Quellen, 939 EIJA-klassifizierte Claims, 299 Kandidaten.</p>
+<p><strong>Monte Carlo:</strong> 10.000 Simulationen pro Stadt. Kandidaten-Stimmanteile als Gauss-Verteilung um den geschätzten Bereich. Stichwahl-Dynamik modelliert mit ±8% Standardabweichung.</p>
+<p><strong>Limitationen:</strong> Keine lokalen Umfragen verfügbar (Ausnahme: Passau). Alle Prognosen basieren auf 2020-Ergebnissen + Strukturanalyse. Stichwahl-Wahrscheinlichkeiten sind <span class="eija eija-j">J</span> Judgments, nicht <span class="eija eija-e">E</span> Evidence.</p>
+<p><strong>EIJA-Labels:</strong> <span class="eija eija-e">E</span> Evidence (verifiziert) | <span class="eija eija-i">I</span> Inference (abgeleitet) | <span class="eija eija-j">J</span> Judgment (Einschätzung) | <span class="eija eija-a">A</span> Assumption (Annahme)</p>
+<p><strong>Quelle:</strong> Ainary Ventures — KI-gestützte Kommunalpolitik-Intelligence. 50 Städte parallel analysiert. <a href="https://ainaryventures.com" style="color:var(--accent)">ainaryventures.com</a></p>
+</div>
+
+<script>
+const data = [{"city": "Aichach", "slug": "aichach", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Josef Dußmann", "r1_fav_win_pct": 66.3, "stw_matchup": "Josef Dußmann vs Nicole Matthes", "result_r1": "", "result_correct": ""}, {"city": "Amberg", "slug": "amberg", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Stefan Ott", "r1_fav_win_pct": 83.3, "stw_matchup": "Stefan Ott vs Birgit Fruth", "result_r1": "", "result_correct": ""}, {"city": "Ansbach", "slug": "ansbach", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Hans-Jürgen Eff", "r1_fav_win_pct": 14.8, "stw_matchup": "Hans-Jürgen Eff vs Elke Homm-Vogel", "result_r1": "", "result_correct": ""}, {"city": "Aschaffenburg", "slug": "aschaffenburg", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Markus Schlemmer", "r1_fav_win_pct": 20.5, "stw_matchup": "Markus Schlemmer vs Lateesha Halmen", "result_r1": "", "result_correct": ""}, {"city": "Augsburg", "slug": "augsburg", "stichwahl_mc": 99.7, "prediction_stichwahl": "JA", "r1_favorite": "Eva Weber", "r1_fav_win_pct": 98.6, "stw_matchup": "Eva Weber vs Dr. Florian Freund", "result_r1": "", "result_correct": ""}, {"city": "Bayreuth", "slug": "bayreuth", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Thomas Ebersberger", "r1_fav_win_pct": 91.7, "stw_matchup": "Thomas Ebersberger vs Andreas Zippel", "result_r1": "", "result_correct": ""}, {"city": "Coburg", "slug": "coburg", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Dominik Sauerteig", "r1_fav_win_pct": 97.4, "stw_matchup": "Dominik Sauerteig vs Hans-Herbert Hartan", "result_r1": "", "result_correct": ""}, {"city": "Dachau", "slug": "dachau", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Florian Hartmann", "r1_fav_win_pct": 97.5, "stw_matchup": "Florian Hartmann vs Christian Hartmann", "result_r1": "", "result_correct": ""}, {"city": "Deggendorf", "slug": "deggendorf", "stichwahl_mc": 0.0, "prediction_stichwahl": "NEIN", "r1_favorite": "Christian Moser", "r1_fav_win_pct": 100.0, "stw_matchup": "Christian Moser vs Christian Heilmann-Tröster", "result_r1": "", "result_correct": ""}, {"city": "Dillingen a.d.Donau", "slug": "dillingen", "stichwahl_mc": 0, "prediction_stichwahl": "NEIN", "r1_favorite": "?", "r1_fav_win_pct": 0, "stw_matchup": "?", "result_r1": "", "result_correct": ""}, {"city": "Donauwörth", "slug": "donauwoerth", "stichwahl_mc": 0.0, "prediction_stichwahl": "NEIN", "r1_favorite": "Jürgen Sorré", "r1_fav_win_pct": 100.0, "stw_matchup": "Jürgen Sorré vs Bärbel Stahl", "result_r1": "", "result_correct": ""}, {"city": "Erlangen", "slug": "erlangen", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Dr. Florian Janik", "r1_fav_win_pct": 63.3, "stw_matchup": "Dr. Florian Janik vs Jörg Volleth", "result_r1": "", "result_correct": ""}, {"city": "Forchheim", "slug": "forchheim", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Uwe Kirschstein", "r1_fav_win_pct": 63.4, "stw_matchup": "Uwe Kirschstein vs Martina Hebendanz", "result_r1": "", "result_correct": ""}, {"city": "Freising", "slug": "freising", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Monika Schwind", "r1_fav_win_pct": 68.5, "stw_matchup": "Monika Schwind vs Daniel Hubensteiner", "result_r1": "", "result_correct": ""}, {"city": "Fürstenfeldbruck", "slug": "fuerstenfeldbruck", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Christian Götz", "r1_fav_win_pct": 83.9, "stw_matchup": "Christian Götz vs Martin Urban", "result_r1": "", "result_correct": ""}, {"city": "Germering", "slug": "germering", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Johannes Kirmair", "r1_fav_win_pct": 73.7, "stw_matchup": "Johannes Kirmair vs Sophie Schuhmacher", "result_r1": "", "result_correct": ""}, {"city": "Günzburg", "slug": "guenzburg", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Michael Jahn", "r1_fav_win_pct": 65.0, "stw_matchup": "Michael Jahn vs Stefan Baisch", "result_r1": "", "result_correct": ""}, {"city": "Herzogenaurach", "slug": "herzogenaurach", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "German Hacker", "r1_fav_win_pct": 78.7, "stw_matchup": "German Hacker vs Stefan Zenger", "result_r1": "", "result_correct": ""}, {"city": "Hof", "slug": "hof", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Eva Döhla", "r1_fav_win_pct": 63.9, "stw_matchup": "Eva Döhla vs Stefan Schmalfuß", "result_r1": "", "result_correct": ""}, {"city": "Kaufbeuren", "slug": "kaufbeuren", "stichwahl_mc": 93.5, "prediction_stichwahl": "JA", "r1_favorite": "Stefan Bosse", "r1_fav_win_pct": 97.6, "stw_matchup": "Stefan Bosse vs Oliver Schill", "result_r1": "", "result_correct": ""}, {"city": "Kempten (Allgäu)", "slug": "kempten", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Thomas Kiechle", "r1_fav_win_pct": 92.1, "stw_matchup": "Thomas Kiechle vs Christian Schoch", "result_r1": "", "result_correct": ""}, {"city": "Königsbrunn", "slug": "koenigsbrunn", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Franz Feigl", "r1_fav_win_pct": 97.3, "stw_matchup": "Franz Feigl vs Helmut Schmidt", "result_r1": "", "result_correct": ""}, {"city": "Landsberg am Lech", "slug": "landsberg", "stichwahl_mc": 83.7, "prediction_stichwahl": "JA", "r1_favorite": "Doris Baumgartl", "r1_fav_win_pct": 90.4, "stw_matchup": "Doris Baumgartl vs Moritz Hartmann", "result_r1": "", "result_correct": ""}, {"city": "Landshut", "slug": "landshut", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Dr. Thomas Haslinger", "r1_fav_win_pct": 80.5, "stw_matchup": "Dr. Thomas Haslinger vs Christoph Rabl", "result_r1": "", "result_correct": ""}, {"city": "Lauf a.d.Pegnitz", "slug": "lauf", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Thomas Lang", "r1_fav_win_pct": 81.0, "stw_matchup": "Thomas Lang vs Nina Bezold", "result_r1": "", "result_correct": ""}, {"city": "Lindau (Bodensee)", "slug": "lindau", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Dr. Claudia Alfons", "r1_fav_win_pct": 73.3, "stw_matchup": "Dr. Claudia Alfons vs Jasmin Sommerweiß", "result_r1": "", "result_correct": ""}, {"city": "Marktoberdorf", "slug": "marktoberdorf", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Thorsten Krebs", "r1_fav_win_pct": 76.1, "stw_matchup": "Thorsten Krebs vs Michael Eichinger", "result_r1": "", "result_correct": ""}, {"city": "München", "slug": "muenchen", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Dieter Reiter", "r1_fav_win_pct": 87.5, "stw_matchup": "Dieter Reiter vs Kristina Frank", "result_r1": "", "result_correct": ""}, {"city": "Neu-Ulm", "slug": "neu-ulm", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Katrin Albsteiger", "r1_fav_win_pct": 99.2, "stw_matchup": "Katrin Albsteiger vs Michael Mehren", "result_r1": "", "result_correct": ""}, {"city": "Neuburg a.d.Donau", "slug": "neuburg", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Matthias Enghuber", "r1_fav_win_pct": 64.9, "stw_matchup": "Matthias Enghuber vs Gerhard Schoder", "result_r1": "", "result_correct": ""}, {"city": "Olching", "slug": "olching", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Julia Worch", "r1_fav_win_pct": 63.7, "stw_matchup": "Julia Worch vs Maximilian Gigl", "result_r1": "", "result_correct": ""}, {"city": "Ottobrunn", "slug": "ottobrunn", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Thomas Loderer", "r1_fav_win_pct": 88.8, "stw_matchup": "Thomas Loderer vs Florian Schardt", "result_r1": "", "result_correct": ""}, {"city": "Passau", "slug": "passau", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Holm Putzke", "r1_fav_win_pct": 80.8, "stw_matchup": "Holm Putzke vs Andreas Rother", "result_r1": "", "result_correct": ""}, {"city": "Rosenheim", "slug": "rosenheim", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Andreas März", "r1_fav_win_pct": 92.5, "stw_matchup": "Andreas März vs Christopher Ehrenböck", "result_r1": "", "result_correct": ""}, {"city": "Schwabach", "slug": "schwabach", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Peter Reiß", "r1_fav_win_pct": 68.7, "stw_matchup": "Peter Reiß vs Axel Rötschke", "result_r1": "", "result_correct": ""}, {"city": "Schwandorf", "slug": "schwandorf", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Andreas Feller", "r1_fav_win_pct": 57.5, "stw_matchup": "Andreas Feller vs Andreas Wopperer", "result_r1": "", "result_correct": ""}, {"city": "Straubing", "slug": "straubing", "stichwahl_mc": 3.7, "prediction_stichwahl": "NEIN", "r1_favorite": "Markus Pannermayr", "r1_fav_win_pct": 100.0, "stw_matchup": "Markus Pannermayr vs Erhard Grundl", "result_r1": "", "result_correct": ""}, {"city": "Traunstein", "slug": "traunstein", "stichwahl_mc": 99.7, "prediction_stichwahl": "JA", "r1_favorite": "Dr. Christian Hümmer", "r1_fav_win_pct": 96.4, "stw_matchup": "Dr. Christian Hümmer vs Nils Bödeker", "result_r1": "", "result_correct": ""}, {"city": "Weiden i.d.OPf.", "slug": "weiden", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Benjamin Zeitler", "r1_fav_win_pct": 59.6, "stw_matchup": "Benjamin Zeitler vs Jens Meyer", "result_r1": "", "result_correct": ""}, {"city": "Weilheim i.OB", "slug": "weilheim", "stichwahl_mc": 100.0, "prediction_stichwahl": "JA", "r1_favorite": "Tillman Wahlefeld", "r1_fav_win_pct": 69.1, "stw_matchup": "Tillman Wahlefeld vs Angelika Flock", "result_r1": "", "result_correct": ""}];
+
+const tbody = document.getElementById('tbody');
+data.forEach((p, i) => {
+  const tr = document.createElement('tr');
+  const stwTag = p.prediction_stichwahl === 'JA' 
+    ? '<span class="tag tag-ja">JA</span>' 
+    : '<span class="tag tag-nein">NEIN</span>';
+  
+  const barWidth = Math.min(100, p.stichwahl_mc);
+  const barColor = barWidth > 80 ? '#3b82f6' : barWidth > 50 ? '#f59e0b' : '#64748b';
+  
+  tr.innerHTML = `
+    <td><strong>${p.city}</strong></td>
+    <td>${stwTag}</td>
+    <td>
+      <div class="bar"><div class="bar-fill" style="width:${barWidth}%;background:${barColor}"></div></div>
+      <span class="confidence" style="font-size:0.75rem">${p.stichwahl_mc}%</span>
+    </td>
+    <td>${p.r1_favorite}</td>
+    <td><span class="confidence">${p.r1_fav_win_pct}%</span></td>
+    <td style="font-size:0.8rem;color:var(--muted)">${p.stw_matchup}</td>
+    <td><input class="result-input" data-idx="${i}" placeholder="—"></td>
+    <td class="score-cell" id="score-${i}">—</td>
+  `;
+  tbody.appendChild(tr);
+});
+
+// Score calculator
+document.querySelectorAll('.result-input').forEach(input => {
+  input.addEventListener('change', () => {
+    let correct = 0, total = 0;
+    document.querySelectorAll('.result-input').forEach(inp => {
+      if (inp.value.trim()) {
+        total++;
+        const idx = inp.dataset.idx;
+        const pred = data[idx];
+        const result = inp.value.trim().toUpperCase();
+        const cell = document.getElementById('score-' + idx);
+        
+        if ((pred.prediction_stichwahl === 'JA' && result === 'STW') ||
+            (pred.prediction_stichwahl === 'NEIN' && result !== 'STW')) {
+          cell.innerHTML = '<span class="score-correct">✓</span>';
+          correct++;
+        } else {
+          cell.innerHTML = '<span class="score-wrong">✗</span>';
+        }
+      }
+    });
+    document.getElementById('score-correct').textContent = correct;
+    document.getElementById('accuracy').textContent = total > 0 ? Math.round(correct/total*100) + '%' : '—';
+  });
+});
+</script>
+
+</body>
+</html>
