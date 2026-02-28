@@ -76,11 +76,35 @@ line-height: 22px;
 | SVG graphics | `rgba(255,255,255,0.1-0.35)` | Monochrome, no semantic color |
 | Labels (PROBLEM, OUR APPROACH) | `--text-muted` | Structural, not decorative |
 
+## Typography Scale (all articles)
+
+*Source: Optimal reading width 45-75 chars at 1.05rem ≈ 720px container.*
+
+| Element | Size | Weight | Line-height | Color |
+|---|---|---|---|---|
+| H1 (article) | `2.2rem` | 600 | 1.2 | `--text-primary` |
+| H1 (page, e.g. About) | `3rem` | 600 | 1.1 | `--text-primary` |
+| H2 | `1.5rem` | 600 | 1.4 | `--text-primary` |
+| Body p | `1.05rem` | 400 | 1.75 | `--text-secondary` |
+| Meta/Labels | `0.65-0.75rem` | 500 | 1 | `--text-muted` |
+| Badges | `0.55rem` | 700 | 1 | per intent |
+
+**Container max-width: `720px`** for all article content.
+
+**No `font-weight: 300`.** Minimum is 400. 300 is too thin on dark backgrounds.
+
+**Mobile H1: `1.6rem`** (breakpoint 640px).
+
 ## Fonts
 | Token | Value | Usage |
 |---|---|---|
-| `--font-body` | `Inter, -apple-system, system-ui, sans-serif` | All body text |
+| `--font-body` / `--font-display` | `Inter, -apple-system, system-ui, sans-serif` | All text |
 | `--font-mono` | `JetBrains Mono, monospace` | Code, badges, category tags, meta |
+
+## Required Components (every article page)
+- Reading progress bar (gold, 2px, fixed top)
+- Ambient gradient blobs (gold + silver)
+- shared/styles.css + nav.js + footer.js
 
 ## Border Radius (from Linear: "8px-spacing scale")
 | Value | When |
