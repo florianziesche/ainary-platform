@@ -59,15 +59,31 @@ These 4 colors appear ONLY in EIJA badges. Not in grid borders, card decorations
 
 No other fonts. No font-size overrides per page.
 
-## Box/Callout Rule
-A bordered box is justified ONLY when it contains **different information** than the surrounding text:
-- ✅ KPI numbers (300+, 750, 4 of 8) — scannable, different from prose
-- ✅ One-time callouts (self-assessment, important note) — unique, singular
-- ✅ Code blocks — structurally different
-- ❌ Repeated "What it improves" boxes — just another paragraph in a frame
-- ❌ Any box that appears 3+ times with the same pattern — becomes noise
+## Box System (2 types only)
 
-**If the box has no information the text doesn't already have, leave it away. Cleaner.**
+### 1. Blockquote
+```css
+border-left: 2px solid rgba(255,255,255,0.12);
+padding-left: 24px;
+background: none;
+```
+**When:** Quotes, metaphors, pulled text. Always italic.
+
+### 2. Data Box
+```css
+background: var(--bg-surface);  /* #111116 */
+border: 1px solid rgba(255,255,255,0.06);
+border-radius: 8px;
+padding: 20px 24px;
+```
+**When:** Tables, KPIs, legends, grids, code — anything structurally different from prose.
+
+### Rules
+- **No colored left borders.** No gold, no blue, no green. Ever.
+- **No box without different information.** If the content is just another paragraph, leave it as text.
+- **Max 3 boxes per article.** More = noise. If you need a 4th, one of the first 3 is wrong.
+- **No repeated box patterns.** If the same box template appears 3+ times, it's visual noise.
+- **Blockquote ≠ Data Box.** Don't mix: italic quoted text never goes in a surface box.
 
 ## What This Replaces
 - No more `--text: #F6F7F9` overrides in articles
