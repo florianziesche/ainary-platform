@@ -11,21 +11,25 @@
 
   const pathname = window.location.pathname;
   const inDE = pathname.includes('/de/');
-  const inBlog = pathname.includes('/blog/');
-  // From /blog/ subdir, prefix must go up one level first
-  const prefix = isDE
-    ? (inDE ? '' : (inBlog ? '../de/' : 'de/'))
-    : (inDE ? '../' : (inBlog ? '../' : ''));
+  // Count depth below site root (or /de/ root for DE pages)
+  // /de/anwendungen/ki-mittelstand.html → depth 2 from root, 1 from /de/
+  // /de/blog.html → depth 1 from root, 0 from /de/
+  // /blog/article.html → depth 1 from root
+  const segments = pathname.replace(/^\//, '').replace(/[^/]+$/, '').split('/').filter(Boolean);
+  const deIndex = segments.indexOf('de');
+  const depthFromLang = isDE && deIndex >= 0 ? segments.length - deIndex - 1 : (inDE ? segments.length - 1 : segments.length);
+  const prefix = '../'.repeat(depthFromLang) + (isDE && !inDE ? 'de/' : '');
   const page = pathname.split('/').pop() || 'index.html';
 
   function activeClass(target) {
     return target === page ? ' active' : '';
   }
 
-  // Language switch link
+  // Language switch link — only works for top-level pages
+  const rootPrefix = '../'.repeat(depthFromLang + (isDE && inDE ? 1 : 0));
   const switchHref = isDE
-    ? (inDE ? '../' + page : page)
-    : (inDE ? page : 'de/' + page);
+    ? rootPrefix + page
+    : rootPrefix + 'de/' + page;
   const switchLabel = isDE ? 'EN' : 'DE';
 
   const t = {
