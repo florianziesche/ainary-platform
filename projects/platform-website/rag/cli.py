@@ -19,6 +19,21 @@ Usage:
     python3 cli.py contradictions      # Find conflicting claims
     python3 cli.py scorecard           # Generate election scorecard
     python3 cli.py audit               # Full quality audit
+
+  Pipeline (deep analysis):
+    python3 cli.py eija-audit          # Deep EIJA reclassification (dry run)
+    python3 cli.py eija-audit --apply  # Apply reclassifications to JSONs
+    python3 cli.py backtest            # Validate model against 2020 results
+    python3 cli.py sentiment [city]    # NLP sentiment per candidate
+    python3 cli.py sentiment --apply   # Write sentiment to JSONs
+    python3 cli.py demographics [city] # Extract demographics from data
+    python3 cli.py demographics --apply # Write demographics to JSONs
+    python3 cli.py graph               # Entity graph analysis
+    python3 cli.py graph --export      # Export graph as JSON
+    python3 cli.py graph --query "..." # Natural language query
+    python3 cli.py contradictions [city] # Semantic contradiction detection
+    python3 cli.py knowledge           # Extract patterns + verified truths
+    python3 cli.py full-pipeline       # Run everything: audit→eija→sentiment→demographics→graph→knowledge
 """
 
 import sys
@@ -326,6 +341,173 @@ if __name__ == '__main__':
         cmd_scorecard()
     elif cmd == 'audit':
         cmd_audit()
+
+    # ── PIPELINE COMMANDS ──
+    elif cmd == 'eija-audit':
+        from pipeline.eija_auditor import EIJAAuditor
+        auditor = EIJAAuditor()
+        apply = '--apply' in sys.argv
+        report = auditor.audit_all_cities(apply=apply)
+        if apply:
+            print(f"✅ Applied {report['total_reclassified']}/{report['total_claims']} reclassifications")
+        else:
+            print(f"DRY RUN: {report['total_reclassified']}/{report['total_claims']} ({report['reclassification_rate']}%)")
+        for t, c in sorted(report['transitions'].items(), key=lambda x: -x[1]):
+            print(f"  {t}: {c}")
+
+    elif cmd == 'backtest':
+        from pipeline.backtest import Backtester
+        bt = Backtester()
+        report = bt.run()
+        print(f"Cities with 2020 data: {report['cities_with_2020_data']}/{report['cities_total']}")
+        for test_name, test in report['tests'].items():
+            print(f"\n## {test_name.upper()}")
+            for k, v in test.items():
+                if k != 'details':
+                    print(f"  {k}: {v}")
+        print(f"\nVERDICT: {report['verdict']['summary']}")
+
+    elif cmd == 'sentiment':
+        from pipeline.sentiment import SentimentAnalyzer
+        sa = SentimentAnalyzer()
+        if '--apply' in sys.argv:
+            results = sa.analyze_all(apply=True)
+            print(f"✅ Sentiment applied to {len(results)} cities")
+        elif len(sys.argv) > 2 and not sys.argv[2].startswith('-'):
+            result = sa.analyze_city(sys.argv[2])
+            print(json.dumps(result, indent=2, ensure_ascii=False))
+        else:
+            results = sa.analyze_all()
+            for slug, r in results.items():
+                for name, data in r['candidates'].items():
+                    if data['news_mentions'] > 0:
+                        emoji = '🟢' if data['sentiment_score'] > 0.1 else '🔴' if data['sentiment_score'] < -0.1 else '⚪'
+                        print(f"  {r['gemeinde'][:18]:<20} {name[:23]:<25} {emoji}{data['sentiment_score']:>7.3f}")
+
+    elif cmd == 'demographics':
+        from pipeline.demographics import DemographicsExtractor
+        de = DemographicsExtractor()
+        if '--apply' in sys.argv:
+            results = de.extract_all(apply=True)
+            complete = sum(1 for r in results.values() if r.get('einwohner'))
+            print(f"✅ Demographics applied to {len(results)} cities ({complete} with Einwohner)")
+        elif len(sys.argv) > 2 and not sys.argv[2].startswith('-'):
+            print(json.dumps(de.extract_city(sys.argv[2]), indent=2, ensure_ascii=False))
+        else:
+            results = de.extract_all()
+            for slug, r in results.items():
+                ew = r.get('einwohner', '-')
+                wb = r.get('wahlbeteiligung_2020', '-')
+                print(f"  {r['gemeinde'][:18]:<20} EW:{str(ew):>8} WB2020:{str(wb):>5} {r.get('completeness','?')}")
+
+    elif cmd == 'graph':
+        from pipeline.graph import EntityGraph
+        g = EntityGraph()
+        g.build_from_dossiers()
+        if '--export' in sys.argv:
+            out = str(CITIES_DIR.parent / 'entity-graph.json')
+            g.export(out)
+            print(f"✅ Graph exported ({g.stats()['total_nodes']} nodes, {g.stats()['total_edges']} edges)")
+        elif '--query' in sys.argv:
+            idx = sys.argv.index('--query')
+            query = ' '.join(sys.argv[idx+1:])
+            results = g.query(query)
+            print(json.dumps(results, indent=2, ensure_ascii=False))
+        else:
+            stats = g.stats()
+            print(f"Nodes: {stats['total_nodes']} | Edges: {stats['total_edges']}")
+            print(f"Types: {stats['node_types']}")
+            heatmap = g.topic_heatmap()
+            for topic, score in list(heatmap['ranking'].items())[:8]:
+                print(f"  {topic:<25} {score:>4} ({', '.join(heatmap['cities'][topic][:3])})")
+
+    elif cmd == 'contradictions':
+        from pipeline.contradictions import ContradictionDetector
+        cd = ContradictionDetector()
+        if len(sys.argv) > 2 and not sys.argv[2].startswith('-'):
+            results = cd.detect_city(sys.argv[2])
+            for r in results:
+                emoji = '🔴' if r.get('severity') == 'high' else '🟡'
+                print(f"  {emoji} {', '.join(r.get('entities',[])[:2])}: {r.get('values', r.get('contradiction',''))}")
+        else:
+            report = cd.detect_all()
+            print(f"Within-city: {report['within_city']['total']} ({report['within_city']['high_severity']} high)")
+            print(f"Cross-city:  {report['cross_city']['total']}")
+            for item in report['action_items'][:5]:
+                print(f"  🔴 {item['city']}: {', '.join(item.get('entities',[])[:2])} → {item.get('values','')}")
+
+    elif cmd == 'knowledge':
+        from pipeline.knowledge_extractor import KnowledgeExtractor
+        ke = KnowledgeExtractor()
+        kb = ke.extract_all()
+        print(f"Error→Fix: {kb['stats']['error_fix_pairs']} | Patterns: {kb['stats']['cross_city_patterns']} | Truths: {kb['stats']['verified_truths']}")
+        for p in kb['cross_city_patterns']:
+            print(f"  [{p['eija']}] {p['pattern']}")
+        ke.close()
+
+    elif cmd == 'full-pipeline':
+        print(f"{'='*60}")
+        print(f"FULL PIPELINE RUN")
+        print(f"{'='*60}")
+        import time
+        t0 = time.time()
+
+        # 1. Audit
+        print(f"\n[1/7] Quality Audit...")
+        cmd_audit()
+
+        # 2. EIJA
+        print(f"\n[2/7] EIJA Re-Audit...")
+        from pipeline.eija_auditor import EIJAAuditor
+        auditor = EIJAAuditor()
+        eija_report = auditor.audit_all_cities(apply=False)
+        print(f"  {eija_report['total_reclassified']}/{eija_report['total_claims']} reclassifiable ({eija_report['reclassification_rate']}%)")
+
+        # 3. Backtest
+        print(f"\n[3/7] Backtest vs 2020...")
+        from pipeline.backtest import Backtester
+        bt = Backtester()
+        bt_report = bt.run()
+        print(f"  {bt_report['verdict']['summary']}")
+
+        # 4. Sentiment
+        print(f"\n[4/7] Sentiment Analysis...")
+        from pipeline.sentiment import SentimentAnalyzer
+        sa = SentimentAnalyzer()
+        sent_results = sa.analyze_all()
+        scored = sum(1 for r in sent_results.values()
+                    for c in r['candidates'].values() if c['news_mentions'] > 0)
+        print(f"  {scored} candidate-news pairs scored")
+
+        # 5. Demographics
+        print(f"\n[5/7] Demographics...")
+        from pipeline.demographics import DemographicsExtractor
+        de = DemographicsExtractor()
+        dem_results = de.extract_all()
+        with_ew = sum(1 for r in dem_results.values() if r.get('einwohner'))
+        print(f"  {with_ew}/{len(dem_results)} cities with population data")
+
+        # 6. Graph
+        print(f"\n[6/7] Entity Graph...")
+        from pipeline.graph import EntityGraph
+        g = EntityGraph()
+        g.build_from_dossiers()
+        stats = g.stats()
+        print(f"  {stats['total_nodes']} nodes, {stats['total_edges']} edges")
+
+        # 7. Knowledge
+        print(f"\n[7/7] Knowledge Extraction...")
+        from pipeline.knowledge_extractor import KnowledgeExtractor
+        ke = KnowledgeExtractor()
+        kb = ke.extract_all()
+        print(f"  {kb['stats']['error_fix_pairs']} error→fix, {kb['stats']['cross_city_patterns']} patterns, {kb['stats']['verified_truths']} truths")
+        ke.close()
+
+        elapsed = time.time() - t0
+        print(f"\n{'='*60}")
+        print(f"✅ Full pipeline complete in {elapsed:.1f}s")
+        print(f"{'='*60}")
+
     else:
         print(f"Unknown command: {cmd}")
         print(__doc__)
