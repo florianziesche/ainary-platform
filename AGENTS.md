@@ -4,7 +4,8 @@
 
 | Task contains... | Load ONLY these | Do NOT load |
 |------------------|----------------|-------------|
-| Website, CSS, HTML, Deploy | `standards/WEBSITE-DESIGN-GUIDE.md` + `standards/BRAND.md` + `projects/platform-website/DATA-SCHEMA.md` | RESEARCH-PROTOCOL, CONTENT-VOICE |
+| Website, CSS, HTML, Deploy | `standards/COLOR-SYSTEM.md` + `standards/BRAND.md` + `projects/platform-website/DATA-SCHEMA.md` | RESEARCH-PROTOCOL, CONTENT-VOICE |
+| Blog, Artikel, Article, HTML Article | `standards/COLOR-SYSTEM.md` → `node test_article.js` VOR und NACH jeder Änderung. Kein Deploy ohne 75/75 PASS. | RESEARCH-PROTOCOL |
 | Dossier, Dashboard, dossier.html, Platform | `projects/platform-website/DEV-STANDARD.md` → `projects/platform-website/PRODUCT-SPEC.md` (§-Nr identifizieren) → `node test_dossier.js` VOR und NACH jeder Änderung | Alles andere |
 | X, Twitter, Post, Tweet | `memory/knowledge/x-algorithm-rules.md` (1-2/day, story, no links, morning approval) | BRAND, RESEARCH-PROTOCOL |
 | Research, Analyse, Report | `standards/RESEARCH-PROTOCOL.md` | BRAND, WEBSITE-DESIGN-GUIDE |
