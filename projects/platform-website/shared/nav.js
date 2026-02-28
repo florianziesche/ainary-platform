@@ -30,10 +30,12 @@
 
   const t = {
     blog: 'Building in Public',
+    useCases: isDE ? 'Anwendungen' : 'Use Cases',
     contact: isDE ? 'Kontakt aufnehmen' : 'Get in touch',
   };
 
   const blogLink = prefix + 'blog.html';
+  const useCasesLink = isDE ? prefix + 'anwendungen.html' : prefix + 'de/anwendungen.html';
   const contactLink = prefix + 'contact.html';
 
   el.innerHTML = `
@@ -42,6 +44,7 @@
         <a href="${prefix}index.html" class="nav-logo" style="text-decoration:none"><span class="logo-dot-wrap"><span class="logo-dot-ring2"></span><span class="logo-dot-ring1"></span><span class="logo-dot"></span></span>Ainary</a>
         <div class="nav-links">
           <a href="${blogLink}" class="nav-link${activeClass('blog.html')}">${t.blog}</a>
+          <a href="${useCasesLink}" class="nav-link${activeClass('anwendungen.html')}">${t.useCases}</a>
         </div>
         <div class="nav-auth" style="display:flex;align-items:center;gap:16px;">
           <a href="${switchHref}" style="color:#8b8b95;font-size:0.75rem;text-decoration:none;font-weight:400;margin-right:8px;">${switchLabel}</a>
@@ -54,6 +57,7 @@
     </nav>
     <div class="mobile-menu">
       <a href="${blogLink}">${t.blog}</a>
+      <a href="${useCasesLink}">${t.useCases}</a>
       <a href="${contactLink}" class="btn-primary">${t.contact}</a>
       <a href="${switchHref}" style="font-size:0.85rem;color:#55555e;">${isDE ? 'EN' : 'DE'}</a>
     </div>
