@@ -63,7 +63,7 @@ No other fonts. No font-size overrides per page.
 
 ### 1. Blockquote
 ```css
-border-left: 2px solid rgba(255,255,255,0.12);
+border-left: 2px solid var(--accent);  /* #c8aa50 */
 padding-left: 24px;
 background: none;
 ```
@@ -79,15 +79,36 @@ padding: 20px 24px;
 **When:** Tables, KPIs, legends, grids, code — anything structurally different from prose.
 
 ### Rules
-- **No colored left borders.** No gold, no blue, no green. Ever.
+- **One left-border color: gold (`#c8aa50`).** No blue, no green, no red. Always gold, always consistent.
 - **No box without different information.** If the content is just another paragraph, leave it as text.
 - **Max 3 boxes per article.** More = noise. If you need a 4th, one of the first 3 is wrong.
 - **No repeated box patterns.** If the same box template appears 3+ times, it's visual noise.
 - **Blockquote ≠ Data Box.** Don't mix: italic quoted text never goes in a surface box.
 
+## Border Radius
+| Value | When |
+|---|---|
+| `8px` | All content boxes, cards, data boxes |
+| `50%` | Circles only (dots, avatars) |
+| `3px` | Small inline badges (EIJA, tags) |
+| `6px` | Buttons |
+
+No `12px`, `16px`, `100px` on content boxes. No mixing.
+
+## Gradient Blobs (ambient background)
+Gold blob uses `#c8aa50 → #a08030 → transparent`. Allowed exception: gradient spectrum uses intermediate values. These are NOT design tokens — they're render artifacts.
+
+## macOS Traffic Lights
+`#ff5f57` / `#ffbd2e` / `#28c840` — allowed ONLY inside monitor mockup chrome. Nowhere else.
+
+## Labels (PROBLEM, OUR APPROACH, etc.)
+Use `--text-muted` (#55555e). NOT gold. Labels are structural, not decorative.
+
 ## What This Replaces
-- No more `--text: #F6F7F9` overrides in articles
-- No more `--bg: #111418` overrides
-- No more colored grid card borders
-- No more inconsistent white values (#ededf0 vs #F6F7F9)
-- No more arbitrary color groupings in grids/cards
+- No more `--text: #F6F7F9` overrides (use `#ededf0`)
+- No more `--bg: #111418` or `#1C2127` surfaces (use `#111116`)
+- No more colored EIJA badges (all grey)
+- No more colored left-borders (all gold)
+- No more inconsistent white values
+- No more arbitrary color groupings
+- No more per-page `:root` overrides
