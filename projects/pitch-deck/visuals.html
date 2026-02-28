@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Glashuette Deck — Visual Options</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#faf8f4;--s:#f5f2ec;--c:#fff;--t:#1a1a1a;--t2:#555;--t3:#888;--t4:#aaa;--g:#c8aa50;--bd:#e0ddd6;--f:'Inter',sans-serif;--m:'JetBrains Mono',monospace}
+body{font-family:var(--f);background:var(--t);color:#fff;font-size:14px;line-height:1.5}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:220px;background:#111;padding:24px 16px;position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:10}
+.sidebar .logo{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;margin-bottom:32px;color:#fff}
+.sidebar .logo .dot{width:7px;height:7px;border-radius:50%;background:var(--g)}
+.sidebar h2{font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#666;margin-bottom:12px}
+.nav-item{padding:9px 12px;border-radius:6px;cursor:pointer;font-size:12px;color:#999;margin-bottom:3px;transition:.15s}
+.nav-item:hover{background:rgba(255,255,255,.05);color:#ccc}
+.nav-item.active{background:rgba(200,170,80,.12);color:var(--g)}
+.nav-item .n{font-family:var(--m);font-size:10px;color:#555;margin-right:8px;width:14px;display:inline-block}
+.nav-item.active .n{color:var(--g)}
+.nav-item .ck{float:right;color:#2d8a4e;display:none;font-size:11px}
+.nav-item.done .ck{display:inline}
+.main{margin-left:220px;padding:32px}
+.slide-header{margin-bottom:24px}
+.slide-header h1{font-size:20px;font-weight:600;color:#fff;margin-bottom:2px}
+.slide-header p{font-size:12px;color:#666}
+.visual-row{display:flex;gap:16px;margin-bottom:16px}
+.vis-card{flex:1;background:#1a1a1a;border:2px solid #2a2a2a;border-radius:8px;overflow:hidden;cursor:pointer;transition:.2s}
+.vis-card:hover{border-color:#444}
+.vis-card.selected{border-color:var(--g);box-shadow:0 0 0 2px rgba(200,170,80,.2)}
+.vis-label{padding:10px 14px;font-size:11px;font-weight:500;color:#999;border-bottom:1px solid #2a2a2a;display:flex;justify-content:space-between;align-items:center}
+.vis-card.selected .vis-label{color:var(--g)}
+.vis-tag{font-size:8px;font-family:var(--m);padding:2px 6px;border-radius:2px;background:#2a2a2a;color:#666}
+.vis-card.selected .vis-tag{background:var(--g);color:#000}
+.slide-frame{aspect-ratio:16/9;background:var(--bg);position:relative;overflow:hidden}
+.slide-frame *{font-family:var(--f)}
+/* Slide internals */
+.sf{width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;padding:8% 7%}
+.sf .logo-chr{position:absolute;top:5%;left:5%;display:flex;align-items:center;gap:5px;font-size:9px;font-weight:600;color:var(--t)}
+.sf .logo-chr .d{width:5px;height:5px;border-radius:50%;background:var(--g)}
+.sf .sec-chr{position:absolute;top:5%;right:5%;font-size:5px;font-family:var(--m);color:var(--t4);letter-spacing:.12em;text-transform:uppercase}
+.sf .cnt-chr{position:absolute;bottom:5%;right:5%;font-size:5px;font-family:var(--m);color:var(--t4)}
+.sf .star{position:absolute;top:-15%;left:30%;width:70%;height:45%;background:radial-gradient(ellipse,rgba(200,170,80,.05),transparent 70%);pointer-events:none}
+.sf .dots{position:absolute;inset:0;background-image:radial-gradient(rgba(0,0,0,.025) 1px,transparent 1px);background-size:20px 20px;pointer-events:none}
+.sf .rule{width:30px;height:1.5px;background:var(--g);opacity:.5;margin:10px 0}
+.sf .big{font-size:clamp(28px,6vw,52px);font-weight:600;letter-spacing:-.04em;line-height:1.05;color:var(--t)}
+.sf .med{font-size:clamp(14px,2.5vw,22px);font-weight:600;letter-spacing:-.03em;line-height:1.12;color:var(--t)}
+.sf .bod{font-size:clamp(8px,1.2vw,12px);color:var(--t2);line-height:1.6;max-width:75%}
+.sf .src{font-size:6px;color:var(--t4);position:absolute;bottom:5%;left:7%}
+.sf .lbl{font-size:clamp(5px,.7vw,7px);font-family:var(--m);color:var(--t3);letter-spacing:.1em;text-transform:uppercase}
+.sf .num{font-size:clamp(16px,3vw,28px);font-weight:600;color:var(--t);line-height:1}
+.sf .meta-line{position:absolute;bottom:5%;left:7%;font-size:7px;color:var(--t4)}
+.feedback-area{margin:16px 0 40px}
+.feedback-area textarea{width:100%;padding:10px 14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:6px;color:#ccc;font-family:var(--f);font-size:12px;resize:vertical;min-height:48px}
+.feedback-area textarea:focus{outline:none;border-color:var(--g)}
+.btn-row{display:flex;gap:12px;margin-top:24px}
+.btn{padding:10px 20px;border-radius:6px;font-family:var(--f);font-size:12px;font-weight:500;cursor:pointer;border:none}
+.btn-gold{background:var(--g);color:#000}
+.btn-gold:hover{background:#d4b45a}
+.btn-ghost{background:transparent;color:#666;border:1px solid #333}
+.btn-ghost:hover{border-color:#555;color:#999}
+</style>
+</head>
+<body>
+<div class="layout">
+<div class="sidebar">
+  <div class="logo"><span class="dot"></span> Visual Options</div>
+  <h2>Slides</h2>
+  <div id="nav"></div>
+  <div style="margin-top:auto;padding-top:24px;border-top:1px solid #222;margin-top:32px">
+    <button class="btn btn-gold" style="width:100%" onclick="exportAll()">Export Auswahl</button>
+  </div>
+</div>
+<div class="main" id="main"></div>
+</div>
+<script>
+var SLIDES=[
+// ========== SLIDE 1: COVER ==========
+{id:1,title:"Cover — Uhren-Metapher",sub:"3 visuelle Ausfuehrungen der gewaehlten Headline",
+visuals:[
+{label:"V1 — Pure Typography",tag:"Palantir",
+html:`<div class="sf"><div class="star"></div><div class="dots"></div><div class="logo-chr"><span class="d"></span> Ainary</div>
+<div class="big" style="max-width:85%">Was waere, wenn Ihre Verwaltung so praezise arbeitet wie Ihre Uhren?</div>
+<div class="meta-line">Florian Ziesche · 24. Februar 2026</div></div>`},
+{label:"V2 — Gear Motif",tag:"Linear",
+html:`<div class="sf"><div class="star"></div><div class="dots"></div><div class="logo-chr"><span class="d"></span> Ainary</div>
+<div style="display:flex;align-items:center;gap:6%;width:100%">
+<div style="flex:1"><div class="med" style="font-size:clamp(14px,2.8vw,26px)">Was waere, wenn Ihre Verwaltung so praezise arbeitet wie Ihre Uhren?</div>
+<div class="rule"></div>
+<div class="bod" style="margin-top:4px">KI-gestuetzte Verwaltung fuer Glashuette.</div></div>
+<div style="flex:0 0 30%;display:flex;justify-content:center">
+<svg viewBox="0 0 120 120" width="100%" style="max-width:140px;opacity:.12">
+<circle cx="60" cy="60" r="55" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+<circle cx="60" cy="60" r="40" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
+<line x1="60" y1="60" x2="60" y2="25" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+<line x1="60" y1="60" x2="85" y2="60" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/>
+<circle cx="60" cy="60" r="3" fill="#1a1a1a"/>
+<g stroke="#1a1a1a" stroke-width="1">${[...Array(12)].map((_,i)=>{const a=i*30*Math.PI/180;return`<line x1="${60+48*Math.sin(a)}" y1="${60-48*Math.cos(a)}" x2="${60+55*Math.sin(a)}" y2="${60-55*Math.cos(a)}"/>`}).join('')}</g>
+</svg></div></div>
+<div class="meta-line">Florian Ziesche · 24. Februar 2026</div></div>`},
+{label:"V3 — Split Dramatic",tag:"Ainary",
+html:`<div class="sf" style="padding:0"><div class="star"></div><div class="dots"></div><div class="logo-chr" style="left:5%;color:var(--t)"><span class="d"></span> Ainary</div>
+<div style="display:flex;height:100%">
+<div style="flex:1;padding:10% 7%;display:flex;flex-direction:column;justify-content:center">
+<div class="med" style="font-size:clamp(13px,2.4vw,22px)">Was waere, wenn Ihre Verwaltung so praezise arbeitet</div>
+<div style="width:30px;height:1.5px;background:#c8aa50;opacity:.5;margin:10px 0"></div>
+<div class="med" style="font-size:clamp(13px,2.4vw,22px);color:#c8aa50">wie Ihre Uhren?</div>
+</div>
+<div style="flex:0 0 35%;background:linear-gradient(135deg,#f0ede6,#e8e4da);display:flex;align-items:center;justify-content:center">
+<svg viewBox="0 0 100 100" width="60%" style="opacity:.08">
+<circle cx="50" cy="50" r="45" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>
+<circle cx="50" cy="50" r="35" fill="none" stroke="#1a1a1a" stroke-width="1"/>
+<line x1="50" y1="50" x2="50" y2="18" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/>
+<line x1="50" y1="50" x2="72" y2="50" stroke="#1a1a1a" stroke-width="1.5" stroke-linecap="round"/>
+<circle cx="50" cy="50" r="2.5" fill="#1a1a1a"/>
+</svg></div></div>
+<div class="meta-line">Florian Ziesche · 24. Februar 2026</div></div>`}
+]},
+// ========== SLIDE 2: STATEMENT ==========
+{id:2,title:"Statement — 40% Routine",sub:"Die Zahl die haengen bleibt",
+visuals:[
+{label:"V1 — Massive Number",tag:"Palantir",
+html:`<div class="sf"><div class="star"></div><div class="dots"></div><div class="logo-chr"><span class="d"></span> Ainary</div><div class="sec-chr">AUSGANGSLAGE</div>
+<div style="font-size:clamp(48px,12vw,96px);font-weight:600;letter-spacing:-.06em;line-height:.9;color:#1a1a1a">40%</div>
+<div class="bod" style="margin-top:12px;font-weight:500;color:#1a1a1a;font-size:clamp(9px,1.4vw,14px);max-width:60%">So viel Arbeitszeit verbringen kleine Verwaltungen mit wiederkehrenden Routineaufgaben.</div>
+<div class="src">Quelle: KGSt / Fraunhofer FOKUS, 2024</div></div>`},
+{label:"V2 — Grid Metaphor",tag:"Linear",
+html:`<div class="sf"><div class="star"></div><div class="dots"></div><div class="logo-chr"><span class="d"></span> Ainary</div><div class="sec-chr">AUSGANGSLAGE</div>
+<div class="med">40% der Arbeitszeit geht fuer Routine drauf.</div>
+<div class="rule"></div>
+<div style="display:grid;grid-template-columns:repeat(10,1fr);gap:4px;width:60%;margin-top:12px">
+${[...Array(10)].map((_,i)=>`<div style="aspect-ratio:1;border-radius:3px;background:${i<4?'#1a1a1a':'#e0ddd6'}"></div>`).join('')}
+</div>
+<div style="display:flex;gap:16px;margin-top:10px">
+<div style="display:flex;align-items:center;gap:4px"><div style="width:8px;height:8px;border-radius:2px;background:#1a1a1a"></div><span style="font-size:7px;color:#888">Routineaufgaben</span></div>
+<div style="display:flex;align-items:center;gap:4px"><div style="width:8px;height:8px;border-radius:2px;background:#e0ddd6"></div><span style="font-size:7px;color:#888">Wertschoepfende Arbeit</span></div>
+</div>
+<div class="src">Quelle: KGSt / Fraunhofer FOKUS, 2024</div></div>`},
+{label:"V3 — Donut + Context",tag:"Ainary",
+html:`<div class="sf"><div class="star"></div><div class="dots"></div><div class="logo-chr"><span class="d"></span> Ainary</div><div class="sec-chr">AUSGANGSLAGE</div>
+<div style="display:flex;align-items:center;gap:8%">
+<div>
+<svg viewBox="0 0 120 120" width="clamp(80px,14vw,140px)">
+<circle cx="60" cy="60" r="50" fill="none" stroke="#e0ddd6" stroke-width="10"/>
+<circle cx="60" cy="60" r="50" fill="none" stroke="#1a1a1a" stroke-width="10" stroke-dasharray="314" stroke-dashoffset="188" transform="rotate(-90 60 60)" stroke-linecap="round"/>
+<text x="60" y="56" text-anchor="middle" font-family="Inter" font-weight="600" font-size="28" fill="#1a1a1a">40%</text>
+<text x="60" y="72" text-anchor="middle" font-family="Inter" font-size="9" fill="#888">Routine</text>
+</svg></div>
+<div>
+<div class="med" style="font-size:clamp(11px,1.8vw,16px)">Zeit die fuer Buergeranliegen fehlt.</div>
+<div class="bod" style="margin-top:6px;max-width:100%">Kleine Verwaltungen verbringen fast die Haelfte ihrer Arbeitszeit mit wiederkehrenden Aufgaben.</div>
+</div></div>
+<div class="src">Quelle: KGSt / Fraunhofer FOKUS, 2024</div></div>`}
+]},
+// ========== SLIDE 3: PROBLEM - OZG Timeline ==========
+{id:3,title:"Problem — OZG-Timeline",sub:"Zeitdruck visualisieren ohne Schuldzuweisung",
+visuals:[
+{label:"V1 — Horizontal Timeline",tag:"Palantir",
+html:`<div class="sf"><div class="star"></div><div class="dots"></div><div class="logo-chr"><span class="d"></span> Ainary</div><div class="sec-chr">GLASHUETTE HEUTE</div>
+<div class="med">Die OZG-Uhr laeuft. Glashuette steht am Anfang.</div>
+<div class="rule"></div>
+<div style="margin-top:16px;width:85%">
+<div style="position:relative;height:4px;background:#e0ddd6;border-radius:2px">
+<div style="position:absolute;left:0;top:0;height:4px;width:12%;background:#1a1a1a;border-radius:2px"></div>
+<div style="position:absolute;left:12%;top:-4px;width:12px;height:12px;border-radius:50%;background:#c8aa50;border:2px solid #faf8f4"></div>
+</div>
+<div style="display:flex;justify-content:space-between;margin-top:10px">
+<div style="text-align:left"><div class="lbl">2017</div><div style="font-size:7px;color:#888;margin-top:2px">OZG verabschiedet</div></div>
+<div style="text-align:center"><div class="lbl">2022</div><div style="font-size:7px;color:#888;margin-top:2px">Erste Kommunen fertig</div></div>
+<div style="text-align:center"><div class="lbl">2024</div><div style="font-size:7px;color:#888;margin-top:2px">OZG 2.0</div></div>
+<div style="text-align:right"><div class="lbl" style="color:#c0392b">2026</div><div style="font-size:7px;color:#c0392b;margin-top:2px;font-weight:500">Deadline</div></div>
+</div>
+</div>
+<div class="bod" style="margin-top:14px">575 Verwaltungsleistungen muessen digital sein. Dippoldiswalde und Freital sind weiter.</div></div>`},
+{label:"V2 — Vertical Steps",tag:"Linear",
+html:`<div class="sf"><div class="star"></div><div class="dots"></div><div class="logo-chr"><span class="d"></span> Ainary</div><div class="sec-chr">GLASHUETTE HEUTE</div>
+<div class="med">575 Leistungen. Eine Deadline. Kein sichtbarer Fortschritt.</div>
+<div class="rule"></div>
+<div style="margin-top:12px;display:flex;gap:6%">
+<div style="display:flex;flex-direction:column;gap:8px;flex:0 0 55%">
+${[{y:'2017',t:'OZG verabschiedet',done:true},{y:'2022',t:'Erste Kommunen fertig',done:true},{y:'2024',t:'OZG 2.0 — neue Pflichten',done:true},{y:'2026',t:'Deadline fuer alle Kommunen',done:false}].map(s=>`
+<div style="display:flex;align-items:flex-start;gap:10px">
+<div style="display:flex;flex-direction:column;align-items:center">
+<div style="width:10px;height:10px;border-radius:50%;background:${s.done?'#1a1a1a':'#c0392b'};flex-shrink:0"></div>
+<div style="width:1.5px;height:14px;background:#e0ddd6"></div>
+</div>
+<div><div style="font-size:8px;font-weight:600;color:${s.done?'#1a1a1a':'#c0392b'}">${s.y}</div><div style="font-size:7px;color:#888">${s.t}</div></div>
+</div>`).join('')}
+</div>
+<div style="flex:1;display:flex;align-items:center;justify-content:center">
+<div style="text-align:center"><div style="font-size:clamp(24px,5vw,42px);font-weight:600;color:#1a1a1a">0</div><div style="font-size:7px;color:#888;margin-top:2px">Online-Services<br>in Glashuette</div></div>
+</div></div></div>`},
+{label:"V3 — Progress Comparison",tag:"Ainary",
+html:`<div class="sf"><div class="star"></div><div class="dots"></div><div class="logo-chr"><span class="d"></span> Ainary</div><div class="sec-chr">GLASHUETTE HEUTE</div>
+<div class="med">Wo steht Glashuette?</div>
+<div class="rule"></div>
+<div style="margin-top:14px;width:80%">
+${[{name:'Freital (39.000 EW)',pct:65},{name:'Dippoldiswalde (14.000 EW)',pct:40},{name:'Glashuette (6.414 EW)',pct:5}].map(c=>`
+<div style="margin-bottom:10px">
+<div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:8px;color:#555">${c.name}</span><span style="font-size:8px;font-weight:600;color:${c.pct<10?'#c0392b':'#1a1a1a'}">${c.pct}%</span></div>
+<div style="height:6px;background:#e0ddd6;border-radius:3px;overflow:hidden"><div style="height:100%;width:${c.pct}%;background:${c.pct<10?'#c0392b':'#1a1a1a'};border-radius:3px"></div></div>
+</div>`).join('')}
+<div style="font-size:7px;color:#888;margin-top:8px">Geschaetzter OZG-Umsetzungsgrad, Stand Feb 2026</div>
+</div></div>`}
+]},
+// ========== SLIDE 4: DATA - Trendlinie ==========
+{id:4,title:"Daten — Bevoelkerungstrend",sub:"Fallender Graph als emotionaler Trigger",
+visuals:[
+{label:"V1 — Area Chart",tag:"Palantir",
+html:`<div class="sf"><div class="star"></div><div class="dots"></div><div class="logo-chr"><span class="d"></span> Ainary</div><div class="sec-chr">IHRE GEMEINDE</div>
+<div class="med">6.414 Einwohner. Tendenz fallend.</div>
+<div class="rule"></div>
+<div style="margin-top:10px;width:80%">
+<svg viewBox="0 0 300 100" width="100%" preserveAspectRatio="xMidYMid meet">
+<defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a1a1a" stop-opacity=".12"/><stop offset="100%" stop-color="#1a1a1a" stop-opacity="0"/></linearGradient></defs>
+<path d="M20,25 L80,28 L140,35 L200,45 L260,58 L260,90 L20,90 Z" fill="url(#g1)"/>
+<polyline points="20,25 80,28 140,35 200,45 260,58" fill="none" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="260" cy="58" r="4" fill="#c0392b"/>
+${[{x:20,y:25,l:'6.720',yr:'2020'},{x:140,y:35,l:'6.560',yr:'2022'},{x:260,y:58,l:'6.414',yr:'2025'}].map(p=>`
+<text x="${p.x}" y="${p.y-8}" font-size="7" fill="#1a1a1a" font-weight="600" font-family="Inter">${p.l}</text>
+<text x="${p.x}" y="98" font-size="6" fill="#888" font-family="Inter">${p.yr}</text>`).join('')}
+</svg>
+</div>
+<div class="bod" style="margin-top:6px">-4,7% seit 2020. Die Verwaltung muss mit weniger mehr leisten.</div></div>`},
+{label:"V2 — Sparkline + Big Number",tag:"Linear",
+html:`<div class="sf"><div class="star"></div><div class="dots"></div><div class="logo-chr"><span class="d"></span> Ainary</div><div class="sec-chr">IHRE GEMEINDE</div>
+<div style="display:flex;gap:10%;align-items:flex-end">
+<div>
+<div style="font-size:clamp(36px,8vw,64px);font-weight:600;letter-spacing:-.04em;line-height:1;color:#1a1a1a">6.414</div>
+<div style="font-size:clamp(8px,1.2vw,12px);color:#888;margin-top:4px">Einwohner</div>
+</div>
+<div style="flex:0 0 40%">
+<svg viewBox="0 0 120 40" width="100%">
+<polyline points="5,8 25,10 45,14 65,18 85,24 115,32" fill="none" stroke="#c0392b" stroke-width="2" stroke-linecap="round"/>
+</svg>
+<div style="display:flex;justify-content:space-between;font-size:6px;color:#888"><span>2020</span><span>2025</span></div>
+</div>
+</div>
+<div class="rule" style="margin-top:14px"></div>
+<div style="display:flex;gap:clamp(16px,4vw,40px);margin-top:8px">
+${[{v:'85',l:'Mitarbeiter'},{v:'16',l:'Ortsteile'},{v:'95 km²',l:'Flaeche'},{v:'-1,2%',l:'pro Jahr'}].map(k=>`<div><div class="num" style="font-size:clamp(14px,2.5vw,22px)">${k.v}</div><div class="lbl" style="margin-top:2px">${k.l}</div></div>`).join('')}
+</div></div>`},
+{label:"V3 — Decline + Opportunity",tag:"Ainary",
+html:`<div class="sf"><div class="star"></div><div class="dots"></div><div class="logo-chr"><span class="d"></span> Ainary</div><div class="sec-chr">IHRE GEMEINDE</div>
+<div class="med">Weniger Menschen. Gleiche Aufgaben.</div>
+<div class="rule"></div>
+<div style="display:flex;gap:8%;margin-top:10px">
+<div style="flex:1">
+<svg viewBox="0 0 140 80" width="100%">
+<rect x="10" y="5" width="18" height="65" rx="3" fill="#e0ddd6"/><text x="19" y="78" text-anchor="middle" font-size="6" fill="#888" font-family="Inter">2020</text>
+<rect x="38" y="10" width="18" height="60" rx="3" fill="#e0ddd6"/><text x="47" y="78" text-anchor="middle" font-size="6" fill="#888" font-family="Inter">2021</text>
+<rect x="66" y="16" width="18" height="54" rx="3" fill="#e0ddd6"/><text x="75" y="78" text-anchor="middle" font-size="6" fill="#888" font-family="Inter">2022</text>
+<rect x="94" y="22" width="18" height="48" rx="3" fill="#e0ddd6"/><text x="103" y="78" text-anchor="middle" font-size="6" fill="#888" font-family="Inter">2023</text>
+<rect x="122" y="28" width="18" height="42" rx="3" fill="#c0392b" opacity=".2"/><rect x="122" y="28" width="18" height="42" rx="3" fill="none" stroke="#c0392b" stroke-width="1.5"/><text x="131" y="78" text-anchor="middle" font-size="6" fill="#c0392b" font-weight="600" font-family="Inter">2025</text>
+</svg>
+<div style="font-size:7px;color:#888;text-align:center">Einwohnerentwicklung</div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+<div style="font-size:clamp(9px,1.3vw,12px);color:#555;line-height:1.6">
+<div style="margin-bottom:6px"><strong style="color:#1a1a1a">6.414</strong> Einwohner (-4,7%)</div>
+<div style="margin-bottom:6px"><strong style="color:#1a1a1a">85</strong> Mitarbeiter</div>
+<div style="margin-bottom:6px"><strong style="color:#1a1a1a">16</strong> Ortsteile auf 95 km²</div>
+<div><strong style="color:#c8aa50">€150K</strong> ext. Beratung/Jahr</div>
+</div></div></div></div>`}
+]},
+// ========== SLIDE 5: SOLUTION - Teaser ==========
+{id:5,title:"Loesung — Demo-Teaser",sub:"Maximale Spannung vor der Live-Demo",
+visuals:[
+{label:"V1 — Pure Statement",tag:"Palantir",
+html:`<div class="sf"><div class="star"></div><div class="dots"></div><div class="logo-chr"><span class="d"></span> Ainary</div><div class="sec-chr">LOESUNG</div>
+<div class="big" style="max-width:70%">Ich zeige es Ihnen.</div>
+<div class="bod" style="margin-top:10px">Live-Demo: Foerdermittel-Check fuer Glashuette.<br>Unter 3 Minuten. Echte Daten.</div></div>`},
+{label:"V2 — Frosted Preview",tag:"Linear",
+html:`<div class="sf"><div class="star"></div><div class="dots"></div><div class="logo-chr"><span class="d"></span> Ainary</div><div class="sec-chr">LOESUNG</div>
+<div style="display:flex;gap:6%;align-items:center">
+<div style="flex:1">
+<div class="med">Sehen statt erklaeren.</div>
+<div class="rule"></div>
+<div class="bod">Live-Demo: Ein echter Foerdermittel-Check fuer Glashuette in unter 3 Minuten.</div>
+</div>
+<div style="flex:0 0 45%;aspect-ratio:4/3;background:linear-gradient(135deg,#f0ede6,#e8e4da);border-radius:8px;border:1px solid #e0ddd6;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden">
+<div style="position:absolute;inset:0;backdrop-filter:blur(4px);background:rgba(250,248,244,.7)"></div>
+<div style="position:relative;text-align:center;z-index:1">
+<div style="font-size:20px;margin-bottom:4px">▶</div>
+<div style="font-size:7px;color:#888;font-family:var(--m)">LIVE DEMO</div>
+</div>
+</div></div></div>`},
+{label:"V3 — Terminal Aesthetic",tag:"Ainary",
+html:`<div class="sf"><div class="star"></div><div class="dots"></div><div class="logo-chr"><span class="d"></span> Ainary</div><div class="sec-chr">LOESUNG</div>
+<div class="med" style="margin-bottom:12px">Ich zeige es Ihnen.</div>
+<div style="background:#1a1a1a;border-radius:6px;padding:12px 14px;width:75%;font-family:'JetBrains Mono',monospace;font-size:clamp(6px,1vw,9px);color:#888;line-height:1.8">
+<div style="color:#555">$ ainary query --gemeinde glashuette</div>
+<div style="color:#c8aa50">→ Suche Foerderprogramme fuer Glashuette/Sa...</div>
+<div style="color:#2d8a4e">✓ 5 Programme gefunden (LEADER, EFRE, OZG...)</div>
+<div style="color:#c8aa50">→ Pruefe Fristen und Antragsvoraussetzungen...</div>
+<div style="color:#2d8a4e">✓ Bericht erstellt. 2 Min 14 Sek.</div>
+<div style="color:#fff;margin-top:4px">█</div>
+</div></div>`}
+]},
+// ========== SLIDE 6: BEFORE/AFTER - Bars ==========
+{id:6,title:"Vorher/Nachher — Balken",sub:"Zeitersparnis visuell beweisen",
+visuals:[
+{label:"V1 — Paired Bars",tag:"Palantir",
+html:`<div class="sf"><div class="star"></div><div class="dots"></div><div class="logo-chr"><span class="d"></span> Ainary</div><div class="sec-chr">VORHER / NACHHER</div>
+<div class="med">Gleiche Mitarbeiter. Ein Zehntel der Zeit.</div>
+<div class="rule"></div>
+<div style="margin-top:12px;width:80%">
+${[{l:'Foerderantrag vorbereiten',b:'2 Wochen',a:'2 Tage',bw:90,aw:14},{l:'Beschlussvorlage schreiben',b:'4 Stunden',a:'30 Min',bw:50,aw:6},{l:'Foerdermittel-Check',b:'3 Tage',a:'10 Min',bw:65,aw:3}].map(r=>`
+<div style="margin-bottom:12px">
+<div style="font-size:8px;color:#555;margin-bottom:4px;font-weight:500">${r.l}</div>
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+<div style="width:40px;font-size:6px;color:#888;text-align:right">Heute</div>
+<div style="flex:1;height:8px;background:#f5f2ec;border-radius:4px;overflow:hidden"><div style="height:100%;width:${r.bw}%;background:#e0ddd6;border-radius:4px"></div></div>
+<div style="width:50px;font-size:7px;color:#888">${r.b}</div>
+</div>
+<div style="display:flex;align-items:center;gap:8px">
+<div style="width:40px;font-size:6px;color:#1a1a1a;text-align:right;font-weight:500">Ainary</div>
+<div style="flex:1;height:8px;background:#f5f2ec;border-radius:4px;overflow:hidden"><div style="height:100%;width:${r.aw}%;background:#1a1a1a;border-radius:4px"></div></div>
+<div style="width:50px;font-size:7px;color:#1a1a1a;font-weight:600">${r.a}</div>
+</div>
+</div>`).join('')}
+</div></div>`},
+{label:"V2 — Reduction Arrows",tag:"Linear",
+html:`<div class="sf"><div class="star"></div><div class="dots"></div><div class="logo-chr"><span class="d"></span> Ainary</div><div class="sec-chr">VORHER / NACHHER</div>
+<div class="med">Gleiche Mitarbeiter. Ein Zehntel der Zeit.</div>
+<div class="rule"></div>
+<div style="display:flex;gap:clamp(12px,3vw,32px);margin-top:14px">
+${[{l:'Foerderantrag',b:'2 Wochen',a:'2 Tage',pct:'85%'},{l:'Beschlussvorlage',b:'4 Stunden',a:'30 Min',pct:'88%'},{l:'Foerdermittel-Check',b:'3 Tage',a:'10 Min',pct:'99%'}].map(r=>`
+<div style="flex:1;text-align:center">
+<div class="lbl">${r.l}</div>
+<div style="font-size:clamp(8px,1.2vw,11px);color:#888;margin-top:6px">${r.b}</div>
+<div style="margin:6px auto;color:#c8aa50;font-size:14px">↓</div>
+<div style="font-size:clamp(10px,1.6vw,14px);font-weight:600;color:#1a1a1a">${r.a}</div>
+<div style="margin-top:6px;font-size:clamp(14px,2.5vw,22px);font-weight:600;color:#2d8a4e">-${r.pct}</div>
+</div>`).join('')}
+</div></div>`},
+{label:"V3 — Single Big Reduction",tag:"Ainary",
+html:`<div class="sf"><div class="star"></div><div class="dots"></div><div class="logo-chr"><span class="d"></span> Ainary</div><div class="sec-chr">VORHER / NACHHER</div>
+<div style="display:flex;align-items:center;gap:8%">
+<div>
+<div style="font-size:clamp(42px,10vw,80px);font-weight:600;letter-spacing:-.04em;line-height:1;color:#1a1a1a">10×</div>
+<div style="font-size:clamp(10px,1.6vw,15px);font-weight:500;color:#555;margin-top:6px">schneller</div>
+</div>
+<div style="width:1px;height:80px;background:#e0ddd6"></div>
+<div>
+${[{l:'Foerderantrag',b:'2 Wo.',a:'2 Tage'},{l:'Beschlussvorlage',b:'4 Std.',a:'30 Min'},{l:'Foerdermittel',b:'3 Tage',a:'10 Min'}].map(r=>`
+<div style="display:flex;gap:12px;align-items:baseline;margin-bottom:6px">
+<div style="font-size:8px;color:#888;width:65px">${r.l}</div>
+<div style="font-size:8px;color:#888;text-decoration:line-through">${r.b}</div>
+<div style="font-size:9px;font-weight:600;color:#1a1a1a">${r.a}</div>
+</div>`).join('')}
+</div></div></div>`}
+]},
+// ========== SLIDE 7: CREDENTIALS - Story ==========
+{id:7,title:"Credentials — Persoenliche Story",sub:"Trust durch lokalen Bezug (Oxytocin-Effekt)",
+visuals:[
+{label:"V1 — Quote Style",tag:"Palantir",
+html:`<div class="sf"><div class="star"></div><div class="dots"></div><div class="logo-chr"><span class="d"></span> Ainary</div><div class="sec-chr">UEBER MICH</div>
+<div class="big" style="max-width:80%;font-size:clamp(16px,3.5vw,30px)">Meine Familie lebt 10 Minuten von hier.</div>
+<div class="rule"></div>
+<div class="bod" style="max-width:65%;line-height:1.7">Aufgewachsen in Schlottwitz. 12 Jahre KI-Systeme fuer BMW, Siemens und Bosch in Muenchen gebaut. €5M Investoren-Kapital eingeworben. Jetzt bringe ich das Wissen zurueck in die Region.</div></div>`},
+{label:"V2 — Journey Map",tag:"Linear",
+html:`<div class="sf"><div class="star"></div><div class="dots"></div><div class="logo-chr"><span class="d"></span> Ainary</div><div class="sec-chr">UEBER MICH</div>
+<div class="med">Von hier. Fuer hier.</div>
+<div class="rule"></div>
+<div style="display:flex;gap:6px;margin-top:14px;align-items:flex-start">
+${[{icon:'🏠',place:'Schlottwitz',desc:'Aufgewachsen in der Region'},{icon:'🏛',place:'Muenchen — 12 Jahre',desc:'KI fuer BMW, Siemens, Bosch. €5M Funding.'},{icon:'🏡',place:'Zurueck im Erzgebirge',desc:'Technologie dorthin bringen wo sie gebraucht wird.'}].map((s,i)=>`
+<div style="flex:1;text-align:center">
+<div style="font-size:18px;margin-bottom:4px">${s.icon}</div>
+<div style="font-size:9px;font-weight:600;color:#1a1a1a">${s.place}</div>
+<div style="font-size:7px;color:#888;margin-top:2px">${s.desc}</div>
+</div>
+${i<2?'<div style="flex:0 0 20px;display:flex;align-items:center;justify-content:center;padding-top:10px;color:#e0ddd6">→</div>':''}`).join('')}
+</div></div>`},
+{label:"V3 — Stats + Story",tag:"Ainary",
+html:`<div class="sf"><div class="star"></div><div class="dots"></div><div class="logo-chr"><span class="d"></span> Ainary</div><div class="sec-chr">UEBER MICH</div>
+<div style="display:flex;gap:8%;align-items:center">
+<div style="flex:1">
+<div class="med" style="font-size:clamp(12px,2vw,18px)">Meine Familie lebt 10 Minuten von hier.</div>
+<div class="rule"></div>
+<div class="bod" style="max-width:100%">12 Jahre kuenstliche Intelligenz fuer die groesste deutsche Industrie. Jetzt fuer Ihre Gemeinde.</div>
+</div>
+<div style="flex:0 0 35%">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+${[{v:'12+',l:'Jahre KI'},{v:'€5M',l:'Funding'},{v:'80+',l:'Projekte'},{v:'3',l:'DAX-Kunden'}].map(k=>`
+<div style="text-align:center;padding:8px;background:#f5f2ec;border-radius:6px">
+<div style="font-size:clamp(12px,2vw,18px);font-weight:600;color:#1a1a1a">${k.v}</div>
+<div style="font-size:6px;color:#888;font-family:var(--m);letter-spacing:.08em;text-transform:uppercase;margin-top:2px">${k.l}</div>
+</div>`).join('')}
+</div></div></div></div>`}
+]},
+// ========== SLIDE 8: CLOSE ==========
+{id:8,title:"Close — Bookend",sub:"Gleiche These wie Cover. Narrative Closure.",
+visuals:[
+{label:"V1 — Pure Bookend",tag:"Palantir",
+html:`<div class="sf"><div class="star"></div><div class="dots"></div><div class="logo-chr"><span class="d"></span> Ainary</div>
+<div class="big" style="max-width:85%">Was waere, wenn Ihre Verwaltung so praezise arbeitet wie Ihre Uhren?</div>
+<div class="bod" style="margin-top:10px;font-weight:500;color:#1a1a1a">Wollen wir es ausprobieren?</div>
+<div style="position:absolute;bottom:5%;left:7%;display:flex;gap:24px;font-size:8px;color:#888">
+<span>florian@ainaryventures.com</span><span>ainaryventures.com</span></div></div>`},
+{label:"V2 — Bookend + Next Step",tag:"Linear",
+html:`<div class="sf"><div class="star"></div><div class="dots"></div><div class="logo-chr"><span class="d"></span> Ainary</div>
+<div class="med" style="font-size:clamp(14px,2.8vw,24px);max-width:80%">Was waere, wenn Ihre Verwaltung so praezise arbeitet wie Ihre Uhren?</div>
+<div class="rule"></div>
+<div style="margin-top:10px;padding:10px 14px;background:#f5f2ec;border-radius:6px;display:inline-block">
+<div style="font-size:8px;font-weight:500;color:#1a1a1a">Naechster Schritt</div>
+<div style="font-size:7px;color:#888;margin-top:2px">30-Minuten Testlauf mit einer echten Aufgabe aus Ihrer Verwaltung. Kostenlos.</div>
+</div>
+<div style="position:absolute;bottom:5%;left:7%;display:flex;gap:24px;font-size:8px;color:#888">
+<span>florian@ainaryventures.com</span><span>ainaryventures.com</span></div></div>`},
+{label:"V3 — Bookend + Card",tag:"Ainary",
+html:`<div class="sf"><div class="star"></div><div class="dots"></div><div class="logo-chr"><span class="d"></span> Ainary</div>
+<div style="display:flex;gap:8%;align-items:center">
+<div style="flex:1">
+<div class="med" style="font-size:clamp(13px,2.6vw,22px)">Was waere, wenn Ihre Verwaltung so praezise arbeitet wie Ihre Uhren?</div>
+<div class="rule"></div>
+<div class="bod" style="font-weight:500;color:#1a1a1a;margin-top:4px">Wollen wir es ausprobieren?</div>
+</div>
+<div style="flex:0 0 30%;padding:14px;border:1px solid #e0ddd6;border-radius:8px;background:#fff">
+<div style="font-size:10px;font-weight:600;color:#1a1a1a">Florian Ziesche</div>
+<div style="font-size:7px;color:#888;margin-top:4px;line-height:1.6">
+AI Strategy & Research<br>
+florian@ainaryventures.com<br>
+ainaryventures.com
+</div>
+<div style="width:20px;height:1px;background:#c8aa50;margin-top:8px;opacity:.5"></div>
+<div style="font-size:6px;color:#aaa;margin-top:4px">Schlottwitz · Muenchen · New York</div>
+</div></div></div>`}
+]}
+];
+
+var sel={},fb={},cur=0;
+function init(){
+  var nav=document.getElementById('nav');
+  SLIDES.forEach(function(s,i){
+    var d=document.createElement('div');
+    d.className='nav-item'+(i===0?' active':'');
+    d.id='nv'+i;
+    d.innerHTML='<span class="n">'+s.id+'</span>'+s.title.split('—')[0].trim()+'<span class="ck">✓</span>';
+    d.onclick=function(){show(i)};
+    nav.appendChild(d);
+  });
+  show(0);
+}
+function show(i){
+  cur=i;var s=SLIDES[i];
+  document.querySelectorAll('.nav-item').forEach(function(n,j){n.className='nav-item'+(j===i?' active':'')+(sel[j]!==undefined?' done':'')});
+  var m=document.getElementById('main');
+  var h='<div class="slide-header"><h1>Slide '+s.id+': '+s.title+'</h1><p>'+s.sub+'</p></div><div class="visual-row">';
+  s.visuals.forEach(function(v,vi){
+    h+='<div class="vis-card'+(sel[i]===vi?' selected':'')+'" onclick="pick('+i+','+vi+')"><div class="vis-label">'+v.label+'<span class="vis-tag">'+v.tag+'</span></div><div class="slide-frame">'+v.html+'</div></div>';
+  });
+  h+='</div><div class="feedback-area"><textarea id="fb" placeholder="Feedback zu Slide '+s.id+'...">'+(fb[i]||'')+'</textarea></div>';
+  m.innerHTML=h;
+  document.getElementById('fb').addEventListener('input',function(){fb[cur]=this.value});
+}
+function pick(si,vi){sel[si]=vi;show(si)}
+function exportAll(){
+  var lines=[];
+  SLIDES.forEach(function(s,i){
+    if(sel[i]===undefined){lines.push('Slide '+s.id+': NICHT GEWAEHLT');return}
+    lines.push('Slide '+s.id+' ('+s.title+'): '+s.visuals[sel[i]].label+(fb[i]?' | '+fb[i]:''));
+  });
+  navigator.clipboard.writeText(lines.join('\n')).then(function(){alert('Auswahl kopiert!')});
+}
+init();
+</script>
+</body>
+</html>

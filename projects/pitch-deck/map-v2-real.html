@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Option A — Echte Karte</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#faf9f6;--text:#1a1a1a;--text2:#444;--muted:#777;--light:#bbb;--border2:#e8e8e8;--accent:#9d7f3b;--green:#2d8a4e;--f:'Inter',-apple-system,sans-serif;--m:'JetBrains Mono',monospace}
+body{font-family:var(--f);background:var(--bg);color:var(--text);overflow:hidden;width:100vw;height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+.nav{padding:1vw 4.5vw;display:flex;align-items:center;gap:.4vw;font:600 1vw/1 var(--f)}
+.nav .dot{width:.4vw;height:.4vw;border-radius:50%;background:var(--accent)}
+
+/* Map */
+.map-section{position:relative;width:100%;height:55vh;overflow:hidden}
+#map{width:100%;height:100%}
+.mapboxgl-canvas{filter:saturate(.35) brightness(1.08) contrast(.9)}
+.mapboxgl-ctrl{display:none!important}
+
+/* Heading overlay */
+.map-overlay{position:absolute;top:2.5vh;left:4.5vw;z-index:10;pointer-events:none}
+.map-overlay h1{font-size:2.4vw;font-weight:700;letter-spacing:-.03em;color:var(--text)}
+.map-overlay .rule{width:48px;height:2px;background:var(--accent);opacity:.5;margin:.5vh 0}
+.map-overlay .sub{font-size:.85vw;color:var(--text2)}
+
+/* Custom markers */
+.marker{display:flex;align-items:center;gap:6px;white-space:nowrap}
+.marker.left{flex-direction:row-reverse}
+.marker-dot{width:14px;height:14px;border-radius:50%;background:var(--accent);border:2.5px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,.2);flex-shrink:0}
+.marker.big .marker-dot{width:18px;height:18px}
+.marker.current .marker-dot{width:20px;height:20px;background:var(--green);box-shadow:0 0 0 5px rgba(45,138,78,.15),0 1px 5px rgba(0,0,0,.2)}
+.marker-text{font-family:var(--f)}
+.marker-city{font-size:12px;font-weight:600;color:var(--text)}
+.marker-detail{font-size:9px;color:var(--muted)}
+.marker.current .marker-city{color:var(--green)}
+.marker.left .marker-text{text-align:right}
+
+/* Route line via mapbox source/layer — defined in JS */
+
+/* Bottom panel */
+.bottom{flex:1;display:flex;align-items:center;padding:1vh 4.5vw;gap:1.5vw}
+.timeline{flex:1;display:flex;position:relative;padding-top:1vh}
+.timeline::before{content:'';position:absolute;top:0;left:2%;right:2%;height:2px;background:var(--border2)}
+.tl-stop{flex:1;text-align:center;position:relative;padding-top:1.2vh}
+.tl-stop::before{content:'';position:absolute;top:-.22vw;left:50%;transform:translateX(-50%);width:.45vw;height:.45vw;border-radius:50%;background:var(--accent);border:2px solid var(--bg)}
+.tl-stop.big::before{width:.6vw;height:.6vw;top:-.3vw}
+.tl-stop.current::before{background:var(--green);width:.65vw;height:.65vw;top:-.32vw;box-shadow:0 0 0 3px rgba(45,138,78,.15)}
+.tl-year{font:.42vw/1 var(--m);color:var(--accent)}
+.tl-stop.current .tl-year{color:var(--green)}
+.tl-place{font-size:.65vw;font-weight:600;margin:.15vh 0}
+.tl-stop.current .tl-place{color:var(--green)}
+.tl-desc{font-size:.42vw;color:var(--text2);line-height:1.3}
+.kpi-row{display:flex;gap:.45vw}
+.kpi{text-align:center;border:1px solid var(--border2);border-radius:6px;padding:.5vh .5vw;min-width:5vw;background:#fff}
+.kpi-val{font:700 .95vw/1.2 var(--m)}
+.kpi-label{font-size:.38vw;color:var(--muted);margin-top:.15vh}
+.ftr{padding:.3vh 4.5vw .6vh;display:flex;justify-content:space-between;font:.38vw/1 var(--m);color:var(--light)}
+</style>
+</head>
+<body>
+
+<div class="nav"><span class="dot"></span> Ainary</div>
+
+<div class="map-section">
+  <div id="map"></div>
+  <div class="map-overlay">
+    <h1>Florian Ziesche</h1>
+    <div class="rule"></div>
+    <div class="sub">6 Städte · 3 Länder · 12 Jahre KI · Zurück in der Heimat.</div>
+  </div>
+</div>
+
+<div class="bottom">
+  <div class="timeline">
+    <div class="tl-stop"><div class="tl-year">1990</div><div class="tl-place">Schlottwitz</div><div class="tl-desc">Geboren · Schule<br>Ausbildung</div></div>
+    <div class="tl-stop"><div class="tl-year">2011</div><div class="tl-place">Toronto</div><div class="tl-desc">BMW Canada</div></div>
+    <div class="tl-stop big"><div class="tl-year">2012-2023</div><div class="tl-place">München</div><div class="tl-desc">TUM · 36ZERO · €5M</div></div>
+    <div class="tl-stop"><div class="tl-year">2024</div><div class="tl-place">San Francisco</div><div class="tl-desc">Start-Up Mentor</div></div>
+    <div class="tl-stop"><div class="tl-year">2024-25</div><div class="tl-place">New York</div><div class="tl-desc">KI-Berater</div></div>
+    <div class="tl-stop current"><div class="tl-year">2025 - heute</div><div class="tl-place">Glashütte</div><div class="tl-desc">Meine Familie<br>lebt hier.</div></div>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-val">+4M EUR</div><div class="kpi-label">Fundraising</div></div>
+    <div class="kpi"><div class="kpi-val">+2M EUR</div><div class="kpi-label">Fördermittel</div></div>
+    <div class="kpi"><div class="kpi-val">+1M EUR</div><div class="kpi-label">Umsatz</div></div>
+    <div class="kpi"><div class="kpi-val">0 → 1</div><div class="kpi-label">Gründung</div></div>
+    <div class="kpi"><div class="kpi-val">+15</div><div class="kpi-label">Mitarbeiter</div></div>
+  </div>
+</div>
+
+<div class="ftr"><span>florian@ainaryventures.com</span><span>ainaryventures.com</span></div>
+
+<script>
+mapboxgl.accessToken = 'pk.eyJ1IjoiYWluYXJ5IiwiYSI6ImNtbHd1a29iZTAzdmwzanI0bGgzN2d4dzUifQ.5cYsur2midrCBjB4ODo6Xg';
+
+const map = new mapboxgl.Map({
+  container: 'map',
+  style: 'mapbox://styles/mapbox/light-v11',
+  center: [-45, 46],
+  zoom: 2.6,
+  interactive: false,
+  attributionControl: false,
+  logoPosition: 'bottom-right'
+});
+
+// Fit to exact bounds: SF to Schlottwitz
+map.fitBounds([[-128, 36], [18, 58]], { padding: { top: 40, bottom: 10, left: 20, right: 20 }, duration: 0 });
+
+const locations = [
+  { lon: -122.42, lat: 37.77, city: 'San Francisco', detail: '2024 · Mentor', cls: '' },
+  { lon: -79.38, lat: 43.65, city: 'Toronto', detail: '2011 · BMW Canada', cls: '' },
+  { lon: -74.01, lat: 40.71, city: 'New York', detail: '2024 · KI-Berater', cls: '' },
+  { lon: 11.58, lat: 48.14, city: 'München', detail: '2012-2023 · 36ZERO · €5M', cls: 'big left' },
+  { lon: 13.78, lat: 50.85, city: 'Glashütte', detail: '2025 · heute', cls: 'current left' },
+];
+
+// Add markers at exact coordinates
+locations.forEach(loc => {
+  const el = document.createElement('div');
+  el.className = `marker ${loc.cls}`;
+  el.innerHTML = `
+    <div class="marker-dot"></div>
+    <div class="marker-text">
+      <div class="marker-city">${loc.city}</div>
+      <div class="marker-detail">${loc.detail}</div>
+    </div>
+  `;
+  new mapboxgl.Marker({ element: el, anchor: 'center' })
+    .setLngLat([loc.lon, loc.lat])
+    .addTo(map);
+});
+
+// Route line
+map.on('load', () => {
+  map.addSource('route', {
+    type: 'geojson',
+    data: {
+      type: 'Feature',
+      geometry: {
+        type: 'LineString',
+        coordinates: [
+          [13.78, 50.88],   // Schlottwitz (start)
+          [-79.38, 43.65],  // Toronto
+          [11.58, 48.14],   // München
+          [-122.42, 37.77], // SF
+          [-74.01, 40.71],  // NYC
+          [11.58, 48.14],   // München (back)
+          [13.78, 50.85],   // Glashütte
+        ]
+      }
+    }
+  });
+  map.addLayer({
+    id: 'route',
+    type: 'line',
+    source: 'route',
+    paint: {
+      'line-color': '#9d7f3b',
+      'line-width': 1.5,
+      'line-dasharray': [4, 3],
+      'line-opacity': 0.3
+    }
+  });
+});
+</script>
+
+</body>
+</html>

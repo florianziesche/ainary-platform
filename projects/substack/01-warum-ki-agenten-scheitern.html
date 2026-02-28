@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Warum 90% der KI-Agenten in Produktion scheitern — Florian Ziesche</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#fafafa;--surface:#fff;--surface2:#f5f5f3;--border:#d0d0d0;--border2:#e8e8e8;
+  --text:#1a1a1a;--text2:#444;--muted:#777;--light:#bbb;
+  --accent:#9d7f3b;--green:#2d8a4e;--red:#c0392b;--amber:#b45309;--blue:#2563eb;
+  --f:'Inter',-apple-system,sans-serif;--m:'JetBrains Mono',monospace;
+}
+body{font-family:var(--f);color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased}
+.page{max-width:1040px;margin:0 auto;padding:32px 48px 48px}
+.meta{font:400 9pt var(--m);color:var(--muted);margin-bottom:24px;display:flex;gap:16px;align-items:center}
+.meta-dot{width:4px;height:4px;border-radius:50%;background:var(--accent)}
+.title{font-size:28pt;font-weight:700;letter-spacing:-.03em;line-height:1.15;margin-bottom:12px;max-width:700px}
+.subtitle{font-size:13pt;color:var(--text2);line-height:1.5;margin-bottom:32px;max-width:600px}
+.rule{width:48px;height:2px;background:var(--accent);margin:24px 0;opacity:.5}
+h2{font-size:16pt;font-weight:600;letter-spacing:-.02em;margin:32px 0 12px}
+h3{font-size:12pt;font-weight:600;margin:24px 0 8px}
+p{font-size:11pt;color:var(--text2);line-height:1.7;margin-bottom:16px;max-width:680px}
+.highlight{background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:20px 24px;margin:24px 0}
+.highlight-label{font:500 7pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.highlight-val{font:700 24pt var(--m);color:var(--text);margin-bottom:4px}
+.highlight-sub{font-size:9pt;color:var(--muted)}
+
+/* KPI Row */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:24px 0}
+.kpi{background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:16px;text-align:center}
+.kpi-val{font:700 20pt var(--m);color:var(--text);margin-bottom:4px}
+.kpi-label{font-size:8pt;color:var(--muted)}
+
+/* Failure Chart */
+.fail-chart{display:flex;gap:2px;margin:20px 0;height:120px;align-items:flex-end}
+.fail-bar{flex:1;border-radius:3px 3px 0 0;position:relative;min-width:0}
+.fail-bar-label{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font:400 6pt var(--m);color:var(--muted);white-space:nowrap}
+.fail-bar-val{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font:500 7pt var(--m);color:var(--text)}
+
+/* Comparison */
+.comp-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:9pt}
+.comp-table th{text-align:left;font:500 7pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:8px 12px;border-bottom:2px solid var(--text)}
+.comp-table td{padding:10px 12px;border-bottom:1px solid var(--border2);vertical-align:top}
+.comp-table tr:last-child td{border-bottom:none}
+.tag-yes{font:500 7pt var(--m);color:var(--green)}
+.tag-no{font:500 7pt var(--m);color:var(--red)}
+.tag-warn{font:500 7pt var(--m);color:var(--amber)}
+
+/* Quote */
+.quote{border-left:3px solid var(--accent);padding:12px 20px;margin:24px 0;font-style:italic;color:var(--text2);font-size:11pt;line-height:1.6}
+.quote-src{font:400 8pt var(--m);color:var(--muted);margin-top:8px;font-style:normal}
+
+/* Checklist */
+.check{display:flex;gap:8px;align-items:flex-start;margin:8px 0;font-size:10pt;color:var(--text2);line-height:1.5}
+.check-icon{font:500 9pt var(--m);color:var(--green);flex-shrink:0;margin-top:2px}
+.check-icon.red{color:var(--red)}
+
+/* Footer */
+.footer{border-top:1px solid var(--border2);margin-top:48px;padding-top:20px;display:flex;justify-content:space-between;font-size:8pt;color:var(--muted)}
+.footer a{color:var(--accent);text-decoration:none}
+
+/* Source */
+.src{font:400 7pt var(--m);color:var(--light);margin-top:4px}
+
+@media(max-width:700px){.page{padding:24px 16px}.kpi-row{grid-template-columns:repeat(2,1fr)}.title{font-size:22pt}}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="meta">
+  <span>Florian Ziesche</span>
+  <div class="meta-dot"></div>
+  <span>23. Februar 2026</span>
+  <div class="meta-dot"></div>
+  <span>8 Min. Lesezeit</span>
+</div>
+
+<div class="title">Warum 90% der KI-Agenten in Produktion scheitern</div>
+<div class="subtitle">Gartner sagt: 40% aller Agent-Projekte werden bis 2027 eingestellt. Ich sage: Das ist optimistisch. Hier ist warum — und was die 10% anders machen.</div>
+<div class="rule"></div>
+
+<div class="kpi-row">
+  <div class="kpi"><div class="kpi-val">40%</div><div class="kpi-label">Projekte eingestellt bis 2027</div><div class="src">Gartner 2025</div></div>
+  <div class="kpi"><div class="kpi-val">96%</div><div class="kpi-label">sagen: Erfolg hängt von Integration ab</div><div class="src">Salesforce 2026</div></div>
+  <div class="kpi"><div class="kpi-val">570k</div><div class="kpi-label">unbesetzte Stellen im öff. Dienst</div><div class="src">dbb Monitor 2025</div></div>
+  <div class="kpi"><div class="kpi-val">25%</div><div class="kpi-label">Prozesse mit KI-Integration 2026</div><div class="src">EY Technology Pulse</div></div>
+</div>
+
+<h2>Die Demo funktioniert immer</h2>
+
+<p>Jede KI-Demo ist beeindruckend. Du tippst eine Frage ein, die KI antwortet intelligent, alle klatschen. Dann gehst du in Produktion und es passiert das:</p>
+
+<div class="fail-chart">
+  <div class="fail-bar" style="height:95%;background:var(--green)"><div class="fail-bar-val">95%</div><div class="fail-bar-label">Demo</div></div>
+  <div class="fail-bar" style="height:72%;background:var(--accent)"><div class="fail-bar-val">72%</div><div class="fail-bar-label">Pilot</div></div>
+  <div class="fail-bar" style="height:31%;background:var(--amber)"><div class="fail-bar-val">31%</div><div class="fail-bar-label">Produktion</div></div>
+  <div class="fail-bar" style="height:12%;background:var(--red)"><div class="fail-bar-val">12%</div><div class="fail-bar-label">6 Monate</div></div>
+</div>
+<div class="src" style="margin-top:24px">Erfolgsrate von KI-Agenten nach Phase · Eigene Schätzung auf Basis Gartner/Forrester 2025-2026</div>
+
+<p style="margin-top:24px">Der Abfall zwischen Demo und Produktion ist brutal. Nicht weil die Technologie schlecht ist. Sondern weil drei Dinge passieren die in der Demo nie passieren.</p>
+
+<h2>Fehler 1: Halluzinationen in der Entscheidungskette</h2>
+
+<p>Ein Agent der einen Förderantrag vorbereitet und eine falsche Frist nennt, kostet nicht Reputation. Er kostet €200.000 an verlorener Förderung. In meinem Team haben wir deshalb eine harte Regel:</p>
+
+<div class="highlight">
+  <div class="highlight-label">ADR-002 — Production Guardrail</div>
+  <div style="font-size:12pt;font-weight:600;margin-bottom:8px">Kein LLM in der Entscheidungskette.</div>
+  <p style="margin:0">Die KI bereitet vor. Der Mensch entscheidet. Immer. Keine Ausnahme. Ein Agent der autonom handelt ist ein Agent der autonom Fehler macht.</p>
+</div>
+
+<p>Das klingt wie eine Einschränkung. Es ist das Gegenteil. Es ist der Grund warum unsere Systeme in Produktion bleiben während andere abgeschaltet werden.</p>
+
+<h2>Fehler 2: Keine Governance, kein Kill Switch</h2>
+
+<p>Forrester prognostiziert: Bis Ende 2026 werden die Hälfte aller Enterprise-ERP-Anbieter autonome Governance-Module launchen. Audit Trails, Compliance-Monitoring, Echtzeit-Überwachung.</p>
+
+<p>Warum erst jetzt? Weil die meisten Agent-Projekte bisher ohne gebaut wurden.</p>
+
+<div class="quote">
+  "Agents operate with a degree of autonomy. The potential for problems is constant. Bad data handling, policy violations, and unintended actions are all real risks."
+  <div class="quote-src">— Gartner, Agentic AI Predictions 2025</div>
+</div>
+
+<h2>Fehler 3: Feature-Denken statt System-Denken</h2>
+
+<p>Die meisten Teams bauen KI-Features: ein Chatbot hier, eine Zusammenfassung dort, eine Suche da drüben. Drei Tools, drei Datenquellen, drei Wahrheiten. Das skaliert nicht.</p>
+
+<p>Was funktioniert: Ein System das aus einer Datenquelle liest, eine Ontologie hat, und jede Information mit Evidenz-Level markiert.</p>
+
+<table class="comp-table">
+  <thead><tr><th>Dimension</th><th>Feature-Denken</th><th>System-Denken</th></tr></thead>
+  <tbody>
+    <tr><td>Datenquelle</td><td class="tag-no">Pro Feature separat</td><td class="tag-yes">Eine Ontologie</td></tr>
+    <tr><td>Evidenz</td><td class="tag-no">Keine Markierung</td><td class="tag-yes">E/I/J/A auf jedem Claim</td></tr>
+    <tr><td>Lücken</td><td class="tag-no">Verschwiegen</td><td class="tag-yes">Explizit offengelegt</td></tr>
+    <tr><td>Kill Switch</td><td class="tag-no">Nicht vorhanden</td><td class="tag-yes">Eingebaut</td></tr>
+    <tr><td>Audit</td><td class="tag-no">Nachträglich</td><td class="tag-warn">In der Render-Pipeline</td></tr>
+    <tr><td>Skalierung</td><td class="tag-no">O(n²)</td><td class="tag-yes">O(1) pro Feature</td></tr>
+  </tbody>
+</table>
+
+<h2>Was die 10% anders machen</h2>
+
+<p>Die Projekte die überleben haben drei Dinge gemeinsam:</p>
+
+<div class="check"><span class="check-icon">01</span><span><strong>Mensch entscheidet.</strong> Die KI macht 80% Vorarbeit. Der Mensch prüft, ändert, unterschreibt. Kein vollautonomer Agent.</span></div>
+<div class="check"><span class="check-icon">02</span><span><strong>Ehrlich über Lücken.</strong> Jeder Output sagt was er weiß (Evidenz), was er ableitet (Inference), und was er nicht weiß (Gaps). Ein System das seine Grenzen kennt, ist vertrauenswürdig.</span></div>
+<div class="check"><span class="check-icon">03</span><span><strong>Schema vor Code.</strong> Erst definieren was existieren kann (Ontologie). Dann bauen. Nicht umgekehrt. Palantir hat das verstanden. Die meisten Startups nicht.</span></div>
+
+<p>40% der Agent-Projekte werden eingestellt. Die anderen 60% werden umgebaut. Die 10% die von Anfang an richtig gebaut wurden? Die werden das nächste Jahrzehnt definieren.</p>
+
+<div class="highlight" style="border-left:3px solid var(--accent);border:1px solid var(--border2);border-left:3px solid var(--accent)">
+  <div style="font-size:11pt;font-weight:500;margin-bottom:8px">Takeaway</div>
+  <p style="margin:0">Die Frage ist nicht ob KI-Agenten funktionieren. Die Frage ist ob dein Agent ehrlich sagt wenn er etwas nicht weiß. Das ist der einzige Moat der zählt.</p>
+</div>
+
+<div class="footer">
+  <div>
+    <strong>Florian Ziesche</strong> · 12 Jahre KI-Erfahrung · Ex-CEO 36ZERO Vision (€5M raised)<br>
+    <a href="https://ainaryventures.com">ainaryventures.com</a>
+  </div>
+  <div style="text-align:right">
+    Quellen: Gartner 2025, Forrester 2026, Salesforce Connectivity Report 2026,<br>EY Technology Pulse 2026, dbb Beamtenbund 2025
+  </div>
+</div>
+
+</div>
+</body>
+</html>

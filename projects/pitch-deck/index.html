@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ainary Ventures — Glashütte</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --f:'Inter',-apple-system,sans-serif;
+  --m:'JetBrains Mono',monospace;
+  --bg:#faf8f4;--surface:#ffffff;--s2:#f2efe8;
+  --text:#1a1a1a;--t2:#4a4a4a;--t3:#7a7a7a;--t4:#a0a0a0;
+  --accent:#c8aa50;--accent-bg:rgba(200,170,80,0.08);
+  --green:#1a6b3c;--brd:rgba(0,0,0,0.08);
+  --shadow:0 1px 3px rgba(0,0,0,0.04),0 4px 24px rgba(0,0,0,0.06);
+}
+html,body{height:100%;font-family:var(--f);background:var(--bg);color:var(--text);overflow:hidden;-webkit-font-smoothing:antialiased}
+
+/* Slide system */
+.deck{height:100%;width:100%;position:relative}
+.slide{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;justify-content:space-between;
+  padding:60px 80px;
+  opacity:0;pointer-events:none;transition:opacity .5s ease;
+  background:var(--bg);
+  background-image:radial-gradient(circle,rgba(0,0,0,0.03) 1px,transparent 1px);
+  background-size:24px 24px;
+}
+.slide.active{opacity:1;pointer-events:auto}
+.slide.active .a{opacity:1;transform:translateY(0)}
+.a{opacity:0;transform:translateY(16px);transition:opacity .6s ease-out,transform .6s ease-out}
+
+/* Content container */
+.content{max-width:1000px;width:100%;flex:1;display:flex;flex-direction:column;justify-content:center}
+
+/* Slide anatomy */
+.label{font-family:var(--m);font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;color:var(--t4);margin-bottom:16px}
+.action-title{font-size:1.5rem;font-weight:600;letter-spacing:-.03em;line-height:1.25;color:var(--text);max-width:700px;margin-bottom:32px}
+.body{flex:1;display:flex;flex-direction:column;justify-content:center}
+.so-what{font-size:.7rem;color:var(--t3);margin-top:auto;padding-top:24px;font-family:var(--m)}
+
+/* Text */
+.sub{font-size:.85rem;font-weight:400;color:var(--t2);max-width:600px;line-height:1.7}
+.accent{color:var(--accent)}
+
+/* Big number with glow */
+.big-num{font-size:clamp(3rem,7vw,5rem);font-weight:600;color:var(--accent);position:relative;display:inline-block;margin-bottom:16px}
+.big-num::before{content:'';position:absolute;inset:-30%;border-radius:50%;background:radial-gradient(ellipse,rgba(200,170,80,0.12) 0%,transparent 70%);z-index:-1}
+
+/* KPI grid */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:24px;max-width:800px}
+.kpi{text-align:center;padding:24px;background:var(--surface);border:1px solid var(--brd);border-radius:10px;position:relative}
+.kpi::before{content:'';position:absolute;inset:-20px;background:radial-gradient(ellipse,rgba(200,170,80,0.1) 0%,transparent 70%);z-index:-1}
+.kpi-value{font-size:2rem;font-weight:600;color:var(--accent)}
+.kpi-label{font-size:.7rem;color:var(--t3);margin-top:4px}
+
+/* Tags */
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.tag{background:var(--accent-bg);color:var(--accent);padding:6px 14px;border-radius:20px;font-size:.75rem;font-weight:500}
+
+/* Card */
+.card{background:var(--surface);border:1px solid var(--brd);border-radius:10px;padding:32px;box-shadow:var(--shadow);max-width:800px}
+
+/* Progress bars */
+.bar-group{margin-bottom:20px}
+.bar-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.bar-name{font-size:.8rem;font-weight:500;color:var(--text)}
+.bar-delta{font-size:.75rem;font-weight:500;color:var(--green)}
+.bar-track{height:8px;background:var(--s2);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),#d4ba6a);border-radius:4px;width:0;transition:width 1s ease-out .4s}
+.slide.active .bar-fill{width:var(--w)}
+
+/* Credentials grid */
+.cred-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:600px}
+.cred{padding:20px;background:var(--surface);border:1px solid var(--brd);border-radius:10px}
+.cred-val{font-size:1.6rem;font-weight:600;color:var(--accent)}
+.cred-lbl{font-size:.7rem;color:var(--t3);margin-top:4px}
+
+/* Cover special */
+.cover-center{text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1}
+.cover-title{font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:600;letter-spacing:-.03em;line-height:1.2;max-width:600px;margin-bottom:16px}
+.cover-sub{font-size:.85rem;color:var(--t3);font-weight:300}
+.cover-meta{font-size:.7rem;color:var(--t4);font-family:var(--m)}
+
+/* Close */
+.close-center{text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1}
+.close-title{font-size:clamp(1.6rem,3.5vw,2.2rem);font-weight:600;letter-spacing:-.03em;line-height:1.2;margin-bottom:24px}
+.close-contact{font-size:.9rem;color:var(--t2);line-height:2}
+.close-contact a{color:var(--accent);text-decoration:none}
+
+/* Nav dots */
+.nav{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:10}
+.dot{width:7px;height:7px;border-radius:50%;background:rgba(0,0,0,0.1);cursor:pointer;transition:all .3s}
+.dot.on{background:var(--accent);transform:scale(1.4)}
+
+/* Mobile */
+@media(max-width:640px){
+  .slide{padding:32px 24px}
+  .action-title{font-size:1.2rem}
+  .kpi-grid{grid-template-columns:1fr 1fr}
+  .cred-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+<!-- 0: Cover -->
+<div class="slide active">
+  <div class="cover-center">
+    <div class="a" style="transition-delay:0ms"><span class="label">Ainary Ventures</span></div>
+    <div class="a" style="transition-delay:80ms"><h1 class="cover-title">KI-Assistenz für<br>kommunale Verwaltung</h1></div>
+    <div class="a" style="transition-delay:160ms"><p class="cover-sub">Vorbereitet für die Stadt Glashütte</p></div>
+    <div class="a" style="transition-delay:240ms;margin-top:48px"><p class="cover-meta">Florian Ziesche · 24. Februar 2025</p></div>
+  </div>
+</div>
+
+<!-- 1: Situation -->
+<div class="slide">
+  <div class="content">
+    <div class="a" style="transition-delay:0ms"><div class="label">01 · Situation</div></div>
+    <div class="a" style="transition-delay:80ms"><h2 class="action-title">6.414 Einwohner, 85 Mitarbeiter, 16 Ortsteile — Glashütte ist typisch für sächsische Kleinstädte</h2></div>
+    <div class="body">
+      <div class="a" style="transition-delay:160ms">
+        <div class="kpi-grid">
+          <div class="kpi"><div class="kpi-value">6.414</div><div class="kpi-label">Einwohner</div></div>
+          <div class="kpi"><div class="kpi-value">16</div><div class="kpi-label">Ortsteile auf 95 km²</div></div>
+          <div class="kpi"><div class="kpi-value">~85</div><div class="kpi-label">Verwaltungsmitarbeiter</div></div>
+          <div class="kpi"><div class="kpi-value">400%</div><div class="kpi-label">Gewerbesteuer-Hebesatz</div></div>
+        </div>
+      </div>
+      <div class="a" style="transition-delay:240ms"><p class="sub" style="margin-top:24px">Weltbekannte Uhrenstadt — A. Lange & Söhne, NOMOS, Glashütte Original — mit den gleichen Verwaltungsproblemen wie jede Gemeinde dieser Größe.</p></div>
+    </div>
+    <div class="a" style="transition-delay:320ms"><div class="so-what">Quelle: Statistisches Landesamt Sachsen, Gemeindeportrait 2024</div></div>
+  </div>
+</div>
+
+<!-- 2: Complication -->
+<div class="slide">
+  <div class="content">
+    <div class="a" style="transition-delay:0ms"><div class="label">02 · Herausforderung</div></div>
+    <div class="a" style="transition-delay:80ms"><h2 class="action-title">Die Anforderungen steigen, die Ressourcen nicht — und jedes Jahr fehlen mehr Leute</h2></div>
+    <div class="body" style="display:flex;flex-direction:column;align-items:flex-start;justify-content:center">
+      <div class="a" style="transition-delay:160ms">
+        <div class="big-num">-1,2%</div>
+        <p class="sub" style="margin-bottom:24px">Einwohner pro Jahr. Der Trend hält seit einem Jahrzehnt an.</p>
+      </div>
+      <div class="a" style="transition-delay:240ms">
+        <div class="tags">
+          <span class="tag">Demografischer Wandel</span>
+          <span class="tag">Uhrenindustrie-Abhängigkeit</span>
+          <span class="tag">Hochwasserrisiko</span>
+          <span class="tag">Fachkräftemangel</span>
+          <span class="tag">Tourismus-Potenzial</span>
+          <span class="tag">Digitalisierungsrückstand</span>
+          <span class="tag">16 Ortsteile koordinieren</span>
+        </div>
+      </div>
+    </div>
+    <div class="a" style="transition-delay:320ms"><div class="so-what">7 Herausforderungen, die gleichzeitig bearbeitet werden müssen — mit schrumpfendem Team.</div></div>
+  </div>
+</div>
+
+<!-- 3: Vision -->
+<div class="slide">
+  <div class="cover-center">
+    <div class="a" style="transition-delay:0ms"><div class="label">03 · Vision</div></div>
+    <div class="a" style="transition-delay:160ms"><h1 class="cover-title" style="max-width:700px">Was wäre, wenn Ihre Verwaltung in 10 Minuten wüsste, wofür andere Gemeinden Monate brauchen?</h1></div>
+    <div class="a" style="transition-delay:320ms"><p class="sub" style="text-align:center;max-width:500px">Ein KI-System, das öffentliche Daten analysiert, Förderprogramme findet und konkrete Handlungsempfehlungen liefert.</p></div>
+  </div>
+</div>
+
+<!-- 4: Demo -->
+<div class="slide">
+  <div class="content">
+    <div class="a" style="transition-delay:0ms"><div class="label">04 · Live-Ergebnis</div></div>
+    <div class="a" style="transition-delay:80ms"><h2 class="action-title">In 3 Minuten hat das System 5 Förderprogramme und 3 Vergleichsgemeinden für Glashütte gefunden</h2></div>
+    <div class="body">
+      <div class="a" style="transition-delay:160ms">
+        <div class="kpi-grid" style="margin-bottom:32px">
+          <div class="kpi"><div class="kpi-value">5</div><div class="kpi-label">Förderprogramme identifiziert</div></div>
+          <div class="kpi"><div class="kpi-value">7</div><div class="kpi-label">Herausforderungen analysiert</div></div>
+          <div class="kpi"><div class="kpi-value">3</div><div class="kpi-label">Vergleichsgemeinden</div></div>
+          <div class="kpi"><div class="kpi-value">12</div><div class="kpi-label">Handlungsempfehlungen</div></div>
+        </div>
+      </div>
+      <div class="a" style="transition-delay:240ms">
+        <p class="sub">Keine manuelle Recherche. Keine externen Berater. Das System nutzt ausschließlich öffentlich verfügbare Daten — Statistikämter, Förderdatenbanken, Gemeindeverzeichnisse.</p>
+      </div>
+    </div>
+    <div class="a" style="transition-delay:320ms"><div class="so-what">Echte Analyse für Glashütte, erstellt am 20.02.2025 · Vollständiger Bericht verfügbar</div></div>
+  </div>
+</div>
+
+<!-- 5: Results detail -->
+<div class="slide">
+  <div class="content">
+    <div class="a" style="transition-delay:0ms"><div class="label">05 · Ergebnisse im Detail</div></div>
+    <div class="a" style="transition-delay:80ms"><h2 class="action-title">Allein bei Fördermitteln bleiben jährlich Hunderttausende Euro liegen</h2></div>
+    <div class="body">
+      <div class="a" style="transition-delay:160ms">
+        <div class="card" style="margin-bottom:24px">
+          <p style="font-weight:500;font-size:.85rem;margin-bottom:12px">Erkannte Förderprogramme</p>
+          <div class="tags">
+            <span class="tag">LEADER Sachsen</span>
+            <span class="tag">Regionalbudgets (5,4 Mio €)</span>
+            <span class="tag">Städtebauförderung</span>
+            <span class="tag">Masterplan Digitale Verwaltung</span>
+            <span class="tag">OZG-Umsetzung</span>
+          </div>
+        </div>
+      </div>
+      <div class="a" style="transition-delay:240ms">
+        <div class="card">
+          <p style="font-weight:500;font-size:.85rem;margin-bottom:12px">Vergleichsgemeinden mit übertragbaren Strategien</p>
+          <p class="sub" style="max-width:100%"><span class="accent">Schramberg</span> (Uhrenindustrie, Baden-Württemberg) · <span class="accent">Pforzheim</span> (Schmuck & Uhren, Strukturwandel) · <span class="accent">Altenberg</span> (Sachsen, ähnliche Größe & Lage)</p>
+        </div>
+      </div>
+    </div>
+    <div class="a" style="transition-delay:320ms"><div class="so-what">Jedes Förderprogramm enthält Fristen, Ansprechpartner und geschätzte Förderhöhe.</div></div>
+  </div>
+</div>
+
+<!-- 6: Before/After -->
+<div class="slide">
+  <div class="content">
+    <div class="a" style="transition-delay:0ms"><div class="label">06 · Wirkung</div></div>
+    <div class="a" style="transition-delay:80ms"><h2 class="action-title">Was Monate dauert, dauert jetzt Minuten — bei einem Bruchteil der Kosten</h2></div>
+    <div class="body">
+      <div class="a" style="transition-delay:160ms">
+        <div class="card">
+          <div class="bar-group">
+            <div class="bar-row"><span class="bar-name">Strategieanalyse</span><span class="bar-delta">3 Wochen → 10 Minuten</span></div>
+            <div class="bar-track"><div class="bar-fill" style="--w:95%"></div></div>
+          </div>
+          <div class="bar-group">
+            <div class="bar-row"><span class="bar-name">Fördermittel-Recherche</span><span class="bar-delta">2 Wochen → 5 Minuten</span></div>
+            <div class="bar-track"><div class="bar-fill" style="--w:90%"></div></div>
+          </div>
+          <div class="bar-group">
+            <div class="bar-row"><span class="bar-name">Benchmarking mit Vergleichsgemeinden</span><span class="bar-delta">Nie gemacht → automatisch</span></div>
+            <div class="bar-track"><div class="bar-fill" style="--w:100%"></div></div>
+          </div>
+          <div class="bar-group" style="margin-bottom:0">
+            <div class="bar-row"><span class="bar-name">Externe Beraterkosten</span><span class="bar-delta">120–180T € → unter 60T €</span></div>
+            <div class="bar-track"><div class="bar-fill" style="--w:65%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="a" style="transition-delay:240ms"><div class="so-what">Investition: €15–30K · Geschätzte Zeitersparnis: 20–40% administrativer Aufwand</div></div>
+  </div>
+</div>
+
+<!-- 7: About -->
+<div class="slide">
+  <div class="content">
+    <div class="a" style="transition-delay:0ms"><div class="label">07 · Hintergrund</div></div>
+    <div class="a" style="transition-delay:80ms"><h2 class="action-title">10 Jahre KI-Erfahrung bei BMW und Siemens — jetzt für Kommunen</h2></div>
+    <div class="body">
+      <div class="a" style="transition-delay:160ms">
+        <div class="cred-grid">
+          <div class="cred"><div class="cred-val">10+</div><div class="cred-lbl">Jahre KI & Datenanalyse</div></div>
+          <div class="cred"><div class="cred-val">€5M</div><div class="cred-lbl">Kapital eingeworben</div></div>
+          <div class="cred"><div class="cred-val">BMW</div><div class="cred-lbl">Siemens · Enterprise AI</div></div>
+          <div class="cred"><div class="cred-val">2025</div><div class="cred-lbl">Gründung Ainary Ventures</div></div>
+        </div>
+      </div>
+      <div class="a" style="transition-delay:240ms;margin-top:24px">
+        <p class="sub">Ich baue das System, das ich mir als Berater selbst gewünscht hätte — ehrlich, pragmatisch, ohne Berater-Aufschlag.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 8: Close -->
+<div class="slide">
+  <div class="close-center">
+    <div class="a" style="transition-delay:0ms"><div class="label">Ainary Ventures</div></div>
+    <div class="a" style="transition-delay:160ms"><h1 class="close-title">Wollen wir es<br>ausprobieren?</h1></div>
+    <div class="a" style="transition-delay:320ms">
+      <p class="close-contact">
+        <a href="mailto:florian@ainaryventures.com">florian@ainaryventures.com</a><br>
+        <a href="https://ainaryventures.com">ainaryventures.com</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="nav" id="nav"></div>
+
+<script>
+const slides=document.querySelectorAll('.slide'),nav=document.getElementById('nav');
+let cur=0;
+slides.forEach((_,i)=>{const d=document.createElement('div');d.className='dot'+(i===0?' on':'');d.onclick=()=>go(i);nav.appendChild(d)});
+function go(n){if(n<0||n>=slides.length)return;slides[cur].classList.remove('active');nav.children[cur].classList.remove('on');cur=n;slides[cur].classList.add('active');nav.children[cur].classList.add('on')}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' '){e.preventDefault();go(cur+1)}if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();go(cur-1)}});
+let tx=0;document.addEventListener('touchstart',e=>tx=e.touches[0].clientX);
+document.addEventListener('touchend',e=>{const d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50){d<0?go(cur+1):go(cur-1)}});
+document.querySelector('.deck').addEventListener('click',e=>{if(e.target.closest('a,.nav'))return;const r=e.clientX/window.innerWidth;r>.6?go(cur+1):r<.4&&go(cur-1)});
+</script>
+</body>
+</html>

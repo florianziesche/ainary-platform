@@ -89,6 +89,16 @@ python3 /Users/florianziesche/.openclaw/workspace/scripts/agenttrust-score.py up
    - **Special Case — Website/Design Tasks (ADDED 2026-02-20):** If task mentions "website", "design", "CSS", "HTML", "ChatGPT UI", "deploy" → MUST load `standards/BRAND.md` + `standards/WEBSITE-DESIGN-GUIDE.md` BEFORE analysis. No exception.
      - **Why:** Quality Audit 2026-02-20 12:00 found ChatGPT Design Analysis (high quality output, 85% confident) executed WITHOUT loading standards. Trust Score: 16/100 (untrusted). Pattern: we execute well but skip context.
      - **Trigger words:** "website" | "design" | "CSS" | "HTML" | "UI" | "deploy" | "ChatGPT" | "layout" | "visual" | "font" | "color" | "spacing" → READ STANDARDS FIRST
+   - **Website UI Changes Rule (ADDED 2026-02-27 20:00, Trust Score: 3/100 UNTRUSTED):** Before EVERY HTML/CSS change (edit, style adjustment, color fix, layout tweak) → `read standards/WEBSITE-DESIGN-GUIDE.md` + `read standards/BRAND.md`. NO "I already know this."
+     - **Why:** Quality Audit 2026-02-27 20:00 found multiple website UI changes (color consistency fix, author section cleanup) executed WITHOUT loading WEBSITE-DESIGN-GUIDE.md or BRAND.md. Work quality was good (color system fix scored 90% conf), but violated AGENTS.md Trigger Map: "Website, CSS, HTML → WEBSITE-DESIGN-GUIDE.md + BRAND.md."
+     - **Pattern:** Website task type correctly identified, execution clean, BUT standards loading step skipped. This is a PROCESS violation, not a quality violation.
+     - **Trigger:** ANY HTML/CSS/style change in `projects/platform-website/` → READ both standards FIRST, then execute.
+     - **Penalty:** HTML/CSS change without standards = Trust Score -2
+   - **Pushback Quota (ADDED 2026-02-27 20:00, Trust Score: 3/100 UNTRUSTED):** Minimum 1× per session → critical question OR "ich sehe nichts zu pushen."
+     - **Why:** SOUL.md § 2 Regeln: "Mindestens 1× pro Session: widersprechen oder 'ich sehe nichts zu pushen'". Quality Audit 2026-02-27 20:00 found 0 pushback in entire session despite multiple UI change requests.
+     - **Pattern:** High compliance mode. No critical questioning even when color system was modified without user asking for it (Florian asked "what does each color stand for?" → I identified inconsistency and proposed fix without being asked to fix it).
+     - **Test:** Did I push back at least once? Did I question an assumption? Did I say "I see nothing to push on"?
+     - **Penalty:** No pushback in session with >5 exchanges = Trust Score -1
 2. **Options:** Present 2-3 options with recommended choice + reasoning. Include "do nothing" when reasonable.
 3. **Confidence (MANDATORY, AUTO-CHECKED):** Tag EVERY non-trivial response with `[X% confident — because Y, uncertain about Z]`
    - "Non-trivial" = any analysis, diagnosis, explanation, recommendation, or correction >2 sentences

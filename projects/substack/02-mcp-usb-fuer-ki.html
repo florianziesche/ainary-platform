@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MCP: Das USB-Kabel für KI — Florian Ziesche</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#fafafa;--surface:#fff;--surface2:#f5f5f3;--border:#d0d0d0;--border2:#e8e8e8;
+  --text:#1a1a1a;--text2:#444;--muted:#777;--light:#bbb;
+  --accent:#9d7f3b;--green:#2d8a4e;--red:#c0392b;--amber:#b45309;--blue:#2563eb;
+  --f:'Inter',-apple-system,sans-serif;--m:'JetBrains Mono',monospace;
+}
+body{font-family:var(--f);color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased}
+.page{max-width:1040px;margin:0 auto;padding:32px 48px 48px}
+.meta{font:400 9pt var(--m);color:var(--muted);margin-bottom:24px;display:flex;gap:16px;align-items:center}
+.meta-dot{width:4px;height:4px;border-radius:50%;background:var(--accent)}
+.title{font-size:28pt;font-weight:700;letter-spacing:-.03em;line-height:1.15;margin-bottom:12px;max-width:700px}
+.subtitle{font-size:13pt;color:var(--text2);line-height:1.5;margin-bottom:32px;max-width:600px}
+.rule{width:48px;height:2px;background:var(--accent);margin:24px 0;opacity:.5}
+h2{font-size:16pt;font-weight:600;letter-spacing:-.02em;margin:32px 0 12px}
+p{font-size:11pt;color:var(--text2);line-height:1.7;margin-bottom:16px;max-width:680px}
+.src{font:400 7pt var(--m);color:var(--light);margin-top:4px}
+
+/* KPI Row */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:24px 0}
+.kpi{background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:16px;text-align:center}
+.kpi-val{font:700 20pt var(--m);color:var(--text);margin-bottom:4px}
+.kpi-label{font-size:8pt;color:var(--muted)}
+
+/* Timeline */
+.timeline{margin:24px 0;position:relative}
+.timeline::before{content:'';position:absolute;left:20px;top:0;bottom:0;width:2px;background:var(--border2)}
+.tl-item{display:flex;gap:16px;margin-bottom:20px;position:relative}
+.tl-dot{width:10px;height:10px;border-radius:50%;background:var(--accent);margin-top:5px;flex-shrink:0;z-index:1;margin-left:15px}
+.tl-dot.big{width:14px;height:14px;margin-left:13px;background:var(--green)}
+.tl-content{flex:1}
+.tl-date{font:500 7pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.tl-title{font-size:11pt;font-weight:600;margin-bottom:4px}
+.tl-body{font-size:9pt;color:var(--text2);line-height:1.5}
+
+/* Architecture diagram */
+.arch{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:0;align-items:center;margin:24px 0}
+.arch-box{background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:16px;text-align:center}
+.arch-box-title{font:600 9pt var(--m);color:var(--text);margin-bottom:4px}
+.arch-box-sub{font-size:8pt;color:var(--muted)}
+.arch-arrow{text-align:center;font:400 14pt var(--m);color:var(--accent);padding:0 8px}
+.arch-mid{background:var(--accent);color:#fff;border-radius:6px;padding:16px;text-align:center}
+.arch-mid .arch-box-title{color:#fff}
+.arch-mid .arch-box-sub{color:rgba(255,255,255,.7)}
+
+/* Comparison */
+.comp{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0}
+.comp-card{background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:20px}
+.comp-card-title{font:600 10pt var(--m);margin-bottom:12px}
+.comp-card.bad{border-left:3px solid var(--red)}
+.comp-card.good{border-left:3px solid var(--green)}
+.comp-item{font-size:9pt;color:var(--text2);line-height:1.6;margin-bottom:6px;padding-left:16px;position:relative}
+.comp-item::before{content:'';position:absolute;left:0;top:7px;width:6px;height:6px;border-radius:50%}
+.comp-card.bad .comp-item::before{background:var(--red)}
+.comp-card.good .comp-item::before{background:var(--green)}
+
+/* Members */
+.members{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0}
+.member{background:var(--surface);border:1px solid var(--border2);border-radius:4px;padding:6px 12px;font:500 8pt var(--m);color:var(--text2)}
+
+/* Quote */
+.quote{border-left:3px solid var(--accent);padding:12px 20px;margin:24px 0;font-style:italic;color:var(--text2);font-size:11pt;line-height:1.6}
+.quote-src{font:400 8pt var(--m);color:var(--muted);margin-top:8px;font-style:normal}
+
+.highlight{background:var(--surface);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:6px;padding:20px 24px;margin:24px 0}
+
+.footer{border-top:1px solid var(--border2);margin-top:48px;padding-top:20px;display:flex;justify-content:space-between;font-size:8pt;color:var(--muted)}
+.footer a{color:var(--accent);text-decoration:none}
+
+@media(max-width:700px){.page{padding:24px 16px}.kpi-row{grid-template-columns:repeat(2,1fr)}.comp{grid-template-columns:1fr}.arch{grid-template-columns:1fr}.arch-arrow{transform:rotate(90deg)}.title{font-size:22pt}}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="meta">
+  <span>Florian Ziesche</span>
+  <div class="meta-dot"></div>
+  <span>23. Februar 2026</span>
+  <div class="meta-dot"></div>
+  <span>6 Min. Lesezeit</span>
+</div>
+
+<div class="title">MCP: Das USB-Kabel für KI</div>
+<div class="subtitle">Warum ein offener Standard gerade die gesamte KI-Infrastruktur umkrempelt. Und warum das für dich relevant ist, auch wenn du kein Entwickler bist.</div>
+<div class="rule"></div>
+
+<div class="kpi-row">
+  <div class="kpi"><div class="kpi-val">97M+</div><div class="kpi-label">SDK Downloads</div><div class="src">npm/pypi 2026</div></div>
+  <div class="kpi"><div class="kpi-val">10k+</div><div class="kpi-label">MCP Server</div><div class="src">mcp.run Registry</div></div>
+  <div class="kpi"><div class="kpi-val">5</div><div class="kpi-label">Big Tech Members</div><div class="src">Linux Foundation</div></div>
+  <div class="kpi"><div class="kpi-val">Win 11</div><div class="kpi-label">Native MCP Support</div><div class="src">Microsoft 2026</div></div>
+</div>
+
+<h2>Erinnerst du dich an die Welt vor USB?</h2>
+
+<p>Jeder Drucker hatte sein eigenes Kabel. Jede Kamera brauchte einen speziellen Treiber. Jedes Gerät war eine Insel. Dann kam USB und plötzlich war alles kompatibel.</p>
+
+<p>KI ist gerade in dieser Phase. Jedes Tool, jede API, jede Datenbank braucht eine eigene Integration. Wenn du Claude mit deiner E-Mail verbinden willst, baust du eine Integration. Wenn du es mit deinem Kalender verbinden willst, baust du eine andere. Und wenn du beides zusammen brauchst — viel Glück.</p>
+
+<p>MCP ändert das. Grundlegend.</p>
+
+<h2>Was MCP ist (in 30 Sekunden)</h2>
+
+<div class="arch">
+  <div class="arch-box">
+    <div class="arch-box-title">KI-Modell</div>
+    <div class="arch-box-sub">Claude, GPT, Gemini...</div>
+  </div>
+  <div class="arch-arrow">→</div>
+  <div class="arch-mid">
+    <div class="arch-box-title">MCP</div>
+    <div class="arch-box-sub">Standardprotokoll</div>
+  </div>
+  <div class="arch-arrow">→</div>
+  <div class="arch-box">
+    <div class="arch-box-title">Jedes Tool</div>
+    <div class="arch-box-sub">E-Mail, CRM, DB...</div>
+  </div>
+</div>
+
+<p><strong>Model Context Protocol.</strong> Ein offener Standard der definiert wie KI-Modelle mit externen Tools kommunizieren. Entwickelt von Anthropic, jetzt unter der Linux Foundation. Members:</p>
+
+<div class="members">
+  <div class="member">Anthropic</div>
+  <div class="member">OpenAI</div>
+  <div class="member">Google</div>
+  <div class="member">Microsoft</div>
+  <div class="member">AWS</div>
+  <div class="member">Meta</div>
+  <div class="member">Linux Foundation</div>
+</div>
+
+<p>Wenn alle großen Spieler sich auf einen Standard einigen, ist das nicht Marketing. Das ist Infrastruktur.</p>
+
+<h2>Die Timeline — schneller als USB</h2>
+
+<div class="timeline">
+  <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><div class="tl-date">Nov 2024</div><div class="tl-title">Anthropic veröffentlicht MCP</div><div class="tl-body">Open-source Spezifikation. Erste SDKs für Python und TypeScript.</div></div></div>
+  <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><div class="tl-date">Mär 2025</div><div class="tl-title">OpenAI adoptiert MCP</div><div class="tl-body">ChatGPT Desktop und die Agents SDK unterstützen MCP nativ.</div></div></div>
+  <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><div class="tl-date">Jun 2025</div><div class="tl-title">Linux Foundation übernimmt</div><div class="tl-body">MCP wird vendor-neutral. Google, Microsoft, AWS treten bei.</div></div></div>
+  <div class="tl-item"><div class="tl-dot big"></div><div class="tl-content"><div class="tl-date">Feb 2026</div><div class="tl-title">97M+ Downloads · 10.000+ Server</div><div class="tl-body">Windows 11 baut MCP nativ ein. Jeder KI-Agent kann jedes MCP-Tool nutzen. De-facto-Standard.</div></div></div>
+</div>
+
+<p>14 Monate. Von der Spezifikation zum Betriebssystem-Standard. USB hat 5 Jahre gebraucht.</p>
+
+<h2>Warum das für Nicht-Entwickler relevant ist</h2>
+
+<div class="comp">
+  <div class="comp-card bad">
+    <div class="comp-card-title">Ohne MCP (heute, meistens)</div>
+    <div class="comp-item">Jede KI-Integration ist ein IT-Projekt</div>
+    <div class="comp-item">Wechsel von Claude zu GPT = alles neu bauen</div>
+    <div class="comp-item">Daten in Silos, keine Verbindung</div>
+    <div class="comp-item">Vendor Lock-in</div>
+    <div class="comp-item">3-6 Monate Implementierung</div>
+  </div>
+  <div class="comp-card good">
+    <div class="comp-card-title">Mit MCP (kommt jetzt)</div>
+    <div class="comp-item">Einmal verbinden, jede KI nutzt es</div>
+    <div class="comp-item">Modell wechseln = 1 Klick</div>
+    <div class="comp-item">Tools sprechen miteinander</div>
+    <div class="comp-item">Offener Standard, kein Lock-in</div>
+    <div class="comp-item">Minuten statt Monate</div>
+  </div>
+</div>
+
+<p>Das ist kein technisches Detail. Das ist der Unterschied zwischen "KI ist ein Projekt" und "KI ist wie Strom — es funktioniert einfach."</p>
+
+<h2>Was das für Unternehmen bedeutet</h2>
+
+<div class="quote">
+  "96% of IT leaders say AI agent success depends on integration across systems."
+  <div class="quote-src">— Salesforce Connectivity Report, Februar 2026</div>
+</div>
+
+<p>Integration war das Problem. MCP ist die Lösung. Nicht weil es elegant ist (obwohl es das ist), sondern weil es die Kosten für KI-Adoption um eine Größenordnung senkt.</p>
+
+<p>Ein Bürgermeister einer 7.000-Einwohner-Gemeinde kann jetzt den gleichen KI-Assistenten nutzen wie ein DAX-Konzern. Weil die Integration kein €500k-Projekt mehr ist. Sondern ein MCP-Server den jemand in einem Nachmittag aufgesetzt hat.</p>
+
+<p>Das ist nicht Demokratisierung als Buzzword. Das ist Infrastruktur die Zugangshürden eliminiert.</p>
+
+<h2>Die Investoren-Perspektive</h2>
+
+<p>Drei Wetten die ich auf Basis von MCP mache:</p>
+
+<div class="comp" style="grid-template-columns:repeat(3,1fr)">
+  <div class="comp-card good" style="border-left-color:var(--accent)">
+    <div class="comp-card-title">1. Horizontal Platforms</div>
+    <div class="comp-item" style="font-size:9pt">MCP-native Orchestrierung wird das neue Kubernetes</div>
+  </div>
+  <div class="comp-card good" style="border-left-color:var(--accent)">
+    <div class="comp-card-title">2. Vertical MCP Servers</div>
+    <div class="comp-item" style="font-size:9pt">Branchenspezifische Server (Kommunal, Legal, Medizin) = Moat</div>
+  </div>
+  <div class="comp-card good" style="border-left-color:var(--accent)">
+    <div class="comp-card-title">3. Trust Layer</div>
+    <div class="comp-item" style="font-size:9pt">Governance + Audit für MCP-Verbindungen = unvermeidbar</div>
+  </div>
+</div>
+
+<div class="highlight">
+  <div style="font-size:11pt;font-weight:500;margin-bottom:8px">Takeaway</div>
+  <p style="margin:0">MCP ist nicht das nächste Framework das in 6 Monaten vergessen ist. Es ist Infrastruktur. Und Infrastruktur gewinnt immer — langsam, leise, und dann überall gleichzeitig.</p>
+</div>
+
+<div class="footer">
+  <div>
+    <strong>Florian Ziesche</strong> · 12 Jahre KI-Erfahrung · Ex-CEO 36ZERO Vision (€5M raised)<br>
+    <a href="https://ainaryventures.com">ainaryventures.com</a>
+  </div>
+  <div style="text-align:right">
+    Quellen: Anthropic MCP Spec, Linux Foundation, Salesforce<br>Connectivity Report 2026, Microsoft Build Announcements
+  </div>
+</div>
+
+</div>
+</body>
+</html>

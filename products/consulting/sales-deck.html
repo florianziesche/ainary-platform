@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ainary — AI-Systeme für den Mittelstand</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root { --black: #0a0a0a; --card: #111111; --elevated: #1a1a1a; --white: #ffffff; --text: #999999; --muted: #55555e; --gold: #c8aa50; --gold-dark: #a38a3a; --dim: #333; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+html { scroll-behavior: smooth; scroll-snap-type: y mandatory; }
+body { font-family: 'Inter', system-ui, sans-serif; background: var(--black); color: var(--white); font-weight: 400; line-height: 1.5; overflow-x: hidden; }
+section { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 4rem 2rem; scroll-snap-align: start; position: relative; }
+h1 { font-size: clamp(2rem, 5vw, 4rem); font-weight: 600; letter-spacing: -0.02em; }
+h2 { font-size: clamp(1.5rem, 3.5vw, 2.8rem); font-weight: 600; letter-spacing: -0.02em; margin-bottom: 2rem; }
+h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); font-weight: 500; }
+p, li { font-size: clamp(1rem, 1.5vw, 1.2rem); color: var(--text); }
+.gold { color: var(--gold); }
+.dim { color: var(--text); }
+.small { font-size: 0.85rem; color: var(--muted); }
+.container { max-width: 960px; width: 100%; text-align: center; }
+.container-left { max-width: 960px; width: 100%; text-align: left; }
+
+/* Logo */
+.logo { display: inline-flex; align-items: baseline; gap: 0; }
+.logo-text { font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 600; letter-spacing: -0.03em; }
+.logo-dot { width: 12px; height: 12px; background: var(--gold); border-radius: 50%; display: inline-block; margin-left: 2px; margin-bottom: 4px; }
+
+/* Big number */
+.big-number { font-size: clamp(5rem, 15vw, 12rem); font-weight: 600; line-height: 1; color: var(--gold); }
+
+/* Grid layouts */
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; max-width: 960px; width: 100%; margin-top: 2rem; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; max-width: 800px; width: 100%; margin-top: 2rem; }
+@media (max-width: 768px) { .grid-3, .grid-2 { grid-template-columns: 1fr; } }
+
+/* Cards */
+.card { border: 1px solid var(--dim); border-radius: 12px; padding: 2rem; text-align: left; background: var(--card); transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; }
+.card:hover { transform: translateY(-4px); border-color: var(--gold); box-shadow: 0 8px 30px rgba(200, 170, 80, 0.08); }
+.card h3 { margin-bottom: 0.75rem; color: var(--white); }
+.card p { color: var(--text); font-size: 0.95rem; line-height: 1.6; }
+.card .tag { color: var(--gold); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+.card .number { font-size: 2.5rem; font-weight: 600; color: var(--gold); margin-bottom: 0.5rem; }
+
+/* Process steps */
+.step { display: flex; align-items: flex-start; gap: 1.5rem; margin-bottom: 2rem; text-align: left; }
+.step-number { font-size: 2rem; font-weight: 600; color: var(--gold); min-width: 50px; }
+.step-content h3 { margin-bottom: 0.25rem; }
+.step-content p { font-size: 0.95rem; }
+.step-line { width: 2px; height: 40px; background: linear-gradient(to bottom, var(--gold), transparent); margin-left: 24px; margin-bottom: 0.5rem; }
+
+/* Pricing */
+.price-card { border: 1px solid var(--dim); border-radius: 12px; padding: 2.5rem 2rem; text-align: center; background: var(--card); transition: transform 0.3s ease, border-color 0.3s ease; }
+.price-card:hover { transform: translateY(-4px); }
+.price-card.featured { border-color: var(--gold); position: relative; }
+.price-card.featured::before { content: "EMPFOHLEN"; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--gold); color: var(--black); font-size: 0.7rem; font-weight: 700; padding: 4px 16px; border-radius: 20px; letter-spacing: 0.08em; }
+.price-card .price { font-size: 2.5rem; font-weight: 600; color: var(--white); margin: 1rem 0 0.5rem; }
+.price-card .price-unit { font-size: 0.9rem; color: var(--muted); }
+.price-card .price-label { font-size: 1.1rem; font-weight: 600; color: var(--white); margin-bottom: 0.5rem; }
+.price-card ul { list-style: none; text-align: left; margin-top: 1.5rem; }
+.price-card li { padding: 0.4rem 0; font-size: 0.9rem; color: var(--text); }
+.price-card li::before { content: "✓ "; color: var(--gold); font-weight: 600; }
+
+/* CTA */
+.cta-button { display: inline-block; background: var(--gold); color: var(--black); padding: 14px 36px; border-radius: 8px; font-weight: 600; font-size: 1rem; text-decoration: none; transition: all 0.3s; margin-top: 2rem; }
+.cta-button:hover { background: var(--gold-dark); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(200, 170, 80, 0.3); }
+
+/* Quote */
+.quote { font-size: clamp(1.2rem, 2.5vw, 1.8rem); font-style: italic; color: var(--text); max-width: 700px; line-height: 1.6; }
+.quote-author { margin-top: 1rem; font-size: 0.9rem; color: var(--muted); font-style: normal; }
+
+/* Comparison table */
+.compare-table { width: 100%; max-width: 800px; border-collapse: collapse; margin-top: 2rem; }
+.compare-table th { text-align: left; padding: 12px 16px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); border-bottom: 1px solid var(--dim); }
+.compare-table td { padding: 12px 16px; font-size: 0.95rem; border-bottom: 1px solid rgba(51,51,51,0.5); }
+.compare-table td:first-child { color: var(--white); font-weight: 500; }
+.compare-table .yes { color: var(--gold); font-weight: 600; }
+.compare-table .no { color: #444; }
+.compare-table tr { transition: background 0.2s; }
+.compare-table tr:hover { background: rgba(200, 170, 80, 0.03); }
+
+/* Slide indicator */
+.slide-indicator { position: fixed; right: 24px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 8px; z-index: 100; }
+.slide-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dim); transition: all 0.3s; cursor: pointer; }
+.slide-dot.active { background: var(--gold); transform: scale(1.3); }
+
+/* Slide counter */
+.slide-counter { position: fixed; bottom: 24px; right: 24px; font-size: 0.8rem; color: var(--muted); z-index: 100; font-variant-numeric: tabular-nums; }
+
+/* Keyboard hint */
+.keyboard-hint { position: fixed; bottom: 24px; left: 24px; font-size: 0.75rem; color: var(--muted); z-index: 100; opacity: 1; transition: opacity 1s; }
+
+/* Divider */
+.divider { width: 60px; height: 2px; background: var(--gold); margin: 1.5rem auto; }
+
+/* Scroll-triggered animations */
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: 0.15s; }
+.reveal-delay-2 { transition-delay: 0.3s; }
+.reveal-delay-3 { transition-delay: 0.45s; }
+
+/* Counter animation */
+.count-up { display: inline-block; }
+
+/* Case study card */
+.case-study { max-width: 800px; width: 100%; border: 1px solid var(--gold); border-radius: 16px; padding: 3rem; background: linear-gradient(135deg, var(--card) 0%, rgba(200,170,80,0.03) 100%); text-align: left; margin-top: 2rem; }
+.case-study .case-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+.case-study .case-label { color: var(--gold); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+.case-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 1.5rem; }
+.case-metric .metric-value { font-size: 2rem; font-weight: 600; color: var(--gold); }
+.case-metric .metric-label { font-size: 0.85rem; color: var(--muted); margin-top: 0.25rem; }
+@media (max-width: 768px) { .case-metrics { grid-template-columns: 1fr; } }
+
+/* ROI Calculator */
+.roi-calc { max-width: 700px; width: 100%; margin-top: 2rem; text-align: left; }
+.roi-slider { width: 100%; margin: 1rem 0; -webkit-appearance: none; height: 4px; background: var(--dim); border-radius: 2px; outline: none; }
+.roi-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: var(--gold); border-radius: 50%; cursor: pointer; }
+.roi-result { margin-top: 1.5rem; padding: 1.5rem; background: var(--card); border: 1px solid var(--dim); border-radius: 12px; }
+.roi-result .roi-number { font-size: 2.5rem; font-weight: 600; color: var(--gold); }
+</style>
+</head>
+<body>
+
+<!-- Slide indicator -->
+<div class="slide-indicator" id="slideIndicator"></div>
+<div class="slide-counter" id="slideCounter">1 / 12</div>
+<div class="keyboard-hint" id="keyboardHint">↑↓ Pfeiltasten zum Navigieren</div>
+
+<!-- SLIDE 1: Cover -->
+<section id="s1">
+  <div class="container">
+    <div class="logo reveal">
+      <span class="logo-text">Ainary</span>
+      <span class="logo-dot"></span>
+    </div>
+    <div class="divider reveal" style="margin: 2rem auto;"></div>
+    <h2 class="reveal" style="font-weight: 400; color: var(--text);">KI-Systeme für den Mittelstand</h2>
+    <p class="small reveal" style="margin-top: 3rem;">Florian Ziesche · Februar 2026</p>
+    <p class="small reveal">AI Strategy · System Design · Execution · Research</p>
+  </div>
+</section>
+
+<!-- SLIDE 2: Problem -->
+<section id="s2">
+  <div class="container">
+    <p class="small reveal" style="margin-bottom: 1rem;">DAS PROBLEM</p>
+    <div class="big-number reveal"><span class="count-up" data-target="1980000" data-format="de" data-suffix="">0</span></div>
+    <h2 class="reveal" style="margin-top: 1.5rem;">fehlende Fachkräfte in Deutschland</h2>
+    <p class="reveal" style="max-width: 600px; margin: 1rem auto 0;">Erfahrene Meister gehen in Rente. Wissen steckt in Köpfen, nicht in Systemen. Junge Fachkräfte kommen nicht nach. Ihre Aufträge warten nicht.</p>
+    <p class="small reveal" style="margin-top: 2rem;">Quelle: IAB, 2024</p>
+  </div>
+</section>
+
+<!-- SLIDE 3: Verschärfung -->
+<section id="s3">
+  <div class="container">
+    <p class="small reveal" style="margin-bottom: 1rem;">DIE REALITÄT</p>
+    <h2 class="reveal">Was passiert, wenn niemand handelt</h2>
+    <div class="grid-3" style="margin-top: 2rem;">
+      <div class="card reveal reveal-delay-1">
+        <div class="number"><span class="count-up" data-target="67" data-suffix="%">0</span></div>
+        <h3>der KMU melden akuten Fachkräftemangel</h3>
+        <p>Besonders in CNC, Planung und Verwaltung verschärft sich die Lage jedes Quartal.</p>
+      </div>
+      <div class="card reveal reveal-delay-2">
+        <div class="number"><span class="count-up" data-target="40" data-suffix="%">0</span></div>
+        <h3>der Arbeitszeit geht für Verwaltung drauf</h3>
+        <p>Angebote schreiben, Aufträge planen, Kunden nachfassen — manuell, repetitiv, fehleranfällig.</p>
+      </div>
+      <div class="card reveal reveal-delay-3">
+        <div class="number">0</div>
+        <h3>KI-Tools, die für KMU gebaut sind</h3>
+        <p>Enterprise-Lösungen kosten €100K+. ChatGPT versteht Ihren Betrieb nicht. Die Lücke ist riesig.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 4: Lösung -->
+<section id="s4">
+  <div class="container">
+    <p class="small reveal" style="margin-bottom: 1rem;">DIE LÖSUNG</p>
+    <h2 class="reveal">KI-Agenten, die <span class="gold">Ihre Arbeit</span> verstehen</h2>
+    <p class="reveal" style="max-width: 650px; margin: 0 auto 2rem;">Keine generischen Chatbots. Spezialisierte KI-Systeme, die Ihre Prozesse lernen, Ihre Daten nutzen und Ihre Mitarbeiter entlasten — ab Tag eins.</p>
+    <div class="grid-3">
+      <div class="card reveal reveal-delay-1">
+        <div class="tag">Planung</div>
+        <h3>Auftragsplanung & Maschinenbelegung</h3>
+        <p>KI analysiert Auftragslage, Maschinenkapazität und Lieferzeiten. Schlägt optimale Belegung vor.</p>
+      </div>
+      <div class="card reveal reveal-delay-2">
+        <div class="tag">Vertrieb</div>
+        <h3>Angebote & Kundenrecherche</h3>
+        <p>Automatische Angebotserstellung aus Anfragen. Kundenrecherche und Nachfass-Workflows.</p>
+      </div>
+      <div class="card reveal reveal-delay-3">
+        <div class="tag">Verwaltung</div>
+        <h3>Dokumenten­verarbeitung & Reporting</h3>
+        <p>Rechnungen, Berichte, Compliance — automatisiert, geprüft, nachvollziehbar.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 5: Wie es funktioniert -->
+<section id="s5">
+  <div class="container-left" style="max-width: 700px;">
+    <p class="small reveal" style="margin-bottom: 1rem;">SO FUNKTIONIERT ES</p>
+    <h2 class="reveal">In 4 Wochen vom Problem zur Lösung</h2>
+    <div style="margin-top: 2.5rem;">
+      <div class="step reveal">
+        <div class="step-number">01</div>
+        <div class="step-content">
+          <h3>Analyse</h3>
+          <p>Wir analysieren Ihre Abläufe, identifizieren die größten Zeitfresser und priorisieren nach ROI.</p>
+        </div>
+      </div>
+      <div class="step-line reveal"></div>
+      <div class="step reveal">
+        <div class="step-number">02</div>
+        <div class="step-content">
+          <h3>Prototyp</h3>
+          <p>In 2 Wochen bauen wir einen funktionierenden Prototyp für Ihren wichtigsten Anwendungsfall.</p>
+        </div>
+      </div>
+      <div class="step-line reveal"></div>
+      <div class="step reveal">
+        <div class="step-number">03</div>
+        <div class="step-content">
+          <h3>Pilot</h3>
+          <p>4 Wochen Live-Test in Ihrem Betrieb. Echte Daten, echte Nutzer, messbare Ergebnisse.</p>
+        </div>
+      </div>
+      <div class="step-line reveal"></div>
+      <div class="step reveal">
+        <div class="step-number">04</div>
+        <div class="step-content">
+          <h3>Skalierung</h3>
+          <p>Was funktioniert, wird ausgerollt. Weitere Prozesse werden schrittweise automatisiert.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 6: Kundenbeispiel -->
+<section id="s6">
+  <div class="container">
+    <p class="small reveal" style="margin-bottom: 1rem;">FALLBEISPIEL</p>
+    <h2 class="reveal">Maschinenbau, 25 Mitarbeiter, 3 CNC-Maschinen</h2>
+    <div class="case-study reveal">
+      <div class="case-header">
+        <div>
+          <div class="case-label">Pilot-Projekt</div>
+          <h3 style="margin-top: 0.5rem;">Auftragsplanung & Belegungsoptimierung</h3>
+        </div>
+        <div class="case-label">4 Wochen</div>
+      </div>
+      <p>Ein sächsischer Maschinenbaubetrieb plante seine CNC-Belegung manuell in Excel — der Meister brauchte dafür 6 Stunden pro Woche. Ainary baute einen KI-Agenten, der Auftragslage, Maschinenkapazität und Liefertermine analysiert und eine optimale Belegung vorschlägt.</p>
+      <div class="case-metrics">
+        <div class="case-metric">
+          <div class="metric-value"><span class="count-up" data-target="6" data-suffix="h → 45min">0</span></div>
+          <div class="metric-label">Planungszeit pro Woche</div>
+        </div>
+        <div class="case-metric">
+          <div class="metric-value"><span class="count-up" data-target="87" data-suffix="%">0</span></div>
+          <div class="metric-label">Zeitersparnis</div>
+        </div>
+        <div class="case-metric">
+          <div class="metric-value">~€18K</div>
+          <div class="metric-label">geschätzte Ersparnis / Jahr</div>
+        </div>
+      </div>
+    </div>
+    <p class="small reveal" style="margin-top: 1.5rem;">* Projizierte Werte auf Basis des Pilot-Ergebnisses. Tatsächliche Ergebnisse variieren.</p>
+  </div>
+</section>
+
+<!-- SLIDE 7: ROI Rechner -->
+<section id="s7">
+  <div class="container">
+    <p class="small reveal" style="margin-bottom: 1rem;">IHR POTENZIAL</p>
+    <h2 class="reveal">Was spart KI in <span class="gold">Ihrem</span> Betrieb?</h2>
+    <div class="roi-calc reveal">
+      <label style="color: var(--white); font-weight: 500;">Stunden pro Woche für manuelle Verwaltung</label>
+      <input type="range" class="roi-slider" id="roiSlider" min="5" max="40" value="15">
+      <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--muted);">
+        <span>5h</span>
+        <span id="roiHours" style="color: var(--gold); font-weight: 600; font-size: 1.1rem;">15h</span>
+        <span>40h</span>
+      </div>
+      <div class="roi-result">
+        <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 0.5rem;">Geschätzte jährliche Ersparnis mit Ainary (70% Automatisierung)</p>
+        <div class="roi-number" id="roiSaving">€27.300</div>
+        <p style="color: var(--muted); font-size: 0.8rem; margin-top: 0.75rem;">Basierend auf €35/h Vollkosten · 48 Arbeitswochen · 70% Automatisierungsgrad</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 8: Warum Ainary -->
+<section id="s8">
+  <div class="container">
+    <p class="small reveal" style="margin-bottom: 1rem;">WARUM AINARY</p>
+    <h2 class="reveal">Nicht beraten. <span class="gold">Gebaut.</span></h2>
+    <p class="reveal" style="max-width: 600px; margin: 0 auto 2rem;">Ich komme nicht aus der Beratung. Ich habe selbst eine KI-Firma aufgebaut — von der ersten Zeile Code bis zur Serienproduktion bei BMW.</p>
+    <div class="grid-2">
+      <div class="card reveal reveal-delay-1">
+        <div class="tag">Track Record</div>
+        <h3>36ZERO Vision</h3>
+        <p>KI-SaaS für Qualitätsprüfung. €5M Funding. BMW, Siemens, Bosch als Kunden. Von 0 auf €1M+ Umsatz in einem Jahr.</p>
+      </div>
+      <div class="card reveal reveal-delay-2">
+        <div class="tag">Mittelstand-DNA</div>
+        <h3>Aufgewachsen im KMU</h3>
+        <p>Familienbetrieb mit 25 Mitarbeitern. Ich kenne die Realität: knappe Ressourcen, kein IT-Team, jeder Cent muss sitzen.</p>
+      </div>
+      <div class="card reveal reveal-delay-1">
+        <div class="tag">Technologie</div>
+        <h3>Eigene Plattform</h3>
+        <p>Agentische Ausführungsplattform mit Trust-Kalibrierung. Kein ChatGPT-Wrapper — eigene Infrastruktur für zuverlässige Ergebnisse.</p>
+      </div>
+      <div class="card reveal reveal-delay-2">
+        <div class="tag">Netzwerk</div>
+        <h3>Silicon Valley + Mittelstand</h3>
+        <p>TUM, Alchemist Accelerator, VC Lab NYC. Beste Technologie mit Verständnis für deutsche Betriebe.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 9: Vergleich -->
+<section id="s9">
+  <div class="container">
+    <p class="small reveal" style="margin-bottom: 1rem;">VERGLEICH</p>
+    <h2 class="reveal">Ainary vs. Alternativen</h2>
+    <table class="compare-table reveal">
+      <tr>
+        <th></th>
+        <th style="color: var(--gold);">Ainary</th>
+        <th>Beratung</th>
+        <th>ChatGPT</th>
+        <th>Enterprise KI</th>
+      </tr>
+      <tr>
+        <td>Versteht Ihren Betrieb</td>
+        <td class="yes">✓</td>
+        <td class="yes">✓</td>
+        <td class="no">✗</td>
+        <td class="no">✗</td>
+      </tr>
+      <tr>
+        <td>Prototyp in 2 Wochen</td>
+        <td class="yes">✓</td>
+        <td class="no">✗</td>
+        <td class="no">✗</td>
+        <td class="no">✗</td>
+      </tr>
+      <tr>
+        <td>Unter €5.000/Monat</td>
+        <td class="yes">✓</td>
+        <td class="no">✗</td>
+        <td class="yes">✓</td>
+        <td class="no">✗</td>
+      </tr>
+      <tr>
+        <td>KI die handelt, nicht nur antwortet</td>
+        <td class="yes">✓</td>
+        <td class="no">✗</td>
+        <td class="no">✗</td>
+        <td class="yes">✓</td>
+      </tr>
+      <tr>
+        <td>Ergebnisse in 4 Wochen</td>
+        <td class="yes">✓</td>
+        <td class="no">✗</td>
+        <td class="no">✗</td>
+        <td class="no">✗</td>
+      </tr>
+      <tr>
+        <td>Datenschutz & Kontrolle</td>
+        <td class="yes">✓</td>
+        <td class="yes">✓</td>
+        <td class="no">✗</td>
+        <td class="yes">✓</td>
+      </tr>
+    </table>
+  </div>
+</section>
+
+<!-- SLIDE 10: Pricing -->
+<section id="s10">
+  <div class="container">
+    <p class="small reveal" style="margin-bottom: 1rem;">INVESTITION</p>
+    <h2 class="reveal">Einstieg ohne Risiko</h2>
+    <div class="grid-3" style="margin-top: 2rem;">
+      <div class="price-card reveal reveal-delay-1">
+        <div class="price-label">Analyse</div>
+        <div class="price">€0</div>
+        <div class="price-unit">Erstgespräch</div>
+        <ul>
+          <li>60 Min. Prozessanalyse</li>
+          <li>Top-3 Automatisierungspotenziale</li>
+          <li>ROI-Schätzung</li>
+          <li>Keine Verpflichtung</li>
+        </ul>
+      </div>
+      <div class="price-card featured reveal reveal-delay-2">
+        <div class="price-label">Pilot</div>
+        <div class="price">€4.900</div>
+        <div class="price-unit">einmalig · 4 Wochen</div>
+        <ul>
+          <li>1 Anwendungsfall, voll funktionsfähig</li>
+          <li>Prototyp in 2 Wochen</li>
+          <li>4 Wochen Live-Test</li>
+          <li>Ergebnisbericht mit ROI-Nachweis</li>
+          <li>Förderung möglich (bis 50%)</li>
+        </ul>
+      </div>
+      <div class="price-card reveal reveal-delay-3">
+        <div class="price-label">Skalierung</div>
+        <div class="price">ab €990</div>
+        <div class="price-unit">pro Monat</div>
+        <ul>
+          <li>Laufender Betrieb der KI-Systeme</li>
+          <li>Weitere Prozesse automatisieren</li>
+          <li>Support & Weiterentwicklung</li>
+          <li>Monatlich kündbar</li>
+        </ul>
+      </div>
+    </div>
+    <p class="small reveal" style="margin-top: 2rem;">Förderungen: go-digital, Sachsen Digital, Bayern Digitalbonus — wir unterstützen bei der Antragstellung.</p>
+  </div>
+</section>
+
+<!-- SLIDE 11: Social Proof -->
+<section id="s11">
+  <div class="container">
+    <p class="small reveal" style="margin-bottom: 2rem;">ERFAHRUNG</p>
+    <div class="quote reveal">
+      „Ich habe eine KI-Firma von Null aufgebaut, €5M eingeworben und Software bei BMW, Siemens und Bosch in die Produktion gebracht. Jetzt bringe ich diese Erfahrung in den Mittelstand — dort, wo sie am meisten bewirkt."
+    </div>
+    <p class="quote-author reveal">— Florian Ziesche, Gründer Ainary</p>
+    <div class="reveal" style="margin-top: 3rem; display: flex; gap: 3rem; justify-content: center; flex-wrap: wrap;">
+      <span style="color: var(--muted); font-size: 1.1rem; font-weight: 500;">BMW</span>
+      <span style="color: var(--muted); font-size: 1.1rem; font-weight: 500;">Siemens</span>
+      <span style="color: var(--muted); font-size: 1.1rem; font-weight: 500;">Bosch</span>
+      <span style="color: var(--muted); font-size: 1.1rem; font-weight: 500;">Magna</span>
+      <span style="color: var(--muted); font-size: 1.1rem; font-weight: 500;">TUM</span>
+      <span style="color: var(--muted); font-size: 1.1rem; font-weight: 500;">Alchemist</span>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 12: CTA -->
+<section id="s12">
+  <div class="container">
+    <h2 class="reveal">Bereit für den ersten Schritt?</h2>
+    <p class="reveal" style="max-width: 500px; margin: 0 auto;">Kostenloses Erstgespräch. 60 Minuten. Konkrete Ergebnisse. Kein Verkaufsgespräch.</p>
+    <a href="mailto:florian@ainaryventures.com" class="cta-button reveal">Gespräch vereinbaren →</a>
+    <div class="reveal" style="margin-top: 3rem;">
+      <p class="small">Florian Ziesche</p>
+      <p class="small">florian@ainaryventures.com · +1 347 740 1465</p>
+      <p class="small">ainaryventures.com</p>
+    </div>
+    <div style="margin-top: 4rem;">
+      <div class="logo" style="opacity: 0.4;">
+        <span style="font-size: 1.5rem; font-weight: 600; letter-spacing: -0.03em;">Ainary</span>
+        <span style="width: 6px; height: 6px; background: var(--gold); border-radius: 50%; display: inline-block; margin-left: 1px; margin-bottom: 2px;"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+// --- Scroll reveal animations ---
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      // Trigger count-up for numbers inside
+      entry.target.querySelectorAll('.count-up:not(.counted)').forEach(el => countUp(el));
+    }
+  });
+}, { threshold: 0.2 });
+
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+// --- Count-up animation ---
+function countUp(el) {
+  el.classList.add('counted');
+  const target = parseInt(el.dataset.target);
+  const suffix = el.dataset.suffix || '';
+  const format = el.dataset.format || '';
+  const duration = 1500;
+  const start = performance.now();
+
+  function update(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+    const current = Math.round(target * eased);
+    
+    if (format === 'de') {
+      el.textContent = current.toLocaleString('de-DE') + suffix;
+    } else {
+      el.textContent = current + suffix;
+    }
+    
+    if (progress < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+
+// --- Slide indicator ---
+const sections = document.querySelectorAll('section');
+const indicator = document.getElementById('slideIndicator');
+const counter = document.getElementById('slideCounter');
+const total = sections.length;
+
+sections.forEach((s, i) => {
+  const dot = document.createElement('div');
+  dot.className = 'slide-dot';
+  dot.onclick = () => s.scrollIntoView({ behavior: 'smooth' });
+  indicator.appendChild(dot);
+});
+
+let currentSlide = 0;
+const slideObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      currentSlide = Array.from(sections).indexOf(entry.target);
+      document.querySelectorAll('.slide-dot').forEach((d, i) => {
+        d.classList.toggle('active', i === currentSlide);
+      });
+      counter.textContent = `${currentSlide + 1} / ${total}`;
+    }
+  });
+}, { threshold: 0.5 });
+
+sections.forEach(s => slideObserver.observe(s));
+
+// --- Keyboard navigation ---
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') {
+    e.preventDefault();
+    const next = Math.min(currentSlide + 1, sections.length - 1);
+    sections[next].scrollIntoView({ behavior: 'smooth' });
+  }
+  if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+    e.preventDefault();
+    const prev = Math.max(currentSlide - 1, 0);
+    sections[prev].scrollIntoView({ behavior: 'smooth' });
+  }
+  if (e.key === 'Escape' || e.key === 'Home') {
+    e.preventDefault();
+    sections[0].scrollIntoView({ behavior: 'smooth' });
+  }
+  if (e.key === 'End') {
+    e.preventDefault();
+    sections[sections.length - 1].scrollIntoView({ behavior: 'smooth' });
+  }
+});
+
+// Hide keyboard hint after first interaction
+document.addEventListener('keydown', () => {
+  document.getElementById('keyboardHint').style.opacity = '0';
+}, { once: true });
+document.addEventListener('scroll', () => {
+  document.getElementById('keyboardHint').style.opacity = '0';
+}, { once: true });
+
+// --- ROI Calculator ---
+const slider = document.getElementById('roiSlider');
+const hoursDisplay = document.getElementById('roiHours');
+const savingDisplay = document.getElementById('roiSaving');
+
+slider.addEventListener('input', () => {
+  const hours = parseInt(slider.value);
+  hoursDisplay.textContent = hours + 'h';
+  const saving = Math.round(hours * 0.7 * 35 * 48);
+  savingDisplay.textContent = '€' + saving.toLocaleString('de-DE');
+});
+</script>
+
+</body>
+</html>

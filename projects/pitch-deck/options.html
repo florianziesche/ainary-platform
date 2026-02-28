@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Glashuette Deck — Slide Options & Feedback</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#faf8f4;--surface:#f5f2ec;--card:#fff;--text:#1a1a1a;--t2:#555;--t3:#888;--t4:#aaa;--gold:#c8aa50;--green:#2d8a4e;--border:#e0ddd6;--f:'Inter',sans-serif;--m:'JetBrains Mono',monospace}
+body{font-family:var(--f);background:var(--bg);color:var(--text);line-height:1.5;font-size:14px}
+
+.layout{display:flex;min-height:100vh}
+.sidebar{width:240px;background:var(--text);color:#fff;padding:24px 16px;position:fixed;top:0;left:0;bottom:0;overflow-y:auto}
+.sidebar h2{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t4);margin-bottom:16px}
+.sidebar .logo{display:flex;align-items:center;gap:8px;font-weight:600;font-size:15px;margin-bottom:32px}
+.sidebar .logo .dot{width:8px;height:8px;border-radius:50%;background:var(--gold)}
+.nav-item{padding:10px 12px;border-radius:6px;cursor:pointer;font-size:13px;margin-bottom:4px;transition:background .15s}
+.nav-item:hover{background:rgba(255,255,255,.08)}
+.nav-item.active{background:rgba(200,170,80,.2);color:var(--gold)}
+.nav-item .num{font-family:var(--m);font-size:11px;color:var(--t4);margin-right:8px}
+.nav-item.active .num{color:var(--gold)}
+.nav-item .check{float:right;color:var(--green);display:none}
+.nav-item.done .check{display:inline}
+
+.main{margin-left:240px;padding:32px 40px;max-width:1200px}
+.main h1{font-size:24px;font-weight:600;margin-bottom:4px}
+.main .subtitle{color:var(--t3);font-size:13px;margin-bottom:24px}
+
+.learnings-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px}
+.learning-tag{font-size:10px;font-family:var(--m);padding:3px 8px;border-radius:3px;background:var(--surface);color:var(--t2);border:1px solid var(--border);letter-spacing:.04em}
+.learning-tag.applied{background:#e8f5e9;color:#2d8a4e;border-color:#c8e6c9}
+
+.options-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:32px}
+.option-card{background:var(--card);border:2px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:border-color .2s,box-shadow .2s}
+.option-card:hover{border-color:var(--t3)}
+.option-card.selected{border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,170,80,.15)}
+.option-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.option-label{font-weight:600;font-size:15px}
+.option-badge{font-size:10px;font-family:var(--m);padding:2px 8px;border-radius:3px;background:var(--surface);color:var(--t3)}
+.option-card.selected .option-badge{background:var(--gold);color:#fff}
+.slide-preview{aspect-ratio:16/9;background:var(--bg);position:relative;overflow:hidden;padding:20px;display:flex;flex-direction:column;justify-content:center}
+.slide-preview *{font-family:var(--f)}
+.slide-preview .p-title{font-size:14px;font-weight:600;letter-spacing:-.02em;line-height:1.15;color:var(--text);max-width:90%}
+.slide-preview .p-body{font-size:9px;color:var(--t2);margin-top:6px;line-height:1.5;max-width:85%}
+.slide-preview .p-label{font-size:7px;font-family:var(--m);color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
+.slide-preview .p-number{font-size:32px;font-weight:600;line-height:1;color:var(--text)}
+.slide-preview .p-rule{width:24px;height:1px;background:var(--gold);margin:8px 0;opacity:.5}
+.slide-preview .p-grid{display:grid;gap:8px;margin-top:8px}
+.slide-preview .p-grid-3{grid-template-columns:repeat(3,1fr)}
+.slide-preview .p-grid-4{grid-template-columns:repeat(4,1fr)}
+.slide-preview .p-kpi{font-size:16px;font-weight:600;line-height:1;color:var(--text)}
+.slide-preview .p-source{position:absolute;bottom:8px;left:20px;font-size:6px;color:#999}
+.slide-preview .p-logo{position:absolute;top:10px;left:14px;font-size:8px;font-weight:600;display:flex;align-items:center;gap:4px}
+.slide-preview .p-logo .dot{width:4px;height:4px;border-radius:50%;background:var(--gold)}
+.slide-preview .p-section{position:absolute;top:10px;right:14px;font-size:5px;font-family:var(--m);color:var(--t4);letter-spacing:.1em;text-transform:uppercase}
+.slide-preview .star-glow{position:absolute;top:-20%;left:30%;width:80%;height:40%;background:radial-gradient(ellipse,rgba(200,170,80,.04),transparent 70%);pointer-events:none}
+
+.hypothesis{padding:14px 16px;font-size:12px;color:var(--t2);border-bottom:1px solid var(--border);min-height:60px}
+.hypothesis strong{color:var(--text);font-weight:500}
+.hyp-learnings{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.hyp-tag{font-size:8px;font-family:var(--m);padding:1px 5px;border-radius:2px;background:#e8f5e9;color:#2d8a4e}
+
+.feedback-section{margin-bottom:48px}
+.feedback-section h3{font-size:14px;font-weight:600;margin-bottom:8px}
+.feedback-row{display:flex;gap:16px;align-items:flex-start}
+.feedback-text{flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:6px;font-family:var(--f);font-size:13px;resize:vertical;min-height:60px;background:var(--card)}
+.feedback-text:focus{outline:none;border-color:var(--gold)}
+
+.btn{padding:10px 20px;border-radius:6px;font-family:var(--f);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:background .15s}
+.btn-primary{background:var(--text);color:#fff}
+.btn-primary:hover{background:#333}
+.btn-secondary{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.btn-export{margin-top:24px;padding:14px 28px;font-size:14px}
+
+.summary{padding:24px;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-top:32px;display:none}
+.summary h3{font-size:16px;margin-bottom:12px}
+.summary-row{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.summary-row:last-child{border:none}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<div class="sidebar">
+  <div class="logo"><span class="dot"></span> Slide Options</div>
+  <h2>Slides</h2>
+  <div id="nav"></div>
+  <div style="margin-top:32px;padding-top:16px;border-top:1px solid rgba(255,255,255,.1)">
+    <button class="btn btn-primary btn-export" onclick="exportSelections()" style="width:100%">Auswahl exportieren</button>
+  </div>
+</div>
+
+<div class="main">
+  <h1 id="slide-title"></h1>
+  <p class="subtitle" id="slide-subtitle"></p>
+  <div class="learnings-bar" id="learnings-bar"></div>
+  <div class="options-grid" id="options-grid"></div>
+  <div class="feedback-section">
+    <h3>Feedback</h3>
+    <div class="feedback-row">
+      <textarea class="feedback-text" id="feedback-text" placeholder="Was gefaellt dir? Was fehlt? Was aendern?"></textarea>
+    </div>
+  </div>
+  <div class="summary" id="summary"></div>
+</div>
+
+</div>
+
+<script>
+var DATA = [
+  {
+    id:1, title:"Cover", subtitle:"Der erste Eindruck. Thesis + Einladung.",
+    learnings:[1,7,8,11,12],
+    options:[
+      {
+        label:"A — Uhren-Metapher",
+        badge:"Empfohlen",
+        hypothesis:"<strong>H1:</strong> Die Uhren-Metapher schmeichelt dem BM (Stolz auf Glashuettes Identitaet) und framt KI als Praezisions-Upgrade, nicht als Kritik. Erwartet: Hoechste Aufmerksamkeit in den ersten 5 Sekunden.",
+        learnings:[1,7,8],
+        preview:{type:"cover",title:"Was waere, wenn Ihre Verwaltung so praezise arbeitet wie Ihre Uhren?",body:"Florian Ziesche · 24. Februar 2026"}
+      },
+      {
+        label:"B — Kurz & Offen",
+        badge:"",
+        hypothesis:"<strong>H2:</strong> Kuerze erzeugt Neugier (Takahashi-Prinzip, AR-035). 3 Woerter laden zum Zuhoeren ein statt eine These zu setzen. Risiko: Zu vage, BM versteht nicht worum es geht.",
+        learnings:[1,12],
+        preview:{type:"cover",title:"Glashuette kann mehr.",body:"Florian Ziesche · 24. Februar 2026"}
+      },
+      {
+        label:"C — Identitaet + Zukunft",
+        badge:"",
+        hypothesis:"<strong>H3:</strong> 'Uhrenstadt' ist die staerkste Marke die Glashuette hat. 'Digital' ist das Ziel. 5 Woerter, null Wertung. Risiko: Klingt wie ein Slogan, nicht wie eine Einladung.",
+        learnings:[1,11],
+        preview:{type:"cover",title:"Die Uhrenstadt. Jetzt auch digital.",body:"Florian Ziesche · 24. Februar 2026"}
+      }
+    ]
+  },
+  {
+    id:2, title:"Statement", subtitle:"Die Zahl die haengen bleibt. Ein Gedanke, maximaler Raum.",
+    learnings:[2,4,6,12],
+    options:[
+      {
+        label:"A — 40% Routine",
+        badge:"",
+        hypothesis:"<strong>H1:</strong> Abstrakte Prozentzahl aus Studie. Universell, aber nicht persoenlich. BM denkt 'interessant' aber nicht 'das betrifft MICH'. Quelle gibt Glaubwuerdigkeit.",
+        learnings:[4,6,12],
+        preview:{type:"statement",number:"40%",body:"So viel Arbeitszeit verbringen kleine Verwaltungen mit Routineaufgaben.",source:"Quelle: KGSt / Fraunhofer FOKUS, 2024"}
+      },
+      {
+        label:"B — 3 Tage (konkret)",
+        badge:"Empfohlen",
+        hypothesis:"<strong>H2:</strong> Konkrete Dauer schlaegt abstrakte Prozentzahl (AR-034: spezifische Bilder > abstrakte Zahlen). BM kann sofort pruefen: 'Stimmt das bei uns?' Erzeugt persoenlichen Bezug.",
+        learnings:[2,4,12],
+        preview:{type:"statement",number:"3 Tage",body:"So lange braucht eine kleine Verwaltung fuer einen Foerdermittel-Check. Mit KI: 10 Minuten.",source:""}
+      },
+      {
+        label:"C — Frage an BM",
+        badge:"",
+        hypothesis:"<strong>H3:</strong> Direkte Frage aktiviert den BM kognitiv (AR-036: Fragen erzeugen 'gap' im Wissen). Risiko: BM fuehlt sich getestet. Oxytocin-Effekt (Zak 2014) braucht Narrative, keine Quiz-Fragen.",
+        learnings:[8,12],
+        preview:{type:"statement",number:"",body:"Wissen Sie, wie viel Zeit Ihre Mitarbeiter mit Routineaufgaben verbringen?",source:"",isQuestion:true}
+      }
+    ]
+  },
+  {
+    id:3, title:"Problem", subtitle:"Die Complication. Warum JETZT handeln?",
+    learnings:[1,2,5,6,7,11],
+    options:[
+      {
+        label:"A — Nachbar-Vergleich",
+        badge:"",
+        hypothesis:"<strong>H1:</strong> Sozialer Vergleich ist ein starker Motivator ('Dippoldiswalde hat schon...'). Aber: BM koennte defensiv reagieren ('Die sind auch groesser'). Text-only, kein Visual.",
+        learnings:[1,7,11],
+        preview:{type:"problem-text",title:"Ihre Nachbarn sind digital. Glashuette noch nicht.",items:["Kein Online-Service: Keine Terminbuchung, kein Portal. Dippoldiswalde ist weiter.","OZG-Pflicht laeuft: 575 Leistungen bis 2026 digital.","16 Ortsteile, 85 Mitarbeiter: Effizienz ist Ueberlebensfrage."]}
+      },
+      {
+        label:"B — Vergleichstabelle",
+        badge:"Empfohlen",
+        hypothesis:"<strong>H2:</strong> Visuelle Tabelle schlaegt Text-Liste (AR-034: Bilder 6.5x Recall). BM sieht sofort wo Glashuette steht vs. Nachbarn. Gestalt Similarity (AR-031): Gleiche Zeilen = vergleichbar. Rote X und gruene Haken sind preattentiv (AR-027).",
+        learnings:[2,5,6,7],
+        preview:{type:"problem-table",title:"Ihre Nachbarn sind schon weiter.",items:[{name:"Dippoldiswalde",pop:"14.000",termin:true,portal:true},{name:"Freital",pop:"39.000",termin:true,portal:true},{name:"Glashuette",pop:"6.414",termin:false,portal:false}]}
+      },
+      {
+        label:"C — OZG-Timeline",
+        badge:"",
+        hypothesis:"<strong>H3:</strong> Zeitdruck-Visual: Eine Linie von 2017 (OZG Start) bis 2026 (Deadline), Glashuette-Marker weit links. Erzeugt Urgency ohne Schuldzuweisung. Visual Evidence (AR-028). Risiko: OZG ist abstrakt fuer BM.",
+        learnings:[2,7,11],
+        preview:{type:"problem-timeline",title:"Die OZG-Uhr laeuft.",items:["2017: OZG verabschiedet","2022: Erste Kommunen fertig","2026: Deadline","Glashuette: noch am Anfang"]}
+      }
+    ]
+  },
+  {
+    id:4, title:"Daten", subtitle:"Glashuette-spezifische Zahlen. Zeigen dass wir die Gemeinde kennen.",
+    learnings:[1,2,4,5,6,9,11],
+    options:[
+      {
+        label:"A — KPI-Grid",
+        badge:"",
+        hypothesis:"<strong>H1:</strong> 4 Zahlen nebeneinander = Dashboard-Gefuehl. BM sieht: 'Die kennen uns.' Aber: Rein numerisch, kein Trend sichtbar. 'Alternde Verwaltung' im Title koennte negativ wirken.",
+        learnings:[1,5,6],
+        preview:{type:"data-grid",title:"Eine Weltmarke mit alternder Verwaltung.",kpis:[{label:"Einwohner",value:"6.414",sub:"-4,7% seit 2020"},{label:"Verwaltung",value:"85",sub:"Mitarbeiter"},{label:"Ext. Ausgaben",value:"€150K",sub:"Beratung/Jahr"},{label:"Ortsteile",value:"16",sub:"auf 95 km2"}]}
+      },
+      {
+        label:"B — Trendlinie",
+        badge:"Empfohlen",
+        hypothesis:"<strong>H2:</strong> Ein fallender Graph ist emotional staerker als eine Zahl (AR-027: Trends sind preattentiv erkennbar). BM sieht die Richtung sofort. Borkin 2013: Embellished Charts 2-3x Recall. Die Trendlinie IST das Argument.",
+        learnings:[2,9,11],
+        preview:{type:"data-trend",title:"6.414 Einwohner. Tendenz fallend.",body:"Seit 2020 verliert Glashuette 1,2% pro Jahr. Die Verwaltung muss mit weniger mehr leisten."}
+      },
+      {
+        label:"C — Kosten-Fokus",
+        badge:"",
+        hypothesis:"<strong>H3:</strong> €150K externe Ausgaben = greifbar fuer BM (sein Budget). Frame: 'Sie geben schon €150K aus — wir machen es effektiver.' Spricht die Geldbeutel-Logik an. Risiko: BM fuehlt sich ertappt bei Ausgaben.",
+        learnings:[1,6,12],
+        preview:{type:"data-cost",title:"€150.000 pro Jahr fuer externe Beratung.",body:"Glashuette gibt jaehrlich geschaetzt €120-180K fuer Gutachten und Beratung aus. Ein Teil davon kann KI uebernehmen."}
+      }
+    ]
+  },
+  {
+    id:5, title:"Loesung", subtitle:"Was Ainary konkret macht. Hier beginnt die Demo.",
+    learnings:[1,2,3,4,12],
+    options:[
+      {
+        label:"A — Text + Icons",
+        badge:"",
+        hypothesis:"<strong>H1:</strong> Drei Bereiche (Recherche, Analyse, Kommunikation) mit simplen SVG-Icons. AR-034: Relevante Bilder verbessern Recall. Icons sind minimal aber besser als reiner Text. Risiko: Icons koennen generisch wirken.",
+        learnings:[2,4,12],
+        preview:{type:"solution-icons",title:"85 Mitarbeiter koennen mehr leisten, wenn Routinen wegfallen.",items:[{icon:"🔍",label:"Recherche",text:"Foerderprogramme, Fristen, Antraege"},{icon:"📊",label:"Analyse",text:"Haushalt, Demografie, Vergleiche"},{icon:"✉️",label:"Kommunikation",text:"Beschlussvorlagen, Pressemitteilungen"}]}
+      },
+      {
+        label:"B — Screenshot/Mockup",
+        badge:"Empfohlen",
+        hypothesis:"<strong>H2:</strong> Ein Mockup des Tools zeigt statt erklaert. AR-034: Bilder > Text. Duarte (AR-036): 'What could be' visual. BM sieht sofort was er bekommt. Risiko: Mockup muss glaubwuerdig aussehen.",
+        learnings:[2,3,12],
+        preview:{type:"solution-mockup",title:"So sieht es aus.",body:"[Live-Demo folgt]",mockup:true}
+      },
+      {
+        label:"C — Teaser fuer Demo",
+        badge:"",
+        hypothesis:"<strong>H3:</strong> Minimale Slide, maximale Spannung. 'Ich zeige es Ihnen' = Zuschauer lehnt sich vor. AR-036 Narrative Tension. AR-035: Slide soll zeigen was man nicht sagen kann — hier ist der Speaker das Medium. Risiko: Leere Slide wirkt unprofessionell.",
+        learnings:[3,8,12],
+        preview:{type:"solution-teaser",title:"Ich zeige es Ihnen.",body:"Live-Demo: Foerdermittel-Check fuer Glashuette in unter 3 Minuten."}
+      }
+    ]
+  },
+  {
+    id:6, title:"Vorher / Nachher", subtitle:"Der Beweis. Konkrete Zeitersparnis.",
+    learnings:[2,5,6,9,11,12],
+    options:[
+      {
+        label:"A — Donut-Charts",
+        badge:"",
+        hypothesis:"<strong>H1:</strong> Drei Donut-Charts (85%, 90%, 99%) sind visuell stark und preattentiv lesbar (AR-027). Gestalt Similarity: Gleiche Form = vergleichbar. Schwaeche: BM muss 3 Grafiken verarbeiten — kognitive Last.",
+        learnings:[2,5,9],
+        preview:{type:"compare-donuts",title:"Gleiche Mitarbeiter. Ein Zehntel der Zeit.",items:[{pct:"85%",label:"Foerderantrag"},{pct:"90%",label:"Beschlussvorlage"},{pct:"99%",label:"Foerdermittel-Check"}]}
+      },
+      {
+        label:"B — Horizontale Balken",
+        badge:"",
+        hypothesis:"<strong>H2:</strong> Cleveland & McGill 1984 (AR-027): Position-Encodings sind praeziser als Winkel-Encodings (Donut). Horizontale Balken = einfachster Vergleich. Vorher-Balken lang, Nachher-Balken kurz. Sofort lesbar.",
+        learnings:[2,5,6,9],
+        preview:{type:"compare-bars",title:"Gleiche Mitarbeiter. Ein Zehntel der Zeit.",items:[{label:"Foerderantrag",before:"2 Wochen",after:"2 Tage"},{label:"Beschlussvorlage",before:"4 Stunden",after:"30 Min"},{label:"Foerdermittel",before:"3 Tage",after:"10 Min"}]}
+      },
+      {
+        label:"C — Ein grosses 10×",
+        badge:"Empfohlen",
+        hypothesis:"<strong>H3:</strong> Palantir-Stil: Eine Zahl, maximaler Raum. '10x' ist merkbarer als drei separate Prozente (AR-034: ein Bild > drei). AR-035 Takahashi: 1-5 Woerter bei Live-Presentation. BM erinnert '10x schneller', nicht '85/90/99%'. Risiko: Verliert Nuance.",
+        learnings:[2,4,11,12],
+        preview:{type:"compare-big",title:"",number:"10×",body:"schneller. Bei Recherche, Analyse, Kommunikation. Gleiche Mitarbeiter."}
+      }
+    ]
+  },
+  {
+    id:7, title:"Credentials", subtitle:"Warum Florian? Vertrauen aufbauen.",
+    learnings:[1,2,6,8,10,11],
+    options:[
+      {
+        label:"A — Stats-Grid",
+        badge:"",
+        hypothesis:"<strong>H1:</strong> Zahlen (12 Jahre, €5M, 80+ Projekte) sind schnell erfassbar. Aber: BM kennt BMW/Siemens nicht persoenlich. Zahlen allein bauen kein Vertrauen bei einem Buergermeister.",
+        learnings:[1,6],
+        preview:{type:"cred-stats",title:"12 Jahre KI fuer deutsche Industrie. Jetzt fuer Ihre Gemeinde.",kpis:[{value:"12+",label:"Jahre KI"},{value:"€5M",label:"Funding"},{value:"80+",label:"Projekte"}]}
+      },
+      {
+        label:"B — Logo-Wall",
+        badge:"",
+        hypothesis:"<strong>H2:</strong> Logos sind preattentiv erkennbar (AR-027) und signalisieren Vertrauen (Social Proof). BMW + Siemens + Bosch = 'Der hat fuer die Grossen gearbeitet.' AR-034: Bilder > Text. Risiko: Wirkt wie Angeben.",
+        learnings:[2,10,11],
+        preview:{type:"cred-logos",title:"Vertraut von Deutschlands groessten Unternehmen.",logos:["BMW","Siemens","Bosch"]}
+      },
+      {
+        label:"C — Persoenliche Story",
+        badge:"Empfohlen",
+        hypothesis:"<strong>H3:</strong> Zak 2014 (AR-036): Character-driven Stories mit persoenlichem Bezug erhoehen Oxytocin → +80% Kooperation. 'Meine Eltern wohnen in Schlottwitz' = lokaler Bezug. BM denkt: 'Der ist einer von uns.' Staerkster Trust-Builder fuer Kommunal-Kontext.",
+        learnings:[1,8,11],
+        preview:{type:"cred-story",title:"Meine Familie lebt 10 Minuten von hier.",body:"Aufgewachsen in der Region. 12 Jahre KI in Muenchen fuer BMW, Siemens, Bosch. Jetzt bringe ich das zurueck."}
+      }
+    ]
+  },
+  {
+    id:8, title:"Close", subtitle:"Letzter Eindruck. Call to Action.",
+    learnings:[1,7,8,11,12],
+    options:[
+      {
+        label:"A — Bookend",
+        badge:"Empfohlen",
+        hypothesis:"<strong>H1:</strong> AR-036 Bookend-Technik: Cover-Headline = Close-Headline. Erzeugt narrative Closure. Der BM hoert die These zum zweiten Mal — jetzt mit Kontext und Beweis. Duarte: 'New Bliss' = die transformierte Welt.",
+        learnings:[1,7,11],
+        preview:{type:"close",title:"Was waere, wenn Ihre Verwaltung so praezise arbeitet wie Ihre Uhren?",body:"Wollen wir es ausprobieren?",contact:"florian@ainaryventures.com · ainaryventures.com"}
+      },
+      {
+        label:"B — Konkreter naechster Schritt",
+        badge:"",
+        hypothesis:"<strong>H2:</strong> McKinsey-Close: Klarer CTA statt offene Frage. '30-Minuten Testlauf' ist niedrigschwellig und messbar. BM weiss exakt was passiert wenn er Ja sagt. Risiko: Zu transaktional fuer ersten Termin.",
+        learnings:[1,12],
+        preview:{type:"close",title:"Naechster Schritt: Ein 30-Minuten Testlauf.",body:"Wir testen Ainary mit einer echten Aufgabe aus Ihrer Verwaltung. Kostenlos. Unverbindlich.",contact:"florian@ainaryventures.com · ainaryventures.com"}
+      },
+      {
+        label:"C — Offene Frage",
+        badge:"",
+        hypothesis:"<strong>H3:</strong> Offene Frage laesst BM die Kontrolle ('Was waere fuer Sie am nuetzlichsten?'). Berater-Technik: Wer fragt, fuehrt. Risiko: BM sagt 'Muss ich drueber nachdenken' = kein Commitment.",
+        learnings:[8,12],
+        preview:{type:"close",title:"Was waere fuer Glashuette am nuetzlichsten?",body:"Foerdermittel finden? Beschlussvorlagen? Buergerservice? Sie entscheiden.",contact:"florian@ainaryventures.com · ainaryventures.com"}
+      }
+    ]
+  }
+];
+
+var selections={};
+var feedbacks={};
+var currentSlide=0;
+
+function init(){
+  var nav=document.getElementById('nav');
+  DATA.forEach(function(s,i){
+    var d=document.createElement('div');
+    d.className='nav-item'+(i===0?' active':'');
+    d.id='nav-'+i;
+    d.innerHTML='<span class="num">'+s.id+'</span>'+s.title+'<span class="check">✓</span>';
+    d.onclick=function(){showSlide(i)};
+    nav.appendChild(d);
+  });
+  showSlide(0);
+}
+
+function showSlide(idx){
+  currentSlide=idx;
+  var s=DATA[idx];
+  document.querySelectorAll('.nav-item').forEach(function(n,i){n.className='nav-item'+(i===idx?' active':'')+(selections[i]!==undefined?' done':'')});
+  document.getElementById('slide-title').textContent='Slide '+s.id+': '+s.title;
+  document.getElementById('slide-subtitle').textContent=s.subtitle;
+
+  var lb=document.getElementById('learnings-bar');
+  var allL=['','1. Headlines','2. Bilder>Text','3. Redundancy','4. White Space','5. Gestalt','6. WCAG','7. SCQA','8. Oxytocin','9. Charts+','10. Farbkonsistenz','11. Headline-Test','12. Max 25W'];
+  lb.innerHTML='';
+  for(var i=1;i<=12;i++){
+    var t=document.createElement('span');
+    t.className='learning-tag'+(s.learnings.indexOf(i)>=0?' applied':'');
+    t.textContent=allL[i];
+    lb.appendChild(t);
+  }
+
+  var grid=document.getElementById('options-grid');
+  grid.innerHTML='';
+  s.options.forEach(function(o,oi){
+    var card=document.createElement('div');
+    card.className='option-card'+(selections[idx]===oi?' selected':'');
+    card.onclick=function(){selectOption(idx,oi)};
+    var prev=renderPreview(o.preview);
+    var tags='';
+    var allL2=['','#1','#2','#3','#4','#5','#6','#7','#8','#9','#10','#11','#12'];
+    o.learnings.forEach(function(l){tags+='<span class="hyp-tag">L'+allL2[l]+'</span>'});
+    card.innerHTML='<div class="option-header"><span class="option-label">'+o.label+'</span>'+(o.badge?'<span class="option-badge">'+o.badge+'</span>':'')+'</div>'+
+      '<div class="slide-preview"><div class="star-glow"></div><div class="p-logo"><span class="dot"></span> Ainary</div>'+prev+'</div>'+
+      '<div class="hypothesis">'+o.hypothesis+'<div class="hyp-learnings">'+tags+'</div></div>';
+    grid.appendChild(card);
+  });
+
+  document.getElementById('feedback-text').value=feedbacks[idx]||'';
+}
+
+function renderPreview(p){
+  if(!p)return'';
+  var h='';
+  if(p.type==='cover'){
+    h='<div class="p-title" style="font-size:16px;margin-top:20px">'+p.title+'</div><div style="position:absolute;bottom:12px;left:20px;font-size:7px;color:#888">'+p.body+'</div>';
+  }else if(p.type==='statement'){
+    if(p.isQuestion){
+      h='<div class="p-title" style="font-size:13px;margin-top:16px">'+p.body+'</div>';
+    }else{
+      h='<div class="p-section">Ausgangslage</div><div class="p-number">'+p.number+'</div><div class="p-body" style="margin-top:4px;font-weight:500;color:#1a1a1a;font-size:10px">'+p.body+'</div>'+(p.source?'<div class="p-source">'+p.source+'</div>':'');
+    }
+  }else if(p.type==='problem-text'){
+    h='<div class="p-section">Glashuette heute</div><div class="p-title">'+p.title+'</div><div class="p-rule"></div><div class="p-grid p-grid-3">';
+    p.items.forEach(function(it){h+='<div><div class="p-body">'+it+'</div></div>'});
+    h+='</div>';
+  }else if(p.type==='problem-table'){
+    h='<div class="p-section">Glashuette heute</div><div class="p-title" style="font-size:12px">'+p.title+'</div><div class="p-rule"></div><table style="font-size:7px;width:90%;border-collapse:collapse;margin-top:6px"><tr style="border-bottom:1px solid #e0ddd6"><th style="text-align:left;padding:3px;color:#888">Gemeinde</th><th style="padding:3px;color:#888">EW</th><th style="padding:3px;color:#888">Termin</th><th style="padding:3px;color:#888">Portal</th></tr>';
+    p.items.forEach(function(it){
+      var isBold=!it.termin;
+      h+='<tr style="border-bottom:1px solid #f0ede6;'+(isBold?'font-weight:600':'')+'"><td style="padding:3px">'+it.name+'</td><td style="padding:3px;text-align:center">'+it.pop+'</td><td style="padding:3px;text-align:center">'+(it.termin?'<span style="color:#2d8a4e">✓</span>':'<span style="color:#c0392b">✗</span>')+'</td><td style="padding:3px;text-align:center">'+(it.portal?'<span style="color:#2d8a4e">✓</span>':'<span style="color:#c0392b">✗</span>')+'</td></tr>';
+    });
+    h+='</table>';
+  }else if(p.type==='problem-timeline'){
+    h='<div class="p-section">Glashuette heute</div><div class="p-title" style="font-size:12px">'+p.title+'</div><div style="margin-top:12px;position:relative;height:4px;background:#e0ddd6;border-radius:2px;width:85%"><div style="position:absolute;left:0;top:0;height:4px;width:15%;background:#1a1a1a;border-radius:2px"></div></div><div style="display:flex;justify-content:space-between;width:85%;margin-top:4px;font-size:6px;color:#888">';
+    p.items.forEach(function(it){h+='<span>'+it+'</span>'});
+    h+='</div>';
+  }else if(p.type==='data-grid'){
+    h='<div class="p-section">Ihre Gemeinde</div><div class="p-title" style="font-size:11px">'+p.title+'</div><div class="p-rule"></div><div class="p-grid p-grid-4">';
+    p.kpis.forEach(function(k){h+='<div><div class="p-label">'+k.label+'</div><div class="p-kpi">'+k.value+'</div><div style="font-size:6px;color:#888">'+k.sub+'</div></div>'});
+    h+='</div>';
+  }else if(p.type==='data-trend'){
+    h='<div class="p-section">Ihre Gemeinde</div><div class="p-title" style="font-size:12px">'+p.title+'</div><div class="p-rule"></div><svg viewBox="0 0 200 60" width="180" style="margin-top:8px"><polyline points="10,15 50,18 90,25 130,32 170,42" fill="none" stroke="#1a1a1a" stroke-width="2"/><circle cx="170" cy="42" r="3" fill="#c0392b"/><text x="10" y="56" font-size="6" fill="#888">2020</text><text x="160" y="56" font-size="6" fill="#888">2025</text></svg><div class="p-body">'+p.body+'</div>';
+  }else if(p.type==='data-cost'){
+    h='<div class="p-section">Ihre Gemeinde</div><div class="p-number" style="font-size:24px">€150K</div><div class="p-title" style="font-size:10px;margin-top:4px">pro Jahr fuer externe Beratung</div><div class="p-body" style="margin-top:6px">'+p.body+'</div>';
+  }else if(p.type==='solution-icons'){
+    h='<div class="p-section">Loesung</div><div class="p-title" style="font-size:11px">'+p.title+'</div><div class="p-rule"></div><div class="p-grid p-grid-3">';
+    p.items.forEach(function(it){h+='<div><div style="font-size:16px;margin-bottom:4px">'+it.icon+'</div><div class="p-label">'+it.label+'</div><div class="p-body">'+it.text+'</div></div>'});
+    h+='</div>';
+  }else if(p.type==='solution-mockup'){
+    h='<div class="p-section">Loesung</div><div class="p-title" style="font-size:12px">'+p.title+'</div><div style="margin-top:10px;background:#f5f2ec;border:1px solid #e0ddd6;border-radius:6px;padding:12px;font-size:8px;color:#888;text-align:center;height:50px;display:flex;align-items:center;justify-content:center">[Screenshot: Ainary Chat-Interface mit Glashuette-Foerdermittel-Anfrage]</div>';
+  }else if(p.type==='solution-teaser'){
+    h='<div class="p-section">Loesung</div><div class="p-title" style="font-size:16px;margin-top:16px">'+p.title+'</div><div class="p-body" style="margin-top:8px">'+p.body+'</div>';
+  }else if(p.type==='compare-donuts'){
+    h='<div class="p-section">Vorher / Nachher</div><div class="p-title" style="font-size:11px">'+p.title+'</div><div class="p-rule"></div><div style="display:flex;gap:16px;margin-top:8px">';
+    p.items.forEach(function(it){h+='<div style="text-align:center;flex:1"><div style="font-size:18px;font-weight:600">'+it.pct+'</div><div style="font-size:7px;color:#888">'+it.label+'</div></div>'});
+    h+='</div>';
+  }else if(p.type==='compare-bars'){
+    h='<div class="p-section">Vorher / Nachher</div><div class="p-title" style="font-size:11px">'+p.title+'</div><div class="p-rule"></div>';
+    p.items.forEach(function(it){h+='<div style="margin-top:6px"><div style="font-size:7px;color:#888">'+it.label+'</div><div style="display:flex;gap:4px;align-items:center;margin-top:2px"><div style="background:#e0ddd6;height:6px;flex:8;border-radius:2px"></div><span style="font-size:6px;color:#888">'+it.before+'</span></div><div style="display:flex;gap:4px;align-items:center;margin-top:1px"><div style="background:#1a1a1a;height:6px;flex:1;border-radius:2px"></div><span style="font-size:6px;color:#1a1a1a;font-weight:600">'+it.after+'</span></div></div>'});
+  }else if(p.type==='compare-big'){
+    h='<div class="p-section">Vorher / Nachher</div><div class="p-number" style="font-size:48px">'+p.number+'</div><div class="p-body" style="font-weight:500;color:#1a1a1a;font-size:10px">'+p.body+'</div>';
+  }else if(p.type==='cred-stats'){
+    h='<div class="p-section">Ueber mich</div><div class="p-title" style="font-size:10px">'+p.title+'</div><div class="p-rule"></div><div style="display:flex;gap:16px;margin-top:8px">';
+    p.kpis.forEach(function(k){h+='<div><div style="font-size:16px;font-weight:600">'+k.value+'</div><div class="p-label">'+k.label+'</div></div>'});
+    h+='</div>';
+  }else if(p.type==='cred-logos'){
+    h='<div class="p-section">Ueber mich</div><div class="p-title" style="font-size:10px">'+p.title+'</div><div class="p-rule"></div><div style="display:flex;gap:20px;margin-top:12px">';
+    p.logos.forEach(function(l){h+='<div style="padding:6px 14px;border:1px solid #e0ddd6;border-radius:4px;font-size:10px;font-weight:600;color:#888">'+l+'</div>'});
+    h+='</div>';
+  }else if(p.type==='cred-story'){
+    h='<div class="p-section">Ueber mich</div><div class="p-title" style="font-size:12px">'+p.title+'</div><div class="p-rule"></div><div class="p-body" style="margin-top:6px">'+p.body+'</div>';
+  }else if(p.type==='close'){
+    h='<div class="p-title" style="font-size:14px;margin-top:10px">'+p.title+'</div><div class="p-body" style="margin-top:6px;font-weight:500;color:#1a1a1a">'+p.body+'</div><div style="position:absolute;bottom:12px;left:20px;font-size:7px;color:#888">'+p.contact+'</div>';
+  }
+  return h;
+}
+
+function selectOption(slideIdx,optIdx){
+  selections[slideIdx]=optIdx;
+  showSlide(slideIdx);
+  // Auto-advance after small delay
+  document.querySelectorAll('.nav-item').forEach(function(n,i){
+    if(i===slideIdx)n.classList.add('done');
+  });
+}
+
+document.getElementById('feedback-text').addEventListener('input',function(){
+  feedbacks[currentSlide]=this.value;
+});
+
+function exportSelections(){
+  var summary=document.getElementById('summary');
+  var html='<h3>Deine Auswahl</h3>';
+  var allDone=true;
+  DATA.forEach(function(s,i){
+    if(selections[i]===undefined){allDone=false;html+='<div class="summary-row"><strong>Slide '+s.id+':</strong> <span style="color:#c0392b">Nicht gewaehlt</span></div>';return}
+    var o=s.options[selections[i]];
+    html+='<div class="summary-row"><strong>Slide '+s.id+' '+s.title+':</strong> '+o.label+(feedbacks[i]?' — <em>'+feedbacks[i]+'</em>':'')+'</div>';
+  });
+  if(!allDone)html+='<p style="margin-top:12px;color:#c0392b;font-size:12px">⚠ Nicht alle Slides gewaehlt.</p>';
+  html+='<div style="margin-top:16px"><button class="btn btn-primary" onclick="copyExport()">In Zwischenablage kopieren</button></div>';
+  summary.innerHTML=html;
+  summary.style.display='block';
+  summary.scrollIntoView({behavior:'smooth'});
+}
+
+function copyExport(){
+  var lines=[];
+  DATA.forEach(function(s,i){
+    if(selections[i]===undefined)return;
+    var o=s.options[selections[i]];
+    lines.push('Slide '+s.id+' ('+s.title+'): '+o.label+(feedbacks[i]?' | Feedback: '+feedbacks[i]:''));
+  });
+  navigator.clipboard.writeText(lines.join('\n')).then(function(){alert('Kopiert!')});
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ainary — KI-Systeme für den Mittelstand</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --black: #0a0a0a; --card: #111111; --elevated: #1a1a1a;
+  --white: #ffffff; --text: #999999; --muted: #55555e;
+  --gold: #c8aa50; --gold-warm: #d4a853; --gold-pale: #e8d89f; --gold-deep: #9d7f3b; --gold-dark: #a38a3a;
+  --dim: #222; --red: #e05555; --green: #50c878;
+}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', system-ui, sans-serif; background: var(--black); color: var(--white); font-weight: 400; line-height: 1.6; overflow-x: hidden; }
+
+/* --- SECTIONS --- */
+section { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 5rem 2rem; position: relative; }
+h1 { font-size: clamp(2rem, 5vw, 4rem); font-weight: 600; letter-spacing: -0.03em; }
+h2 { font-size: clamp(1.4rem, 3.5vw, 2.6rem); font-weight: 600; letter-spacing: -0.02em; margin-bottom: 1.5rem; }
+h3 { font-size: clamp(1rem, 2vw, 1.4rem); font-weight: 500; }
+p, li { font-size: clamp(0.95rem, 1.4vw, 1.15rem); color: var(--text); line-height: 1.7; }
+.gold { color: var(--gold); }
+.small { font-size: 0.8rem; color: var(--muted); }
+.container { max-width: 960px; width: 100%; text-align: center; }
+.container-left { max-width: 800px; width: 100%; text-align: left; }
+
+/* --- PARTICLE CANVAS --- */
+#particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+section { position: relative; z-index: 1; }
+
+/* --- LOGO --- */
+.logo { display: inline-flex; align-items: baseline; }
+.logo-text { font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 600; letter-spacing: -0.03em; }
+.logo-dot { width: 12px; height: 12px; background: var(--gold); border-radius: 50%; display: inline-block; margin-left: 2px; margin-bottom: 4px; }
+
+/* --- BIG NUMBER --- */
+.big-number { font-size: clamp(4rem, 14vw, 11rem); font-weight: 600; line-height: 1; color: var(--gold); }
+
+/* --- GRIDS (borderless) --- */
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem; max-width: 960px; width: 100%; margin-top: 2.5rem; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 3rem; max-width: 800px; width: 100%; margin-top: 2.5rem; }
+@media (max-width: 768px) { .grid-3, .grid-2 { grid-template-columns: 1fr; } }
+
+/* --- CARDS (borderless) --- */
+.card { padding: 0; text-align: left; }
+.card h3 { margin-bottom: 0.5rem; color: var(--white); }
+.card p { color: var(--text); font-size: 0.95rem; }
+.card .tag { color: var(--gold); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem; }
+.card .number { font-size: 3rem; font-weight: 600; color: var(--gold); margin-bottom: 0.25rem; line-height: 1; }
+.card .gold-line { width: 40px; height: 2px; background: var(--gold); margin-bottom: 1.25rem; }
+
+/* --- STEPS --- */
+.step { display: flex; align-items: flex-start; gap: 2rem; margin-bottom: 2.5rem; text-align: left; }
+.step-number { font-size: 3rem; font-weight: 300; color: var(--gold); min-width: 60px; line-height: 1; opacity: 0.6; }
+.step-content h3 { margin-bottom: 0.25rem; }
+.step-content p { font-size: 0.95rem; }
+
+/* --- PRICING (minimal) --- */
+.price-col { text-align: left; padding: 2rem 0; border-top: 1px solid var(--dim); }
+.price-col.featured { border-top: 2px solid var(--gold); }
+.price-col .price { font-size: 2.5rem; font-weight: 600; color: var(--white); margin: 0.75rem 0 0.25rem; }
+.price-col .price-unit { font-size: 0.85rem; color: var(--muted); }
+.price-col .price-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); }
+.price-col ul { list-style: none; margin-top: 1.25rem; }
+.price-col li { padding: 0.3rem 0; font-size: 0.9rem; color: var(--text); }
+.price-col li::before { content: "— "; color: var(--muted); }
+
+/* --- CTA --- */
+.cta-button { display: inline-block; background: var(--gold); color: var(--black); padding: 16px 40px; border-radius: 6px; font-weight: 600; font-size: 1rem; text-decoration: none; transition: all 0.3s; margin-top: 2.5rem; letter-spacing: 0.02em; }
+.cta-button:hover { background: var(--gold-dark); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(200, 170, 80, 0.2); }
+
+/* --- QUOTE --- */
+.quote { font-size: clamp(1.1rem, 2.2vw, 1.6rem); font-weight: 300; color: var(--text); max-width: 700px; line-height: 1.7; }
+.quote-mark { font-size: 5rem; line-height: 0.5; color: var(--gold); opacity: 0.3; display: block; margin-bottom: 1rem; }
+
+/* --- COMPARISON TABLE --- */
+.compare-table { width: 100%; max-width: 800px; border-collapse: collapse; margin-top: 2rem; }
+.compare-table th { text-align: left; padding: 12px 16px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); border-bottom: 1px solid var(--dim); }
+.compare-table th:nth-child(2) { color: var(--gold); }
+.compare-table td { padding: 14px 16px; font-size: 0.9rem; border-bottom: 1px solid rgba(34,34,34,0.8); color: var(--text); }
+.compare-table td:first-child { color: var(--white); font-weight: 500; }
+.compare-table .yes { color: var(--gold); }
+.compare-table .no { color: #333; }
+
+/* --- BEFORE/AFTER SLIDER --- */
+.ba-container { max-width: 800px; width: 100%; margin-top: 2.5rem; position: relative; overflow: hidden; border-radius: 12px; }
+.ba-wrapper { display: flex; position: relative; height: 350px; }
+.ba-side { flex: 1; padding: 2.5rem; display: flex; flex-direction: column; justify-content: center; transition: flex 0.4s ease; }
+.ba-before { background: linear-gradient(135deg, #1a0a0a 0%, #0a0a0a 100%); }
+.ba-after { background: linear-gradient(135deg, #0a0a0a 0%, #0a1a0a 100%); }
+.ba-divider { width: 2px; background: var(--gold); position: relative; cursor: col-resize; flex-shrink: 0; }
+.ba-divider::after { content: "⟷"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--gold); font-size: 1.2rem; background: var(--black); padding: 8px 4px; border-radius: 4px; }
+.ba-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 1.5rem; }
+.ba-before .ba-label { color: var(--red); }
+.ba-after .ba-label { color: var(--green); }
+.ba-stat { margin-bottom: 1rem; }
+.ba-stat .val { font-size: 1.8rem; font-weight: 600; }
+.ba-before .val { color: var(--red); }
+.ba-after .val { color: var(--green); }
+.ba-stat .lbl { font-size: 0.8rem; color: var(--muted); }
+
+/* --- LIVE AGENT DEMO --- */
+.agent-demo { max-width: 600px; width: 100%; margin-top: 2rem; background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid var(--dim); }
+.agent-header { padding: 12px 16px; border-bottom: 1px solid var(--dim); display: flex; align-items: center; gap: 8px; }
+.agent-dot { width: 8px; height: 8px; border-radius: 50%; }
+.agent-dot.green { background: var(--green); }
+.agent-messages { padding: 16px; min-height: 200px; max-height: 300px; overflow-y: auto; }
+.agent-msg { margin-bottom: 12px; font-size: 0.9rem; line-height: 1.5; }
+.agent-msg.system { color: var(--muted); font-size: 0.8rem; font-style: italic; }
+.agent-msg.agent { color: var(--text); }
+.agent-msg .tool-call { color: var(--gold); font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; }
+.agent-input { display: flex; border-top: 1px solid var(--dim); }
+.agent-input input { flex: 1; background: transparent; border: none; padding: 14px 16px; color: var(--white); font-family: inherit; font-size: 0.9rem; outline: none; }
+.agent-input input::placeholder { color: var(--muted); }
+.agent-input button { background: var(--gold); color: var(--black); border: none; padding: 14px 20px; font-weight: 600; cursor: pointer; font-family: inherit; }
+.typing-cursor { display: inline-block; width: 2px; height: 14px; background: var(--gold); animation: blink 0.8s infinite; vertical-align: middle; margin-left: 2px; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+/* --- DASHBOARD EMBED --- */
+.dashboard-frame { max-width: 900px; width: 100%; margin-top: 2rem; border-radius: 12px; overflow: hidden; border: 1px solid var(--dim); background: var(--card); }
+.dashboard-titlebar { padding: 10px 16px; background: var(--elevated); display: flex; align-items: center; gap: 6px; border-bottom: 1px solid var(--dim); }
+.dashboard-titlebar .dot { width: 10px; height: 10px; border-radius: 50%; }
+.dashboard-titlebar .dot.r { background: #e05555; }
+.dashboard-titlebar .dot.y { background: #e0c855; }
+.dashboard-titlebar .dot.g { background: #50c878; }
+.dashboard-titlebar span { margin-left: 12px; font-size: 0.75rem; color: var(--muted); }
+.dashboard-body { padding: 0; height: 500px; }
+.dashboard-body iframe { width: 100%; height: 100%; border: none; }
+
+/* --- SLIDE NAV --- */
+.slide-indicator { position: fixed; right: 24px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 8px; z-index: 100; }
+.slide-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--dim); transition: all 0.3s; cursor: pointer; }
+.slide-dot.active { background: var(--gold); transform: scale(1.5); }
+.slide-counter { position: fixed; bottom: 24px; right: 24px; font-size: 0.75rem; color: var(--muted); z-index: 100; font-variant-numeric: tabular-nums; }
+.keyboard-hint { position: fixed; bottom: 24px; left: 24px; font-size: 0.7rem; color: var(--muted); z-index: 100; opacity: 1; transition: opacity 1s; }
+
+/* --- REVEAL --- */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-d1 { transition-delay: 0.1s; }
+.reveal-d2 { transition-delay: 0.2s; }
+.reveal-d3 { transition-delay: 0.3s; }
+
+/* --- LOGOS ROW --- */
+.logos-row { display: flex; gap: 3rem; justify-content: center; flex-wrap: wrap; margin-top: 3rem; }
+.logos-row span { color: var(--muted); font-size: 1rem; font-weight: 500; letter-spacing: 0.05em; transition: color 0.3s; }
+.logos-row span:hover { color: var(--gold); }
+
+/* --- APPENDIX LABEL --- */
+.appendix-label { position: absolute; top: 2rem; right: 2rem; font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.15em; padding: 4px 10px; border: 1px solid var(--dim); border-radius: 4px; }
+
+/* --- DIVIDER --- */
+.gold-line { width: 40px; height: 2px; background: var(--gold); }
+.gold-line.center { margin: 1.5rem auto; }
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+<div class="slide-indicator" id="slideIndicator"></div>
+<div class="slide-counter" id="slideCounter">1 / 16</div>
+<div class="keyboard-hint" id="keyboardHint">↑↓ Navigieren · Esc = Start</div>
+
+<!-- ====== SLIDE 1: COVER ====== -->
+<section id="s1">
+  <div class="container">
+    <div class="logo reveal">
+      <span class="logo-text">Ainary</span>
+      <span class="logo-dot"></span>
+    </div>
+    <div class="gold-line center reveal"></div>
+    <h2 class="reveal" style="font-weight: 300; color: var(--text);">KI-Systeme für den Mittelstand</h2>
+    <p class="small reveal" style="margin-top: 4rem;">Florian Ziesche · Februar 2026</p>
+    <p class="small reveal">AI Strategy · System Design · Execution · Research</p>
+  </div>
+</section>
+
+<!-- ====== SLIDE 2: PROBLEM ====== -->
+<section id="s2">
+  <div class="container">
+    <p class="small reveal" style="margin-bottom: 1rem; letter-spacing: 0.15em;">DAS PROBLEM</p>
+    <div class="big-number reveal"><span class="count-up" data-target="1980000" data-format="de">0</span></div>
+    <h2 class="reveal" style="margin-top: 1rem; font-weight: 400;">fehlende Fachkräfte</h2>
+    <p class="reveal" style="max-width: 550px; margin: 1rem auto 0;">Erfahrene Meister gehen in Rente. Wissen steckt in Köpfen, nicht in Systemen.<br>Ihre Aufträge warten nicht.</p>
+    <p class="small reveal" style="margin-top: 2.5rem;">Quelle: IAB, 2024</p>
+  </div>
+</section>
+
+<!-- ====== SLIDE 3: REALITÄT ====== -->
+<section id="s3">
+  <div class="container">
+    <p class="small reveal" style="margin-bottom: 1rem; letter-spacing: 0.15em;">DIE REALITÄT</p>
+    <h2 class="reveal">Was passiert, wenn niemand handelt</h2>
+    <div class="grid-3">
+      <div class="card reveal reveal-d1">
+        <div class="number"><span class="count-up" data-target="67" data-suffix="%">0</span></div>
+        <div class="gold-line"></div>
+        <h3>Akuter Fachkräftemangel</h3>
+        <p>Besonders in CNC, Planung und Verwaltung. Verschärft sich jedes Quartal.</p>
+      </div>
+      <div class="card reveal reveal-d2">
+        <div class="number"><span class="count-up" data-target="40" data-suffix="%">0</span></div>
+        <div class="gold-line"></div>
+        <h3>Verwaltungszeit</h3>
+        <p>Angebote, Auftragsplanung, Nachfassen — manuell, repetitiv, fehleranfällig.</p>
+      </div>
+      <div class="card reveal reveal-d3">
+        <div class="number">0</div>
+        <div class="gold-line"></div>
+        <h3>Passende KI-Tools</h3>
+        <p>Enterprise kostet €100K+. ChatGPT versteht Ihren Betrieb nicht.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== SLIDE 4: LÖSUNG ====== -->
+<section id="s4">
+  <div class="container">
+    <p class="small reveal" style="margin-bottom: 1rem; letter-spacing: 0.15em;">DIE LÖSUNG</p>
+    <h2 class="reveal">KI-Agenten, die <span class="gold">Ihre Arbeit</span> verstehen</h2>
+    <p class="reveal" style="max-width: 600px; margin: 0 auto 2.5rem;">Keine Chatbots. Spezialisierte Systeme, die Ihre Prozesse lernen und Mitarbeiter entlasten — ab Tag eins.</p>
+    <div class="grid-3">
+      <div class="card reveal reveal-d1">
+        <div class="tag">Planung</div>
+        <h3>Auftragsplanung & Maschinenbelegung</h3>
+        <p>Auftragslage, Kapazität, Lieferzeiten — KI schlägt optimale Belegung vor.</p>
+      </div>
+      <div class="card reveal reveal-d2">
+        <div class="tag">Vertrieb</div>
+        <h3>Angebote & Kundenrecherche</h3>
+        <p>Automatische Angebotserstellung. Kundenrecherche und Nachfass-Workflows.</p>
+      </div>
+      <div class="card reveal reveal-d3">
+        <div class="tag">Verwaltung</div>
+        <h3>Dokumente & Reporting</h3>
+        <p>Rechnungen, Berichte, Compliance — automatisiert und nachvollziehbar.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== SLIDE 5: PROZESS ====== -->
+<section id="s5">
+  <div class="container-left">
+    <p class="small reveal" style="margin-bottom: 1rem; letter-spacing: 0.15em;">SO FUNKTIONIERT ES</p>
+    <h2 class="reveal">4 Wochen. Problem → Lösung.</h2>
+    <div style="margin-top: 3rem;">
+      <div class="step reveal"><div class="step-number">01</div><div class="step-content"><h3>Analyse</h3><p>Abläufe verstehen, Zeitfresser identifizieren, nach ROI priorisieren.</p></div></div>
+      <div class="step reveal"><div class="step-number">02</div><div class="step-content"><h3>Prototyp</h3><p>2 Wochen: funktionierender Prototyp für den wichtigsten Anwendungsfall.</p></div></div>
+      <div class="step reveal"><div class="step-number">03</div><div class="step-content"><h3>Pilot</h3><p>4 Wochen Live-Test. Echte Daten, echte Nutzer, messbare Ergebnisse.</p></div></div>
+      <div class="step reveal"><div class="step-number">04</div><div class="step-content"><h3>Skalierung</h3><p>Was funktioniert, wird ausgerollt. Schrittweise weitere Prozesse.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== SLIDE 6: VORHER/NACHHER ====== -->
+<section id="s6">
+  <div class="container">
+    <p class="small reveal" style="margin-bottom: 1rem; letter-spacing: 0.15em;">TRANSFORMATION</p>
+    <h2 class="reveal">Vorher → Nachher</h2>
+    <div class="ba-container reveal">
+      <div class="ba-wrapper">
+        <div class="ba-side ba-before">
+          <div class="ba-label">Ohne KI</div>
+          <div class="ba-stat"><div class="val">6h / Woche</div><div class="lbl">Belegungsplanung</div></div>
+          <div class="ba-stat"><div class="val">3h / Woche</div><div class="lbl">Angebote schreiben</div></div>
+          <div class="ba-stat"><div class="val">Excel + Telefon</div><div class="lbl">Werkzeuge</div></div>
+          <div class="ba-stat"><div class="val">Meisterwissen</div><div class="lbl">Nicht dokumentiert</div></div>
+        </div>
+        <div class="ba-divider" id="baDivider"></div>
+        <div class="ba-side ba-after">
+          <div class="ba-label">Mit Ainary</div>
+          <div class="ba-stat"><div class="val">45 min / Woche</div><div class="lbl">Automatische Vorschläge</div></div>
+          <div class="ba-stat"><div class="val">20 min / Woche</div><div class="lbl">KI-generierte Entwürfe</div></div>
+          <div class="ba-stat"><div class="val">Dashboard</div><div class="lbl">Ein Blick, alles klar</div></div>
+          <div class="ba-stat"><div class="val">Im System</div><div class="lbl">Wissen gesichert</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== SLIDE 7: KUNDENBEISPIEL ====== -->
+<section id="s7">
+  <div class="container">
+    <p class="small reveal" style="margin-bottom: 1rem; letter-spacing: 0.15em;">FALLBEISPIEL</p>
+    <h2 class="reveal">Maschinenbau · 25 Mitarbeiter · 3 CNC-Maschinen</h2>
+    <div class="grid-3 reveal" style="margin-top: 3rem;">
+      <div class="card" style="text-align: center;">
+        <div class="number"><span class="count-up" data-target="87" data-suffix="%">0</span></div>
+        <div class="gold-line" style="margin: 0.75rem auto;"></div>
+        <p>Zeitersparnis Planung</p>
+      </div>
+      <div class="card" style="text-align: center;">
+        <div class="number">6h→45m</div>
+        <div class="gold-line" style="margin: 0.75rem auto;"></div>
+        <p>pro Woche</p>
+      </div>
+      <div class="card" style="text-align: center;">
+        <div class="number">~€18K</div>
+        <div class="gold-line" style="margin: 0.75rem auto;"></div>
+        <p>geschätzte Ersparnis / Jahr</p>
+      </div>
+    </div>
+    <p class="small reveal" style="margin-top: 2rem;">Projizierte Werte auf Basis des Pilot-Ergebnisses.</p>
+  </div>
+</section>
+
+<!-- ====== SLIDE 8: ROI RECHNER ====== -->
+<section id="s8">
+  <div class="container">
+    <p class="small reveal" style="margin-bottom: 1rem; letter-spacing: 0.15em;">IHR POTENZIAL</p>
+    <h2 class="reveal">Was spart KI in <span class="gold">Ihrem</span> Betrieb?</h2>
+    <div class="reveal" style="max-width: 600px; width: 100%; margin: 2rem auto 0; text-align: left;">
+      <label style="color: var(--white); font-weight: 500; font-size: 0.95rem;">Stunden pro Woche für Verwaltung & Planung</label>
+      <input type="range" class="roi-slider" id="roiSlider" min="5" max="40" value="15" style="width:100%;margin:1rem 0;-webkit-appearance:none;height:3px;background:var(--dim);border-radius:2px;outline:none;">
+      <div style="display:flex;justify-content:space-between;font-size:0.8rem;color:var(--muted);">
+        <span>5h</span>
+        <span id="roiHours" style="color:var(--gold);font-weight:600;font-size:1.2rem;">15h</span>
+        <span>40h</span>
+      </div>
+      <div style="margin-top:2rem;padding:2rem 0;border-top:1px solid var(--dim);">
+        <p style="color:var(--muted);font-size:0.8rem;margin-bottom:0.5rem;">Geschätzte jährliche Ersparnis (70% Automatisierung)</p>
+        <div id="roiSaving" style="font-size:3rem;font-weight:600;color:var(--gold);">€27.300</div>
+        <p style="color:var(--muted);font-size:0.75rem;margin-top:0.75rem;">€35/h Vollkosten · 48 Wochen · 70% Automatisierungsgrad</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== SLIDE 9: WARUM AINARY ====== -->
+<section id="s9">
+  <div class="container">
+    <p class="small reveal" style="margin-bottom: 1rem; letter-spacing: 0.15em;">WARUM AINARY</p>
+    <h2 class="reveal">Nicht beraten. <span class="gold">Gebaut.</span></h2>
+    <p class="reveal" style="max-width: 550px; margin: 0 auto 2.5rem;">Ich habe selbst eine KI-Firma aufgebaut — von der ersten Zeile Code bis zur Serienproduktion bei BMW.</p>
+    <div class="grid-2">
+      <div class="card reveal reveal-d1">
+        <div class="tag">Track Record</div>
+        <h3>36ZERO Vision</h3>
+        <p>KI-SaaS für Qualitätsprüfung. €5M Funding. BMW, Siemens, Bosch. Von 0 auf €1M+ in einem Jahr.</p>
+      </div>
+      <div class="card reveal reveal-d2">
+        <div class="tag">Mittelstand-DNA</div>
+        <h3>Aufgewachsen im Familienbetrieb</h3>
+        <p>25 Mitarbeiter. Knappe Ressourcen, kein IT-Team, jeder Cent muss sitzen. Ich kenne diese Realität.</p>
+      </div>
+      <div class="card reveal reveal-d1">
+        <div class="tag">Technologie</div>
+        <h3>Eigene Plattform</h3>
+        <p>Agentische Ausführungsplattform mit Trust-Kalibrierung. Kein ChatGPT-Wrapper.</p>
+      </div>
+      <div class="card reveal reveal-d2">
+        <div class="tag">Netzwerk</div>
+        <h3>Silicon Valley + Sachsen</h3>
+        <p>TUM, Alchemist Accelerator, VC Lab NYC. Beste Technologie, deutsches Verständnis.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== SLIDE 10: VERGLEICH ====== -->
+<section id="s10">
+  <div class="container">
+    <p class="small reveal" style="margin-bottom: 1rem; letter-spacing: 0.15em;">VERGLEICH</p>
+    <h2 class="reveal">Ainary vs. Alternativen</h2>
+    <table class="compare-table reveal">
+      <tr><th></th><th>Ainary</th><th>Beratung</th><th>ChatGPT</th><th>Enterprise</th></tr>
+      <tr><td>Versteht Ihren Betrieb</td><td class="yes">✓</td><td class="yes">✓</td><td class="no">✗</td><td class="no">✗</td></tr>
+      <tr><td>Prototyp in 2 Wochen</td><td class="yes">✓</td><td class="no">✗</td><td class="no">✗</td><td class="no">✗</td></tr>
+      <tr><td>Unter €5.000/Monat</td><td class="yes">✓</td><td class="no">✗</td><td class="yes">✓</td><td class="no">✗</td></tr>
+      <tr><td>KI die handelt</td><td class="yes">✓</td><td class="no">✗</td><td class="no">✗</td><td class="yes">✓</td></tr>
+      <tr><td>Ergebnisse in 4 Wochen</td><td class="yes">✓</td><td class="no">✗</td><td class="no">✗</td><td class="no">✗</td></tr>
+      <tr><td>Datenschutz</td><td class="yes">✓</td><td class="yes">✓</td><td class="no">✗</td><td class="yes">✓</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ====== SLIDE 11: PRICING ====== -->
+<section id="s11">
+  <div class="container-left">
+    <p class="small reveal" style="margin-bottom: 1rem; letter-spacing: 0.15em;">INVESTITION</p>
+    <h2 class="reveal">Einstieg ohne Risiko</h2>
+    <div style="margin-top: 2.5rem; max-width: 700px;">
+      <div class="price-col reveal">
+        <div class="price-label">Analyse</div>
+        <div class="price">€0</div>
+        <div class="price-unit">60 Min. Erstgespräch</div>
+        <ul><li>Top-3 Automatisierungspotenziale</li><li>ROI-Schätzung</li><li>Keine Verpflichtung</li></ul>
+      </div>
+      <div class="price-col featured reveal">
+        <div class="price-label">Pilot ★</div>
+        <div class="price">€4.900</div>
+        <div class="price-unit">einmalig · 4 Wochen</div>
+        <ul><li>1 Anwendungsfall, voll funktionsfähig</li><li>Prototyp in 2 Wochen</li><li>4 Wochen Live-Test</li><li>Ergebnisbericht mit ROI-Nachweis</li><li>Förderung möglich (bis 50%)</li></ul>
+      </div>
+      <div class="price-col reveal">
+        <div class="price-label">Skalierung</div>
+        <div class="price">ab €990</div>
+        <div class="price-unit">pro Monat · monatlich kündbar</div>
+        <ul><li>Laufender Betrieb</li><li>Weitere Prozesse</li><li>Support & Weiterentwicklung</li></ul>
+      </div>
+    </div>
+    <p class="small reveal" style="margin-top: 2rem;">Förderungen: go-digital, Sachsen Digital, Bayern Digitalbonus</p>
+  </div>
+</section>
+
+<!-- ====== SLIDE 12: QUOTE ====== -->
+<section id="s12">
+  <div class="container">
+    <div class="reveal">
+      <span class="quote-mark">"</span>
+      <div class="quote">Ich habe eine KI-Firma von Null aufgebaut, €5M eingeworben und Software bei BMW, Siemens und Bosch in die Produktion gebracht. Jetzt bringe ich diese Erfahrung in den Mittelstand.</div>
+    </div>
+    <p class="small reveal" style="margin-top: 2rem;">— Florian Ziesche, Gründer</p>
+    <div class="logos-row reveal">
+      <span>BMW</span><span>Siemens</span><span>Bosch</span><span>Magna</span><span>TUM</span><span>Alchemist</span>
+    </div>
+  </div>
+</section>
+
+<!-- ====== SLIDE 13: CTA ====== -->
+<section id="s13">
+  <div class="container">
+    <h2 class="reveal">Bereit?</h2>
+    <p class="reveal" style="max-width: 450px; margin: 0 auto;">Kostenloses Erstgespräch. 60 Minuten.<br>Konkrete Ergebnisse. Kein Verkaufsgespräch.</p>
+    <a href="mailto:florian@ainaryventures.com" class="cta-button reveal">Gespräch vereinbaren →</a>
+    <div class="reveal" style="margin-top: 3rem;">
+      <p class="small">florian@ainaryventures.com · +1 347 740 1465</p>
+      <p class="small">ainaryventures.com</p>
+    </div>
+  </div>
+</section>
+
+<!-- =============================== -->
+<!-- ========== APPENDIX =========== -->
+<!-- =============================== -->
+
+<!-- ====== A1: LIVE AGENT DEMO ====== -->
+<section id="a1">
+  <div class="appendix-label">Appendix · Live Demo</div>
+  <div class="container">
+    <p class="small reveal" style="margin-bottom: 1rem; letter-spacing: 0.15em;">LIVE DEMO</p>
+    <h2 class="reveal">So arbeitet ein KI-Agent</h2>
+    <p class="reveal" style="max-width: 500px; margin: 0 auto 0;">Tippen Sie eine Frage — der Agent recherchiert, denkt, und antwortet.</p>
+    <div class="agent-demo reveal">
+      <div class="agent-header">
+        <div class="agent-dot green"></div>
+        <span style="font-size: 0.8rem; color: var(--muted);">Ainary Agent · Online</span>
+      </div>
+      <div class="agent-messages" id="agentMessages">
+        <div class="agent-msg system">Agent bereit. Stellen Sie eine Frage über Ihren Betrieb.</div>
+      </div>
+      <div class="agent-input">
+        <input type="text" id="agentInput" placeholder="z.B. Wie viele Stunden verbringen wir mit Planung?">
+        <button id="agentSend">→</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== A2: DASHBOARD PREVIEW ====== -->
+<section id="a2">
+  <div class="appendix-label">Appendix · Dashboard</div>
+  <div class="container">
+    <p class="small reveal" style="margin-bottom: 1rem; letter-spacing: 0.15em;">ECHTES PRODUKT</p>
+    <h2 class="reveal">So sieht Ihr Dashboard aus</h2>
+    <div class="dashboard-frame reveal">
+      <div class="dashboard-titlebar">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <span>Ainary Execution Dashboard — Pilot Verwaltung</span>
+      </div>
+      <div class="dashboard-body">
+        <iframe src="demos/glashuette.html" loading="lazy"></iframe>
+      </div>
+    </div>
+    <p class="small reveal" style="margin-top: 1.5rem;">Live-Preview des Pilot-Dashboards. Daten sind Beispieldaten.</p>
+  </div>
+</section>
+
+<!-- ====== A3: VERWALTUNG / BÜRGERMEISTER ====== -->
+<section id="a3">
+  <div class="appendix-label">Appendix · Verwaltung</div>
+  <div class="container">
+    <p class="small reveal" style="margin-bottom: 1rem; letter-spacing: 0.15em;">ANWENDUNGSFALL VERWALTUNG</p>
+    <h2 class="reveal">KI für kommunale Verwaltung</h2>
+    <p class="reveal" style="max-width: 600px; margin: 0 auto 2.5rem;">OZG-Umsetzung, Bürgeranfragen, interne Abläufe — KI-Agenten entlasten Ihre Verwaltung dort, wo der Fachkräftemangel am stärksten trifft.</p>
+    <div class="grid-3">
+      <div class="card reveal reveal-d1">
+        <div class="tag">Bürgerservice</div>
+        <h3>Anfragen automatisch beantworten</h3>
+        <p>KI beantwortet Standardfragen zu Öffnungszeiten, Formularen, Zuständigkeiten — 24/7, korrekt, mehrsprachig.</p>
+      </div>
+      <div class="card reveal reveal-d2">
+        <div class="tag">Dokumentation</div>
+        <h3>Bescheide & Berichte</h3>
+        <p>Automatische Erstellung von Bescheiden, Protokollen und Berichten aus Vorlagen und Datenquellen.</p>
+      </div>
+      <div class="card reveal reveal-d3">
+        <div class="tag">OZG</div>
+        <h3>Digitalisierung der Verwaltung</h3>
+        <p>Strukturierte Datenerfassung, digitale Workflows und Schnittstellen zu bestehenden Fachverfahren.</p>
+      </div>
+    </div>
+    <div class="grid-3 reveal" style="margin-top: 3rem;">
+      <div class="card" style="text-align: center;">
+        <div class="number"><span class="count-up" data-target="60" data-suffix="%">0</span></div>
+        <div class="gold-line" style="margin: 0.5rem auto;"></div>
+        <p>Weniger Bearbeitungszeit bei Standardanfragen</p>
+      </div>
+      <div class="card" style="text-align: center;">
+        <div class="number">24/7</div>
+        <div class="gold-line" style="margin: 0.5rem auto;"></div>
+        <p>Bürgerservice ohne Mehrpersonal</p>
+      </div>
+      <div class="card" style="text-align: center;">
+        <div class="number">€0</div>
+        <div class="gold-line" style="margin: 0.5rem auto;"></div>
+        <p>Erstgespräch & Potenzialanalyse</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== A4: MASCHINENBAU / ANDREAS ====== -->
+<section id="a4">
+  <div class="appendix-label">Appendix · Maschinenbau</div>
+  <div class="container">
+    <p class="small reveal" style="margin-bottom: 1rem; letter-spacing: 0.15em;">ANWENDUNGSFALL MASCHINENBAU</p>
+    <h2 class="reveal">KI für Maschinenbau-KMU</h2>
+    <p class="reveal" style="max-width: 600px; margin: 0 auto 2.5rem;">CNC-Planung, Angebotswesen, Kundenrecherche — die drei größten Zeitfresser im Maschinenbau, automatisiert.</p>
+    <div class="grid-3">
+      <div class="card reveal reveal-d1">
+        <div class="tag">CNC-Planung</div>
+        <h3>Maschinenbelegung optimieren</h3>
+        <p>KI analysiert Aufträge, Rüstzeiten, Materialverfügbarkeit und schlägt die optimale Reihenfolge vor.</p>
+      </div>
+      <div class="card reveal reveal-d2">
+        <div class="tag">Angebote</div>
+        <h3>Kalkulation in Minuten</h3>
+        <p>Aus Anfrage-PDF wird automatisch ein kalkuliertes Angebot — mit Materialkosten, Maschinenzeit, Marge.</p>
+      </div>
+      <div class="card reveal reveal-d3">
+        <div class="tag">Akquise</div>
+        <h3>Neue Kunden finden</h3>
+        <p>KI recherchiert passende Unternehmen, prüft Bonität und bereitet den Erstkontakt vor.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+// ========== PARTICLE SYSTEM ==========
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let mouseX = -1000, mouseY = -1000;
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+
+class Particle {
+  constructor() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.vx = (Math.random() - 0.5) * 0.3;
+    this.vy = (Math.random() - 0.5) * 0.3;
+    this.r = Math.random() * 1.5 + 0.5;
+  }
+  update() {
+    this.x += this.vx; this.y += this.vy;
+    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+    // Mouse repulsion
+    const dx = this.x - mouseX, dy = this.y - mouseY;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < 150) {
+      this.x += dx / dist * 1.5;
+      this.y += dy / dist * 1.5;
+    }
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(200, 170, 80, 0.15)';
+    ctx.fill();
+  }
+}
+
+for (let i = 0; i < 60; i++) particles.push(new Particle());
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => { p.update(); p.draw(); });
+  // Draw connections
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 160) {
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = `rgba(200, 170, 80, ${0.06 * (1 - dist/160)})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+// ========== REVEAL ==========
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      e.target.querySelectorAll('.count-up:not(.counted)').forEach(el => countUp(el));
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+// ========== COUNT UP ==========
+function countUp(el) {
+  el.classList.add('counted');
+  const target = parseInt(el.dataset.target);
+  const suffix = el.dataset.suffix || '';
+  const format = el.dataset.format || '';
+  const dur = 1400;
+  const start = performance.now();
+  function tick(now) {
+    const p = Math.min((now - start) / dur, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    const cur = Math.round(target * ease);
+    el.textContent = (format === 'de' ? cur.toLocaleString('de-DE') : cur) + suffix;
+    if (p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+// ========== SLIDE NAV ==========
+const sections = document.querySelectorAll('section');
+const indicator = document.getElementById('slideIndicator');
+const counter = document.getElementById('slideCounter');
+const total = sections.length;
+sections.forEach((s, i) => {
+  const dot = document.createElement('div');
+  dot.className = 'slide-dot';
+  dot.onclick = () => s.scrollIntoView({ behavior: 'smooth' });
+  indicator.appendChild(dot);
+});
+let cur = 0;
+const slideObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      cur = Array.from(sections).indexOf(e.target);
+      document.querySelectorAll('.slide-dot').forEach((d, i) => d.classList.toggle('active', i === cur));
+      counter.textContent = `${cur + 1} / ${total}`;
+    }
+  });
+}, { threshold: 0.5 });
+sections.forEach(s => slideObs.observe(s));
+
+// ========== KEYBOARD ==========
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (['ArrowDown','ArrowRight',' '].includes(e.key)) { e.preventDefault(); sections[Math.min(cur+1, total-1)].scrollIntoView({behavior:'smooth'}); }
+  if (['ArrowUp','ArrowLeft'].includes(e.key)) { e.preventDefault(); sections[Math.max(cur-1, 0)].scrollIntoView({behavior:'smooth'}); }
+  if (e.key==='Escape'||e.key==='Home') { e.preventDefault(); sections[0].scrollIntoView({behavior:'smooth'}); }
+  if (e.key==='End') { e.preventDefault(); sections[total-1].scrollIntoView({behavior:'smooth'}); }
+});
+document.addEventListener('keydown', () => { document.getElementById('keyboardHint').style.opacity='0'; }, {once:true});
+
+// ========== ROI CALCULATOR ==========
+const slider = document.getElementById('roiSlider');
+slider?.addEventListener('input', () => {
+  const h = parseInt(slider.value);
+  document.getElementById('roiHours').textContent = h + 'h';
+  document.getElementById('roiSaving').textContent = '€' + Math.round(h*0.7*35*48).toLocaleString('de-DE');
+});
+
+// ========== AGENT DEMO ==========
+const agentMsgs = document.getElementById('agentMessages');
+const agentInput = document.getElementById('agentInput');
+const agentSend = document.getElementById('agentSend');
+
+const agentResponses = {
+  'planung': [
+    { type: 'tool', text: '🔍 Analysiere Planungsdaten...' },
+    { type: 'tool', text: '📊 3 CNC-Maschinen gefunden, 47 offene Aufträge' },
+    { type: 'agent', text: 'Ihre aktuelle Belegungsplanung hat eine Auslastung von 73%. Durch optimierte Reihenfolge der Aufträge nach Rüstzeit-Ähnlichkeit können Sie die Auslastung auf ~85% steigern. Das entspricht ca. 2 zusätzlichen Aufträgen pro Woche.' }
+  ],
+  'angebote': [
+    { type: 'tool', text: '🔍 Durchsuche Angebotshistorie...' },
+    { type: 'tool', text: '📋 127 Angebote im letzten Jahr, Ø 45 Min pro Angebot' },
+    { type: 'agent', text: 'Sie erstellen ~10 Angebote pro Woche, davon sind 60% Standardteile. Diese können in unter 5 Minuten automatisch kalkuliert werden. Geschätzte Ersparnis: 4-5 Stunden pro Woche.' }
+  ],
+  'kosten': [
+    { type: 'tool', text: '🔍 Berechne Einsparpotenzial...' },
+    { type: 'tool', text: '💰 Aktuelle Verwaltungskosten: ~€2.800/Monat' },
+    { type: 'agent', text: 'Bei 15h/Woche Verwaltungsaufwand und €35/h Vollkosten investieren Sie €2.520/Monat in manuelle Arbeit. Mit 70% Automatisierung sparen Sie ~€1.764/Monat — das Ainary-System amortisiert sich im ersten Monat.' }
+  ],
+  'default': [
+    { type: 'tool', text: '🔍 Recherchiere...' },
+    { type: 'tool', text: '📊 Daten werden analysiert' },
+    { type: 'agent', text: 'Basierend auf vergleichbaren Betrieben Ihrer Größe liegt das Automatisierungspotenzial bei 25-35% der Verwaltungszeit. Die drei größten Hebel: Belegungsplanung (6h→1h), Angebotserstellung (5h→1h), und Kundenrecherche (3h→30min). Soll ich einen dieser Bereiche genauer analysieren?' }
+  ]
+};
+
+function addMsg(type, text) {
+  const div = document.createElement('div');
+  div.className = 'agent-msg ' + type;
+  if (type === 'tool') div.innerHTML = '<span class="tool-call">' + text + '</span>';
+  else div.textContent = text;
+  agentMsgs.appendChild(div);
+  agentMsgs.scrollTop = agentMsgs.scrollHeight;
+}
+
+async function simulateAgent(query) {
+  // User message
+  const userDiv = document.createElement('div');
+  userDiv.className = 'agent-msg';
+  userDiv.style.color = 'var(--white)';
+  userDiv.style.fontWeight = '500';
+  userDiv.textContent = query;
+  agentMsgs.appendChild(userDiv);
+
+  const q = query.toLowerCase();
+  let responses;
+  if (q.includes('plan') || q.includes('beleg') || q.includes('cnc') || q.includes('maschine')) responses = agentResponses.planung;
+  else if (q.includes('angebot') || q.includes('kalkul')) responses = agentResponses.angebote;
+  else if (q.includes('kosten') || q.includes('spar') || q.includes('geld') || q.includes('euro')) responses = agentResponses.kosten;
+  else responses = agentResponses.default;
+
+  for (const r of responses) {
+    await new Promise(res => setTimeout(res, r.type === 'tool' ? 800 : 1200));
+    if (r.type === 'agent') {
+      // Typing effect
+      const div = document.createElement('div');
+      div.className = 'agent-msg agent';
+      div.innerHTML = '<span class="typing-cursor"></span>';
+      agentMsgs.appendChild(div);
+      agentMsgs.scrollTop = agentMsgs.scrollHeight;
+      let i = 0;
+      await new Promise(resolve => {
+        const interval = setInterval(() => {
+          div.textContent = r.text.substring(0, i);
+          i += 2;
+          agentMsgs.scrollTop = agentMsgs.scrollHeight;
+          if (i >= r.text.length) { clearInterval(interval); div.textContent = r.text; resolve(); }
+        }, 15);
+      });
+    } else {
+      addMsg(r.type, r.text);
+    }
+  }
+}
+
+agentSend?.addEventListener('click', () => {
+  const q = agentInput.value.trim();
+  if (!q) return;
+  agentInput.value = '';
+  simulateAgent(q);
+});
+agentInput?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') agentSend.click();
+});
+
+// Slider style
+const style = document.createElement('style');
+style.textContent = `input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:var(--gold);border-radius:50%;cursor:pointer;box-shadow:0 0 10px rgba(200,170,80,0.3)}`;
+document.head.appendChild(style);
+</script>
+
+</body>
+</html>

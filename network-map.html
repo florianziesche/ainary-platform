@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Netzwerk-Analyse — Ainary Intelligence</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  :root { --text:#1a1a1a;--text2:#444;--muted:#777;--light:#bbb;--border:#d0d0d0;--border2:#e8e8e8;--surface:#fafafa;--accent:#9d7f3b;--green:#2d8a4e;--red:#c0392b;--yellow:#b8860b;--f:'Inter',-apple-system,sans-serif;--m:'JetBrains Mono',monospace; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--f);color:var(--text);background:#fff;-webkit-font-smoothing:antialiased}
+  .page{max-width:1200px;margin:0 auto;padding:32px 48px 48px}
+  .portal-hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;margin-bottom:24px;border-bottom:1px solid var(--border2);font-size:8pt}
+  .portal-left{display:flex;align-items:center;gap:8px}
+  .brand-dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+  .brand-name{font-weight:500;color:var(--muted)}
+  .portal-right{font-family:var(--m);font-size:7pt;color:var(--light)}
+  .doc-hdr{border-bottom:1px solid var(--border2);padding-bottom:16px;margin-bottom:24px}
+  .doc-title{font-size:18pt;font-weight:600;letter-spacing:-0.025em;margin-bottom:4px}
+  .doc-sub{font-size:10pt;color:var(--text2)}
+  .doc-meta{font-family:var(--m);font-size:7.5pt;color:var(--muted);margin-top:8px}
+  .doc-meta .conf-tag{display:inline-block;font-family:var(--m);font-size:6.5pt;color:var(--red);border:1px solid var(--red);border-radius:2px;padding:1px 6px;margin-left:8px;letter-spacing:1px}
+
+  /* Graph */
+  #graph-container{width:100%;height:600px;border:1px solid var(--border2);border-radius:4px;position:relative;overflow:hidden;background:var(--surface)}
+  svg{width:100%;height:100%}
+  .link{stroke-opacity:0.5;fill:none}
+  .link-label{font-family:var(--m);font-size:6pt;fill:var(--muted);pointer-events:none}
+  .node-circle{cursor:pointer;transition:r 0.2s}
+  .node-circle:hover{filter:brightness(1.1)}
+  .node-label{font-family:var(--f);font-weight:600;pointer-events:none;text-anchor:middle}
+  .node-sublabel{font-family:var(--m);pointer-events:none;text-anchor:middle;fill:var(--muted)}
+
+  /* Tooltip */
+  .tooltip{position:absolute;background:#fff;border:1px solid var(--border);border-radius:4px;padding:12px 16px;font-size:8pt;max-width:280px;pointer-events:none;opacity:0;transition:opacity 0.15s;box-shadow:0 2px 8px rgba(0,0,0,0.08);z-index:10}
+  .tooltip h4{font-size:9pt;margin-bottom:4px}
+  .tooltip .role{font-family:var(--m);font-size:7pt;color:var(--accent);margin-bottom:6px}
+  .tooltip .detail{font-size:7.5pt;color:var(--text2);line-height:1.5}
+  .tooltip .tag{display:inline-block;font-family:var(--m);font-size:6pt;padding:1px 6px;border-radius:2px;margin-right:4px}
+  .tooltip .tag-red{background:rgba(192,57,43,0.08);color:var(--red)}
+  .tooltip .tag-green{background:rgba(45,138,78,0.08);color:var(--green)}
+  .tooltip .tag-yellow{background:rgba(184,134,11,0.08);color:var(--yellow)}
+
+  /* Legend */
+  .legend{display:flex;gap:20px;flex-wrap:wrap;margin-top:16px;font-family:var(--m);font-size:7pt;color:var(--muted)}
+  .legend-item{display:flex;align-items:center;gap:6px}
+  .legend-dot{width:10px;height:10px;border-radius:50%}
+
+  /* Info cards */
+  .info-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:24px}
+  .info-card{border:1px solid var(--border2);border-radius:4px;padding:16px;transition:border-color 0.12s;cursor:pointer;text-decoration:none;color:inherit}
+  .info-card:hover{border-color:var(--accent);text-decoration:none}
+  .info-card-name{font-size:10pt;font-weight:600;margin-bottom:2px}
+  .info-card-role{font-family:var(--m);font-size:7pt;color:var(--muted);margin-bottom:6px}
+  .info-card-stat{font-family:var(--m);font-size:7pt;color:var(--text2)}
+  .info-card-connections{font-family:var(--m);font-size:18pt;font-weight:700;color:var(--accent);float:right;margin-top:-20px}
+
+  /* Connection table */
+  .conn-section{margin-top:32px}
+  .sec-label{font-family:var(--m);font-size:7pt;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:12px}
+  table{width:100%;border-collapse:collapse;font-size:8pt}
+  th{text-align:left;font-family:var(--m);font-size:6.5pt;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:6px 10px;border-bottom:1px solid var(--border)}
+  td{padding:6px 10px;border-bottom:1px solid var(--border2);color:var(--text2)}
+  tr:hover{background:var(--surface)}
+  .ftr{margin-top:32px;padding:16px 0;border-top:1px solid var(--border);display:flex;justify-content:center;gap:6px;flex-wrap:wrap;font-family:var(--m);font-size:7pt;color:var(--light)}
+  @media(max-width:768px){.page{padding:24px 20px}.info-grid{grid-template-columns:1fr 1fr}#graph-container{height:450px}}
+  @media(max-width:480px){.info-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="portal-hdr">
+  <div class="portal-left"><div class="brand-dot"></div><span class="brand-name">Ainary</span><span style="color:var(--border2)">·</span><span style="color:var(--light)">Network Intelligence</span></div>
+  <div class="portal-right">VERTRAULICH</div>
+</div>
+
+<div class="doc-hdr">
+  <div class="doc-title">Netzwerk-Analyse: SOE + Mittelsachsen</div>
+  <div class="doc-sub">4 Dossier-Subjekte · 12 Akteure · 18 Verbindungen · Interaktiver Graph</div>
+  <div class="doc-meta">Erstellt: 22. Februar 2026 · Basierend auf 4 Intelligence Dossiers <span class="conf-tag">VERTRAULICH</span></div>
+</div>
+
+<div id="graph-container">
+  <div class="tooltip" id="tooltip"></div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#c0392b"></div> Dossier-Subjekt (AfD)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#2d8a4e"></div> Dossier-Subjekt (demokratisch)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#5b8def"></div> AfD-Netzwerk</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#9d7f3b"></div> Organisation</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#bbb"></div> Sonstige</div>
+  <div class="legend-item">— <span style="color:var(--red)">Rot</span> = VS-relevant &nbsp; — <span style="color:var(--muted)">Grau</span> = Neutral &nbsp; — <span style="color:var(--green)">Grün</span> = Demokratisch</div>
+</div>
+
+<div class="info-grid">
+  <a class="info-card" href="dossier-andre-barth.html">
+    <div class="info-card-connections">6</div>
+    <div class="info-card-name">André Barth</div>
+    <div class="info-card-role">BM Altenberg · AfD</div>
+    <div class="info-card-stat">Trust 7.8 · 40 Quellen</div>
+  </a>
+  <a class="info-card" href="dossier-rolf-weigand.html">
+    <div class="info-card-connections">5</div>
+    <div class="info-card-name">Dr. Rolf Weigand</div>
+    <div class="info-card-role">BM Großschirma · AfD</div>
+    <div class="info-card-stat">Trust 8.2 · 25 Quellen</div>
+  </a>
+  <a class="info-card" href="dossier-tim-lochner.html">
+    <div class="info-card-connections">4</div>
+    <div class="info-card-name">Tim Lochner</div>
+    <div class="info-card-role">OB Pirna · AfD-nominiert</div>
+    <div class="info-card-stat">Trust 8.5 · 20 Quellen</div>
+  </a>
+  <a class="info-card" href="dossier-dirk-neubauer.html">
+    <div class="info-card-connections">3</div>
+    <div class="info-card-name">Dirk Neubauer</div>
+    <div class="info-card-role">Ex-Landrat · Parteilos</div>
+    <div class="info-card-stat">Trust 9.0 · 20 Quellen</div>
+  </a>
+</div>
+
+<div class="conn-section">
+  <div class="sec-label">Alle Verbindungen (18)</div>
+  <table id="conn-table">
+    <thead><tr><th>Von</th><th>Zu</th><th>Verbindung</th><th>Jahr</th><th>Evidenz</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<div class="ftr">
+  <span>Ainary Intelligence</span><span style="color:var(--border2)">·</span>
+  <span>Network Map</span><span style="color:var(--border2)">·</span>
+  <span>22.02.2026</span><span style="color:var(--border2)">·</span>
+  <span>4 Dossiers · 12 Akteure · 18 Verbindungen</span><span style="color:var(--border2)">·</span>
+  <span>Vertraulich</span>
+</div>
+</div>
+
+<script>
+const nodes = [
+  // Dossier subjects
+  {id:"barth",label:"André Barth",sub:"BM Altenberg",group:"dossier-afd",r:28,info:"AfD, 61.8%, seit Jan 2026. 'Anis Amri 2', VS-Partei.",risk:"hoch"},
+  {id:"weigand",label:"Dr. Rolf Weigand",sub:"BM Großschirma",group:"dossier-afd",r:26,info:"AfD, 82.1%, seit Okt 2024. Identitäre Bewegung, 'Gebärfähige Frauen'.",risk:"hoch"},
+  {id:"lochner",label:"Tim Lochner",sub:"OB Pirna",group:"dossier-afd",r:30,info:"Parteilos/AfD, 38.5%, seit Feb 2024. 'Bevölkerungsaustausch', Hakenkreuz-Vergleich.",risk:"hoch"},
+  {id:"neubauer",label:"Dirk Neubauer",sub:"Ex-Landrat",group:"dossier-dem",r:26,info:"Parteilos, Rücktritt Sept 2024. 2 Bücher, Bürgerbeteiligung, bedroht.",risk:"niedrig"},
+  // AfD network
+  {id:"urban",label:"Jörg Urban",sub:"AfD-Sachsen-Chef",group:"afd-net",r:20,info:"Landesvorsitzender AfD Sachsen. VS: gesichert rechtsextrem.",risk:"hoch"},
+  {id:"chrupalla",label:"Tino Chrupalla",sub:"AfD-Bundeschef",group:"afd-net",r:20,info:"AfD-Bundesvorsitzender.",risk:"hoch"},
+  {id:"maier",label:"Jens Maier",sub:"Ex-Richter",group:"afd-net",r:16,info:"Vom VS als rechtsextrem eingestuft, aus Richteramt entfernt.",risk:"hoch"},
+  {id:"petry",label:"Frauke Petry",sub:"Ex-AfD-Chefin",group:"other",r:14,info:"Ehemalige AfD-Bundesvorsitzende, 'Blaue Wende'.",risk:"mittel"},
+  // Orgs
+  {id:"afd_sachsen",label:"AfD Sachsen",sub:"VS: gesichert rechtsextrem",group:"org",r:22,info:"Vom Verfassungsschutz als 'gesichert rechtsextremistisch' eingestuft.",risk:"hoch"},
+  {id:"ib",label:"Identitäre Bewegung",sub:"VS: gesichert rechtsextrem",group:"org",r:16,info:"Rechtsextreme Bewegung, VS-beobachtet.",risk:"hoch"},
+  {id:"ja_sachsen",label:"Junge Alternative",sub:"Sachsen",group:"org",r:14,info:"AfD-Jugendorganisation, teilweise vom VS beobachtet.",risk:"hoch"},
+  {id:"kreistag_soe",label:"Kreistag SOE",sub:"Sächs. Schweiz-Osterz.",group:"org",r:18,info:"Kreistag des Landkreises. Lochner (Pirna) + Barth (Altenberg) im gleichen Kreis.",risk:"neutral"},
+];
+
+const links = [
+  // Barth connections
+  {source:"barth",target:"lochner",label:"Wahlkampf-Unterstützung",year:"2023",evidence:"andrebarth.de",type:"support"},
+  {source:"barth",target:"urban",label:"Foto 2017 + Parteiführung",year:"2017",evidence:"Belltower/dpa",type:"party"},
+  {source:"barth",target:"chrupalla",label:"Joint Events + Wahlkampf",year:"2024",evidence:"YouTube, andrebarth.de",type:"network"},
+  {source:"barth",target:"maier",label:"'Klartext in Pirna' 2018",year:"2018",evidence:"YouTube",type:"network"},
+  {source:"barth",target:"afd_sachsen",label:"MdL + Kreisvorstand SOE",year:"2014–",evidence:"Landtag offiziell",type:"party"},
+  {source:"barth",target:"kreistag_soe",label:"Gleicher Landkreis",year:"2026",evidence:"Struktur",type:"geo"},
+  // Weigand connections
+  {source:"weigand",target:"urban",label:"'Genderwahn'-Kampagne",year:"2023",evidence:"Partei-PM",type:"campaign"},
+  {source:"weigand",target:"ib",label:"Vernetzung (taz)",year:"~2020",evidence:"taz",type:"network"},
+  {source:"weigand",target:"ja_sachsen",label:"Ex-Landesvorsitzender",year:"2013–",evidence:"Wikipedia",type:"party"},
+  {source:"weigand",target:"neubauer",label:"Verlor Landratswahl gegen ihn",year:"2022",evidence:"MDR",type:"opponent"},
+  {source:"weigand",target:"afd_sachsen",label:"MdL + stv. Kreisvors. Mittelsachsen",year:"2018–2024",evidence:"Landtag",type:"party"},
+  // Lochner connections
+  {source:"lochner",target:"petry",label:"BTW-Unterstützung + Blaue Wende",year:"2017–18",evidence:"WELT, Tagesspiegel",type:"support"},
+  {source:"lochner",target:"afd_sachsen",label:"AfD-Fraktion Stadtrat + Nominierung",year:"2020–",evidence:"Wikipedia",type:"party"},
+  {source:"lochner",target:"kreistag_soe",label:"OB der Kreisstadt",year:"2024–",evidence:"Struktur",type:"geo"},
+  // Neubauer connections  
+  {source:"neubauer",target:"afd_sachsen",label:"Gegner / Bedrohungslage",year:"2022–24",evidence:"MDR, ZDF, FAZ",type:"opposition"},
+  // Cross-connections
+  {source:"lochner",target:"barth",label:"Gleicher Landkreis SOE",year:"2024–",evidence:"Geografie",type:"geo"},
+  {source:"urban",target:"afd_sachsen",label:"Landesvorsitzender",year:"2018–",evidence:"offiziell",type:"party"},
+  {source:"maier",target:"afd_sachsen",label:"Ex-MdL (entfernt)",year:"~2021",evidence:"VS",type:"party"},
+];
+
+// Color mapping
+const colorMap = {
+  "dossier-afd": "#c0392b",
+  "dossier-dem": "#2d8a4e",
+  "afd-net": "#5b8def",
+  "org": "#9d7f3b",
+  "other": "#bbb"
+};
+const linkColorMap = {
+  "support": "#c0392b",
+  "party": "#5b8def",
+  "network": "#e67e22",
+  "campaign": "#e67e22",
+  "opponent": "#999",
+  "opposition": "#2d8a4e",
+  "geo": "#bbb"
+};
+
+// Build connection table
+const tbody = document.querySelector('#conn-table tbody');
+links.forEach(l => {
+  const sn = nodes.find(n=>n.id===l.source);
+  const tn = nodes.find(n=>n.id===l.target);
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td><strong>${sn.label}</strong></td><td><strong>${tn.label}</strong></td><td>${l.label}</td><td>${l.year}</td><td style="font-family:var(--m);font-size:7pt">${l.evidence}</td>`;
+  tbody.appendChild(tr);
+});
+
+// D3 Force Simulation
+const container = document.getElementById('graph-container');
+const width = container.clientWidth;
+const height = container.clientHeight;
+
+const svg = d3.select('#graph-container').append('svg')
+  .attr('viewBox', [0, 0, width, height]);
+
+// Arrow markers
+svg.append('defs').selectAll('marker')
+  .data(['arrow']).join('marker')
+  .attr('id', d => d).attr('viewBox', '0 -5 10 10')
+  .attr('refX', 20).attr('refY', 0)
+  .attr('markerWidth', 6).attr('markerHeight', 6)
+  .attr('orient', 'auto')
+  .append('path').attr('d', 'M0,-4L10,0L0,4').attr('fill', '#bbb');
+
+const simulation = d3.forceSimulation(nodes)
+  .force('link', d3.forceLink(links).id(d => d.id).distance(120))
+  .force('charge', d3.forceManyBody().strength(-400))
+  .force('center', d3.forceCenter(width / 2, height / 2))
+  .force('collision', d3.forceCollide().radius(d => d.r + 10));
+
+// Links
+const link = svg.append('g').selectAll('line')
+  .data(links).join('line')
+  .attr('class', 'link')
+  .attr('stroke', d => linkColorMap[d.type] || '#ccc')
+  .attr('stroke-width', d => d.type === 'support' || d.type === 'opponent' ? 2.5 : 1.5)
+  .attr('stroke-dasharray', d => d.type === 'geo' ? '4,3' : d.type === 'opposition' ? '6,3' : null);
+
+// Link labels
+const linkLabel = svg.append('g').selectAll('text')
+  .data(links).join('text')
+  .attr('class', 'link-label')
+  .text(d => d.label);
+
+// Node groups
+const node = svg.append('g').selectAll('g')
+  .data(nodes).join('g')
+  .call(d3.drag()
+    .on('start', (e,d) => { if (!e.active) simulation.alphaTarget(0.3).restart(); d.fx=e.x; d.fy=e.y; })
+    .on('drag', (e,d) => { d.fx=e.x; d.fy=e.y; })
+    .on('end', (e,d) => { if (!e.active) simulation.alphaTarget(0); d.fx=null; d.fy=null; })
+  );
+
+// Circles
+node.append('circle')
+  .attr('class', 'node-circle')
+  .attr('r', d => d.r)
+  .attr('fill', d => colorMap[d.group])
+  .attr('stroke', '#fff')
+  .attr('stroke-width', 2)
+  .attr('opacity', d => d.group.startsWith('dossier') ? 1 : 0.8);
+
+// Labels
+node.append('text')
+  .attr('class', 'node-label')
+  .attr('dy', d => -d.r - 8)
+  .attr('font-size', d => d.group.startsWith('dossier') ? '8pt' : '7pt')
+  .attr('fill', d => colorMap[d.group])
+  .text(d => d.label);
+
+node.append('text')
+  .attr('class', 'node-sublabel')
+  .attr('dy', d => -d.r + 2)
+  .attr('font-size', '5.5pt')
+  .text(d => d.sub);
+
+// Tooltip
+const tooltip = document.getElementById('tooltip');
+node.on('mouseover', (e, d) => {
+  const riskTag = d.risk === 'hoch' ? '<span class="tag tag-red">Risiko: Hoch</span>' :
+                  d.risk === 'mittel' ? '<span class="tag tag-yellow">Risiko: Mittel</span>' :
+                  '<span class="tag tag-green">Risiko: Niedrig</span>';
+  tooltip.innerHTML = `<h4>${d.label}</h4><div class="role">${d.sub}</div><div class="detail">${d.info}</div><div style="margin-top:6px">${riskTag}</div>`;
+  tooltip.style.opacity = 1;
+  tooltip.style.left = (e.offsetX + 16) + 'px';
+  tooltip.style.top = (e.offsetY - 10) + 'px';
+}).on('mousemove', (e) => {
+  tooltip.style.left = (e.offsetX + 16) + 'px';
+  tooltip.style.top = (e.offsetY - 10) + 'px';
+}).on('mouseout', () => { tooltip.style.opacity = 0; });
+
+// Tick
+simulation.on('tick', () => {
+  // Keep nodes in bounds
+  nodes.forEach(d => {
+    d.x = Math.max(d.r+10, Math.min(width-d.r-10, d.x));
+    d.y = Math.max(d.r+10, Math.min(height-d.r-10, d.y));
+  });
+  link.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
+  linkLabel.attr('x',d=>(d.source.x+d.target.x)/2).attr('y',d=>(d.source.y+d.target.y)/2-4);
+  node.attr('transform', d => `translate(${d.x},${d.y})`);
+});
+</script>
+</body>
+</html>

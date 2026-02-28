@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KI im Mittelstand — Was heute funktioniert und was nicht | Florian Ziesche</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --black: #0a0a0a; --card: #111111; --elevated: #1a1a1a;
+  --white: #ffffff; --text: #999999; --muted: #55555e;
+  --gold: #c8aa50; --gold-dark: #a38a3a;
+  --dim: #222; --red: #e05555; --green: #50c878;
+}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', system-ui, sans-serif; background: var(--black); color: var(--white); overflow-x: hidden; }
+
+/* SLIDE SYSTEM */
+section { width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 4rem 3rem; position: relative; overflow: hidden; }
+.container { max-width: 1000px; width: 100%; }
+.container-center { max-width: 1000px; width: 100%; text-align: center; }
+
+/* TYPOGRAPHY */
+h1 { font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 600; letter-spacing: -0.03em; line-height: 1.1; }
+h2 { font-size: clamp(1.8rem, 4vw, 3.2rem); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
+h3 { font-size: clamp(1.1rem, 2vw, 1.5rem); font-weight: 500; line-height: 1.3; }
+p { font-size: clamp(1rem, 1.5vw, 1.2rem); color: var(--text); line-height: 1.7; }
+.gold { color: var(--gold); }
+.muted { color: var(--muted); }
+.small { font-size: 0.8rem; color: var(--muted); }
+.tag { color: var(--gold); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; }
+.big-number { font-size: clamp(5rem, 15vw, 12rem); font-weight: 600; line-height: 1; color: var(--gold); font-variant-numeric: tabular-nums; }
+.gold-line { width: 40px; height: 2px; background: var(--gold); }
+.gold-line.center { margin: 1.5rem auto; }
+
+/* GRID */
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem; margin-top: 2.5rem; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 3rem; margin-top: 2.5rem; }
+@media (max-width: 768px) { .grid-3, .grid-2 { grid-template-columns: 1fr; } section { padding: 2rem 1.5rem; } }
+
+/* CARDS */
+.card { text-align: left; }
+.card h3 { margin-bottom: 0.5rem; }
+.card p { font-size: 0.95rem; }
+.card .number { font-size: 3rem; font-weight: 600; color: var(--gold); line-height: 1; margin-bottom: 0.25rem; }
+
+/* SPEAKER NOTE (hidden, print only) */
+.speaker-note { display: none; }
+@media print { .speaker-note { display: block; page-break-before: always; padding: 2rem; font-size: 0.9rem; color: #333; } }
+
+/* LIVE DEMO BOX */
+.demo-box { max-width: 700px; width: 100%; margin: 2rem auto 0; background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid var(--dim); }
+.demo-header { padding: 10px 16px; background: var(--elevated); display: flex; align-items: center; gap: 6px; border-bottom: 1px solid var(--dim); }
+.demo-header .dot { width: 10px; height: 10px; border-radius: 50%; }
+.demo-header .r { background: #e05555; } .demo-header .y { background: #e0c855; } .demo-header .g { background: #50c878; }
+.demo-header span { margin-left: 10px; font-size: 0.75rem; color: var(--muted); }
+.demo-body { padding: 24px; min-height: 200px; }
+.demo-line { margin-bottom: 8px; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace; }
+.demo-line.cmd { color: var(--gold); }
+.demo-line.out { color: var(--text); }
+.demo-line.ok { color: var(--green); }
+.demo-line.err { color: var(--red); }
+.demo-cursor { display: inline-block; width: 8px; height: 16px; background: var(--gold); animation: blink 1s infinite; vertical-align: text-bottom; }
+@keyframes blink { 0%,50% { opacity: 1; } 51%,100% { opacity: 0; } }
+
+/* BEFORE/AFTER */
+.ba-row { display: flex; margin-top: 2.5rem; border-radius: 12px; overflow: hidden; }
+.ba-side { flex: 1; padding: 2.5rem; }
+.ba-before { background: linear-gradient(135deg, #1a0808 0%, #0d0d0d 100%); }
+.ba-after { background: linear-gradient(135deg, #0d0d0d 0%, #081a08 100%); }
+.ba-divider { width: 2px; background: var(--gold); flex-shrink: 0; }
+.ba-label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 1.5rem; }
+.ba-before .ba-label { color: var(--red); }
+.ba-after .ba-label { color: var(--green); }
+.ba-item { margin-bottom: 1rem; }
+.ba-item .val { font-size: 1.6rem; font-weight: 600; }
+.ba-before .val { color: var(--red); }
+.ba-after .val { color: var(--green); }
+.ba-item .lbl { font-size: 0.8rem; color: var(--muted); }
+
+/* STEPS */
+.step { display: flex; align-items: flex-start; gap: 2rem; margin-bottom: 2rem; }
+.step-n { font-size: 3rem; font-weight: 300; color: var(--gold); opacity: 0.5; min-width: 50px; line-height: 1; }
+.step h3 { margin-bottom: 0.25rem; }
+.step p { font-size: 0.95rem; }
+
+/* QUOTE */
+.quote { font-size: clamp(1.2rem, 2.5vw, 1.8rem); font-weight: 300; color: var(--text); line-height: 1.6; max-width: 700px; }
+.quote-mark { font-size: 5rem; color: var(--gold); opacity: 0.3; line-height: 0.5; display: block; margin-bottom: 1rem; }
+
+/* COMPARE TABLE */
+.compare { width: 100%; max-width: 800px; margin: 2rem auto 0; border-collapse: collapse; }
+.compare th { text-align: left; padding: 10px 14px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); border-bottom: 1px solid var(--dim); }
+.compare th:nth-child(2) { color: var(--gold); }
+.compare td { padding: 12px 14px; font-size: 0.9rem; border-bottom: 1px solid rgba(34,34,34,0.6); color: var(--text); }
+.compare td:first-child { color: var(--white); font-weight: 500; }
+.compare .y { color: var(--gold); }
+.compare .n { color: #333; }
+
+/* NAV */
+.slide-indicator { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 5px; z-index: 100; }
+.slide-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--dim); cursor: pointer; transition: all 0.3s; }
+.slide-dot.active { background: var(--gold); transform: scale(1.6); }
+.slide-counter { position: fixed; bottom: 20px; right: 20px; font-size: 0.7rem; color: var(--muted); z-index: 100; font-variant-numeric: tabular-nums; }
+.progress-bar { position: fixed; top: 0; left: 0; height: 2px; background: var(--gold); z-index: 200; transition: width 0.3s; }
+
+/* ANIMATIONS */
+.reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-d1 { transition-delay: 0.1s; }
+.reveal-d2 { transition-delay: 0.2s; }
+.reveal-d3 { transition-delay: 0.3s; }
+.reveal-d4 { transition-delay: 0.4s; }
+
+/* CTA */
+.cta-btn { display: inline-block; background: var(--gold); color: var(--black); padding: 14px 36px; border-radius: 6px; font-weight: 600; font-size: 1rem; text-decoration: none; transition: all 0.3s; }
+.cta-btn:hover { background: var(--gold-dark); transform: translateY(-2px); }
+
+/* LOGO */
+.logo { display: inline-flex; align-items: baseline; }
+.logo-text { font-size: 2rem; font-weight: 600; letter-spacing: -0.03em; }
+.logo-dot { width: 8px; height: 8px; background: var(--gold); border-radius: 50%; margin-left: 2px; }
+
+/* WARNING BOX */
+.warning { max-width: 700px; margin: 2rem auto 0; padding: 24px; border-left: 3px solid var(--red); background: rgba(224,85,85,0.05); border-radius: 0 8px 8px 0; text-align: left; }
+.warning p { color: var(--text); font-size: 0.95rem; }
+
+/* SUCCESS BOX */
+.success { max-width: 700px; margin: 2rem auto 0; padding: 24px; border-left: 3px solid var(--green); background: rgba(80,200,120,0.05); border-radius: 0 8px 8px 0; text-align: left; }
+.success p { color: var(--text); font-size: 0.95rem; }
+
+/* TIMELINE */
+.timeline { max-width: 600px; width: 100%; margin: 2rem auto 0; position: relative; padding-left: 30px; }
+.timeline::before { content: ''; position: absolute; left: 6px; top: 0; bottom: 0; width: 2px; background: var(--dim); }
+.tl-item { position: relative; margin-bottom: 2rem; }
+.tl-item::before { content: ''; position: absolute; left: -27px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: var(--gold); }
+.tl-item .tl-time { font-size: 0.75rem; color: var(--gold); font-weight: 600; margin-bottom: 4px; }
+.tl-item h3 { font-size: 1rem; margin-bottom: 2px; }
+.tl-item p { font-size: 0.85rem; }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="slide-indicator" id="slideIndicator"></div>
+<div class="slide-counter" id="slideCounter"></div>
+
+<!-- ============================================ -->
+<!-- S1: TITEL -->
+<!-- ============================================ -->
+<section>
+  <div class="container-center">
+    <div class="tag reveal">Impulsvortrag</div>
+    <h1 class="reveal" style="margin-top:1rem;">KI im Mittelstand</h1>
+    <h2 class="reveal" style="font-weight:300;color:var(--text);margin-top:0.5rem;">Was heute funktioniert.<br>Und was nicht.</h2>
+    <div class="gold-line center reveal"></div>
+    <p class="reveal" style="margin-top:2rem;">Florian Ziesche · Ainary</p>
+    <p class="small reveal">Ex-CEO 36ZERO Vision · BMW, Siemens, Bosch · €5M Funding · TUM · Alchemist Accelerator</p>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- S2: ÜBER MICH (30 Sekunden) -->
+<!-- ============================================ -->
+<section>
+  <div class="container-center">
+    <div class="tag reveal">Kurz zu mir</div>
+    <h2 class="reveal" style="margin-top:1rem;">Nicht Berater. <span class="gold">Builder.</span></h2>
+    <div class="grid-3" style="margin-top:3rem;">
+      <div class="card reveal reveal-d1" style="text-align:center;">
+        <div class="number">€5M</div>
+        <div class="gold-line" style="margin:0.5rem auto;"></div>
+        <h3>Funding eingeworben</h3>
+        <p>36ZERO Vision. KI-SaaS für Computer Vision.</p>
+      </div>
+      <div class="card reveal reveal-d2" style="text-align:center;">
+        <div class="number" style="font-size:2rem;">BMW · Siemens<br>Bosch</div>
+        <div class="gold-line" style="margin:0.5rem auto;"></div>
+        <h3>In Produktion</h3>
+        <p>Nicht Piloten. Echte Seriensoftware.</p>
+      </div>
+      <div class="card reveal reveal-d3" style="text-align:center;">
+        <div class="number" style="font-size:2rem;">Sachsen</div>
+        <div class="gold-line" style="margin:0.5rem auto;"></div>
+        <h3>Aufgewachsen</h3>
+        <p>Familienbetrieb. 25 MA. Kein IT-Team.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- S3: DAS PROBLEM -->
+<!-- ============================================ -->
+<section>
+  <div class="container-center">
+    <div class="tag reveal">Das Problem</div>
+    <div class="big-number reveal" style="margin-top:1rem;"><span class="count-up" data-target="83">0</span>%</div>
+    <h2 class="reveal" style="margin-top:0.5rem;">der Unternehmen erwarten negative Folgen<br>durch Fachkräftemangel</h2>
+    <p class="small reveal" style="margin-top:2rem;">DIHK Fachkräftereport 2025/2026</p>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- S4: DAS ECHTE PROBLEM -->
+<!-- ============================================ -->
+<section>
+  <div class="container-center">
+    <div class="tag reveal">Aber das eigentliche Problem ist ein anderes</div>
+    <h2 class="reveal" style="margin-top:1.5rem;">Wissen steckt in <span class="gold">Köpfen</span>,<br>nicht in Systemen.</h2>
+    <div class="grid-3" style="margin-top:3rem;">
+      <div class="card reveal reveal-d1">
+        <h3>Der Meister geht in Rente</h3>
+        <p>30 Jahre Erfahrung — in keinem System dokumentiert.</p>
+      </div>
+      <div class="card reveal reveal-d2">
+        <h3>Excel ist das "System"</h3>
+        <p>Planung, Angebote, Kundenhistorie — alles in Tabellen und Köpfen.</p>
+      </div>
+      <div class="card reveal reveal-d3">
+        <h3>Neue Leute finden Sie nicht</h3>
+        <p>Und wenn doch: Einarbeitung dauert 6-12 Monate.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- S5: WAS BISHER NICHT FUNKTIONIERT -->
+<!-- ============================================ -->
+<section>
+  <div class="container-center">
+    <div class="tag reveal">Ehrliche Bestandsaufnahme</div>
+    <h2 class="reveal" style="margin-top:1rem;">Was <span style="color:var(--red);">nicht</span> funktioniert</h2>
+    <div class="warning reveal" style="margin-top:2rem;">
+      <p><strong style="color:var(--red);">❌ ChatGPT als Unternehmensberater.</strong><br>Kennt Ihren Betrieb nicht. Halluziniert Zahlen. Kein Zugriff auf Ihre Daten.</p>
+    </div>
+    <div class="warning reveal">
+      <p><strong style="color:var(--red);">❌ Enterprise-KI für €100K+.</strong><br>SAP, Salesforce, Microsoft Copilot — gebaut für Konzerne mit IT-Abteilungen. Nicht für 25 Mitarbeiter.</p>
+    </div>
+    <div class="warning reveal">
+      <p><strong style="color:var(--red);">❌ "Wir machen mal was mit KI."</strong><br>Ohne klares Problem → kein messbares Ergebnis → Schublade.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- S6: WAS FUNKTIONIERT -->
+<!-- ============================================ -->
+<section>
+  <div class="container-center">
+    <div class="tag reveal">Jetzt die gute Nachricht</div>
+    <h2 class="reveal" style="margin-top:1rem;">Was <span style="color:var(--green);">funktioniert</span></h2>
+    <div class="success reveal" style="margin-top:2rem;">
+      <p><strong style="color:var(--green);">✓ KI-Agenten für einen konkreten Prozess.</strong><br>Ein Problem. Ein Agent. Messbar in 4 Wochen.</p>
+    </div>
+    <div class="success reveal">
+      <p><strong style="color:var(--green);">✓ KI die Ihre Daten versteht.</strong><br>Trainiert auf Ihren Betrieb — nicht auf das Internet.</p>
+    </div>
+    <div class="success reveal">
+      <p><strong style="color:var(--green);">✓ KI als Werkzeug, nicht als Ersatz.</strong><br>Ihr Meister bleibt der Experte. Der Agent übernimmt die Fleißarbeit.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- S7: WAS IST EIN KI-AGENT -->
+<!-- ============================================ -->
+<section>
+  <div class="container-center">
+    <div class="tag reveal">Grundlagen</div>
+    <h2 class="reveal" style="margin-top:1rem;">Was ist ein KI-Agent?</h2>
+    <p class="reveal" style="max-width:600px;margin:1.5rem auto 0;">Ein Softwaresystem, das <strong style="color:var(--white);">selbstständig Aufgaben erledigt</strong> — nicht nur antwortet, sondern recherchiert, plant, handelt und lernt.</p>
+    <div class="grid-3" style="margin-top:3rem;">
+      <div class="card reveal reveal-d1" style="text-align:center;">
+        <div style="font-size:2.5rem;margin-bottom:0.5rem;">💬</div>
+        <h3>Chatbot</h3>
+        <p>Antwortet auf Fragen.<br><span class="muted">Passiv.</span></p>
+      </div>
+      <div class="card reveal reveal-d2" style="text-align:center;">
+        <div style="font-size:2.5rem;margin-bottom:0.5rem;">🤖</div>
+        <h3>Automatisierung</h3>
+        <p>Folgt Regeln.<br><span class="muted">Starr.</span></p>
+      </div>
+      <div class="card reveal reveal-d3" style="text-align:center;">
+        <div style="font-size:2.5rem;margin-bottom:0.5rem;color:var(--gold);">⚡</div>
+        <h3 style="color:var(--gold);">KI-Agent</h3>
+        <p>Versteht Kontext, entscheidet, handelt.<br><strong style="color:var(--gold);">Aktiv.</strong></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- S8: LIVE DEMO -->
+<!-- ============================================ -->
+<section>
+  <div class="container-center">
+    <div class="tag reveal">Live Demo</div>
+    <h2 class="reveal" style="margin-top:1rem;">Ein Agent in Aktion</h2>
+    <div class="demo-box reveal">
+      <div class="demo-header">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <span>Ainary Agent · Auftragsplanung</span>
+      </div>
+      <div class="demo-body" id="demoBody">
+        <div class="demo-line cmd">▶ Aufgabe: Plane die CNC-Belegung für KW 09</div>
+      </div>
+    </div>
+    <button onclick="runDemo()" style="margin-top:1.5rem;background:var(--gold);color:var(--black);border:none;padding:12px 28px;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:0.9rem;">▶ Demo starten</button>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- S9: ERGEBNIS -->
+<!-- ============================================ -->
+<section>
+  <div class="container-center">
+    <div class="tag reveal">Ergebnis</div>
+    <h2 class="reveal" style="margin-top:1rem;">Vorher → Nachher</h2>
+    <div class="ba-row reveal">
+      <div class="ba-side ba-before">
+        <div class="ba-label">Ohne KI</div>
+        <div class="ba-item"><div class="val">6h / Woche</div><div class="lbl">Belegungsplanung</div></div>
+        <div class="ba-item"><div class="val">3h / Woche</div><div class="lbl">Angebote schreiben</div></div>
+        <div class="ba-item"><div class="val">2h / Woche</div><div class="lbl">Kundenrecherche</div></div>
+        <div class="ba-item"><div class="val">Excel + Telefon</div><div class="lbl">Werkzeuge</div></div>
+      </div>
+      <div class="ba-divider"></div>
+      <div class="ba-side ba-after">
+        <div class="ba-label">Mit KI-Agent</div>
+        <div class="ba-item"><div class="val">45 min</div><div class="lbl">Automatische Vorschläge</div></div>
+        <div class="ba-item"><div class="val">20 min</div><div class="lbl">KI-generierte Entwürfe</div></div>
+        <div class="ba-item"><div class="val">15 min</div><div class="lbl">Agent recherchiert vorab</div></div>
+        <div class="ba-item"><div class="val">Dashboard</div><div class="lbl">Ein Blick, alles klar</div></div>
+      </div>
+    </div>
+    <p class="small reveal" style="margin-top:1.5rem;">Maschinenbaubetrieb · 25 Mitarbeiter · 3 CNC-Maschinen · Pilot-Ergebnis</p>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- S10: ANWENDUNGSFÄLLE -->
+<!-- ============================================ -->
+<section>
+  <div class="container-center">
+    <div class="tag reveal">Wo KI heute Sinn macht</div>
+    <h2 class="reveal" style="margin-top:1rem;">Die Top 5 Anwendungsfälle</h2>
+    <div class="grid-2" style="margin-top:2rem;max-width:800px;margin-left:auto;margin-right:auto;">
+      <div class="card reveal reveal-d1"><div class="tag">01 · Planung</div><h3>Auftrags- & Belegungsplanung</h3><p>Kapazität, Rüstzeiten, Liefertermine — KI schlägt optimale Reihenfolge vor.</p></div>
+      <div class="card reveal reveal-d2"><div class="tag">02 · Angebote</div><h3>Automatische Angebotserstellung</h3><p>Aus Anfrage-PDF wird kalkuliertes Angebot in Minuten.</p></div>
+      <div class="card reveal reveal-d3"><div class="tag">03 · Verwaltung</div><h3>Dokumente & Berichte</h3><p>Förderanträge, Berichte, Rechnungen — automatisiert und konsistent.</p></div>
+      <div class="card reveal reveal-d4"><div class="tag">04 · Kundenservice</div><h3>Anfragen beantworten</h3><p>Bürgeranfragen, Standardfragen, Verfügbarkeiten — 24/7, korrekt.</p></div>
+    </div>
+    <div class="card reveal" style="text-align:center;margin-top:2rem;">
+      <div class="tag">05 · Wissen sichern</div>
+      <h3>Meisterwissen dokumentieren</h3>
+      <p style="max-width:400px;margin:0 auto;">Erfahrungswissen in durchsuchbare Systeme überführen — bevor es in Rente geht.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- S11: VERGLEICH -->
+<!-- ============================================ -->
+<section>
+  <div class="container-center">
+    <div class="tag reveal">Einordnung</div>
+    <h2 class="reveal" style="margin-top:1rem;">KI-Agent vs. Alternativen</h2>
+    <table class="compare reveal">
+      <tr><th></th><th>KI-Agent</th><th>ChatGPT</th><th>Beratung</th><th>Enterprise</th></tr>
+      <tr><td>Versteht Ihren Betrieb</td><td class="y">✓</td><td class="n">✗</td><td class="y">✓</td><td class="n">✗</td></tr>
+      <tr><td>Handelt selbstständig</td><td class="y">✓</td><td class="n">✗</td><td class="n">✗</td><td class="y">✓</td></tr>
+      <tr><td>Ergebnis in 4 Wochen</td><td class="y">✓</td><td class="n">✗</td><td class="n">✗</td><td class="n">✗</td></tr>
+      <tr><td>Unter €5.000</td><td class="y">✓</td><td class="y">✓</td><td class="n">✗</td><td class="n">✗</td></tr>
+      <tr><td>Skaliert mit Ihnen</td><td class="y">✓</td><td class="n">✗</td><td class="n">✗</td><td class="y">✓</td></tr>
+      <tr><td>Daten bleiben bei Ihnen</td><td class="y">✓</td><td class="n">✗</td><td class="y">✓</td><td class="y">✓</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- S12: WIE STARTEN -->
+<!-- ============================================ -->
+<section>
+  <div class="container">
+    <div class="tag reveal">Der Weg</div>
+    <h2 class="reveal" style="margin-top:1rem;">4 Wochen. Problem → Lösung.</h2>
+    <div style="margin-top:3rem;">
+      <div class="step reveal"><div class="step-n">01</div><div><h3>Analyse <span class="muted">(kostenlos)</span></h3><p>60 Minuten. Wir identifizieren Ihre Top-3 Zeitfresser und priorisieren nach ROI.</p></div></div>
+      <div class="step reveal"><div class="step-n">02</div><div><h3>Prototyp</h3><p>2 Wochen. Funktionierender Agent für den wichtigsten Anwendungsfall.</p></div></div>
+      <div class="step reveal"><div class="step-n">03</div><div><h3>Pilot</h3><p>4 Wochen Live-Test. Echte Daten, echte Nutzer, messbare Ergebnisse.</p></div></div>
+      <div class="step reveal"><div class="step-n">04</div><div><h3>Skalierung</h3><p>Was funktioniert, wird ausgerollt. Weitere Prozesse. Monatlich kündbar.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- S13: FÖRDERUNG -->
+<!-- ============================================ -->
+<section>
+  <div class="container-center">
+    <div class="tag reveal">Förderung</div>
+    <h2 class="reveal" style="margin-top:1rem;"><span class="gold">50%</span> zahlt der Freistaat</h2>
+    <p class="reveal" style="max-width:600px;margin:1.5rem auto 0;">Der Digitalisierungszuschuss Sachsen fördert KI-Projekte in KMU mit bis zu 50% auf bis zu €100.000 förderfähige Kosten.</p>
+    <div class="grid-3" style="margin-top:3rem;">
+      <div class="card reveal reveal-d1" style="text-align:center;">
+        <div class="number">€50K</div>
+        <div class="gold-line" style="margin:0.5rem auto;"></div>
+        <p>max. Zuschuss<br><span class="muted">Sachsen Digital (EFRE)</span></p>
+      </div>
+      <div class="card reveal reveal-d2" style="text-align:center;">
+        <div class="number">€380K</div>
+        <div class="gold-line" style="margin:0.5rem auto;"></div>
+        <p>max. Zuschuss<br><span class="muted">ZIM (Bund)</span></p>
+      </div>
+      <div class="card reveal reveal-d3" style="text-align:center;">
+        <div class="number">€2.450</div>
+        <div class="gold-line" style="margin:0.5rem auto;"></div>
+        <p>Ihr Pilotpreis nach Förderung<br><span class="muted">statt €4.900</span></p>
+      </div>
+    </div>
+    <p class="small reveal" style="margin-top:2rem;">Wir unterstützen bei der Antragstellung. Quelle: SAB Sachsen, BMWK</p>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- S14: DREI DINGE -->
+<!-- ============================================ -->
+<section>
+  <div class="container-center">
+    <div class="tag reveal">Zusammenfassung</div>
+    <h2 class="reveal" style="margin-top:1rem;">Drei Dinge, die Sie mitnehmen</h2>
+    <div style="margin-top:3rem;max-width:700px;margin-left:auto;margin-right:auto;">
+      <div class="step reveal"><div class="step-n" style="color:var(--gold);">1</div><div><h3>KI funktioniert — wenn das Problem klar ist.</h3><p>Kein "mal was mit KI machen". Ein Prozess, ein Agent, ein messbares Ergebnis.</p></div></div>
+      <div class="step reveal"><div class="step-n" style="color:var(--gold);">2</div><div><h3>Der Mittelstand hat einen unfairen Vorteil.</h3><p>Kurze Wege, echte Entscheider, schnelle Umsetzung. Konzerne brauchen 12 Monate — Sie brauchen 4 Wochen.</p></div></div>
+      <div class="step reveal"><div class="step-n" style="color:var(--gold);">3</div><div><h3>Jetzt starten kostet wenig. Warten kostet viel.</h3><p>Fachkräfte werden nicht mehr. Förderung gibt es jetzt. Ihre Wettbewerber schlafen nicht.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- S15: CTA -->
+<!-- ============================================ -->
+<section>
+  <div class="container-center">
+    <div class="logo reveal"><span class="logo-text">Ainary</span><span class="logo-dot"></span></div>
+    <h2 class="reveal" style="margin-top:2rem;">Kostenloses Erstgespräch.<br>60 Minuten. Konkrete Ergebnisse.</h2>
+    <p class="reveal" style="max-width:500px;margin:1.5rem auto 0;">Kein Verkaufsgespräch. Wir analysieren gemeinsam Ihre Prozesse und ich sage Ihnen ehrlich, ob KI Sinn macht — und wo nicht.</p>
+    <a href="mailto:florian@ainaryventures.com" class="cta-btn reveal" style="margin-top:2rem;">Gespräch vereinbaren →</a>
+    <div class="reveal" style="margin-top:3rem;">
+      <p style="color:var(--white);font-weight:500;">Florian Ziesche</p>
+      <p class="small" style="margin-top:0.5rem;">florian@ainaryventures.com · +1 347 740 1465</p>
+      <p class="small">ainaryventures.com</p>
+    </div>
+  </div>
+</section>
+
+<script>
+// ========== REVEAL ==========
+const rObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');e.target.querySelectorAll('.count-up:not(.counted)').forEach(el=>countUp(el));}});},{threshold:0.15});
+document.querySelectorAll('.reveal').forEach(el=>rObs.observe(el));
+
+function countUp(el){el.classList.add('counted');const t=parseInt(el.dataset.target),s=el.dataset.suffix||'',dur=1200,st=performance.now();function tick(now){const p=Math.min((now-st)/dur,1),ease=1-Math.pow(1-p,3),cur=Math.round(t*ease);el.textContent=cur+s;if(p<1)requestAnimationFrame(tick);}requestAnimationFrame(tick);}
+
+// ========== SLIDE NAV ==========
+const sections=document.querySelectorAll('section');
+const indicator=document.getElementById('slideIndicator');
+const counter=document.getElementById('slideCounter');
+const progress=document.getElementById('progressBar');
+const total=sections.length;
+sections.forEach((_,i)=>{const d=document.createElement('div');d.className='slide-dot';d.onclick=()=>sections[i].scrollIntoView({behavior:'smooth'});indicator.appendChild(d);});
+let cur=0;
+const sObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){cur=Array.from(sections).indexOf(e.target);document.querySelectorAll('.slide-dot').forEach((d,i)=>d.classList.toggle('active',i===cur));counter.textContent=`${cur+1} / ${total}`;progress.style.width=`${((cur+1)/total)*100}%`;}});},{threshold:0.5});
+sections.forEach(s=>sObs.observe(s));
+
+// ========== KEYBOARD ==========
+document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;if(['ArrowDown','ArrowRight',' ','PageDown'].includes(e.key)){e.preventDefault();sections[Math.min(cur+1,total-1)].scrollIntoView({behavior:'smooth'});}if(['ArrowUp','ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();sections[Math.max(cur-1,0)].scrollIntoView({behavior:'smooth'});}if(e.key==='Home'||e.key==='Escape'){e.preventDefault();sections[0].scrollIntoView({behavior:'smooth'});}if(e.key==='End'){e.preventDefault();sections[total-1].scrollIntoView({behavior:'smooth'});}});
+
+// ========== LIVE DEMO ==========
+const demoLines=[
+  {t:'cmd',d:500,text:'🔍 Lese Auftragsdaten aus ERP...'},
+  {t:'out',d:800,text:'   47 offene Aufträge · 3 CNC-Maschinen · KW 09'},
+  {t:'cmd',d:600,text:'📊 Analysiere Rüstzeiten und Abhängigkeiten...'},
+  {t:'out',d:700,text:'   12 Aufträge mit ähnlichem Material → Cluster bilden'},
+  {t:'out',d:500,text:'   Maschine 1: Alu-Teile (A-047, A-051, A-053)'},
+  {t:'out',d:500,text:'   Maschine 2: Stahl (S-012, S-018, S-019, S-022)'},
+  {t:'out',d:500,text:'   Maschine 3: Sonderteile (X-003, X-007)'},
+  {t:'cmd',d:600,text:'⚡ Optimiere Reihenfolge nach Rüstzeit...'},
+  {t:'out',d:800,text:'   Rüstzeit-Ersparnis: 4.2h → 1.8h (−57%)'},
+  {t:'cmd',d:500,text:'📅 Prüfe Liefertermine...'},
+  {t:'ok', d:400,text:'   ✓ Alle Termine haltbar'},
+  {t:'ok', d:400,text:'   ✓ Auslastung: 87% (vorher: 73%)'},
+  {t:'cmd',d:600,text:'📧 Erstelle Belegungsplan und sende an Meister...'},
+  {t:'ok', d:800,text:'   ✓ Plan erstellt. Email an h.mueller@firma.de gesendet.'},
+  {t:'ok', d:500,text:''},
+  {t:'ok', d:100,text:'   Fertig. Dauer: 90 Sekunden. Vorher: 6 Stunden.'},
+];
+let demoRunning=false;
+async function runDemo(){
+  if(demoRunning)return;demoRunning=true;
+  const body=document.getElementById('demoBody');
+  body.innerHTML='<div class="demo-line cmd">▶ Aufgabe: Plane die CNC-Belegung für KW 09</div>';
+  for(const line of demoLines){
+    await new Promise(r=>setTimeout(r,line.d));
+    const d=document.createElement('div');
+    d.className='demo-line '+line.t;
+    if(line.t==='cmd'){
+      d.textContent='';
+      body.appendChild(d);
+      // Typing effect
+      for(let i=0;i<line.text.length;i++){
+        await new Promise(r=>setTimeout(r,15));
+        d.textContent=line.text.substring(0,i+1);
+        body.scrollTop=body.scrollHeight;
+      }
+    } else {
+      d.textContent=line.text;
+      body.appendChild(d);
+    }
+    body.scrollTop=body.scrollHeight;
+  }
+  demoRunning=false;
+}
+</script>
+</body>
+</html>

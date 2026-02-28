@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KI 2026 — Florian Ziesche</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fafafa;--surface:#fff;--surface2:#f5f5f3;--border:#d0d0d0;--border2:#e8e8e8;
+  --text:#1a1a1a;--text2:#444;--muted:#777;--light:#bbb;
+  --accent:#9d7f3b;--green:#2d8a4e;--red:#c0392b;--amber:#b45309;--blue:#2563eb;
+  --f:'Inter',-apple-system,sans-serif;--m:'JetBrains Mono',monospace;
+  --mx:6vw;
+}
+html{font-size:16px}
+body{font-family:var(--f);color:var(--text);background:var(--bg);overflow:hidden;-webkit-font-smoothing:antialiased}
+
+/* Nav */
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:1.2vw var(--mx);display:flex;align-items:center;justify-content:space-between;background:var(--bg)}
+.nav-logo{display:flex;align-items:center;gap:.4vw;font:600 1vw/1 var(--f);color:var(--text)}
+.nav-logo .dot{width:.4vw;height:.4vw;border-radius:50%;background:var(--accent)}
+.nav-right{font:.7vw/1 var(--m);color:var(--muted);display:flex;gap:1.5vw}
+
+/* Progress */
+.progress-bar{position:fixed;bottom:0;left:0;right:0;height:3px;background:var(--border2);z-index:200}
+.progress-fill{height:100%;background:var(--accent);transition:width .3s}
+.slide-cnt{position:fixed;bottom:8px;right:var(--mx);font:.6vw/1 var(--m);color:var(--light);z-index:200}
+
+/* Slides */
+.deck{width:100vw;height:100vh;position:relative}
+.slide{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .4s;padding:6vh var(--mx) 4vh;display:flex;flex-direction:column}
+.slide.active{opacity:1;pointer-events:auto}
+
+/* Typography */
+.h1{font-size:3.2vw;font-weight:700;letter-spacing:-.04em;line-height:1.1;max-width:55vw}
+.h2{font-size:2.4vw;font-weight:600;letter-spacing:-.03em;line-height:1.15}
+.h3{font-size:1.4vw;font-weight:600;letter-spacing:-.02em}
+.body{font-size:1.1vw;color:var(--text2);line-height:1.5;max-width:50vw}
+.body-sm{font-size:.85vw;color:var(--text2);line-height:1.5}
+.rule{width:48px;height:2px;background:var(--accent);margin:.8vh 0;opacity:.5}
+.mono{font-family:var(--m)}
+.src{font:.5vw/1 var(--m);color:var(--light)}
+
+/* Cards */
+.card{background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:1.4vw}
+.kpi-row{display:flex;gap:1vw}
+.kpi{text-align:center;padding:1vw 1.4vw;background:var(--surface);border:1px solid var(--border2);border-radius:6px;flex:1}
+.kpi-val{font:700 1.6vw/1 var(--m);color:var(--text);margin-bottom:.3vh}
+.kpi-label{font-size:.7vw;color:var(--text2)}
+.kpi-sub{font:.55vw/1 var(--m);color:var(--muted);margin-top:.15vh}
+
+/* Bars */
+.bar-row{display:flex;align-items:center;gap:.8vw;margin:.5vh 0}
+.bar-label{width:8vw;font:.7vw/1 var(--f);font-weight:500;text-align:right;flex-shrink:0}
+.bar-track{flex:1;height:1.8vh;background:var(--border2);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;transition:width 1s}
+.bar-val{width:4vw;font:.65vw/1 var(--m);color:var(--text)}
+
+/* Grid */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1vw}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1vw}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:1vw}
+
+/* Comparison */
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:1vw;align-items:start}
+.vs-mid{font:700 1.5vw/1 var(--m);color:var(--accent);padding-top:2vw}
+.vs-card{background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:1.2vw}
+.vs-card.bad{border-left:3px solid var(--red)}
+.vs-card.good{border-left:3px solid var(--green)}
+.vs-title{font:600 .9vw/1 var(--f);margin-bottom:.8vh}
+.vs-item{font-size:.75vw;color:var(--text2);line-height:1.6;padding-left:1vw;position:relative;margin:.3vh 0}
+.vs-item::before{content:'';position:absolute;left:0;top:.35vw;width:.3vw;height:.3vw;border-radius:50%}
+.vs-card.bad .vs-item::before{background:var(--red)}
+.vs-card.good .vs-item::before{background:var(--green)}
+
+/* Timeline */
+.tl{position:relative;padding-left:2vw;margin:1vh 0}
+.tl::before{content:'';position:absolute;left:.45vw;top:0;bottom:0;width:2px;background:var(--border2)}
+.tl-item{display:flex;gap:.8vw;margin-bottom:1.2vh;position:relative}
+.tl-dot{width:.5vw;height:.5vw;border-radius:50%;background:var(--accent);margin-top:.3vw;flex-shrink:0;z-index:1}
+.tl-dot.big{width:.7vw;height:.7vw;background:var(--green);margin-left:-.1vw}
+.tl-date{font:.5vw/1 var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.tl-title{font:.8vw/1 var(--f);font-weight:600}
+.tl-body{font:.6vw/1 var(--f);color:var(--text2)}
+
+/* Evidence */
+.ev{display:inline-block;font:500 .4vw/1 var(--m);padding:.1vw .3vw;border-radius:2px}
+.ev-e{background:rgba(45,138,78,.12);color:var(--green)}
+.ev-i{background:rgba(37,99,235,.12);color:var(--blue)}
+.ev-j{background:rgba(157,127,59,.12);color:var(--accent)}
+.ev-a{background:rgba(192,57,43,.12);color:var(--red)}
+
+/* Quote */
+.quote{border-left:3px solid var(--accent);padding:.6vw 1.2vw;font-style:italic;font-size:1vw;color:var(--text2);line-height:1.5}
+.quote-src{font:.5vw/1 var(--m);color:var(--muted);margin-top:.3vh;font-style:normal}
+
+/* Members */
+.members{display:flex;gap:.5vw;flex-wrap:wrap}
+.member{background:var(--surface);border:1px solid var(--border2);border-radius:4px;padding:.3vw .6vw;font:.55vw/1 var(--m);color:var(--text2)}
+
+/* Arch diagram */
+.arch{display:flex;align-items:center;gap:0;justify-content:center}
+.arch-box{background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:1vw 1.4vw;text-align:center}
+.arch-box-t{font:.7vw/1 var(--m);font-weight:600}
+.arch-box-s{font:.5vw/1 var(--f);color:var(--muted)}
+.arch-arrow{font:1.2vw var(--m);color:var(--accent);padding:0 .5vw}
+.arch-mid{background:var(--accent);color:#fff;border-radius:6px;padding:1vw 1.4vw;text-align:center}
+.arch-mid .arch-box-t{color:#fff}
+.arch-mid .arch-box-s{color:rgba(255,255,255,.7)}
+
+/* Waffle chart */
+.waffle{display:grid;grid-template-columns:repeat(10,1fr);gap:2px;width:12vw}
+.waffle-cell{width:100%;aspect-ratio:1;border-radius:2px;background:var(--border2)}
+
+/* Screenshot */
+.browser{border:1px solid var(--border2);border-radius:8px;overflow:hidden;flex:1;display:flex;flex-direction:column}
+.browser-bar{background:#f0f0f0;padding:.3vw .5vw;display:flex;align-items:center;gap:.3vw;border-bottom:1px solid #ddd;flex-shrink:0}
+.browser-dot{width:.4vw;height:.4vw;border-radius:50%}
+.browser-url{flex:1;background:#fff;border-radius:4px;padding:.12vw .4vw;font:.4vw/1 var(--m);color:#999;border:1px solid #e0e0e0;margin-left:.3vw}
+.browser iframe{flex:1;border:none;width:100%}
+
+/* Highlight */
+.hl{background:var(--surface);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:6px;padding:1vw 1.4vw}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo"><div class="dot"></div> Florian Ziesche</div>
+  <div class="nav-right"><span id="cnt">1 / 15</span></div>
+</nav>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="deck">
+
+<!-- ═══════════════════ S1: TITLE ═══════════════════ -->
+<section class="slide active" style="justify-content:center">
+  <div style="font:.7vw/1 var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:.15em;margin-bottom:1vh">Keynote · Februar 2026</div>
+  <div class="h1" style="font-size:4vw;max-width:65vw">KI 2026:<br>Was funktioniert. Was nicht. Und warum.</div>
+  <div class="rule" style="margin:1.5vh 0"></div>
+  <div class="body" style="font-size:1.3vw">12 Jahre KI-Erfahrung. €5M raised. 80+ Projekte. Von DAX-Konzernen bis zur 7.000-Einwohner-Gemeinde.</div>
+  <div style="margin-top:auto;font:.7vw/1 var(--m);color:var(--muted)">Florian Ziesche · ainaryventures.com</div>
+</section>
+
+<!-- ═══════════════════ S2: THE NUMBERS ═══════════════════ -->
+<section class="slide">
+  <div style="margin-top:8vh">
+    <div class="h2">Die Zahlen die niemand ignorieren kann.</div>
+    <div class="rule"></div>
+  </div>
+  <div class="kpi-row" style="margin-top:2vh">
+    <div class="kpi"><div class="kpi-val">25%</div><div class="kpi-label">Prozesse mit KI-Integration</div><div class="kpi-sub">8× in 2 Jahren</div><div class="src">EY Technology Pulse 2026</div></div>
+    <div class="kpi"><div class="kpi-val">97M</div><div class="kpi-label">MCP SDK Downloads</div><div class="kpi-sub">14 Monate</div><div class="src">npm + pypi</div></div>
+    <div class="kpi"><div class="kpi-val">67%</div><div class="kpi-label">Multi-Agent Wachstum</div><div class="kpi-sub">bis 2027</div><div class="src">Salesforce 2026</div></div>
+    <div class="kpi"><div class="kpi-val">570k</div><div class="kpi-label">Unbesetzte Stellen</div><div class="kpi-sub">Öffentlicher Dienst DE</div><div class="src">dbb Monitor 2025</div></div>
+  </div>
+  <div class="kpi-row" style="margin-top:1vh">
+    <div class="kpi"><div class="kpi-val">40%</div><div class="kpi-label">Agent-Projekte eingestellt</div><div class="kpi-sub">bis 2027</div><div class="src">Gartner 2025</div></div>
+    <div class="kpi"><div class="kpi-val">96%</div><div class="kpi-label">sagen: Erfolg = Integration</div><div class="kpi-sub">IT-Leader</div><div class="src">Salesforce 2026</div></div>
+    <div class="kpi"><div class="kpi-val">€4,4B</div><div class="kpi-label">Verlorene EU-Fördermittel</div><div class="kpi-sub">Jährlich</div><div class="src">EU-Kommission 2024</div></div>
+    <div class="kpi"><div class="kpi-val">1,36M</div><div class="kpi-label">Gehen bis 2030 in Rente</div><div class="kpi-sub">27% aller Beschäftigten</div><div class="src">dbb 2023</div></div>
+  </div>
+  <div style="margin-top:auto;font-size:.8vw;color:var(--muted)">Jede Zahl mit Quelle. Keine unverifizierten Claims.</div>
+</section>
+
+<!-- ═══════════════════ S3: THE GAP ═══════════════════ -->
+<section class="slide">
+  <div style="margin-top:8vh">
+    <div class="h2">Das Problem: Die Demo funktioniert immer.</div>
+    <div class="rule"></div>
+    <div class="body">Der Abfall zwischen Demo und Produktion ist brutal. Nicht weil die Technologie schlecht ist.</div>
+  </div>
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:2vw">
+    <div style="text-align:center">
+      <div style="font:700 4vw/1 var(--m);color:var(--text)">95%</div>
+      <div style="width:8vw;height:16vh;background:var(--green);border-radius:4px;margin:1vh auto"></div>
+      <div style="font:.7vw/1 var(--m);color:var(--muted)">Demo</div>
+    </div>
+    <div style="text-align:center">
+      <div style="font:700 4vw/1 var(--m);color:var(--text)">72%</div>
+      <div style="width:8vw;height:12vh;background:var(--accent);border-radius:4px;margin:1vh auto"></div>
+      <div style="font:.7vw/1 var(--m);color:var(--muted)">Pilot</div>
+    </div>
+    <div style="text-align:center">
+      <div style="font:700 4vw/1 var(--m);color:var(--text)">31%</div>
+      <div style="width:8vw;height:5vh;background:var(--amber);border-radius:4px;margin:1vh auto"></div>
+      <div style="font:.7vw/1 var(--m);color:var(--muted)">Produktion</div>
+    </div>
+    <div style="text-align:center">
+      <div style="font:700 4vw/1 var(--m);color:var(--red)">12%</div>
+      <div style="width:8vw;height:2vh;background:var(--red);border-radius:4px;margin:1vh auto"></div>
+      <div style="font:.7vw/1 var(--m);color:var(--muted)">Nach 6 Monaten</div>
+    </div>
+  </div>
+  <div class="src">Eigene Schätzung auf Basis Gartner/Forrester 2025-2026</div>
+</section>
+
+<!-- ═══════════════════ S4: 3 ERRORS ═══════════════════ -->
+<section class="slide">
+  <div style="margin-top:8vh">
+    <div class="h2">Drei Fehler die jedes Projekt töten.</div>
+    <div class="rule"></div>
+  </div>
+  <div class="grid-3" style="flex:1;margin-top:2vh">
+    <div class="card" style="border-top:3px solid var(--red)">
+      <div style="font:700 2vw/1 var(--m);color:var(--text);margin-bottom:1vh">01</div>
+      <div class="h3">Halluzinationen in der Entscheidungskette</div>
+      <div class="body-sm" style="margin-top:1vh">Eine falsche Frist im Förderantrag kostet nicht Reputation. Sie kostet €200.000. Kein LLM darf autonom entscheiden.</div>
+      <div style="margin-top:auto;padding-top:1vh">
+        <div class="hl" style="padding:.6vw .8vw"><div style="font:.55vw/1 var(--m);color:var(--accent)">UNSERE REGEL</div><div style="font:.75vw/1 var(--f);font-weight:500;margin-top:.3vh">KI macht 80% Vorarbeit. Mensch entscheidet. Immer.</div></div>
+      </div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--red)">
+      <div style="font:700 2vw/1 var(--m);color:var(--text);margin-bottom:1vh">02</div>
+      <div class="h3">Keine Governance, kein Kill Switch</div>
+      <div class="body-sm" style="margin-top:1vh">Agents operieren autonom. Bad data handling, policy violations, unintended actions — alles reale Risiken. Ohne Audit Trail fliegst du blind.</div>
+      <div style="margin-top:auto;padding-top:1vh">
+        <div class="quote" style="font-size:.7vw;padding:.5vw .8vw">"50% of enterprise ERP vendors will launch autonomous governance modules in 2026."<div class="quote-src">Forrester 2026</div></div>
+      </div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--red)">
+      <div style="font:700 2vw/1 var(--m);color:var(--text);margin-bottom:1vh">03</div>
+      <div class="h3">Feature-Denken statt System-Denken</div>
+      <div class="body-sm" style="margin-top:1vh">Ein Chatbot hier, eine Zusammenfassung dort. Drei Tools, drei Datenquellen, drei Wahrheiten. Das skaliert nicht.</div>
+      <div style="margin-top:auto;padding-top:1vh">
+        <div class="hl" style="padding:.6vw .8vw"><div style="font:.55vw/1 var(--m);color:var(--accent)">WAS FUNKTIONIERT</div><div style="font:.75vw/1 var(--f);font-weight:500;margin-top:.3vh">Eine Ontologie. Eine Datenquelle. Ein System.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ S5: FEATURE VS SYSTEM ═══════════════════ -->
+<section class="slide">
+  <div style="margin-top:8vh">
+    <div class="h2">Feature-Denken vs. System-Denken</div>
+    <div class="rule"></div>
+  </div>
+  <div class="vs" style="flex:1;margin-top:2vh">
+    <div class="vs-card bad">
+      <div class="vs-title" style="color:var(--red)">Feature-Denken</div>
+      <div class="vs-item">Pro Feature eine eigene Datenquelle</div>
+      <div class="vs-item">Keine Evidenz-Markierung auf Claims</div>
+      <div class="vs-item">Lücken werden verschwiegen</div>
+      <div class="vs-item">Kein Kill Switch vorhanden</div>
+      <div class="vs-item">Audit ist ein Nachgedanke</div>
+      <div class="vs-item">Skalierung: O(n²) pro Feature</div>
+      <div class="vs-item">Jeder onclick ist handgeschrieben</div>
+      <div class="vs-item">"Funktioniert bei mir"</div>
+    </div>
+    <div class="vs-mid">vs.</div>
+    <div class="vs-card good">
+      <div class="vs-title" style="color:var(--green)">System-Denken</div>
+      <div class="vs-item">Eine Ontologie für alles</div>
+      <div class="vs-item">E/I/J/A auf jedem Claim</div>
+      <div class="vs-item">Lücken explizit offengelegt</div>
+      <div class="vs-item">Kill Switch eingebaut</div>
+      <div class="vs-item">Audit in der Render-Pipeline</div>
+      <div class="vs-item">Skalierung: O(1) pro Feature</div>
+      <div class="vs-item">Wenn es rendert, ist es ein Object</div>
+      <div class="vs-item">"Hier ist der Beweis"</div>
+    </div>
+  </div>
+  <div class="src">Palantir Ontology-Prinzip: Schema vor Code. Daten ≠ Präsentation.</div>
+</section>
+
+<!-- ═══════════════════ S6: EVIDENCE SYSTEM ═══════════════════ -->
+<section class="slide">
+  <div style="margin-top:8vh">
+    <div class="h2">Das Geheimnis: Ehrlichkeit als System.</div>
+    <div class="rule"></div>
+    <div class="body">Jeder Claim wird klassifiziert. Nicht "wahr/falsch" — sondern wie sicher.</div>
+  </div>
+  <div class="grid-4" style="margin-top:3vh">
+    <div class="card" style="border-top:3px solid var(--green);text-align:center">
+      <div style="font:700 2.5vw/1 var(--m);margin-bottom:1vh"><span class="ev ev-e" style="font-size:1vw;padding:.3vw .6vw">E</span></div>
+      <div class="h3">Empirisch</div>
+      <div class="body-sm" style="margin-top:.5vh">Belegt durch externe Quelle. Überprüfbar. Link vorhanden.</div>
+      <div style="margin-top:1vh;font:.6vw/1 var(--f);color:var(--muted)">Beispiel: "570.000 Stellen unbesetzt" — dbb Monitor 2025</div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--blue);text-align:center">
+      <div style="font:700 2.5vw/1 var(--m);margin-bottom:1vh"><span class="ev ev-i" style="font-size:1vw;padding:.3vw .6vw">I</span></div>
+      <div class="h3">Inference</div>
+      <div class="body-sm" style="margin-top:.5vh">Abgeleitet aus Daten. Logisch, aber nicht direkt belegt.</div>
+      <div style="margin-top:1vh;font:.6vw/1 var(--f);color:var(--muted)">Beispiel: "Windkraft 78% negativ" — 342 Posts analysiert</div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--accent);text-align:center">
+      <div style="font:700 2.5vw/1 var(--m);margin-bottom:1vh"><span class="ev ev-j" style="font-size:1vw;padding:.3vw .6vw">J</span></div>
+      <div class="h3">Judgment</div>
+      <div class="body-sm" style="margin-top:.5vh">Einschätzung basierend auf Erfahrung. Kann falsch sein.</div>
+      <div style="margin-top:1vh;font:.6vw/1 var(--f);color:var(--muted)">Beispiel: "Quick Win möglich in 2-4 Wochen"</div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--red);text-align:center">
+      <div style="font:700 2.5vw/1 var(--m);margin-bottom:1vh"><span class="ev ev-a" style="font-size:1vw;padding:.3vw .6vw">A</span></div>
+      <div class="h3">Assumption</div>
+      <div class="body-sm" style="margin-top:.5vh">Annahme. Keine Daten. Sollte hinterfragt werden.</div>
+      <div style="margin-top:1vh;font:.6vw/1 var(--f);color:var(--muted)">Beispiel: "Nächste Antragsrunde Sommer 2026"</div>
+    </div>
+  </div>
+  <div class="hl" style="margin-top:2vh">
+    <div style="font:.9vw/1 var(--f);font-weight:500">Ein System das seine Grenzen kennt, ist vertrauenswürdig. Das ist kein Feature — das ist der Moat.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════ S7: MCP ═══════════════════ -->
+<section class="slide">
+  <div style="margin-top:8vh">
+    <div class="h2">MCP: Das USB-Kabel für KI.</div>
+    <div class="rule"></div>
+    <div class="body">Jeder Drucker hatte sein eigenes Kabel. Dann kam USB. KI ist gerade in dieser Phase.</div>
+  </div>
+  <div class="arch" style="margin-top:3vh">
+    <div class="arch-box"><div class="arch-box-t">KI-Modell</div><div class="arch-box-s">Claude, GPT, Gemini</div></div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-mid"><div class="arch-box-t">MCP</div><div class="arch-box-s">Standardprotokoll</div></div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-box"><div class="arch-box-t">Jedes Tool</div><div class="arch-box-s">E-Mail, CRM, DB</div></div>
+  </div>
+  <div style="margin-top:2vh">
+    <div style="font:.6vw/1 var(--m);color:var(--muted);margin-bottom:.5vh">LINUX FOUNDATION MEMBERS</div>
+    <div class="members">
+      <div class="member">Anthropic</div><div class="member">OpenAI</div><div class="member">Google</div>
+      <div class="member">Microsoft</div><div class="member">AWS</div><div class="member">Meta</div>
+    </div>
+  </div>
+  <div class="kpi-row" style="margin-top:2vh">
+    <div class="kpi"><div class="kpi-val">97M+</div><div class="kpi-label">SDK Downloads</div></div>
+    <div class="kpi"><div class="kpi-val">10k+</div><div class="kpi-label">MCP Server</div></div>
+    <div class="kpi"><div class="kpi-val">14</div><div class="kpi-label">Monate bis Standard</div></div>
+    <div class="kpi"><div class="kpi-val">Win 11</div><div class="kpi-label">Native Support</div></div>
+  </div>
+  <div style="margin-top:auto;font:.8vw/1 var(--f);color:var(--text2)">USB hat 5 Jahre gebraucht. MCP hat 14 Monate gebraucht.</div>
+</section>
+
+<!-- ═══════════════════ S8: MCP TIMELINE ═══════════════════ -->
+<section class="slide">
+  <div style="margin-top:8vh">
+    <div class="h2">MCP Timeline: Schneller als USB.</div>
+    <div class="rule"></div>
+  </div>
+  <div style="flex:1;display:flex;gap:3vw;margin-top:2vh">
+    <div style="flex:1">
+      <div class="tl">
+        <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-date">Nov 2024</div><div class="tl-title">Anthropic veröffentlicht MCP</div><div class="tl-body">Open-source. Erste SDKs Python + TypeScript.</div></div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-date">Mär 2025</div><div class="tl-title">OpenAI adoptiert MCP</div><div class="tl-body">ChatGPT Desktop + Agents SDK nativ.</div></div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-date">Jun 2025</div><div class="tl-title">Linux Foundation übernimmt</div><div class="tl-body">Vendor-neutral. Google, Microsoft, AWS treten bei.</div></div></div>
+        <div class="tl-item"><div class="tl-dot big"></div><div><div class="tl-date">Feb 2026</div><div class="tl-title">97M+ Downloads · De-facto-Standard</div><div class="tl-body">Windows 11 nativ. Jeder Agent nutzt jedes Tool.</div></div></div>
+      </div>
+    </div>
+    <div style="flex:1">
+      <div class="vs" style="grid-template-columns:1fr 1fr;gap:1vw">
+        <div class="vs-card bad">
+          <div class="vs-title" style="color:var(--red)">Ohne MCP</div>
+          <div class="vs-item">Jede Integration = IT-Projekt</div>
+          <div class="vs-item">Modell wechseln = alles neu</div>
+          <div class="vs-item">Vendor Lock-in</div>
+          <div class="vs-item">3-6 Monate</div>
+        </div>
+        <div class="vs-card good">
+          <div class="vs-title" style="color:var(--green)">Mit MCP</div>
+          <div class="vs-item">Einmal verbinden, jede KI nutzt es</div>
+          <div class="vs-item">Modell wechseln = 1 Klick</div>
+          <div class="vs-item">Offener Standard</div>
+          <div class="vs-item">Minuten statt Monate</div>
+        </div>
+      </div>
+      <div class="hl" style="margin-top:1vh">
+        <div style="font:.7vw/1 var(--f);font-weight:500">Nicht "KI ist ein Projekt."<br>Sondern "KI ist wie Strom — es funktioniert einfach."</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ S9: MULTI-AGENT ═══════════════════ -->
+<section class="slide">
+  <div style="margin-top:8vh">
+    <div class="h2">Multi-Agent: Spezialisten die zusammenarbeiten.</div>
+    <div class="rule"></div>
+  </div>
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:1.5vw;margin-top:1vh">
+    <div class="card" style="flex:1;text-align:center;padding:1.5vw">
+      <div style="font:700 1.5vw/1 var(--m);color:var(--text);margin-bottom:.5vh">🔍</div>
+      <div style="font:.8vw/1 var(--f);font-weight:600;margin-bottom:.5vh">Research Agent</div>
+      <div style="font:.6vw/1 var(--f);color:var(--text2)">Sucht, filtert, bewertet Quellen</div>
+    </div>
+    <div style="font:1.5vw var(--m);color:var(--accent)">→</div>
+    <div class="card" style="flex:1;text-align:center;padding:1.5vw">
+      <div style="font:700 1.5vw/1 var(--m);color:var(--text);margin-bottom:.5vh">📊</div>
+      <div style="font:.8vw/1 var(--f);font-weight:600;margin-bottom:.5vh">Analyse Agent</div>
+      <div style="font:.6vw/1 var(--f);color:var(--text2)">Strukturiert, vergleicht, bewertet</div>
+    </div>
+    <div style="font:1.5vw var(--m);color:var(--accent)">→</div>
+    <div class="card" style="flex:1;text-align:center;padding:1.5vw">
+      <div style="font:700 1.5vw/1 var(--m);color:var(--text);margin-bottom:.5vh">✍️</div>
+      <div style="font:.8vw/1 var(--f);font-weight:600;margin-bottom:.5vh">Draft Agent</div>
+      <div style="font:.6vw/1 var(--f);color:var(--text2)">Schreibt Vorlage, markiert Evidenz</div>
+    </div>
+    <div style="font:1.5vw var(--m);color:var(--accent)">→</div>
+    <div class="card" style="flex:1;text-align:center;padding:1.5vw;border:2px solid var(--accent)">
+      <div style="font:700 1.5vw/1 var(--m);color:var(--text);margin-bottom:.5vh">👤</div>
+      <div style="font:.8vw/1 var(--f);font-weight:600;margin-bottom:.5vh">Mensch</div>
+      <div style="font:.6vw/1 var(--f);color:var(--accent)">Prüft, ändert, entscheidet</div>
+    </div>
+  </div>
+  <div class="quote" style="margin-top:2vh">
+    "Multi-agent adoption to surge 67% by 2027. 96% of IT leaders say success depends on integration."
+    <div class="quote-src">— Salesforce Connectivity Report, Februar 2026</div>
+  </div>
+  <div style="font:.8vw/1 var(--f);color:var(--text2);margin-top:1vh">Der Mensch am Ende ist kein Bottleneck. Er ist der Qualitätsfilter der das ganze System vertrauenswürdig macht.</div>
+</section>
+
+<!-- ═══════════════════ S10: CASE STUDY INTRO ═══════════════════ -->
+<section class="slide">
+  <div style="margin-top:8vh">
+    <div style="font:.6vw/1 var(--m);color:var(--accent);text-transform:uppercase;letter-spacing:.15em;margin-bottom:1vh">Case Study</div>
+    <div class="h1" style="font-size:3.5vw">Was passiert wenn ein Bürgermeister KI bekommt.</div>
+    <div class="rule"></div>
+    <div class="body" style="font-size:1.2vw">7.000 Einwohner. Erzgebirge. 0 Stabsstellen für Digitalisierung. 79 Quellen. 5 Analysen. Echte Daten.</div>
+  </div>
+  <div class="kpi-row" style="margin-top:auto;margin-bottom:2vh">
+    <div class="kpi"><div class="kpi-val">93</div><div class="kpi-label">Stunden eingespart / Monat</div></div>
+    <div class="kpi"><div class="kpi-val">79</div><div class="kpi-label">Quellen ausgewertet</div></div>
+    <div class="kpi"><div class="kpi-val">5</div><div class="kpi-label">Analysen erstellt</div></div>
+    <div class="kpi"><div class="kpi-val">€5.100</div><div class="kpi-label">Einsparpotenzial / Monat</div></div>
+  </div>
+</section>
+
+<!-- ═══════════════════ S11: USE CASES ═══════════════════ -->
+<section class="slide">
+  <div style="margin-top:8vh">
+    <div class="h2">6 Anwendungen. Echte Ergebnisse.</div>
+    <div class="rule"></div>
+  </div>
+  <div class="grid-3" style="flex:1;margin-top:1vh">
+    <div class="card"><div style="font:700 1.4vw/1 var(--m);color:var(--text)">01</div><div style="font:.85vw/1 var(--f);font-weight:600;margin:.5vh 0">Fördermittel-Scanner</div><div class="body-sm">11 Programme, 3 mit Frist. EU bis SAB automatisch.</div><div style="font:.6vw/1 var(--m);color:var(--green);margin-top:.5vh">-85% Zeit</div><div class="src">78% Conf · 23 Quellen</div></div>
+    <div class="card"><div style="font:700 1.4vw/1 var(--m);color:var(--text)">02</div><div style="font:.85vw/1 var(--f);font-weight:600;margin:.5vh 0">Beschlussvorlagen</div><div class="body-sm">Entwürfe aus Notizen. Prüfen, unterschreiben.</div><div style="font:.6vw/1 var(--m);color:var(--green);margin-top:.5vh">-87% Zeit</div><div class="src">Worms "Justus" seit 2025</div></div>
+    <div class="card"><div style="font:700 1.4vw/1 var(--m);color:var(--text)">03</div><div style="font:.85vw/1 var(--f);font-weight:600;margin:.5vh 0">Bürgerfragen 24/7</div><div class="body-sm">78% wiederholen sich. Automatisch beantwortet.</div><div style="font:.6vw/1 var(--m);color:var(--green);margin-top:.5vh">-70% Anfragen</div><div class="src">Augsburg "CiSA" · Gersheim</div></div>
+    <div class="card"><div style="font:700 1.4vw/1 var(--m);color:var(--text)">04</div><div style="font:.85vw/1 var(--f);font-weight:600;margin:.5vh 0">Bürgerstimmung</div><div class="body-sm">342 Posts. Windkraft 78% negativ. Erkennt Eskalation.</div><div style="font:.6vw/1 var(--m);color:var(--green);margin-top:.5vh">Frühwarnung</div><div class="src">FB + Google + SZ · täglich</div></div>
+    <div class="card"><div style="font:700 1.4vw/1 var(--m);color:var(--text)">05</div><div style="font:.85vw/1 var(--f);font-weight:600;margin:.5vh 0">Daily Intel</div><div class="body-sm">Jeden Morgen: Fristen, News, Förderungen — priorisiert.</div><div style="font:.6vw/1 var(--m);color:var(--green);margin-top:.5vh">3 Min. statt 3 Tage</div><div class="src">12 Quellen · 8 Meldungen</div></div>
+    <div class="card"><div style="font:700 1.4vw/1 var(--m);color:var(--text)">06</div><div style="font:.85vw/1 var(--f);font-weight:600;margin:.5vh 0">Energie & Gebäude</div><div class="body-sm">Rathaus, Schule, Turnhalle. Erkennt Verschwendung.</div><div style="font:.6vw/1 var(--m);color:var(--green);margin-top:.5vh">10-20% gespart</div><div class="src">Fraunhofer IAO</div></div>
+  </div>
+</section>
+
+<!-- ═══════════════════ S12: BEFORE/AFTER ═══════════════════ -->
+<section class="slide">
+  <div style="margin-top:8vh">
+    <div class="h2">Gleiche Mitarbeiter. Ein Zehntel der Zeit.</div>
+    <div class="rule"></div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:1vh">
+    <div class="bar-row"><div class="bar-label">Förderantrag</div><div class="bar-track"><div class="bar-fill" style="width:90%;background:var(--border)"></div></div><div class="bar-val" style="color:var(--muted)">2 Wochen</div></div>
+    <div class="bar-row"><div class="bar-label" style="color:var(--accent)">→ Ainary</div><div class="bar-track"><div class="bar-fill" style="width:14%;background:var(--accent)"></div></div><div class="bar-val">2 Tage</div></div>
+    <div style="height:1vh"></div>
+    <div class="bar-row"><div class="bar-label">Beschlussvorlage</div><div class="bar-track"><div class="bar-fill" style="width:50%;background:var(--border)"></div></div><div class="bar-val" style="color:var(--muted)">4 Stunden</div></div>
+    <div class="bar-row"><div class="bar-label" style="color:var(--accent)">→ Ainary</div><div class="bar-track"><div class="bar-fill" style="width:6%;background:var(--accent)"></div></div><div class="bar-val">30 Min</div></div>
+    <div style="height:1vh"></div>
+    <div class="bar-row"><div class="bar-label">Fördermittel-Check</div><div class="bar-track"><div class="bar-fill" style="width:65%;background:var(--border)"></div></div><div class="bar-val" style="color:var(--muted)">3 Tage</div></div>
+    <div class="bar-row"><div class="bar-label" style="color:var(--accent)">→ Ainary</div><div class="bar-track"><div class="bar-fill" style="width:3%;background:var(--accent)"></div></div><div class="bar-val">10 Min</div></div>
+    <div style="height:1vh"></div>
+    <div class="bar-row"><div class="bar-label">Stimmungsanalyse</div><div class="bar-track"><div class="bar-fill" style="width:45%;background:var(--border)"></div></div><div class="bar-val" style="color:var(--muted)">wird nicht gemacht</div></div>
+    <div class="bar-row"><div class="bar-label" style="color:var(--accent)">→ Ainary</div><div class="bar-track"><div class="bar-fill" style="width:2%;background:var(--accent)"></div></div><div class="bar-val">automatisch</div></div>
+  </div>
+  <div class="kpi-row" style="margin-top:1vh">
+    <div class="kpi"><div class="kpi-val">93 Std.</div><div class="kpi-label">Ersparnis / Monat</div></div>
+    <div class="kpi"><div class="kpi-val">€5.100</div><div class="kpi-label">Einsparpotenzial</div><div class="kpi-sub">€55/Std. TVöD E11</div></div>
+    <div class="kpi"><div class="kpi-val">20%</div><div class="kpi-label">Ihr Anteil</div><div class="kpi-sub">Prüfen, entscheiden, handeln</div></div>
+  </div>
+</section>
+
+<!-- ═══════════════════ S13: LIVE DEMO ═══════════════════ -->
+<section class="slide">
+  <div style="margin-top:8vh">
+    <div class="h2">Live Demo: Das haben wir gebaut.</div>
+    <div class="rule"></div>
+    <div class="body">Echte Daten. Echte Analysen. Läuft bereits.</div>
+  </div>
+  <div class="browser" style="margin-top:1vh">
+    <div class="browser-bar">
+      <div class="browser-dot" style="background:#ff5f57"></div>
+      <div class="browser-dot" style="background:#febc2e"></div>
+      <div class="browser-dot" style="background:#28c840"></div>
+      <div class="browser-url">florianziesche.github.io/ainary-demo-v11</div>
+    </div>
+    <iframe src="https://florianziesche.github.io/ainary-demo-v11/" loading="lazy"></iframe>
+  </div>
+</section>
+
+<!-- ═══════════════════ S14: INVESTMENT THESIS ═══════════════════ -->
+<section class="slide">
+  <div style="margin-top:8vh">
+    <div class="h2">Drei Wetten auf die Zukunft.</div>
+    <div class="rule"></div>
+  </div>
+  <div class="grid-3" style="flex:1;margin-top:2vh">
+    <div class="card" style="border-top:3px solid var(--accent);display:flex;flex-direction:column">
+      <div style="font:700 2vw/1 var(--m);color:var(--text);margin-bottom:1vh">01</div>
+      <div class="h3">Vertical AI Agents</div>
+      <div class="body-sm" style="margin-top:.5vh;flex:1">Horizontale Plattformen gibt es genug. Was fehlt: Agents die eine Branche verstehen. Kommunen, Legal, Medizin. Domänenwissen ist der Moat.</div>
+      <div style="margin-top:1vh;padding-top:1vh;border-top:1px solid var(--border2)">
+        <div style="font:.6vw/1 var(--m);color:var(--green)">Beispiel: Unser Kommunal-Agent kennt 11 Förderprogramme und 3 Fristen.</div>
+      </div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--accent);display:flex;flex-direction:column">
+      <div style="font:700 2vw/1 var(--m);color:var(--text);margin-bottom:1vh">02</div>
+      <div class="h3">Trust Infrastructure</div>
+      <div class="body-sm" style="margin-top:.5vh;flex:1">Governance, Audit, Evidence-Systeme für KI-Outputs. Das Compliance-Layer das jedes Unternehmen braucht sobald KI Entscheidungen vorbereitet.</div>
+      <div style="margin-top:1vh;padding-top:1vh;border-top:1px solid var(--border2)">
+        <div style="font:.6vw/1 var(--m);color:var(--green)">Beispiel: E/I/J/A Tags auf jedem Claim. Gaps offengelegt.</div>
+      </div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--accent);display:flex;flex-direction:column">
+      <div style="font:700 2vw/1 var(--m);color:var(--text);margin-bottom:1vh">03</div>
+      <div class="h3">MCP Ecosystem</div>
+      <div class="body-sm" style="margin-top:.5vh;flex:1">MCP-native Orchestrierung, branchenspezifische MCP-Server, Monitoring. Das Kubernetes-Moment für KI-Integration.</div>
+      <div style="margin-top:1vh;padding-top:1vh;border-top:1px solid var(--border2)">
+        <div style="font:.6vw/1 var(--m);color:var(--green)">97M Downloads. Windows 11 nativ. De-facto-Standard.</div>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:auto;font:.9vw/1 var(--f);color:var(--text2)">Die nächste Milliarden-Firma wird nicht das beste Modell bauen. Sie wird das vertrauenswürdigste System bauen.</div>
+</section>
+
+<!-- ═══════════════════ S15: CTA ═══════════════════ -->
+<section class="slide" style="justify-content:center">
+  <div class="h1" style="font-size:3.2vw;max-width:60vw">KI funktioniert nicht weil sie intelligent ist.<br>Sie funktioniert weil sie ehrlich ist.</div>
+  <div class="rule" style="margin:1.5vh 0"></div>
+
+  <div style="display:flex;gap:2vw;align-items:flex-start;margin-top:3vh">
+    <div class="card" style="padding:1.4vw 2vw;flex-shrink:0;text-align:center">
+      <div style="font:.55vw/1 var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.3vh">Let's Talk</div>
+      <div style="font:700 3vw/1 var(--m);color:var(--text)">30</div>
+      <div style="font:.85vw/1 var(--m);color:var(--muted)">Minuten</div>
+    </div>
+    <div>
+      <div style="font-size:1.3vw;font-weight:500">Was würde KI für Ihr Unternehmen ändern?</div>
+      <div style="font-size:.9vw;color:var(--text2);margin-top:.8vh;line-height:1.5">
+        12 Jahre KI-Erfahrung. €5M raised. 80+ Projekte.<br>
+        Von BMW und Siemens bis zur 7.000-Einwohner-Gemeinde.<br><br>
+        <strong>Florian Ziesche</strong><br>
+        florian@ainaryventures.com · ainaryventures.com
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:auto;display:flex;gap:3vw;font-size:.7vw;color:var(--muted);padding-bottom:2vh">
+    <span>Quellen: Gartner 2025, Forrester 2026, Salesforce 2026, EY 2026, dbb 2025, EU-Kommission 2024</span>
+  </div>
+</section>
+
+</div>
+
+<script>
+(function(){
+  var slides=document.querySelectorAll('.slide'),cur=0,total=slides.length;
+  function go(n){
+    if(n<0||n>=total)return;
+    slides[cur].classList.remove('active');cur=n;slides[cur].classList.add('active');
+    document.getElementById('progress').style.width=(cur/(total-1)*100)+'%';
+    document.getElementById('cnt').textContent=(cur+1)+' / '+total;
+  }
+  go(0);
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key===' ')go(cur+1);
+    else if(e.key==='ArrowLeft')go(cur-1);
+    else if(e.key==='Escape')go(0);
+  });
+  document.addEventListener('click',function(e){
+    if(e.target.closest('iframe')||e.target.closest('input'))return;
+    var x=e.clientX/window.innerWidth;
+    if(x<.33)go(cur-1);else go(cur+1);
+  });
+  var tx=0;
+  document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX});
+  document.addEventListener('touchend',function(e){var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50){if(d<0)go(cur+1);else go(cur-1)}});
+})();
+</script>
+</body>
+</html>

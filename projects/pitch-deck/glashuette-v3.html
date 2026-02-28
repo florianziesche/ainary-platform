@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Glashütte V3 — Ainary</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/*
+  V2 — Website DNA + McKinsey SCR
+  Design tokens from ainary-demo-v7: cards, KPI row, comparison bars, timeline, tiles
+  Grid: Verified (Penn State + McKinsey + Palantir consensus)
+*/
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* Website tokens */
+  --text:#1a1a1a;--text2:#444;--muted:#777;--light:#bbb;
+  --border:#d0d0d0;--border2:#e8e8e8;--surface:#fafafa;
+  --accent:#9d7f3b;--green:#2d8a4e;--red:#c0392b;--amber:#b45309;
+  --f:'Inter',-apple-system,sans-serif;--m:'JetBrains Mono',monospace;
+  /* Slide grid */
+  --mx:4.5vw;--head-top:3vh;--vis-top:24vh;--bot:3.5vh;
+}
+html{font-size:16px}
+body{font-family:var(--f);color:var(--text);background:#fff;overflow:hidden;-webkit-font-smoothing:antialiased}
+
+/* Chrome */
+#progress{position:fixed;top:0;left:0;height:2px;background:var(--text);z-index:100;transition:width .3s}
+#logo{position:fixed;bottom:var(--bot);left:var(--mx);z-index:100;display:flex;align-items:center;gap:.4vw;font:500 .85vw/1 var(--f);color:var(--muted)}
+#logo .dot{width:.35vw;height:.35vw;border-radius:50%;background:var(--accent)}
+#sec{position:fixed;top:var(--head-top);right:var(--mx);z-index:100;font:600 .55vw/1 var(--m);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);transition:opacity .3s}
+#cnt{position:fixed;bottom:var(--bot);right:var(--mx);font:500 .55vw/1 var(--m);color:var(--light);letter-spacing:.1em;z-index:100}
+.deck{width:100vw;height:100vh;position:relative;z-index:1}
+.slide{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .35s}
+.slide.active{opacity:1;pointer-events:auto}
+.head{position:absolute;top:var(--head-top);left:var(--mx);right:var(--mx)}
+.title{font-size:2.8vw;font-weight:600;letter-spacing:-.04em;line-height:1.1}
+.sub{font-size:1.8vw;font-weight:400;line-height:1.4;color:var(--text2);margin-top:2vh;max-width:55vw}
+.rule{width:48px;height:2px;background:var(--accent);margin:1.2vh 0;opacity:.5}
+.vis{position:absolute;top:var(--vis-top);left:var(--mx);right:var(--mx);bottom:calc(var(--bot) + 2vh)}
+.meta-line{font:400 .7vw/1 var(--m);color:var(--light)}
+.src-line{font:400 .6vw/1 var(--m);color:var(--light);position:absolute;bottom:0;left:0}
+
+/* Website components adapted for slides */
+.sec-label{font:.6vw/1 var(--m);font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:1.2vh}
+.card{border:1px solid var(--border2);border-radius:4px;padding:1.4vw}
+.kpi{text-align:center;padding:1.2vw 1.6vw;background:var(--surface);border-radius:4px}
+.kpi-val{font:700 1.8vw/1 var(--m);margin-bottom:.3vh}
+.kpi-label{font-size:.75vw;color:var(--text2)}
+.kpi-sub{font:italic .6vw/1 var(--f);color:var(--muted);margin-top:.2vh}
+.cmp-item{margin-bottom:1.2vh}
+.cmp-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.3vh}
+.cmp-name{font-size:.8vw;color:var(--text2)}
+.cmp-val{font:.65vw/1 var(--m);color:var(--muted)}
+.cmp-bar{height:.4vw;background:var(--border2);border-radius:3px;overflow:hidden}
+.cmp-fill{height:100%;border-radius:3px}
+.tl{position:relative;padding-left:1.4vw}
+.tl::before{content:'';position:absolute;left:.35vw;top:.3vw;bottom:.3vw;width:1px;background:var(--border2)}
+.tl-item{position:relative;margin-bottom:1.2vh}
+.tl-dot{position:absolute;left:-1.4vw;top:.2vw;width:.7vw;height:.7vw;border-radius:50%;border:2px solid var(--border);background:#fff}
+.tl-dot.urgent{border-color:var(--red);background:rgba(192,57,43,.08)}
+.tl-dot.soon{border-color:var(--amber);background:rgba(180,83,9,.06)}
+.tl-date{font:.55vw/1 var(--m);color:var(--muted);margin-bottom:.15vh}
+.tl-label{font-size:.8vw;font-weight:500}
+.tl-amount{font:.6vw/1 var(--m);color:var(--muted)}
+.tile{border:1px solid var(--border2);border-radius:4px;padding:1.2vw}
+.tile-title{font-size:.9vw;font-weight:600;margin-bottom:.3vh}
+.tile-desc{font-size:.7vw;color:var(--text2);line-height:1.55}
+.tile-meta{font:.55vw/1 var(--m);color:var(--muted);margin-top:.5vh}
+.tile-cta{font-size:.75vw;font-weight:600;color:var(--accent);margin-top:.6vh}
+.featured{border:1px solid var(--border2);border-radius:4px;padding:1.6vw}
+.badge-new{font:.55vw/1 var(--m);color:var(--green)}
+
+@media(max-width:768px){
+  :root{--mx:4vw;--head-top:2vh;--vis-top:18vh}
+  .title{font-size:5.5vw}.sub{font-size:3vw;max-width:92vw}
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="logo"><span class="dot"></span> Ainary</div>
+<div id="sec"></div><div id="cnt"></div>
+
+<div class="deck">
+
+<!-- 1: COVER -->
+<section class="slide active" data-section="">
+  <div class="head" style="top:6vh">
+    <h1 class="title" style="font-size:3.5vw;max-width:65vw">Was wäre, wenn Ihre Verwaltung so präzise arbeitet wie Ihre Uhren?</h1>
+    <div class="rule"></div>
+    <p style="font-size:2vw;font-weight:400;line-height:1.4;color:var(--text2);margin-top:2.5vh;max-width:55vw">Ihr persönlicher KI-Assistent, der Ihnen die Zeit zurückgibt, die Sie nicht haben.</p>
+    <p style="font-size:1.6vw;font-weight:500;color:var(--text);margin-top:3vh">Wir machen 80% der Arbeit — Sie die 20%, die zählen.</p>
+  </div>
+  <!-- KPI row — horizontal, black, same size as other slides -->
+  <div style="position:absolute;bottom:calc(var(--bot) + 6vh);left:var(--mx);right:var(--mx);display:flex;gap:1.2vw">
+    <div class="kpi" style="flex:1">
+      <div class="kpi-val" style="color:var(--text)">~93 Std.</div>
+      <div class="kpi-label">Ihr Aufwand ohne Ainary</div>
+      <div class="kpi-sub">5 Analysen · 79 Quellen</div>
+    </div>
+    <div class="kpi" style="flex:1">
+      <div class="kpi-val" style="color:var(--text)">69%</div>
+      <div class="kpi-label">Confidence</div>
+      <div class="kpi-sub">über alle Analysen</div>
+    </div>
+    <div class="kpi" style="flex:1">
+      <div class="kpi-val" style="color:var(--text)">20%</div>
+      <div class="kpi-label">Ihr Anteil</div>
+      <div class="kpi-sub">Prüfen, entscheiden, handeln</div>
+    </div>
+  </div>
+  <div style="position:absolute;bottom:var(--bot);left:calc(var(--mx) + 6vw);font:.7vw/1 var(--f);color:var(--light)">Florian Ziesche · 24. Februar 2026</div>
+</section>
+
+<!-- 2: ABOUT ME — Timeline -->
+<section class="slide" data-section="Über mich">
+  <div class="head">
+    <h2 class="title">Von BMW zu Ihrer Gemeinde. In 12 Jahren.</h2>
+    <div class="rule"></div>
+  </div>
+  <div class="vis" style="display:flex;flex-direction:column;justify-content:space-between;padding-bottom:2vh">
+    <!-- Timeline horizontal -->
+    <div style="display:flex;gap:1.5vw;align-items:flex-start">
+      <div class="tl" style="flex:1">
+        <div class="tl-item">
+          <div class="tl-dot urgent"></div>
+          <div class="tl-date">2014</div>
+          <div class="tl-label">36ZERO gegründet</div>
+          <div class="tl-amount">KI-Startup · München</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot soon"></div>
+          <div class="tl-date">2017</div>
+          <div class="tl-label">BMW, Siemens, Bosch</div>
+          <div class="tl-amount">Cloud Computer Vision · 80+ Projekte</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot soon"></div>
+          <div class="tl-date">2020</div>
+          <div class="tl-label">€5M Funding</div>
+          <div class="tl-amount">€3.5M Eigenkapital + €1.5M Förderung</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot" style="border-color:var(--accent);background:rgba(157,127,59,.1)"></div>
+          <div class="tl-date">2026</div>
+          <div class="tl-label" style="color:var(--accent);font-size:.9vw">Glashütte</div>
+          <div class="tl-amount" style="color:var(--text);font-size:.7vw">Meine Familie lebt 10 Minuten von hier.</div>
+        </div>
+      </div>
+    </div>
+    <!-- KPIs horizontal, black, same size as cover/proof slides -->
+    <div style="display:flex;gap:1.2vw">
+      <div class="kpi" style="flex:1">
+        <div class="kpi-val" style="color:var(--text)">12+</div>
+        <div class="kpi-label">Jahre KI</div>
+      </div>
+      <div class="kpi" style="flex:1">
+        <div class="kpi-val" style="color:var(--text)">€5M</div>
+        <div class="kpi-label">Funding</div>
+      </div>
+      <div class="kpi" style="flex:1">
+        <div class="kpi-val" style="color:var(--text)">80+</div>
+        <div class="kpi-label">Projekte</div>
+      </div>
+      <div class="kpi" style="flex:1">
+        <div class="kpi-val" style="color:var(--text)">3</div>
+        <div class="kpi-label">DAX-Kunden</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3: AGENDA -->
+<section class="slide" data-section="Agenda">
+  <div class="head">
+    <h2 class="title">Worüber wir heute sprechen.</h2>
+    <div class="rule"></div>
+  </div>
+  <div class="vis" style="display:grid;grid-template-columns:1fr 1fr;gap:1vw;align-content:start">
+    <div class="tile">
+      <div style="font:500 2.5vw/1 var(--m);color:var(--border);margin-bottom:.6vh">01</div>
+      <div class="tile-title">570.000 Stellen unbesetzt</div>
+      <div class="tile-desc">Warum KI keine Option ist, sondern Notwendigkeit.</div>
+    </div>
+    <div class="tile">
+      <div style="font:500 2.5vw/1 var(--m);color:var(--border);margin-bottom:.6vh">02</div>
+      <div class="tile-title">Was kann KI konkret?</div>
+      <div class="tile-desc">Live-Demo: Fördermittel-Check in 3 Minuten.</div>
+    </div>
+    <div class="tile">
+      <div style="font:500 2.5vw/1 var(--m);color:var(--border);margin-bottom:.6vh">03</div>
+      <div class="tile-title">Was ändert sich für Ihr Team?</div>
+      <div class="tile-desc">Gleiche Mitarbeiter. Ein Zehntel der Routinezeit.</div>
+    </div>
+    <div class="tile">
+      <div style="font:500 2.5vw/1 var(--m);color:var(--border);margin-bottom:.6vh">04</div>
+      <div class="tile-title">Wie starten wir?</div>
+      <div class="tile-desc">30 Minuten mit einer echten Aufgabe. Kostenlos.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 4: SITUATION — Fachkraeftemangel (Big Number) -->
+<section class="slide" data-section="Situation">
+  <div class="head">
+    <h2 class="title" style="font-size:6vw;line-height:1;letter-spacing:-.06em">570.000</h2>
+    <div class="rule" style="margin-top:1.5vh"></div>
+    <p class="sub" style="font-size:1.6vw">Unbesetzte Stellen im öffentlichen Dienst.<br>Die Frage ist nicht ob Sie KI brauchen. Sondern ob Sie sich leisten können, es nicht zu tun.</p>
+  </div>
+  <div class="vis" style="top:55vh">
+    <div style="display:flex;gap:3vw;align-items:flex-end">
+      <div>
+        <div class="sec-label">McKinsey, Juli 2024</div>
+        <div style="font-size:1.1vw;color:var(--text2);max-width:35vw">Generative KI koennte die Fachkraefteluecke um <strong>165.000 Vollzeitkräfte</strong> senken — ein Drittel des Mangels. Nicht indem sie Mitarbeiter ersetzt. Indem sie den vorhandenen die Routine abnimmt.</div>
+      </div>
+      <div>
+        <div class="sec-label">Kommunal bis 2030</div>
+        <div style="font:700 3vw/1 var(--m);color:var(--red)">31%</div>
+        <div style="font-size:.75vw;color:var(--muted);margin-top:.3vh">Nichtbesetzungsquote</div>
+        <div class="meta-line" style="margin-top:.3vh">Quelle: Demografieportal</div>
+      </div>
+    </div>
+  </div>
+  <div class="src-line" style="position:absolute;bottom:var(--bot);left:var(--mx)">Quellen: dbb Monitor 2025 · McKinsey.de Juli 2024 · Demografieportal</div>
+</section>
+
+<!-- 5: COMPLICATION — Glashütte spezifisch -->
+<section class="slide" data-section="Herausforderung">
+  <div class="head">
+    <h2 class="title">65% der Behörden scheitern an sich selbst. Nicht an der Technik.</h2>
+    <div class="rule"></div>
+  </div>
+  <div class="vis" style="display:flex;gap:2vw">
+    <!-- Left: Benchmark bars (website component) -->
+    <div class="card" style="flex:1">
+      <div class="sec-label">Digitale Services · Benchmark</div>
+      <div class="cmp-item">
+        <div class="cmp-top"><span class="cmp-name">Dippoldiswalde</span><span class="cmp-val">5/6</span></div>
+        <div class="cmp-bar"><div class="cmp-fill" style="width:83%;background:var(--green);opacity:.55"></div></div>
+      </div>
+      <div class="cmp-item">
+        <div class="cmp-top"><span class="cmp-name">Freital</span><span class="cmp-val">4/6</span></div>
+        <div class="cmp-bar"><div class="cmp-fill" style="width:67%;background:var(--amber);opacity:.6"></div></div>
+      </div>
+      <div class="cmp-item">
+        <div class="cmp-top"><span class="cmp-name">Altenberg</span><span class="cmp-val">3/6</span></div>
+        <div class="cmp-bar"><div class="cmp-fill" style="width:50%;background:var(--amber);opacity:.6"></div></div>
+      </div>
+      <div class="cmp-item">
+        <div class="cmp-top"><span class="cmp-name" style="font-weight:600;color:var(--text)">Glashütte</span><span class="cmp-val" style="color:var(--accent)">1/6</span></div>
+        <div class="cmp-bar"><div class="cmp-fill" style="width:17%;background:var(--accent)"></div></div>
+      </div>
+    </div>
+    <!-- Right: Hindernis stats -->
+    <div class="card" style="flex:1">
+      <div class="sec-label">Größte Hindernisse · Deutschland</div>
+      <div class="cmp-item">
+        <div class="cmp-top"><span class="cmp-name">Widerstand gegen Veränderung</span><span class="cmp-val" style="color:var(--red);font-weight:500">65%</span></div>
+        <div class="cmp-bar"><div class="cmp-fill" style="width:65%;background:var(--red);opacity:.55"></div></div>
+      </div>
+      <div class="cmp-item">
+        <div class="cmp-top"><span class="cmp-name">Budgetrestriktionen</span><span class="cmp-val">55%</span></div>
+        <div class="cmp-bar"><div class="cmp-fill" style="width:55%;background:var(--text);opacity:.2"></div></div>
+      </div>
+      <div class="cmp-item">
+        <div class="cmp-top"><span class="cmp-name">Können Produktivität nicht messen</span><span class="cmp-val">40%</span></div>
+        <div class="cmp-bar"><div class="cmp-fill" style="width:40%;background:var(--text);opacity:.2"></div></div>
+      </div>
+      <div class="cmp-item">
+        <div class="cmp-top"><span class="cmp-name">Nutzen ML/GenAI für Buerger</span><span class="cmp-val" style="color:var(--red)">29%</span></div>
+        <div class="cmp-bar"><div class="cmp-fill" style="width:29%;background:var(--red);opacity:.55"></div></div>
+      </div>
+      <div style="font:.5vw/1 var(--m);color:var(--light);margin-top:.8vh">SAS / Economist Impact, Feb 2025 · N=1.550 · 26 Länder</div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM-SLIDE — 3 große grafische Zahlen -->
+<section class="slide" data-section="Problem">
+  <div class="head" style="top:3vh">
+    <h2 class="title" style="font-size:2.4vw">Drei Zahlen, die alles erklären.</h2>
+    <div class="rule"></div>
+  </div>
+  <div class="vis" style="top:18vh;display:flex;gap:2vw;align-items:flex-start">
+    <!-- 40% Admin -->
+    <div style="flex:1;text-align:center">
+      <div style="position:relative;width:12vw;height:12vw;margin:0 auto">
+        <svg viewBox="0 0 100 100" width="100%" height="100%">
+          <circle cx="50" cy="50" r="45" fill="none" stroke="var(--border2)" stroke-width="8"/>
+          <circle cx="50" cy="50" r="45" fill="none" stroke="var(--red)" stroke-width="8" stroke-dasharray="113 283" stroke-dashoffset="-70" stroke-linecap="round" opacity=".7"/>
+        </svg>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <div style="font:700 3vw/1 var(--m);color:var(--text)">40%</div>
+        </div>
+      </div>
+      <div style="font-size:1.1vw;font-weight:600;margin-top:1.5vh">Routinearbeit</div>
+      <div style="font-size:.7vw;color:var(--text2);margin-top:.3vh;max-width:15vw;margin-left:auto;margin-right:auto;line-height:1.4">Ihrer Arbeitszeit geht für Verwaltungsaufgaben drauf, die eine KI in Minuten erledigt.</div>
+      <div style="font:.45vw/1 var(--m);color:var(--muted);margin-top:.5vh">KGSt / Fraunhofer FOKUS 2024</div>
+    </div>
+    <!-- €4,4 Mrd. verlorene Fördermittel -->
+    <div style="flex:1;text-align:center">
+      <div style="position:relative;width:12vw;height:12vw;margin:0 auto;display:flex;align-items:center;justify-content:center">
+        <svg viewBox="0 0 100 100" width="100%" height="100%">
+          <circle cx="50" cy="50" r="45" fill="none" stroke="var(--border2)" stroke-width="8"/>
+          <circle cx="50" cy="50" r="45" fill="none" stroke="var(--red)" stroke-width="8" stroke-dasharray="198 283" stroke-dashoffset="-70" stroke-linecap="round" opacity=".7"/>
+        </svg>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <div style="font:700 2.2vw/1 var(--m);color:var(--text)">€4,4<span style="font-size:1.2vw"> Mrd.</span></div>
+        </div>
+      </div>
+      <div style="font-size:1.1vw;font-weight:600;margin-top:1.5vh">Nicht abgerufene EU-Mittel</div>
+      <div style="font-size:.7vw;color:var(--text2);margin-top:.3vh;max-width:15vw;margin-left:auto;margin-right:auto;line-height:1.4">Deutschland gibt jährlich Milliarden an EU-Förderung zurück — weil Anträge zu spät oder gar nicht gestellt werden.</div>
+      <div style="font:.45vw/1 var(--m);color:var(--muted);margin-top:.5vh">EU-Kommission Kohäsionsbericht 2024</div>
+    </div>
+    <!-- 1,36 Mio. gehen in Rente -->
+    <div style="flex:1;text-align:center">
+      <div style="position:relative;width:12vw;height:12vw;margin:0 auto">
+        <svg viewBox="0 0 100 100" width="100%" height="100%">
+          <circle cx="50" cy="50" r="45" fill="none" stroke="var(--border2)" stroke-width="8"/>
+          <circle cx="50" cy="50" r="45" fill="none" stroke="var(--red)" stroke-width="8" stroke-dasharray="76 283" stroke-dashoffset="-70" stroke-linecap="round" opacity=".7"/>
+        </svg>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <div style="font:700 2.2vw/1 var(--m);color:var(--text)">1,36<span style="font-size:1.2vw"> Mio.</span></div>
+        </div>
+      </div>
+      <div style="font-size:1.1vw;font-weight:600;margin-top:1.5vh">Gehen bis 2030 in Rente</div>
+      <div style="font-size:.7vw;color:var(--text2);margin-top:.3vh;max-width:15vw;margin-left:auto;margin-right:auto;line-height:1.4">27% aller Beschäftigten im öffentlichen Dienst. Für die meisten Stellen gibt es keinen Ersatz.</div>
+      <div style="font:.45vw/1 var(--m);color:var(--muted);margin-top:.5vh">dbb Beamtenbund 2023</div>
+    </div>
+  </div>
+</section>
+
+<!-- 6: WAS KANN KI — Evolution Timeline mit Live-Demo -->
+<section class="slide" data-section="Was kann KI">
+  <div class="head">
+    <h2 class="title">Wie wir hierher gekommen sind.</h2>
+    <div class="rule"></div>
+  </div>
+  <div class="vis" style="display:flex;flex-direction:column;gap:0;padding-top:0">
+    <!-- Timeline rows -->
+    <div style="display:grid;grid-template-columns:7vw 1fr 1fr;gap:0;align-items:stretch" id="evo-grid">
+      <!-- Row 1: Programmierung -->
+      <div style="display:flex;flex-direction:column;align-items:center;padding:.6vw 0">
+        <div style="font:500 .55vw/1 var(--m);color:var(--muted)">~2005</div>
+        <div style="width:1px;flex:1;background:var(--border2);margin:.3vw 0"></div>
+      </div>
+      <div style="padding:.5vw 1vw;border-bottom:1px solid var(--border2)">
+        <div style="font-size:.85vw;font-weight:600">Programmierung</div>
+        <div style="font-size:.65vw;color:var(--text2);margin-top:.2vh">Mensch schreibt jede Regel selbst</div>
+      </div>
+      <div style="padding:.5vw 1vw;border-bottom:1px solid var(--border2);background:var(--surface);font-family:var(--m);font-size:.6vw;color:var(--muted);display:flex;align-items:center">
+        <span><span style="color:var(--accent)">if</span> einwohner &lt; 7000 <span style="color:var(--accent)">and</span> bundesland == "Sachsen":<br>&nbsp;&nbsp;foerderung = <span style="color:var(--green)">True</span></span>
+      </div>
+
+      <!-- Row 2: Machine Learning -->
+      <div style="display:flex;flex-direction:column;align-items:center;padding:.6vw 0">
+        <div style="font:500 .55vw/1 var(--m);color:var(--muted)">~2010</div>
+        <div style="width:1px;flex:1;background:var(--border2);margin:.3vw 0"></div>
+      </div>
+      <div style="padding:.5vw 1vw;border-bottom:1px solid var(--border2)">
+        <div style="font-size:.85vw;font-weight:600">Machine Learning</div>
+        <div style="font-size:.65vw;color:var(--text2);margin-top:.2vh">Maschine findet die Werte — Mensch gibt die Formel</div>
+      </div>
+      <div style="padding:.5vw 1vw;border-bottom:1px solid var(--border2);background:var(--surface);font-family:var(--m);font-size:.6vw;color:var(--muted);display:flex;align-items:center">
+        <span>x + y = z &nbsp;→&nbsp; z muss <span style="color:var(--accent)">29</span> sein<br>also x = <span style="color:var(--accent)">?</span>, y = <span style="color:var(--accent)">?</span> &nbsp;← Maschine rechnet</span>
+      </div>
+
+      <!-- Row 3: Deep Learning -->
+      <div style="display:flex;flex-direction:column;align-items:center;padding:.6vw 0">
+        <div style="font:500 .55vw/1 var(--m);color:var(--muted)">~2015</div>
+        <div style="width:1px;flex:1;background:var(--border2);margin:.3vw 0"></div>
+      </div>
+      <div style="padding:.5vw 1vw;border-bottom:1px solid var(--border2)">
+        <div style="font-size:.85vw;font-weight:600">Deep Learning</div>
+        <div style="font-size:.65vw;color:var(--text2);margin-top:.2vh">Maschine findet Formel UND Werte selbst</div>
+      </div>
+      <div style="padding:.5vw 1vw;border-bottom:1px solid var(--border2);background:var(--surface);font-family:var(--m);font-size:.6vw;color:var(--muted);display:flex;align-items:center">
+        <span><span style="color:var(--accent)">f(</span>?<span style="color:var(--accent)">)</span> = ? &nbsp;← Algorithmus sucht<br>Formel + Werte + Zusammenhänge</span>
+      </div>
+
+      <!-- Row 4: LLM / GenAI -->
+      <div style="display:flex;flex-direction:column;align-items:center;padding:.6vw 0">
+        <div style="font:500 .55vw/1 var(--m);color:var(--muted)">~2020</div>
+        <div style="width:1px;flex:1;background:var(--border2);margin:.3vw 0"></div>
+      </div>
+      <div style="padding:.5vw 1vw;border-bottom:1px solid var(--border2)">
+        <div style="font-size:.85vw;font-weight:600">Generative KI</div>
+        <div style="font-size:.65vw;color:var(--text2);margin-top:.2vh">KI kennt die Antwort und generiert sie — Wort für Wort</div>
+      </div>
+      <div style="padding:.3vw .6vw;border-bottom:1px solid var(--border2);background:#fff;overflow:hidden">
+        <!-- Browser Chrome Frame -->
+        <div style="border:1px solid #ccc;border-radius:6px;overflow:hidden;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.08)">
+          <!-- Browser Tab Bar -->
+          <div style="background:#f0f0f0;padding:.2vw .4vw;display:flex;align-items:center;gap:.3vw;border-bottom:1px solid #ddd">
+            <div style="display:flex;gap:.15vw">
+              <div style="width:.35vw;height:.35vw;border-radius:50%;background:#ff5f57"></div>
+              <div style="width:.35vw;height:.35vw;border-radius:50%;background:#febc2e"></div>
+              <div style="width:.35vw;height:.35vw;border-radius:50%;background:#28c840"></div>
+            </div>
+            <div style="flex:1;background:#fff;border-radius:3px;padding:.12vw .4vw;font:.35vw/1 var(--m);color:#999;border:1px solid #e0e0e0">saechsische.de/lokales/glashuette/ki-assistent-verwaltung</div>
+          </div>
+          <!-- SZ Article Content -->
+          <div style="padding:.5vw .6vw;background:#fff">
+            <div style="display:flex;align-items:center;gap:.3vw;margin-bottom:.3vh;padding-bottom:.2vh;border-bottom:1px solid #e8e8e8">
+              <div style="font-family:Georgia,'Times New Roman',serif;font-size:.6vw;font-weight:700;color:#1a1a1a;letter-spacing:.01em">Sächsische Zeitung</div>
+              <div style="font:.3vw/1 var(--f);color:#999;margin-left:auto">Lokales · Glashütte · 21. Februar 2026</div>
+            </div>
+            <div style="font-family:Georgia,'Times New Roman',serif;font-size:.5vw;font-weight:700;color:#1a1a1a;line-height:1.25;margin-bottom:.15vh" id="typewriter">Glashütte setzt als erste Gemeinde im Osterzgebirge auf KI-Assistenten für die Verwaltung</div>
+            <div style="font-size:.35vw;color:#555;line-height:1.5;font-family:Georgia,serif" id="typewriter-body">Bürgermeister Markus Gleißberg stellte am Montag ein Pilotprojekt vor, das Fördermittel automatisch identifiziert und Beschlussvorlagen vorbereitet. „Wir machen damit in Stunden, wofür wir bisher Wochen brauchten", sagte Gleißberg. Das System hatte bereits 11 Förderprogramme für Glashütte identifiziert — darunter die Breitband-Förderung mit Frist am 28. Februar. Dippoldiswalde und Freital zeigten Interesse an einer eigenen Testphase.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 5: Agentic AI — HIGHLIGHTED -->
+      <div style="display:flex;flex-direction:column;align-items:center;padding:.6vw 0">
+        <div style="font:700 .55vw/1 var(--m);color:var(--accent)">2025</div>
+        <div style="width:2px;flex:1;background:var(--accent);margin:.3vw 0;opacity:.5"></div>
+      </div>
+      <div style="padding:.5vw 1vw;border-left:2px solid var(--accent)">
+        <div style="font-size:.85vw;font-weight:600;color:var(--accent)">Agentic AI — Ihr Assistent</div>
+        <div style="font-size:.65vw;color:var(--text2);margin-top:.2vh">KI ist Experte. Kennt Ihre Gemeinde, Ihre Stimme, Ihre Aufgaben.</div>
+        <div style="font-size:.65vw;color:var(--text);margin-top:.4vh;font-weight:500">Macht 80% — Sie die 20%, die zählen.</div>
+      </div>
+      <div style="padding:.5vw 1vw;border-left:2px solid var(--accent);display:flex;align-items:center">
+        <div class="card" style="padding:.6vw .8vw;width:100%;border-color:var(--accent);border-width:1px">
+          <div style="display:flex;align-items:center;gap:.3vw;margin-bottom:.3vh">
+            <div style="width:.5vw;height:.5vw;border-radius:50%;background:var(--accent);flex-shrink:0"></div>
+            <span style="font-size:.55vw;font-weight:600">Mia</span>
+          </div>
+          <div style="font-size:.5vw;color:var(--text2);line-height:1.5">3 Förderprogramme für Glashütte identifiziert. Breitband-Frist in 8 Tagen. Empfehlung: Antrag priorisieren — <span style="color:var(--accent);font-weight:500">soll ich den Entwurf vorbereiten?</span></div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:1.2vh;font-size:.75vw;color:var(--text2);max-width:50vw">Von Ausführer zu <strong>Entscheider</strong>. Ihre Mitarbeiter machen weniger Routine — und bessere Entscheidungen.</div>
+  </div>
+</section>
+
+<!-- 7: TOP PROBLEME + KI-LÖSUNG — aus Kommune-Reports -->
+<section class="slide" data-section="Konkret">
+  <div class="head" style="top:2vh">
+    <h2 class="title" style="font-size:2.2vw">Die 6 größten Zeitfresser. Und was Ihr Assistent daraus macht.</h2>
+    <div class="rule"></div>
+  </div>
+  <div class="vis" style="top:14vh;display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8vw;align-content:start">
+    <!-- 01 -->
+    <div class="card" style="padding:1vw">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div style="font:500 1.6vw/1 var(--m);color:var(--accent)">01</div>
+        <div style="font:.45vw/1 var(--m);color:var(--green);font-weight:500">-85% Zeit</div>
+      </div>
+      <div style="font-size:.85vw;font-weight:600;margin:.4vh 0 .2vh">Fördermittel finden</div>
+      <div style="font-size:.6vw;color:var(--text2);line-height:1.5">11 Programme identifiziert, 3 mit Frist in 8 Wochen. EU bis SAB automatisch durchsucht.</div>
+      <div style="font-size:.55vw;color:var(--red);margin-top:.4vh;font-weight:500">Problem: 24-40 Std. manuelle Recherche</div>
+      <div style="font:.45vw/1 var(--m);color:var(--muted);margin-top:.3vh">78% Confidence · 23 Quellen</div>
+    </div>
+    <!-- 02 -->
+    <div class="card" style="padding:1vw">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div style="font:500 1.6vw/1 var(--m);color:var(--accent)">02</div>
+        <div style="font:.45vw/1 var(--m);color:var(--green);font-weight:500">-87% Zeit</div>
+      </div>
+      <div style="font-size:.85vw;font-weight:600;margin:.4vh 0 .2vh">Beschlussvorlagen</div>
+      <div style="font-size:.6vw;color:var(--text2);line-height:1.5">Entwürfe aus Ihren Notizen und Protokollen. Sie prüfen und unterschreiben — fertig.</div>
+      <div style="font-size:.55vw;color:var(--red);margin-top:.4vh;font-weight:500">Problem: 4 Std. pro Vorlage</div>
+      <div style="font:.45vw/1 var(--m);color:var(--muted);margin-top:.3vh">Worms: "Justus" im Bauamt seit 2025</div>
+    </div>
+    <!-- 03 -->
+    <div class="card" style="padding:1vw">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div style="font:500 1.6vw/1 var(--m);color:var(--accent)">03</div>
+        <div style="font:.45vw/1 var(--m);color:var(--green);font-weight:500">-70% Anfragen</div>
+      </div>
+      <div style="font-size:.85vw;font-weight:600;margin:.4vh 0 .2vh">Bürgerfragen</div>
+      <div style="font-size:.6vw;color:var(--text2);line-height:1.5">78% aller Anfragen wiederholen sich. KI beantwortet sie 24/7 — auch am Wochenende.</div>
+      <div style="font-size:.55vw;color:var(--red);margin-top:.4vh;font-weight:500">Problem: 5-10 Std./Woche Telefon</div>
+      <div style="font:.45vw/1 var(--m);color:var(--muted);margin-top:.3vh">Augsburg "CiSA" · Gersheim "Gerda Bürki"</div>
+    </div>
+    <!-- 04 -->
+    <div class="card" style="padding:1vw">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div style="font:500 1.6vw/1 var(--m);color:var(--accent)">04</div>
+        <div style="font:.45vw/1 var(--m);color:var(--green);font-weight:500">Frühwarnung</div>
+      </div>
+      <div style="font-size:.85vw;font-weight:600;margin:.4vh 0 .2vh">Bürgerstimmung</div>
+      <div style="font-size:.6vw;color:var(--text2);line-height:1.5">342 Posts analysiert. Windkraft 78% negativ. Erkennt Themen bevor sie eskalieren.</div>
+      <div style="font-size:.55vw;color:var(--red);margin-top:.4vh;font-weight:500">Problem: BM erfährt es zuletzt</div>
+      <div style="font:.45vw/1 var(--m);color:var(--muted);margin-top:.3vh">FB + Google Reviews + SZ · täglich</div>
+    </div>
+    <!-- 05 -->
+    <div class="card" style="padding:1vw">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div style="font:500 1.6vw/1 var(--m);color:var(--accent)">05</div>
+        <div style="font:.45vw/1 var(--m);color:var(--green);font-weight:500">3 Min. statt 3 Tage</div>
+      </div>
+      <div style="font-size:.85vw;font-weight:600;margin:.4vh 0 .2vh">Daily Intel</div>
+      <div style="font-size:.6vw;color:var(--text2);line-height:1.5">Jeden Morgen: Fristen, Förderungen, Nachrichten — gefiltert, bewertet, priorisiert für Glashütte.</div>
+      <div style="font-size:.55vw;color:var(--red);margin-top:.4vh;font-weight:500">Problem: 12 Quellen manuell lesen</div>
+      <div style="font:.45vw/1 var(--m);color:var(--muted);margin-top:.3vh">12 Meldungen · 8 Quellen · 3 Empfehlungen</div>
+    </div>
+    <!-- 06 -->
+    <div class="card" style="padding:1vw">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div style="font:500 1.6vw/1 var(--m);color:var(--accent)">06</div>
+        <div style="font:.45vw/1 var(--m);color:var(--green);font-weight:500">10-20% gespart</div>
+      </div>
+      <div style="font-size:.85vw;font-weight:600;margin:.4vh 0 .2vh">Energie & Gebäude</div>
+      <div style="font-size:.6vw;color:var(--text2);line-height:1.5">KI wertet Verbrauchsdaten aus: Rathaus, Schule, Turnhalle. Erkennt Verschwendung automatisch.</div>
+      <div style="font-size:.55vw;color:var(--red);margin-top:.4vh;font-weight:500">Problem: Niemand prüft Energiedaten</div>
+      <div style="font:.45vw/1 var(--m);color:var(--muted);margin-top:.3vh">Fraunhofer IAO · 10-20% Kostenersparnis</div>
+    </div>
+  </div>
+  <!-- KPI bottom -->
+  <div style="position:absolute;bottom:var(--bot);left:var(--mx);right:var(--mx);display:flex;gap:1.2vw">
+    <div class="kpi" style="flex:1;padding:.5vw">
+      <div class="kpi-val" style="color:var(--text);font-size:1.4vw">75%</div>
+      <div class="kpi-label">halten KI für sinnvoll</div>
+      <div class="kpi-sub">Zukunftsradar Digitale Kommune</div>
+    </div>
+    <div class="kpi" style="flex:1;padding:.5vw">
+      <div class="kpi-val" style="color:var(--text);font-size:1.4vw">13%</div>
+      <div class="kpi-label">setzen es bereits ein</div>
+      <div class="kpi-sub">IHK Hannover 2026</div>
+    </div>
+    <div class="kpi" style="flex:1;padding:.5vw">
+      <div class="kpi-val" style="color:var(--text);font-size:1.4vw">20-30%</div>
+      <div class="kpi-label">kürzere Bearbeitungszeit</div>
+      <div class="kpi-sub">AKDB Megatrends 2026</div>
+    </div>
+    <div class="kpi" style="flex:1;padding:.5vw">
+      <div class="kpi-val" style="color:var(--text);font-size:1.4vw">€23,9 Mrd.</div>
+      <div class="kpi-label">KI-Potenzial Verwaltung</div>
+      <div class="kpi-sub">IW-Consult Studie</div>
+    </div>
+  </div>
+</section>
+
+<!-- 8: LIVE PRODUKT — Moonshot: echte Plattform als iframe -->
+<section class="slide" data-section="Live Demo">
+  <div class="head" style="top:2vh">
+    <h2 class="title" style="font-size:2.2vw">Das haben wir bereits für Glashütte vorbereitet.</h2>
+    <div class="rule"></div>
+  </div>
+  <div style="position:absolute;top:12vh;left:var(--mx);right:var(--mx);bottom:calc(var(--bot) + 6vh)">
+    <!-- Browser Chrome Frame -->
+    <div style="border:1px solid #ccc;border-radius:8px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08);height:100%;display:flex;flex-direction:column">
+      <div style="background:#f0f0f0;padding:.3vw .5vw;display:flex;align-items:center;gap:.4vw;border-bottom:1px solid #ddd;flex-shrink:0">
+        <div style="display:flex;gap:.2vw">
+          <div style="width:.45vw;height:.45vw;border-radius:50%;background:#ff5f57"></div>
+          <div style="width:.45vw;height:.45vw;border-radius:50%;background:#febc2e"></div>
+          <div style="width:.45vw;height:.45vw;border-radius:50%;background:#28c840"></div>
+        </div>
+        <div style="flex:1;background:#fff;border-radius:4px;padding:.15vw .5vw;font:.45vw/1 var(--m);color:#999;border:1px solid #e0e0e0">app.ainary.com/glashuette</div>
+      </div>
+      <iframe src="https://florianziesche.github.io/ainary-demo-v7/index.html" style="flex:1;border:none;width:100%;background:#fff" loading="lazy"></iframe>
+    </div>
+  </div>
+  <!-- KPI row bottom -->
+  <div style="position:absolute;bottom:var(--bot);left:var(--mx);right:var(--mx);display:flex;gap:1.2vw">
+    <div class="kpi" style="flex:1;padding:.5vw">
+      <div class="kpi-val" style="color:var(--text);font-size:1.4vw">12</div>
+      <div class="kpi-label">Meldungen analysiert</div>
+    </div>
+    <div class="kpi" style="flex:1;padding:.5vw">
+      <div class="kpi-val" style="color:var(--text);font-size:1.4vw">79</div>
+      <div class="kpi-label">Quellen durchsucht</div>
+    </div>
+    <div class="kpi" style="flex:1;padding:.5vw">
+      <div class="kpi-val" style="color:var(--text);font-size:1.4vw">5</div>
+      <div class="kpi-label">Analysen geschrieben</div>
+    </div>
+    <div class="kpi" style="flex:1;padding:.5vw">
+      <div class="kpi-val" style="color:var(--text);font-size:1.4vw">~93 Std.</div>
+      <div class="kpi-label">Aufwand ohne Ainary</div>
+    </div>
+  </div>
+</section>
+
+<!-- PROOF — Before/After volle Breite + mehr Aufgaben -->
+<section class="slide" data-section="Beweis">
+  <div class="head" style="top:2vh">
+    <h2 class="title" style="font-size:2.4vw">Gleiche Mitarbeiter. Ein Zehntel der Zeit.</h2>
+    <div class="rule"></div>
+  </div>
+  <div class="vis" style="top:14vh;left:var(--mx);right:var(--mx)">
+    <div class="cmp-item">
+      <div class="cmp-top"><span class="cmp-name" style="font-size:.85vw;font-weight:500">Förderantrag vorbereiten</span></div>
+      <div style="display:flex;align-items:center;gap:.6vw;margin-bottom:.3vh">
+        <span style="width:3vw;font:.55vw/1 var(--m);color:var(--muted);text-align:right">Heute</span>
+        <div class="cmp-bar" style="flex:1"><div class="cmp-fill" style="width:90%;background:var(--border)"></div></div>
+        <span style="width:5vw;font:.65vw/1 var(--m);color:var(--muted)">2 Wochen</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:.6vw">
+        <span style="width:3vw;font:.55vw/1 var(--m);color:var(--accent);text-align:right;font-weight:500">Ainary</span>
+        <div class="cmp-bar" style="flex:1"><div class="cmp-fill" style="width:14%;background:var(--accent)"></div></div>
+        <span style="width:5vw;font:.65vw/1 var(--m);color:var(--text);font-weight:600">2 Tage</span>
+      </div>
+    </div>
+    <div class="cmp-item">
+      <div class="cmp-top"><span class="cmp-name" style="font-size:.85vw;font-weight:500">Beschlussvorlage schreiben</span></div>
+      <div style="display:flex;align-items:center;gap:.6vw;margin-bottom:.3vh">
+        <span style="width:3vw;font:.55vw/1 var(--m);color:var(--muted);text-align:right">Heute</span>
+        <div class="cmp-bar" style="flex:1"><div class="cmp-fill" style="width:50%;background:var(--border)"></div></div>
+        <span style="width:5vw;font:.65vw/1 var(--m);color:var(--muted)">4 Stunden</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:.6vw">
+        <span style="width:3vw;font:.55vw/1 var(--m);color:var(--accent);text-align:right;font-weight:500">Ainary</span>
+        <div class="cmp-bar" style="flex:1"><div class="cmp-fill" style="width:6%;background:var(--accent)"></div></div>
+        <span style="width:5vw;font:.65vw/1 var(--m);color:var(--text);font-weight:600">30 Min</span>
+      </div>
+    </div>
+    <div class="cmp-item">
+      <div class="cmp-top"><span class="cmp-name" style="font-size:.85vw;font-weight:500">Fördermittel-Check</span></div>
+      <div style="display:flex;align-items:center;gap:.6vw;margin-bottom:.3vh">
+        <span style="width:3vw;font:.55vw/1 var(--m);color:var(--muted);text-align:right">Heute</span>
+        <div class="cmp-bar" style="flex:1"><div class="cmp-fill" style="width:65%;background:var(--border)"></div></div>
+        <span style="width:5vw;font:.65vw/1 var(--m);color:var(--muted)">3 Tage</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:.6vw">
+        <span style="width:3vw;font:.55vw/1 var(--m);color:var(--accent);text-align:right;font-weight:500">Ainary</span>
+        <div class="cmp-bar" style="flex:1"><div class="cmp-fill" style="width:3%;background:var(--accent)"></div></div>
+        <span style="width:5vw;font:.65vw/1 var(--m);color:var(--text);font-weight:600">10 Min</span>
+      </div>
+    </div>
+    <div class="cmp-item">
+      <div class="cmp-top"><span class="cmp-name" style="font-size:.85vw;font-weight:500">Bürgerfragen beantworten (FAQ)</span></div>
+      <div style="display:flex;align-items:center;gap:.6vw;margin-bottom:.3vh">
+        <span style="width:3vw;font:.55vw/1 var(--m);color:var(--muted);text-align:right">Heute</span>
+        <div class="cmp-bar" style="flex:1"><div class="cmp-fill" style="width:55%;background:var(--border)"></div></div>
+        <span style="width:5vw;font:.65vw/1 var(--m);color:var(--muted)">5-10 Std./Wo</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:.6vw">
+        <span style="width:3vw;font:.55vw/1 var(--m);color:var(--accent);text-align:right;font-weight:500">Ainary</span>
+        <div class="cmp-bar" style="flex:1"><div class="cmp-fill" style="width:8%;background:var(--accent)"></div></div>
+        <span style="width:5vw;font:.65vw/1 var(--m);color:var(--text);font-weight:600">1 Std./Wo</span>
+      </div>
+    </div>
+    <div class="cmp-item">
+      <div class="cmp-top"><span class="cmp-name" style="font-size:.85vw;font-weight:500">Stimmungsanalyse (Presse, Social Media)</span></div>
+      <div style="display:flex;align-items:center;gap:.6vw;margin-bottom:.3vh">
+        <span style="width:3vw;font:.55vw/1 var(--m);color:var(--muted);text-align:right">Heute</span>
+        <div class="cmp-bar" style="flex:1"><div class="cmp-fill" style="width:45%;background:var(--border)"></div></div>
+        <span style="width:5vw;font:.65vw/1 var(--m);color:var(--muted)">wird nicht gemacht</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:.6vw">
+        <span style="width:3vw;font:.55vw/1 var(--m);color:var(--accent);text-align:right;font-weight:500">Ainary</span>
+        <div class="cmp-bar" style="flex:1"><div class="cmp-fill" style="width:2%;background:var(--accent)"></div></div>
+        <span style="width:5vw;font:.65vw/1 var(--m);color:var(--text);font-weight:600">automatisch</span>
+      </div>
+    </div>
+    <div class="cmp-item" style="margin-bottom:0">
+      <div class="cmp-top"><span class="cmp-name" style="font-size:.85vw;font-weight:500">Daily Briefing (12 Quellen)</span></div>
+      <div style="display:flex;align-items:center;gap:.6vw;margin-bottom:.3vh">
+        <span style="width:3vw;font:.55vw/1 var(--m);color:var(--muted);text-align:right">Heute</span>
+        <div class="cmp-bar" style="flex:1"><div class="cmp-fill" style="width:40%;background:var(--border)"></div></div>
+        <span style="width:5vw;font:.65vw/1 var(--m);color:var(--muted)">wird nicht gemacht</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:.6vw">
+        <span style="width:3vw;font:.55vw/1 var(--m);color:var(--accent);text-align:right;font-weight:500">Ainary</span>
+        <div class="cmp-bar" style="flex:1"><div class="cmp-fill" style="width:1%;background:var(--accent)"></div></div>
+        <span style="width:5vw;font:.65vw/1 var(--m);color:var(--text);font-weight:600">jeden Morgen</span>
+      </div>
+    </div>
+  </div>
+  <!-- KPI bottom, volle Breite, schwarz -->
+  <div style="position:absolute;bottom:var(--bot);left:var(--mx);right:var(--mx);display:flex;gap:1.2vw">
+    <div class="kpi" style="flex:1;padding:.5vw"><div class="kpi-val" style="color:var(--text);font-size:1.4vw">~93 Std.</div><div class="kpi-label">Ersparnis pro Monat</div></div>
+    <div class="kpi" style="flex:1;padding:.5vw"><div class="kpi-val" style="color:var(--text);font-size:1.4vw">€5.100</div><div class="kpi-label">Einsparpotenzial</div><div class="kpi-sub">Basis: €55/Std. TVöD E11</div></div>
+    <div class="kpi" style="flex:1;padding:.5vw"><div class="kpi-val" style="color:var(--text);font-size:1.4vw">20%</div><div class="kpi-label">Ihr Anteil</div><div class="kpi-sub">Prüfen, entscheiden, handeln</div></div>
+  </div>
+</section>
+
+<!-- 8: CLOSE — Bookend -->
+<section class="slide" data-section="">
+  <div class="head" style="top:8vh">
+    <h2 class="title" style="font-size:3.2vw;max-width:60vw">Was wäre, wenn Ihre Verwaltung so präzise arbeitet wie Ihre Uhren?</h2>
+    <div class="rule"></div>
+    <div style="margin-top:3vh">
+      <div class="card" style="display:inline-block;padding:1.6vw 2.2vw">
+        <div style="font-size:1.3vw;font-weight:500;color:var(--text)">Wollen wir es ausprobieren?</div>
+        <div style="font-size:.9vw;color:var(--text2);margin-top:.5vh">30 Minuten mit einer echten Aufgabe aus Ihrer Verwaltung. Kostenlos.</div>
+      </div>
+    </div>
+  </div>
+  <div style="position:absolute;bottom:calc(var(--bot) + 4vh);left:var(--mx);display:flex;gap:3vw;font-size:.8vw;color:var(--muted)">
+    <span>florian@ainaryventures.com</span>
+    <span>ainaryventures.com</span>
+  </div>
+  <div style="position:absolute;bottom:var(--bot);left:var(--mx);right:var(--mx);border-top:1px solid var(--border);padding-top:1vh;display:flex;justify-content:center;gap:.5vw;font:.5vw/1 var(--m);color:var(--light)">
+    <span>© 2026 Ainary</span><span>·</span>
+    <span>AI Strategy · System Design · Execution · Consultancy · Research</span>
+  </div>
+</section>
+
+</div>
+
+<script>
+(function(){
+  var slides=document.querySelectorAll('.slide');
+  var cur=0,total=slides.length;
+  function go(n){
+    if(n<0||n>=total)return;
+    slides[cur].classList.remove('active');cur=n;slides[cur].classList.add('active');
+    document.getElementById('progress').style.width=(cur/(total-1)*100)+'%';
+    document.getElementById('cnt').textContent=(cur+1)+' / '+total;
+    var s=slides[cur].getAttribute('data-section')||'';
+    var el=document.getElementById('sec');el.textContent=s;el.style.opacity=s?'1':'0';
+    if(cur===5)setTimeout(runTypewriter,400);
+  }
+  // Typewriter effect for SZ article
+  var twEl=document.getElementById('typewriter');
+  var twBody=document.getElementById('typewriter-body');
+  var twText=twEl?twEl.textContent:'';
+  var twBodyText=twBody?twBody.textContent:'';
+  var twRunning=false;
+  function runTypewriter(){
+    if(twRunning||!twEl)return;twRunning=true;
+    twEl.textContent='';if(twBody)twBody.textContent='';
+    twEl.style.borderRight='2px solid var(--accent)';
+    var i=0;var iv=setInterval(function(){
+      if(i<twText.length){twEl.textContent+=twText[i];i++}
+      else{
+        clearInterval(iv);twEl.style.borderRight='none';
+        // Start body text after headline
+        if(twBody){
+          twBody.style.opacity='1';
+          var j=0;var iv2=setInterval(function(){
+            if(j<twBodyText.length){twBody.textContent+=twBodyText[j];j++}
+            else{clearInterval(iv2);twRunning=false}
+          },18);
+        } else {twRunning=false}
+      }
+    },30);
+  }
+
+  go(0);
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key===' ')go(cur+1);
+    else if(e.key==='ArrowLeft')go(cur-1);
+    else if(e.key==='Escape')go(0);
+  });
+  document.addEventListener('click',function(e){
+    var x=e.clientX/window.innerWidth;
+    if(x<.33)go(cur-1);else go(cur+1);
+  });
+  var tx=0;
+  document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX});
+  document.addEventListener('touchend',function(e){var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50){if(d<0)go(cur+1);else go(cur-1)}});
+})();
+</script>
+</body>
+</html>

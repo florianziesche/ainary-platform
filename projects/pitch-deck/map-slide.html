@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Florian Ziesche — Werdegang</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#faf9f6;--text:#1a1a1a;--text2:#444;--muted:#777;--light:#bbb;
+  --border2:#e8e8e8;--accent:#9d7f3b;--green:#2d8a4e;--red:#c0392b;
+  --f:'Inter',-apple-system,sans-serif;--m:'JetBrains Mono',monospace;
+}
+body{font-family:var(--f);background:var(--bg);color:var(--text);overflow:hidden;width:100vw;height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+
+/* Nav */
+.nav{padding:1.2vw 4.5vw;display:flex;align-items:center;gap:.4vw;font:600 1vw/1 var(--f)}
+.nav .dot{width:.4vw;height:.4vw;border-radius:50%;background:var(--accent)}
+
+/* Map container */
+.map-wrap{flex:1;position:relative;padding:0 4.5vw 2vh}
+
+/* SVG map styling */
+.land{fill:#e8e5de;stroke:#d0cdc6;stroke-width:.3}
+.water{fill:none}
+
+/* Pin markers */
+.pin{cursor:default}
+.pin circle.outer{fill:var(--accent);opacity:.15}
+.pin circle.inner{fill:var(--accent)}
+.pin circle.pulse{fill:var(--accent);opacity:0;animation:pulse 2s infinite}
+.pin.active circle.pulse{opacity:.3}
+.pin.current circle.inner{fill:var(--green)}
+.pin.current circle.outer{fill:var(--green);opacity:.2}
+
+/* Labels */
+.pin-label{font-family:var(--f);font-size:.7vw;fill:var(--text);font-weight:500}
+.pin-year{font-family:var(--m);font-size:.5vw;fill:var(--accent);font-weight:500}
+.pin-desc{font-family:var(--f);font-size:.5vw;fill:var(--text2)}
+.pin-label.current{fill:var(--green)}
+
+/* Route line */
+.route{fill:none;stroke:var(--accent);stroke-width:.5;stroke-dasharray:3 2;opacity:.3}
+
+/* Legend */
+.legend{position:absolute;bottom:3vh;right:4.5vw;display:flex;gap:1.5vw;font:.55vw/1 var(--m);color:var(--muted)}
+.legend-item{display:flex;align-items:center;gap:.3vw}
+.legend-dot{width:.4vw;height:.4vw;border-radius:50%}
+
+/* Footer */
+.ftr{padding:.5vh 4.5vw 1.5vh;display:flex;justify-content:space-between;font:.5vw/1 var(--m);color:var(--light)}
+
+@keyframes pulse{0%{r:6;opacity:.3}100%{r:14;opacity:0}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+.pin{animation:fadeIn .5s ease both}
+.pin:nth-child(2){animation-delay:.1s}
+.pin:nth-child(3){animation-delay:.2s}
+.pin:nth-child(4){animation-delay:.3s}
+.pin:nth-child(5){animation-delay:.4s}
+.pin:nth-child(6){animation-delay:.5s}
+.pin:nth-child(7){animation-delay:.6s}
+</style>
+</head>
+<body>
+
+<div class="nav"><span class="dot"></span> Ainary</div>
+
+<div class="map-wrap">
+<svg viewBox="0 0 900 500" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+
+  <!-- Simplified map paths — Europe + Atlantic + East NA -->
+  <!-- Water background -->
+  <rect class="water" x="0" y="0" width="900" height="500" fill="none"/>
+
+  <!-- Europe simplified -->
+  <path class="land" d="M450,80 L480,75 510,85 540,80 570,90 590,85 610,95 620,110 630,120 640,115 650,125 660,130 650,140 640,135 630,145 625,155 630,165 620,175 615,185 620,195 615,205 620,215 610,225 600,220 590,230 580,225 570,235 565,245 555,240 545,250 540,260 535,255 525,265 515,260 510,270 500,265 495,275 490,270 480,275 470,268 465,258 470,248 460,240 455,230 450,225 440,230 430,225 425,215 430,205 425,195 430,185 425,178 435,170 440,160 435,150 440,140 435,130 440,120 450,115 455,105 450,95 445,90Z"/>
+
+  <!-- Scandinavia -->
+  <path class="land" d="M500,30 L510,25 530,30 540,40 535,50 545,55 550,65 545,75 535,70 525,75 515,70 510,60 500,55 495,45 500,35Z"/>
+
+  <!-- UK/Ireland -->
+  <path class="land" d="M390,100 L400,95 410,100 415,110 410,120 405,130 395,135 385,130 380,120 385,110Z"/>
+  <path class="land" d="M375,115 L380,110 385,115 383,125 375,120Z"/>
+
+  <!-- Iberian Peninsula -->
+  <path class="land" d="M390,230 L410,225 430,230 440,235 445,245 440,260 430,270 415,275 400,270 388,260 385,250 388,240Z"/>
+
+  <!-- Italy -->
+  <path class="land" d="M510,200 L520,195 525,205 530,215 535,225 530,235 525,245 520,255 515,260 510,255 515,245 510,235 505,225 510,215Z"/>
+
+  <!-- North America East Coast (simplified) -->
+  <path class="land" d="M50,80 L80,75 110,80 140,90 160,100 170,120 175,140 180,160 185,180 190,200 195,220 200,240 205,260 210,280 220,300 230,310 240,305 245,295 240,285 235,275 230,260 225,245 220,230 215,210 210,195 200,180 190,165 180,150 170,135 160,120 145,105 130,95 110,85 85,78 60,80Z"/>
+
+  <!-- Greenland hint -->
+  <path class="land" d="M200,20 L230,15 260,20 280,30 285,45 280,55 265,60 245,55 225,50 210,40 205,30Z"/>
+
+  <!-- Route line connecting all locations -->
+  <polyline class="route" points="
+    640,195
+    215,195
+    610,230
+    80,255
+    235,260
+    610,230
+    645,205
+  "/>
+
+  <!-- === PINS === -->
+
+  <!-- 1: Schlottwitz / Dippoldiswalde (born + school + Ausbildung) -->
+  <g class="pin" transform="translate(640,195)">
+    <circle class="outer" r="8"/>
+    <circle class="inner" r="2.5"/>
+    <text class="pin-year" x="14" y="-8">1990 - 2011</text>
+    <text class="pin-label" x="14" y="-1">Schlottwitz</text>
+    <text class="pin-desc" x="14" y="7">Geboren · Schule · Ausbildung Maschinenbau</text>
+  </g>
+
+  <!-- 2: Toronto (BMW Canada) -->
+  <g class="pin" transform="translate(215,195)">
+    <circle class="outer" r="8"/>
+    <circle class="inner" r="3"/>
+    <text class="pin-year" x="14" y="-8">2011-2012</text>
+    <text class="pin-label" x="14" y="-1">Toronto</text>
+    <text class="pin-desc" x="14" y="7">BMW Canada</text>
+  </g>
+
+  <!-- 3: München (TUM + 36ZERO) — largest pin, longest stay -->
+  <g class="pin" transform="translate(610,230)">
+    <circle class="outer" r="12"/>
+    <circle class="inner" r="4"/>
+    <text class="pin-year" x="-120" y="-14">2012 - 2023</text>
+    <text class="pin-label" x="-120" y="-4" style="font-weight:600;font-size:.8vw">München</text>
+    <text class="pin-desc" x="-120" y="5">TU München · 36ZERO Vision · €5M Funding</text>
+    <text class="pin-desc" x="-120" y="14">BMW · Siemens · Bosch · 80+ Projekte</text>
+  </g>
+
+  <!-- 4: San Francisco -->
+  <g class="pin" transform="translate(80,255)">
+    <circle class="outer" r="7"/>
+    <circle class="inner" r="2.5"/>
+    <text class="pin-year" x="12" y="-6">2024</text>
+    <text class="pin-label" x="12" y="2">San Francisco</text>
+    <text class="pin-desc" x="12" y="10">Start-Up Mentor</text>
+  </g>
+
+  <!-- 5: New York City -->
+  <g class="pin" transform="translate(235,260)">
+    <circle class="outer" r="8"/>
+    <circle class="inner" r="3"/>
+    <text class="pin-year" x="14" y="-8">2024-2025</text>
+    <text class="pin-label" x="14" y="-1">New York City</text>
+    <text class="pin-desc" x="14" y="7">KI-Unternehmensberater</text>
+  </g>
+
+  <!-- 6: Glashütte (CURRENT — green, pulsing) -->
+  <g class="pin current" transform="translate(645,205)">
+    <circle class="pulse" r="6"/>
+    <circle class="outer" r="14"/>
+    <circle class="inner" r="5"/>
+    <text class="pin-year" x="18" y="-12" style="fill:var(--green)">2025 - heute</text>
+    <text class="pin-label current" x="18" y="-2" style="font-weight:700;font-size:.9vw">Glashütte</text>
+    <text class="pin-desc" x="18" y="8" style="fill:var(--green)">KI-Beratung &amp; Umsetzung</text>
+    <text class="pin-desc" x="18" y="17">Meine Familie lebt hier.</text>
+  </g>
+
+  <!-- Headline -->
+  <text x="30" y="40" style="font-family:var(--f);font-size:20px;font-weight:700;fill:var(--text);letter-spacing:-0.5px">Vorstellung Florian Ziesche</text>
+  <line x1="30" y1="48" x2="78" y2="48" stroke="var(--accent)" stroke-width="2" opacity=".5"/>
+  <text x="30" y="62" style="font-family:var(--f);font-size:9px;fill:var(--text2)">6 Städte · 3 Länder · 12 Jahre KI</text>
+
+  <!-- KPI row bottom -->
+  <g transform="translate(30,460)">
+    <text style="font-family:var(--m);font-size:12px;font-weight:700;fill:var(--text)">12+</text>
+    <text x="0" y="12" style="font-family:var(--f);font-size:6px;fill:var(--muted)">Jahre KI</text>
+    <text x="70" style="font-family:var(--m);font-size:12px;font-weight:700;fill:var(--text)">€5M</text>
+    <text x="70" y="12" style="font-family:var(--f);font-size:6px;fill:var(--muted)">Funding</text>
+    <text x="130" style="font-family:var(--m);font-size:12px;font-weight:700;fill:var(--text)">80+</text>
+    <text x="130" y="12" style="font-family:var(--f);font-size:6px;fill:var(--muted)">Projekte</text>
+    <text x="200" style="font-family:var(--m);font-size:12px;font-weight:700;fill:var(--text)">3</text>
+    <text x="200" y="12" style="font-family:var(--f);font-size:6px;fill:var(--muted)">DAX-Kunden</text>
+  </g>
+
+</svg>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div> Station</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> Heute</div>
+</div>
+</div>
+
+<div class="ftr">
+  <span>florian@ainaryventures.com</span>
+  <span>ainaryventures.com</span>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bürgermeister-KI — Ainary</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --black: #0a0a0a; --card: #111111; --elevated: #1a1a1a;
+  --white: #ffffff; --text: #999999; --muted: #55555e;
+  --gold: #c8aa50; --gold-dark: #a38a3a;
+  --dim: #222; --red: #e05555; --green: #50c878; --blue: #5088c8;
+}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', system-ui, sans-serif; background: var(--black); color: var(--white); line-height: 1.6; overflow-x: hidden; }
+
+section { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 5rem 2rem; position: relative; z-index: 1; }
+h1 { font-size: clamp(2rem, 5vw, 4rem); font-weight: 600; letter-spacing: -0.03em; }
+h2 { font-size: clamp(1.4rem, 3.5vw, 2.6rem); font-weight: 600; letter-spacing: -0.02em; margin-bottom: 1.5rem; }
+h3 { font-size: clamp(1rem, 2vw, 1.4rem); font-weight: 500; }
+p, li { font-size: clamp(0.95rem, 1.4vw, 1.15rem); color: var(--text); line-height: 1.7; }
+.gold { color: var(--gold); }
+.container { max-width: 960px; width: 100%; text-align: center; }
+.big-number { font-size: clamp(4rem, 14vw, 11rem); font-weight: 600; line-height: 1; color: var(--gold); }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem; max-width: 960px; width: 100%; margin-top: 2.5rem; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 3rem; max-width: 800px; width: 100%; margin-top: 2.5rem; }
+@media (max-width: 768px) { .grid-3, .grid-2 { grid-template-columns: 1fr; } }
+.card { padding: 0; text-align: left; }
+.card h3 { margin-bottom: 0.5rem; color: var(--white); }
+.card p { color: var(--text); font-size: 0.95rem; }
+.card .tag { color: var(--gold); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem; }
+.card .number { font-size: 3rem; font-weight: 600; color: var(--gold); margin-bottom: 0.25rem; line-height: 1; }
+.card .gold-line { width: 40px; height: 2px; background: var(--gold); margin-bottom: 1.25rem; }
+
+.cta-button { display: inline-block; background: var(--gold); color: var(--black); padding: 16px 40px; border-radius: 6px; font-weight: 600; font-size: 1rem; text-decoration: none; transition: all 0.3s; margin-top: 2.5rem; letter-spacing: 0.02em; cursor: pointer; border: none; }
+.cta-button:hover { background: var(--gold-dark); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(200, 170, 80, 0.2); }
+
+.quote { font-size: clamp(1.1rem, 2.2vw, 1.6rem); font-weight: 300; color: var(--text); max-width: 700px; line-height: 1.7; }
+.quote-mark { font-size: 5rem; line-height: 0.5; color: var(--gold); opacity: 0.3; display: block; margin-bottom: 1rem; }
+
+.compare-table { width: 100%; max-width: 800px; border-collapse: collapse; margin-top: 2rem; }
+.compare-table th { text-align: left; padding: 12px 16px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); border-bottom: 1px solid var(--dim); }
+.compare-table th:nth-child(3) { color: var(--gold); }
+.compare-table td { padding: 14px 16px; font-size: 0.9rem; border-bottom: 1px solid rgba(34,34,34,0.8); color: var(--text); }
+.compare-table td:first-child { color: var(--white); font-weight: 500; }
+
+.step { display: flex; align-items: flex-start; gap: 2rem; margin-bottom: 2.5rem; text-align: left; max-width: 700px; }
+.step-number { font-size: 3rem; font-weight: 300; color: var(--gold); min-width: 60px; line-height: 1; opacity: 0.6; }
+.step-content h3 { margin-bottom: 0.25rem; }
+.step-content p { font-size: 0.95rem; }
+
+.price-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; max-width: 900px; width: 100%; margin-top: 2.5rem; }
+@media (max-width: 768px) { .price-grid { grid-template-columns: 1fr; } }
+.price-card { padding: 2rem; border-top: 1px solid var(--dim); text-align: left; }
+.price-card.featured { border-top: 2px solid var(--gold); }
+.price-card .label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gold); }
+.price-card .price { font-size: 2.5rem; font-weight: 600; color: var(--white); margin: 0.75rem 0 0.25rem; }
+.price-card .unit { font-size: 0.85rem; color: var(--muted); }
+.price-card ul { list-style: none; margin-top: 1rem; }
+.price-card li { padding: 0.3rem 0; font-size: 0.85rem; color: var(--text); }
+.price-card li::before { content: "— "; color: var(--muted); }
+
+/* Agent Demo */
+.agent-demo { max-width: 600px; width: 100%; margin-top: 2rem; background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid var(--dim); }
+.agent-header { padding: 12px 16px; border-bottom: 1px solid var(--dim); display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--muted); }
+.agent-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+.agent-messages { padding: 16px; min-height: 200px; }
+.agent-msg { margin-bottom: 12px; font-size: 0.9rem; line-height: 1.5; }
+.agent-msg.citizen { color: var(--white); }
+.agent-msg.agent { color: var(--text); }
+.agent-msg .who { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
+.agent-msg .who.c { color: var(--blue); }
+.agent-msg .who.a { color: var(--gold); }
+.typing-cursor { display: inline-block; width: 2px; height: 14px; background: var(--gold); animation: blink 0.8s infinite; vertical-align: middle; margin-left: 2px; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+/* Slide nav */
+.slide-counter { position: fixed; bottom: 24px; right: 24px; font-size: 0.75rem; color: var(--muted); z-index: 100; font-variant-numeric: tabular-nums; }
+.keyboard-hint { position: fixed; bottom: 24px; left: 24px; font-size: 0.7rem; color: var(--muted); z-index: 100; }
+
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-d1 { transition-delay: 0.1s; }
+.reveal-d2 { transition-delay: 0.2s; }
+.reveal-d3 { transition-delay: 0.3s; }
+
+/* Radar bars */
+.radar-bar { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; text-align: left; }
+.radar-bar .label { min-width: 200px; font-size: 0.9rem; color: var(--white); }
+.radar-bar .bar { height: 24px; background: linear-gradient(90deg, var(--gold) 0%, var(--gold-dark) 100%); border-radius: 4px; transition: width 1.5s ease; }
+.radar-bar .count { font-size: 0.8rem; color: var(--muted); min-width: 40px; }
+.radar-bar.negative .bar { background: linear-gradient(90deg, var(--red) 0%, #a03333 100%); }
+.radar-bar.positive .bar { background: linear-gradient(90deg, var(--green) 0%, #338833 100%); }
+
+/* Personalization */
+.gemeinde-name { color: var(--gold); }
+</style>
+</head>
+<body>
+
+<!-- ==================== SLIDE 1: HOOK ==================== -->
+<section>
+<div class="container">
+<p class="reveal" style="color: var(--muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 2rem;">Für Bürgermeister & Kandidaten</p>
+<h1 class="reveal reveal-d1">Wissen, was Ihre<br><span class="gold">Bürger bewegt.</span></h1>
+<p class="reveal reveal-d2" style="max-width: 600px; margin: 1.5rem auto 0;">Bevor sie anrufen. Bevor sie sich beschweren.<br>Bevor es in der Zeitung steht.</p>
+</div>
+</section>
+
+<!-- ==================== SLIDE 2: DAS PROBLEM ==================== -->
+<section>
+<div class="container">
+<h2 class="reveal">Die Realität in deutschen Rathäusern</h2>
+<div class="grid-3 reveal reveal-d1">
+<div class="card">
+<div class="tag">Tagesschau 2025</div>
+<div class="gold-line"></div>
+<h3>„Wenig Geld, viel Bürokratie"</h3>
+<p>Der Frust bei ehrenamtlichen Bürgermeistern ist so groß, dass immer weniger kandidieren.</p>
+</div>
+<div class="card">
+<div class="tag">Körber-Stiftung</div>
+<div class="number" data-count="86">0</div>
+<div class="gold-line"></div>
+<h3>Prozent sehen fehlende Haushaltsmittel als größte Herausforderung</h3>
+</div>
+<div class="card">
+<div class="tag">OZG-Bilanz</div>
+<div class="number" data-count="9">0</div>
+<div class="gold-line"></div>
+<h3>neue Online-Dienste in einem Jahr. Von 575 benötigten.</h3>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ==================== SLIDE 3: BÜRGER-RADAR DEMO ==================== -->
+<section>
+<div class="container">
+<h2 class="reveal">Bürger-Radar<br><span class="gold gemeinde-name">Glashütte</span></h2>
+<p class="reveal reveal-d1" style="color: var(--muted); margin-bottom: 2rem;">Live — Was Ihre Bürger diese Woche bewegt</p>
+
+<div class="reveal reveal-d2" style="max-width: 700px; width: 100%; margin: 0 auto;">
+<div class="radar-bar negative">
+<span class="label">🔴 Umspannwerk Reinhardtsgrimma</span>
+<div class="bar" style="width: 85%;"></div>
+<span class="count">400</span>
+</div>
+<div class="radar-bar">
+<span class="label">🚧 Ortsdurchfahrt Baustelle</span>
+<div class="bar" style="width: 40%;"></div>
+<span class="count">35</span>
+</div>
+<div class="radar-bar">
+<span class="label">🚂 Müglitztalbahn Reparatur</span>
+<div class="bar" style="width: 32%;"></div>
+<span class="count">28</span>
+</div>
+<div class="radar-bar">
+<span class="label">🏫 BSZ Kläranlage</span>
+<div class="bar" style="width: 15%;"></div>
+<span class="count">12</span>
+</div>
+<div class="radar-bar positive">
+<span class="label">✅ Elektronische Wohnsitzanmeldung</span>
+<div class="bar" style="width: 10%;"></div>
+<span class="count">+</span>
+</div>
+</div>
+<p class="reveal reveal-d3" style="margin-top: 2rem; font-size: 0.85rem; color: var(--muted);">Quellen: Sächsische Zeitung, Facebook „Stadt Glashütte" (1.152 Follower), Ratsinformationssystem, Beteiligungsportal Sachsen</p>
+</div>
+</section>
+
+<!-- ==================== SLIDE 4: BÜRGER-AGENT DEMO ==================== -->
+<section>
+<div class="container">
+<h2 class="reveal">Ihr Bürgerservice-Agent</h2>
+<p class="reveal reveal-d1" style="color: var(--text); margin-bottom: 1rem;">Beantwortet 71% aller Anfragen. Automatisch. 24/7.</p>
+
+<div class="agent-demo reveal reveal-d2">
+<div class="agent-header">
+<div class="agent-dot"></div>
+Bürgerservice <span class="gemeinde-name">Glashütte</span> — Online
+</div>
+<div class="agent-messages" id="agentMessages">
+</div>
+</div>
+</div>
+</section>
+
+<!-- ==================== SLIDE 5: ANFRAGE-VERTEILUNG ==================== -->
+<section>
+<div class="container">
+<h2 class="reveal">Was Bürger fragen</h2>
+<p class="reveal reveal-d1" style="color: var(--text); margin-bottom: 2rem;">Und wie viel davon ein Agent sofort beantworten kann.</p>
+<div class="reveal reveal-d2" style="max-width: 600px; width: 100%; margin: 0 auto;">
+<div class="radar-bar positive"><span class="label">Öffnungszeiten / Kontakt</span><div class="bar" style="width: 34%;"></div><span class="count">34%</span></div>
+<div class="radar-bar positive"><span class="label">Meldebescheinigung / Ausweis</span><div class="bar" style="width: 22%;"></div><span class="count">22%</span></div>
+<div class="radar-bar positive"><span class="label">Abfall / Sperrmüll / Entsorgung</span><div class="bar" style="width: 15%;"></div><span class="count">15%</span></div>
+<div class="radar-bar"><span class="label">Bauanträge / Status</span><div class="bar" style="width: 12%;"></div><span class="count">12%</span></div>
+<div class="radar-bar positive"><span class="label">Kindergarten / Schule</span><div class="bar" style="width: 9%;"></div><span class="count">9%</span></div>
+<div class="radar-bar"><span class="label">Sonstige</span><div class="bar" style="width: 8%;"></div><span class="count">8%</span></div>
+</div>
+<p class="reveal reveal-d3" style="margin-top: 2rem;"><span class="gold" style="font-size: 2rem; font-weight: 600;">71%</span><br>sofort beantwortbar — ohne dass ein Mensch rangeht.</p>
+</div>
+</section>
+
+<!-- ==================== SLIDE 6: VORHER / NACHHER ==================== -->
+<section>
+<div class="container">
+<h2 class="reveal">Vorher → Nachher</h2>
+<table class="compare-table reveal reveal-d1">
+<tr><th>Thema</th><th>Heute</th><th>Mit Bürger-KI</th></tr>
+<tr><td>Bürgeranfragen</td><td>Telefon, Mo-Fr 9-12</td><td style="color: var(--gold);">Agent antwortet 24/7</td></tr>
+<tr><td>Bürgerstimmung</td><td>Aus der Zeitung erfahren</td><td style="color: var(--gold);">Bürger-Radar live</td></tr>
+<tr><td>Online-Dienste</td><td>1 (Meldebescheinigung)</td><td style="color: var(--gold);">Agent erklärt alle Dienste</td></tr>
+<tr><td>Terminbuchung</td><td>Anrufen, warten</td><td style="color: var(--gold);">Online in 30 Sekunden</td></tr>
+<tr><td>Neue Satzungen erklären</td><td>PDF auf der Website</td><td style="color: var(--gold);">Agent erklärt individuell</td></tr>
+<tr><td>Petitionen erkennen</td><td>Wenn 400 unterschrieben haben</td><td style="color: var(--gold);">Bei den ersten 10</td></tr>
+</table>
+</div>
+</section>
+
+<!-- ==================== SLIDE 7: FÜR KANDIDATEN ==================== -->
+<section>
+<div class="container">
+<h2 class="reveal">Sie kandidieren?</h2>
+<p class="reveal reveal-d1 quote"><span class="quote-mark">"</span>Zeit und Geld sind begrenzt — trotzdem muss es gelingen, positiv für sich zu werben.</p>
+<p class="reveal reveal-d2" style="color: var(--muted); font-size: 0.85rem; margin-top: 1rem;">— kommunal.de, Dezember 2025</p>
+
+<div class="grid-3 reveal reveal-d3" style="margin-top: 3rem;">
+<div class="card">
+<div class="tag">Wahlkampf-Agentur</div>
+<div class="number" style="color: var(--red);">€15.000</div>
+<div class="gold-line"></div>
+<p>Website, Flyer, Plakate, Social Media. Wochen Vorlauf. Für die meisten Kandidaten unbezahlbar.</p>
+</div>
+<div class="card">
+<div class="tag">Selber machen</div>
+<div class="number" style="color: var(--muted);">€0</div>
+<div class="gold-line"></div>
+<p>Kein Budget, kein Know-how, kein Ergebnis. „Ich hab da was mit Word gemacht."</p>
+</div>
+<div class="card">
+<div class="tag">Ainary</div>
+<div class="number">€250</div>
+<div class="gold-line"></div>
+<p>Fertige Website + Bürger-Chat + Social Media Posts + Wahlkampf-Flyer. In 10 Minuten. Professionell.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ==================== SLIDE 8: WAS SIE BEKOMMEN ==================== -->
+<section>
+<div class="container">
+<h2 class="reveal">Alles aus <span class="gold">Name + Foto + 3 Themen</span></h2>
+<p class="reveal reveal-d1" style="color: var(--text); margin-bottom: 2rem;">Unser Agent generiert Ihren kompletten digitalen Wahlkampf.</p>
+<div class="grid-3 reveal reveal-d2">
+<div class="card"><h3>🌐 Website</h3><p>Responsive, professionell, sofort live. Mit Ihren Themen, Ihrer Bio, Ihrem Foto.</p></div>
+<div class="card"><h3>🤖 Bürger-Chat</h3><p>Beantwortet Fragen zu Ihrem Programm. 24/7. „Was ist Ihre Position zum Umspannwerk?"</p></div>
+<div class="card"><h3>📱 Social Media</h3><p>10 fertige Posts für Facebook, Instagram. Aus Ihren Themen + lokalen Daten.</p></div>
+<div class="card"><h3>📄 Flyer (PDF)</h3><p>A4, druckfertig. Professionelles Layout. Sofort in die Druckerei.</p></div>
+<div class="card"><h3>📊 Bürger-Radar</h3><p>Die 5 Themen die Ihre Gemeinde bewegen. Datenbasiert, nicht aus dem Bauch.</p></div>
+<div class="card"><h3>✍️ Unterschriften</h3><p>Online-Formular für Unterstützer. DSGVO-konform. Automatische Zählung.</p></div>
+</div>
+</div>
+</section>
+
+<!-- ==================== SLIDE 9: DER MARKT ==================== -->
+<section>
+<div class="container">
+<div class="big-number reveal" data-count="10775">0</div>
+<h2 class="reveal reveal-d1">Gemeinden in Deutschland</h2>
+<p class="reveal reveal-d2" style="color: var(--text); max-width: 600px; margin: 1rem auto;">Jede hat einen Bürgermeister. Jede 5-7 Jahre wird gewählt. 2026 ist Super-Wahljahr.</p>
+<div class="grid-3 reveal reveal-d3" style="margin-top: 2rem;">
+<div class="card">
+<div class="tag">8. März 2026</div>
+<div class="number" data-count="2056">0</div>
+<div class="gold-line"></div>
+<h3>Bayern — Kommunalwahl</h3>
+</div>
+<div class="card">
+<div class="tag">13. September 2026</div>
+<div class="number" data-count="940">0</div>
+<div class="gold-line"></div>
+<h3>Niedersachsen — Kommunalwahl</h3>
+</div>
+<div class="card">
+<div class="tag">Laufend</div>
+<div class="number" data-count="418">0</div>
+<div class="gold-line"></div>
+<h3>Sachsen — ~50 BM-Wahlen/Jahr</h3>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ==================== SLIDE 10: PREISE ==================== -->
+<section>
+<div class="container">
+<h2 class="reveal">Drei Pakete. Ein Ziel.</h2>
+<div class="price-grid reveal reveal-d1">
+<div class="price-card">
+<div class="label">Starter</div>
+<div class="price">€250</div>
+<div class="unit">einmalig</div>
+<ul>
+<li>Website (responsive, live)</li>
+<li>Bürger-Chat-Agent</li>
+<li>10 Social-Media-Posts</li>
+<li>Wahlkampf-Flyer (PDF)</li>
+<li>QR-Code für Plakate</li>
+<li>Email-Signatur</li>
+</ul>
+</div>
+<div class="price-card featured">
+<div class="label">Pro — Empfohlen</div>
+<div class="price">€490</div>
+<div class="unit">einmalig</div>
+<ul>
+<li>Alles aus Starter</li>
+<li>Bürger-Radar (Live-Dashboard)</li>
+<li>Content-Maschine (3 Posts/Woche)</li>
+<li>Video-Botschaft (KI-Avatar)</li>
+<li>Gegenkandidaten-Check</li>
+<li>Sentiment-Analyse</li>
+</ul>
+</div>
+<div class="price-card">
+<div class="label">Nach der Wahl</div>
+<div class="price">€290</div>
+<div class="unit">pro Monat</div>
+<ul>
+<li>Bürgerservice-Agent (24/7)</li>
+<li>Bürger-Radar dauerhaft</li>
+<li>Terminbuchung</li>
+<li>Anfragen-Statistik</li>
+<li>OZG-Kompatibel</li>
+<li>Monatlich kündbar</li>
+</ul>
+</div>
+</div>
+<p class="reveal reveal-d2" style="margin-top: 2rem; font-size: 0.85rem; color: var(--muted);">Wahlkampfkosten sind steuerlich als Werbungskosten absetzbar.</p>
+</div>
+</section>
+
+<!-- ==================== SLIDE 11: SO FUNKTIONIERT'S ==================== -->
+<section>
+<div class="container">
+<h2 class="reveal">In 3 Schritten startklar</h2>
+<div class="reveal reveal-d1" style="margin-top: 2rem;">
+<div class="step">
+<div class="step-number">01</div>
+<div class="step-content">
+<h3>Name, Foto, 3 Themen senden</h3>
+<p>Per Email oder WhatsApp. Dauert 5 Minuten.</p>
+</div>
+</div>
+<div class="step">
+<div class="step-number">02</div>
+<div class="step-content">
+<h3>Agent generiert alles</h3>
+<p>Website, Chat, Posts, Flyer, Radar — in unter 10 Minuten.</p>
+</div>
+</div>
+<div class="step">
+<div class="step-number">03</div>
+<div class="step-content">
+<h3>Live — Sie sind sichtbar</h3>
+<p>Ihre Website ist online. Ihr Agent antwortet. Ihre Posts sind fertig.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ==================== SLIDE 12: ZITAT / CLOSE ==================== -->
+<section>
+<div class="container">
+<p class="reveal quote"><span class="quote-mark">"</span>Eine Wahlkampfagentur kostet €15.000.<br>Selber machen kostet Wochen.<br><span class="gold">Oder Sie schicken mir ein Foto und 3 Stichworte.</span></p>
+<p class="reveal reveal-d1" style="margin-top: 2rem; color: var(--white);">Florian Ziesche — Ainary</p>
+<p class="reveal reveal-d2" style="color: var(--muted); font-size: 0.9rem;">Schlottwitz bei Glashütte · florian@ainary.de</p>
+<a class="cta-button reveal reveal-d3" href="mailto:florian@ainary.de?subject=Bürgermeister-KI%20anfragen">Jetzt starten — €250</a>
+</div>
+</section>
+
+<!-- ==================== SCRIPTS ==================== -->
+<script>
+// Keyboard nav
+const sections = document.querySelectorAll('section');
+let current = 0;
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); if (current < sections.length - 1) sections[++current].scrollIntoView({ behavior: 'smooth' }); }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); if (current > 0) sections[--current].scrollIntoView({ behavior: 'smooth' }); }
+});
+
+// Slide counter
+const counter = document.createElement('div');
+counter.className = 'slide-counter';
+document.body.appendChild(counter);
+const hint = document.createElement('div');
+hint.className = 'keyboard-hint';
+hint.textContent = '← → Pfeiltasten zum Navigieren';
+document.body.appendChild(hint);
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      current = [...sections].indexOf(e.target);
+      counter.textContent = `${current + 1} / ${sections.length}`;
+    }
+  });
+}, { threshold: 0.5 });
+sections.forEach(s => observer.observe(s));
+
+// Reveal on scroll
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+// Count-up
+const countObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting && !e.target.dataset.counted) {
+      e.target.dataset.counted = '1';
+      const target = parseInt(e.target.dataset.count);
+      const duration = 1500;
+      const start = performance.now();
+      const tick = now => {
+        const p = Math.min((now - start) / duration, 1);
+        const ease = 1 - Math.pow(1 - p, 3);
+        e.target.textContent = Math.round(ease * target).toLocaleString('de-DE');
+        if (p < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('[data-count]').forEach(el => countObs.observe(el));
+
+// Agent chat demo
+const messages = [
+  { who: 'citizen', text: 'Wann hat das Rathaus offen?' },
+  { who: 'agent', text: 'Die Stadtverwaltung Glashütte ist erreichbar:\n\nMo 9–12 Uhr\nDi 9–12 + 14–16 Uhr\nDo 9–12 + 14–18 Uhr\nFr 9–12 Uhr\n\nBitte vereinbaren Sie vorab einen Termin: 035053 45-0' },
+  { who: 'citizen', text: 'Wie melde ich Sperrmüll an?' },
+  { who: 'agent', text: 'Seit 01.01.2026 erfolgt die Entsorgungsanmeldung direkt beim Eigenbetrieb Abwasserentsorgung Glashütte. Für Sperrmüll wenden Sie sich an den ZAOE:\n\n📞 03501 7173-0\n🌐 zaoe.de\n\nSoll ich einen Termin für Sie vormerken?' },
+  { who: 'citizen', text: 'Was ist mit dem Umspannwerk?' },
+  { who: 'agent', text: 'Der Ortschaftsrat Reinhardtsgrimma setzt sich für einen alternativen Standort des geplanten Umspannwerks ein. Eine Petition mit rund 400 Unterschriften wurde beim zuständigen Bauamt eingereicht.\n\nBürgermeister Gleißberg nimmt am 15.03. Stellung im Stadtrat. Möchten Sie informiert werden?' },
+];
+
+const msgContainer = document.getElementById('agentMessages');
+const chatObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting && !e.target.dataset.played) {
+      e.target.dataset.played = '1';
+      let i = 0;
+      function showNext() {
+        if (i >= messages.length) return;
+        const m = messages[i];
+        const div = document.createElement('div');
+        div.className = `agent-msg ${m.who}`;
+        const whoLabel = document.createElement('div');
+        whoLabel.className = `who ${m.who === 'citizen' ? 'c' : 'a'}`;
+        whoLabel.textContent = m.who === 'citizen' ? '👤 Bürger' : '🤖 Bürgerservice-Agent';
+        div.appendChild(whoLabel);
+        const text = document.createElement('div');
+        text.style.whiteSpace = 'pre-line';
+        div.appendChild(text);
+        msgContainer.appendChild(div);
+        // Type effect
+        let ci = 0;
+        const speed = m.who === 'agent' ? 8 : 15;
+        function typeChar() {
+          if (ci < m.text.length) {
+            text.textContent = m.text.slice(0, ++ci);
+            msgContainer.scrollTop = msgContainer.scrollHeight;
+            setTimeout(typeChar, speed);
+          } else {
+            i++;
+            setTimeout(showNext, 1200);
+          }
+        }
+        setTimeout(typeChar, 400);
+      }
+      showNext();
+    }
+  });
+}, { threshold: 0.5 });
+chatObs.observe(document.querySelector('.agent-demo'));
+
+// URL params for personalization
+const params = new URLSearchParams(window.location.search);
+const gemeinde = params.get('gemeinde') || params.get('stadt');
+if (gemeinde) {
+  document.querySelectorAll('.gemeinde-name').forEach(el => el.textContent = gemeinde);
+  document.title = `Bürgermeister-KI — ${gemeinde}`;
+}
+</script>
+</body>
+</html>

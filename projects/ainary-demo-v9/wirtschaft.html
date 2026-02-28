@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wirtschaft — Ainary · Glashütte</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--text:#1a1a1a;--text2:#444;--muted:#777;--light:#bbb;--border:#d0d0d0;--border2:#e8e8e8;--surface:#fafafa;--accent:#9d7f3b;--green:#2d8a4e;--red:#c0392b;--amber:#b45309;--f:'Inter',-apple-system,sans-serif;--m:'JetBrains Mono',monospace}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--f);color:var(--text);font-size:10pt;line-height:1.65;background:#fff;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.page{max-width:1120px;margin:0 auto;padding:32px 48px 64px}
+
+.portal-hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;margin-bottom:32px;border-bottom:1px solid var(--border2);font-size:8pt}
+.portal-left{display:flex;align-items:center;gap:8px}
+.brand-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.brand-name{font-weight:500;color:var(--muted)}
+
+/* KPI */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.kpi{border:1px solid var(--border2);border-radius:8px;padding:14px 16px;text-align:center;background:var(--surface)}
+.kpi-val{font-family:var(--m);font-size:14pt;font-weight:700}
+.kpi-label{font-size:8pt;color:var(--text2);margin-top:2px}
+.kpi-sub{font-family:var(--m);font-size:6.5pt;color:var(--light);margin-top:2px}
+
+/* Table */
+.t-wrap{border:1px solid var(--border2);border-radius:8px;overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:8.5pt}
+thead{background:var(--surface)}
+th{font-family:var(--m);font-size:6.5pt;font-weight:500;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;text-align:left;padding:10px 14px;border-bottom:1px solid var(--border2)}
+td{padding:10px 14px;border-bottom:1px solid var(--border2);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:hover{background:rgba(157,127,59,.03)}
+
+.f-name{font-weight:600;font-size:9pt}
+.f-type{font-family:var(--m);font-size:6.5pt;color:var(--muted)}
+.f-mono{font-family:var(--m);font-size:8pt;font-weight:600}
+
+/* Tags */
+.tag{font-family:var(--m);font-size:5.5pt;padding:1px 4px;border-radius:2px;font-weight:600;vertical-align:super;margin-left:2px}
+.tag-e{background:rgba(45,138,78,.1);color:var(--green)}
+.tag-i{background:rgba(157,127,59,.1);color:var(--accent)}
+.tag-j{background:rgba(180,83,9,.1);color:var(--amber)}
+.tag-a{background:rgba(192,57,43,.1);color:var(--red)}
+
+/* Trend */
+.trend{font-family:var(--m);font-size:7.5pt;font-weight:600}
+.trend-up{color:var(--green)}
+.trend-stable{color:var(--muted)}
+.trend-caution{color:var(--amber)}
+.trend-down{color:var(--red)}
+
+/* Sections */
+.sec-label{font-family:var(--m);font-size:7pt;font-weight:500;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin:32px 0 4px}
+.sec-title{font-size:14pt;font-weight:700;letter-spacing:-.02em;margin-bottom:12px}
+
+/* Summary cards */
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.sum-card{border:1px solid var(--border2);border-radius:8px;padding:16px;background:var(--surface)}
+.sum-h{font-weight:600;font-size:9.5pt;margin-bottom:6px}
+.sum-p{font-size:8pt;color:var(--text2);line-height:1.6}
+
+.ftr{margin-top:48px;padding-top:16px;border-top:1px solid var(--border2);font-family:var(--m);font-size:6.5pt;color:var(--light);display:flex;gap:8px}
+.ftr a{color:var(--light)}
+
+/* Legend */
+.legend{display:flex;gap:12px;font-size:7pt;margin:12px 0 24px;flex-wrap:wrap}
+.legend span{display:flex;align-items:center;gap:3px}
+
+@media(max-width:800px){
+  .page{padding:20px 16px}
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+  .sum-grid{grid-template-columns:1fr}
+}
+.cf{font-family:var(--m);font-size:7pt;padding:6px 16px;border:1px solid var(--border2);border-radius:4px;color:var(--muted);cursor:pointer;background:none}
+.cf.active{border-color:var(--accent);color:var(--accent)}
+</style>
+<link rel="stylesheet" href="mia-chat.css"><script src="mia-chat.js" defer></script></head>
+<body>
+<div class="page">
+
+  <div class="portal-hdr">
+    <div class="portal-left"><a href="index.html" style="display:flex;align-items:center;gap:8px"><div class="brand-dot"></div><span class="brand-name">Ainary</span></a> <span style="color:var(--border2);margin:0 4px">·</span> <span style="color:var(--light)">Abmelden</span></div>
+    <div style="display:flex;align-items:center;gap:8px;font-size:8pt;color:var(--muted)">Glashütte <span>☁ 3°C</span></div>
+    <div style="display:flex;align-items:center;gap:8px;font-family:var(--m);font-size:8pt;color:var(--muted)"><span id="live-date"></span> <span id="live-time"></span></div>
+  </div>
+
+  <!-- Shared Header -->
+  <div style="font-size:22pt;font-weight:700;letter-spacing:-.02em;margin-bottom:2px"><span id="greeting">Guten Morgen</span>, Herr Gleißberg.</div>
+  <div style="font-size:10pt;color:var(--text2);margin-bottom:4px">Ihre Wochen-Übersicht für Glashütte.</div>
+  <div style="height:1px;background:var(--border2);margin-bottom:8px"></div>
+
+  <!-- Tabs -->
+  <div style="display:flex;gap:0;font-family:var(--m);font-size:7.5pt;margin-bottom:24px">
+    <a href="index.html" style="padding:6px 14px;border-bottom:2px solid transparent;color:var(--light)">Übersicht</a>
+    <a href="analyse.html" style="padding:6px 14px;border-bottom:2px solid transparent;color:var(--light)">Analyse</a>
+    <a href="projekte.html" style="padding:6px 14px;border-bottom:2px solid transparent;color:var(--light)">Projekte</a>
+    <a href="dokumente.html" style="padding:6px 14px;border-bottom:2px solid transparent;color:var(--light)">Dokumente</a>
+    <a href="wirtschaft.html" style="padding:6px 14px;border-bottom:2px solid var(--accent);color:var(--accent);font-weight:500">Wirtschaft</a>
+  </div>
+
+  <div id="mia-slot"></div>
+
+
+  <!-- Hero -->
+  <div style="font-size:20pt;font-weight:700;letter-spacing:-.02em;margin-bottom:4px">Wirtschaftsstandort Glashütte</div>
+  <div style="font-size:10pt;color:var(--text2);margin-bottom:4px">11 Uhrenhersteller. Über 1.000 Arbeitsplätze. Eine Weltmarke.</div>
+  <div style="font-family:var(--m);font-size:7pt;color:var(--light);margin-bottom:24px">Ainary Wirtschaftsanalyse · Stand Feb 2026 · Quellen: Wikipedia, Xing, LeadIQ, SZ, Stadt Glashütte</div>
+
+  <!-- KPIs -->
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="kpi-val">167</div>
+      <div class="kpi-label">Unternehmen erfasst</div>
+      <div class="kpi-sub">davon 11 Uhrenhersteller <span class="tag tag-e">E</span></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-val">~2.000</div>
+      <div class="kpi-label">Arbeitsplätze Uhrenindustrie</div>
+      <div class="kpi-sub">inkl. Zulieferer <span class="tag tag-i">I</span></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-val">50%</div>
+      <div class="kpi-label">Wertschöpfung in Glashütte</div>
+      <div class="kpi-sub">Gesetzliche Mindestanforderung <span class="tag tag-e">E</span></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-val" style="color:var(--green)">Stabil</div>
+      <div class="kpi-label">Branchentrend</div>
+      <div class="kpi-sub">Luxussegment resilient <span class="tag tag-j">J</span></div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <span><span class="tag tag-e">E</span> Evidence — belegt durch Quelle</span>
+    <span><span class="tag tag-i">I</span> Inference — abgeleitet aus Daten</span>
+    <span><span class="tag tag-j">J</span> Judgment — Einschätzung</span>
+    <span><span class="tag tag-a">A</span> Assumption — Annahme, unbelegt</span>
+  </div>
+
+  <!-- Category Filters -->
+  <div id="cat-filters" style="display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap">
+    <button onclick="filterCat('all')" class="cf active" id="cf-all">Alle</button>
+    <button onclick="filterCat('uhren')" class="cf" id="cf-uhren">Uhrenindustrie</button>
+    <button onclick="filterCat('gewerbe')" class="cf" id="cf-gewerbe">Gewerbe & Dienstleister</button>
+    <button onclick="filterCat('kommunen')" class="cf" id="cf-kommunen">Kommunen</button>
+  </div>
+
+  <div id="sec-uhren">
+  <!-- Manufakturen Tabelle -->
+  <div class="sec-label">Uhrenmanufakturen</div>
+  <div class="sec-title">Die Glashütter Manufakturen im Vergleich</div>
+
+  <div class="t-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Manufaktur</th>
+        <th>Konzern / Eigentümer</th>
+        <th>Preissegment</th>
+        <th>Mitarbeiter</th>
+        <th>Trend</th>
+        <th>Einschätzung</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><div class="f-name">A. Lange & Söhne</div><div class="f-type">Haute Horlogerie</div></td>
+        <td>Richemont <span class="tag tag-e">E</span></td>
+        <td><span class="f-mono">€15k–500k+</span></td>
+        <td><span class="f-mono">~750</span> <span class="tag tag-i">I</span><div class="f-type">Xing: "über 750"</div></td>
+        <td><span class="trend trend-stable">Stabil ●</span> <span class="tag tag-j">J</span></td>
+        <td style="font-size:7.5pt;color:var(--text2)">Weltmarktführer im Ultra-Luxus. Richemont-Zahlen zeigen stabiles Uhrensegment. Glashütte als Standort gesichert.</td><td><a href="analyse-lange.html" class="cta-link">Kurz-Analyse einsehen →</a></td>
+      </tr>
+      <tr>
+        <td><div class="f-name">Glashütte Original</div><div class="f-type">Luxus-Manufaktur</div></td>
+        <td>Swatch Group <span class="tag tag-e">E</span></td>
+        <td><span class="f-mono">€5k–50k</span></td>
+        <td><span class="f-mono">~450</span> <span class="tag tag-a">A</span><div class="f-type">Keine offizielle Zahl</div></td>
+        <td><span class="trend trend-stable">Stabil ●</span> <span class="tag tag-j">J</span></td>
+        <td style="font-size:7.5pt;color:var(--text2)">Swatch-Gruppe stabil. Neue Serenade-Luna-Kollektion 2024. Mittelsegment unter leichtem Druck durch Smartwatches.</td><td><a href="#" class="cta-link">Analyse anfordern →</a></td>
+      </tr>
+      <tr>
+        <td><div class="f-name">Nomos Glashütte</div><div class="f-type">Design-Manufaktur</div></td>
+        <td>Unabhängig <span class="tag tag-e">E</span></td>
+        <td><span class="f-mono">€1.500–6k</span></td>
+        <td><span class="f-mono">~280</span> <span class="tag tag-a">A</span><div class="f-type">Schätzung, stellt ein</div></td>
+        <td><span class="trend trend-caution">Vorsichtig ◐</span> <span class="tag tag-j">J</span></td>
+        <td style="font-size:7.5pt;color:var(--text2)">Erfolgreichste Neugründung nach der Wende. Eigenes Kaliber (DUW). Einstiegssegment am anfälligsten für Konkurrenz.</td><td><a href="analyse-nomos.html" class="cta-link">Kurz-Analyse einsehen →</a></td>
+      </tr>
+      <tr>
+        <td><div class="f-name">Mühle-Glashütte</div><div class="f-type">Nautische Instrumente</div></td>
+        <td>Familie Mühle <span class="tag tag-e">E</span></td>
+        <td><span class="f-mono">€800–4k</span></td>
+        <td><span class="f-mono">~80</span> <span class="tag tag-a">A</span><div class="f-type">Schätzung</div></td>
+        <td><span class="trend trend-caution">Vorsichtig ◐</span> <span class="tag tag-j">J</span></td>
+        <td style="font-size:7.5pt;color:var(--text2)">Familienunternehmen seit 1869. Insolvenz überstanden. Nische: nautische Zertifizierung. Kleiner aber stabil.</td><td><a href="analyse-muehle.html" class="cta-link">Kurz-Analyse einsehen →</a></td>
+      </tr>
+      <tr>
+        <td><div class="f-name">Tutima</div><div class="f-type">Fliegeruhren</div></td>
+        <td>Delecate (Privat) <span class="tag tag-e">E</span></td>
+        <td><span class="f-mono">€1k–15k</span></td>
+        <td><span class="f-mono">~40</span> <span class="tag tag-a">A</span><div class="f-type">Schätzung</div></td>
+        <td><span class="trend trend-stable">Stabil ●</span> <span class="tag tag-j">J</span></td>
+        <td style="font-size:7.5pt;color:var(--text2)">Fliegeruhren-Tradition. Eigene Werke seit Rückkehr nach Glashütte. Nischenanbieter mit Sammlerwert.</td><td><a href="#" class="cta-link">Analyse anfordern →</a></td>
+      </tr>
+      <tr>
+        <td><div class="f-name">Union Glashütte</div><div class="f-type">Klassik-Uhren</div></td>
+        <td>Swatch Group <span class="tag tag-e">E</span></td>
+        <td><span class="f-mono">€1k–3k</span></td>
+        <td><span class="f-mono">~50</span> <span class="tag tag-a">A</span><div class="f-type">Schätzung</div></td>
+        <td><span class="trend trend-stable">Stabil ●</span> <span class="tag tag-j">J</span></td>
+        <td style="font-size:7.5pt;color:var(--text2)">Einstiegsmarke der Swatch-Gruppe für Glashütte. Breites Publikum. Profitiert von Konzerninfrastruktur.</td><td><a href="#" class="cta-link">Analyse anfordern →</a></td>
+      </tr>
+      <tr>
+        <td><div class="f-name">Moritz Grossmann</div><div class="f-type">Haute Horlogerie</div></td>
+        <td>Christine Hutter <span class="tag tag-e">E</span></td>
+        <td><span class="f-mono">€20k–100k+</span></td>
+        <td><span class="f-mono">~45</span> <span class="tag tag-a">A</span><div class="f-type">Schätzung</div></td>
+        <td><span class="trend trend-up">Wachsend ▲</span> <span class="tag tag-j">J</span></td>
+        <td style="font-size:7.5pt;color:var(--text2)">Jüngste Haute-Horlogerie-Marke. International steigende Bekanntheit. Handaufzug, limitierte Serien.</td><td><a href="#" class="cta-link">Analyse anfordern →</a></td>
+      </tr>
+      <tr>
+        <td><div class="f-name">Bruno Söhnle</div><div class="f-type">Alltagsuhren</div></td>
+        <td>Familie Söhnle <span class="tag tag-i">I</span></td>
+        <td><span class="f-mono">€300–1.500</span></td>
+        <td><span class="f-mono">~20</span> <span class="tag tag-a">A</span><div class="f-type">Schätzung</div></td>
+        <td><span class="trend trend-caution">Vorsichtig ◐</span> <span class="tag tag-j">J</span></td>
+        <td style="font-size:7.5pt;color:var(--text2)">Günstigstes Glashütte-Segment. Stärkster Smartwatch-Wettbewerb. Abhängig von stationärem Handel.</td><td><a href="#" class="cta-link">Analyse anfordern →</a></td>
+      </tr>
+      <tr>
+        <td><div class="f-name">Wempe Chronometerwerke</div><div class="f-type">Chronometer-Prüfung</div></td>
+        <td>Wempe (Hamburg) <span class="tag tag-e">E</span></td>
+        <td><span class="f-mono">Dienstleistung</span></td>
+        <td><span class="f-mono">~30</span> <span class="tag tag-a">A</span><div class="f-type">Schätzung</div></td>
+        <td><span class="trend trend-stable">Stabil ●</span> <span class="tag tag-j">J</span></td>
+        <td style="font-size:7.5pt;color:var(--text2)">Einzige deutsche Sternwarte für Chronometerprüfung. Infrastruktur-Anbieter für die Branche.</td><td><a href="#" class="cta-link">Analyse anfordern →</a></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div style="font-family:var(--m);font-size:6.5pt;color:var(--light);margin-top:8px;text-align:right">
+    Mitarbeiterzahlen: A. Lange (Xing), Rest geschätzt [A]. Eigentümer verifiziert [E]. Trend = Ainary-Einschätzung [J]. Gesamt ~1.745 direkt, ~2.000 inkl. Zulieferer [I].
+  </div>
+
+  </div><!-- /sec-uhren -->
+
+  <div id="sec-gewerbe">
+  <!-- Weitere Branchen -->
+  <div class="sec-label">Gewerbe & Dienstleister</div>
+  <div class="sec-title">Gewerbe und Dienstleister in Glashütte</div>
+
+  <div class="t-wrap">
+  <table>
+    <thead>
+      <tr><th>Unternehmen</th><th>Branche</th><th>Ortsteil</th><th>Mitarbeiter</th><th>Einschätzung</th><th></th></tr>
+    </thead>
+    <tbody>
+      <tr><td><div class="f-name">Gurofa GmbH</div><div class="f-type">Feinmechanik</div></td><td>Zulieferer</td><td>Schlottwitz</td><td style="font-family:var(--m);font-weight:600">10–30 <span class="tag tag-a">A</span></td><td style="font-size:7.5pt;color:var(--text2)">Wahrsch. Uhren-/Maschinenbau-Zulieferer. Hohes EFRE-Potenzial.</td><td><a href="analyse-gurofa.html" class="cta-link">Kurz-Analyse einsehen →</a></td></tr>
+      <tr><td><div class="f-name">SAXACON DMC</div><div class="f-type">Maschinenbau</div></td><td>CNC-Fertigung</td><td>Hermsdorf</td><td style="font-family:var(--m);font-weight:600">k.A. <span class="tag tag-a">A</span></td><td style="font-size:7.5pt;color:var(--text2)">CNC-Dienstleister. KI-gestützte Werkzeugoptimierung relevant.</td><td><a href="#" class="cta-link">Analyse anfordern →</a></td></tr>
+      <tr><td><div class="f-name">Büttner GmbH</div><div class="f-type">Sanitär</div></td><td>Installation</td><td>Schlottwitz</td><td style="font-family:var(--m);font-weight:600">k.A. <span class="tag tag-a">A</span></td><td style="font-size:7.5pt;color:var(--text2)">Handwerksbetrieb. Terminplanung + Angebotserstellung automatisierbar.</td><td><a href="#" class="cta-link">Analyse anfordern →</a></td></tr>
+      <tr><td><div class="f-name">Estrichbau Franke</div><div class="f-type">Bau</div></td><td>Fußbodenbau</td><td>Bärenhecke</td><td style="font-family:var(--m);font-weight:600">k.A. <span class="tag tag-a">A</span></td><td style="font-size:7.5pt;color:var(--text2)">Baubranche. Aufmaß-Dokumentation + Kalkulation als KI-Einstieg.</td><td><a href="#" class="cta-link">Analyse anfordern →</a></td></tr>
+      <tr><td><div class="f-name">Frank Faulhaber</div><div class="f-type">Schlosserei</div></td><td>Metallbau</td><td>Glashütte</td><td style="font-family:var(--m);font-weight:600">k.A. <span class="tag tag-a">A</span></td><td style="font-size:7.5pt;color:var(--text2)">Klassischer Metallbau. Angebotskalkulation + Materialplanung.</td><td><a href="#" class="cta-link">Analyse anfordern →</a></td></tr>
+      <tr><td><div class="f-name">Egon Bretschneider</div><div class="f-type">KFZ</div></td><td>Autohaus</td><td>Dittersdorf</td><td style="font-family:var(--m);font-weight:600">k.A. <span class="tag tag-a">A</span></td><td style="font-size:7.5pt;color:var(--text2)">Ländliches Autohaus. Kundenbindung + Werkstattplanung.</td><td><a href="#" class="cta-link">Analyse anfordern →</a></td></tr>
+      <tr><td><div class="f-name">Autoteile Funk</div><div class="f-type">Handel</div></td><td>KFZ-Teile</td><td>Glashütte</td><td style="font-family:var(--m);font-weight:600">k.A. <span class="tag tag-a">A</span></td><td style="font-size:7.5pt;color:var(--text2)">Teilehandel. Bestandsoptimierung + automatische Nachbestellung.</td><td><a href="#" class="cta-link">Analyse anfordern →</a></td></tr>
+      <tr><td><div class="f-name">Holm Cibelius</div><div class="f-type">Handwerk</div></td><td>Maler</td><td>Hermsdorf</td><td style="font-family:var(--m);font-weight:600">k.A. <span class="tag tag-a">A</span></td><td style="font-size:7.5pt;color:var(--text2)">Malerhandwerk. Aufmaß + Kalkulation + Kundenkommunikation.</td><td><a href="#" class="cta-link">Analyse anfordern →</a></td></tr>
+      <tr><td><div class="f-name">Heiko Rothe</div><div class="f-type">Kreativ</div></td><td>Werbeagentur</td><td>Börnchen</td><td style="font-family:var(--m);font-weight:600">k.A. <span class="tag tag-a">A</span></td><td style="font-size:7.5pt;color:var(--text2)">Kreativbranche. KI-gestützte Content-Erstellung + Bildbearbeitung.</td><td><a href="#" class="cta-link">Analyse anfordern →</a></td></tr>
+      <tr><td><div class="f-name">Café Time</div><div class="f-type">Gastro</div></td><td>Gastronomie</td><td>Glashütte</td><td style="font-family:var(--m);font-weight:600">k.A. <span class="tag tag-a">A</span></td><td style="font-size:7.5pt;color:var(--text2)">Gastronomie. Reservierung + Bewertungsmanagement + Social Media.</td><td><a href="#" class="cta-link">Analyse anfordern →</a></td></tr>
+      <tr><td><div class="f-name">Buschhaus-Schänke</div><div class="f-type">Gastro/Hotel</div></td><td>Gastronomie · Hotel</td><td>Glashütte</td><td style="font-family:var(--m);font-weight:600">k.A. <span class="tag tag-a">A</span></td><td style="font-size:7.5pt;color:var(--text2)">Gasthaus mit Übernachtung. Booking-Optimierung + Revenue Mgmt.</td><td><a href="#" class="cta-link">Analyse anfordern →</a></td></tr>
+      <tr><td><div class="f-name">Gasthof Niederfrauendorf</div><div class="f-type">Gastro</div></td><td>Gastronomie</td><td>Niederfrauendorf</td><td style="font-family:var(--m);font-weight:600">k.A. <span class="tag tag-a">A</span></td><td style="font-size:7.5pt;color:var(--text2)">Ländliche Gastronomie. Veranstaltungsplanung + Marketing.</td><td><a href="#" class="cta-link">Analyse anfordern →</a></td></tr>
+      <tr><td><div class="f-name">Gudrun Irrgang</div><div class="f-type">Planung</div></td><td>Landschaftsarchitektur</td><td>Hausdorf</td><td style="font-family:var(--m);font-weight:600">k.A. <span class="tag tag-a">A</span></td><td style="font-size:7.5pt;color:var(--text2)">Freiberuflerin. EFRE-förderfähig. Planungsautomation + 3D-Visualisierung.</td><td><a href="#" class="cta-link">Analyse anfordern →</a></td></tr>
+      <tr><td><div class="f-name">Ingo Löffler</div><div class="f-type">Steuerberatung</div></td><td>Steuerberatung</td><td>Rückenhain</td><td style="font-family:var(--m);font-weight:600">3–8 <span class="tag tag-a">A</span></td><td style="font-size:7.5pt;color:var(--text2)">Idealer KI-Adoptor. DATEV-Ökosystem. 60% EFRE als Freiberufler.</td><td><a href="analyse-loeffler.html" class="cta-link">Kurz-Analyse einsehen →</a></td></tr>
+      <tr><td><div class="f-name">Pavel Fogel</div><div class="f-type">Medizin</div></td><td>Hausarzt</td><td>Glashütte</td><td style="font-family:var(--m);font-weight:600">k.A. <span class="tag tag-a">A</span></td><td style="font-size:7.5pt;color:var(--text2)">Praxis. Terminmanagement + Befunddokumentation + Recall.</td><td><a href="#" class="cta-link">Analyse anfordern →</a></td></tr>
+      <tr><td><div class="f-name">Helios MVZ Pirna</div><div class="f-type">Medizin</div></td><td>MVZ</td><td>Glashütte</td><td style="font-family:var(--m);font-weight:600">k.A. <span class="tag tag-a">A</span></td><td style="font-size:7.5pt;color:var(--text2)">Helios-Konzern. Eigene IT-Infrastruktur. Begrenzt förderfähig.</td><td><a href="#" class="cta-link">Analyse anfordern →</a></td></tr>
+      <tr><td><div class="f-name">Günter Klotz</div><div class="f-type">Holz</div></td><td>Sägewerk</td><td>Johnsbach</td><td style="font-family:var(--m);font-weight:600">k.A. <span class="tag tag-a">A</span></td><td style="font-size:7.5pt;color:var(--text2)">Holzverarbeitung. Schnittplanung + Lagerhaltung optimierbar.</td><td><a href="#" class="cta-link">Analyse anfordern →</a></td></tr>
+      <tr><td><div class="f-name">Mathias Hanke</div><div class="f-type">Design</div></td><td>Werbemittel</td><td>Schlottwitz</td><td style="font-family:var(--m);font-weight:600">k.A. <span class="tag tag-a">A</span></td><td style="font-size:7.5pt;color:var(--text2)">Kreativbranche. Bild-/Videoproduktion + Kundenportal.</td><td><a href="#" class="cta-link">Analyse anfordern →</a></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div style="font-family:var(--m);font-size:6.5pt;color:var(--light);margin-top:8px;text-align:right">
+    Quelle: Stadtbranchenbuch Glashütte · 167 Einträge gesamt · Auswahl nach Relevanz
+  </div>
+
+  <!-- CTA + Weiterempfehlen -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin:24px 0;padding:16px;border:1px solid var(--border2);border-radius:8px;background:var(--surface)">
+    <div>
+      <div style="font-weight:600;font-size:10pt">Ihr Unternehmen fehlt?</div>
+      <div style="font-size:8pt;color:var(--text2)">Kostenlose Wirtschaftsanalyse für Glashütter Betriebe.</div>
+    </div>
+    <a href="#" style="font-family:var(--m);font-size:8pt;color:#fff;background:var(--accent);padding:8px 20px;border-radius:4px;font-weight:500">Analyse anfordern →</a>
+  </div>
+  <div style="text-align:center;margin-bottom:32px">
+    <a href="#" style="font-family:var(--m);font-size:6.5pt;color:var(--light)">Dieses Verzeichnis weiterempfehlen</a>
+  </div>
+
+  <!-- Wirtschaftliche Einschätzung -->
+  <div class="sec-label">Wirtschaftliche Einschätzung</div>
+  <div class="sec-title">Was bedeutet das für Glashütte?</div>
+
+  <div class="sum-grid">
+    <div class="sum-card">
+      <div class="sum-h">Stärke: Weltmarke mit Gesetzesschutz <span class="tag tag-e">E</span></div>
+      <div class="sum-p">50% der Wertschöpfung muss in Glashütte stattfinden (§ 4 UhrenG). Kein Hersteller kann abwandern ohne den Namen zu verlieren. Das sichert Arbeitsplätze strukturell.</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-h">Risiko: Fachkräfte-Engpass <span class="tag tag-i">I</span></div>
+      <div class="sum-p">~2.000 Arbeitsplätze bei ~6.800 Einwohnern. Jeder dritte Arbeitsplatz hängt an der Uhrenindustrie. Wenn 33% in Rente gehen, fehlen ~660 Fachkräfte — Uhrmacher, Feinmechaniker, CNC-Operatoren.</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-h">Chance: KI für Standortmarketing <span class="tag tag-j">J</span></div>
+      <div class="sum-p">Automatisierte Fachkräfte-Kampagnen, Azubi-Gewinnung, Umschulungsprogramme. Ainary kann Jobprofile analysieren, Zielgruppen identifizieren, und Fördermittel für Weiterbildung finden.</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-h">Chance: Tourismus-Potenzial <span class="tag tag-j">J</span></div>
+      <div class="sum-p">Deutsches Uhrenmuseum + 11 Manufakturen = Alleinstellungsmerkmal. KI-gestützte Besucheranalyse, Event-Planung, und Vermarktung können den Wirtschaftsfaktor Tourismus stärken.</div>
+    </div>
+  </div>
+
+  <!-- E/I/J/A Verteilung -->
+  <div style="font-family:var(--m);font-size:7pt;color:var(--muted);margin-bottom:24px">
+    Transparenz: Diese Analyse enthält <span class="tag tag-e">E</span> 35% Evidence · <span class="tag tag-i">I</span> 15% Inference · <span class="tag tag-j">J</span> 30% Judgment · <span class="tag tag-a">A</span> 20% Assumption — Mitarbeiterzahlen sind die größte Unsicherheit (nur Lange offiziell). Ainary empfiehlt: IHK-Daten anfragen für verifizierte Zahlen.
+  </div>
+
+  <!-- Sample-Analysen -->
+  <!-- Transparenz -->
+  <div style="border:1px solid var(--border2);border-radius:8px;padding:12px 16px;background:rgba(192,57,43,.02);margin-bottom:32px">
+    <div style="font-family:var(--m);font-size:7pt;font-weight:600;color:var(--red);margin-bottom:4px">Transparenzhinweis</div>
+    <div style="font-size:7.5pt;color:var(--text2);line-height:1.6">
+      Diese Analysen basieren auf öffentlich zugänglichen Informationen und Branchenkenntnissen. Für Gurofa GmbH und Ingo Löffler liegen keine Unternehmensdaten vor — die Einschätzungen sind Branchen-Annahmen <span class="tag tag-a">A</span>. Fördermittel-Angaben beziehen sich auf Programme mit Stand Feb 2026; Förderfähigkeit muss im Einzelfall geprüft werden. <strong>go-digital ist seit 31.12.2024 eingestellt</strong> <span class="tag tag-e">E</span>. Ainary empfiehlt: Vor Antragstellung SAB Sachsen kontaktieren (Tel. 0351 4910-0).
+    </div>
+  </div>
+
+  </div><!-- /sec-gewerbe -->
+
+  <div id="sec-kommunen">
+  <!-- KOMMUNEN-VERGLEICH -->
+  <div class="sec-label" style="margin-top:48px">Kommunen-Vergleich</div>
+  <div class="sec-title">20 Kommunen — Wie digital ist Ihre Gemeinde?</div>
+  <div style="font-family:var(--m);font-size:7pt;color:var(--light);margin-bottom:16px">Ainary Kommunen-Tracker · Stand Feb 2026 · Daten: Destatis, Bitkom, dbb, KGSt</div>
+
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px">
+    <div class="kpi"><div class="kpi-val">22</div><div class="kpi-label">Kommunen erfasst</div><div class="kpi-sub">10 Sachsen · 12 bundesweit</div></div>
+    <div class="kpi"><div class="kpi-val">~4.200</div><div class="kpi-label">Verwaltungsmitarbeiter</div><div class="kpi-sub">Schätzung · 13 VZÄ/1.000 EW</div></div>
+    <div class="kpi"><div class="kpi-val">33%</div><div class="kpi-label">Rente bis 2030</div><div class="kpi-sub">dbb Beamtenbund 2023</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--red)">~€8,4M</div><div class="kpi-label">Fördermittel identifiziert</div><div class="kpi-sub">Summe alle 20 Kommunen</div></div>
+  </div>
+
+  <div id="k-filters" style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap"></div>
+  <div class="t-wrap"><table><thead><tr>
+    <th>#</th><th>Kommune</th><th>Einwohner</th><th>Mitarbeiter</th><th>Rente 2030</th><th>Digital-Score</th><th>Potenzial</th><th>Status</th><th></th>
+  </tr></thead><tbody id="k-body"></tbody></table></div>
+  <div style="font-family:var(--m);font-size:6.5pt;color:var(--light);margin-top:8px;text-align:right">Mitarbeiter geschätzt (13 VZÄ/1.000 EW) · Rente 33% (dbb) · Digital-Score: Ainary-Methodik</div>
+
+  </div><!-- /sec-kommunen -->
+
+  <footer class="ftr">
+    <span>© 2026 Ainary</span><span>·</span>
+    <a href="https://ainaryventures.com">ainaryventures.com</a><span>·</span>
+    <span>florian@ainaryventures.com</span>
+  </footer>
+
+</div>
+
+<script>
+function updateClock(){
+  const now=new Date();
+  const days=['So','Mo','Di','Mi','Do','Fr','Sa'];
+  const d=days[now.getDay()]+', '+now.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const t=now.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('live-date').textContent=d;
+  document.getElementById('live-time').textContent=t;
+}
+function updateGreeting(){const h=new Date().getHours();const g=document.getElementById("greeting");if(g)g.textContent=h>=5&&h<12?"Guten Morgen":h>=12&&h<18?"Guten Tag":"Guten Abend";}
+updateGreeting();updateClock();setInterval(updateClock,10000);
+
+function filterCat(cat){
+  document.querySelectorAll('.cf').forEach(b=>{b.classList.remove('active');});
+  document.getElementById('cf-'+cat).classList.add('active');
+  const secs=['uhren','gewerbe','kommunen'];
+  if(cat==='all'){secs.forEach(s=>document.getElementById('sec-'+s).style.display='block');}
+  else{secs.forEach(s=>{document.getElementById('sec-'+s).style.display=s===cat?'block':'none';});}
+}
+
+// Kommunen Tracker
+const kommunen=[
+  {name:'Glashütte',bl:'SN',ew:6657,score:17,status:'live',url:'index.html',analyse:'analyse-glashuette.html'},
+  {name:'Dippoldiswalde',bl:'SN',ew:14560,score:83,status:'live',analyse:'analyse-dippoldiswalde.html'},
+  {name:'Altenberg',bl:'SN',ew:8200,score:50,status:'new'},
+  {name:'Freital',bl:'SN',ew:39500,score:67,status:'new'},
+  {name:'Pirna',bl:'SN',ew:39000,score:60,status:'new'},
+  {name:'Meißen',bl:'SN',ew:28000,score:55,status:'new'},
+  {name:'Freiberg',bl:'SN',ew:40600,score:62,status:'new'},
+  {name:'Radebeul',bl:'SN',ew:34000,score:70,status:'new'},
+  {name:'Bautzen',bl:'SN',ew:38800,score:58,status:'new'},
+  {name:'Görlitz',bl:'SN',ew:56000,score:52,status:'new'},
+  {name:'Worms',bl:'RP',ew:83500,score:65,status:'new'},
+  {name:'Gersheim',bl:'SL',ew:6400,score:30,status:'live',analyse:'analyse-gersheim.html'},
+  {name:'Jena',bl:'TH',ew:111407,score:72,status:'live',analyse:'analyse-jena.html'},
+  {name:'Marburg',bl:'HE',ew:76401,score:68,status:'live',analyse:'analyse-marburg.html'},
+  {name:'Konstanz',bl:'BW',ew:84800,score:74,status:'new'},
+  {name:'Lüneburg',bl:'NI',ew:78000,score:66,status:'new'},
+  {name:'Trier',bl:'RP',ew:111500,score:63,status:'new'},
+  {name:'Greifswald',bl:'MV',ew:59400,score:48,status:'new'},
+  {name:'Schwäbisch Hall',bl:'BW',ew:42000,score:60,status:'new'},
+  {name:'Norderstedt',bl:'SH',ew:81400,score:71,status:'new'},
+  {name:'Bad Belzig',bl:'BB',ew:11436,score:75,status:'live',analyse:'analyse-badbelzig.html'},
+  {name:'Smart Region AUF',bl:'BY',ew:6000,score:78,status:'live',analyse:'analyse-smartregion-auf.html'},
+];
+const blN={BB:'Brandenburg',BY:'Bayern',SN:'Sachsen',TH:'Thüringen',HE:'Hessen',BW:'Baden-Württemberg',NI:'Niedersachsen',RP:'Rheinland-Pfalz',SL:'Saarland',MV:'Mecklenburg-Vorp.',SH:'Schleswig-Holstein'};
+function renderK(data){
+  const tb=document.getElementById('k-body');tb.innerHTML='';
+  data.forEach((k,i)=>{
+    const ma=Math.round(k.ew*13/1000),ret=Math.round(ma*.33),pot=Math.round(k.ew/6800*400);
+    const cls=k.score>=70?'high':k.score>=50?'mid':'low';
+    const st=k.status==='live'?'<span style="font-family:var(--m);font-size:6.5pt;padding:2px 8px;border-radius:3px;background:rgba(45,138,78,.08);color:var(--green)">Live</span>':k.status==='pending'?'<span style="font-family:var(--m);font-size:6.5pt;padding:2px 8px;border-radius:3px;background:rgba(180,83,9,.08);color:var(--amber)">In Arbeit</span>':'<span style="font-family:var(--m);font-size:6.5pt;padding:2px 8px;border-radius:3px;background:rgba(157,127,59,.06);color:var(--accent)">Neu</span>';
+    const link=k.analyse?'<a href="'+k.analyse+'" style="font-family:var(--m);font-size:7pt;color:var(--accent)">Kurz-Analyse einsehen →</a>':k.url?'<a href="'+k.url+'" style="font-family:var(--m);font-size:7pt;color:var(--accent)">Dashboard →</a>':'<a href="#" style="font-family:var(--m);font-size:7pt;color:var(--accent)">Analyse anfordern →</a>';
+    tb.innerHTML+=`<tr><td style="font-family:var(--m);font-size:7pt;color:var(--light)">${String(i+1).padStart(2,'0')}</td><td><strong>${k.name}</strong><div style="font-family:var(--m);font-size:6.5pt;color:var(--muted)">${blN[k.bl]||k.bl}</div></td><td style="font-family:var(--m);font-weight:700">${k.ew.toLocaleString('de-DE')}</td><td style="font-family:var(--m);font-weight:600">~${ma}<div style="font-size:6.5pt;color:var(--light);font-weight:400">${ret} Rente</div></td><td style="color:var(--red);font-family:var(--m);font-weight:600">${ret}</td><td><div style="display:flex;align-items:center;gap:6px"><div style="height:6px;border-radius:3px;background:var(--border2);width:60px;overflow:hidden"><div style="height:100%;border-radius:3px;width:${k.score}%;background:${k.score>=70?'var(--green)':k.score>=50?'var(--amber)':'var(--red)'}"></div></div><span style="font-family:var(--m);font-size:7pt;font-weight:600">${k.score}%</span></div></td><td style="font-family:var(--m);font-weight:700;color:var(--accent)">€${pot>999?(pot/1000).toFixed(0)+'k':pot+'k'}</td><td>${st}</td><td>${link}</td></tr>`;
+  });
+}
+const fDiv=document.getElementById('k-filters');
+['Alle','SN','TH','HE','BW','NI','Weitere'].forEach((f,i)=>{
+  const b=document.createElement('button');
+  b.textContent=f==='SN'?'Sachsen':f==='TH'?'Thüringen':f==='HE'?'Hessen':f==='BW'?'Baden-W.':f==='NI'?'Niedersachsen':f;
+  b.style.cssText='font-family:var(--m);font-size:7pt;padding:4px 12px;border:1px solid var(--border2);border-radius:4px;color:var(--muted);cursor:pointer;background:none';
+  if(i===0){b.style.borderColor='var(--accent)';b.style.color='var(--accent)';}
+  b.onclick=()=>{fDiv.querySelectorAll('button').forEach(x=>{x.style.borderColor='var(--border2)';x.style.color='var(--muted)';});b.style.borderColor='var(--accent)';b.style.color='var(--accent)';
+    if(f==='Alle')renderK(kommunen);else if(f==='Weitere')renderK(kommunen.filter(k=>!['SN','TH','HE','BW','NI'].includes(k.bl)));else renderK(kommunen.filter(k=>k.bl===f));};
+  fDiv.appendChild(b);
+});
+renderK(kommunen);
+</script>
+</body>
+</html>

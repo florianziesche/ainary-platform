@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Presentation Template — Ainary (Palantir Standard)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#faf8f4;--surface:#f5f2ec;--text:#1a1a1a;--t2:#555;--t3:#888;--t4:#aaa;
+  --rule:#e0ddd6;
+  --gold:#c8aa50;--gold-muted:rgba(200,170,80,0.08);--gold-glow:rgba(200,170,80,0.06);
+  --f:'Inter',-apple-system,sans-serif;--m:'JetBrains Mono',monospace;
+}
+html{font-size:16px}
+body{font-family:var(--f);color:var(--text);background:var(--bg);overflow:hidden;-webkit-font-smoothing:antialiased}
+
+/* === FIXED CHROME — same position on EVERY slide === */
+#progress{position:fixed;top:0;left:0;height:2px;background:var(--text);z-index:100;transition:width .3s}
+#logo{position:fixed;top:40px;left:48px;z-index:100;display:flex;align-items:center;gap:8px;font:600 .85rem/1 var(--f);color:var(--text);letter-spacing:-.01em}
+#logo .logo-dot{width:6px;height:6px;border-radius:50%;background:var(--gold)}
+#section-label{position:fixed;top:40px;right:48px;z-index:100;font:.5rem/1 var(--m);font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--t4);transition:opacity .3s}
+#counter{position:fixed;bottom:40px;right:48px;font:500 .55rem/1 var(--m);color:var(--t4);letter-spacing:.1em;z-index:100}
+
+/* === AINARY DESIGN ELEMENT — Binary Star Glow === */
+.star-glow{position:fixed;top:-15%;left:50%;transform:translateX(-50%);width:120%;height:50%;background:radial-gradient(ellipse at 50% 0%,rgba(200,170,80,0.05) 0%,rgba(200,170,80,0.02) 35%,transparent 70%);pointer-events:none;z-index:0}
+/* Dot grid texture — subtle, from ainaryventures.com */
+.dot-grid{position:fixed;inset:0;background-image:radial-gradient(rgba(0,0,0,0.03) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;z-index:0}
+
+/* === SLIDE SYSTEM === */
+.deck{width:100vw;height:100vh;position:relative;z-index:1}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:100px 48px 60px 48px;opacity:0;pointer-events:none;transition:opacity .35s}
+.slide.active{opacity:1;pointer-events:auto}
+.slide-inner{max-width:1100px;width:100%;margin:0 auto;padding:0 16px}
+
+/* === TYPOGRAPHY — Palantir scale === */
+.slide-title{font-size:3.2rem;font-weight:600;letter-spacing:-.04em;line-height:1.08;max-width:820px}
+.body-text{font-size:1.05rem;font-weight:400;line-height:1.7;color:var(--t2);max-width:560px}
+.label{font-size:.6rem;font-weight:500;font-family:var(--m);letter-spacing:.12em;text-transform:uppercase;color:var(--t3)}
+.source-note{font-size:.6rem;color:var(--t4);margin-top:auto;padding-top:24px}
+
+/* Numbers — BLACK, confident */
+.big-number{font-size:7rem;font-weight:600;letter-spacing:-.05em;line-height:1;color:var(--text)}
+.kpi-number{font-size:2.8rem;font-weight:600;letter-spacing:-.03em;color:var(--text)}
+
+/* Explicit conclusion */
+.explicit{font-size:1.15rem;font-weight:500;color:var(--text);margin-top:20px;max-width:600px}
+
+/* Thin rule — Ainary gold, subtle */
+.rule{width:48px;height:1.5px;background:var(--gold);margin:24px 0;opacity:.5}
+
+/* === GRIDS === */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:48px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:40px}
+
+/* Pain blocks — no icons, Palantir-clean */
+.pain-block .label{margin-bottom:6px}
+.pain-block .body-text{font-size:.95rem}
+
+/* KPI blocks — naked numbers */
+.kpi-block{text-align:left}
+.kpi-block .label{margin-bottom:4px}
+.kpi-block .body-text{font-size:.8rem;margin-top:4px}
+
+/* Progress bars — black fill */
+.progress-bar{height:4px;background:var(--surface);border-radius:2px;overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;background:var(--text);border-radius:2px;width:0;transition:width 1.2s ease-out}
+.slide.active .progress-fill{width:var(--w)}
+.compare-row{display:flex;gap:64px}
+.compare-col{flex:1}
+.compare-col h3{font-size:.7rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:20px}
+.compare-item{margin-bottom:20px}
+.compare-item span{font-size:.9rem;display:flex;justify-content:space-between;color:var(--t2)}
+
+/* Credentials */
+.photo-placeholder{width:100px;height:100px;border-radius:50%;background:var(--surface);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--t4);font-size:.6rem;font-family:var(--m)}
+.stats-row{display:flex;gap:40px;margin:20px 0}
+.stat{text-align:left}
+
+/* Visual placeholder — flat, gold border hint */
+.visual-placeholder{min-height:200px;background:var(--surface);display:flex;align-items:center;justify-content:center;border:1px solid var(--rule)}
+
+/* === SLIDE TYPES === */
+
+/* Cover */
+.cover{text-align:left;justify-content:center}
+.cover .slide-title{font-size:4rem;max-width:700px}
+.cover .body-text{margin-top:16px}
+.cover .meta{font:400 .75rem/1 var(--f);color:var(--t3);position:absolute;bottom:40px;left:48px}
+
+/* Statement */
+.statement{justify-content:center;align-items:flex-start}
+.statement .big-number{margin:8px 0}
+
+/* Close — bookend */
+.close-slide{justify-content:center;align-items:flex-start}
+.close-slide .slide-title{font-size:3.5rem}
+.contact-row{display:flex;gap:40px;margin-top:32px;color:var(--t3);font-size:.85rem}
+
+/* === MOBILE === */
+@media(max-width:768px){
+  .slide{padding:80px 24px 48px 24px}
+  #logo{left:24px;top:24px}
+  #section-label{right:24px;top:24px}
+  #counter{right:24px;bottom:24px}
+  .cover .slide-title{font-size:2.2rem}
+  .slide-title{font-size:2rem}
+  .big-number{font-size:4rem}
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+  .compare-row{flex-direction:column;gap:32px}
+  .grid-4{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- Ainary design elements -->
+<div class="star-glow"></div>
+<div class="dot-grid"></div>
+
+<!-- Fixed chrome — NEVER moves -->
+<div id="progress"></div>
+<div id="logo"><span class="logo-dot"></span> Ainary</div>
+<div id="section-label"></div>
+<div id="counter"></div>
+
+<div class="deck">
+
+  <!-- 0: COVER -->
+  <section class="slide cover active" data-section="">
+    <div class="slide-inner">
+      <h1 class="slide-title">[Thesis in max 8 words.]</h1>
+      <p class="body-text">[One sentence a stranger instantly understands.]</p>
+    </div>
+    <p class="meta">[PRESENTER] · [DATE]</p>
+  </section>
+
+  <!-- 1: STATEMENT -->
+  <section class="slide statement" data-section="[CONTEXT]">
+    <div class="slide-inner">
+      <div class="big-number">73%</div>
+      <p class="explicit">[State what 73% means. A sentence, not a label.]</p>
+      <p class="source-note">Source: [Publication, Year]</p>
+    </div>
+  </section>
+
+  <!-- 2: PROBLEM -->
+  <section class="slide" data-section="[PROBLEM]">
+    <div class="slide-inner">
+      <h2 class="slide-title">[The problem as a sentence.]</h2>
+      <div class="rule"></div>
+      <div class="grid-3">
+        <div class="pain-block">
+          <div class="label">[Pain 1]</div>
+          <p class="body-text">[One sentence. No jargon.]</p>
+        </div>
+        <div class="pain-block">
+          <div class="label">[Pain 2]</div>
+          <p class="body-text">[One sentence. No caveats.]</p>
+        </div>
+        <div class="pain-block">
+          <div class="label">[Pain 3]</div>
+          <p class="body-text">[One sentence. Visceral.]</p>
+        </div>
+      </div>
+      <p class="source-note">So what: [Why this demands action now.]</p>
+    </div>
+  </section>
+
+  <!-- 3: DATA -->
+  <section class="slide" data-section="[DATA]">
+    <div class="slide-inner">
+      <h2 class="slide-title">[Data insight as a sentence.]</h2>
+      <div class="rule"></div>
+      <div class="grid-4">
+        <div class="kpi-block">
+          <div class="label">[KPI 1]</div>
+          <div class="kpi-number">42</div>
+          <p class="body-text">[What 42 means]</p>
+        </div>
+        <div class="kpi-block">
+          <div class="label">[KPI 2]</div>
+          <div class="kpi-number">€1.2M</div>
+          <p class="body-text">[Meaning]</p>
+        </div>
+        <div class="kpi-block">
+          <div class="label">[KPI 3]</div>
+          <div class="kpi-number">98%</div>
+          <p class="body-text">[Meaning]</p>
+        </div>
+        <div class="kpi-block">
+          <div class="label">[KPI 4]</div>
+          <div class="kpi-number">3x</div>
+          <p class="body-text">[Meaning]</p>
+        </div>
+      </div>
+      <p class="explicit">[Explicit conclusion — state the meaning.]</p>
+      <p class="source-note">Source: [Publication, Year]</p>
+    </div>
+  </section>
+
+  <!-- 4: COMPARISON -->
+  <section class="slide" data-section="[COMPARISON]">
+    <div class="slide-inner">
+      <h2 class="slide-title">[State the shift as a sentence.]</h2>
+      <div class="rule"></div>
+      <div class="compare-row">
+        <div class="compare-col">
+          <h3>Before</h3>
+          <div class="compare-item"><span>[Metric A] <strong>32%</strong></span><div class="progress-bar"><div class="progress-fill" style="--w:32%"></div></div></div>
+          <div class="compare-item"><span>[Metric B] <strong>18%</strong></span><div class="progress-bar"><div class="progress-fill" style="--w:18%"></div></div></div>
+          <div class="compare-item"><span>[Metric C] <strong>45%</strong></span><div class="progress-bar"><div class="progress-fill" style="--w:45%"></div></div></div>
+        </div>
+        <div class="compare-col">
+          <h3>After</h3>
+          <div class="compare-item"><span>[Metric A] <strong>78%</strong></span><div class="progress-bar"><div class="progress-fill" style="--w:78%"></div></div></div>
+          <div class="compare-item"><span>[Metric B] <strong>64%</strong></span><div class="progress-bar"><div class="progress-fill" style="--w:64%"></div></div></div>
+          <div class="compare-item"><span>[Metric C] <strong>91%</strong></span><div class="progress-bar"><div class="progress-fill" style="--w:91%"></div></div></div>
+        </div>
+      </div>
+      <p class="explicit">[Conclusion. Don't make them calculate.]</p>
+      <p class="source-note">So what: [Implication.]</p>
+    </div>
+  </section>
+
+  <!-- 5: TWO-COLUMN -->
+  <section class="slide" data-section="[SOLUTION]">
+    <div class="slide-inner">
+      <h2 class="slide-title">[One idea as a sentence.]</h2>
+      <div class="rule"></div>
+      <div class="grid-2">
+        <div>
+          <p class="body-text">[Sparse. The speaker fills gaps. Title tells everything.]</p>
+        </div>
+        <div class="visual-placeholder">
+          <span class="label" style="color:var(--t4)">[Visual — NO screenshots]</span>
+        </div>
+      </div>
+      <p class="source-note">So what: [Takeaway.]</p>
+    </div>
+  </section>
+
+  <!-- 6: CREDENTIALS -->
+  <section class="slide" data-section="[TEAM]">
+    <div class="slide-inner">
+      <h2 class="slide-title">[Why this person wins.]</h2>
+      <div class="rule"></div>
+      <div class="grid-2">
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="photo-placeholder">Photo</div>
+          <div class="stats-row">
+            <div class="stat"><div class="kpi-number" style="font-size:1.8rem">12+</div><div class="label">Years</div></div>
+            <div class="stat"><div class="kpi-number" style="font-size:1.8rem">80+</div><div class="label">Projects</div></div>
+            <div class="stat"><div class="kpi-number" style="font-size:1.8rem">€5M</div><div class="label">Managed</div></div>
+          </div>
+        </div>
+        <div>
+          <p class="body-text" style="font-weight:500;color:var(--text)">[Name]</p>
+          <p class="body-text" style="margin-top:12px">[2-3 sentences. Why THIS person for THIS problem.]</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7: CLOSE — Bookend -->
+  <section class="slide close-slide" data-section="">
+    <div class="slide-inner">
+      <h2 class="slide-title">[Repeat thesis from Slide 1.]</h2>
+      <p class="body-text" style="margin-top:16px">[One sentence — next action.]</p>
+      <div class="contact-row">
+        <span>[email]</span>
+        <span>[phone]</span>
+        <span>[website]</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function(){
+  var slides=document.querySelectorAll('.slide');
+  var cur=0;
+  var total=slides.length;
+  var sectionEl=document.getElementById('section-label');
+
+  function go(n){
+    if(n<0||n>=total)return;
+    slides[cur].classList.remove('active');
+    cur=n;
+    slides[cur].classList.add('active');
+    document.getElementById('progress').style.width=(cur/(total-1)*100)+'%';
+    document.getElementById('counter').textContent=(cur+1)+' / '+total;
+    // Update section label from data-section
+    var sec=slides[cur].getAttribute('data-section')||'';
+    sectionEl.textContent=sec;
+    sectionEl.style.opacity=sec?'1':'0';
+  }
+  go(0);
+
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key===' ')go(cur+1);
+    else if(e.key==='ArrowLeft')go(cur-1);
+    else if(e.key==='Escape')go(0);
+  });
+
+  document.addEventListener('click',function(e){
+    if(e.target.closest('#logo,#counter,#section-label'))return;
+    var x=e.clientX/window.innerWidth;
+    if(x<0.33)go(cur-1);else go(cur+1);
+  });
+
+  var tx=0;
+  document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX});
+  document.addEventListener('touchend',function(e){
+    var d=e.changedTouches[0].clientX-tx;
+    if(Math.abs(d)>50){if(d<0)go(cur+1);else go(cur-1)}
+  });
+})();
+</script>
+</body>
+</html>
