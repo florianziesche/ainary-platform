@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KI-Agent Memory: Was Anthropic noch fehlt | Ainary Ventures</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Anthropic hat Auto-Memory für Claude Code ausgeliefert. Wir betreiben ein 7-Layer-Memory-System in Produktion. Ein tiefer Vergleich von 8 Systemen über 9 Dimensionen, gestützt auf 21 akademische und industrielle Quellen.">
+  <meta name="keywords" content="KI Agent Memory, Claude Code, persistentes Gedächtnis, LLM Memory, Context Engineering, EIJA, Wissenshierarchie, Compound Intelligence">
+  <meta name="author" content="Florian Ziesche">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="KI-Agent Memory: Was Anthropic noch fehlt">
+  <meta property="og:description" content="Wir haben 8 KI-Memory-Systeme über 9 Dimensionen bewertet. Claude Code: 3/27. Unser System: 21/27. Ehrliche Bewertungen, vertretbare Positionen. Hier ist die vollständige Analyse.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://ainaryventures.com/de/blog/ai-agent-memory-what-anthropic-is-missing.html">
+  <meta property="og:image" content="https://ainaryventures.com/assets/og-ai-memory.png">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="KI-Agent Memory: Was Anthropic noch fehlt">
+  <meta name="twitter:description" content="8 Systeme. 9 Dimensionen. 21 Quellen. Claude Code: 3/27. Unser System: 21/27. Ehrliche Selbstbewertung inklusive.">
+  
+  <!-- Structured Data (Article) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "KI-Agent Memory: Was Anthropic noch fehlt",
+    "description": "Ein tiefer Vergleich von 8 KI-Agent-Memory-Systemen über 9 Dimensionen, gestützt auf 21 akademische und industrielle Quellen.",
+    "datePublished": "2026-02-27",
+    "dateModified": "2026-02-27",
+    "author": {
+      "@type": "Person",
+      "name": "Florian Ziesche",
+      "url": "https://ainaryventures.com"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Ainary Ventures",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://ainaryventures.com/assets/logo.png"
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://ainaryventures.com/de/blog/ai-agent-memory-what-anthropic-is-missing.html"
+    }
+  }
+  </script>
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="../../shared/styles.css">
+  <style>
+    /* Override shared vars to match site palette */
+    :root {
+      --accent: #c8aa50;
+    }
+    
+    @keyframes drift-gold { 0%,100% { transform:translate(0,0) scale(1); } 33% { transform:translate(40px,-30px) scale(1.1); } 66% { transform:translate(-20px,20px) scale(0.95); } }
+    @keyframes drift-silver { 0%,100% { transform:translate(0,0) scale(1); } 33% { transform:translate(-30px,25px) scale(1.05); } 66% { transform:translate(25px,-15px) scale(0.9); } }
+    
+    /* Article-specific styles (consistent with kommunalwahl article) */
+    .article-header {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 80px 24px 48px 24px;
+    }
+    
+    .breadcrumb {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+    .breadcrumb a {
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+    .breadcrumb a:hover {
+      color: var(--accent);
+    }
+    
+    .article-category {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #2D72D2;
+      background: transparent;
+      border: none;
+      padding: 0;
+      margin-bottom: 16px;
+    }
+    
+    .article-meta {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      margin-bottom: 24px;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .article-meta .hai-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.55rem;
+      font-family: var(--font-mono);
+      color: #238551;
+      border: 1px solid #238551;
+      border-radius: 3px;
+      padding: 1px 6px;
+      vertical-align: middle;
+    }
+    
+    .article-title {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 600;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 24px;
+    }
+    
+    .article-lead {
+      font-size: 1.125rem;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      margin-bottom: 48px;
+    }
+    
+    .article-body {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 24px 80px 24px;
+    }
+    
+    .article-body h2 {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+      margin: 56px 0 24px 0;
+      scroll-margin-top: 80px;
+    }
+    
+    .article-body h3 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 36px 0 16px 0;
+    }
+    
+    .article-body p {
+      font-size: 1.05rem;
+      line-height: 1.75;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+    
+    .article-body ul, .article-body ol {
+      list-style: none;
+      padding-left: 0;
+      margin-bottom: 24px;
+    }
+    
+    .article-body li {
+      position: relative;
+      padding-left: 28px;
+      margin-bottom: 12px;
+      font-size: 1.05rem;
+      line-height: 1.75;
+      color: var(--text-secondary);
+    }
+    
+    .article-body li::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    
+    .article-body ol li {
+      counter-increment: item;
+    }
+    .article-body ol li::before {
+      content: counter(item) ".";
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+    }
+    
+    /* Data boxes */
+    .data-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius:8px;
+      padding: 24px;
+      margin: 32px 0;
+    }
+    
+    .data-box-title {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    
+    .data-stat {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    
+    .data-label {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+    
+    .highlight {
+      background: rgba(200, 170, 80, 0.12);
+      padding: 2px 6px;
+      border-radius:3px;
+      color: var(--accent);
+    }
+    
+    /* EIJA legend */
+    .eija-legend {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius:8px;
+      padding: 20px 24px;
+      margin: 32px 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .eija-item {
+      text-align: center;
+    }
+    .eija-badge {
+      display: inline-block;
+      width: 28px;
+      height: 28px;
+      line-height: 28px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .eija-badge.e { background: rgba(35, 133, 81, 0.2); color: #238551; border: 1px solid rgba(35, 133, 81, 0.3); }
+    .eija-badge.i { background: rgba(45, 114, 210, 0.2); color: #2D72D2; border: 1px solid rgba(45, 114, 210, 0.3); }
+    .eija-badge.j { background: rgba(200, 118, 25, 0.2); color: #C87619; border: 1px solid rgba(200, 118, 25, 0.3); }
+    .eija-badge.a { background: rgba(205, 66, 70, 0.2); color: #CD4246; border: 1px solid rgba(205, 66, 70, 0.3); }
+    .eija-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+    }
+    
+    /* Comparison table */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 32px 0;
+      font-size: 0.85rem;
+    }
+    .comparison-table th {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      text-align: left;
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--accent-border);
+      white-space: nowrap;
+    }
+    .comparison-table td {
+      padding: 10px;
+      border-bottom: 1px solid var(--border-default);
+      color: var(--text-secondary);
+      vertical-align: top;
+    }
+    .comparison-table tr:last-child td {
+      border-bottom: none;
+    }
+    .comparison-table .row-highlight td {
+      color: var(--text-primary);
+      background: var(--accent-muted);
+      font-weight: 500;
+    }
+    .comparison-table .score {
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+    .comparison-table .score-high { color: #238551; }
+    .comparison-table .score-mid { color: #C87619; }
+    .comparison-table .score-low { color: #CD4246; }
+    
+    /* Score visualization — Palantir/Linear style */
+    .score-viz {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius:8px;
+      padding: 28px;
+      margin: 40px 0;
+    }
+    .score-viz-title {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+    .score-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 14px;
+      gap: 12px;
+    }
+    .score-row:last-child { margin-bottom: 0; }
+    .score-name {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      min-width: 110px;
+      text-align: right;
+    }
+    .score-row.highlight .score-name {
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .score-track {
+      flex: 1;
+      height: 6px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 3px;
+      overflow: hidden;
+      position: relative;
+    }
+    .score-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+      width: 0;
+    }
+    .score-fill.low { background: linear-gradient(90deg, #CD4246 0%, #CD4246 100%); }
+    .score-fill.mid { background: linear-gradient(90deg, #C87619 0%, #C87619 100%); }
+    .score-fill.high { background: linear-gradient(90deg, #238551 0%, #238551 100%); }
+    .score-fill.gold { background: linear-gradient(90deg, var(--accent) 0%, #c8aa50 60%, #c8aa50 100%); box-shadow: 0 0 12px rgba(200,170,80,0.3); }
+    .score-val {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      min-width: 36px;
+    }
+    .score-row.highlight .score-val {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    
+    /* Scan line animation */
+    .score-viz::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent 0%, rgba(200,170,80,0.03) 50%, transparent 100%);
+      animation: scanline 4s ease-in-out infinite;
+      pointer-events: none;
+    }
+    .score-viz { position: relative; overflow: hidden; }
+    @keyframes scanline {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+    
+    /* Dimension radar dots */
+    .dimension-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 32px 0;
+    }
+    .dim-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      transition: border-color 0.3s;
+    }
+    .dim-card:hover {
+      border-color: var(--accent-border);
+    }
+    .dim-card.dim-3 {
+      border-color: rgba(35,133,81,0.3);
+      background: rgba(35,133,81,0.05);
+    }
+    .dim-score {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .dim-card.dim-3 .dim-score { color: #238551; }
+    .dim-card.dim-2 .dim-score { color: var(--text-muted); }
+    .dim-card.dim-1 .dim-score { color: #CD4246; }
+    .dim-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+    }
+    .dim-note {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+    
+    @media (max-width: 640px) {
+      .dimension-grid { grid-template-columns: 1fr 1fr; }
+      .score-name { min-width: 80px; font-size: 0.65rem; }
+    }
+    
+    /* Maturity levels */
+    .maturity-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin: 32px 0;
+    }
+    .maturity-level {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .maturity-level.active {
+      border-color: var(--accent-border);
+      background: var(--accent-muted);
+    }
+    .maturity-num {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      min-width: 32px;
+    }
+    .maturity-level.active .maturity-num {
+      color: var(--accent);
+    }
+    .maturity-name {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+    }
+    .maturity-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .maturity-examples {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    
+    /* Blockquote */
+    .article-body blockquote {
+      
+      padding: 16px 24px;
+      margin: 32px 0;
+      background: var(--bg-surface);
+      border-radius: 0 8px 8px 0;
+      font-style: italic;
+      color: var(--text-secondary);
+    }
+    
+    /* Author box */
+    .author-box {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius:8px;
+      padding: 24px;
+      margin: 56px 0 32px 0;
+    }
+    .author-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--accent-muted);
+      border: 2px solid var(--accent-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-weight: 600;
+      color: var(--accent);
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    .author-name {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .author-bio {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    
+    /* Share row */
+    .share-row {
+      display: flex;
+      gap: 12px;
+      margin: 32px 0;
+    }
+    .share-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .share-btn:hover {
+      border-color: var(--accent-border);
+      color: var(--text-primary);
+    }
+    
+    /* Footnote */
+    .footnote {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-default);
+      line-height: 1.7;
+    }
+    
+    /* Reading progress bar */
+    .reading-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 2px;
+      background: var(--accent);
+      z-index: 200;
+      transition: width 50ms linear;
+    }
+    
+    /* Reveal animation */
+    .reveal {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    @media (max-width: 640px) {
+      .article-title { font-size: 1.6rem; }
+      .data-stat { font-size: 2rem; }
+      .eija-legend { grid-template-columns: repeat(2, 1fr); }
+      .comparison-table { font-size: 0.75rem; }
+      .comparison-table th, .comparison-table td { padding: 8px 6px; }
+    }
+    
+    @keyframes pulseGreen { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+    
+    
+
+  </style>
+</head>
+<body>
+  <!-- Ambient gradient blobs (matching about.html) -->
+  <div style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden;">
+    <div style="position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle at 45% 45%,#c8aa50 0%,#c8aa50 25%,#a08030 50%,transparent 72%);filter:blur(80px);mix-blend-mode:screen;opacity:0.1;top:10%;left:65%;animation:drift-gold 90s ease-in-out infinite;"></div>
+    <div style="position:absolute;width:250px;height:250px;border-radius:50%;background:radial-gradient(circle at 55% 45%,#ffffff 0%,#e8f0ff 20%,#b0c4e8 45%,transparent 70%);filter:blur(72px);mix-blend-mode:screen;opacity:0.06;top:55%;left:10%;animation:drift-silver 90s ease-in-out infinite;"></div>
+  </div>
+  <!-- Reading Progress Bar -->
+  <div class="reading-progress" id="readingProgress"></div>
+  
+  <!-- Navigation -->
+  <div id="site-nav"></div>
+  
+  <!-- Article Header -->
+  <header class="article-header">
+    <nav style="font:400 13px var(--f, Inter, sans-serif); margin-bottom:32px;"><a href="/de/blog.html" style="color:var(--text-muted); text-decoration:none;">← Building in Public</a></nav>
+
+    <div class="article-category">Compound Intelligence · CI-001</div>
+    <div class="article-meta">
+      <span>Florian Ziesche · 27. Feb 2026 · 12 Min Lesezeit</span>
+      <span class="hai-badge">Mensch + KI</span>
+    </div>
+    <h1 class="article-title">KI-Agent Memory: Was Anthropic noch fehlt</h1>
+    <p class="article-lead">
+      Anthropic hat gerade persistentes Memory für Claude Code ausgeliefert. Zwei flache Dateien. Die ersten 200 Zeilen werden pro Session geladen. Keine Suche. Kein Ranking. Keine Faktenprüfung. Wir betreiben seit Monaten ein 7-Layer-Memory-System in Produktion. Hier ist ein tiefer Vergleich von 8 Systemen über 9 Dimensionen, gestützt auf 21 Quellen.
+    </p>
+  </header>
+  
+  <!-- EIJA Legend (matches Kommunalwahl style) -->
+  <div style="max-width:720px; margin:0 auto 32px; padding:0 24px;">
+    <div style="background:var(--bg-surface, #111116); border:1px solid var(--border-default, rgba(255,255,255,0.06)); border-radius:8px; padding:20px 24px;">
+      <div style="font:600 11px/1 var(--font-mono, monospace); color:var(--text-muted, #55555e); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:14px;">Transparenz: So liest man diese Analyse</div>
+      <div style="display:grid; grid-template-columns:auto 1fr; gap:8px 12px; align-items:center;">
+        <span style="display:inline-block;font:700 11px/1 var(--font-mono, monospace);width:22px;height:22px;border-radius:3px;text-align:center;line-height:22px;background:rgba(35,133,81,0.15);color:#238551;">E</span><span style="font:400 13px/1.5 var(--font-body, Inter, sans-serif);color:var(--text-secondary, #8b8b95);"><strong>Evidence</strong> · Dokumentierte Tatsache. Quelle verfügbar, überprüfbar.</span>
+        <span style="display:inline-block;font:700 11px/1 var(--font-mono, monospace);width:22px;height:22px;border-radius:3px;text-align:center;line-height:22px;background:rgba(45,114,210,0.15);color:#2D72D2;">I</span><span style="font:400 13px/1.5 var(--font-body, Inter, sans-serif);color:var(--text-secondary, #8b8b95);"><strong>Interpretation</strong> · Unsere Lesart dokumentierter Daten. Andere Lesarten möglich.</span>
+        <span style="display:inline-block;font:700 11px/1 var(--font-mono, monospace);width:22px;height:22px;border-radius:3px;text-align:center;line-height:22px;background:rgba(200,118,25,0.15);color:#C87619;">J</span><span style="font:400 13px/1.5 var(--font-body, Inter, sans-serif);color:var(--text-secondary, #8b8b95);"><strong>Judgment</strong> · Bewertung basierend auf Erfahrung und Mustern. Kann falsch sein.</span>
+        <span style="display:inline-block;font:700 11px/1 var(--font-mono, monospace);width:22px;height:22px;border-radius:3px;text-align:center;line-height:22px;background:rgba(205,66,70,0.15);color:#CD4246;">A</span><span style="font:400 13px/1.5 var(--font-body, Inter, sans-serif);color:var(--text-secondary, #8b8b95);"><strong>Assumption</strong> · Nicht dokumentiert, aber notwendig für die Analyse.</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- C1: Trust Bar -->
+  <div style="max-width:720px; margin:0 auto 24px; padding:0 24px;">
+    <div style="display:flex; align-items:center; gap:16px; padding:10px 16px; background:var(--bg-surface, #111116); border-left:3px solid var(--accent, #c8aa50); border-radius:0 8px 8px 0; font:500 0.75rem/1.4 var(--font-mono, monospace); color:var(--text-secondary, #8b8b95); flex-wrap:wrap;">
+      <span>● 21 Quellen</span>
+      <span style="color:var(--text-muted, #55555e);">·</span>
+      <span>● 8 verglichene Systeme</span>
+      <span style="color:var(--text-muted, #55555e);">·</span>
+      <span>● 9 Bewertungsdimensionen</span>
+      <span style="color:var(--text-muted, #55555e);">·</span>
+      <span style="color:#238551;">EIJA-Verifiziert</span>
+    </div>
+  </div>
+
+  <!-- Stats Row -->
+
+
+  <!-- Article Body -->
+  <article class="article-body">
+    
+    <h2 id="the-problem"><span style="color:var(--accent, #c8aa50);">●</span> 1-Layer Memory: Das Problem, das alle haben</h2>
+    
+    <p>
+      Jeder KI-Agent setzt zwischen Konversationen zurück. Claude, GPT, Gemini: Sie wachen mit Amnesie auf. Die Branche hat dieses Problem erkannt, und Lösungen entstehen schnell. Aber die meisten lösen den falschen Teil davon.
+    </p>
+    
+    <p>
+      Das Kernproblem ist nicht die Speicherung. Es ist die Retrieval-Qualität. Enterprise-Agenten erreichen eine Genauigkeitsobergrenze von 40-55%, nicht weil ihnen Intelligenz fehlt, sondern wegen Datenfragmentierung, fehlendem organisatorischem Kontext und gebrochenem Multi-Step-Reasoning (Zhang et al., 2025; CRMArena-Benchmarks). Bessere Antworten kommen von besserem Kontext, nicht von größeren Modellen. Memory-Architektur ist der Flaschenhals.
+    </p>
+    
+    <p>
+      <span class="eija-badge e" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">E</span> 
+      Anthropics Claude Code Auto-Memory (v2.1.32, Februar 2026) schreibt nach <code>~/.claude/projects/&lt;project&gt;/memory/</code> als flache Markdown-Dateien. Die ersten 200 Zeilen werden beim Session-Start geladen. Es gibt keine semantische Suche, keinen Graph, keinen Decay-Mechanismus. Dies ist in der <a href="https://code.claude.com/docs/en/memory" target="_blank" style="color:var(--accent);">offiziellen Dokumentation</a> dokumentiert.
+    </p>
+    
+    <p>
+      <span class="eija-badge e" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">E</span> 
+      OpenAIs ChatGPT Memory (GA seit Februar 2024) speichert Key-Value-Paare mit opaker Retrieval-Logik. Seit April 2025 referenziert es vergangene Konversationen. Der Mechanismus ist nicht öffentlich dokumentiert.
+    </p>
+    
+    <p>
+      Das sind nützliche Features. Es sind keine Memory-Systeme. Es gibt einen Unterschied zwischen einem Notizblock und einem Gehirn. Ein Notizblock speichert, was du schreibst. Ein Gehirn entscheidet, was wichtig ist, verbindet es mit dem, was es bereits weiß, vergisst, was irrelevant ist, und wird im Laufe der Zeit bei allen drei Dingen besser.
+    </p>
+
+    <!-- HERO GRAPHIC: Notepad vs Brain -->
+    <div style="margin:40px 0; display:flex; gap:24px; align-items:stretch; flex-wrap:wrap;">
+      <div style="flex:1; min-width:220px; padding:28px 24px; background:#111116; border:1px solid rgba(255,255,255,0.06); border-radius:8px; border-left:3px solid var(--accent, #c8aa50); text-align:center;">
+        <svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:16px;">
+          <rect x="16" y="8" width="48" height="64" rx="3" stroke="rgba(255,255,255,0.12)" stroke-width="1.5" fill="rgba(255,255,255,0.02)"/>
+          <line x1="24" y1="24" x2="56" y2="24" stroke="rgba(255,255,255,0.08)" stroke-width="1.5"/>
+          <line x1="24" y1="32" x2="56" y2="32" stroke="rgba(255,255,255,0.08)" stroke-width="1.5"/>
+          <line x1="24" y1="40" x2="56" y2="40" stroke="rgba(255,255,255,0.08)" stroke-width="1.5"/>
+          <line x1="24" y1="48" x2="48" y2="48" stroke="rgba(255,255,255,0.08)" stroke-width="1.5"/>
+          <line x1="24" y1="56" x2="40" y2="56" stroke="rgba(255,255,255,0.06)" stroke-width="1.5"/>
+        </svg>
+        <div style="font:600 14px var(--font-body, Inter, sans-serif); color:var(--text-primary, #ededf0); margin-bottom:6px;">Notizblock</div>
+        <div style="font:400 12px/1.6 var(--font-mono, monospace); color:var(--text-muted, #55555e);">Speichert, was du schreibst.<br>Zeile 1 = Zeile 200.<br>Keine Suche. Keine Struktur.<br>Kein Vergessen.</div>
+      </div>
+      <div style="display:flex; align-items:center; justify-content:center; min-width:40px;">
+        <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+          <line x1="4" y1="20" x2="32" y2="20" stroke="var(--accent, #c8aa50)" stroke-width="2"/>
+          <polyline points="26,14 32,20 26,26" stroke="var(--accent, #c8aa50)" stroke-width="2" fill="none"/>
+        </svg>
+      </div>
+      <div style="flex:1; min-width:220px; padding:28px 24px; background:#111116; border:1px solid rgba(255,255,255,0.06); border-radius:8px; text-align:center;">
+        <svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:16px;">
+          <circle cx="40" cy="16" r="5" fill="rgba(232,200,74,0.3)" stroke="#c8aa50" stroke-width="1"/>
+          <circle cx="18" cy="32" r="4" fill="rgba(35,133,81,0.2)" stroke="#238551" stroke-width="1"/>
+          <circle cx="62" cy="32" r="4" fill="rgba(45,114,210,0.2)" stroke="#2D72D2" stroke-width="1"/>
+          <circle cx="24" cy="54" r="3.5" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+          <circle cx="56" cy="54" r="3.5" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+          <circle cx="40" cy="66" r="3" fill="rgba(200,118,25,0.2)" stroke="#C87619" stroke-width="1"/>
+          <line x1="40" y1="21" x2="18" y2="28" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+          <line x1="40" y1="21" x2="62" y2="28" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+          <line x1="18" y1="36" x2="24" y2="50" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+          <line x1="62" y1="36" x2="56" y2="50" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+          <line x1="24" y1="57" x2="40" y2="63" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+          <line x1="56" y1="57" x2="40" y2="63" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+          <line x1="18" y1="32" x2="62" y2="32" stroke="rgba(232,200,74,0.1)" stroke-width="1" stroke-dasharray="3,3"/>
+        </svg>
+        <div style="font:600 14px var(--font-body, Inter, sans-serif); color:var(--accent, #c8aa50); margin-bottom:6px;">Memory-System</div>
+        <div style="font:400 12px/1.6 var(--font-mono, monospace); color:var(--text-secondary, #8b8b95);">Entscheidet, was wichtig ist.<br>Verbindet mit bestehendem Wissen.<br>Vergisst das Irrelevante.<br>Wird mit der Zeit besser.</div>
+      </div>
+    </div>
+
+
+    <div style="margin:48px 0 40px; text-align:center;">
+      <svg width="120" height="6" viewBox="0 0 120 6" xmlns="http://www.w3.org/2000/svg">
+        <line x1="0" y1="3" x2="48" y2="3" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+        <circle cx="60" cy="3" r="2" fill="var(--accent, #c8aa50)"/>
+        <line x1="72" y1="3" x2="120" y2="3" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+      </svg>
+    </div>
+
+    <h3>Warum 9 Dimensionen, nicht 1</h3>
+    
+    <p>
+      <span class="eija-badge i" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">I</span> 
+      Memory ist keine einzelne Fähigkeit. Es sind mindestens neun unterschiedliche Probleme, die sich verstärken, wenn sie zusammen gelöst werden:
+    </p>
+    
+    <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin:20px 0 24px;">
+      <div style="padding:16px; background:#111116; border:1px solid rgba(255,255,255,0.04); border-radius:8px; border-top:1px solid rgba(255,255,255,0.08);">
+        <div style="font:600 13px var(--font-body, Inter, sans-serif); color:var(--text-primary, #ededf0); margin-bottom:4px;">Storage</div>
+        <div style="font:500 11px var(--font-mono, monospace); color:var(--accent, #c8aa50); margin-bottom:6px;">Wie wird Memory persistiert?</div>
+        <div style="font:400 12px/1.5 var(--font-body, Inter, sans-serif); color:var(--text-muted, #55555e);">Textdateien degradieren ab 1K Einträgen. Vektoren skalieren, verlieren aber Struktur.</div>
+      </div>
+<div style="padding:16px; background:#111116; border:1px solid rgba(255,255,255,0.04); border-radius:8px; border-top:1px solid rgba(255,255,255,0.08);">
+        <div style="font:600 13px var(--font-body, Inter, sans-serif); color:var(--text-primary, #ededf0); margin-bottom:4px;">Retrieval</div>
+        <div style="font:500 11px var(--font-mono, monospace); color:var(--accent, #c8aa50); margin-bottom:6px;">Wie findet es, was relevant ist?</div>
+        <div style="font:400 12px/1.5 var(--font-body, Inter, sans-serif); color:var(--text-muted, #55555e);">Die ersten 200 Zeilen laden ignoriert 99% des Kontexts. Similarity verpasst Struktur.</div>
+      </div>
+<div style="padding:16px; background:#111116; border:1px solid rgba(255,255,255,0.04); border-radius:8px; border-top:1px solid rgba(255,255,255,0.08);">
+        <div style="font:600 13px var(--font-body, Inter, sans-serif); color:var(--text-primary, #ededf0); margin-bottom:4px;">Decay</div>
+        <div style="font:500 11px var(--font-mono, monospace); color:var(--accent, #c8aa50); margin-bottom:6px;">Was wird vergessen, und wann?</div>
+        <div style="font:400 12px/1.5 var(--font-body, Inter, sans-serif); color:var(--text-muted, #55555e);">Ohne aktiven Decay wird Memory zu Rauschen. Alles erinnern = nichts erinnern.</div>
+      </div>
+<div style="padding:16px; background:#111116; border:1px solid rgba(255,255,255,0.04); border-radius:8px; border-top:1px solid rgba(255,255,255,0.08);">
+        <div style="font:600 13px var(--font-body, Inter, sans-serif); color:var(--text-primary, #ededf0); margin-bottom:4px;">Cross-Session</div>
+        <div style="font:500 11px var(--font-mono, monospace); color:var(--accent, #c8aa50); margin-bottom:6px;">Überlebt Kontext Neustarts?</div>
+        <div style="font:400 12px/1.5 var(--font-body, Inter, sans-serif); color:var(--text-muted, #55555e);">Die meisten Agenten verlieren alles zwischen Sessions. Persistente laden veralteten Kontext.</div>
+      </div>
+<div style="padding:16px; background:#111116; border:1px solid rgba(255,255,255,0.04); border-radius:8px; border-top:1px solid rgba(255,255,255,0.08);">
+        <div style="font:600 13px var(--font-body, Inter, sans-serif); color:var(--text-primary, #ededf0); margin-bottom:4px;">Multi-Agent</div>
+        <div style="font:500 11px var(--font-mono, monospace); color:var(--accent, #c8aa50); margin-bottom:6px;">Können Agenten Memory teilen?</div>
+        <div style="font:400 12px/1.5 var(--font-body, Inter, sans-serif); color:var(--text-muted, #55555e);">Shared Memories + RL übertreffen größere Modelle mit besseren Prompts (CRMWeaver 2025).</div>
+      </div>
+<div style="padding:16px; background:#111116; border:1px solid rgba(255,255,255,0.04); border-radius:8px; border-top:1px solid rgba(255,255,255,0.08);">
+        <div style="font:600 13px var(--font-body, Inter, sans-serif); color:var(--text-primary, #ededf0); margin-bottom:4px;">Fact-Check</div>
+        <div style="font:500 11px var(--font-mono, monospace); color:var(--accent, #c8aa50); margin-bottom:6px;">Verifiziert es, was es erinnert?</div>
+        <div style="font:400 12px/1.5 var(--font-body, Inter, sans-serif); color:var(--text-muted, #55555e);">Ein halluziniertes Faktum aus Session 12 korrumpiert jede Session danach. Stiller Killer.</div>
+      </div>
+<div style="padding:16px; background:#111116; border:1px solid rgba(255,255,255,0.04); border-radius:8px; border-top:1px solid rgba(255,255,255,0.08);">
+        <div style="font:600 13px var(--font-body, Inter, sans-serif); color:var(--text-primary, #ededf0); margin-bottom:4px;">Knowledge Graph</div>
+        <div style="font:500 11px var(--font-mono, monospace); color:var(--accent, #c8aa50); margin-bottom:6px;">Sind Beziehungen explizit?</div>
+        <div style="font:400 12px/1.5 var(--font-body, Inter, sans-serif); color:var(--text-muted, #55555e);">Flache Speicherung kann nicht "was verbindet X mit Y?" beantworten. Graphen ermöglichen Multi-Hop-Reasoning.</div>
+      </div>
+<div style="padding:16px; background:#111116; border:1px solid rgba(255,255,255,0.04); border-radius:8px; border-top:1px solid rgba(255,255,255,0.08);">
+        <div style="font:600 13px var(--font-body, Inter, sans-serif); color:var(--text-primary, #ededf0); margin-bottom:4px;">Hierarchy</div>
+        <div style="font:500 11px var(--font-mono, monospace); color:var(--accent, #c8aa50); margin-bottom:6px;">Werden manche Memories höher gewichtet?</div>
+        <div style="font:400 12px/1.5 var(--font-body, Inter, sans-serif); color:var(--text-muted, #55555e);">Ohne Hierarchie behandelt Retrieval alles gleich. Was bedeutet, dass es nichts gut behandelt.</div>
+      </div>
+<div style="padding:16px; background:#111116; border:1px solid rgba(255,255,255,0.04); border-radius:8px; border-top:1px solid rgba(255,255,255,0.08);">
+        <div style="font:600 13px var(--font-body, Inter, sans-serif); color:var(--text-primary, #ededf0); margin-bottom:4px;">Human Feedback</div>
+        <div style="font:500 11px var(--font-mono, monospace); color:var(--accent, #c8aa50); margin-bottom:6px;">Können User das Memory korrigieren?</div>
+        <div style="font:400 12px/1.5 var(--font-body, Inter, sans-serif); color:var(--text-muted, #55555e);">AI-as-Judge: 99% konsistent, aber braucht menschliches Override. Ohne: Drift von Intent.</div>
+      </div>
+    </div>
+    
+    <p>
+      Die meisten Memory-Lösungen adressieren 2-3 davon. Keine adressiert alle 9. Das ist die Lücke, die diese Analyse misst.
+    </p>
+    
+    <p style="font-size:0.85rem; color:var(--text-muted, #55555e); margin:20px 0 28px;">
+      Wir haben alle 8 Systeme über diese 9 Dimensionen bewertet. Die vollständige Vergleichsmatrix ist am Ende dieses Artikels.
+    </p>
+    
+    <h2 id="maturity-model"><span style="color:var(--accent, #c8aa50);">●</span> Das 5-Stufen Memory-Reifegradmodell</h2>
+    
+    <p>
+      <span class="eija-badge i" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">I</span> 
+      Basierend auf unserer Analyse von 21 Quellen (8 akademische Paper, 6 Produktionssysteme, 4 Open-Source-Repositories, 3 Industrieanalysen) schlagen wir ein Reifegradspektrum für KI-Agent-Memory vor. Jede Stufe repräsentiert einen kategorischen Fähigkeitssprung, keine inkrementelle Verbesserung.
+    </p>
+    
+    <!-- Unified Maturity Element: Why + Table in one box -->
+    <div style="margin:24px 0 32px; background:#111116; border:1px solid rgba(255,255,255,0.06); border-radius:8px;  overflow:hidden;">
+      <div style="padding:20px 24px 16px;">
+        <div style="font:600 11px var(--font-mono, monospace); color:var(--accent, #c8aa50); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:12px;">Warum jede Stufe zählt</div>
+        <div style="font:400 13px/1.8 var(--font-body, Inter, sans-serif); color:var(--text-secondary, #8b8b95);">
+          Jede Stufe löst den Failure-Modus der Stufe darunter.
+        </div>
+      </div>
+      <table style="width:100%; border-collapse:collapse; font:400 12px var(--font-body, Inter, sans-serif); color:var(--text-secondary, #8b8b95);">
+        <thead>
+          <tr style="border-top:1px solid rgba(255,255,255,0.06); border-bottom:1px solid rgba(255,255,255,0.06);">
+            <th style="padding:8px 12px 8px 24px; text-align:left; font:600 10px var(--font-mono, monospace); color:rgba(255,255,255,0.3); letter-spacing:0.1em; text-transform:uppercase; width:30px;"></th>
+            <th style="padding:8px 12px; text-align:left; font:600 10px var(--font-mono, monospace); color:rgba(255,255,255,0.3); letter-spacing:0.1em; text-transform:uppercase;">Name</th>
+            <th style="padding:8px 12px; text-align:left; font:600 10px var(--font-mono, monospace); color:rgba(255,255,255,0.3); letter-spacing:0.1em; text-transform:uppercase;">Löst diesen Fehler</th>
+            <th style="padding:8px 12px; text-align:left; font:600 10px var(--font-mono, monospace); color:rgba(255,255,255,0.3); letter-spacing:0.1em; text-transform:uppercase;">Beispiel</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
+            <td style="padding:10px 12px 10px 24px; font:700 14px var(--font-mono, monospace); color:rgba(255,255,255,0.3);">1</td>
+            <td style="padding:10px 12px; font:600 12px var(--font-body, Inter, sans-serif); color:var(--text-secondary, #8b8b95);">Flat Store</td>
+            <td style="padding:10px 12px;">Bricht ab 1K Memories. Keine Suche, lädt erste N Zeilen.</td>
+            <td style="padding:10px 12px; font:500 11px var(--font-mono, monospace); color:rgba(255,255,255,0.3);">Claude Code</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
+            <td style="padding:10px 12px 10px 24px; font:700 14px var(--font-mono, monospace); color:rgba(255,255,255,0.35);">2</td>
+            <td style="padding:10px 12px; font:600 12px var(--font-body, Inter, sans-serif); color:var(--text-secondary, #8b8b95);">Structured Store</td>
+            <td style="padding:10px 12px;">Kann nicht finden, was relevant ist. Key-Value, basic Retrieval.</td>
+            <td style="padding:10px 12px; font:500 11px var(--font-mono, monospace); color:rgba(255,255,255,0.3);">ChatGPT Memory</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
+            <td style="padding:10px 12px 10px 24px; font:700 14px var(--font-mono, monospace); color:rgba(255,255,255,0.4);">3</td>
+            <td style="padding:10px 12px; font:600 12px var(--font-body, Inter, sans-serif); color:var(--text-secondary, #8b8b95);">Semantic Store</td>
+            <td style="padding:10px 12px;">Findet ähnlichen Content, hat aber kein Zeitgefühl oder Wahrheitskonzept.</td>
+            <td style="padding:10px 12px; font:500 11px var(--font-mono, monospace); color:rgba(255,255,255,0.3);">Mem0 · Letta</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
+            <td style="padding:10px 12px 10px 24px; font:700 14px var(--font-mono, monospace); color:rgba(255,255,255,0.45);">4</td>
+            <td style="padding:10px 12px; font:600 12px var(--font-body, Inter, sans-serif); color:var(--text-secondary, #8b8b95);">Knowledge Graph</td>
+            <td style="padding:10px 12px;">Modelliert Beziehungen, behandelt aber alles Wissen gleich.</td>
+            <td style="padding:10px 12px; font:500 11px var(--font-mono, monospace); color:rgba(255,255,255,0.3);">Zep · HippoRAG</td>
+          </tr>
+          <tr style="background:rgba(200,170,80,0.04); ">
+            <td style="padding:10px 12px 10px 24px; font:700 14px var(--font-mono, monospace); color:#c8aa50;">5</td>
+            <td style="padding:10px 12px; font:700 12px var(--font-body, Inter, sans-serif); color:#c8aa50;">Compound Intelligence</td>
+            <td style="padding:10px 12px; color:var(--text-primary, #ededf0);">Architektur, die ihre eigene Memory-Qualität im Laufe der Zeit verbessert.</td>
+            <td style="padding:10px 12px; font:500 11px var(--font-mono, monospace); color:#c8aa50;">Mia / OpenClaw</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin:48px 0 40px; text-align:center;">
+      <svg width="120" height="6" viewBox="0 0 120 6" xmlns="http://www.w3.org/2000/svg">
+        <line x1="0" y1="3" x2="48" y2="3" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+        <circle cx="60" cy="3" r="2" fill="var(--accent, #c8aa50)"/>
+        <line x1="72" y1="3" x2="120" y2="3" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+      </svg>
+    </div>
+
+    <h2 id="five-capabilities"><span style="color:var(--accent, #c8aa50);">●</span> 5 ungelöste Probleme in Agent Memory</h2>
+    
+    
+    <div style="margin:40px 0;">
+      <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
+        <div style="flex-shrink:0;"><svg width="40" height="40" viewBox="0 0 28 28" fill="none"><rect x="4" y="21" width="20" height="3" rx="1" fill="rgba(255,255,255,0.1)"/><rect x="6" y="16" width="16" height="3" rx="1" fill="rgba(255,255,255,0.15)"/><rect x="8" y="11" width="12" height="3" rx="1" fill="rgba(255,255,255,0.22)"/><rect x="10" y="6" width="8" height="3" rx="1" fill="rgba(255,255,255,0.35)"/></svg></div>
+        <h3 style="margin:0 !important;">1. Wissenshierarchie mit Gewichtungen</h3>
+      </div>
+      <div style="margin-left:56px;">
+        <div style="margin-bottom:16px;">
+          <div style="font:600 10px var(--font-mono, monospace); color:rgba(255,255,255,0.3); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px;">Problem</div>
+          <p style="margin-bottom:0;">Nicht alle Memories sind gleich. Eine verifizierte Architekturentscheidung sollte eine beiläufige Beobachtung von letztem Dienstag übertreffen. Aber jedes getestete System behandelt Memories als flach: Claude Code lädt die ersten 200 Zeilen mit gleichem Gewicht. Mem0 rankt nach Vektor-Ähnlichkeit. Zep nach zeitlicher Aktualität. Keines wendet domänenspezifische Gewichtung an.
+        </div>
+        <div style="margin-bottom:16px;">
+          <div style="font:600 10px var(--font-mono, monospace); color:var(--accent, #c8aa50); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px;">Unser Ansatz</div>
+          <p style="margin-bottom:0;">
+            <span class="eija-badge e" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">E</span> 
+            Eine 4-Stufen-Hierarchie: <span class="highlight">CORE</span> (2x Gewicht) für verifizierte Wahrheiten und Entscheidungen. <span class="highlight">KNOWLEDGE</span> (1.5x) für Domänenmuster. <span class="highlight">OPERATIONAL</span> (1x) für aktuelle Projekte und Personen. <span class="highlight">EPHEMERAL</span> (0.5x) für tägliche Notizen. Wenn Quellen sich widersprechen, gewinnt die höhere Stufe. Immer.
+          </p>
+        </div>
+        <p style="font:400 0.95rem/1.6 var(--font-body, Inter, sans-serif); color:var(--text-secondary); margin-top:12px;">Der Agent hört auf, eine Debug-Notiz als gleich wichtig zu behandeln wie eine kritische Architekturentscheidung. Retrieval-Qualität verbessert sich, weil das System weiß, was wichtig ist, nicht nur, was ähnlich ist.</p>
+      </div>
+    </div>
+
+
+    <div style="margin:40px 0;">
+      <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
+        <div style="flex-shrink:0;"><svg width="40" height="40" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="10" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/><circle cx="14" cy="14" r="6" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/><circle cx="14" cy="14" r="2.5" fill="rgba(255,255,255,0.4)"/></svg></div>
+        <h3 style="margin:0 !important;">2. Epistemologische Trust-Labels (EIJA)</h3>
+      </div>
+      <div style="margin-left:56px;">
+        <div style="margin-bottom:16px;">
+          <div style="font:600 10px var(--font-mono, monospace); color:rgba(255,255,255,0.3); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px;">Problem</div>
+          <p style="margin-bottom:0;">Ohne Unterscheidung zwischen Fakt und Vermutung wird KI-Memory zum Halluzinations-Verstärker. Der Failure-Modus: Ein Agent rät etwas in Session 1, speichert es, und behandelt es in Session 5 als etabliertes Faktum. Das System hat seine eigene Halluzination verstärkt.</p>
+        </div>
+        <div style="margin-bottom:16px;">
+          <div style="font:600 10px var(--font-mono, monospace); color:var(--accent, #c8aa50); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px;">Unser Ansatz</div>
+          <p style="margin-bottom:0;">
+            <span class="eija-badge e" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">E</span> 
+            Jede Behauptung wird gelabelt: <strong>E</strong>vidence, <strong>I</strong>nterpretation, <strong>J</strong>udgment oder <strong>A</strong>ssumption. Sie haben diese Labels durch den gesamten Artikel gesehen. Die Umfrage "Memory in the Age of AI Agents" (Zhang et al., Dezember 2025, arXiv:2512.13564) identifiziert "Vertrauenswürdigkeit" als aufkommendes Forschungsfeld. Die Februar-2026-Umfrage (arXiv:2602.19320) bestätigt, dass es ein offenes Problem bleibt.
+          </p>
+        </div>
+        <p style="font:400 0.95rem/1.6 var(--font-body, Inter, sans-serif); color:var(--text-secondary); margin-top:12px;">Der Agent kann unterscheiden, was er weiß von dem, was er geraten hat. Selbstverstärkte Halluzination bricht zusammen, weil Annahmen als Annahmen gelabelt bleiben, egal wie viele Sessions vergehen.</p>
+      </div>
+    </div>
+
+
+    <div style="margin:40px 0;">
+      <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
+        <div style="flex-shrink:0;"><svg width="40" height="40" viewBox="0 0 28 28" fill="none"><line x1="4" y1="22" x2="24" y2="22" stroke="rgba(255,255,255,0.08)" stroke-width="1.5"/><polyline points="4,20 10,16 14,8 20,12 24,4" stroke="rgba(255,255,255,0.35)" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+        <h3 style="margin:0 !important;">3. Memory-R1: Der "30-Tage-Test"</h3>
+      </div>
+      <div style="margin-left:56px;">
+        <div style="margin-bottom:16px;">
+          <div style="font:600 10px var(--font-mono, monospace); color:rgba(255,255,255,0.3); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px;">Problem</div>
+          <p style="margin-bottom:0;">Jedes Append-Only-System stirbt denselben Tod: Rauschakkumulation. Je mehr Sie speichern, desto schwerer wird es, zu finden, was zählt. Mem0 adressiert dies mit automatischer Filterung. Zep tracked zeitliche Validität. Gute Teillösungen, aber das fundamentale Problem bleibt: Systeme werden größer, nicht dichter.</p>
+        </div>
+        <div style="margin-bottom:16px;">
+          <div style="font:600 10px var(--font-mono, monospace); color:var(--accent, #c8aa50); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px;">Unser Ansatz</div>
+          <p style="margin-bottom:0;">
+            <span class="eija-badge j" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">J</span> 
+            Bevor irgendetwas in persistentes Memory geschrieben wird, eine Frage: "Wird das Verhalten in 30 Tagen ändern?" Falls nein, wird es nicht gespeichert. Falls es bestehendes Wissen aktualisiert, wird der alte Eintrag ersetzt. Falls bestehende Info jetzt falsch ist, wird sie gelöscht.
+          </p>
+        </div>
+        <p style="font:400 0.95rem/1.6 var(--font-body, Inter, sans-serif); color:var(--text-secondary); margin-top:12px;">Das System akkumuliert weniger, aber hochwertigere Einträge im Laufe der Zeit. Es wird dichter, nicht größer. Jeder Eintrag ist tragend. Das ist, was Anti-Entropie in der Praxis bedeutet.</p>
+      </div>
+    </div>
+
+
+    <div style="margin:40px 0;">
+      <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
+        <div style="flex-shrink:0;"><svg width="40" height="40" viewBox="0 0 28 28" fill="none"><rect x="6" y="6" width="16" height="16" rx="2" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/><polyline points="10,14 13,17 18,11" stroke="rgba(255,255,255,0.35)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3 style="margin:0 !important;">4. Verifizierte Wahrheiten mit Invalidierungsbedingungen</h3>
+      </div>
+      <div style="margin-left:56px;">
+        <div style="margin-bottom:16px;">
+          <div style="font:600 10px var(--font-mono, monospace); color:rgba(255,255,255,0.3); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px;">Problem</div>
+          <p style="margin-bottom:0;">Die meisten Memory-Systeme nehmen an, Fakten seien permanent. Aber Fakten verfallen. Ein Produktpreis ändert sich. Ein Teammitglied geht. Eine Strategie wechselt. Ohne explizite Ablauflogik vergiften veraltete Fakten zukünftige Entscheidungen.</p>
+        </div>
+        <div style="margin-bottom:16px;">
+          <div style="font:600 10px var(--font-mono, monospace); color:var(--accent, #c8aa50); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px;">Unser Ansatz</div>
+          <p style="margin-bottom:0;">
+            <span class="eija-badge e" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">E</span> 
+            <code>verified-truths.md</code> speichert faktengeprüfte Behauptungen mit: Quellenangabe, Confidence-Score (0-100%), zuletzt verifiziertes Datum und Invalidierungsbedingungen ("dies wird falsch, wenn X passiert"). Zeps bitemporales Modell kommt am nächsten, indem es "wann war es wahr" von "wann wurde es aufgezeichnet" unterscheidet. Aber zeitliche Validität ist unterschiedlich von bedingter Invalidierung.
+          </p>
+        </div>
+        <p style="font:400 0.95rem/1.6 var(--font-body, Inter, sans-serif); color:var(--text-secondary); margin-top:12px;">Fakten haben Haltbarkeitsdaten und Trigger, die sie verfallen lassen. Das System weiß nicht nur, was wahr ist, sondern unter welchen Bedingungen es aufhört, wahr zu sein.</p>
+      </div>
+    </div>
+
+
+    <div style="margin:40px 0;">
+      <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
+
+        <div style="flex-shrink:0;"><svg width="40" height="40" viewBox="0 0 28 28" fill="none"><circle cx="9" cy="14" r="4" stroke="rgba(255,255,255,0.15)" stroke-width="1.2"/><circle cx="19" cy="14" r="4" stroke="rgba(255,255,255,0.15)" stroke-width="1.2"/><circle cx="14" cy="7" r="4" stroke="rgba(255,255,255,0.3)" stroke-width="1.2"/><line x1="12" y1="10" x2="9" y2="14" stroke="rgba(255,255,255,0.08)" stroke-width="1"/><line x1="16" y1="10" x2="19" y2="14" stroke="rgba(255,255,255,0.08)" stroke-width="1"/></svg></div>
+        <h3 style="margin:0 !important;">5. Cross-Agent Memory mit Trust-Scoring</h3>
+      </div>
+      <div style="margin-left:56px;">
+        <div style="margin-bottom:16px;">
+          <div style="font:600 10px var(--font-mono, monospace); color:rgba(255,255,255,0.3); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px;">Problem</div>
+          <p style="margin-bottom:0;">Wenn Sie Sub-Agenten für Aufgaben spawnen, woher wissen Sie, welchen Ergebnissen Sie vertrauen können? Die meisten Multi-Agent-Systeme teilen Kontext, tracken aber keine Qualität. Die Ausgabe jedes Agenten wird gleich behandelt, unabhängig von vergangener Performance.</p>
+        </div>
+        <div style="margin-bottom:16px;">
+          <div style="font:600 10px var(--font-mono, monospace); color:var(--accent, #c8aa50); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px;">Unser Ansatz</div>
+          <p style="margin-bottom:0;">
+            <span class="eija-badge e" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">E</span> 
+            Jeder Sub-Agent erbt ein Kontextdokument mit relevantem Memory, Entscheidungen und Regeln. Wenn Ergebnisse zurückkommen, bewertet der Mensch die Qualität. Dieses Feedback aktualisiert einen Trust-Score pro Agent-Typ. Lettas Conversations API (Januar 2026) kommt Cross-Agent-Sharing am nächsten, aber ohne Trust-Scoring.
+          </p>
+        </div>
+        <p style="font:400 0.95rem/1.6 var(--font-body, Inter, sans-serif); color:var(--text-secondary); margin-top:12px;">Im Laufe der Zeit lernt das System, welche Agent-Konfigurationen zuverlässige Ergebnisse produzieren. Ressourcenzuteilung verbessert sich, weil High-Trust-Agenten härtere Aufgaben bekommen.</p>
+      </div>
+    </div>
+
+    <div style="margin:48px 0 40px; text-align:center;">
+      <svg width="120" height="6" viewBox="0 0 120 6" xmlns="http://www.w3.org/2000/svg">
+        <line x1="0" y1="3" x2="48" y2="3" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+        <circle cx="60" cy="3" r="2" fill="var(--accent, #c8aa50)"/>
+        <line x1="72" y1="3" x2="120" y2="3" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+      </svg>
+    </div>
+
+    <h2 id="comparison"><span style="color:var(--accent, #c8aa50);">●</span> Die Vergleichsmatrix</h2>
+    
+    <p>
+      <span class="eija-badge e" style="display:inline-block;width:auto;height:auto;line-height:normal;padding:1px 6px;font-size:0.65rem;vertical-align:middle;">E</span> 
+      Wir haben 8 Systeme über 9 Dimensionen bewertet (0-3 Skala: 0=Keine, 1=Basic, 2=Gut, 3=State-of-art). Bewertungen basieren auf offizieller Dokumentation, akademischen Papers und Open-Source-Repositories. Vollständige Quellenliste am Ende dieses Artikels.
+    </p>
+    
+    <!-- COMPARISON MATRIX — Spiderweb/Radar Chart -->
+    <div style="margin:24px 0 32px; text-align:center;">
+      <svg viewBox="0 0 500 470" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:560px; height:auto;">
+        <!-- Grid -->
+        <polygon points="250.0,176.7 284.3,189.1 302.5,220.7 296.2,256.7 268.2,280.1 231.8,280.1 203.8,256.7 197.5,220.7 215.7,189.1" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+<polygon points="250.0,123.3 318.6,148.3 355.0,211.5 342.4,283.3 286.5,330.2 213.5,330.2 157.6,283.3 145.0,211.5 181.4,148.3" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+<polygon points="250.0,70.0 352.8,107.4 407.6,202.2 388.6,310.0 304.7,380.4 195.3,380.4 111.4,310.0 92.4,202.2 147.2,107.4" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+
+        <!-- Axes -->
+        <line x1="250" y1="230" x2="250.0" y2="70.0" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+<line x1="250" y1="230" x2="352.8" y2="107.4" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+<line x1="250" y1="230" x2="407.6" y2="202.2" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+<line x1="250" y1="230" x2="388.6" y2="310.0" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+<line x1="250" y1="230" x2="304.7" y2="380.4" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+<line x1="250" y1="230" x2="195.3" y2="380.4" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+<line x1="250" y1="230" x2="111.4" y2="310.0" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+<line x1="250" y1="230" x2="92.4" y2="202.2" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+<line x1="250" y1="230" x2="147.2" y2="107.4" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+
+        <!-- Score markers -->
+        <text x="256.0" y="172.7" style="font:400 8px 'JetBrains Mono', monospace; fill:rgba(255,255,255,0.15);">1</text>
+<text x="256.0" y="119.3" style="font:400 8px 'JetBrains Mono', monospace; fill:rgba(255,255,255,0.15);">2</text>
+<text x="256.0" y="66.0" style="font:400 8px 'JetBrains Mono', monospace; fill:rgba(255,255,255,0.15);">3</text>
+
+        <!-- System polygons -->
+        <polygon points="250.0,176.7 250.0,230.0 250.0,230.0 296.2,256.7 250.0,230.0 250.0,230.0 250.0,230.0 197.5,220.7 250.0,230.0" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.3)" stroke-width="1.2"/>
+<polygon points="250.0,123.3 318.6,148.3 302.5,220.7 342.4,283.3 268.2,280.1 250.0,230.0 203.8,256.7 197.5,220.7 250.0,230.0" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.4)" stroke-width="1.2" stroke-dasharray="4,3"/>
+<polygon points="250.0,70.0 352.8,107.4 355.0,211.5 342.4,283.3 286.5,330.2 231.8,280.1 111.4,310.0 250.0,230.0 250.0,230.0" fill="rgba(35,133,81,0.08)" stroke="#238551" stroke-width="1.2"/>
+<polygon points="250.0,123.3 318.6,148.3 407.6,202.2 388.6,310.0 286.5,330.2 195.3,380.4 203.8,256.7 92.4,202.2 181.4,148.3" fill="rgba(200,170,80,0.12)" stroke="#c8aa50" stroke-width="2"/>
+
+        <!-- Labels -->
+        <text x="250.0" y="52.0" text-anchor="middle" style="font:500 9px 'JetBrains Mono', monospace; fill:rgba(255,255,255,0.3);">Storage</text>
+<text x="364.4" y="93.6" text-anchor="start" style="font:500 9px 'JetBrains Mono', monospace; fill:rgba(255,255,255,0.3);">Retrieval</text>
+<text x="425.3" y="199.1" text-anchor="start" style="font:500 9px 'JetBrains Mono', monospace; fill:rgba(255,255,255,0.3);">Decay</text>
+<text x="404.2" y="319.0" text-anchor="start" style="font:500 9px 'JetBrains Mono', monospace; fill:rgba(255,255,255,0.3);">Cross-Session</text>
+<text x="310.9" y="397.3" text-anchor="start" style="font:500 9px 'JetBrains Mono', monospace; fill:rgba(255,255,255,0.3);">Multi-Agent</text>
+<text x="189.1" y="397.3" text-anchor="end" style="font:500 9px 'JetBrains Mono', monospace; fill:rgba(255,255,255,0.3);">Fact-Check</text>
+<text x="95.8" y="319.0" text-anchor="end" style="font:500 9px 'JetBrains Mono', monospace; fill:rgba(255,255,255,0.3);">KG</text>
+<text x="74.7" y="199.1" text-anchor="end" style="font:500 9px 'JetBrains Mono', monospace; fill:rgba(255,255,255,0.3);">Hierarchy</text>
+<text x="135.6" y="93.6" text-anchor="end" style="font:500 9px 'JetBrains Mono', monospace; fill:rgba(255,255,255,0.3);">Human FB</text>
+
+        <!-- Legend -->
+        <line x1="100" y1="440" x2="120" y2="440" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+<text x="126" y="443" style="font:400 9px 'JetBrains Mono', monospace; fill:rgba(255,255,255,0.3);">Claude Code</text>
+<line x1="210" y1="440" x2="230" y2="440" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-dasharray='4,3'/>
+<text x="236" y="443" style="font:400 9px 'JetBrains Mono', monospace; fill:rgba(255,255,255,0.4);">Mem0</text>
+<line x1="320" y1="440" x2="340" y2="440" stroke="#238551" stroke-width="2"/>
+<text x="346" y="443" style="font:400 9px 'JetBrains Mono', monospace; fill:#238551;">Zep</text>
+<line x1="430" y1="440" x2="450" y2="440" stroke="#c8aa50" stroke-width="2"/>
+<text x="456" y="443" style="font:400 9px 'JetBrains Mono', monospace; fill:#c8aa50;">Unseres (Mia)</text>
+
+      </svg>
+    </div>
+
+    <div style="margin:16px 0 32px; padding:16px 20px; background:#111116; border:1px solid rgba(255,255,255,0.06); border-radius:8px;">
+      <div style="font:600 10px var(--font-mono, monospace); color:var(--text-muted, #55555e); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:8px;">Ehrliche Selbstbewertung</div>
+      <div style="font:400 13px/1.6 var(--font-body, Inter, sans-serif); color:var(--text-secondary, #8b8b95);">Wir bewerten 2 (nicht 3) bei Storage, Retrieval, Multi-Agent, Knowledge Graph und Human Feedback. Wir bewerten 3 nur dort, wo die Evidenz eindeutig ist: Decay, Fact-Checking, Hierarchy und Cross-Session.</div>
+    </div>
+
+    <h2 id="credit"><span style="color:var(--accent, #c8aa50);">●</span> Was Anthropic richtig gemacht hat</h2>
+    
+    <p>
+      Anerkennung, wo sie gebührt.
+    </p>
+    
+    <p>
+      Claude Codes Memory-Hierarchie (User-Level, Project-Level, Directory-Level CLAUDE.md) ist ein smartes Design für den Coding-Use-Case. Entwickler brauchen unterschiedliche Regeln für verschiedene Repos, und das kaskadierende Override-Modell handhabt das sauber.
+    </p>
+    
+    <p>
+      Die Entscheidung, einfache Markdown-Dateien zu verwenden, ist vertretbar. Es ist transparent, versionskontrollierbar und menschlich editierbar. Kein Lock-in. Keine Datenbankabhängigkeit.
+    </p>
+    
+    <p>
+      Und der Auto-Save-Trigger (Claude entscheidet, wann etwas es wert ist, erinnert zu werden) ist der richtige Startpunkt. Entwickler zu zwingen, Memory manuell zu verwalten, skaliert nicht.
+    </p>
+    
+    <div style="margin:24px 0; padding:20px 24px; background:#111116; border:1px solid rgba(255,255,255,0.06); border-radius:8px;  text-align:center;">
+      <div style="font:500 1.1rem/1.6 var(--font-body, Inter, sans-serif); color:var(--text-primary, #ededf0);">Ein Notizblock, der weiß, in welches Notizbuch er schreiben soll, ist immer noch ein Notizblock.</div>
+    </div>
+    
+    <h2 id="takeaways"><span style="color:var(--accent, #c8aa50);">●</span> Was das für Builder bedeutet</h2>
+    
+    <p>
+      Wenn Sie KI-Agenten bauen, die sich erinnern, lernen und im Laufe der Zeit ehrlich bleiben müssen:
+    </p>
+    
+    <div style="margin:20px 0 32px;">
+      <div style="display:flex; gap:16px; padding:16px 0; border-bottom:1px solid rgba(255,255,255,0.04);">
+        <div style="font:700 20px var(--font-mono, monospace); color:var(--accent, #c8aa50); min-width:36px;">01</div>
+        <div>
+          <div style="font:600 14px var(--font-body, Inter, sans-serif); color:var(--text-primary, #ededf0); margin-bottom:4px;">Architektur zuerst</div>
+          <div style="font:400 13px/1.6 var(--font-body, Inter, sans-serif); color:var(--text-secondary, #8b8b95);">Entscheiden Sie zuerst Ihr Maturity-Level-Ziel. Level 3 (Vektorsuche) ist Tischstandard. Level 4 (Knowledge Graph) ist dort, wo kompetitive Differenzierung beginnt.</div>
+        </div>
+      </div>
+<div style="display:flex; gap:16px; padding:16px 0; border-bottom:1px solid rgba(255,255,255,0.04);">
+        <div style="font:700 20px var(--font-mono, monospace); color:var(--accent, #c8aa50); min-width:36px;">02</div>
+        <div>
+          <div style="font:600 14px var(--font-body, Inter, sans-serif); color:var(--text-primary, #ededf0); margin-bottom:4px;">Vertrauen zur Schreibzeit</div>
+          <div style="font:400 13px/1.6 var(--font-body, Inter, sans-serif); color:var(--text-secondary, #8b8b95);">Memories nach Retrieval zu faktenprüfen ist zu spät. Labeln Sie Behauptungen zur Schreibzeit. Tracken Sie Provenienz. Setzen Sie Invalidierungsbedingungen.</div>
+        </div>
+      </div>
+<div style="display:flex; gap:16px; padding:16px 0; border-bottom:1px solid rgba(255,255,255,0.04);">
+        <div style="font:700 20px var(--font-mono, monospace); color:var(--accent, #c8aa50); min-width:36px;">03</div>
+        <div>
+          <div style="font:600 14px var(--font-body, Inter, sans-serif); color:var(--text-primary, #ededf0); margin-bottom:4px;">Design für Decay</div>
+          <div style="font:400 13px/1.6 var(--font-body, Inter, sans-serif); color:var(--text-secondary, #8b8b95);">Die Frage ist nie "Was soll ich erinnern?" Es ist "Was soll ich vergessen?" Der 30-Tage-Test ist der einfachste effektive Ansatz, den wir gefunden haben.</div>
+        </div>
+      </div>
+<div style="display:flex; gap:16px; padding:16px 0; border-bottom:1px solid rgba(255,255,255,0.04);">
+        <div style="font:700 20px var(--font-mono, monospace); color:var(--accent, #c8aa50); min-width:36px;">04</div>
+        <div>
+          <div style="font:600 14px var(--font-body, Inter, sans-serif); color:var(--text-primary, #ededf0); margin-bottom:4px;">Anti-entropisch by Design</div>
+          <div style="font:400 13px/1.6 var(--font-body, Inter, sans-serif); color:var(--text-secondary, #8b8b95);">Jede Session sollte das Memory sauberer hinterlassen. Nicht größer. Dichter, genauer, besser organisiert.</div>
+        </div>
+      </div>
+<div style="display:flex; gap:16px; padding:16px 0; border-bottom:1px solid rgba(255,255,255,0.04);">
+        <div style="font:700 20px var(--font-mono, monospace); color:var(--accent, #c8aa50); min-width:36px;">05</div>
+        <div>
+          <div style="font:600 14px var(--font-body, Inter, sans-serif); color:var(--text-primary, #ededf0); margin-bottom:4px;">Wissen ist der Burggraben</div>
+          <div style="font:400 13px/1.6 var(--font-body, Inter, sans-serif); color:var(--text-secondary, #8b8b95);">Wir haben dreimal das zugrunde liegende Modell gewechselt. Das Memory überlebte alle Übergänge ohne Datenverlust. Das Modell ist ersetzbar. Das Wissen nicht.</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="data-box">
+      <div class="data-box-title">Die Pointe</div>
+      <p style="font-size:1.1rem; color:var(--text-primary); line-height:1.6; margin:0;">
+        Anthropic hat validiert, dass Memory die nächste Grenze ist.
+        Die Branche wird bei Storage und Retrieval aufholen.
+        Aber epistemologische Integrität, die Fähigkeit zu wissen, was man weiß und wie sehr man dem vertrauen kann, das ist das harte Problem. Und das, was am meisten zählt.
+      </p>
+    </div>
+    
+    <!-- C4: Product Link + C6: CTA -->
+    <div style="margin:32px 0; padding:20px 24px; background:var(--bg-surface, #111116); border:1px solid var(--border-default, rgba(255,255,255,0.06)); border-left:3px solid var(--accent, #c8aa50); border-radius:0 8px 8px 0;">
+      <div style="font:600 14px/1.4 var(--font-body, Inter, sans-serif); color:var(--text-primary, #ededf0); margin-bottom:8px;">● Sehen Sie diese Prinzipien angewandt</div>
+      <p style="font:400 13px/1.6 var(--font-body, Inter, sans-serif); color:var(--text-secondary, #8b8b95); margin:0 0 12px;">
+        Wir haben ein Compound-Intelligence-System mit dieser Memory-Architektur gebaut. Es analysiert Kommunalwahlen über 10+ deutsche Städte mit 300+ verifizierten Quellen, EIJA-gelabelten Behauptungen und Confidence-Scores auf jeder Vorhersage.
+      </p>
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+        <a href="/article-agenttrust.html" style="display:inline-block; padding:8px 16px; background:var(--accent, #c8aa50); color:#111116; font:600 12px/1 var(--font-mono, monospace); text-decoration:none; border-radius:6px; letter-spacing:0.04em;">AgentTrust-Report lesen →</a>
+        <a href="/radar.html" style="display:inline-block; padding:8px 16px; background:transparent; color:var(--accent, #c8aa50); font:600 12px/1 var(--font-mono, monospace); text-decoration:none; border-radius:6px; border:1px solid var(--accent, #c8aa50); letter-spacing:0.04em;">Election Radar ansehen →</a>
+      </div>
+    </div>
+
+    <!-- Author Section (matches Kommunalwahl article) -->
+    <div class="author fade-in" style="margin:48px 0 32px; padding:24px; border:1px solid var(--border-default, rgba(255,255,255,0.08)); border-radius:8px; background:var(--bg-surface, #111116); display:flex; gap:16px; align-items:flex-start;">
+      <div style="width:48px; height:48px; border-radius:50%; background:var(--accent, #c8aa50); display:flex; align-items:center; justify-content:center; font:700 16px var(--font-mono, monospace); color:#111116; flex-shrink:0;">FZ</div>
+      <div>
+        <div style="font:600 15px/1.4 var(--font-body, Inter, sans-serif); color:var(--text-primary, #ededf0);">Florian Ziesche</div>
+        <div style="font:400 12px var(--font-mono, monospace); color:var(--text-muted, #55555e); margin-top:2px;">Gründer, Ainary Ventures</div>
+        <div style="margin-top:8px;"><a href="https://ainaryventures.com/about.html" target="_blank" style="font:500 12px var(--font-mono, monospace); color:var(--accent, #c8aa50); text-decoration:none;">Über →</a></div>
+
+      </div>
+    </div>
+    
+    <div class="footnote">
+      <strong>Offenlegung:</strong> Der Autor hat das in diesem Artikel beschriebene Memory-System gebaut. Alle Vergleiche basieren auf öffentlich verfügbarer Dokumentation und akademischen Papers. Bewertungen reflektieren dokumentierte Fähigkeiten, nicht undokumentierte Interna. Konkurrenten können Features haben, die nicht in ihrer öffentlichen Dokumentation erfasst sind. Confidence: 82%.
+    </div>
+    
+    <div class="footnote" style="margin-top:16px;">
+      <strong>Methodik:</strong> Diese Analyse basiert auf 21 Quellen: 8 akademische Papers (NeurIPS 2024, arXiv 2024-2026), 6 Produktionssystem-Dokumentationssätze, 4 Open-Source-Repositories, 3 Industrieanalysen. Jede Behauptung wird nach der Admiralty-Skala bewertet (Quellenreliabilität A-C, Behauptungsglaubwürdigkeit 1-3). Hypothese vor Untersuchung aufgestellt, MECE-Dekomposition, deliberater Widerlegungsversuch, Confidence-Scoring (82%) und Admiralty-Quellenrating.
+    </div>
+    
+    <div class="footnote" style="margin-top:12px; font-size:0.75rem;">
+      <strong>Quellen:</strong> Zhang et al. (2025), arXiv:2512.13564 [A1] · Chhikara et al. (2025), arXiv:2504.19413 [A1] · Rasmussen (2025), arXiv:2501.13956 [A1] · "Anatomy of Agentic Memory" (2026), arXiv:2602.19320 [A1] · "Graph-based Agent Memory" (2026), arXiv:2602.05665 [A1] · Gutierrez et al. (2024), NeurIPS [A1] · "Beyond a Million Tokens" (2025), arXiv:2510.27246 [A1] · "From RAG to Memory" (2025), arXiv:2502.14802 [A1] · Anthropic Claude Code Docs [A1] · OpenAI ChatGPT Memory FAQ [A2] · OpenAI Agents SDK [A2] · Mem0 GitHub [A2] · Letta GitHub [A2] · HippoRAG GitHub [A2] · Zep Docs [A2] · LangChain Blog [B2] · AWS Blog [B2] · The New Stack (2026) [B2] · Moxo (2026) [B2] · Reddit r/ClaudeAI [C3] · Direkte Workspace-Inspektion [E]
+    </div>
+
+    
+    <!-- Newsletter CTA -->
+    <div class="fade-in" style="margin:40px 0; padding:32px; border:1px solid var(--border-default, rgba(255,255,255,0.06)); border-radius:8px; background:var(--bg-surface, #111116); text-align:center;">
+      <div style="font:600 16px var(--font-body, Inter, sans-serif); color:var(--text-primary, #ededf0); margin-bottom:8px;">Benachrichtigung bei neuen Artikeln</div>
+      <div style="font:400 13px/1.5 var(--font-body, Inter, sans-serif); color:var(--text-muted, #55555e); margin-bottom:20px;">Tiefgehende Analysen zu KI-Systemen, Memory-Architekturen und Compound Intelligence. Kein Spam.</div>
+      <div id="subscribe-form" style="display:flex;gap:8px;max-width:400px;margin:0 auto;flex-wrap:wrap;justify-content:center;">
+        <input type="email" id="sub-email" placeholder="deine@email.com" required style="flex:1;min-width:180px;padding:10px 14px;background:var(--bg-page, #08080c);border:1px solid var(--border-default, rgba(255,255,255,0.06));border-radius:6px;color:var(--text-primary, #ededf0);font:400 14px var(--font-body, Inter, sans-serif);outline:none;">
+        <button onclick="subscribeFn()" id="sub-btn" style="padding:10px 20px;background:var(--accent, #c8aa50);color:#111116;border:none;border-radius:6px;font:500 14px var(--font-body, Inter, sans-serif);cursor:pointer;white-space:nowrap;">Abonnieren</button>
+      </div>
+      <div id="sub-ok" style="display:none;font:500 13px var(--font-body, Inter, sans-serif);color:var(--accent, #238551);margin-top:12px;">✓ Abonniert. Wir halten Sie auf dem Laufenden.</div>
+      <script>
+      function subscribeFn(){
+        var email=document.getElementById('sub-email').value;
+        var btn=document.getElementById('sub-btn');
+        if(!email||!email.includes('@'))return;
+        btn.textContent='...';btn.disabled=true;
+        fetch('/api/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,source:'ai-agent-memory'})})
+        .then(function(){
+          document.getElementById('subscribe-form').style.display='none';
+          document.getElementById('sub-ok').style.display='block';
+        }).catch(function(){btn.textContent='Fehler';});
+      }
+      </script>
+    </div>
+
+    <!-- Share (Stripe-pattern: 3 icons, monochrome, horizontal) -->
+    <div style="margin-top:32px; padding-top:24px; border-top:1px solid var(--border-default, rgba(255,255,255,0.06));">
+      <div style="font:500 10px var(--font-mono, monospace); color:var(--text-muted, #55555e); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:12px;">Artikel teilen</div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <a href="https://twitter.com/intent/tweet?url=https://ainaryventures.com/de/blog/ai-agent-memory-what-anthropic-is-missing.html&text=KI-Agent%20Memory%3A%20Was%20Anthropic%20noch%20fehlt" target="_blank" title="Auf X teilen" style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:var(--bg-surface, #111116);border:1px solid var(--border-default, rgba(255,255,255,0.06));color:var(--text-muted, #55555e);text-decoration:none;font:500 14px var(--font-body, Inter, sans-serif);transition:all 0.15s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='var(--text-primary, #ededf0)'" onmouseout="this.style.borderColor='var(--border-default, rgba(255,255,255,0.06))';this.style.color='var(--text-muted, #55555e)'">𝕏</a>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://ainaryventures.com/de/blog/ai-agent-memory-what-anthropic-is-missing.html" target="_blank" title="Auf LinkedIn teilen" style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:var(--bg-surface, #111116);border:1px solid var(--border-default, rgba(255,255,255,0.06));color:var(--text-muted, #55555e);text-decoration:none;font:700 13px var(--font-body, Inter, sans-serif);transition:all 0.15s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='var(--text-primary, #ededf0)'" onmouseout="this.style.borderColor='var(--border-default, rgba(255,255,255,0.06))';this.style.color='var(--text-muted, #55555e)'">in</a>
+        <button id="copy-btn-bottom" onclick="navigator.clipboard.writeText(window.location.href);var b=this;b.innerHTML='✓';setTimeout(function(){b.innerHTML='⎘'},1500)" title="Link kopieren" style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:var(--bg-surface, #111116);border:1px solid var(--border-default, rgba(255,255,255,0.06));color:var(--text-muted, #55555e);cursor:pointer;font:400 16px var(--font-body, Inter, sans-serif);transition:all 0.15s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.2)';this.style.color='var(--text-primary, #ededf0)'" onmouseout="this.style.borderColor='var(--border-default, rgba(255,255,255,0.06))';this.style.color='var(--text-muted, #55555e)'">⎘</button>
+      </div>
+    </div>
+
+    <!-- More from Ainary -->
+    <div style="margin-top:48px; padding-top:48px; border-top:1px solid var(--border-default, rgba(255,255,255,0.06));">
+      <div style="font:500 11px var(--font-mono, monospace); color:var(--text-muted, #55555e); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:24px; text-align:center;">Mehr von Ainary</div>
+      <a href="/blog/kommunalwahl-stichwahl-analyse.html" style="display:grid; grid-template-columns:auto 1fr; gap:16px; text-decoration:none; padding:16px 0; border-bottom:1px solid rgba(255,255,255,0.04);">
+        <span style="font:400 12px var(--font-mono, monospace); color:var(--text-muted, #55555e);">22. Feb 2026</span>
+        <div>
+          <span style="font:500 9px var(--font-mono, monospace); color:#2D72D2; letter-spacing:0.06em; text-transform:uppercase;">Wahlintelligenz</span>
+          <div style="font:500 15px/1.4 var(--font-body, Inter, sans-serif); color:var(--text-primary, #ededf0); margin-top:4px;">Kommunalwahl Bayern 2026: Stichwahl-Analyse</div>
+        </div>
+      </a>
+      <a href="/article-agenttrust.html" style="display:grid; grid-template-columns:auto 1fr; gap:16px; text-decoration:none; padding:16px 0; border-bottom:1px solid rgba(255,255,255,0.04);">
+        <span style="font:400 12px var(--font-mono, monospace); color:var(--text-muted, #55555e);">16. Feb 2026</span>
+        <div>
+          <span style="font:500 9px var(--font-mono, monospace); color:#2D72D2; letter-spacing:0.06em; text-transform:uppercase;">KI-Strategie</span>
+          <div style="font:500 15px/1.4 var(--font-body, Inter, sans-serif); color:var(--text-primary, #ededf0); margin-top:4px;">State of AI Agent Trust 2026</div>
+        </div>
+      </a>
+      <a href="/de/blog.html" style="display:grid; grid-template-columns:auto 1fr; gap:16px; text-decoration:none; padding:16px 0;">
+        <span style="font:400 12px var(--font-mono, monospace); color:var(--text-muted, #55555e);">Alle</span>
+        <div>
+          <div style="font:500 15px/1.4 var(--font-body, Inter, sans-serif); color:var(--text-muted, #55555e);">Alle Artikel ansehen →</div>
+        </div>
+      </a>
+    </div>
+
+  </article>
+  
+  <!-- Footer -->
+  <div id="site-footer"></div>
+  
+  <!-- Scripts -->
+  <script src="../../shared/nav.js"></script>
+  <script src="../../shared/footer.js"></script>
+  <script>
+    // Score bar animation on scroll
+    const scoreObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.querySelectorAll('.score-fill').forEach(bar => {
+            bar.style.width = bar.dataset.width + '%';
+          });
+          scoreObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+    const scoreViz = document.querySelector('.score-viz');
+    if (scoreViz) scoreObserver.observe(scoreViz);
+    
+    // Reading Progress Bar
+    const progressBar = document.getElementById('readingProgress');
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      progressBar.style.width = progress + '%';
+    });
+    
+    // Scroll Reveal Animation — only for data-boxes and special elements
+    const reveals = document.querySelectorAll('.data-box, .maturity-grid, .comparison-table, .author, .eija-legend, .score-viz, .dim-grid, .fade-in');
+    reveals.forEach(el => el.classList.add('reveal'));
+    
+    const revealOnScroll = () => {
+      const windowHeight = window.innerHeight;
+      reveals.forEach(el => {
+        const elementTop = el.getBoundingClientRect().top;
+        if (elementTop < windowHeight - 40) {
+          el.classList.add('visible');
+        }
+      });
+    };
+    
+    window.addEventListener('scroll', revealOnScroll);
+    revealOnScroll();
+    setTimeout(revealOnScroll, 200);
+  </script>
+</body>
+</html>
