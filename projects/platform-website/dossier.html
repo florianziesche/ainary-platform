@@ -1289,7 +1289,7 @@ function updateScatter() {
   var fcL = {};
   for (var i=0;i<(FORECAST.kandidaten||[]).length;i++) fcL[FORECAST.kandidaten[i].id] = FORECAST.kandidaten[i];
 
-  var axisLabels = {digital:'Digitale Sichtbarkeit',quellen:'Quellenabdeckung',risk:'Risiko-Score',controversies:'Risikosignale',strength:'Wahlstärke'};
+  var axisLabels = {digital:'Digitale Sichtbarkeit',quellen:'Quellenabdeckung',risk:'Prognose-Unsicherheit (±pp)',controversies:'Risikosignale',strength:'Wahlstärke'};
 
   // Compute values
   var points = [];
@@ -2140,7 +2140,13 @@ function renderBriefing() {
   }
 
   // Top risk cards
-  h += '<div class="canvas-title">Jetzt relevant</div>';
+  h += '<div class="canvas-title">Kandidaten — Prognose-Unsicherheit</div>';
+  h += '<div style="font:400 6pt var(--f);color:var(--muted);margin-bottom:8px;line-height:1.6">';
+  h += 'Unsicherheit = wie stark könnte unser Forecast abweichen. ';
+  h += '<span style="color:var(--red)">■</span> Rot (50+): ±10 Prozentpunkte — Ergebnis schwer vorhersagbar. ';
+  h += '<span style="color:var(--amber)">■</span> Gelb (25-49): ±5pp — moderate Unsicherheit. ';
+  h += '<span style="color:var(--green)">■</span> Grün (0-24): ±2pp — vorhersagbar. ';
+  h += 'Alle Werte geschätzt, keine Umfragen verfügbar.</div>';
   h += '<div class="briefing-grid">';
   for (const k of sortedByRisk.slice(0, 6)) {
     const e = KB[k];
@@ -2148,7 +2154,9 @@ function renderBriefing() {
     h += '<div class="briefing-card clickable" onclick="showEntity(\'' + k + '\')">';
     h += '<div class="briefing-card-title" style="color:' + riskColor + '">' + e.name + '</div>';
     h += '<div class="briefing-card-body"><span class="ev ev-j">J</span> ' + (e.summary || '').substring(0, 120) + '...</div>';
-    h += '<div class="briefing-card-tag" style="background:' + riskColor + '20;color:' + riskColor + '"><span class="ev ev-j">J</span> RISK ' + e.risk + '</div>';
+    var riskExpl = e.risk >= 50 ? 'Hohe Prognose-Unsicherheit: ±10pp' : e.risk >= 25 ? 'Moderate Unsicherheit: ±5pp' : 'Geringe Unsicherheit: ±2pp';
+    h += '<div class="briefing-card-tag" style="background:' + riskColor + '20;color:' + riskColor + '" title="' + riskExpl + '"><span class="ev ev-j">J</span> UNSICHERHEIT ' + e.risk + '/100</div>';
+    if (e.risk_reason) h += '<div style="font:400 5.5pt var(--f);color:var(--muted);margin-top:3px;padding:0 8px">' + e.risk_reason + '</div>';
     h += '</div>';
   }
   h += '</div>';
@@ -2473,7 +2481,9 @@ function showEntity(id, el) {
   h += '<div class="canvas-title">Entity: ' + p.name + ' <span class="ct-badge" style="background:' + p.color + '">DOSSIER</span></div>';
   h += '<div class="entity-card"><div class="entity-header"><div>';
   h += '<div class="entity-name" style="color:' + p.color + '">' + p.name + '</div>';
-  h += '<div class="entity-meta"><span><span class="ev ev-e">E</span> TYPE: Person</span><span><span class="ev ev-j">J</span> RISK: ' + p.risk + '</span><span><span class="ev ev-e">E</span> PARTEI: ' + (p.party || '—') + '</span></div>';
+  var riskLabel2 = p.risk >= 50 ? 'HOCH — Prognose kann ±10pp abweichen' : p.risk >= 25 ? 'MITTEL — Prognose kann ±5pp abweichen' : 'NIEDRIG — Prognose kann ±2pp abweichen';
+  h += '<div class="entity-meta"><span><span class="ev ev-e">E</span> PARTEI: ' + (p.party || '—') + '</span><span><span class="ev ev-j">J</span> UNSICHERHEIT: ' + p.risk + '/100 (' + riskLabel2 + ')</span></div>';
+  if (p.risk_reason) h += '<div style="font:400 6pt var(--f);color:var(--muted);margin:4px 0 8px;padding:6px 10px;background:var(--surface);border:1px solid var(--border);border-radius:4px">' + p.risk_reason + '</div>';
   h += '</div></div>';
   // Dossier link button
   if (p.dossierUrl) {
