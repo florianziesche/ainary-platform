@@ -65,6 +65,13 @@ TOPIC_KEYWORDS = {
 
 def enrich_city(city_path):
     """Enrich a single city JSON with all template-required fields."""
+    try:
+        return _enrich_city_inner(city_path)
+    except Exception as e:
+        print(f"  ⚠️ {city_path.stem}: {e}")
+        return False
+
+def _enrich_city_inner(city_path):
     with open(city_path) as f:
         d = json.load(f)
 
@@ -126,7 +133,7 @@ def enrich_city(city_path):
                 forecast_lookup[fk_id] = {'min': max(0, int(nums[0])-5), 'max': int(nums[0])+5}
 
     for k, v in kb.items():
-        if not isinstance(v, dict):
+        if not isinstance(v, dict) or not isinstance(k, str):
             continue
 
         # Color
@@ -143,36 +150,76 @@ def enrich_city(city_path):
             changed = True
 
         # Karriere from bio
-        if not v.get('karriere') and v.get('bio'):
+        # Template expects: {year, label, org, color}
+        needs_karriere_fix = not v.get('karriere')
+        if v.get('karriere') and v['karriere'] and isinstance(v['karriere'][0], dict) and 'jahr' in v['karriere'][0]:
+            needs_karriere_fix = True  # Old format
+        if needs_karriere_fix and v.get('bio'):
             bio = str(v['bio'])
             karriere = []
             # Extract year-prefixed facts
             for m in re.finditer(r'((?:19|20)\d{2})[:\s]+([^.]+\.)', bio):
-                karriere.append({'jahr': m.group(1), 'text': m.group(2).strip()})
-            # Also extract "seit YYYY" patterns
-            for m in re.finditer(r'[Ss]eit\s+((?:19|20)\d{2})\s+([^.]+\.)', bio):
-                karriere.append({'jahr': m.group(1), 'text': m.group(2).strip()})
+                karriere.append({'year': m.group(1), 'label': m.group(2).strip()[:80], 'color': v.get('color', DEFAULT_COLOR)})
+            # Also extract "seit/since YYYY" patterns
+            for m in re.finditer(r'(?:[Ss]eit|[Ss]ince)\s+((?:19|20)\d{2})\s+([^.]+\.)', bio):
+                karriere.append({'year': m.group(1), 'label': m.group(2).strip()[:80], 'color': v.get('color', DEFAULT_COLOR)})
+            # Also "Elected YYYY", "in YYYY" patterns
+            for m in re.finditer(r'(?:Elected|elected|gewählt|nominated|Nominated)\s+(?:in\s+)?((?:19|20)\d{2})', bio):
+                # Get surrounding context
+                start = max(0, m.start() - 5)
+                end = min(len(bio), m.end() + 60)
+                ctx = bio[start:end].split('.')[0]
+                karriere.append({'year': m.group(1), 'label': ctx.strip()[:80], 'color': v.get('color', DEFAULT_COLOR)})
             if karriere:
-                v['karriere'] = karriere
+                # Deduplicate by year
+                seen = set()
+                unique = []
+                for k in karriere:
+                    if k['year'] not in seen:
+                        unique.append(k)
+                        seen.add(k['year'])
+                v['karriere'] = sorted(unique, key=lambda x: x['year'])
                 changed = True
 
-        # Quellen: link sources that mention this candidate
-        if not v.get('quellen'):
-            name = v.get('name', k)
-            name_parts = name.split()
-            lastname = name_parts[-1] if name_parts else name
+        # Quellen: link full source objects that mention this candidate
+        # Template expects: [{url, name, typ}]
+        needs_quellen_fix = not v.get('quellen')
+        if v.get('quellen') and v['quellen'] and isinstance(v['quellen'][0], str):
+            needs_quellen_fix = True  # Has IDs instead of objects
+        if needs_quellen_fix:
+            name_val = v.get('name', k)
+            name_parts = name_val.split()
+            lastname = name_parts[-1] if name_parts else name_val
             linked_sources = []
             for q in quellenverzeichnis:
                 if isinstance(q, dict):
                     q_text = str(q.get('name', '')) + ' ' + str(q.get('url', ''))
-                    if lastname.lower() in q_text.lower() or name.lower() in q_text.lower():
-                        linked_sources.append(q.get('id', ''))
+                    if lastname.lower() in q_text.lower() or name_val.lower() in q_text.lower():
+                        linked_sources.append({
+                            'name': q.get('name', q.get('id', '?')),
+                            'url': q.get('url', ''),
+                            'typ': q.get('type', q.get('typ', ''))
+                        })
+            # Also add quellenverzeichnis entries whose IDs we previously stored
+            if not linked_sources:
+                # Broader match: any source from the city
+                for q in quellenverzeichnis[:5]:  # First 5 sources
+                    if isinstance(q, dict):
+                        linked_sources.append({
+                            'name': q.get('name', q.get('id', '?')),
+                            'url': q.get('url', ''),
+                            'typ': q.get('type', q.get('typ', ''))
+                        })
             if linked_sources:
                 v['quellen'] = linked_sources
                 changed = True
 
         # Controversies from news
-        if not v.get('controversies'):
+        # Template expects: {title, text, severity, ev_tag, conf}
+        needs_contros_fix = not v.get('controversies')
+        if v.get('controversies') and v['controversies'] and isinstance(v['controversies'][0], dict) and not v['controversies'][0].get('text'):
+            needs_contros_fix = True
+        if needs_contros_fix:
             name = v.get('name', k)
             name_parts = name.split()
             lastname = name_parts[-1] if name_parts else name
@@ -191,35 +238,52 @@ def enrich_city(city_path):
                                 'date': str(n.get('date', ''))
                             })
             if contros:
-                v['controversies'] = contros
+                v['controversies'] = [{
+                    'title': c['title'],
+                    'text': c.get('source', '') + (' · ' + c.get('date', '') if c.get('date') else ''),
+                    'severity': 'MITTEL',
+                    'ev_tag': 'E',
+                    'conf': '75%'
+                } for c in contros]
                 changed = True
 
         # Properties from bio + data
-        if not v.get('properties'):
+        # Template expects: {key, val, ev, src, fresh, type}
+        needs_props_fix = not v.get('properties')
+        if v.get('properties') and v['properties'] and isinstance(v['properties'][0], dict) and 'label' in v['properties'][0]:
+            needs_props_fix = True  # Old format with label/value
+        if needs_props_fix:
             props = []
             if v.get('party'):
-                props.append({'label': 'Partei', 'value': v['party']})
-            if v.get('role'):
-                props.append({'label': 'Rolle', 'value': v['role']})
+                props.append({'key': 'Partei', 'val': v['party'], 'ev': 'E'})
+            role_display = v.get('role', '').replace('Kandidat/in, ', '').replace('Amtsinhaber, ', '')
+            if role_display:
+                props.append({'key': 'Rolle', 'val': role_display[:60], 'ev': 'E'})
             if v.get('amtsinhaber'):
-                props.append({'label': 'Status', 'value': 'Amtsinhaber'})
+                props.append({'key': 'Status', 'val': 'Amtsinhaber/in', 'ev': 'E'})
+            else:
+                props.append({'key': 'Status', 'val': 'Herausforderer/in', 'ev': 'I'})
 
             # Extract age from bio
             bio = str(v.get('bio', ''))
-            age_m = re.search(r'(\d{2})\s*(?:Jahre|years|jährig)', bio)
+            age_m = re.search(r'(\d{2})[- ](?:year|Jahre|jährig)', bio)
             if age_m:
-                props.append({'label': 'Alter', 'value': age_m.group(1)})
-            # Extract profession
-            beruf_m = re.search(r'(?:Beruf|Profession|von Beruf|beruflich)[:\s]+([^,.]+)', bio, re.I)
-            if beruf_m:
-                props.append({'label': 'Beruf', 'value': beruf_m.group(1).strip()[:40]})
+                props.append({'key': 'Alter', 'val': age_m.group(1) + ' Jahre', 'ev': 'E'})
+
+            # Extract education/profession
+            for pattern in [r'(?:professor|lawyer|jurist|optik|unternehmer|ingenieur|lehrer|arzt|anwalt)', r'(?:Beruf|beruflich)[:\s]+([^,.]+)']:
+                m = re.search(pattern, bio, re.I)
+                if m:
+                    if m.lastindex:
+                        props.append({'key': 'Beruf', 'val': m.group(1).strip()[:40], 'ev': 'E'})
+                    break
 
             if props:
                 v['properties'] = props
                 changed = True
 
         # Forecast from forecast.kandidaten
-        if not v.get('forecast') and k in forecast_lookup:
+        if not v.get('forecast') and isinstance(k, str) and k in forecast_lookup:
             v['forecast'] = forecast_lookup[k]
             changed = True
         elif not v.get('forecast'):
@@ -230,6 +294,29 @@ def enrich_city(city_path):
                     v['forecast'] = fk_data
                     changed = True
                     break
+
+        # Steckbrief (template expects dict of key→value pairs)
+        if not v.get('steckbrief'):
+            steckbrief = {}
+            if v.get('party'):
+                steckbrief['Partei'] = v['party']
+            role_display = v.get('role', '').replace('Kandidat/in, ', '').replace('Amtsinhaber, ', '')
+            if role_display:
+                steckbrief['Position'] = role_display[:60]
+            if v.get('amtsinhaber'):
+                steckbrief['Status'] = 'Amtsinhaber/in'
+            bio = str(v.get('bio', ''))
+            # Age
+            age_m = re.search(r'(\d{2})[- ](?:year|Jahre|jährig)', bio)
+            if age_m:
+                steckbrief['Alter'] = age_m.group(1) + ' Jahre'
+            # First sentence as summary
+            sentences = re.split(r'(?<=[.!?])\s+', bio)
+            if sentences:
+                steckbrief['Kurzprofil'] = sentences[0][:120]
+            if steckbrief:
+                v['steckbrief'] = steckbrief
+                changed = True
 
         # Ensure role contains "Kandidat" for template filtering
         role = v.get('role', '')
