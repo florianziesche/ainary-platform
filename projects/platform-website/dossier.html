@@ -1083,6 +1083,7 @@ function normalizeCity(d) {
     TENANT = data.tenant;
     KB = data.kb;
     GRAPH = data.graph;
+    AGENTTRUST = data.agenttrust || null;
     NEWS = data.news;
     HYPOTHESES = data.hypotheses;
     SENTIMENT = data.sentiment;
@@ -1116,6 +1117,7 @@ function normalizeCity(d) {
 
 var USER = { name: 'Besucher', role: 'viewer' };
 let TALKINGPOINTS = [];
+let AGENTTRUST = null;
 let SCENARIOS = [];
 let CLAIM_LEDGER = [];
 let CONTRADICTIONS = [];
@@ -3636,6 +3638,67 @@ function buildStatusBar() {
 function renderAnalytics() {
   var el = document.getElementById('analytics-view');
   el.innerHTML = '<div style="padding:20px;font:400 7pt var(--f);color:var(--muted)">Lade Analytics...</div>';
+
+  // ═══ AGENTTRUST SCORE ═══
+  var at = AGENTTRUST || null;
+  var atHtml = '';
+  if (at) {
+    var lvlColor = at.trust_level === 'AUTONOMOUS' ? 'var(--green)' : at.trust_level === 'SPOT_CHECK' ? 'var(--blue)' : at.trust_level === 'SUPERVISED' ? 'var(--amber)' : 'var(--red)';
+    atHtml += '<div style="max-width:900px;margin:0 auto;padding:20px 0 0">';
+    atHtml += '<div class="canvas-title">AgentTrust Score <span class="ct-badge" style="background:'+lvlColor+'">'+at.trust_level+'</span></div>';
+    atHtml += '<div style="font:400 6.5pt var(--f);color:var(--muted);margin-bottom:12px">'+at.method+' · Dogfooding: Wir messen die Kalibrierung unserer eigenen Analysen.</div>';
+
+    // Score bar
+    atHtml += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">';
+    atHtml += '<div style="font:700 18pt var(--m);color:'+lvlColor+'">'+at.trust_score+'</div>';
+    atHtml += '<div style="flex:1;height:8px;background:var(--bg);border-radius:4px;overflow:hidden;border:1px solid var(--border)">';
+    atHtml += '<div style="width:'+at.trust_score+'%;height:100%;background:'+lvlColor+';border-radius:4px;transition:width .5s"></div></div>';
+    atHtml += '<div style="font:500 6pt var(--m);color:var(--muted)">/100</div></div>';
+
+    // Trust levels explanation
+    atHtml += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:16px">';
+    var lvls = [['0-30','UNTRUSTED','var(--red)'],['31-60','SUPERVISED','var(--amber)'],['61-80','SPOT_CHECK','var(--blue)'],['81+','AUTONOMOUS','var(--green)']];
+    for (var li=0;li<lvls.length;li++) {
+      var isActive = (li===0 && at.trust_score<=30) || (li===1 && at.trust_score>30 && at.trust_score<=60) || (li===2 && at.trust_score>60 && at.trust_score<=80) || (li===3 && at.trust_score>80);
+      atHtml += '<div style="text-align:center;padding:6px;border-radius:4px;border:1px solid '+(isActive?lvls[li][2]:'var(--border)')+';background:'+(isActive?lvls[li][2]+'15':'var(--surface)')+'"><div style="font:600 6pt var(--m);color:'+(isActive?lvls[li][2]:'var(--muted)')+'">'+lvls[li][1]+'</div><div style="font:400 5pt var(--f);color:var(--muted)">'+lvls[li][0]+'</div></div>';
+    }
+    atHtml += '</div>';
+
+    // Budget-CoCoA Calibration
+    if (at.calibration && at.calibration.results) {
+      atHtml += '<div class="canvas-title" style="margin-top:16px">Budget-CoCoA Kalibrierung <span class="ct-badge" style="background:var(--accent)">'+at.calibration.hypotheses_checked+' HYPOTHESEN</span></div>';
+      atHtml += '<div style="font:400 6pt var(--f);color:var(--muted);margin-bottom:8px">'+at.calibration.formula+'</div>';
+      
+      for (var ci=0;ci<at.calibration.results.length;ci++) {
+        var cr = at.calibration.results[ci];
+        var gapColor = cr.overconfident ? 'var(--red)' : Math.abs(cr.calibration_gap) < 5 ? 'var(--green)' : 'var(--amber)';
+        atHtml += '<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:4px;margin-bottom:4px">';
+        atHtml += '<div style="flex:1;font:500 6.5pt var(--m);color:var(--text)">'+cr.id+'</div>';
+        atHtml += '<div style="font:400 6pt var(--m);color:var(--muted)">Stated: '+cr.stated_confidence+'%</div>';
+        atHtml += '<div style="font:400 6pt var(--m);color:var(--muted)">CoCoA: '+cr.cocoa_confidence+'%</div>';
+        atHtml += '<div style="font:600 6pt var(--m);color:'+gapColor+'">'+(cr.calibration_gap>0?'+':'')+cr.calibration_gap+'%</div>';
+        if (cr.overconfident) atHtml += '<span class="ct-badge" style="background:var(--red);font-size:4.5pt">OVERCONFIDENT</span>';
+        atHtml += '</div>';
+      }
+      
+      atHtml += '<div style="display:flex;gap:16px;margin-top:10px;padding:10px;background:var(--bg);border-radius:4px">';
+      atHtml += '<div style="font:400 6pt var(--f);color:var(--muted)">Ø Calibration Gap: <span style="color:'+(Math.abs(at.calibration.avg_calibration_gap)<5?'var(--green)':'var(--amber)')+'">'+at.calibration.avg_calibration_gap+'%</span></div>';
+      atHtml += '<div style="font:400 6pt var(--f);color:var(--muted)">Overconfident: <span style="color:'+(at.calibration.overconfident_hypotheses>0?'var(--red)':'var(--green)')+'">'+at.calibration.overconfident_hypotheses+'/'+at.calibration.hypotheses_checked+'</span></div>';
+      atHtml += '</div>';
+    }
+
+    // Scoring rules
+    atHtml += '<div style="margin-top:16px;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:4px">';
+    atHtml += '<div style="font:600 6pt var(--m);color:var(--text);margin-bottom:6px">Scoring Rules</div>';
+    var rules = at.scoring_rules || {};
+    for (var rk in rules) {
+      atHtml += '<div style="font:400 5.5pt var(--m);color:var(--muted);line-height:1.8">'+rules[rk]+'</div>';
+    }
+    atHtml += '</div>';
+
+    atHtml += '</div><hr style="border:0;border-top:1px solid var(--border);margin:20px 0">';
+  }
+  el.innerHTML = atHtml + '<div style="padding:20px;font:400 7pt var(--f);color:var(--muted)">Lade Analytics...</div>';
   
   var endpoint = _aiEndpoint ? _aiEndpoint.replace('/track','/track') : 'https://ainaryventures.com/api/track';
   fetch(endpoint + '?key=ainary2026&format=raw')
