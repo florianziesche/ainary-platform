@@ -117,14 +117,25 @@ def _enrich_city_inner(city_path):
     forecast_lookup = {}
     for fk in forecast_kandidaten:
         if isinstance(fk, dict):
-            # Fix missing id: match by name against KB
+            # Fix missing id: match by name against KB (exact, then last name, then slug)
             if not fk.get('id'):
                 fk_name = fk.get('name', '')
+                fk_lastname = fk_name.split()[-1].lower() if fk_name.split() else ''
+                # Try exact name match
                 for k2, v2 in kb.items():
                     if isinstance(v2, dict) and v2.get('name') == fk_name:
                         fk['id'] = k2
                         changed = True
                         break
+                # Try last name match
+                if not fk.get('id') and fk_lastname and len(fk_lastname) > 2:
+                    for k2, v2 in kb.items():
+                        if isinstance(v2, dict):
+                            kb_name = v2.get('name', '')
+                            if fk_lastname in kb_name.lower() or fk_lastname in k2.lower():
+                                fk['id'] = k2
+                                changed = True
+                                break
             fk_id = fk.get('id', fk.get('name', ''))
             nums = re.findall(r'(\d+)', str(fk.get('erstwahlgang', '')))
             if len(nums) >= 2:
@@ -295,8 +306,8 @@ def _enrich_city_inner(city_path):
                     changed = True
                     break
 
-        # Steckbrief (template expects dict of key→value pairs)
-        if not v.get('steckbrief'):
+        # Steckbrief (template expects dict of key→value pairs) — always regenerate
+        if True:
             steckbrief = {}
             if v.get('party'):
                 steckbrief['Partei'] = v['party']
@@ -318,16 +329,13 @@ def _enrich_city_inner(city_path):
                 v['steckbrief'] = steckbrief
                 changed = True
 
-        # Ensure role contains "Kandidat" for template filtering
+        # Ensure role ALWAYS contains "Kandidat" for template filtering
         role = v.get('role', '')
-        if role and 'Kandidat' not in role and 'kandidat' not in role:
+        if 'andidat' not in role.lower():
             if v.get('amtsinhaber'):
-                v['role'] = f"Amtsinhaber, {role}" if role else "Amtsinhaber"
+                v['role'] = f"Kandidat/in (Amtsinhaber), {role}" if role else "Kandidat/in (Amtsinhaber)"
             else:
                 v['role'] = f"Kandidat/in, {role}" if role else "Kandidat/in"
-            changed = True
-        elif not role:
-            v['role'] = 'Kandidat/in'
             changed = True
 
         # Risk score from controversies + weaknesses
@@ -378,7 +386,7 @@ def _enrich_city_inner(city_path):
                                 for n in news if isinstance(n, dict)).lower()
         for topic, keywords in TOPIC_KEYWORDS.items():
             matches = sum(1 for kw in keywords if kw in all_news_text)
-            if matches >= 2:
+            if matches >= 1:
                 topic_id = 'topic_' + topic.lower().replace(' ', '_').replace('&', '')
                 nodes.append({
                     'id': topic_id,
@@ -419,7 +427,7 @@ def _enrich_city_inner(city_path):
         changed = True
 
     # ═══ FIX 4: Topics ═══
-    if not d.get('topics') or len(d.get('topics', [])) < 2:
+    if True:  # Always regenerate topics to catch bilingual keywords
         all_text = ' '.join(
             str(c.get('claim','')) for c in claim_ledger if isinstance(c, dict)
         ).lower() + ' ' + ' '.join(
@@ -430,7 +438,7 @@ def _enrich_city_inner(city_path):
         topics = []
         for topic, keywords in TOPIC_KEYWORDS.items():
             matches = sum(1 for kw in keywords if kw in all_text)
-            if matches >= 2:
+            if matches >= 1:
                 # Find representative sentence
                 desc = ''
                 for n in news:
