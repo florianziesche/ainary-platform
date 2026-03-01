@@ -25,6 +25,7 @@
     blog: isDE ? 'Building in Public' : 'Building in Public',
     about: isDE ? 'Über uns' : 'About',
     resources: isDE ? 'Ressourcen' : 'Resources',
+    usecases: isDE ? 'Anwendungen' : 'Use Cases',
     connect: isDE ? 'Verbinden' : 'Connect',
     legal: isDE ? 'Rechtliches' : 'Legal',
     privacy: isDE ? 'Datenschutz' : 'Privacy',
@@ -86,6 +87,7 @@
             <a href="${blogLink}" style="color:#55555e;text-decoration:none;font-size:0.8rem;">${t.blog}</a>
             <a href="${aboutLink}" style="color:#55555e;text-decoration:none;font-size:0.8rem;">${t.about}</a>
             <a href="${resourcesLink}" style="color:#55555e;text-decoration:none;font-size:0.8rem;">${t.resources}</a>
+            <a href="${prefix}index${isDE ? '-de' : ''}.html#ask-ai" style="color:#55555e;text-decoration:none;font-size:0.8rem;">${t.usecases}</a>
           </div>
         </div>
         <div>
