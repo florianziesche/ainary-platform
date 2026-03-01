@@ -33,7 +33,9 @@ Usage:
     python3 cli.py graph --query "..." # Natural language query
     python3 cli.py contradictions [city] # Semantic contradiction detection
     python3 cli.py knowledge           # Extract patterns + verified truths
-    python3 cli.py full-pipeline       # Run everything: audit→eija→sentiment→demographics→graph→knowledge
+    python3 cli.py verify              # ⛔ Fact verification (run BEFORE deploy)
+    python3 cli.py verify --fix        # Auto-fix deterministic issues
+    python3 cli.py full-pipeline       # Run everything: audit→verify→eija→sentiment→demographics→graph→knowledge
 """
 
 import sys
@@ -445,6 +447,16 @@ if __name__ == '__main__':
             print(f"  [{p['eija']}] {p['pattern']}")
         ke.close()
 
+    elif cmd == 'verify':
+        from pipeline.verify_facts import main as verify_main
+        import sys as _sys
+        # Pass remaining args
+        _sys.argv = ['verify_facts'] + args[1:]
+        exit_code = verify_main()
+        if exit_code:
+            print("\n⛔ DEPLOY BLOCKED. Fix HOCH issues before deploying.")
+        sys.exit(exit_code)
+
     elif cmd == 'full-pipeline':
         print(f"{'='*60}")
         print(f"FULL PIPELINE RUN")
@@ -453,25 +465,36 @@ if __name__ == '__main__':
         t0 = time.time()
 
         # 1. Audit
-        print(f"\n[1/7] Quality Audit...")
+        print(f"\n[1/8] Quality Audit...")
         cmd_audit()
 
-        # 2. EIJA
-        print(f"\n[2/7] EIJA Re-Audit...")
+        # 1b. Fact Verification
+        print(f"\n[2/8] Fact Verification...")
+        from pipeline.verify_facts import verify_city as _verify
+        hoch_count = 0
+        for f in sorted(os.listdir(CITIES_DIR)):
+            if not f.endswith('.json') or f == 'internal.json': continue
+            d = json.load(open(CITIES_DIR / f))
+            issues = _verify(f.replace('.json',''), d)
+            hoch_count += sum(1 for i in issues if i.impact == 'HOCH')
+        print(f"  🔴 HOCH: {hoch_count} | {'⛔ DEPLOY BLOCKED' if hoch_count else '✅ PASS'}")
+
+        # 3. EIJA
+        print(f"\n[3/8] EIJA Re-Audit...")
         from pipeline.eija_auditor import EIJAAuditor
         auditor = EIJAAuditor()
         eija_report = auditor.audit_all_cities(apply=False)
         print(f"  {eija_report['total_reclassified']}/{eija_report['total_claims']} reclassifiable ({eija_report['reclassification_rate']}%)")
 
         # 3. Backtest
-        print(f"\n[3/7] Backtest vs 2020...")
+        print(f"\n[4/8] Backtest vs 2020...")
         from pipeline.backtest import Backtester
         bt = Backtester()
         bt_report = bt.run()
         print(f"  {bt_report['verdict']['summary']}")
 
         # 4. Sentiment
-        print(f"\n[4/7] Sentiment Analysis...")
+        print(f"\n[5/8] Sentiment Analysis...")
         from pipeline.sentiment import SentimentAnalyzer
         sa = SentimentAnalyzer()
         sent_results = sa.analyze_all()
@@ -480,7 +503,7 @@ if __name__ == '__main__':
         print(f"  {scored} candidate-news pairs scored")
 
         # 5. Demographics
-        print(f"\n[5/7] Demographics...")
+        print(f"\n[6/8] Demographics...")
         from pipeline.demographics import DemographicsExtractor
         de = DemographicsExtractor()
         dem_results = de.extract_all()
@@ -488,7 +511,7 @@ if __name__ == '__main__':
         print(f"  {with_ew}/{len(dem_results)} cities with population data")
 
         # 6. Graph
-        print(f"\n[6/7] Entity Graph...")
+        print(f"\n[7/8] Entity Graph...")
         from pipeline.graph import EntityGraph
         g = EntityGraph()
         g.build_from_dossiers()
@@ -496,7 +519,7 @@ if __name__ == '__main__':
         print(f"  {stats['total_nodes']} nodes, {stats['total_edges']} edges")
 
         # 7. Knowledge
-        print(f"\n[7/7] Knowledge Extraction...")
+        print(f"\n[8/8] Knowledge Extraction...")
         from pipeline.knowledge_extractor import KnowledgeExtractor
         ke = KnowledgeExtractor()
         kb = ke.extract_all()
