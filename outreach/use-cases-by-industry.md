@@ -8,30 +8,42 @@
 ## Maschinenbau
 
 ### 1. Predictive Maintenance
-**Beschreibung:** KI analysiert Sensordaten (Vibration, Temperatur, Laufzeit) und sagt Ausfälle 2-4 Wochen im Voraus vorher.  
-**Value Prop:** 20-30% weniger ungeplante Stillstände, ROI in 6-12 Monaten.  
-**Daten benötigt:** Sensordaten (historisch + live), Wartungslogs.  
-**Technologie:** Time-Series Forecasting (LSTM, Prophet), Anomalie-Erkennung.
+**Beschreibung:** KI analysiert Sensordaten (Vibration, Temperatur, Laufzeit, Drehzahl) und sagt Ausfälle 2-4 Wochen im Voraus vorher. Große Datenmengen aus Maschinenbetrieb werden analysiert → Muster identifiziert → bevorstehender Verschleiß erkannt.  
+**Value Prop:** 20-30% weniger ungeplante Stillstände, 15-25% niedrigere Wartungskosten, ROI in 6-12 Monaten. Wartung kann terminiert werden, dass sie geringstmögliche Auswirkungen auf Produktion hat.  
+**Daten benötigt:** Sensordaten (historisch + live), Wartungslogs, Ausfallhistorie.  
+**Technologie:** Time-Series Forecasting (LSTM, Prophet), Anomalie-Erkennung (Isolation Forest, Autoencoders).  
+**Quelle:** Fraunhofer IIS Whitepaper "Predictive Maintenance durch KI" (2026), GFOS Blog "KI in der Produktion"
 
 ---
 
 ### 2. Quality Control mit Computer Vision
-**Beschreibung:** Automatische Fehlererkennung auf Bauteilen (Kratzer, Risse, Maßabweichungen) per Kamera + KI.  
-**Value Prop:** 95%+ Erkennungsrate, 10x schneller als manuelle Prüfung, weniger Ausschuss.  
+**Beschreibung:** Automatische Fehlererkennung auf Bauteilen (Kratzer, Risse, Maßabweichungen, Farbabweichungen) per Kamera + KI. Analysiert 100% aller Produkte in Echtzeit — bevor sie zum Kunden gelangen. Dokumentation für Qualitätsnachweise automatisch generiert.  
+**Value Prop:** 99%+ Erkennungsrate (besser als manuell), 10x schneller als menschliche Kontrolle, weniger Ausschuss, messbare Qualitätsverbesserung.  
 **Daten benötigt:** Bilder von guten + schlechten Teilen (500-1.000 Samples pro Kategorie).  
-**Technologie:** CNN-basierte Klassifikation (YOLOv8, EfficientNet).
+**Technologie:** CNN-basierte Klassifikation (YOLOv8, EfficientNet), Object Detection, Segmentation.  
+**Quelle:** Telekom MMS Blog "Computer Vision in der Qualitätssicherung" (2025), Fraunhofer IEM "KI in der Produktion"
 
 ---
 
 ### 3. Supply Chain Optimization
-**Beschreibung:** Nachfrageprognose + optimale Lagerhaltung durch historische Verkaufs-/Auftragsdaten.  
-**Value Prop:** 15-25% niedrigere Lagerkosten, weniger Out-of-Stock Situationen.  
-**Daten benötigt:** Auftragsdaten (2+ Jahre), Lieferzeiten, Saisonalität.  
-**Technologie:** Time-Series Forecasting, Reinforcement Learning (optional).
+**Beschreibung:** Nachfrageprognose + optimale Lagerhaltung durch historische Verkaufs-/Auftragsdaten. KI-gestützte Algorithmen analysieren Bestellungen, Lieferzeiten, Nachfragemuster → präzise Prognosen → Lagerbestände optimal steuern → Produktionsplanung verbessern. Früherkennung von Materialengpässen (2-4 Wochen Vorlauf).  
+**Value Prop:** 15-25% niedrigere Lagerkosten (weniger Überbestände), 20-30% bessere Liefertermintreue, weniger Out-of-Stock Situationen. Besonders relevant für Automotive-Zulieferer (volatile Lieferketten).  
+**Daten benötigt:** Auftragsdaten (2+ Jahre), Lieferzeiten, Saisonalität, Lieferanten-Performance.  
+**Technologie:** Time-Series Forecasting (Prophet, ARIMA), Demand Forecasting, Reinforcement Learning (optional).  
+**Quelle:** Salesforce "KI in der Automobilindustrie" (2025), Alexander Thamm "KI in der Automobil- und Zulieferindustrie"
 
 ---
 
-### 4. Energieeffizienz
+### 4. Digitale Zwillinge (Real-Time Optimization)
+**Beschreibung:** Virtuelles Modell der Produktion erfasst und steuert in Echtzeit Materialflüsse, Energieverbrauch, Maschinenleistung. KI-gestützter Digitaler Zwilling simuliert "Was-wäre-wenn"-Szenarien → optimale Produktionssteuerung.  
+**Value Prop:** 10-15% höhere Auslastung, 15-20% Energieeinsparung, schnellere Reaktion auf Störungen.  
+**Daten benötigt:** Echtzeit-Sensordaten, Produktionspläne, Maschinenparameter.  
+**Technologie:** Digital Twin Frameworks (RAPIDZ, Azure Digital Twins), Simulation, Optimization.  
+**Quelle:** Fraunhofer ITWM "Condition Monitoring und Predictive Maintenance" (2026)
+
+---
+
+### 5. Energieeffizienz
 **Beschreibung:** KI analysiert Energieverbrauch und optimiert Produktionszeiten / Maschinenlaufzeiten.  
 **Value Prop:** 10-20% niedrigerer Energieverbrauch, CO₂-Reduktion messbar.  
 **Daten benötigt:** Smart Meter Daten, Produktionspläne.  

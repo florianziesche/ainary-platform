@@ -11,7 +11,7 @@ START: Kunde identifiziert
 │
 ├─ Wo sitzt das Unternehmen?
 │  ├─ Sachsen → SAB EFRE (beste Konditionen!) oder BAFA
-│  └─ Andere Bundesländer → BAFA oder go-digital
+│  └─ Andere Bundesländer → BAFA (go-digital eingestellt ab 1.1.2025!)
 │
 ├─ Wie viele Mitarbeiter?
 │  ├─ <10 MA (Kleinstunternehmen) → SAB EFRE Heranführung (60%!) oder BAFA
@@ -42,16 +42,16 @@ START: Kunde identifiziert
 
 | Kriterium | BAFA | go-digital | SAB EFRE | KfW Digitalisierung |
 |-----------|------|------------|----------|---------------------|
-| **Fördersatz** | 50-80% | 50% | 35-60% | Zins-Vorteil + 3% Zuschuss |
-| **Max. Förderung** | €3.500 | €16.500 | €6K-€45K | €25 Mio. (Kredit) |
-| **Projektgröße** | Klein | Klein-Mittel | Klein-Groß | Groß |
-| **Region** | Ganz DE | Ganz DE | Nur Sachsen | Ganz DE |
-| **Förderfähig** | Beratung | Beratung + Invest | Beratung + Invest | Invest (Hard/Soft) |
-| **Antragsprozess** | Mittel | Komplex | Komplex | Über Hausbank |
-| **Durchlaufzeit** | 3-6 Monate | 4-8 Monate | 4-8 Monate | 2-4 Wochen |
-| **Zulassung nötig** | Nein (Kunde stellt) | Ja (Berater) | Nein | Nein |
-| **Kombination** | Mit KfW, nicht SAB | Mit KfW | Mit KfW, nicht BAFA | Mit BAFA/SAB |
-| **Laufzeit** | Bis 31.12.2026 | Unklar (ggf. 2024 Ende) | Bis 31.12.2027 | Unbegrenzt |
+| **Fördersatz** | 50-80% | ❌ EINGESTELLT | 35-60% | Zins-Vorteil + 3% Zuschuss |
+| **Max. Förderung** | €3.500 | ❌ EINGESTELLT | €6K-€45K | €25 Mio. (Kredit) |
+| **Projektgröße** | Klein | — | Klein-Groß | Groß |
+| **Region** | Ganz DE | — | Nur Sachsen | Ganz DE |
+| **Förderfähig** | Beratung | — | Beratung + Invest | Invest (Hard/Soft) |
+| **Antragsprozess** | Mittel | — | Komplex | Über Hausbank |
+| **Durchlaufzeit** | 3-6 Monate | — | 4-8 Monate | 2-4 Wochen |
+| **Zulassung nötig** | Nein (Kunde stellt) | — | Nein | Nein |
+| **Kombination** | Mit KfW, nicht SAB | — | Mit KfW, nicht BAFA | Mit BAFA/SAB |
+| **Laufzeit** | Bis 31.12.2026 | **Ab 1.1.2025 beendet** | Bis 31.12.2027 | Unbegrenzt |
 
 ---
 
@@ -179,6 +179,33 @@ START: Kunde identifiziert
 - SAB EFRE: Antrag VOR Bestellung/Vertrag
 - KfW: Antrag VOR Investition
 → "Zu spät" = keine Förderung
+
+---
+
+## BAFA BERATER-REGISTRIERUNG (Florian kann sich registrieren lassen!)
+
+### Voraussetzungen
+- Qualifikation als Berater (Studium, Berufserfahrung, Referenzen)
+- Qualitätssicherungssystem nachweisen (ISO, Prozessdokumentation)
+- Nachweis Berufshaftpflichtversicherung
+- Kostenfreie Registrierung via BAFA Online-Portal
+
+### Prozess
+1. **Profil erstellen:** https://elan1.bafa.bund.de/ubf/registrierung/
+2. **Nachweise hochladen:** Qualifikation, QM-System, Versicherung (PDF)
+3. **Berater ID:** Sofort nach Profil-Erstellung (Unternehmensnummer)
+4. **Freischaltung:** BAFA prüft → Status wechselt von "NICHT GELISTET" zu "GELISTET"
+5. **Dauer:** 2-4 Wochen (keine gesonderte Mitteilung)
+
+### Vorteil für Florian
+- **Sofort vermittelbar:** "Ich bin BAFA-registrierter Berater" = Trust-Signal
+- **Förderungs-Angle:** "80% staatlich gefördert, nur noch bis Ende 2026"
+- **Differenzierung:** Viele Berater NICHT registriert → Florian = sofort einsetzbar
+
+### WICHTIG: Brutto-Regelung ab 15.11.2025
+- **NEU:** Bei nicht Vorsteuerabzugsberechtigten wird Zuschuss auf BRUTTO-Rechnungsbetrag berechnet
+- **Vorher:** Nur NETTO förderfähig
+- **Bedeutung:** Höhere Förderung für Freiberufler/Kleinunternehmen (kein Vorsteuerabzug)
 
 ---
 
