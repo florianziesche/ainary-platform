@@ -261,8 +261,10 @@ def _enrich_city_inner(city_path):
         # Properties from bio + data
         # Template expects: {key, val, ev, src, fresh, type}
         needs_props_fix = not v.get('properties')
-        if v.get('properties') and v['properties'] and isinstance(v['properties'][0], dict) and 'label' in v['properties'][0]:
-            needs_props_fix = True  # Old format with label/value
+        if v.get('properties') and v['properties'] and isinstance(v['properties'][0], dict):
+            first = v['properties'][0]
+            if 'label' in first or 'k' in first or ('key' not in first):
+                needs_props_fix = True  # Old/wrong format
         if needs_props_fix:
             props = []
             if v.get('party'):
