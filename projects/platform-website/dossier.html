@@ -1690,7 +1690,7 @@ function buildIntelFeed() {
     html += '<div class="feed-item ' + cls + '" onclick="showNewsDetail('+fi+')" style="cursor:pointer">';
     html += '<div class="feed-source">' + n.source + ' · ' + n.date + (n.url ? ' · <a href="'+n.url+'" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent);text-decoration:underline">Quelle</a>' : '') + '</div>';
     html += '<div class="feed-title">' + n.title + '</div>';
-    html += '<div class="feed-body">' + (n.body || n.summary || '').substring(0, 100) + '...</div>';
+    html += '<div class="feed-body">' + (n.summary || n.body || '').substring(0, 140) + '</div>';
     html += '</div>';
   }
   el.innerHTML = html;
@@ -2544,8 +2544,11 @@ function showEntity(id, el) {
     for (const c of p.controversies) {
       const sev = c.severity === 'SCHWERWIEGEND' ? 'var(--red)' : c.severity === 'MITTEL' ? 'var(--amber)' : 'var(--muted)';
       h += '<div style="margin-bottom:10px"><span class="ev ev-' + (c.ev_tag || 'e') + '">' + (c.ev_tag || 'E').toUpperCase() + '</span> <strong style="color:' + sev + '">' + c.title + '</strong>';
-      h += ' <span style="font:500 5.5pt var(--m);color:var(--green)">' + (c.conf || '') + '</span>';
-      h += '<div style="font-size:7pt;color:var(--text2);margin-top:2px">' + c.text + '</div></div>';
+      h += ' <span style="font:500 5.5pt var(--m);color:var(--green)">' + (c.conf ? c.conf + '%' : '') + '</span>';
+      if (c.summary) h += '<div style="font-size:7pt;color:var(--text);margin-top:4px;line-height:1.5">' + c.summary + '</div>';
+      h += '<div style="font-size:6.5pt;color:var(--text2);margin-top:2px">' + (c.source||'') + '</div>';
+      if (c.url && c.url.indexOf('http') === 0) h += '<div style="margin-top:3px"><a href="' + c.url + '" target="_blank" rel="noopener" style="font:500 5.5pt var(--m);color:var(--accent);text-decoration:none">Quelle öffnen ↗</a></div>';
+      h += '</div>';
     }
     h += '</div></div>';
   }
@@ -2589,8 +2592,14 @@ function showEntity(id, el) {
     h += '<div class="entity-card"><div class="entity-body">';
     for (const z of p.zitate) {
       h += '<div style="border-left:2px solid var(--accent);padding-left:10px;margin-bottom:10px">';
-      h += '<div style="font:italic 7.5pt var(--f);color:var(--text);line-height:1.5"><span class="ev ev-e">E</span> "' + z.text + '"</div>';
-      h += '<div style="font:400 5.5pt var(--m);color:var(--muted);margin-top:2px">' + (z.quelle || z.source || '') + (z.datum ? ' · ' + z.datum : '') + '</div>';
+      h += '<div style="font:italic 7.5pt var(--f);color:var(--text);line-height:1.5"><span class="ev ev-e">E</span> \u201e' + z.text + '\u201c</div>';
+      var zSrc = z.quelle || z.source || '';
+      var zDate = z.datum || z.date || '';
+      if (z.url && z.url.indexOf('http') === 0) {
+        h += '<div style="font:400 5.5pt var(--m);color:var(--muted);margin-top:2px"><a href="' + z.url + '" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none">' + zSrc + ' ↗</a>' + (zDate ? ' · ' + zDate : '') + '</div>';
+      } else {
+        h += '<div style="font:400 5.5pt var(--m);color:var(--muted);margin-top:2px">' + zSrc + (zDate ? ' · ' + zDate : '') + '</div>';
+      }
       h += '</div>';
     }
     h += '</div></div>';
