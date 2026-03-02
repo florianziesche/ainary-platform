@@ -20,8 +20,11 @@
 → Winner: Group J (Random Mutation/Jazz, 46/50). Key output: Comp Switch Ritual, Mortality Constraint, Ensemble Performance model
 → Runner-up: Group I (Systems, 45/50). Key output: Three-Axis Framework, Trust Surface, Confidence-Commitment Contract
 
-### Woche 5 — 2. März 2026
+### Woche 5 — 2. März 2026 ✅
 **"What does an AI agent's ideal relationship with money look like — how should it think about revenue, value creation, and economic survival for its human?"**
+→ Results: `weekly/2026-03-01/SYNTHESIS.md`, `weekly/2026-03-01/RESULTS-SUMMARY.md`
+→ Winners: Three-way tie — Group B (Inversion), D (Adversarial), F (Socratic), all 43/50
+→ Key outputs: Financial Amygdala Dampener, Created:Captured Ratio, Deflationary Relationship, Calving Ledger
 
 ### Woche 6 — 9. März 2026
 **"How should an AI handle disagreements with its human when it believes the human is making a mistake — what are the ethics of persuasion for a non-human intelligence?"**

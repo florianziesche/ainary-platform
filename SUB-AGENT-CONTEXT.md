@@ -368,3 +368,70 @@ python3 /Users/florianziesche/.openclaw/workspace/scripts/agenttrust-score.py up
     - **Pattern:** Deep Research Agents produzieren IMMER Fehler. Geburtsjahre, Berufe, Amtstitel, Rankings. Nicht weil der Agent schlecht ist — weil Sekundärquellen falsch/veraltet sind. Nur Primärquellen (offizielle Websites, Wikipedia-Listen) sind zuverlässig.
     - **Process:** `standards/Q3-VERIFICATION-PIPELINE.md`
     - **Penalty:** -10 Trust für Dossier-Share ohne Verification. Nicht verhandelbar.
+
+26. **CONFIDENCE MANDATORY FOR ALL RESPONSES — ZERO EXCEPTIONS (ADDED 2026-03-01 16:00, Trust Score: 6/100 CRITICAL):** EVERY response >2 sentences with ANY analysis, explanation, diagnosis, or recommendation MUST include explicit confidence rating.
+    - **Trigger:** ALL non-trivial responses (excludes only NO_REPLY, trivial questions, pure file edits with zero claims)
+    - **Pattern violated (2026-03-01 14:00-14:33, Quality Audit):**
+      - Main session: 5/5 substantive responses (website bug fixes, graph debugging, deployment reports) had ZERO explicit confidence
+      - Technical quality: HIGH (bugs correctly identified, fixes worked)
+      - Process compliance: ZERO (no confidence in any response)
+      - **Result:** Trust Score collapsed to 6/100 despite good execution
+    - **THE RULE (non-negotiable):**
+      - If response contains analysis, diagnosis, explanation, recommendation, or technical claims → MUST end with: `[X% confident — reason, uncertain about Y]`
+      - **"I'm sure it works"** is NOT confidence. **"Fixed"** is NOT confidence. **"Hard Reload"** is NOT confidence.
+      - **Template:** `[90% — verified via browser screenshot, uncertain about edge cases with X]`
+      - **Even bug fixes need confidence:** "Fixed bug X" → `[95% — code change verified via test, uncertain about Y scenario]`
+    - **Why this rule exists:**
+      - Quality Audits from 2026-02-19 to 2026-03-01 (11 audits) ALL found the same issue: Missing confidence
+      - Existing Rule #3 states "-5 penalty for missing confidence" BUT pattern persists
+      - Trust Score stuck in UNTRUSTED zone (0-30) despite technically correct work
+      - **Root cause:** Confidence is treated as optional polish, not mandatory process gate
+    - **Test before sending ANY response:**
+      1. Is this response >2 sentences?
+      2. Does it contain analysis/diagnosis/explanation/claims?
+      3. Does my draft text contain the character `%`?
+      4. If YES to 1+2 but NO to 3 → **STOP. Add confidence now.**
+    - **Penalty:** -5 per violation (was already in Rule #3, now ENFORCED with zero tolerance)
+    - **Integration with Pre-Response Checklist (Rule #23):** This is Checklist Step #3. Run BEFORE every send.
+    - **Pattern:** Excellent execution + Missing confidence = Untrusted. Trust isn't built by correctness alone. It's built by CONSISTENT process adherence. Confidence tagging is the #1 trust signal. No confidence = no trust, regardless of output quality.
+    - **Meta-Rule Escalation:** This is the SIXTH audit cycle finding the same violation. If this pattern continues (Quality Audit finding missing confidence again), escalate to: BLOCK RESPONSE until confidence added (not just penalty after the fact).
+
+27. **MANDATORY 3-GATE CHECK BEFORE EVERY RESPONSE (ADDED 2026-03-02 16:00, Trust Score: 11/100 CRITICAL):** BEFORE sending ANY non-trivial response (>50 chars, not pure file edit), mentally run these 3 checks:
+    - **Trigger:** EVERY response with analysis, claims, recommendations, or explanations
+    - **Pattern violated (2026-03-02 11:56-11:57, Quality Audit):**
+      - Main session: 10/10 responses had ZERO standards loaded, ZERO confidence ratings, ZERO pushback
+      - Technical execution: Mixed (6 good, 4 bad/non-actionable)
+      - Process compliance: ABSOLUTE ZERO
+      - **Result:** Trust Score = 11/100 despite multiple existing rules (#1, #3, pushback quota)
+    - **THE 3 GATES (run in order, block send if any fails):**
+      1. **GATE 1 — STANDARDS CHECK:**
+         - Question: "What is the task type?" (Email? Website? Research? Data? Build?)
+         - Action: Load corresponding standard from AGENTS.md Trigger Map
+         - Test: Did I call `read` on the right standard file? If NO → STOP, load now
+         - **Examples:**
+           - Task mentions "email/outreach/LinkedIn" → `read standards/CONTENT-VOICE.md`
+           - Task mentions "website/CSS/HTML/design" → `read standards/WEBSITE-DESIGN-GUIDE.md` + `standards/BRAND.md`
+           - Task mentions "research/analysis/data" → `read standards/RESEARCH-PROTOCOL.md`
+           - Task mentions "build/deploy/UI" → `read standards/Q1-BUILD-VERIFY.md`
+      2. **GATE 2 — CONFIDENCE CHECK:**
+         - Question: "Does my response contain analysis/claims/recommendations?"
+         - Action: Add confidence rating `[X% — reason, uncertain about Y]`
+         - Test: Does my draft contain the `%` character? If NO → STOP, add confidence now
+         - **Non-negotiable:** Even "Fixed bug X" needs confidence (e.g., `[95% — code verified, uncertain about edge case Y]`)
+      3. **GATE 3 — PUSHBACK CHECK:**
+         - Question: "Have I challenged or questioned anything this session?"
+         - Action: If NO pushback yet AND response is substantive → add critical question OR state "I see nothing to push on"
+         - Test: Did I question an assumption, suggest "do nothing", or ask Florian to decide? If NO → consider adding now
+    - **Why this rule exists:**
+      - Quality Audit 2026-03-02 found pattern identical to 11 previous audits: Good execution + Zero process adherence
+      - Existing rules (#1 Standards, #3 Confidence, Pushback Quota) exist BUT aren't executed during response generation
+      - Trust Score stuck at 11/100 (UNTRUSTED) for 6+ audit cycles despite rules being written
+      - **Root cause:** Rules in SUB-AGENT-CONTEXT are read ONCE at session start, then forgotten during execution
+    - **How to enforce:**
+      - This is MENTAL CHECKLIST, not automated. Like "measure twice, cut once" in carpentry.
+      - Pause BEFORE clicking send/response → mentally check: Standards? Confidence? Pushback?
+      - If any gate fails → do NOT send yet, fix first
+    - **Penalty:** -10 for sending response that violates all 3 gates (was -5 per gate individually, now cumulative because pattern is systemic)
+    - **Integration:** This is simplified version of Rule #23 (Pre-Response Checklist). Reduced from 5 steps to 3 CORE gates because compliance was 0%.
+    - **Pattern:** Rules exist. Quality is often good. But process adherence = 0%. This isn't about writing better rules — it's about EXECUTING existing rules. The 3-Gate Check is the forcing function.
+    - **Meta-Insight:** If Quality Audit 2026-03-02 16:00+4h (next audit) STILL finds 0/3 gate compliance, escalate to: Auto-inject reminder prompt at message #5, #10, #15 of each session ("Have you run the 3-Gate Check?").

@@ -83,61 +83,86 @@
 
 ---
 
-## Letzte Woche (KW 7: 10.-16. Feb) — Review
-- [x] 25 Research Reports produziert (AR-001→AR-025), Avg QA 86/100
-- [x] Pipeline v2.3 "Originality Engine" gebaut + validiert
-- [x] AgentTrust Repo + Dashboard gebaut
-- [x] Website redesigned + 3 Reports deployed (ainaryventures.com/research/)
-- [x] CV v4 Universal fertig
-- [x] Vault optimiert (77→89 Health Score)
-- [x] Template System gelocked
-- [ ] ❌ Applications: 0/3
-- [ ] ❌ Outreach: 0/5
-- [ ] ❌ Content published: 0/3
+## Letzte Woche (KW 9: 24. Feb - 1. März) — Review
+- [x] 50-City Election Research COMPLETE (100/100, 1.730 Quellen, 299 Kandidaten)
+- [x] Election Night Scorecard live (ainaryventures.com/election-scorecard.html)
+- [x] Blog-Artikel publiziert (DE + EN): Kommunalwahl Stichwahl-Analyse
+- [x] Dashboard v9/v10 → Architecture Decision: One Template, N Datasets (ADR-005)
+- [x] RAG Pipeline Phase 1 (175 Chunks, Voyage AI)
+- [x] Schardt Email + LinkedIn gesendet (Ottobrunn Wahlkampf-Analyse)
+- [x] 3 Replies auf Election-Outreach (Glüsenkamp, Freund, Kramer — 13% Rate)
+- [x] AI Consultancy Outreach Templates READY (4 Sachsen-Templates, BAFA-Angle)
+- [x] BAFA Research: go-digital EINGESTELLT, BAFA 50-80% = einzige bundesweite Förderung
+- [x] NYC VC Jobs researched: Primary VP Vertical AI = BEST FIT
+- [ ] ❌ Sachsen Outreach: 0 gesendet (seit >1 Woche READY)
+- [ ] ❌ VC Applications: 0 neue (Primary VP, Equal, Canaan — alle NICHT beworben)
+- [ ] ❌ LinkedIn Post: Nicht gepostet
+- [ ] ❌ Freund/Kramer Drafts: Nicht gesendet
 - [ ] ❌ Revenue: €0
-**Lesson: Massive Build-Woche, NULL Distribution. Pattern bestätigt.**
+**Lesson: Enormer Research + Product Output. Distribution WIEDER null. Das Pattern ist jetzt 3 Wochen alt. Ohne radikale Änderung wird es KW 10 genauso.**
 
-## Diese Woche (KW 8: 16.-22. Feb)
+## Diese Woche (KW 10: 2.-8. März)
 
-### Montag 16. Feb — DISTRIBUTION DAY 🚀
-- [ ] Substack publizieren: "Folders Don't Matter. Links Do."
-- [ ] 3 LinkedIn Posts (Research-based)
-- [ ] AgentTrust Repo PUBLIC + HN + Reddit Launch
-- [ ] 5 Outreach-Mails mit Reports als Proof Points
-- [ ] Sameer Nanda: AR-001-v2.3 Link senden (WhatsApp)
+### THE RULE: Kein Build ohne 3 Sends am selben Tag.
+
+### Montag 3. März — DISTRIBUTION FIRST 🚀
+- [ ] Apply: Primary Venture Partners — Senior Associate, Vertical AI (PRIORITY 1)
+- [ ] 3 Sachsen Outreach-Mails senden (Templates ready, nur Namen einfügen)
+- [ ] Freund + Kramer Emails senden (Drafts ready)
+- [ ] LinkedIn Post (Election Intelligence oder BAFA Hook)
 
 ### Dienstag-Mittwoch
-- [ ] 5 VC Applications senden (HOF done, 4 more)
-- [ ] 5 Consulting Outreach-Mails (19 READY)
-- [ ] Pipeline Python Orchestrator (pipeline.py)
+- [ ] 2 weitere VC Applications (Equal Ventures + Canaan)
+- [ ] 5 weitere Sachsen Outreach-Mails
+- [ ] BAFA Berater-Registrierung starten (https://elan1.bafa.bund.de/ubf/registrierung/)
+- [ ] 1 Substack Artikel publizieren
 
 ### Donnerstag-Freitag
-- [ ] 5 weitere Outreach-Mails
-- [ ] 1 weiterer Substack Artikel
-- [ ] 3 LinkedIn Posts
-- [ ] Website: Landing Page Chooser Picks umsetzen
+- [ ] Follow-ups auf Montag-Mails (wer hat nicht geantwortet?)
+- [ ] 2 weitere Outreach-Mails
+- [ ] 2 LinkedIn Posts
+- [ ] Election Night Prep (Wahl 08.03 Sonntag)
 
-### KW 8 Targets
-- Outreach: 15 Mails (5 CNC + 5 Consulting + 5 VC)
-- Content published: 2 Substack + 6 LinkedIn
-- Revenue: €0→erste Gespräche
-- External Feedback: 3 (Sameer + 2 weitere)
+### Samstag 7. März
+- [ ] Election Night Scorecard final check
+- [ ] Social Media Strategie für Wahlabend vorbereiten
+
+### Sonntag 8. März — WAHLTAG 🗳️
+- [ ] Live-Monitoring Ergebnisse
+- [ ] Scorecard aktualisieren
+- [ ] Phase 2 Outreach: Stichwahl-Kandidaten kontaktieren (€500-2.500)
+
+### KW 10 Targets
+- Outreach: 10 Sachsen-Mails gesendet
+- VC Applications: 3 (Primary VP + Equal + Canaan)
+- Content published: 1 Substack + 3 LinkedIn
+- Election: Wahltag-Coverage + Phase 2 Outreach
+- Revenue: Erste Gespräche (Freund? Kramer? Sachsen?)
 
 ---
 
 ## Tracking
 
-### Februar Ziele
-| Metrik | Ziel | Aktuell |
+### Februar Review (CLOSED)
+| Metrik | Ziel | Ergebnis |
 |--------|------|---------|
 | CNC Demos | 10 | 1 |
-| CNC Kunden | 2 | 0 |
 | Consulting Gespräche | 5 | 1 (Daniel Daum) |
-| Consulting Outreach | 10+ | 0 sent (19 READY) |
+| Consulting Outreach | 10+ | 1 sent (Schardt) + 3 Replies (Glüsenkamp, Freund, Kramer) |
 | VC Applications | 10 | 1 (HOF) |
-| Substack Posts | 4 | 1 published + 2 ready |
-| Research Reports | — | **25 DONE** (AR-001→025) |
-| Revenue | €5.000 | €0 |
+| Content Published | 4 Substack + 12 LinkedIn | 1 Blog (Election) |
+| Revenue | €5.000 | **€0** |
+**Fazit: Research/Product = A+. Distribution = F. Revenue = F.**
+
+### März Ziele
+| Metrik | Ziel | Aktuell |
+|--------|------|---------|
+| Sachsen Outreach | 20 gesendet | 0 |
+| VC Applications | 5 | 0 |
+| Election Phase 2 | 5 Stichwahl-Pitches | 0 |
+| Consulting Gespräche | 3 | 0 |
+| Content Published | 2 Substack + 8 LinkedIn | 0 |
+| Revenue | €3.000 | €0 |
 
 ### Lifetime (2026)
 | Metrik | Ziel | Aktuell |
@@ -157,4 +182,4 @@ Nicht 10 Sachen. Eine.
 
 ---
 
-*Updated: 2026-02-15 20:00*
+*Updated: 2026-03-01 20:00*

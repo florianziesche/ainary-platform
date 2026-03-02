@@ -47,6 +47,7 @@
       <div class="nav-container">
         <a href="${prefix}index.html" class="nav-logo" style="text-decoration:none"><span class="logo-dot-wrap"><span class="logo-dot-ring2"></span><span class="logo-dot-ring1"></span><span class="logo-dot"></span></span>Ainary</a>
         <div class="nav-links">
+          <a href="${blogLink}" class="nav-link${activeClass('blog.html')}" style="font-size:0.875rem;color:var(--text-secondary);text-decoration:none;">${t.blog}</a>
         </div>
         <div class="nav-auth" style="display:flex;align-items:center;gap:16px;">
           <a href="${switchHref}" style="color:#8b8b95;font-size:0.75rem;text-decoration:none;font-weight:400;margin-right:8px;">${switchLabel}</a>
@@ -58,6 +59,7 @@
       </div>
     </nav>
     <div class="mobile-menu">
+      <a href="${blogLink}" style="font-size:0.95rem;color:var(--text-secondary);text-decoration:none;">${t.blog}</a>
       <a href="${contactLink}" class="btn-primary">${t.contact}</a>
       <a href="${switchHref}" style="font-size:0.85rem;color:#55555e;">${isDE ? 'EN' : 'DE'}</a>
     </div>

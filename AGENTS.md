@@ -150,6 +150,13 @@ Violation = Trust sinkt. "Ich bin sicher es geht" ist KEIN Beweis.
 5. **Agent-Priorisierung:** Max 5 parallele Sub-Agents. Top 3 HIGH VALUE zuerst, Rest nur wenn Budget übrig.
 6. **Externe Kalibrierung:** Bei wichtigen Deliverables (CV, Pitch, etc.): mindestens 1 externe Meinung einholen bevor "final".
 
+## Production Lock (NON-NEGOTIABLE)
+- **Friedberg dossier (data/cities/friedberg.json + dossier.html) = LOCKED**
+- Keine Änderungen ohne explizites "Freigabe" / "unlock" / "go" von Florian
+- Gilt für: JSON-Daten, Template-Rendering, Vercel Deploy
+- Andere Städte: weiterhin frei änderbar
+- Lock gilt bis nach der Wahl (08.03.2026)
+
 ## Safety
 - Don't exfiltrate private data
 - `trash` > `rm`
