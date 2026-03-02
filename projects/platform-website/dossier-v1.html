@@ -1602,9 +1602,7 @@ function switchView(view) {
 // =====================================================
 function buildOntology() {
   const el = document.getElementById('ontology-content');
-  const allKeys = Object.keys(KB);
-  const keys = allKeys.filter(k => KB[k].type !== 'media');
-  const mediaKeys = allKeys.filter(k => KB[k].type === 'media');
+  const keys = Object.keys(KB);
   let html = '<div class="ont-group">';
   html += '<div class="ont-group-title"><span style="color:var(--text2)">&#9679;</span> PERSONEN <span class="ont-count">' + keys.length + '</span></div>';
   for (const k of keys) {
@@ -1633,21 +1631,6 @@ function buildOntology() {
     html += '</div>';
   }
   html += '</div>';
-
-  // Media entities
-  if (mediaKeys.length) {
-    html += '<div class="ont-group"><div class="ont-group-title"><span style="color:var(--blue)">&#9679;</span> MEDIEN <span class="ont-count">' + mediaKeys.length + '</span></div>';
-    for (var mi3=0; mi3<mediaKeys.length; mi3++) {
-      var mk = mediaKeys[mi3];
-      var me = KB[mk];
-      html += '<div class="ont-item' + (mk === currentEntity ? ' active' : '') + '" data-entity="' + mk + '" onclick="showEntity(\'' + mk + '\',this)">';
-      html += '<div class="ont-dot" style="background:' + (me.color||'var(--blue)') + '"></div>';
-      html += '<span class="ont-label">' + me.name + '</span>';
-      html += '<span class="ont-badge" style="background:var(--surface2);color:var(--muted)">' + (me.role||'Medium') + '</span>';
-      html += '</div>';
-    }
-    html += '</div>';
-  }
 
   // Events from NEWS — click opens detail overlay
   html += '<div class="ont-group"><div class="ont-group-title"><span style="color:var(--text2)">&#9679;</span> EVENTS <span class="ont-count">' + NEWS.length + '</span></div>';
@@ -1946,28 +1929,6 @@ function renderBriefing() {
   }
   h += '</div>';
 
-  // ═══ ZONE 4: QUICK-NAVIGATION ═══
-  h += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:24px">';
-  var quickLinks = [
-    {label:'Kandidaten vergleichen',icon:'⬡',count:kandidaten.length+' Profile',view:'compare',color:'var(--gold)'},
-    {label:'Medienlandschaft',icon:'◈',count:NEWS.length+' Quellen',view:'briefing',anchor:'medien-section',color:'var(--blue)'},
-    {label:'Netzwerk erkunden',icon:'◎',count:Object.keys(KB).length+' Akteure',view:'graph',color:'var(--accent)'},
-    {label:'Strategie & Szenarien',icon:'◆',count:(SCENARIOS.length||0)+' Szenarien',view:'strategy',color:'var(--green)'}
-  ];
-  for (var qi=0;qi<quickLinks.length;qi++) {
-    var ql = quickLinks[qi];
-    h += '<div style="padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .2s;text-align:center" onclick="switchView(\''+ql.view+'\')" onmouseover="this.style.borderColor=\''+ql.color+'\';this.style.background=\'var(--surface2)\'" onmouseout="this.style.borderColor=\'var(--border)\';this.style.background=\'var(--surface)\'">';
-    h += '<div style="font:600 16pt var(--m);color:'+ql.color+';margin-bottom:4px">'+ql.icon+'</div>';
-    h += '<div style="font:600 7pt var(--m);color:var(--text2)">'+ql.label+'</div>';
-    h += '<div style="font:400 5.5pt var(--m);color:var(--muted);margin-top:2px">'+ql.count+'</div>';
-    h += '</div>';
-  }
-  h += '</div>';
-
-  // ═══ EXTENDED SECTIONS (below fold — scroll to explore, or use tabs) ═══
-  h += '<div style="border-top:1px solid var(--border);padding-top:16px;margin-top:8px">';
-  h += '<div style="font:500 6pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px">Detailanalyse</div>';
-
   // ═══ BLOCK 3: KANDIDATEN-VERGLEICH (Stärken/Schwächen, neutral) ═══
   h += '<div style="margin-bottom:16px">';
   var kandAlpha = kandidaten.slice().sort(function(a,b){ return KB[a].name.localeCompare(KB[b].name); });
@@ -2157,7 +2118,7 @@ function renderBriefing() {
   var MEDIEN = MEDIENLANDSCHAFT;
   if (MEDIEN) {
     h += '<div style="margin-bottom:16px">';
-    h += '<div id="medien-section" class="canvas-title">Medienlandschaft <span class="ct-badge" style="background:var(--blue)">QUELLENANALYSE</span></div>';
+    h += '<div class="canvas-title">Medienlandschaft <span class="ct-badge" style="background:var(--blue)">QUELLENANALYSE</span></div>';
 
     // Executive Summary
     var mCL = confLabel(MEDIEN.confidence||0);
@@ -2253,265 +2214,6 @@ function renderBriefing() {
       h += '</div>';
     }
 
-    // Media Network: Interactive with filters + So-What
-    var mNet = MEDIEN.network;
-    var mSoWhats = MEDIEN.soWhats || [];
-    if (mNet && mNet.nodes && mNet.links) {
-      var netId = 'media-network-' + Date.now();
-      h += '<div style="padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:4px;margin-bottom:8px">';
-      h += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap">';
-      h += '<div style="font:600 6pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Medien-Netzwerk</div>';
-      // Filter buttons
-      h += '<div id="'+netId+'-filters" style="display:flex;gap:4px;flex-wrap:wrap">';
-      h += '<button onclick="window._netFilter(\''+netId+'\',null)" style="font:500 5.5pt var(--m);padding:2px 8px;border-radius:3px;border:1px solid var(--border);background:var(--accent);color:#fff;cursor:pointer">Alle</button>';
-      var kandColors = {Eichmann:'#c0392b',Böhm:'#0a4d8c',Stamp:'#4a8c3f','Micheler-Jones':'#8F99A8',Gold:'#AB8D4B',Dörfler:'#8b1a1a'};
-      var kandList = ['Eichmann','Böhm','Stamp','Micheler-Jones','Gold','Dörfler'];
-      for (var ki=0;ki<kandList.length;ki++) {
-        var kn = kandList[ki];
-        h += '<button onclick="window._netFilter(\''+netId+'\',\''+kn+'\')" style="font:500 5.5pt var(--m);padding:2px 8px;border-radius:3px;border:1px solid '+(kandColors[kn]||'var(--border)')+';background:transparent;color:'+(kandColors[kn]||'var(--text2)')+';cursor:pointer">'+kn+'</button>';
-      }
-      h += '</div></div>';
-      h += '<div id="'+netId+'" style="width:100%;height:360px;position:relative;overflow:hidden;background:var(--bg);border-radius:4px"></div>';
-      // Legend
-      // Legend
-      h += '<div style="display:flex;gap:10px;margin-top:6px;font:400 5.5pt var(--m);color:var(--muted);flex-wrap:wrap">';
-      h += '<span>Linie: <span style="color:#238551">■</span> positiv <span style="color:#CD4246">■</span> negativ <span style="color:#C87619">■</span> gemischt <span style="color:#5F6B7C">■</span> neutral</span>';
-      h += '<span>—— Medium berichtet</span><span>- - - Kandidat spricht</span>';
-      h += '<span style="margin-left:auto">Dicke = Artikelanzahl</span>';
-      h += '</div>';
-      h += '</div>';
-
-      // So-What cards per candidate
-      if (mSoWhats.length) {
-        h += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px;margin-bottom:8px">';
-        var swKandColors = {Eichmann:'#c0392b',Böhm:'#0a4d8c',Stamp:'#4a8c3f','Micheler-Jones':'#8F99A8',Gold:'#AB8D4B',Dörfler:'#8b1a1a'};
-        for (var swi=0; swi<mSoWhats.length; swi++) {
-          var sw = mSoWhats[swi];
-          var swCol = swKandColors[sw.kandidat] || 'var(--muted)';
-          var sentBar = '';
-          var stot = (sw.sentiment.POS||0)+(sw.sentiment.NEG||0)+(sw.sentiment.MIX||0)+(sw.sentiment.NEUTRAL||0);
-          if (stot > 0) {
-            var pcts = {POS:Math.round((sw.sentiment.POS||0)/stot*100),NEG:Math.round((sw.sentiment.NEG||0)/stot*100),MIX:Math.round((sw.sentiment.MIX||0)/stot*100)};
-            pcts.NEUTRAL = 100-pcts.POS-pcts.NEG-pcts.MIX;
-            sentBar = '<div style="display:flex;height:4px;border-radius:2px;overflow:hidden;margin:4px 0">';
-            if(pcts.POS>0) sentBar += '<div style="width:'+pcts.POS+'%;background:#238551"></div>';
-            if(pcts.NEG>0) sentBar += '<div style="width:'+pcts.NEG+'%;background:#CD4246"></div>';
-            if(pcts.MIX>0) sentBar += '<div style="width:'+pcts.MIX+'%;background:#C87619"></div>';
-            if(pcts.NEUTRAL>0) sentBar += '<div style="width:'+pcts.NEUTRAL+'%;background:#5F6B7C"></div>';
-            sentBar += '</div>';
-          }
-          // Top themes as small tags
-          var themeTags = '';
-          for (var tti=0; tti<(sw.topThemes||[]).length; tti++) {
-            var tt = sw.topThemes[tti];
-            var ttCol = tt.dominant==='POS'?'#238551':tt.dominant==='NEG'?'#CD4246':tt.dominant==='MIX'?'#C87619':'#5F6B7C';
-            themeTags += '<span style="display:inline-block;font:500 5pt var(--m);padding:1px 5px;border-radius:2px;background:'+ttCol+'20;color:'+ttCol+';margin-right:3px">'+tt.theme+' ('+tt.count+')</span>';
-          }
-          // Blind spots
-          var blindTags = '';
-          for (var bi=0; bi<(sw.blindSpots||[]).length; bi++) {
-            blindTags += '<span style="display:inline-block;font:500 5pt var(--m);padding:1px 5px;border-radius:2px;background:var(--surface2);color:var(--muted);margin-right:3px;text-decoration:line-through">'+sw.blindSpots[bi]+'</span>';
-          }
-          h += '<div style="padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:4px;border-left:3px solid '+swCol+'" data-kandidat="'+sw.kandidat+'">';
-          h += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">';
-          h += '<span style="font:700 7pt var(--m);color:'+swCol+'">'+sw.kandidat+'</span>';
-          h += '<span style="font:400 5.5pt var(--m);color:var(--muted)">'+sw.mentions+' Erwähnungen</span>';
-          h += '</div>';
-          h += sentBar;
-          h += '<div style="margin:4px 0"><span style="font:500 5.5pt var(--m);color:var(--text2)">Stark bei: </span>'+themeTags+'</div>';
-          if (sw.blindSpots && sw.blindSpots.length) {
-            h += '<div style="margin:2px 0"><span style="font:500 5.5pt var(--m);color:var(--muted)">Blind Spots: </span>'+blindTags+'</div>';
-          }
-          h += '<div style="font:400 6pt var(--f);color:var(--accent);margin-top:6px;line-height:1.4">→ '+sw.strategie+'</div>';
-          h += '</div>';
-        }
-        h += '</div>';
-      }
-
-      // Render interactive network after DOM is ready
-      setTimeout(function() {
-        var container = document.getElementById(netId);
-        if (!container) return;
-        var W = container.offsetWidth, H = 380;
-        var sentCol = {POS:'#238551',NEG:'#CD4246',MIX:'#C87619',NEUTRAL:'#5F6B7C'};
-
-        // Position maps
-        var themeNodes = mNet.nodes.filter(function(n){return n.type==='theme'});
-        var mediaNodes = mNet.nodes.filter(function(n){return n.type==='media'});
-        var kandNodes = mNet.nodes.filter(function(n){return n.type==='kandidat'});
-        var nMap = {};
-        themeNodes.forEach(function(n,i) { nMap[n.id] = {x: W/(themeNodes.length+1)*(i+1), y: H*0.48, node: n}; });
-        mediaNodes.forEach(function(n,i) { nMap[n.id] = {x: W/(mediaNodes.length+1)*(i+1), y: H*0.12, node: n}; });
-        kandNodes.forEach(function(n,i) { nMap[n.id] = {x: W/(kandNodes.length+1)*(i+1), y: H*0.88, node: n}; });
-
-        // Row labels
-        var rowLabels = [{y:H*0.03,text:'MEDIEN'},{y:H*0.38,text:'THEMEN'},{y:H*0.78,text:'KANDIDATEN'}];
-
-        function renderNet(filterKand) {
-          container.innerHTML = '';
-          var svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
-          svg.setAttribute('width', W); svg.setAttribute('height', H);
-          svg.style.width='100%'; svg.style.height=H+'px';
-
-          // Row labels
-          rowLabels.forEach(function(rl) {
-            var t = document.createElementNS('http://www.w3.org/2000/svg','text');
-            t.setAttribute('x',8); t.setAttribute('y',rl.y+10);
-            t.setAttribute('fill','#5F6B7C'); t.setAttribute('font-size','5.5');
-            t.setAttribute('font-family','JetBrains Mono,monospace'); t.setAttribute('font-weight','600');
-            t.setAttribute('letter-spacing','0.1em');
-            t.textContent = rl.text; svg.appendChild(t);
-          });
-
-          // Find connected node IDs for filter
-          var activeNodes = new Set();
-          var activeLinks = [];
-          if (filterKand) {
-            var kandId = 'kand_' + filterKand.toLowerCase().replace(/-/g,'_').replace(/ö/g,'oe');
-            activeNodes.add(kandId);
-            mNet.links.forEach(function(l) {
-              if (l.source === kandId || l.target === kandId) {
-                activeNodes.add(l.source); activeNodes.add(l.target);
-                activeLinks.push(l);
-              }
-            });
-            // Also add media→theme links for connected themes
-            var connThemes = new Set();
-            activeLinks.forEach(function(l) { if (l.target.startsWith('theme_')) connThemes.add(l.target); });
-            mNet.links.forEach(function(l) {
-              if (l.type === 'covers' && connThemes.has(l.target)) {
-                activeNodes.add(l.source); activeNodes.add(l.target);
-                activeLinks.push(l);
-              }
-            });
-          } else {
-            mNet.nodes.forEach(function(n) { activeNodes.add(n.id); });
-            activeLinks = mNet.links;
-          }
-
-          // Draw links
-          activeLinks.forEach(function(l) {
-            var s = nMap[l.source], t = nMap[l.target];
-            if (!s || !t) return;
-            var line = document.createElementNS('http://www.w3.org/2000/svg','line');
-            line.setAttribute('x1',s.x); line.setAttribute('y1',s.y);
-            line.setAttribute('x2',t.x); line.setAttribute('y2',t.y);
-            line.setAttribute('stroke', sentCol[l.sentiment]||'#5F6B7C');
-            line.setAttribute('stroke-width', Math.max(1.5, Math.min(5, (l.weight||1)*1.2)));
-            line.setAttribute('stroke-opacity', l.type==='covers'?'0.7':'0.5');
-            if (l.type==='speaks_about') line.setAttribute('stroke-dasharray','6,4');
-            svg.appendChild(line);
-            // Article count label on link
-            if (l.count > 1) {
-              var mx = (s.x+t.x)/2, my = (s.y+t.y)/2;
-              var bg = document.createElementNS('http://www.w3.org/2000/svg','rect');
-              bg.setAttribute('x',mx-6); bg.setAttribute('y',my-5);
-              bg.setAttribute('width',12); bg.setAttribute('height',10);
-              bg.setAttribute('rx',2); bg.setAttribute('fill','#1C2127'); bg.setAttribute('fill-opacity','0.85');
-              svg.appendChild(bg);
-              var ct = document.createElementNS('http://www.w3.org/2000/svg','text');
-              ct.setAttribute('x',mx); ct.setAttribute('y',my+3);
-              ct.setAttribute('text-anchor','middle'); ct.setAttribute('fill',sentCol[l.sentiment]||'#5F6B7C');
-              ct.setAttribute('font-size','6'); ct.setAttribute('font-family','JetBrains Mono,monospace');
-              ct.setAttribute('font-weight','600');
-              ct.textContent = l.count; svg.appendChild(ct);
-            }
-          });
-
-          // Draw nodes
-          mNet.nodes.forEach(function(n) {
-            var pos = nMap[n.id]; if (!pos) return;
-            var active = activeNodes.has(n.id);
-            var opacity = active ? 1 : 0.15;
-            var g = document.createElementNS('http://www.w3.org/2000/svg','g');
-            g.style.opacity = opacity;
-            g.style.cursor = 'pointer';
-            g.style.transition = 'opacity 0.3s';
-
-            if (n.type==='theme') {
-              var r = document.createElementNS('http://www.w3.org/2000/svg','rect');
-              var tw = Math.max(48, n.label.length*6+16);
-              r.setAttribute('x',pos.x-tw/2); r.setAttribute('y',pos.y-14);
-              r.setAttribute('width',tw); r.setAttribute('height',28);
-              r.setAttribute('rx',4);
-              r.setAttribute('fill','#D1980B'); r.setAttribute('fill-opacity','0.15');
-              r.setAttribute('stroke','#D1980B'); r.setAttribute('stroke-width','1.5');
-              g.appendChild(r);
-            } else {
-              var c = document.createElementNS('http://www.w3.org/2000/svg','circle');
-              c.setAttribute('cx',pos.x); c.setAttribute('cy',pos.y);
-              var rad = n.type==='media'? Math.min(20,10+((n.count||2)*1.5)) : 14;
-              c.setAttribute('r',rad);
-              var col = n.type==='media'?'#2D72D2':(n.color||'#ABB3BF');
-              c.setAttribute('fill',col); c.setAttribute('fill-opacity','0.2');
-              c.setAttribute('stroke',col); c.setAttribute('stroke-width','2');
-              g.appendChild(c);
-            }
-
-            // Label
-            var t = document.createElementNS('http://www.w3.org/2000/svg','text');
-            t.setAttribute('x',pos.x); t.setAttribute('y',pos.y + (n.type==='theme'?4:3));
-            t.setAttribute('text-anchor','middle');
-            t.setAttribute('fill',n.type==='theme'?'#D1980B':n.type==='media'?'#6eb0ff':(n.color||'#F6F7F9'));
-            t.setAttribute('font-size',n.type==='theme'?'7.5':'7');
-            t.setAttribute('font-family','Inter,system-ui,sans-serif');
-            t.setAttribute('font-weight','600');
-            t.textContent = n.label; g.appendChild(t);
-
-            // Sub-label
-            var sub = n.party || (n.count ? n.count+' Artikel' : '');
-            if (sub) {
-              var s2 = document.createElementNS('http://www.w3.org/2000/svg','text');
-              s2.setAttribute('x',pos.x); s2.setAttribute('y',pos.y+14);
-              s2.setAttribute('text-anchor','middle'); s2.setAttribute('fill','#8F99A8');
-              s2.setAttribute('font-size','5.5'); s2.setAttribute('font-family','Inter,system-ui,sans-serif');
-              s2.textContent = sub; g.appendChild(s2);
-            }
-
-            svg.appendChild(g);
-          });
-
-          container.appendChild(svg);
-
-          // Highlight active filter button
-          var btns = document.querySelectorAll('#'+netId+'-filters button');
-          btns.forEach(function(b) {
-            var isAll = !filterKand && b.textContent==='Alle';
-            var isMatch = filterKand && b.textContent===filterKand;
-            b.style.background = (isAll||isMatch) ? (isMatch ? (sentCol.POS) : 'var(--accent)') : 'transparent';
-            b.style.color = (isAll||isMatch) ? '#fff' : b.style.borderColor;
-          });
-
-          // Highlight matching So-What card
-          document.querySelectorAll('[data-kandidat]').forEach(function(el) {
-            el.style.opacity = (!filterKand || el.getAttribute('data-kandidat')===filterKand) ? '1' : '0.3';
-            el.style.transition = 'opacity 0.3s';
-          });
-        }
-
-        // Global filter function — filters network + so-what + news items + heatmap
-        window._netFilter = function(id, kand) {
-          if (id===netId) renderNet(kand);
-          // Filter news items
-          document.querySelectorAll('.nf-card[data-mentions]').forEach(function(el) {
-            if (!kand) { el.style.opacity='1'; el.style.display=''; return; }
-            var mentions = el.getAttribute('data-mentions')||'';
-            if (mentions.indexOf(kand)>=0) { el.style.opacity='1'; el.style.display=''; }
-            else { el.style.opacity='0.12'; }
-          });
-          // Filter heatmap rows
-          document.querySelectorAll('tr[style*="border-top"]').forEach(function(tr) {
-            tr.style.opacity = '1';
-          });
-          // Show active filter label
-          var labelEl = document.getElementById('media-filter-label');
-          if (labelEl) labelEl.textContent = kand ? ('▸ Filter: '+kand) : '';
-        };
-
-        renderNet(null);
-      }, 500);
-    }
-
     // Insights
     var mInsights = MEDIEN.insights || [];
     if (mInsights.length) {
@@ -2540,11 +2242,37 @@ function renderBriefing() {
   var avgConf = newsTotal > 0 ? Math.round(NEWS.reduce(function(s,n){ return s + (n.confidence||0); }, 0) / newsTotal) : 0;
 
   h += '<div style="margin-bottom:16px">';
-  h += '<div class="canvas-title">Aktuelle Lage <span class="ct-badge" style="background:var(--accent)">' + newsTotal + ' MELDUNGEN</span>';
-  h += '<span id="media-filter-label" style="font:600 6.5pt var(--m);color:var(--accent);margin-left:8px"></span>';
-  h += '</div>';
+  h += '<div class="canvas-title">Aktuelle Lage <span class="ct-badge" style="background:var(--accent)">' + newsTotal + ' MELDUNGEN</span></div>';
 
-  // Beipackzettel removed — trust system kept internal, not customer-facing
+  // Beipackzettel — Trust overview with 3-Signal system (no Tier labels)
+  // 3 Signals: Quellsignal (source quality) · Konsistenz (cross-verification) · Struktur (deterministic markers)
+  var admCounts = {}; NEWS.forEach(function(n){ var a = n.admiralty||'?'; admCounts[a] = (admCounts[a]||0)+1; });
+  var admOrder = ['A1','A2','B2','C3','D4','E2'];
+
+  h += '<div style="padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:4px;margin-bottom:10px">';
+  // Row 1: Title + avg confidence
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
+  h += '<span style="font:600 6pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:.06em">📋 BEIPACKZETTEL</span>';
+  var confCol = avgConf >= 60 ? 'var(--green)' : avgConf >= 35 ? 'var(--amber)' : 'var(--red)';
+  h += '<span style="font:500 6pt var(--m);color:'+confCol+'">Ø '+avgConf+'% Konfidenz</span>';
+  h += '</div>';
+  // Row 2: 3 Signal dots with labels
+  h += '<div style="display:flex;gap:16px;margin-bottom:8px">';
+  h += '<div style="flex:1;text-align:center"><div style="font:700 9pt var(--m);color:var(--accent)">●</div><div style="font:500 5pt var(--m);color:var(--muted);margin-top:2px">QUELLSIGNAL</div><div style="font:400 4.5pt var(--f);color:var(--muted)">Herkunft × Verifikation × Aktualität</div></div>';
+  h += '<div style="flex:1;text-align:center"><div style="font:700 9pt var(--m);color:var(--accent)">●</div><div style="font:500 5pt var(--m);color:var(--muted);margin-top:2px">KONSISTENZ</div><div style="font:400 4.5pt var(--f);color:var(--muted)">Gegenprüfung durch weitere Quellen</div></div>';
+  h += '<div style="flex:1;text-align:center"><div style="font:700 9pt var(--m);color:var(--accent)">●</div><div style="font:500 5pt var(--m);color:var(--muted);margin-top:2px">STRUKTUR</div><div style="font:400 4.5pt var(--f);color:var(--muted)">URL, Datum, Zahlen, Quellenreferenz</div></div>';
+  h += '</div>';
+  // Row 3: Admiralty distribution (codes only, no tier labels)
+  h += '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">';
+  for (var ai=0; ai<admOrder.length; ai++) {
+    var aCode = admOrder[ai];
+    if (!admCounts[aCode]) continue;
+    var aCol = admColors[aCode] || 'var(--muted)';
+    h += '<span style="font:500 5.5pt var(--m);padding:2px 6px;border-radius:2px;background:'+aCol+'12;color:'+aCol+'" title="'+admLabels[aCode]+'">'+aCode+' × '+admCounts[aCode]+'</span>';
+  }
+  h += '<span style="font:400 5pt var(--f);color:var(--muted);margin-left:auto">Admiralty-System · agenttrust v0.1</span>';
+  h += '</div>';
+  h += '</div>';
 
   // Render themed clusters
   if (typeof NEWS_CLUSTERED === 'object' && NEWS_CLUSTERED !== null) {
@@ -2628,17 +2356,7 @@ function renderBriefing() {
           var nAdmColor = admColors[n.admiralty] || 'var(--muted)';
           var nEija = (n.eija||'E').charAt(0);
 
-          // Candidate mentions for filtering
-          var nMentions = [];
-          var nTextAll = ((n.title||'')+ ' ' + (n.body||'') + ' ' + (n.summary||'')).toLowerCase();
-          if (nTextAll.indexOf('eichmann')>=0) nMentions.push('Eichmann');
-          if (nTextAll.indexOf('böhm')>=0 || nTextAll.indexOf('boehm')>=0) nMentions.push('Böhm');
-          if (nTextAll.indexOf('stamp')>=0) nMentions.push('Stamp');
-          if (nTextAll.indexOf('micheler')>=0) nMentions.push('Micheler-Jones');
-          if (nTextAll.indexOf('gold')>=0 && nTextAll.indexOf('kandidat')>=0) nMentions.push('Gold');
-          if (nTextAll.indexOf('dörfler')>=0 || nTextAll.indexOf('doerfler')>=0) nMentions.push('Dörfler');
-
-          h += '<div class="nf-card" data-mentions="'+nMentions.join(',')+'" style="cursor:pointer;transition:border-color .15s,opacity .3s;border-left:3px solid '+nAdmColor+'" onclick="'+(n.url?'window.open(\''+n.url+'\',\'_blank\')':'')+'" onmouseover="this.style.borderColor=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border)\'">';
+          h += '<div class="nf-card" style="cursor:pointer;transition:border-color .15s;border-left:3px solid '+nAdmColor+'" onclick="'+(n.url?'window.open(\''+n.url+'\',\'_blank\')':'')+'" onmouseover="this.style.borderColor=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border)\'">';
 
           // Title row
           h += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">';
@@ -2654,14 +2372,12 @@ function renderBriefing() {
           if (n.body) h += '<div style="font:400 7pt var(--f);color:var(--text2);line-height:1.5;margin:4px 0">' + n.body + '</div>';
 
           // Meta row with source attribution
-          h += '<div class="nf-meta" style="flex-wrap:wrap;gap:4px">';
+          h += '<div class="nf-meta" style="flex-wrap:wrap">';
           h += '<span style="font:500 5.5pt var(--m);color:var(--text2)">'+n.source+'</span>';
-          h += '<span style="color:var(--border)">·</span>';
           h += '<span style="font:400 5pt var(--m);color:'+nAdmColor+'" title="Admiralty '+(n.admiralty||'')+'">'+(admHuman[n.admiralty]||'')+'</span>';
-          h += '<span style="color:var(--border)">·</span>';
           h += '<span>' + n.date + '</span>';
-          if (n.sentiment && n.sentiment !== 'NEUTRAL') { h += '<span style="color:var(--border)">·</span>'; h += '<span class="nf-sentiment" style="background:'+nSentColor+'15;color:'+nSentColor+'">'+n.sentiment+'</span>'; }
-          if (n.impact) { h += '<span style="color:var(--border)">·</span>'; h += '<span class="nf-impact" style="color:'+nImpactColor+'">'+n.impact+'</span>'; }
+          if (n.sentiment && n.sentiment !== 'NEUTRAL') h += '<span class="nf-sentiment" style="background:'+nSentColor+'15;color:'+nSentColor+'">'+n.sentiment+'</span>';
+          if (n.impact) h += '<span class="nf-impact" style="color:'+nImpactColor+'">'+n.impact+'</span>';
           // Entity links
           if (n.entities && n.entities.length) {
             for (var nei=0;nei<n.entities.length;nei++) {
@@ -3029,7 +2745,6 @@ function renderBriefing() {
   }
 
   h += '</div></div>'; // close deep-dive + border section
-  h += '</div>'; // close extended sections container
 
   el.innerHTML = h;
 }
@@ -3370,38 +3085,6 @@ function renderGraph() {
   const colorMap = {"ally":"#2d8a4e","threat":"#c0392b","neutral":"#b45309","org_ally":"#2d8a4e","org_threat":"#c0392b","org_neutral":"#9d7f3b","institution":"#555e70","theme_hot":"#c0392b","theme":"#777","incumbent":"#2D72D2","CSU":"#0a4d8c","SPD":"#c0392b","Grüne":"#238551","Bündnis 90/Die Grünen":"#238551","AfD":"#8E292C","FDP":"#e8c84a","Freie Wähler":"#f59e0b","Parteifreie Bürger":"#9d7f3b","CSU/FDP":"#0a4d8c","Wirtschaft":"#555e70","Thema":"#6b7280","Medien":"#8b5cf6"};
   const linkColorMap = {"party":"#9d7f3b","opponent":"#c0392b","ally":"#2d8a4e","network":"#2563eb","conflict":"#b45309","threat":"#c0392b"};
 
-  // Filter bar
-  var filterBar = document.createElement('div');
-  filterBar.style.cssText = 'position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:10;display:flex;gap:4px;padding:4px 8px;background:rgba(28,33,39,0.9);border:1px solid var(--border);border-radius:6px;backdrop-filter:blur(8px)';
-  var filterGroups = [
-    {id:'alle',label:'Alle',color:'var(--accent)'},
-    {id:'kandidaten',label:'Kandidaten',color:'#CD4246'},
-    {id:'parteien',label:'Parteien',color:'#D1980B'},
-    {id:'medien',label:'Medien',color:'#8b5cf6'},
-    {id:'themen',label:'Themen',color:'#6b7280'},
-    {id:'institutionen',label:'Institutionen',color:'#555e70'}
-  ];
-  var activeFilter = 'alle';
-  filterGroups.forEach(function(fg) {
-    var btn = document.createElement('button');
-    btn.textContent = fg.label;
-    btn.dataset.filter = fg.id;
-    btn.style.cssText = 'font:500 6pt JetBrains Mono,monospace;padding:3px 10px;border-radius:3px;border:1px solid '+fg.color+';background:'+(fg.id==='alle'?fg.color:'transparent')+';color:'+(fg.id==='alle'?'#fff':fg.color)+';cursor:pointer;transition:all .2s';
-    btn.addEventListener('click', function() {
-      activeFilter = fg.id;
-      if (window.applyGraphFilter) window.applyGraphFilter(fg.id);
-      filterBar.querySelectorAll('button').forEach(function(b) {
-        var isActive = b.dataset.filter === fg.id;
-        var bfg = filterGroups.find(function(f){return f.id===b.dataset.filter});
-        b.style.background = isActive ? bfg.color : 'transparent';
-        b.style.color = isActive ? '#fff' : bfg.color;
-      });
-    });
-    filterBar.appendChild(btn);
-  });
-  container.style.position = 'relative';
-  container.appendChild(filterBar);
-
   const nodes = JSON.parse(JSON.stringify(GRAPH.nodes));
   nodes.forEach(n => { n.r = n.r || n.size || 12; n.group = n.group || n.type || "neutral"; n.info = n.info || n.sub || ""; });
   const links = JSON.parse(JSON.stringify(GRAPH.links));
@@ -3464,42 +3147,6 @@ function renderGraph() {
     linkLabel.attr('x', d => (d.source.x + d.target.x) / 2).attr('y', d => (d.source.y + d.target.y) / 2 - 3);
     node.attr('transform', d => 'translate(' + d.x + ',' + d.y + ')');
   });
-
-  // Filter function
-  function applyGraphFilter(filterId) {
-    if (filterId === 'alle') {
-      node.style('opacity', 1);
-      link.style('opacity', 1);
-      linkLabel.style('opacity', 1);
-      return;
-    }
-    // Find matching nodes
-    var activeNodeIds = new Set();
-    nodes.forEach(function(n) {
-      if (n.filterGroup === filterId) activeNodeIds.add(n.id);
-    });
-    // Also include nodes connected to matching nodes
-    var connectedIds = new Set(activeNodeIds);
-    links.forEach(function(l) {
-      var sid = typeof l.source === 'object' ? l.source.id : l.source;
-      var tid = typeof l.target === 'object' ? l.target.id : l.target;
-      if (activeNodeIds.has(sid)) connectedIds.add(tid);
-      if (activeNodeIds.has(tid)) connectedIds.add(sid);
-    });
-    node.style('opacity', function(d) { return connectedIds.has(d.id) ? 1 : 0.08; });
-    link.style('opacity', function(d) {
-      var sid = typeof d.source === 'object' ? d.source.id : d.source;
-      var tid = typeof d.target === 'object' ? d.target.id : d.target;
-      return (activeNodeIds.has(sid) || activeNodeIds.has(tid)) ? 0.8 : 0.04;
-    });
-    linkLabel.style('opacity', function(d) {
-      var sid = typeof d.source === 'object' ? d.source.id : d.source;
-      var tid = typeof d.target === 'object' ? d.target.id : d.target;
-      return (activeNodeIds.has(sid) || activeNodeIds.has(tid)) ? 1 : 0.04;
-    });
-  }
-  // Make applyGraphFilter available to filter buttons
-  window.applyGraphFilter = applyGraphFilter;
 }
 
 // =====================================================

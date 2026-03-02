@@ -1946,6 +1946,28 @@ function renderBriefing() {
   }
   h += '</div>';
 
+  // ═══ ZONE 4: QUICK-NAVIGATION ═══
+  h += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:24px">';
+  var quickLinks = [
+    {label:'Kandidaten vergleichen',icon:'⬡',count:kandidaten.length+' Profile',view:'compare',color:'var(--gold)'},
+    {label:'Medienlandschaft',icon:'◈',count:NEWS.length+' Quellen',view:'briefing',anchor:'medien-section',color:'var(--blue)'},
+    {label:'Netzwerk erkunden',icon:'◎',count:Object.keys(KB).length+' Akteure',view:'graph',color:'var(--accent)'},
+    {label:'Strategie & Szenarien',icon:'◆',count:(SCENARIOS.length||0)+' Szenarien',view:'strategy',color:'var(--green)'}
+  ];
+  for (var qi=0;qi<quickLinks.length;qi++) {
+    var ql = quickLinks[qi];
+    h += '<div style="padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .2s;text-align:center" onclick="switchView(\''+ql.view+'\')" onmouseover="this.style.borderColor=\''+ql.color+'\';this.style.background=\'var(--surface2)\'" onmouseout="this.style.borderColor=\'var(--border)\';this.style.background=\'var(--surface)\'">';
+    h += '<div style="font:600 16pt var(--m);color:'+ql.color+';margin-bottom:4px">'+ql.icon+'</div>';
+    h += '<div style="font:600 7pt var(--m);color:var(--text2)">'+ql.label+'</div>';
+    h += '<div style="font:400 5.5pt var(--m);color:var(--muted);margin-top:2px">'+ql.count+'</div>';
+    h += '</div>';
+  }
+  h += '</div>';
+
+  // ═══ EXTENDED SECTIONS (below fold — scroll to explore, or use tabs) ═══
+  h += '<div style="border-top:1px solid var(--border);padding-top:16px;margin-top:8px">';
+  h += '<div style="font:500 6pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px">Detailanalyse</div>';
+
   // ═══ BLOCK 3: KANDIDATEN-VERGLEICH (Stärken/Schwächen, neutral) ═══
   h += '<div style="margin-bottom:16px">';
   var kandAlpha = kandidaten.slice().sort(function(a,b){ return KB[a].name.localeCompare(KB[b].name); });
@@ -2135,7 +2157,7 @@ function renderBriefing() {
   var MEDIEN = MEDIENLANDSCHAFT;
   if (MEDIEN) {
     h += '<div style="margin-bottom:16px">';
-    h += '<div class="canvas-title">Medienlandschaft <span class="ct-badge" style="background:var(--blue)">QUELLENANALYSE</span></div>';
+    h += '<div id="medien-section" class="canvas-title">Medienlandschaft <span class="ct-badge" style="background:var(--blue)">QUELLENANALYSE</span></div>';
 
     // Executive Summary
     var mCL = confLabel(MEDIEN.confidence||0);
@@ -2632,12 +2654,14 @@ function renderBriefing() {
           if (n.body) h += '<div style="font:400 7pt var(--f);color:var(--text2);line-height:1.5;margin:4px 0">' + n.body + '</div>';
 
           // Meta row with source attribution
-          h += '<div class="nf-meta" style="flex-wrap:wrap">';
+          h += '<div class="nf-meta" style="flex-wrap:wrap;gap:4px">';
           h += '<span style="font:500 5.5pt var(--m);color:var(--text2)">'+n.source+'</span>';
+          h += '<span style="color:var(--border)">·</span>';
           h += '<span style="font:400 5pt var(--m);color:'+nAdmColor+'" title="Admiralty '+(n.admiralty||'')+'">'+(admHuman[n.admiralty]||'')+'</span>';
+          h += '<span style="color:var(--border)">·</span>';
           h += '<span>' + n.date + '</span>';
-          if (n.sentiment && n.sentiment !== 'NEUTRAL') h += '<span class="nf-sentiment" style="background:'+nSentColor+'15;color:'+nSentColor+'">'+n.sentiment+'</span>';
-          if (n.impact) h += '<span class="nf-impact" style="color:'+nImpactColor+'">'+n.impact+'</span>';
+          if (n.sentiment && n.sentiment !== 'NEUTRAL') { h += '<span style="color:var(--border)">·</span>'; h += '<span class="nf-sentiment" style="background:'+nSentColor+'15;color:'+nSentColor+'">'+n.sentiment+'</span>'; }
+          if (n.impact) { h += '<span style="color:var(--border)">·</span>'; h += '<span class="nf-impact" style="color:'+nImpactColor+'">'+n.impact+'</span>'; }
           // Entity links
           if (n.entities && n.entities.length) {
             for (var nei=0;nei<n.entities.length;nei++) {
@@ -3005,6 +3029,7 @@ function renderBriefing() {
   }
 
   h += '</div></div>'; // close deep-dive + border section
+  h += '</div>'; // close extended sections container
 
   el.innerHTML = h;
 }
