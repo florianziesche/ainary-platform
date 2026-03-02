@@ -636,7 +636,7 @@ try { if (sessionStorage.getItem('ai-auth') === '1') setTimeout(initGreeting, 50
 const urlParams = new URLSearchParams(window.location.search);
 const CITY_ID = urlParams.get('city') || 'bamberg';
 let TENANT = {}, KB = {}, GRAPH = {nodes:[],links:[]};
-let NEWS = [], HYPOTHESES = [], SENTIMENT = {}, PATTERNS = [], ACTIONS = [], FORECAST = {}, THEMEN = {}, SOCIAL = {}, STICHWAHL = {}, YOUTUBE = {};
+let NEWS = [], NEWS_CLUSTERED = null, HYPOTHESES = [], SENTIMENT = {}, PATTERNS = [], ACTIONS = [], FORECAST = {}, THEMEN = {}, SOCIAL = {}, STICHWAHL = {}, YOUTUBE = {}, MEDIENLANDSCHAFT = null;
 
 // ═══ SAFE STRING HELPER — use everywhere instead of raw concatenation ═══
 function S(val, fallback) { return (val != null && val !== '') ? val : (fallback || ''); }
@@ -1084,7 +1084,8 @@ function normalizeCity(d) {
     KB = data.kb;
     GRAPH = data.graph;
     AGENTTRUST = data.agenttrust || null;
-    NEWS = data.news;
+    NEWS = data.news || [];
+    NEWS_CLUSTERED = data.newsClusteredByThema || null;
     HYPOTHESES = data.hypotheses;
     SENTIMENT = data.sentiment;
     PATTERNS = data.patterns;
@@ -1099,6 +1100,7 @@ function normalizeCity(d) {
     CLAIM_LEDGER = data.claim_ledger || [];
     CONTRADICTIONS = data.contradictions_register || [];
     WEEKLYBRIEF = data.weekly_brief || {};
+    MEDIENLANDSCHAFT = data.medienlandschaft || null;
     // Build SOURCE_MAP for clickable S-IDs
     SOURCE_MAP = {};
     (data.quellenverzeichnis || []).forEach(function(q) { if (q.id) SOURCE_MAP[q.id] = q; });
@@ -1775,6 +1777,18 @@ function renderBriefing() {
   const kandidaten = keys.filter(k => KB[k].role && (KB[k].role.includes('Kandidat') || KB[k].role.includes('Bürgermeister')));
   const sortedByRisk = keys.slice().sort((a, b) => KB[b].risk - KB[a].risk);
 
+  // ═══ Shared trust helper functions (must be at top of renderBriefing) ═══
+  var confLabel = function(c) {
+    if (c >= 80) return {text:'Sehr gut belegt', col:'var(--green)'};
+    if (c >= 65) return {text:'Gut belegt', col:'var(--green)'};
+    if (c >= 50) return {text:'Teilweise belegt', col:'var(--amber)'};
+    if (c >= 35) return {text:'Wenige Quellen', col:'var(--amber)'};
+    return {text:'Schwach belegt', col:'var(--red)'};
+  };
+  var admHuman = {A1:'Amtlich bestätigt',A2:'Amtliche Quelle',B2:'Leitmedium',C3:'Partei-/Bürgerquelle',D4:'Aggregator',E2:'Unzuverlässig'};
+  var admColors = {A1:'var(--green)',A2:'var(--green)',B2:'var(--accent)',C3:'var(--amber)',D4:'var(--red)',E2:'var(--red)'};
+  var admLabels = {A1:'Bestätigt',A2:'Verlässlich',B2:'Üblich zuverlässig',C3:'Bedingt zuverlässig',D4:'Eingeschränkt',E2:'Unzuverlässig'};
+
   // Compute days to election
   // Parse DD.MM.YYYY or ISO date
   var wahlStr = (typeof TENANT.wahl === 'string' ? TENANT.wahl : (TENANT.wahl && TENANT.wahl.datum) || '2026-03-08');
@@ -2098,6 +2112,301 @@ function renderBriefing() {
     h += '</div></div>';
   }
 
+  // ═══ AKTUELLE LAGE — BEFORE Deep Dive (always visible) ═══
+  // Moved out of deep-dive so it's always visible in the Briefing
+  // ═══ MEDIENLANDSCHAFT (Media Analysis Block) ═══
+  var MEDIEN = MEDIENLANDSCHAFT;
+  if (MEDIEN) {
+    h += '<div style="margin-bottom:16px">';
+    h += '<div class="canvas-title">Medienlandschaft <span class="ct-badge" style="background:var(--blue)">QUELLENANALYSE</span></div>';
+
+    // Executive Summary
+    var mCL = confLabel(MEDIEN.confidence||0);
+    var mEija = (MEDIEN.eija||'I').charAt(0);
+    h += '<div style="padding:12px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--blue);border-radius:4px;margin-bottom:8px">';
+    h += '<div style="font:500 7.5pt var(--f);color:var(--text);line-height:1.6;margin-bottom:6px">'+MEDIEN.summary+'</div>';
+    if (MEDIEN.soWhat) h += '<div style="font:400 7pt var(--f);color:var(--accent);line-height:1.5;margin-bottom:8px">→ '+MEDIEN.soWhat+'</div>';
+    h += '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">';
+    h += '<span class="ev ev-'+mEija.toLowerCase()+'">'+mEija+'</span>';
+    h += '<span style="font:500 5.5pt var(--m);color:'+mCL.col+'">'+mCL.text+'</span>';
+    if (MEDIEN.trustNote) h += '<span style="font:400 5pt var(--m);color:var(--muted)">· '+MEDIEN.trustNote+'</span>';
+    h += '</div></div>';
+
+    // Media Ranking — horizontal bar chart
+    var mediaRank = MEDIEN.mediaRanking || [];
+    if (mediaRank.length) {
+      var maxCount = mediaRank[0].count || 1;
+      h += '<div style="padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:4px;margin-bottom:8px">';
+      h += '<div style="font:600 6pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Quellen nach Artikelanzahl</div>';
+      for (var mri=0; mri<mediaRank.length; mri++) {
+        var mr = mediaRank[mri];
+        var mrAdmCol = admColors[mr.admiralty] || 'var(--muted)';
+        var barW = Math.round(mr.count / maxCount * 100);
+        var mrKey = 'media_'+mr.name.toLowerCase().replace(/ /g,'_').replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/[()]/g,'').replace(/\//g,'_');
+        h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;cursor:pointer" onclick="showEntity(\''+mrKey+'\')" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1">';
+        h += '<div style="width:140px;font:500 6.5pt var(--f);color:var(--text2);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+mr.name+'</div>';
+        h += '<div style="flex:1;height:14px;background:var(--surface2);border-radius:2px;overflow:hidden">';
+        h += '<div style="width:'+barW+'%;height:100%;background:'+mrAdmCol+';border-radius:2px;transition:width .3s"></div>';
+        h += '</div>';
+        h += '<div style="width:50px;font:500 6pt var(--m);color:var(--text2);text-align:right">'+mr.count+'</div>';
+        h += '<div style="width:30px;font:400 5pt var(--m);color:'+mrAdmCol+'" title="'+(admHuman[mr.admiralty]||'')+'">'+(admHuman[mr.admiralty]||mr.admiralty)+'</div>';
+        h += '</div>';
+      }
+      h += '</div>';
+    }
+
+    // Heatmap: Media × Thema × Sentiment
+    var heatmap = MEDIEN.heatmap;
+    if (heatmap && heatmap.sources && heatmap.themes) {
+      var hThemes = heatmap.themes;
+      // Short theme labels
+      var themeShort = {};
+      hThemes.forEach(function(t) { themeShort[t] = t.replace('Digitalisierung & Verwaltung','Digital').replace('Familie & Bildung','Bildung').replace('Finanzen & Wirtschaft','Finanzen').replace('Kultur & Gemeinschaft','Kultur').replace('Mobilität & Infrastruktur','Mobilität').replace('Politik & Demokratie','Politik').replace('Stadtentwicklung & Wohnen','Wohnen'); });
+      var sentColors = {POS:'var(--green)',NEG:'var(--red)',MIX:'var(--amber)',NEUTRAL:'var(--muted)'};
+
+      h += '<div style="padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:4px;margin-bottom:8px;overflow-x:auto">';
+      h += '<div style="font:600 6pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Wer schreibt worüber — und wie?</div>';
+
+      // Table
+      h += '<table style="width:100%;border-collapse:collapse;font:400 6pt var(--f)">';
+      // Header row
+      h += '<tr><td style="padding:4px 6px;font:600 6pt var(--m);color:var(--muted);min-width:120px"></td>';
+      for (var hi=0; hi<hThemes.length; hi++) {
+        h += '<td style="padding:4px 4px;font:600 5.5pt var(--m);color:var(--muted);text-align:center;min-width:50px;letter-spacing:.04em">'+(themeShort[hThemes[hi]]||hThemes[hi])+'</td>';
+      }
+      h += '</tr>';
+
+      // Data rows (only sources with >1 total article, plus top single-article sources)
+      var hSources = heatmap.sources.filter(function(s) { return s.total >= 2; });
+      // Add up to 3 single-article sources for completeness
+      var singles = heatmap.sources.filter(function(s) { return s.total === 1; }).slice(0,3);
+      hSources = hSources.concat(singles);
+
+      for (var hsi=0; hsi<hSources.length; hsi++) {
+        var hs = hSources[hsi];
+        h += '<tr style="border-top:1px solid var(--border)">';
+        h += '<td style="padding:4px 6px;font:500 6.5pt var(--f);color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px" title="'+hs.name+'">'+hs.name+'</td>';
+        for (var hti=0; hti<hThemes.length; hti++) {
+          var cell = (hs.cells||{})[hThemes[hti]];
+          if (!cell) {
+            h += '<td style="padding:4px;text-align:center;color:var(--border)">—</td>';
+          } else {
+            var cellCol = sentColors[cell.dominant] || 'var(--muted)';
+            var cellSize = Math.min(20, 8 + cell.count * 4);
+            h += '<td style="padding:4px;text-align:center" title="'+cell.count+' Artikel, '+cell.dominant+'">';
+            h += '<div style="display:inline-block;width:'+cellSize+'px;height:'+cellSize+'px;border-radius:3px;background:'+cellCol+';opacity:0.8;position:relative">';
+            if (cell.count > 1) h += '<span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font:700 5pt var(--m);color:#fff">'+cell.count+'</span>';
+            h += '</div></td>';
+          }
+        }
+        h += '</tr>';
+      }
+      h += '</table>';
+
+      // Legend
+      h += '<div style="display:flex;gap:10px;margin-top:8px;font:400 5.5pt var(--m);color:var(--muted)">';
+      h += '<span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--green);vertical-align:middle;margin-right:3px"></span>Positiv</span>';
+      h += '<span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--red);vertical-align:middle;margin-right:3px"></span>Negativ</span>';
+      h += '<span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--amber);vertical-align:middle;margin-right:3px"></span>Gemischt</span>';
+      h += '<span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--muted);vertical-align:middle;margin-right:3px"></span>Neutral</span>';
+      h += '<span style="margin-left:auto">Größe = Anzahl Artikel</span>';
+      h += '</div>';
+      h += '</div>';
+    }
+
+    // Insights
+    var mInsights = MEDIEN.insights || [];
+    if (mInsights.length) {
+      h += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+      for (var mii=0; mii<mInsights.length; mii++) {
+        var mi = mInsights[mii];
+        var miCL = confLabel(mi.confidence||0);
+        var miEija = (mi.eija||'I').charAt(0);
+        h += '<div style="flex:1;min-width:200px;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:4px">';
+        h += '<div style="font:600 7pt var(--f);color:var(--text);margin-bottom:4px;line-height:1.3">'+mi.title+'</div>';
+        h += '<div style="font:400 6.5pt var(--f);color:var(--text2);line-height:1.5;margin-bottom:6px">'+mi.body+'</div>';
+        h += '<div style="display:flex;align-items:center;gap:4px">';
+        h += '<span class="ev ev-'+miEija.toLowerCase()+'">'+miEija+'</span>';
+        h += '<span style="font:500 5pt var(--m);color:'+miCL.col+'">'+miCL.text+'</span>';
+        h += '</div></div>';
+      }
+      h += '</div>';
+    }
+    h += '</div>';
+  }
+
+  // ═══ AKTUELLE LAGE — Thematic Clusters with Trust System ═══
+  // Uses newsClusteredByThema structure: { theme: { icon, count, meldungen: { period: { items[] } } } }
+  // Each item has: title, date, source, body, url, eija, confidence, admiralty, sourceTier, sourceLabel, sentiment, impact, trustNote
+  var newsTotal = NEWS.length;
+  var avgConf = newsTotal > 0 ? Math.round(NEWS.reduce(function(s,n){ return s + (n.confidence||0); }, 0) / newsTotal) : 0;
+
+  h += '<div style="margin-bottom:16px">';
+  h += '<div class="canvas-title">Aktuelle Lage <span class="ct-badge" style="background:var(--accent)">' + newsTotal + ' MELDUNGEN</span></div>';
+
+  // Beipackzettel — Trust overview with 3-Signal system (no Tier labels)
+  // 3 Signals: Quellsignal (source quality) · Konsistenz (cross-verification) · Struktur (deterministic markers)
+  var admCounts = {}; NEWS.forEach(function(n){ var a = n.admiralty||'?'; admCounts[a] = (admCounts[a]||0)+1; });
+  var admOrder = ['A1','A2','B2','C3','D4','E2'];
+
+  h += '<div style="padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:4px;margin-bottom:10px">';
+  // Row 1: Title + avg confidence
+  h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
+  h += '<span style="font:600 6pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:.06em">📋 BEIPACKZETTEL</span>';
+  var confCol = avgConf >= 60 ? 'var(--green)' : avgConf >= 35 ? 'var(--amber)' : 'var(--red)';
+  h += '<span style="font:500 6pt var(--m);color:'+confCol+'">Ø '+avgConf+'% Konfidenz</span>';
+  h += '</div>';
+  // Row 2: 3 Signal dots with labels
+  h += '<div style="display:flex;gap:16px;margin-bottom:8px">';
+  h += '<div style="flex:1;text-align:center"><div style="font:700 9pt var(--m);color:var(--accent)">●</div><div style="font:500 5pt var(--m);color:var(--muted);margin-top:2px">QUELLSIGNAL</div><div style="font:400 4.5pt var(--f);color:var(--muted)">Herkunft × Verifikation × Aktualität</div></div>';
+  h += '<div style="flex:1;text-align:center"><div style="font:700 9pt var(--m);color:var(--accent)">●</div><div style="font:500 5pt var(--m);color:var(--muted);margin-top:2px">KONSISTENZ</div><div style="font:400 4.5pt var(--f);color:var(--muted)">Gegenprüfung durch weitere Quellen</div></div>';
+  h += '<div style="flex:1;text-align:center"><div style="font:700 9pt var(--m);color:var(--accent)">●</div><div style="font:500 5pt var(--m);color:var(--muted);margin-top:2px">STRUKTUR</div><div style="font:400 4.5pt var(--f);color:var(--muted)">URL, Datum, Zahlen, Quellenreferenz</div></div>';
+  h += '</div>';
+  // Row 3: Admiralty distribution (codes only, no tier labels)
+  h += '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">';
+  for (var ai=0; ai<admOrder.length; ai++) {
+    var aCode = admOrder[ai];
+    if (!admCounts[aCode]) continue;
+    var aCol = admColors[aCode] || 'var(--muted)';
+    h += '<span style="font:500 5.5pt var(--m);padding:2px 6px;border-radius:2px;background:'+aCol+'12;color:'+aCol+'" title="'+admLabels[aCode]+'">'+aCode+' × '+admCounts[aCode]+'</span>';
+  }
+  h += '<span style="font:400 5pt var(--f);color:var(--muted);margin-left:auto">Admiralty-System · agenttrust v0.1</span>';
+  h += '</div>';
+  h += '</div>';
+
+  // Render themed clusters
+  if (typeof NEWS_CLUSTERED === 'object' && NEWS_CLUSTERED !== null) {
+    // Sort themes by item count descending
+    var themeKeys = Object.keys(NEWS_CLUSTERED).sort(function(a,b) {
+      return (NEWS_CLUSTERED[b].count||0) - (NEWS_CLUSTERED[a].count||0);
+    });
+
+    for (var tki=0; tki<themeKeys.length; tki++) {
+      var themeName = themeKeys[tki];
+      var themeData = NEWS_CLUSTERED[themeName];
+      if (!themeData || !themeData.meldungen) continue;
+      var themeCode = themeData.iconCode || themeName.substring(0,3).toUpperCase();
+      var themeColor = themeData.iconColor || 'var(--accent)';
+      var themeCount = themeData.count || 0;
+      var themeId = 'news-theme-' + tki;
+
+      // Theme container — visual grouping with colored left border + subtle background
+      h += '<div style="margin-bottom:12px;border:1px solid var(--border);border-left:3px solid '+themeColor+';border-radius:4px;background:var(--surface);overflow:hidden">';
+
+      // Theme header (collapsible)
+      h += '<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;transition:background .15s" onclick="var el=document.getElementById(\''+themeId+'\');var arr=this.querySelector(\'.theme-arrow\');if(el.style.display===\'none\'){el.style.display=\'\';arr.textContent=\'▼\'}else{el.style.display=\'none\';arr.textContent=\'▶\'}" onmouseover="this.style.background=\'var(--surface2)\'" onmouseout="this.style.background=\'transparent\'">';
+      // Icon: colored code badge instead of emoji
+      h += '<span style="font:700 5.5pt var(--m);color:#fff;background:'+themeColor+';padding:3px 6px;border-radius:3px;letter-spacing:.06em">'+themeCode+'</span>';
+      h += '<span style="font:600 8.5pt var(--f);color:var(--text);flex:1">'+themeName+'</span>';
+      h += '<span style="font:500 6pt var(--m);color:var(--muted);padding:2px 6px;background:var(--surface2);border-radius:2px">'+themeCount+' Meldungen</span>';
+      h += '<span class="theme-arrow" style="font:400 7pt var(--m);color:var(--accent)">'+(tki < 3 ? '▼' : '▶')+'</span>';
+      h += '</div>';
+
+      // Theme content (first 3 expanded, rest collapsed)
+      h += '<div id="'+themeId+'" style="display:'+(tki < 3 ? '' : 'none')+';padding:0 12px 10px 12px;background:rgba(0,0,0,0.15)">';
+
+      // Executive Summary (if available)
+      var exSum = themeData.executiveSummary;
+      if (exSum) {
+        var exCL = confLabel(exSum.confidence||0);
+        var exEija = (exSum.eija||'I').charAt(0);
+        h += '<div style="padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:4px;margin:8px 0">';
+        // Summary text
+        h += '<div style="font:500 7.5pt var(--f);color:var(--text);line-height:1.6;margin-bottom:6px">'+exSum.summary+'</div>';
+        // So-What (interpretation)
+        if (exSum.soWhat) h += '<div style="font:400 7pt var(--f);color:var(--accent);line-height:1.5;margin-bottom:8px">→ '+exSum.soWhat+'</div>';
+        // Trust row: human-readable labels
+        h += '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">';
+        h += '<span class="ev ev-'+exEija.toLowerCase()+'">'+exEija+'</span>';
+        h += '<span style="font:500 5.5pt var(--m);color:'+exCL.col+'" title="Konfidenz '+exSum.confidence+'%">'+exCL.text+'</span>';
+        h += '<span style="font:400 5pt var(--m);color:var(--muted)">·</span>';
+        h += '<span style="font:400 5pt var(--m);color:var(--muted)" title="Admiralty '+exSum.admiralty+': '+(admLabels[exSum.admiralty]||'')+'">'+(admHuman[exSum.admiralty]||exSum.admiralty)+'</span>';
+        // Source pills
+        if (exSum.sources && exSum.sources.length) {
+          h += '<span style="font:400 5pt var(--m);color:var(--muted)">·</span>';
+          for (var si=0; si<exSum.sources.length; si++) {
+            h += '<span style="font:400 5pt var(--m);color:var(--muted);padding:1px 4px;background:var(--surface2);border-radius:2px">'+exSum.sources[si]+'</span>';
+          }
+        }
+        h += '</div>';
+        // Trust note
+        if (exSum.trustNote) h += '<div style="font:400 5pt var(--f);color:var(--muted);margin-top:4px;line-height:1.4;font-style:italic">⚠ '+exSum.trustNote+'</div>';
+        h += '</div>';
+      }
+
+      // Sort periods chronologically (newest first)
+      var periodKeys = Object.keys(themeData.meldungen).sort().reverse();
+
+      for (var pki=0; pki<periodKeys.length; pki++) {
+        var periodKey = periodKeys[pki];
+        var periodData = themeData.meldungen[periodKey];
+        if (!periodData || !periodData.items || !periodData.items.length) continue;
+
+        // Period sub-header (KW label)
+        h += '<div style="padding:4px 12px;font:600 5.5pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:4px">';
+        h += (periodData.kw || periodKey) + ' · ' + (periodData.monat || '');
+        h += '</div>';
+
+        // Items within period
+        for (var ii=0; ii<periodData.items.length; ii++) {
+          var n = periodData.items[ii];
+          var nSentColor = n.sentiment==='NEG'?'var(--red)':n.sentiment==='POS'?'var(--green)':n.sentiment==='MIX'?'var(--amber)':'var(--muted)';
+          var nImpactColor = n.impact==='HOCH'?'var(--red)':n.impact==='MITTEL'?'var(--amber)':'var(--muted)';
+          var nConfColor = (n.confidence||0)>=60?'var(--green)':(n.confidence||0)>=35?'var(--amber)':'var(--red)';
+          var nAdmColor = admColors[n.admiralty] || 'var(--muted)';
+          var nEija = (n.eija||'E').charAt(0);
+
+          h += '<div class="nf-card" style="cursor:pointer;transition:border-color .15s;border-left:3px solid '+nAdmColor+'" onclick="'+(n.url?'window.open(\''+n.url+'\',\'_blank\')':'')+'" onmouseover="this.style.borderColor=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border)\'">';
+
+          // Title row
+          h += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">';
+          h += '<div style="flex:1;font:600 8pt var(--f);color:var(--text);line-height:1.3">' + n.title + (n.url?' <span style="font:400 6pt var(--m);color:var(--accent)">↗</span>':'') + '</div>';
+          // Trust badges (right side): EIJA + human-readable confidence + source type
+          var nCL = confLabel(n.confidence||0);
+          h += '<div style="display:flex;gap:4px;flex-shrink:0;align-items:center">';
+          h += '<span class="ev ev-'+nEija.toLowerCase()+'" title="'+(nEija==='E'?'Ereignis — objektivierbar':nEija==='I'?'Interpretation — Einordnung':nEija==='A'?'Aktion — Handlungsempfehlung':'Joker — Unsicherheit')+'">'+nEija+'</span>';
+          h += '<span style="font:500 5pt var(--m);color:'+nCL.col+'" title="Konfidenz '+(n.confidence||0)+'% (3-Signal: Quellsignal×Konsistenz×Struktur)">'+nCL.text+'</span>';
+          h += '</div></div>';
+
+          // Body
+          if (n.body) h += '<div style="font:400 7pt var(--f);color:var(--text2);line-height:1.5;margin:4px 0">' + n.body + '</div>';
+
+          // Meta row with source attribution
+          h += '<div class="nf-meta" style="flex-wrap:wrap">';
+          h += '<span style="font:500 5.5pt var(--m);color:var(--text2)">'+n.source+'</span>';
+          h += '<span style="font:400 5pt var(--m);color:'+nAdmColor+'" title="Admiralty '+(n.admiralty||'')+'">'+(admHuman[n.admiralty]||'')+'</span>';
+          h += '<span>' + n.date + '</span>';
+          if (n.sentiment && n.sentiment !== 'NEUTRAL') h += '<span class="nf-sentiment" style="background:'+nSentColor+'15;color:'+nSentColor+'">'+n.sentiment+'</span>';
+          if (n.impact) h += '<span class="nf-impact" style="color:'+nImpactColor+'">'+n.impact+'</span>';
+          // Entity links
+          if (n.entities && n.entities.length) {
+            for (var nei=0;nei<n.entities.length;nei++) {
+              var ne = KB[n.entities[nei]];
+              if (ne) h += '<span class="related-pill" style="padding:1px 5px;font-size:5pt" onclick="event.stopPropagation();showEntity(\''+n.entities[nei]+'\')">'+ne.name.split(' ').pop()+'</span>';
+            }
+          }
+          h += '</div></div>';
+        }
+      }
+      h += '</div></div>'; // close theme-content + theme-container
+    }
+  } else {
+    // Fallback: flat NEWS rendering (backwards compat)
+    for (var ni=0; ni<NEWS.length; ni++) {
+      var n = NEWS[ni];
+      var nSentColor = n.sentiment==='NEG'?'var(--red)':n.sentiment==='POS'?'var(--green)':n.sentiment==='MIX'?'var(--amber)':'var(--muted)';
+      var nImpactColor = n.impact==='HOCH'?'var(--red)':n.impact==='MITTEL'?'var(--amber)':'var(--muted)';
+      h += '<div class="nf-card" style="cursor:pointer;transition:border-color .15s" onclick="'+(n.url?'window.open(\''+n.url+'\',\'_blank\')':'')+'" onmouseover="this.style.borderColor=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border)\'">';
+      h += '<div style="font:600 8pt var(--f);color:var(--text);line-height:1.3">' + n.title + (n.url?' <span style="font:400 6pt var(--m);color:var(--accent)">↗</span>':'') + '</div>';
+      h += '<div style="font:400 7pt var(--f);color:var(--text2);line-height:1.5;margin:4px 0">' + (n.body || '') + '</div>';
+      h += '<div class="nf-meta"><span>' + n.source + '</span><span>' + n.date + '</span>';
+      if (n.sentiment) h += '<span class="nf-sentiment" style="background:'+nSentColor+'15;color:'+nSentColor+'">'+n.sentiment+'</span>';
+      if (n.impact) h += '<span class="nf-impact" style="color:'+nImpactColor+'">Impact: '+n.impact+'</span>';
+      h += '</div></div>';
+    }
+  }
+  h += '</div>';
+
   // ═══ DEEP DIVE SECTION (collapsed by default) ═══
   h += '<div style="margin-top:24px;padding-top:16px;border-top:2px solid var(--border)">';
   h += '<div class="canvas-title" style="cursor:pointer" onclick="var dd=document.getElementById(\'deep-dive\');var arr=document.getElementById(\'dd-arrow\');if(dd.style.display===\'none\'){dd.style.display=\'\';arr.textContent=\'▼\'}else{dd.style.display=\'none\';arr.textContent=\'▶\'}">Quellenanalyse und Rohdaten <span id="dd-arrow" style="font:400 7pt var(--m);color:var(--accent)">▶</span></div>';
@@ -2236,27 +2545,7 @@ function renderBriefing() {
     } else { h += '</div></div>'; }
   }
 
-  // Latest news
-  h += '<div class="canvas-title">Aktuelle Lage <span class="ct-badge" style="background:var(--accent)">' + NEWS.length + ' MELDUNGEN</span></div>';
-  for (var ni=0; ni<NEWS.length; ni++) {
-    var n = NEWS[ni];
-    var nSentColor = n.sentiment==='NEG'?'var(--red)':n.sentiment==='POS'?'var(--green)':n.sentiment==='MIX'?'var(--amber)':'var(--muted)';
-    var nImpactColor = n.impact==='HOCH'?'var(--red)':n.impact==='MITTEL'?'var(--amber)':'var(--muted)';
-    h += '<div class="nf-card" style="cursor:pointer;transition:border-color .15s" onclick="'+(n.url?'window.open(\''+n.url+'\',\'_blank\')':'showNewsDetail('+ni+')')+'" onmouseover="this.style.borderColor=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border)\'">';
-    h += '<div style="font:600 8pt var(--f);color:var(--text);line-height:1.3">' + n.title + (n.url?' <span style="font:400 6pt var(--m);color:var(--accent)">↗</span>':'') + '</div>';
-    h += '<div style="font:400 7pt var(--f);color:var(--text2);line-height:1.5;margin:4px 0"><span class="ev ev-e">E</span> ' + (n.body || '') + '</div>';
-    h += '<div class="nf-meta">';
-    h += '<span>' + n.source + '</span><span>' + n.date + '</span>';
-    if (n.sentiment) h += '<span class="nf-sentiment" style="background:'+nSentColor+'15;color:'+nSentColor+'">'+n.sentiment+'</span>';
-    if (n.impact) h += '<span class="nf-impact" style="color:'+nImpactColor+'">Impact: '+n.impact+'</span>';
-    if (n.entities && n.entities.length) {
-      for (var nei=0;nei<n.entities.length;nei++) {
-        var ne = KB[n.entities[nei]];
-        if (ne) h += '<span class="related-pill" style="padding:1px 5px;font-size:5pt" onclick="showEntity(\''+n.entities[nei]+'\')">'+ne.name.split(' ').pop()+'</span>';
-      }
-    }
-    h += '</div></div>';
-  }
+
 
   // Risk Ranking (absorbed from Alerts)
   h += '<div class="canvas-title">Risiko-Ranking</div>';
