@@ -2450,35 +2450,97 @@ function renderBriefing() {
           return lbl.substring(0, maxLen-1) + '…';
         }
 
-        // Position maps — staggered layout for readability
+        // Force-directed layout simulation
         var themeNodes = mNet.nodes.filter(function(n){return n.type==='theme'});
         var mediaNodes = mNet.nodes.filter(function(n){return n.type==='media'});
         var kandNodes = mNet.nodes.filter(function(n){return n.type==='kandidat'});
+
+        // Initial positions: spread in type bands with jitter
         var nMap = {};
-        // Media: top band, staggered y for density
-        var mPad = 50, mW = W - mPad*2;
+        var PAD = 50;
         mediaNodes.forEach(function(n,i) {
-          var xPos = mPad + mW/(mediaNodes.length)*(i+0.5);
-          var yStagger = (i % 2 === 0) ? H*0.08 : H*0.14;
-          nMap[n.id] = {x: xPos, y: yStagger, node: n};
+          nMap[n.id] = {x: PAD + (W-PAD*2)/(mediaNodes.length)*(i+0.5) + (Math.random()-0.5)*20, y: H*0.11 + (Math.random()-0.5)*H*0.06, vx:0, vy:0, node: n};
         });
-        // Themes: middle band, staggered
-        var tPad = 60;
         themeNodes.forEach(function(n,i) {
-          var xPos = tPad + (W-tPad*2)/(themeNodes.length)*(i+0.5);
-          var yStagger = (i % 2 === 0) ? H*0.44 : H*0.52;
-          nMap[n.id] = {x: xPos, y: yStagger, node: n};
+          nMap[n.id] = {x: PAD + (W-PAD*2)/(themeNodes.length)*(i+0.5) + (Math.random()-0.5)*20, y: H*0.48 + (Math.random()-0.5)*H*0.06, vx:0, vy:0, node: n};
         });
-        // Candidates: bottom band, staggered
-        var kPad = 40;
         kandNodes.forEach(function(n,i) {
-          var xPos = kPad + (W-kPad*2)/(kandNodes.length)*(i+0.5);
-          var yStagger = (i % 2 === 0) ? H*0.82 : H*0.90;
-          nMap[n.id] = {x: xPos, y: yStagger, node: n};
+          nMap[n.id] = {x: PAD + (W-PAD*2)/(kandNodes.length)*(i+0.5) + (Math.random()-0.5)*20, y: H*0.86 + (Math.random()-0.5)*H*0.06, vx:0, vy:0, node: n};
         });
 
-        // Row labels
+        // Band targets for soft Y-constraint (keeps types in lanes)
+        var bandY = {media: H*0.11, theme: H*0.48, kandidat: H*0.86};
+        var bandStrength = 0.08;
+
+        // Build adjacency for quick lookup
+        var adjMap = {};
+        mNet.nodes.forEach(function(n) { adjMap[n.id] = []; });
+        mNet.links.forEach(function(l) {
+          if (adjMap[l.source]) adjMap[l.source].push(l.target);
+          if (adjMap[l.target]) adjMap[l.target].push(l.source);
+        });
+
+        // Force simulation: 180 iterations
+        var REPULSION = 3500;
+        var SPRING_K = 0.012;
+        var SPRING_LEN = 120;
+        var DAMPING = 0.85;
+        var DT = 1;
+        var allIds = Object.keys(nMap);
+
+        for (var iter = 0; iter < 180; iter++) {
+          // Repulsion: all pairs
+          for (var ai = 0; ai < allIds.length; ai++) {
+            var a = nMap[allIds[ai]];
+            for (var bi = ai+1; bi < allIds.length; bi++) {
+              var b = nMap[allIds[bi]];
+              var dx = a.x - b.x, dy = a.y - b.y;
+              var dist = Math.sqrt(dx*dx + dy*dy) || 1;
+              var force = REPULSION / (dist * dist);
+              var fx = (dx/dist) * force, fy = (dy/dist) * force;
+              a.vx += fx; a.vy += fy;
+              b.vx -= fx; b.vy -= fy;
+            }
+          }
+          // Attraction: linked pairs
+          mNet.links.forEach(function(l) {
+            var a = nMap[l.source], b = nMap[l.target];
+            if (!a || !b) return;
+            var dx = b.x - a.x, dy = b.y - a.y;
+            var dist = Math.sqrt(dx*dx + dy*dy) || 1;
+            var displacement = dist - SPRING_LEN;
+            var force = SPRING_K * displacement;
+            var fx = (dx/dist) * force, fy = (dy/dist) * force;
+            a.vx += fx; a.vy += fy;
+            b.vx -= fx; b.vy -= fy;
+          });
+          // Band gravity: pull nodes toward their type's Y-band
+          allIds.forEach(function(id) {
+            var p = nMap[id];
+            var targetY = bandY[p.node.type] || H*0.5;
+            p.vy += (targetY - p.y) * bandStrength;
+          });
+          // Center gravity X
+          allIds.forEach(function(id) {
+            var p = nMap[id];
+            p.vx += (W/2 - p.x) * 0.003;
+          });
+          // Integrate + damp + clamp
+          allIds.forEach(function(id) {
+            var p = nMap[id];
+            p.vx *= DAMPING; p.vy *= DAMPING;
+            p.x += p.vx * DT; p.y += p.vy * DT;
+            p.x = Math.max(PAD, Math.min(W-PAD, p.x));
+            p.y = Math.max(20, Math.min(H-20, p.y));
+          });
+        }
+
+        // Row labels (positioned at band centers)
         var rowLabels = [{y:H*0.01,text:'MEDIEN'},{y:H*0.36,text:'THEMEN'},{y:H*0.74,text:'KANDIDATEN'}];
+
+        // Zoom/pan state
+        var zoomLevel = 1, panX = 0, panY = 0;
+        var isDragging = false, dragNodeId = null, dragOffX = 0, dragOffY = 0;
 
         // Tooltip element
         var tooltip = document.createElement('div');
@@ -2493,13 +2555,73 @@ function renderBriefing() {
 
           var svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
           svg.setAttribute('width', W); svg.setAttribute('height', H);
-          svg.style.width='100%'; svg.style.height=H+'px';
+          svg.setAttribute('viewBox', '0 0 '+W+' '+H);
+          svg.style.width='100%'; svg.style.height=H+'px'; svg.style.cursor='grab';
 
-          // Row labels
+          // Zoom controls
+          var zoomBar = document.createElement('div');
+          zoomBar.style.cssText='position:absolute;top:8px;right:8px;display:flex;gap:4px;z-index:10';
+          ['−','⟳','+'].forEach(function(label) {
+            var btn = document.createElement('button');
+            btn.textContent = label;
+            btn.style.cssText='width:28px;height:28px;border-radius:4px;border:1px solid var(--border);background:var(--surface);color:var(--text);font:600 12pt var(--m);cursor:pointer;display:flex;align-items:center;justify-content:center';
+            btn.addEventListener('click',function(e){
+              e.stopPropagation();
+              if(label==='+') zoomLevel=Math.min(3,zoomLevel*1.25);
+              else if(label==='−') zoomLevel=Math.max(0.4,zoomLevel/1.25);
+              else { zoomLevel=1; panX=0; panY=0; }
+              var vw=W/zoomLevel, vh=H/zoomLevel;
+              var vx = W/2 - vw/2 + panX;
+              var vy = H/2 - vh/2 + panY;
+              svg.setAttribute('viewBox', vx+' '+vy+' '+vw+' '+vh);
+            });
+            zoomBar.appendChild(btn);
+          });
+
+          // Pan with mouse drag on SVG background
+          var isPanning = false, panStartX=0, panStartY=0;
+          svg.addEventListener('mousedown',function(e){
+            if(e.target===svg || e.target.tagName==='line' || e.target.tagName==='path') {
+              isPanning=true; panStartX=e.clientX; panStartY=e.clientY; svg.style.cursor='grabbing';
+            }
+          });
+          svg.addEventListener('mousemove',function(e){
+            if(isPanning) {
+              var dx = (e.clientX-panStartX)/zoomLevel;
+              var dy = (e.clientY-panStartY)/zoomLevel;
+              panX -= dx; panY -= dy;
+              panStartX=e.clientX; panStartY=e.clientY;
+              var vw=W/zoomLevel, vh=H/zoomLevel;
+              svg.setAttribute('viewBox', (W/2-vw/2+panX)+' '+(H/2-vh/2+panY)+' '+vw+' '+vh);
+            }
+            // Node dragging
+            if(dragNodeId && nMap[dragNodeId]) {
+              var rect = svg.getBoundingClientRect();
+              var vb = svg.getAttribute('viewBox').split(' ').map(Number);
+              var svgX = vb[0] + (e.clientX - rect.left) / rect.width * vb[2];
+              var svgY = vb[1] + (e.clientY - rect.top) / rect.height * vb[3];
+              nMap[dragNodeId].x = svgX;
+              nMap[dragNodeId].y = svgY;
+              renderNet(filterKand);
+            }
+          });
+          svg.addEventListener('mouseup',function(){isPanning=false; dragNodeId=null; svg.style.cursor='grab';});
+          svg.addEventListener('mouseleave',function(){isPanning=false; dragNodeId=null; svg.style.cursor='grab';});
+
+          // Scroll to zoom
+          svg.addEventListener('wheel',function(e){
+            e.preventDefault();
+            var factor = e.deltaY > 0 ? 0.9 : 1.1;
+            zoomLevel = Math.max(0.4, Math.min(3, zoomLevel*factor));
+            var vw=W/zoomLevel, vh=H/zoomLevel;
+            svg.setAttribute('viewBox', (W/2-vw/2+panX)+' '+(H/2-vh/2+panY)+' '+vw+' '+vh);
+          },{passive:false});
+
+          // Row labels (faint, in background)
           rowLabels.forEach(function(rl) {
             var t = document.createElementNS('http://www.w3.org/2000/svg','text');
             t.setAttribute('x',8); t.setAttribute('y',rl.y*H+14);
-            t.setAttribute('fill','#5F6B7C'); t.setAttribute('font-size','6');
+            t.setAttribute('fill','#3D4752'); t.setAttribute('font-size','7');
             t.setAttribute('font-family','JetBrains Mono,monospace'); t.setAttribute('font-weight','600');
             t.setAttribute('letter-spacing','0.12em');
             t.textContent = rl.text; svg.appendChild(t);
@@ -2683,6 +2805,11 @@ function renderBriefing() {
               tooltip.style.display = 'none';
             });
 
+            // Drag to reposition
+            g.addEventListener('mousedown', (function(nodeId) { return function(e) {
+              e.stopPropagation(); dragNodeId = nodeId; svg.style.cursor = 'move';
+            }; })(n.id));
+
             // Clickability: candidates → showEntity, media → URL, themes → scroll
             if (n.type==='kandidat') {
               var kbId = n.id.replace(/^kand_/,'');
@@ -2704,6 +2831,11 @@ function renderBriefing() {
           });
 
           container.insertBefore(svg, tooltip);
+          // Add zoom controls if not already present
+          if (!container.querySelector('.zoom-bar')) {
+            zoomBar.classList.add('zoom-bar');
+            container.appendChild(zoomBar);
+          }
 
           // Highlight active filter button
           var btns = document.querySelectorAll('#'+netId+'-filters button');
