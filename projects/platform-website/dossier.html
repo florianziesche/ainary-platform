@@ -3997,35 +3997,52 @@ function renderGraph() {
 
   // Filter function
   function applyGraphFilter(filterId) {
+    // Direct DOM manipulation — D3 selections may go stale
+    var svgEl = document.querySelector('#graph-view svg');
+    if (!svgEl) return;
+    var allGs = svgEl.querySelectorAll('g > g');
+    var allLines = svgEl.querySelectorAll('line');
+    var allLinkTexts = svgEl.querySelectorAll('text.link-label');
     if (filterId === 'alle') {
-      node.style('opacity', 1);
-      link.style('opacity', 1);
-      linkLabel.style('opacity', 1);
+      allGs.forEach(function(g) { g.style.opacity = 1; });
+      allLines.forEach(function(l) { l.style.opacity = 1; });
+      allLinkTexts.forEach(function(t) { t.style.opacity = 1; });
       return;
     }
-    // Find matching nodes
+    // Find matching nodes by filterGroup
     var activeNodeIds = new Set();
-    nodes.forEach(function(n) {
-      if (n.filterGroup === filterId) activeNodeIds.add(n.id);
+    allGs.forEach(function(g) {
+      var d = g.__data__;
+      if (d && d.filterGroup === filterId) activeNodeIds.add(d.id);
     });
     // Also include nodes connected to matching nodes
     var connectedIds = new Set(activeNodeIds);
-    links.forEach(function(l) {
-      var sid = typeof l.source === 'object' ? l.source.id : l.source;
-      var tid = typeof l.target === 'object' ? l.target.id : l.target;
+    allLines.forEach(function(l) {
+      var d = l.__data__;
+      if (!d) return;
+      var sid = typeof d.source === 'object' ? d.source.id : d.source;
+      var tid = typeof d.target === 'object' ? d.target.id : d.target;
       if (activeNodeIds.has(sid)) connectedIds.add(tid);
       if (activeNodeIds.has(tid)) connectedIds.add(sid);
     });
-    node.style('opacity', function(d) { return connectedIds.has(d.id) ? 1 : 0.08; });
-    link.style('opacity', function(d) {
-      var sid = typeof d.source === 'object' ? d.source.id : d.source;
-      var tid = typeof d.target === 'object' ? d.target.id : d.target;
-      return (activeNodeIds.has(sid) || activeNodeIds.has(tid)) ? 0.8 : 0.04;
+    // Apply opacity
+    allGs.forEach(function(g) {
+      var d = g.__data__;
+      g.style.opacity = (d && connectedIds.has(d.id)) ? 1 : 0.08;
     });
-    linkLabel.style('opacity', function(d) {
+    allLines.forEach(function(l) {
+      var d = l.__data__;
+      if (!d) { l.style.opacity = 0.04; return; }
       var sid = typeof d.source === 'object' ? d.source.id : d.source;
       var tid = typeof d.target === 'object' ? d.target.id : d.target;
-      return (activeNodeIds.has(sid) || activeNodeIds.has(tid)) ? 1 : 0.04;
+      l.style.opacity = (activeNodeIds.has(sid) || activeNodeIds.has(tid)) ? 0.8 : 0.04;
+    });
+    allLinkTexts.forEach(function(t) {
+      var d = t.__data__;
+      if (!d) { t.style.opacity = 0.04; return; }
+      var sid = typeof d.source === 'object' ? d.source.id : d.source;
+      var tid = typeof d.target === 'object' ? d.target.id : d.target;
+      t.style.opacity = (activeNodeIds.has(sid) || activeNodeIds.has(tid)) ? 1 : 0.04;
     });
   }
   // Make applyGraphFilter available to filter buttons
