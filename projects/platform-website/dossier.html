@@ -1213,7 +1213,7 @@ function showNewsDetail(idx) {
   h += '<div class="detail-title">'+n.title+'</div>';
   if (n.sentiment) h += '<span style="font:600 6pt var(--m);padding:2px 6px;border-radius:2px;background:'+nSentColor+'15;color:'+nSentColor+'">'+n.sentiment+'</span> ';
   if (n.impact) h += '<span style="font:500 6pt var(--m);color:var(--muted)">Impact: '+n.impact+'</span>';
-  h += '<div class="detail-body" style="margin-top:10px"><span class="ev ev-e">E</span> '+n.body+'</div>';
+  h += '<div class="detail-body" style="margin-top:10px">' + formatBody(n.body) + '</div>';
   // Related entities
   if (n.entities && n.entities.length) {
     h += '<div style="margin-top:10px;display:flex;gap:4px;flex-wrap:wrap">';
@@ -1706,7 +1706,7 @@ function buildIntelFeed() {
     html += '<div class="feed-item ' + cls + '" onclick="showNewsDetail('+fi+')" style="cursor:pointer">';
     html += '<div class="feed-source">' + n.source + ' · ' + n.date + (n.url ? ' · <a href="'+n.url+'" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent);text-decoration:underline">Quelle</a>' : '') + '</div>';
     html += '<div class="feed-title">' + (n.url ? '<a href="'+n.url+'" target="_blank" onclick="event.stopPropagation()" style="color:inherit;text-decoration:none" onmouseover="this.style.textDecoration=\'underline\'" onmouseout="this.style.textDecoration=\'none\'">' + n.title + '</a>' : n.title) + '</div>';
-    html += '<div class="feed-body">' + (n.summary || n.body || '').substring(0, 140) + '</div>';
+    html += '<div class="feed-body">' + formatBody((n.summary || n.body || '').substring(0, 140)) + '</div>';
     html += '</div>';
   }
   el.innerHTML = html;
@@ -1816,6 +1816,18 @@ function renderBriefing() {
   var admBadgeShort = {A1:'Amtlich',A2:'Verlässlich',B2:'Leitmedium',B3:'Lokal',C2:'Partei',C3:'Bürger',D4:'Aggregator',E2:'Unzuverlässig'};
   var sentLabel = {POS:'Positiv',NEG:'Negativ',NEUTRAL:'Neutral',MIX:'Gemischt'};
   var sentIcon = {POS:'↑',NEG:'↓',NEUTRAL:'—',MIX:'↕'};
+
+  // EIJA body formatter — strips [E]/[I]/[J]/[A] prefix, renders as inline badge
+  var eijaNames = {E:'Evidenz',I:'Einordnung',J:'Bewertung',A:'Annahme'};
+  var eijaColors = {E:'var(--green)',I:'var(--accent)',J:'var(--amber)',A:'var(--red)'};
+  function formatBody(body) {
+    if (!body) return '';
+    var m = body.match(/^\[([EIJA])\]\s*/);
+    if (!m) return body;
+    var tag = m[1];
+    var text = body.substring(m[0].length);
+    return '<span class="ev ev-'+tag.toLowerCase()+'" style="font-size:5pt;margin-right:3px" title="'+eijaNames[tag]+'">'+tag+'</span>' + text;
+  }
 
   // Compute days to election
   // Parse DD.MM.YYYY or ISO date
@@ -3126,7 +3138,7 @@ function renderBriefing() {
         var exAdmCol = admColors[exAdm] || 'var(--muted)';
         h += '<div style="padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:4px;margin:8px 0">';
         // Summary text
-        h += '<div style="font:500 7.5pt var(--f);color:var(--text);line-height:1.6;margin-bottom:6px">'+exSum.summary+'</div>';
+        h += '<div style="font:500 7.5pt var(--f);color:var(--text);line-height:1.6;margin-bottom:6px">' + formatBody(exSum.summary || (typeof exSum === 'string' ? exSum : '')) + '</div>';
         // So-What (interpretation)
         if (exSum.soWhat) h += '<div style="font:400 7pt var(--f);color:var(--accent);line-height:1.5;margin-bottom:8px">→ '+exSum.soWhat+'</div>';
         // Trust row: Admiralty badge + confidence label
@@ -3145,6 +3157,22 @@ function renderBriefing() {
         h += '</div>';
         // Trust note
         if (exSum.trustNote) h += '<div style="font:400 5pt var(--f);color:var(--muted);margin-top:4px;line-height:1.4;font-style:italic">△ '+exSum.trustNote+'</div>';
+        // Konsistenz-Hinweis: unique source count for this theme
+        var themeSources = {};
+        var periodKeysTemp = Object.keys(themeData.meldungen);
+        for (var pkt=0; pkt<periodKeysTemp.length; pkt++) {
+          var tmpItems = themeData.meldungen[periodKeysTemp[pkt]].items || [];
+          for (var ti2=0; ti2<tmpItems.length; ti2++) {
+            var src = tmpItems[ti2].source || '';
+            if (src) themeSources[src] = 1;
+          }
+        }
+        var srcCount = Object.keys(themeSources).length;
+        if (srcCount >= 3) {
+          h += '<div style="font:500 5pt var(--m);color:var(--green);margin-top:4px;padding:2px 6px;background:var(--green)08;border-radius:2px;display:inline-block">◉ Bestätigt durch '+srcCount+' unabhängige Quellen</div>';
+        } else if (srcCount === 2) {
+          h += '<div style="font:500 5pt var(--m);color:var(--accent);margin-top:4px;padding:2px 6px;background:var(--accent)08;border-radius:2px;display:inline-block">◎ 2 Quellen</div>';
+        }
         h += '</div>';
       }
 
@@ -3194,7 +3222,7 @@ function renderBriefing() {
           h += '</div></div>';
 
           // Body
-          if (n.body) h += '<div style="font:400 7pt var(--f);color:var(--text2);line-height:1.5;margin:4px 0">' + n.body + '</div>';
+          if (n.body) h += '<div style="font:400 7pt var(--f);color:var(--text2);line-height:1.5;margin:4px 0">' + formatBody(n.body) + '</div>';
 
           // Meta row with source attribution + sentiment + clickable source
           h += '<div class="nf-meta" style="flex-wrap:wrap;gap:4px">';
