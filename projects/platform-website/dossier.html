@@ -3281,13 +3281,9 @@ function renderBriefing() {
   }
 
   // Top risk cards
-  h += '<div class="canvas-title">Kandidaten — Prognose-Unsicherheit</div>';
+  h += '<div class="canvas-title">Kandidaten-Profile</div>';
   h += '<div style="font:400 6pt var(--f);color:var(--muted);margin-bottom:8px;line-height:1.6">';
-  h += 'Unsicherheit = wie stark könnte unser Forecast abweichen. ';
-  h += '<span style="color:var(--red)">■</span> Rot (50+): ±10 Prozentpunkte — Ergebnis schwer vorhersagbar. ';
-  h += '<span style="color:var(--amber)">■</span> Gelb (25-49): ±5pp — moderate Unsicherheit. ';
-  h += '<span style="color:var(--green)">■</span> Grün (0-24): ±2pp — vorhersagbar. ';
-  h += 'Alle Werte geschätzt, keine Umfragen verfügbar.</div>';
+  h += 'Alle Werte geschätzt auf Basis öffentlicher Quellen — keine Umfragen verfügbar.</div>';
   h += '<div class="briefing-grid">';
   for (const k of sortedByRisk.slice(0, 6)) {
     const e = KB[k];
@@ -3377,20 +3373,7 @@ function renderBriefing() {
 
 
 
-  // Risk Ranking (absorbed from Alerts)
-  h += '<div class="canvas-title">Risiko-Ranking</div>';
-  h += '<div class="entity-card"><div class="entity-body">';
-  const ranked = Object.keys(KB).sort((a, b) => KB[b].risk - KB[a].risk);
-  for (const k of ranked) {
-    const e = KB[k];
-    const rc = e.risk > 40 ? 'var(--red)' : e.risk > 25 ? 'var(--amber)' : 'var(--green)';
-    h += '<div class="risk-row" onclick="showEntity(\'' + k + '\')">';
-    h += '<div class="risk-name" style="color:' + e.color + '">' + e.name + '</div>';
-    h += '<div class="risk-bar-bg"><div class="risk-bar" style="width:' + e.risk + '%;background:' + rc + '"></div></div>';
-    h += '<div class="risk-val" style="color:' + rc + '"><span class="ev ev-j">J</span> ' + e.risk + '</div>';
-    h += '</div>';
-  }
-  h += '</div></div>';
+  // Risk Ranking removed — Florian: "verunsichert nur, Rohdaten"
 
   // NEW: Rich Themen-Radar (from themen section)
   if (THEMEN.radar && THEMEN.radar.length) {
@@ -3601,8 +3584,7 @@ function showEntity(id, el) {
   h += '<div class="canvas-title">Entity: ' + p.name + ' <span class="ct-badge" style="background:' + p.color + '">DOSSIER</span></div>';
   h += '<div class="entity-card"><div class="entity-header"><div>';
   h += '<div class="entity-name" style="color:' + p.color + '">' + p.name + '</div>';
-  var riskLabel2 = p.risk >= 50 ? 'HOCH — Prognose kann ±10pp abweichen' : p.risk >= 25 ? 'MITTEL — Prognose kann ±5pp abweichen' : 'NIEDRIG — Prognose kann ±2pp abweichen';
-  h += '<div class="entity-meta"><span><span class="ev ev-e">E</span> PARTEI: ' + (p.party || '—') + '</span><span><span class="ev ev-j">J</span> UNSICHERHEIT: ' + p.risk + '/100 (' + riskLabel2 + ')</span></div>';
+  h += '<div class="entity-meta"><span><span class="ev ev-e">E</span> PARTEI: ' + (p.party || '—') + '</span><span><span class="ev ev-e">E</span> ' + (p.quellen||[]).length + ' Quellen · ' + ((p.controversies||[]).length + (p.contradictions||[]).length) + ' Risikosignale</span></div>';
   if (p.risk_reason) h += '<div style="font:400 6pt var(--f);color:var(--muted);margin:4px 0 8px;padding:6px 10px;background:var(--surface);border:1px solid var(--border);border-radius:4px">' + p.risk_reason + '</div>';
   h += '</div></div>';
   // Dossier link button
