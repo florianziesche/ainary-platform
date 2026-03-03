@@ -1802,9 +1802,15 @@ function renderBriefing() {
     if (c >= 35) return {text:'Wenige Quellen', col:'var(--amber)'};
     return {text:'Schwach belegt', col:'var(--red)'};
   };
-  var admHuman = {A1:'Amtlich bestätigt',A2:'Amtliche Quelle',B2:'Leitmedium',C3:'Partei-/Bürgerquelle',D4:'Aggregator',E2:'Unzuverlässig'};
-  var admColors = {A1:'var(--green)',A2:'var(--green)',B2:'var(--accent)',C3:'var(--amber)',D4:'var(--red)',E2:'var(--red)'};
-  var admLabels = {A1:'Bestätigt',A2:'Verlässlich',B2:'Üblich zuverlässig',C3:'Bedingt zuverlässig',D4:'Eingeschränkt',E2:'Unzuverlässig'};
+  var admHuman = {A1:'Amtlich bestätigt',A2:'Verlässliche Quelle',B2:'Leitmedium',B3:'Lokale Quelle',C2:'Partei-Quelle',C3:'Partei-/Bürgerquelle',D4:'Aggregator',E2:'Unzuverlässig'};
+  var admColors = {A1:'var(--green)',A2:'var(--green)',B2:'var(--accent)',B3:'var(--accent)',C2:'var(--amber)',C3:'var(--amber)',D4:'var(--red)',E2:'var(--red)'};
+  var admLabels = {A1:'Bestätigt',A2:'Verlässlich',B2:'Üblich zuverlässig',B3:'Lokal zuverlässig',C2:'Bedingt zuverlässig',C3:'Bedingt zuverlässig',D4:'Eingeschränkt',E2:'Unzuverlässig'};
+  // Admiralty-derived confidence + display labels (used across all sections)
+  var admConfMap = {A1:95,A2:90,B2:80,B3:70,C2:65,C3:60,D4:40,E2:30};
+  var admBadgeLabel = {A1:'Amtlich bestätigt',A2:'Verlässliche Quelle',B2:'Leitmedium',B3:'Lokale Quelle',C2:'Partei-Quelle',C3:'Bürger-Quelle',D4:'Aggregator',E2:'Unzuverlässig'};
+  var admBadgeShort = {A1:'Amtlich',A2:'Verlässlich',B2:'Leitmedium',B3:'Lokal',C2:'Partei',C3:'Bürger',D4:'Aggregator',E2:'Unzuverlässig'};
+  var sentLabel = {POS:'Positiv',NEG:'Negativ',NEUTRAL:'Neutral',MIX:'Gemischt'};
+  var sentIcon = {POS:'↑',NEG:'↓',NEUTRAL:'—',MIX:'↕'};
 
   // Compute days to election
   // Parse DD.MM.YYYY or ISO date
@@ -2160,13 +2166,15 @@ function renderBriefing() {
     h += '<div id="medien-section" class="canvas-title">Medienlandschaft <span class="ct-badge" style="background:var(--blue)">QUELLENANALYSE</span></div>';
 
     // Executive Summary
-    var mCL = confLabel(MEDIEN.confidence||0);
-    var mEija = (MEDIEN.eija||'I').charAt(0);
+    var mAdm = MEDIEN.admiralty || 'B2';
+    var mConf = MEDIEN.confidence || admConfMap[mAdm] || 50;
+    var mCL = confLabel(mConf);
+    var mAdmCol = admColors[mAdm] || 'var(--muted)';
     h += '<div style="padding:12px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--blue);border-radius:4px;margin-bottom:8px">';
     h += '<div style="font:500 7.5pt var(--f);color:var(--text);line-height:1.6;margin-bottom:6px">'+MEDIEN.summary+'</div>';
     if (MEDIEN.soWhat) h += '<div style="font:400 7pt var(--f);color:var(--accent);line-height:1.5;margin-bottom:8px">→ '+MEDIEN.soWhat+'</div>';
     h += '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">';
-    h += '<span class="ev ev-'+mEija.toLowerCase()+'">'+mEija+'</span>';
+    h += '<span style="font:600 5pt var(--m);color:'+mAdmCol+';padding:1px 5px;background:'+mAdmCol+'15;border-radius:2px">'+(admBadgeShort[mAdm]||mAdm)+'</span>';
     h += '<span style="font:500 5.5pt var(--m);color:'+mCL.col+'">'+mCL.text+'</span>';
     if (MEDIEN.trustNote) h += '<span style="font:400 5pt var(--m);color:var(--muted)">· '+MEDIEN.trustNote+'</span>';
     h += '</div></div>';
@@ -2567,6 +2575,28 @@ function renderBriefing() {
               s2.textContent = sub; g.appendChild(s2);
             }
 
+            // Clickability: candidates → showEntity, media → URL, themes → filter
+            if (n.type==='kandidat') {
+              // Graph IDs are 'kand_xxx', KB keys are 'xxx' — try both
+              var kbId = n.id.replace(/^kand_/,'');
+              if (!KB[kbId]) { for (var kk in KB) { if (KB[kk].name===n.label || kk===n.id) { kbId=kk; break; } } }
+              g.addEventListener('click', (function(id) { return function(e) { e.stopPropagation(); if (typeof showEntity==='function') showEntity(id); }; })(kbId));
+              g.style.cursor = 'pointer';
+            } else if (n.type==='media') {
+              // Media nodes: open KB entity or find URL from KB
+              var mediaKbId = n.id.replace(/^src_/,'').replace(/^media_/,'');
+              if (!KB[mediaKbId]) { for (var mk in KB) { if (KB[mk].name===n.label || mk===n.id || mk==='media_'+mediaKbId) { mediaKbId=mk; break; } } }
+              if (KB[mediaKbId]) {
+                g.addEventListener('click', (function(id) { return function(e) { e.stopPropagation(); showEntity(id); }; })(mediaKbId));
+              } else if (n.url) {
+                g.addEventListener('click', (function(url) { return function(e) { e.stopPropagation(); window.open(url, '_blank'); }; })(n.url));
+              }
+              g.style.cursor = 'pointer';
+            } else if (n.type==='theme') {
+              g.addEventListener('click', (function(label) { return function(e) { e.stopPropagation(); window._netFilter(netId, null); /* scroll to theme in news */ var el = document.querySelector('[data-theme="'+label+'"]'); if (el) el.scrollIntoView({behavior:'smooth',block:'start'}); }; })(n.label));
+              g.style.cursor = 'pointer';
+            }
+
             svg.appendChild(g);
           });
 
@@ -2662,7 +2692,7 @@ function renderBriefing() {
       var themeId = 'news-theme-' + tki;
 
       // Theme container — visual grouping with colored left border + subtle background
-      h += '<div style="margin-bottom:12px;border:1px solid var(--border);border-left:3px solid '+themeColor+';border-radius:4px;background:var(--surface);overflow:hidden">';
+      h += '<div data-theme="'+themeName+'" style="margin-bottom:12px;border:1px solid var(--border);border-left:3px solid '+themeColor+';border-radius:4px;background:var(--surface);overflow:hidden">';
 
       // Theme header (collapsible)
       h += '<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;transition:background .15s" onclick="var el=document.getElementById(\''+themeId+'\');var arr=this.querySelector(\'.theme-arrow\');if(el.style.display===\'none\'){el.style.display=\'\';arr.textContent=\'▼\'}else{el.style.display=\'none\';arr.textContent=\'▶\'}" onmouseover="this.style.background=\'var(--surface2)\'" onmouseout="this.style.background=\'transparent\'">';
@@ -2679,19 +2709,21 @@ function renderBriefing() {
       // Executive Summary (if available)
       var exSum = themeData.executiveSummary;
       if (exSum) {
-        var exCL = confLabel(exSum.confidence||0);
-        var exEija = (exSum.eija||'I').charAt(0);
+        var exAdm = exSum.admiralty || 'B2';
+        var exConf = exSum.confidence || admConfMap[exAdm] || 50;
+        var exCL = confLabel(exConf);
+        var exAdmCol = admColors[exAdm] || 'var(--muted)';
         h += '<div style="padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:4px;margin:8px 0">';
         // Summary text
         h += '<div style="font:500 7.5pt var(--f);color:var(--text);line-height:1.6;margin-bottom:6px">'+exSum.summary+'</div>';
         // So-What (interpretation)
         if (exSum.soWhat) h += '<div style="font:400 7pt var(--f);color:var(--accent);line-height:1.5;margin-bottom:8px">→ '+exSum.soWhat+'</div>';
-        // Trust row: human-readable labels
+        // Trust row: Admiralty badge + confidence label
         h += '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">';
-        h += '<span class="ev ev-'+exEija.toLowerCase()+'">'+exEija+'</span>';
-        h += '<span style="font:500 5.5pt var(--m);color:'+exCL.col+'" title="Konfidenz '+exSum.confidence+'%">'+exCL.text+'</span>';
+        h += '<span style="font:600 5pt var(--m);color:'+exAdmCol+';padding:1px 5px;background:'+exAdmCol+'15;border-radius:2px" title="Admiralty '+exAdm+'">'+(admBadgeShort[exAdm]||exAdm)+'</span>';
+        h += '<span style="font:500 5.5pt var(--m);color:'+exCL.col+'" title="Konfidenz '+exConf+'%">'+exCL.text+'</span>';
         h += '<span style="font:400 5pt var(--m);color:var(--muted)">·</span>';
-        h += '<span style="font:400 5pt var(--m);color:var(--muted)" title="Admiralty '+exSum.admiralty+': '+(admLabels[exSum.admiralty]||'')+'">'+(admHuman[exSum.admiralty]||exSum.admiralty)+'</span>';
+        h += '<span style="font:400 5pt var(--m);color:var(--muted)">'+(admBadgeLabel[exAdm]||exAdm)+'</span>';
         // Source pills
         if (exSum.sources && exSum.sources.length) {
           h += '<span style="font:400 5pt var(--m);color:var(--muted)">·</span>';
@@ -2723,9 +2755,10 @@ function renderBriefing() {
           var n = periodData.items[ii];
           var nSentColor = n.sentiment==='NEG'?'var(--red)':n.sentiment==='POS'?'var(--green)':n.sentiment==='MIX'?'var(--amber)':'var(--muted)';
           var nImpactColor = n.impact==='HOCH'?'var(--red)':n.impact==='MITTEL'?'var(--amber)':'var(--muted)';
-          var nConfColor = (n.confidence||0)>=60?'var(--green)':(n.confidence||0)>=35?'var(--amber)':'var(--red)';
-          var nAdmColor = admColors[n.admiralty] || 'var(--muted)';
-          var nEija = (n.eija||'E').charAt(0);
+          var nAdm = n.admiralty || 'B2';
+          var nConf = n.confidence || admConfMap[nAdm] || 50;
+          var nConfColor = nConf>=60?'var(--green)':nConf>=35?'var(--amber)':'var(--red)';
+          var nAdmColor = admColors[nAdm] || 'var(--muted)';
 
           // Candidate mentions for filtering
           var nMentions = [];
@@ -2742,25 +2775,30 @@ function renderBriefing() {
           // Title row
           h += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">';
           h += '<div style="flex:1;font:600 8pt var(--f);color:var(--text);line-height:1.3">' + n.title + (n.url?' <span style="font:400 6pt var(--m);color:var(--accent)">↗</span>':'') + '</div>';
-          // Trust badges (right side): EIJA + human-readable confidence + source type
-          var nCL = confLabel(n.confidence||0);
+          // Trust badges (right side): Admiralty source type + confidence label
+          var nCL = confLabel(nConf);
           h += '<div style="display:flex;gap:4px;flex-shrink:0;align-items:center">';
-          h += '<span class="ev ev-'+nEija.toLowerCase()+'" title="'+(nEija==='E'?'Ereignis — objektivierbar':nEija==='I'?'Interpretation — Einordnung':nEija==='A'?'Aktion — Handlungsempfehlung':'Joker — Unsicherheit')+'">'+nEija+'</span>';
-          h += '<span style="font:500 5pt var(--m);color:'+nCL.col+'" title="Konfidenz '+(n.confidence||0)+'% (3-Signal: Quellsignal×Konsistenz×Struktur)">'+nCL.text+'</span>';
+          h += '<span style="font:600 5pt var(--m);color:'+nAdmColor+';padding:1px 5px;background:'+nAdmColor+'15;border-radius:2px" title="Admiralty '+nAdm+': '+(admBadgeLabel[nAdm]||nAdm)+'">'+(admBadgeShort[nAdm]||nAdm)+'</span>';
+          h += '<span style="font:500 5pt var(--m);color:'+nCL.col+'" title="Konfidenz '+nConf+'%">'+nCL.text+'</span>';
           h += '</div></div>';
 
           // Body
           if (n.body) h += '<div style="font:400 7pt var(--f);color:var(--text2);line-height:1.5;margin:4px 0">' + n.body + '</div>';
 
-          // Meta row with source attribution
+          // Meta row with source attribution + sentiment + clickable source
           h += '<div class="nf-meta" style="flex-wrap:wrap;gap:4px">';
           h += '<span style="font:500 5.5pt var(--m);color:var(--text2)">'+n.source+'</span>';
           h += '<span style="color:var(--border)">·</span>';
-          h += '<span style="font:400 5pt var(--m);color:'+nAdmColor+'" title="Admiralty '+(n.admiralty||'')+'">'+(admHuman[n.admiralty]||'')+'</span>';
+          h += '<span style="font:400 5pt var(--m);color:'+nAdmColor+'">'+(admBadgeLabel[nAdm]||'')+'</span>';
           h += '<span style="color:var(--border)">·</span>';
           h += '<span>' + n.date + '</span>';
-          if (n.sentiment && n.sentiment !== 'NEUTRAL') { h += '<span style="color:var(--border)">·</span>'; h += '<span class="nf-sentiment" style="background:'+nSentColor+'15;color:'+nSentColor+'">'+n.sentiment+'</span>'; }
+          // Always show sentiment — POS/NEG/NEUTRAL all visible
+          var nSentL = sentLabel[n.sentiment] || 'Neutral';
+          h += '<span style="color:var(--border)">·</span>';
+          h += '<span style="font:600 5pt var(--m);padding:1px 5px;border-radius:2px;background:'+nSentColor+'15;color:'+nSentColor+'">'+(sentIcon[n.sentiment]||'—')+' '+nSentL+'</span>';
           if (n.impact) { h += '<span style="color:var(--border)">·</span>'; h += '<span class="nf-impact" style="color:'+nImpactColor+'">'+n.impact+'</span>'; }
+          // Explicit source link
+          if (n.url) { h += '<a href="'+n.url+'" target="_blank" onclick="event.stopPropagation()" style="font:500 5.5pt var(--m);color:var(--accent);text-decoration:underline;margin-left:auto">Quelle →</a>'; }
           // Entity links
           if (n.entities && n.entities.length) {
             for (var nei=0;nei<n.entities.length;nei++) {
