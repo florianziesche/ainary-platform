@@ -2266,7 +2266,7 @@ function renderBriefing() {
         if (cl.this_answers) h += '<div style="font:400 6pt var(--f);color:var(--accent);font-style:italic;margin-top:3px">↳ "'+cl.this_answers+'"</div>';
         if (cl.sources && cl.sources.length) h += '<div style="font:400 5.5pt var(--m);color:var(--muted);margin-top:2px">Quellen: '+renderSourceLinks(cl.sources)+'</div>';
         // if_wrong hidden — was confusing users (looked like real warnings, not hypothetical impact)
-        // if (cl.if_wrong) h += '<div style="font:400 5.5pt var(--f);color:var(--red);margin-top:2px">⚠ '+cl.if_wrong+'</div>';
+        // if (cl.if_wrong) h += '<div style="font:400 5.5pt var(--f);color:var(--red);margin-top:2px">△ '+cl.if_wrong+'</div>';
         if (cl.contradictions) h += '<div style="font:400 5.5pt var(--f);color:var(--amber);margin-top:2px">↔ '+cl.contradictions+'</div>';
         h += '</div>';
       }
@@ -2526,13 +2526,13 @@ function renderBriefing() {
           var imp = impulse[ii];
           var prioCol = imp.priority==='HOCH'?'#991b1b':'#c87619';
           var prioBg = imp.priority==='HOCH'?'#991b1b18':'#c8761918';
-          var typeIcon = imp.type==='coverage_gap'?'◎':imp.type==='theme_vacuum'?'◇':imp.type==='narrative_monopoly'?'⚡':'●';
+          var typeIcon = imp.type==='coverage_gap'?'◎':imp.type==='theme_vacuum'?'◇':imp.type==='narrative_monopoly'?'◉':'●';
           h += '<div style="display:flex;gap:8px;padding:6px 8px;border-radius:3px;margin-bottom:4px;background:'+prioBg+';border-left:3px solid '+prioCol+'">';
           h += '<div style="flex:0 0 auto"><span style="font:700 6pt var(--m);color:'+prioCol+'">'+typeIcon+' '+imp.priority+'</span></div>';
           h += '<div style="flex:1;min-width:0">';
           h += '<div style="font:500 6pt var(--f);color:var(--text1);line-height:1.4">'+imp.insight+'</div>';
           h += '<div style="font:400 5.5pt var(--f);color:var(--accent);margin-top:2px;line-height:1.3">→ '+imp.action+'</div>';
-          if (imp.forMedium) h += '<div style="font:400 5pt var(--f);color:var(--muted);margin-top:2px">📰 '+imp.forMedium+'</div>';
+          if (imp.forMedium) h += '<div style="font:400 5pt var(--f);color:var(--muted);margin-top:2px">◈ '+imp.forMedium+'</div>';
           h += '</div></div>';
         }
         h += '</div>';
@@ -3145,7 +3145,7 @@ function renderBriefing() {
         }
         h += '</div>';
         // Trust note
-        if (exSum.trustNote) h += '<div style="font:400 5pt var(--f);color:var(--muted);margin-top:4px;line-height:1.4;font-style:italic">⚠ '+exSum.trustNote+'</div>';
+        if (exSum.trustNote) h += '<div style="font:400 5pt var(--f);color:var(--muted);margin-top:4px;line-height:1.4;font-style:italic">△ '+exSum.trustNote+'</div>';
         h += '</div>';
       }
 
@@ -4291,6 +4291,29 @@ function renderMatrixHTML() {
     h += '</tr>';
   }
   h += '</table>';
+
+  // → Daher conclusion for Vergleich
+  // Find top 2 candidates by forecast
+  var fkSort = (FORECAST.kandidaten||[]).slice().sort(function(a,b){ return (b.max||0) - (a.max||0); });
+  if (fkSort.length >= 2) {
+    var top1 = fkSort[0], top2 = fkSort[1];
+    var t1Name = (top1.name||top1.id||'').split(' ').pop();
+    var t2Name = (top2.name||top2.id||'').split(' ').pop();
+    var gap = (top1.min||0) - (top2.max||0);
+    var daherVergleich = '';
+    if (gap > 5) {
+      daherVergleich = t1Name + ' hat einen klaren Vorsprung (' + top1.min + '-' + top1.max + '% vs. ' + top2.min + '-' + top2.max + '%). ' + t2Name + ' bräuchte ein disruptives Ereignis für eine Trendwende.';
+    } else if (gap > 0) {
+      daherVergleich = t1Name + ' führt knapp (' + top1.min + '-' + top1.max + '% vs. ' + top2.min + '-' + top2.max + '%). Stichwahl-Szenario wahrscheinlich — taktische Positionierung entscheidet.';
+    } else {
+      daherVergleich = 'Offenes Rennen: ' + t1Name + ' (' + top1.min + '-' + top1.max + '%) und ' + t2Name + ' (' + top2.min + '-' + top2.max + '%) liegen gleichauf. Mobilisierung wird entscheidend.';
+    }
+    h += '<div style="padding:8px 12px;background:var(--accent)08;border-left:2px solid var(--accent);border-radius:0 4px 4px 0;margin-top:10px">';
+    h += '<span style="font:600 7pt var(--m);color:var(--accent)">→ Daher: </span>';
+    h += '<span style="font:400 7pt var(--f);color:var(--text2);line-height:1.5">' + daherVergleich + '</span>';
+    h += '</div>';
+  }
+
   return h;
 }
 
@@ -4394,7 +4417,7 @@ function renderStrategy() {
     }
     // If wrong
     if (false && pat.if_wrong) {
-      h += '<div style="font:400 5.5pt var(--f);color:var(--red);margin-top:2px">⚠ Wenn falsch: '+pat.if_wrong+'</div>';
+      h += '<div style="font:400 5.5pt var(--f);color:var(--red);margin-top:2px">△ Wenn falsch: '+pat.if_wrong+'</div>';
     }
     // So what
     if (pat.soWhat) {
@@ -4664,7 +4687,7 @@ function renderStrategy() {
     }
     // Deadline
     if (a.deadline) {
-      h += '<div style="margin-top:3px;font:500 6pt var(--m);color:var(--amber)">⏱ Deadline: ' + a.deadline + '</div>';
+      h += '<div style="margin-top:3px;font:500 6pt var(--m);color:var(--amber)">◎ Deadline: ' + a.deadline + '</div>';
     }
     // Metrics with links
     if (a.metrics) {
