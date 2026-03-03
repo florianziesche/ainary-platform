@@ -2324,9 +2324,96 @@ function renderBriefing() {
           h += sentBar;
           h += '<div style="margin:4px 0"><span style="font:500 5.5pt var(--m);color:var(--text2)">Stark bei: </span>'+themeTags+'</div>';
           if (sw.blindSpots && sw.blindSpots.length) {
-            h += '<div style="margin:2px 0"><span style="font:500 5.5pt var(--m);color:var(--muted)">Blind Spots: </span>'+blindTags+'</div>';
+            h += '<div style="margin:2px 0"><span style="font:500 5.5pt var(--m);color:#991b1b">⊘ Medien-Blind-Spots: </span>'+blindTags+'</div>';
+          }
+          // Theme blind spots
+          if (sw.themeBlindSpots && sw.themeBlindSpots.length) {
+            var tbTags = '';
+            for (var tbi=0; tbi<sw.themeBlindSpots.length; tbi++) {
+              tbTags += '<span style="display:inline-block;font:500 5pt var(--m);padding:1px 5px;border-radius:2px;background:#991b1b18;color:#991b1b;margin-right:3px;text-decoration:line-through">'+sw.themeBlindSpots[tbi]+'</span>';
+            }
+            h += '<div style="margin:2px 0"><span style="font:500 5.5pt var(--m);color:#991b1b">⊘ Themen-Leerstellen: </span>'+tbTags+'</div>';
           }
           h += '<div style="font:400 6pt var(--f);color:var(--accent);margin-top:6px;line-height:1.4">→ '+sw.strategie+'</div>';
+          h += '</div>';
+        }
+        h += '</div>';
+      }
+
+      // === HANDLUNGSIMPULSE ===
+      var impulse = MEDIEN.handlungsimpulse || [];
+      if (impulse.length) {
+        h += '<div style="padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:4px;margin-bottom:8px">';
+        h += '<div style="font:600 6pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Handlungsimpulse</div>';
+        for (var ii=0; ii<Math.min(impulse.length,8); ii++) {
+          var imp = impulse[ii];
+          var prioCol = imp.priority==='HOCH'?'#991b1b':'#c87619';
+          var prioBg = imp.priority==='HOCH'?'#991b1b18':'#c8761918';
+          var typeIcon = imp.type==='coverage_gap'?'◎':imp.type==='theme_vacuum'?'◇':imp.type==='narrative_monopoly'?'⚡':'●';
+          h += '<div style="display:flex;gap:8px;padding:6px 8px;border-radius:3px;margin-bottom:4px;background:'+prioBg+';border-left:3px solid '+prioCol+'">';
+          h += '<div style="flex:0 0 auto"><span style="font:700 6pt var(--m);color:'+prioCol+'">'+typeIcon+' '+imp.priority+'</span></div>';
+          h += '<div style="flex:1;min-width:0">';
+          h += '<div style="font:500 6pt var(--f);color:var(--text1);line-height:1.4">'+imp.insight+'</div>';
+          h += '<div style="font:400 5.5pt var(--f);color:var(--accent);margin-top:2px;line-height:1.3">→ '+imp.action+'</div>';
+          if (imp.forMedium) h += '<div style="font:400 5pt var(--f);color:var(--muted);margin-top:2px">📰 '+imp.forMedium+'</div>';
+          h += '</div></div>';
+        }
+        h += '</div>';
+      }
+
+      // === THEMEN-DOMINANZ ===
+      var themeDom = MEDIEN.themeDominance || {};
+      var themeDomKeys = Object.keys(themeDom);
+      if (themeDomKeys.length) {
+        h += '<div style="padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:4px;margin-bottom:8px">';
+        h += '<div style="font:600 6pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Themen-Dominanz — Wer kontrolliert das Narrativ?</div>';
+        themeDomKeys.sort(function(a,b) { return (themeDom[b].total||0) - (themeDom[a].total||0); });
+        for (var ti=0; ti<themeDomKeys.length; ti++) {
+          var tk = themeDomKeys[ti];
+          var td = themeDom[tk];
+          var domCol = td.contested ? '#c87619' : '#1a5c2a';
+          var domLabel = td.contested ? 'umkämpft' : 'dominiert';
+          h += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;padding:4px 0;border-bottom:1px solid var(--border)">';
+          h += '<span style="font:500 6pt var(--f);color:var(--text1);flex:0 0 140px">'+tk+'</span>';
+          // Bar showing mentions per candidate
+          h += '<div style="flex:1;display:flex;height:14px;border-radius:2px;overflow:hidden;background:var(--surface2)">';
+          var mentions = td.mentions || {};
+          var mentKeys = Object.keys(mentions).sort(function(a,b){return mentions[b]-mentions[a]});
+          for (var mi=0; mi<mentKeys.length; mi++) {
+            var mk = mentKeys[mi];
+            var mPct = Math.round(mentions[mk] / Math.max(td.total,1) * 100);
+            var mCol = kbColors[mk] || ['#2D72D2','#CD4246','#238551','#C87619','#7961DB'][mi%5];
+            h += '<div style="width:'+mPct+'%;background:'+mCol+';display:flex;align-items:center;justify-content:center" title="'+mk+': '+mentions[mk]+'">';
+            if (mPct > 15) h += '<span style="font:600 5pt var(--m);color:#fff">'+mk.split(" ").pop()+'</span>';
+            h += '</div>';
+          }
+          h += '</div>';
+          h += '<span style="font:500 5.5pt var(--m);color:'+domCol+';flex:0 0 65px;text-align:right">'+td.share+'% '+domLabel+'</span>';
+          h += '</div>';
+        }
+        h += '</div>';
+      }
+
+      // === MEDIEN-AUSGEWOGENHEIT ===
+      var mediaCov = MEDIEN.mediaCoverage || {};
+      var mediaCovKeys = Object.keys(mediaCov).sort(function(a,b){return (mediaCov[b].total||0)-(mediaCov[a].total||0)});
+      if (mediaCovKeys.length) {
+        h += '<div style="padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:4px;margin-bottom:8px">';
+        h += '<div style="font:600 6pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Medien-Ausgewogenheit — Wer wird ignoriert?</div>';
+        for (var mi=0; mi<Math.min(mediaCovKeys.length,10); mi++) {
+          var mk = mediaCovKeys[mi];
+          var mc = mediaCov[mk];
+          var covCol = mc.coverage_ratio < 40 ? '#991b1b' : mc.coverage_ratio < 60 ? '#c87619' : '#1a5c2a';
+          h += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;padding:3px 0;border-bottom:1px solid var(--border)">';
+          h += '<span style="font:500 5.5pt var(--f);color:var(--text1);flex:0 0 130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+mk+'">'+mk+'</span>';
+          // Coverage bar
+          h += '<div style="flex:0 0 50px;height:10px;background:var(--surface2);border-radius:2px;overflow:hidden">';
+          h += '<div style="width:'+mc.coverage_ratio+'%;height:100%;background:'+covCol+';border-radius:2px"></div>';
+          h += '</div>';
+          h += '<span style="font:500 5.5pt var(--m);color:'+covCol+'">'+mc.candidates_covered+'/'+mc.total_candidates+'</span>';
+          // Who's covered
+          var covNames = Object.keys(mc.mentions||{}).map(function(n){return n.split(' ').pop()}).join(', ');
+          h += '<span style="font:400 5pt var(--f);color:var(--muted);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+covNames+'</span>';
           h += '</div>';
         }
         h += '</div>';
