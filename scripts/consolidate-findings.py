@@ -190,15 +190,20 @@ def main():
     # Generate files
     os.makedirs(MEMORY_DIR, exist_ok=True)
     
+    skipped = []
     for line, line_findings in by_line.items():
         if not line_findings:
             continue
         content = generate_domain_file(line, line_findings, dead, clusters)
         filename = f"{line}.md"
         filepath = os.path.join(MEMORY_DIR, filename)
-        with open(filepath, 'w') as f:
-            f.write(content)
-        print(f"  → {filename} ({len(line_findings)} findings)")
+        try:
+            with open(filepath, 'w') as f:
+                f.write(content)
+            print(f"  → {filename} ({len(line_findings)} findings)")
+        except OSError as e:
+            print(f"  ✗ SKIPPED {filename}: {e}")
+            skipped.append(filename)
     
     # Write summary
     summary_path = os.path.join(MEMORY_DIR, "_index.md")
@@ -214,7 +219,9 @@ def main():
             for c in clusters[:5]:
                 f.write(f"- {' × '.join(c['tags'])}: {c['count']} findings\n")
     
-    print(f"\nConsolidation complete. {len(by_line)} domain files written to {MEMORY_DIR}/")
+    print(f"\nConsolidation complete. {len(by_line) - len(skipped)} domain files written to {MEMORY_DIR}/")
+    if skipped:
+        print(f"Skipped {len(skipped)} files due to errors: {', '.join(skipped)}")
 
 if __name__ == "__main__":
     main()
