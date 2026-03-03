@@ -3918,7 +3918,22 @@ function renderGraph() {
   container.appendChild(filterBar);
 
   const nodes = JSON.parse(JSON.stringify(GRAPH.nodes));
-  nodes.forEach(n => { n.r = n.r || n.size || 12; n.group = n.group || n.type || "neutral"; n.info = n.info || n.sub || ""; });
+  var partyGroups = ['CSU','SPD','Grüne','Bündnis 90/Die Grünen','AfD','FDP','Freie Wähler','FW','Linke','ÖDP','Parteifreie Bürger','CSU/FDP','Die Guten','Sonstige','Linke Liste Nürnberg','DIE LINKE'];
+  var mediaGroups = ['Medien','Medium'];
+  var themaGroups = ['Thema','Wirtschaft','Struktur'];
+  nodes.forEach(n => {
+    n.r = n.r || n.size || 12; n.group = n.group || n.type || "neutral"; n.info = n.info || n.sub || "";
+    // Derive filterGroup for filter buttons
+    var g = n.group || '';
+    var isKB = KB[n.id] || KB[n.id.replace('kand_','')] || null;
+    if (isKB && (isKB.role||'').match(/Kandidat|Bürgermeister/i)) { n.filterGroup = 'kandidaten'; }
+    else if (partyGroups.indexOf(g) >= 0 && !n.filterGroup) { n.filterGroup = (isKB && isKB.type === 'medium') ? 'medien' : 'parteien'; }
+    else if (mediaGroups.indexOf(g) >= 0 || (isKB && isKB.type === 'medium')) { n.filterGroup = 'medien'; }
+    else if (themaGroups.indexOf(g) >= 0 || g === 'theme' || g === 'theme_hot') { n.filterGroup = 'themen'; }
+    else if (g === 'institution' || g === 'Institutionen') { n.filterGroup = 'institutionen'; }
+    else if (isKB && isKB.role) { n.filterGroup = 'kandidaten'; }
+    else { n.filterGroup = 'parteien'; }
+  });
   const links = JSON.parse(JSON.stringify(GRAPH.links));
   links.forEach(l => { l.type = l.type || "network"; l.label = l.label || ""; });
 
