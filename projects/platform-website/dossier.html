@@ -94,6 +94,10 @@ body{font-family:var(--f);color:var(--text);background:var(--bg);-webkit-font-sm
 .vtl-label{font:400 8pt var(--f);color:var(--text);line-height:1.4}
 #graph-view{display:none;width:100%;height:100%;position:relative}
 #graph-view svg{width:100%;height:100%}
+#graph-view .graph-dimmed{opacity:0.08!important;transition:opacity .3s}
+#graph-view .graph-dimmed-link{opacity:0.04!important;transition:opacity .3s}
+#graph-view .graph-active{opacity:1!important;transition:opacity .3s}
+#graph-view .graph-active-link{opacity:0.8!important;transition:opacity .3s}
 #graph-view .tooltip{position:absolute;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:10px 14px;font-size:7pt;max-width:280px;pointer-events:none;opacity:0;transition:opacity 0.15s;z-index:10}
 #graph-view .tooltip h4{font-size:8pt;margin-bottom:3px}
 .link{stroke-opacity:0.5;fill:none}
@@ -2019,6 +2023,26 @@ function renderBriefing() {
     h += '</div>'; // close more-entwicklungen
     h += '<div style="text-align:center;padding:8px"><span style="font:500 7.5pt var(--m);color:var(--accent);cursor:pointer;text-decoration:underline" onclick="var el=document.getElementById(\'more-entwicklungen\');if(el.style.display===\'none\'){el.style.display=\'\';this.textContent=\'Weniger anzeigen\'}else{el.style.display=\'none\';this.textContent=\''+(actionItems.length-maxVisible)+' weitere Entwicklungen anzeigen\'}">' + (actionItems.length - maxVisible) + ' weitere Entwicklungen anzeigen</span></div>';
   }
+  // "→ Daher..." conclusion — what do these developments MEAN together?
+  if (actionItems.length) {
+    var daherText = '';
+    if ((WEEKLYBRIEF||{}).daher) { daherText = WEEKLYBRIEF.daher; }
+    else {
+      // Dynamic: derive from alert priorities + election proximity
+      var kritisch = actionItems.filter(function(a){ return a.severity === 'KRITISCH' || a.severity === 'HOCH'; }).length;
+      if (kritisch >= 2 && wbDays <= 14) {
+        daherText = 'Mehrere hochrelevante Entwicklungen gleichzeitig. Wahlkampf-Endphase erfordert schnelle Reaktionsfähigkeit. Jede öffentliche Positionierung wird medial verstärkt.';
+      } else if (kritisch >= 1) {
+        daherText = 'Mindestens eine Entwicklung mit hoher Dynamik. Medienresonanz beobachten und bei Bedarf Gegenstrategie vorbereiten.';
+      } else {
+        daherText = 'Keine akuten Eskalationen — Fenster für eigene Themen-Setzung nutzen.';
+      }
+    }
+    h += '<div style="padding:8px 12px;background:var(--accent)08;border-left:2px solid var(--accent);border-radius:0 4px 4px 0;margin-top:8px">';
+    h += '<span style="font:600 7pt var(--m);color:var(--accent)">→ Daher: </span>';
+    h += '<span style="font:400 7pt var(--f);color:var(--text2);line-height:1.5">' + daherText + '</span>';
+    h += '</div>';
+  }
   h += '</div>';
 
   // ═══ WATCHLIST — NÄCHSTE 48 STUNDEN (actionable, zeitgebunden) ═══
@@ -3036,6 +3060,17 @@ function renderBriefing() {
       }
       h += '</div>';
     }
+    // → Daher conclusion for Medienlandschaft
+    var medienDaher = (MEDIENLANDSCHAFT||{}).daher || '';
+    if (!medienDaher && MEDIENLANDSCHAFT && MEDIENLANDSCHAFT.insights && MEDIENLANDSCHAFT.insights.length) {
+      medienDaher = (MEDIENLANDSCHAFT.insights[0].text || MEDIENLANDSCHAFT.insights[0].insight || '');
+    }
+    if (medienDaher) {
+      h += '<div style="padding:8px 12px;background:var(--accent)08;border-left:2px solid var(--accent);border-radius:0 4px 4px 0;margin-top:10px">';
+      h += '<span style="font:600 7pt var(--m);color:var(--accent)">→ Daher: </span>';
+      h += '<span style="font:400 7pt var(--f);color:var(--text2);line-height:1.5">' + medienDaher + '</span>';
+      h += '</div>';
+    }
     h += '</div>';
   }
 
@@ -3985,25 +4020,6 @@ function renderGraph() {
     tooltip.style.top = (e.offsetY - 8) + 'px';
   }).on('mouseout', () => { tooltip.style.opacity = 0; });
 
-  // Active filter state — applied on every tick for consistency
-  var currentFilter = 'alle';
-  var filterActiveIds = null; // Set of active node IDs
-  var filterConnectedIds = null; // Set of active + connected node IDs
-
-  function computeFilter(filterId) {
-    currentFilter = filterId;
-    if (filterId === 'alle') { filterActiveIds = null; filterConnectedIds = null; return; }
-    filterActiveIds = new Set();
-    nodes.forEach(function(n) { if (n.filterGroup === filterId) filterActiveIds.add(n.id); });
-    filterConnectedIds = new Set(filterActiveIds);
-    links.forEach(function(l) {
-      var sid = typeof l.source === 'object' ? l.source.id : l.source;
-      var tid = typeof l.target === 'object' ? l.target.id : l.target;
-      if (filterActiveIds.has(sid)) filterConnectedIds.add(tid);
-      if (filterActiveIds.has(tid)) filterConnectedIds.add(sid);
-    });
-  }
-
   simulation.on('tick', () => {
     nodes.forEach(d => {
       d.x = Math.max(d.r + 8, Math.min(width - d.r - 8, d.x));
@@ -4012,31 +4028,53 @@ function renderGraph() {
     link.attr('x1', d => d.source.x).attr('y1', d => d.source.y).attr('x2', d => d.target.x).attr('y2', d => d.target.y);
     linkLabel.attr('x', d => (d.source.x + d.target.x) / 2).attr('y', d => (d.source.y + d.target.y) / 2 - 3);
     node.attr('transform', d => 'translate(' + d.x + ',' + d.y + ')');
-    // Apply filter on every tick
-    if (filterActiveIds) {
-      node.attr('opacity', d => filterConnectedIds.has(d.id) ? 1 : 0.08);
-      link.attr('opacity', d => {
-        var sid = typeof d.source === 'object' ? d.source.id : d.source;
-        var tid = typeof d.target === 'object' ? d.target.id : d.target;
-        return (filterActiveIds.has(sid) || filterActiveIds.has(tid)) ? 0.8 : 0.04;
-      });
-      linkLabel.attr('opacity', d => {
-        var sid = typeof d.source === 'object' ? d.source.id : d.source;
-        var tid = typeof d.target === 'object' ? d.target.id : d.target;
-        return (filterActiveIds.has(sid) || filterActiveIds.has(tid)) ? 1 : 0.04;
-      });
-    } else {
-      node.attr('opacity', 1);
-      link.attr('opacity', 1);
-      linkLabel.attr('opacity', 1);
-    }
   });
 
-  // Filter function — just computes filter state, tick applies it
+  // Filter via CSS classes — bulletproof, no D3 closure issues
   function applyGraphFilter(filterId) {
-    computeFilter(filterId);
-    // Force one tick to apply immediately if simulation cooled
-    simulation.alpha(0.01).restart();
+    var svgEl = document.querySelector('#graph-view svg');
+    if (!svgEl) return;
+    // Collect all elements
+    var nodeGs = svgEl.querySelectorAll('g > g');
+    var linkLines = svgEl.querySelectorAll('line.link');
+    var linkTexts = svgEl.querySelectorAll('text.link-label');
+    // Reset all classes
+    nodeGs.forEach(function(g) { g.classList.remove('graph-dimmed','graph-active'); });
+    linkLines.forEach(function(l) { l.classList.remove('graph-dimmed-link','graph-active-link'); });
+    linkTexts.forEach(function(t) { t.classList.remove('graph-dimmed-link','graph-active-link'); });
+    if (filterId === 'alle') return; // All visible (no classes = default opacity)
+    // Find matching nodes
+    var activeNodeIds = new Set();
+    nodeGs.forEach(function(g) {
+      var d = g.__data__;
+      if (d && d.filterGroup === filterId) activeNodeIds.add(d.id);
+    });
+    // Connected nodes
+    var connectedIds = new Set(activeNodeIds);
+    linkLines.forEach(function(l) {
+      var d = l.__data__; if (!d) return;
+      var sid = typeof d.source === 'object' ? d.source.id : d.source;
+      var tid = typeof d.target === 'object' ? d.target.id : d.target;
+      if (activeNodeIds.has(sid)) connectedIds.add(tid);
+      if (activeNodeIds.has(tid)) connectedIds.add(sid);
+    });
+    // Apply classes
+    nodeGs.forEach(function(g) {
+      var d = g.__data__;
+      g.classList.add((d && connectedIds.has(d.id)) ? 'graph-active' : 'graph-dimmed');
+    });
+    linkLines.forEach(function(l) {
+      var d = l.__data__; if (!d) { l.classList.add('graph-dimmed-link'); return; }
+      var sid = typeof d.source === 'object' ? d.source.id : d.source;
+      var tid = typeof d.target === 'object' ? d.target.id : d.target;
+      l.classList.add((activeNodeIds.has(sid) || activeNodeIds.has(tid)) ? 'graph-active-link' : 'graph-dimmed-link');
+    });
+    linkTexts.forEach(function(t) {
+      var d = t.__data__; if (!d) { t.classList.add('graph-dimmed-link'); return; }
+      var sid = typeof d.source === 'object' ? d.source.id : d.source;
+      var tid = typeof d.target === 'object' ? d.target.id : d.target;
+      t.classList.add((activeNodeIds.has(sid) || activeNodeIds.has(tid)) ? 'graph-active-link' : 'graph-dimmed-link');
+    });
   }
   // Make applyGraphFilter available to filter buttons
   window.applyGraphFilter = applyGraphFilter;
