@@ -2431,23 +2431,66 @@ function renderBriefing() {
       setTimeout(function() {
         var container = document.getElementById(netId);
         if (!container) return;
-        var W = container.offsetWidth, H = 380;
+        var W = container.offsetWidth, H = 620;
         var sentCol = {POS:'#238551',NEG:'#CD4246',MIX:'#C87619',NEUTRAL:'#5F6B7C'};
 
-        // Position maps
+        // Compute degree centrality per node
+        var degreeMap = {};
+        mNet.nodes.forEach(function(n) { degreeMap[n.id] = 0; });
+        mNet.links.forEach(function(l) { degreeMap[l.source] = (degreeMap[l.source]||0)+1; degreeMap[l.target] = (degreeMap[l.target]||0)+1; });
+        var maxDegree = Math.max.apply(null, Object.values(degreeMap).concat([1]));
+
+        // Label shortener
+        function shortLabel(lbl, maxLen) {
+          if (lbl.length <= maxLen) return lbl;
+          // Smart abbreviations
+          var abbr = {'Demokratie & Partizipation':'Demokratie','Stadtentwicklung & Wohnen':'Wohnen & Stadt','Wirtschaft & Finanzen':'Wirtschaft','Kandidaten & Wahlkampf':'Wahlkampf','Soziales & Bildung':'Soziales','Mobilität & Verkehr':'Mobilität','Sicherheit & Ordnung':'Sicherheit','Klima & Umwelt':'Klima & Umwelt','Kultur & Sport':'Kultur','Nürnberger Nachrichten':'Nürnb. Nachr.','Bayerischer Rundfunk':'BR24','abgeordnetenwatch.de':'abgeordnetw.','personensuche.dastelefonbuch.de':'Telefonbuch'};
+          if (abbr[lbl]) return abbr[lbl];
+          // Truncate with ellipsis
+          return lbl.substring(0, maxLen-1) + '…';
+        }
+
+        // Position maps — staggered layout for readability
         var themeNodes = mNet.nodes.filter(function(n){return n.type==='theme'});
         var mediaNodes = mNet.nodes.filter(function(n){return n.type==='media'});
         var kandNodes = mNet.nodes.filter(function(n){return n.type==='kandidat'});
         var nMap = {};
-        themeNodes.forEach(function(n,i) { nMap[n.id] = {x: W/(themeNodes.length+1)*(i+1), y: H*0.48, node: n}; });
-        mediaNodes.forEach(function(n,i) { nMap[n.id] = {x: W/(mediaNodes.length+1)*(i+1), y: H*0.12, node: n}; });
-        kandNodes.forEach(function(n,i) { nMap[n.id] = {x: W/(kandNodes.length+1)*(i+1), y: H*0.88, node: n}; });
+        // Media: top band, staggered y for density
+        var mPad = 50, mW = W - mPad*2;
+        mediaNodes.forEach(function(n,i) {
+          var xPos = mPad + mW/(mediaNodes.length)*(i+0.5);
+          var yStagger = (i % 2 === 0) ? H*0.08 : H*0.14;
+          nMap[n.id] = {x: xPos, y: yStagger, node: n};
+        });
+        // Themes: middle band, staggered
+        var tPad = 60;
+        themeNodes.forEach(function(n,i) {
+          var xPos = tPad + (W-tPad*2)/(themeNodes.length)*(i+0.5);
+          var yStagger = (i % 2 === 0) ? H*0.44 : H*0.52;
+          nMap[n.id] = {x: xPos, y: yStagger, node: n};
+        });
+        // Candidates: bottom band, staggered
+        var kPad = 40;
+        kandNodes.forEach(function(n,i) {
+          var xPos = kPad + (W-kPad*2)/(kandNodes.length)*(i+0.5);
+          var yStagger = (i % 2 === 0) ? H*0.82 : H*0.90;
+          nMap[n.id] = {x: xPos, y: yStagger, node: n};
+        });
 
         // Row labels
-        var rowLabels = [{y:H*0.03,text:'MEDIEN'},{y:H*0.38,text:'THEMEN'},{y:H*0.78,text:'KANDIDATEN'}];
+        var rowLabels = [{y:H*0.01,text:'MEDIEN'},{y:H*0.36,text:'THEMEN'},{y:H*0.74,text:'KANDIDATEN'}];
+
+        // Tooltip element
+        var tooltip = document.createElement('div');
+        tooltip.style.cssText = 'position:absolute;display:none;background:#1C2127;border:1px solid var(--border);border-radius:6px;padding:8px 12px;font:500 8pt var(--f);color:#F6F7F9;pointer-events:none;z-index:100;max-width:200px;box-shadow:0 4px 12px rgba(0,0,0,0.4)';
+        container.style.position = 'relative';
+        container.appendChild(tooltip);
 
         function renderNet(filterKand) {
-          container.innerHTML = '';
+          // Keep tooltip, remove rest
+          while (container.firstChild && container.firstChild !== tooltip) container.removeChild(container.firstChild);
+          if (container.firstChild !== tooltip) container.appendChild(tooltip);
+
           var svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
           svg.setAttribute('width', W); svg.setAttribute('height', H);
           svg.style.width='100%'; svg.style.height=H+'px';
@@ -2455,10 +2498,10 @@ function renderBriefing() {
           // Row labels
           rowLabels.forEach(function(rl) {
             var t = document.createElementNS('http://www.w3.org/2000/svg','text');
-            t.setAttribute('x',8); t.setAttribute('y',rl.y+10);
-            t.setAttribute('fill','#5F6B7C'); t.setAttribute('font-size','5.5');
+            t.setAttribute('x',8); t.setAttribute('y',rl.y*H+14);
+            t.setAttribute('fill','#5F6B7C'); t.setAttribute('font-size','6');
             t.setAttribute('font-family','JetBrains Mono,monospace'); t.setAttribute('font-weight','600');
-            t.setAttribute('letter-spacing','0.1em');
+            t.setAttribute('letter-spacing','0.12em');
             t.textContent = rl.text; svg.appendChild(t);
           });
 
@@ -2466,7 +2509,6 @@ function renderBriefing() {
           var activeNodes = new Set();
           var activeLinks = [];
           if (filterKand) {
-            // Find matching node by label or ID
             var kandId = null;
             var fkLower = filterKand.toLowerCase();
             mNet.nodes.forEach(function(n) {
@@ -2482,7 +2524,6 @@ function renderBriefing() {
                 activeLinks.push(l);
               }
             });
-            // Also add media→theme links for connected themes
             var connThemes = new Set();
             activeLinks.forEach(function(l) { if (l.target.startsWith('theme_')) connThemes.add(l.target); });
             mNet.links.forEach(function(l) {
@@ -2496,94 +2537,158 @@ function renderBriefing() {
             activeLinks = mNet.links;
           }
 
-          // Draw links
+          // Draw links as quadratic bezier curves
           activeLinks.forEach(function(l) {
-            var s = nMap[l.source], t = nMap[l.target];
-            if (!s || !t) return;
-            var line = document.createElementNS('http://www.w3.org/2000/svg','line');
-            line.setAttribute('x1',s.x); line.setAttribute('y1',s.y);
-            line.setAttribute('x2',t.x); line.setAttribute('y2',t.y);
-            line.setAttribute('stroke', sentCol[l.sentiment]||'#5F6B7C');
-            line.setAttribute('stroke-width', Math.max(1.5, Math.min(5, (l.weight||1)*1.2)));
-            line.setAttribute('stroke-opacity', l.type==='covers'?'0.7':'0.5');
-            if (l.type==='speaks_about') line.setAttribute('stroke-dasharray','6,4');
-            svg.appendChild(line);
-            // Article count label on link
+            var s = nMap[l.source], tgt = nMap[l.target];
+            if (!s || !tgt) return;
+            // Compute curve control point — offset perpendicular to midpoint
+            var mx = (s.x+tgt.x)/2, my = (s.y+tgt.y)/2;
+            var dx = tgt.x-s.x, dy = tgt.y-s.y;
+            var len = Math.sqrt(dx*dx+dy*dy) || 1;
+            // Offset perpendicular — use link index hash for variety
+            var hash = (l.source+l.target).split('').reduce(function(a,c){return a+c.charCodeAt(0)},0);
+            var offset = ((hash % 7) - 3) * 12;
+            var cx = mx + (-dy/len)*offset;
+            var cy = my + (dx/len)*offset;
+            var path = document.createElementNS('http://www.w3.org/2000/svg','path');
+            path.setAttribute('d', 'M'+s.x+','+s.y+' Q'+cx+','+cy+' '+tgt.x+','+tgt.y);
+            path.setAttribute('stroke', sentCol[l.sentiment]||'#5F6B7C');
+            path.setAttribute('stroke-width', Math.max(1, Math.min(4, (l.weight||1)*1)));
+            path.setAttribute('stroke-opacity', l.type==='covers'?'0.55':'0.4');
+            path.setAttribute('fill','none');
+            if (l.type==='speaks_about') path.setAttribute('stroke-dasharray','6,4');
+            path.setAttribute('data-source', l.source);
+            path.setAttribute('data-target', l.target);
+            path.classList.add('net-link');
+            svg.appendChild(path);
+            // Article count badge on curve midpoint
             if (l.count > 1) {
-              var mx = (s.x+t.x)/2, my = (s.y+t.y)/2;
+              var bx = s.x*0.25+cx*0.5+tgt.x*0.25, by = s.y*0.25+cy*0.5+tgt.y*0.25;
               var bg = document.createElementNS('http://www.w3.org/2000/svg','rect');
-              bg.setAttribute('x',mx-6); bg.setAttribute('y',my-5);
-              bg.setAttribute('width',12); bg.setAttribute('height',10);
-              bg.setAttribute('rx',2); bg.setAttribute('fill','#1C2127'); bg.setAttribute('fill-opacity','0.85');
+              bg.setAttribute('x',bx-7); bg.setAttribute('y',by-6);
+              bg.setAttribute('width',14); bg.setAttribute('height',12);
+              bg.setAttribute('rx',3); bg.setAttribute('fill','#1C2127'); bg.setAttribute('fill-opacity','0.9');
+              bg.classList.add('net-link'); bg.setAttribute('data-source',l.source); bg.setAttribute('data-target',l.target);
               svg.appendChild(bg);
               var ct = document.createElementNS('http://www.w3.org/2000/svg','text');
-              ct.setAttribute('x',mx); ct.setAttribute('y',my+3);
+              ct.setAttribute('x',bx); ct.setAttribute('y',by+4);
               ct.setAttribute('text-anchor','middle'); ct.setAttribute('fill',sentCol[l.sentiment]||'#5F6B7C');
-              ct.setAttribute('font-size','6'); ct.setAttribute('font-family','JetBrains Mono,monospace');
-              ct.setAttribute('font-weight','600');
+              ct.setAttribute('font-size','7'); ct.setAttribute('font-family','JetBrains Mono,monospace');
+              ct.setAttribute('font-weight','700');
+              ct.classList.add('net-link'); ct.setAttribute('data-source',l.source); ct.setAttribute('data-target',l.target);
               ct.textContent = l.count; svg.appendChild(ct);
             }
           });
 
           // Draw nodes
+          var allGroups = [];
           mNet.nodes.forEach(function(n) {
             var pos = nMap[n.id]; if (!pos) return;
             var active = activeNodes.has(n.id);
-            var opacity = active ? 1 : 0.15;
+            var opacity = active ? 1 : 0.1;
+            var deg = degreeMap[n.id] || 0;
             var g = document.createElementNS('http://www.w3.org/2000/svg','g');
             g.style.opacity = opacity;
             g.style.cursor = 'pointer';
             g.style.transition = 'opacity 0.3s';
+            g.setAttribute('data-node-id', n.id);
+            g.classList.add('net-node');
+
+            // "Sonstige" node — shrink to minimal
+            var isSonstige = n.label && n.label.indexOf('Sonstige') >= 0;
 
             if (n.type==='theme') {
+              var lbl = shortLabel(n.label, 18);
               var r = document.createElementNS('http://www.w3.org/2000/svg','rect');
-              var tw = Math.max(48, n.label.length*6+16);
-              r.setAttribute('x',pos.x-tw/2); r.setAttribute('y',pos.y-14);
-              r.setAttribute('width',tw); r.setAttribute('height',28);
-              r.setAttribute('rx',4);
-              r.setAttribute('fill','#D1980B'); r.setAttribute('fill-opacity','0.15');
+              var tw = Math.max(50, lbl.length*6.5+20);
+              var th = 30;
+              r.setAttribute('x',pos.x-tw/2); r.setAttribute('y',pos.y-th/2);
+              r.setAttribute('width',tw); r.setAttribute('height',th);
+              r.setAttribute('rx',5);
+              r.setAttribute('fill','#D1980B'); r.setAttribute('fill-opacity','0.12');
               r.setAttribute('stroke','#D1980B'); r.setAttribute('stroke-width','1.5');
               g.appendChild(r);
             } else {
               var c = document.createElementNS('http://www.w3.org/2000/svg','circle');
               c.setAttribute('cx',pos.x); c.setAttribute('cy',pos.y);
-              var rad = n.type==='media'? Math.min(20,10+((n.count||2)*1.5)) : 14;
+              // Degree-based sizing: min 8, max 22 for candidates; media uses count
+              var rad;
+              if (isSonstige) { rad = 6; }
+              else if (n.type==='media') { rad = Math.max(8, Math.min(18, 8 + (n.count||1)*0.8)); }
+              else { rad = Math.max(10, Math.min(22, 10 + (deg/maxDegree)*12)); }
               c.setAttribute('r',rad);
               var col = n.type==='media'?'#2D72D2':(n.color||'#ABB3BF');
-              c.setAttribute('fill',col); c.setAttribute('fill-opacity','0.2');
-              c.setAttribute('stroke',col); c.setAttribute('stroke-width','2');
+              c.setAttribute('fill',col); c.setAttribute('fill-opacity', isSonstige ? '0.08' : '0.2');
+              c.setAttribute('stroke',col); c.setAttribute('stroke-width', isSonstige ? '1' : '2');
               g.appendChild(c);
             }
 
             // Label
+            var displayLabel = (n.type==='theme') ? shortLabel(n.label,18) : (isSonstige ? n.label : shortLabel(n.label, 20));
             var t = document.createElementNS('http://www.w3.org/2000/svg','text');
             t.setAttribute('x',pos.x); t.setAttribute('y',pos.y + (n.type==='theme'?4:3));
             t.setAttribute('text-anchor','middle');
             t.setAttribute('fill',n.type==='theme'?'#D1980B':n.type==='media'?'#6eb0ff':(n.color||'#F6F7F9'));
-            t.setAttribute('font-size',n.type==='theme'?'7.5':'7');
+            t.setAttribute('font-size', isSonstige ? '5.5' : (n.type==='theme'?'8':'7.5'));
             t.setAttribute('font-family','Inter,system-ui,sans-serif');
             t.setAttribute('font-weight','600');
-            t.textContent = n.label; g.appendChild(t);
+            t.textContent = displayLabel; g.appendChild(t);
 
-            // Sub-label
+            // Sub-label (party for candidates, count for media)
             var sub = n.party || (n.count ? n.count+' Artikel' : '');
-            if (sub) {
+            if (sub && !isSonstige) {
               var s2 = document.createElementNS('http://www.w3.org/2000/svg','text');
-              s2.setAttribute('x',pos.x); s2.setAttribute('y',pos.y+14);
+              s2.setAttribute('x',pos.x); s2.setAttribute('y',pos.y+15);
               s2.setAttribute('text-anchor','middle'); s2.setAttribute('fill','#8F99A8');
-              s2.setAttribute('font-size','5.5'); s2.setAttribute('font-family','Inter,system-ui,sans-serif');
+              s2.setAttribute('font-size','6'); s2.setAttribute('font-family','Inter,system-ui,sans-serif');
               s2.textContent = sub; g.appendChild(s2);
             }
 
-            // Clickability: candidates → showEntity, media → URL, themes → filter
+            // Hover: highlight connected nodes + links, show tooltip
+            g.addEventListener('mouseenter', (function(nodeId, node) { return function(evt) {
+              // Highlight connected
+              var connIds = new Set([nodeId]);
+              mNet.links.forEach(function(l) {
+                if (l.source===nodeId) connIds.add(l.target);
+                if (l.target===nodeId) connIds.add(l.source);
+              });
+              svg.querySelectorAll('.net-node').forEach(function(el) {
+                el.style.opacity = connIds.has(el.getAttribute('data-node-id')) ? '1' : '0.08';
+              });
+              svg.querySelectorAll('.net-link').forEach(function(el) {
+                var ls = el.getAttribute('data-source'), lt = el.getAttribute('data-target');
+                el.style.opacity = (ls===nodeId||lt===nodeId) ? '1' : '0.05';
+              });
+              // Tooltip
+              var tipParts = ['<b>'+node.label+'</b>'];
+              if (node.party) tipParts.push(node.party);
+              if (node.count) tipParts.push(node.count+' Artikel');
+              var deg = degreeMap[nodeId]||0;
+              tipParts.push(deg+' Verbindungen');
+              tooltip.innerHTML = tipParts.join('<br>');
+              tooltip.style.display = 'block';
+              var rect = container.getBoundingClientRect();
+              tooltip.style.left = (evt.clientX - rect.left + 12) + 'px';
+              tooltip.style.top = (evt.clientY - rect.top - 10) + 'px';
+            }; })(n.id, n));
+            g.addEventListener('mouseleave', function() {
+              // Restore all opacities
+              svg.querySelectorAll('.net-node').forEach(function(el) {
+                var nid = el.getAttribute('data-node-id');
+                el.style.opacity = activeNodes.has(nid) ? '1' : '0.1';
+              });
+              svg.querySelectorAll('.net-link').forEach(function(el) {
+                el.style.opacity = '';
+              });
+              tooltip.style.display = 'none';
+            });
+
+            // Clickability: candidates → showEntity, media → URL, themes → scroll
             if (n.type==='kandidat') {
-              // Graph IDs are 'kand_xxx', KB keys are 'xxx' — try both
               var kbId = n.id.replace(/^kand_/,'');
               if (!KB[kbId]) { for (var kk in KB) { if (KB[kk].name===n.label || kk===n.id) { kbId=kk; break; } } }
               g.addEventListener('click', (function(id) { return function(e) { e.stopPropagation(); if (typeof showEntity==='function') showEntity(id); }; })(kbId));
-              g.style.cursor = 'pointer';
             } else if (n.type==='media') {
-              // Media nodes: open KB entity or find URL from KB
               var mediaKbId = n.id.replace(/^src_/,'').replace(/^media_/,'');
               if (!KB[mediaKbId]) { for (var mk in KB) { if (KB[mk].name===n.label || mk===n.id || mk==='media_'+mediaKbId) { mediaKbId=mk; break; } } }
               if (KB[mediaKbId]) {
@@ -2591,16 +2696,14 @@ function renderBriefing() {
               } else if (n.url) {
                 g.addEventListener('click', (function(url) { return function(e) { e.stopPropagation(); window.open(url, '_blank'); }; })(n.url));
               }
-              g.style.cursor = 'pointer';
             } else if (n.type==='theme') {
-              g.addEventListener('click', (function(label) { return function(e) { e.stopPropagation(); window._netFilter(netId, null); /* scroll to theme in news */ var el = document.querySelector('[data-theme="'+label+'"]'); if (el) el.scrollIntoView({behavior:'smooth',block:'start'}); }; })(n.label));
-              g.style.cursor = 'pointer';
+              g.addEventListener('click', (function(label) { return function(e) { e.stopPropagation(); window._netFilter(netId, null); var el = document.querySelector('[data-theme="'+label+'"]'); if (el) el.scrollIntoView({behavior:'smooth',block:'start'}); }; })(n.label));
             }
 
             svg.appendChild(g);
           });
 
-          container.appendChild(svg);
+          container.insertBefore(svg, tooltip);
 
           // Highlight active filter button
           var btns = document.querySelectorAll('#'+netId+'-filters button');
@@ -2618,21 +2721,18 @@ function renderBriefing() {
           });
         }
 
-        // Global filter function — filters network + so-what + news items + heatmap
+        // Global filter function
         window._netFilter = function(id, kand) {
           if (id===netId) renderNet(kand);
-          // Filter news items
           document.querySelectorAll('.nf-card[data-mentions]').forEach(function(el) {
             if (!kand) { el.style.opacity='1'; el.style.display=''; return; }
             var mentions = el.getAttribute('data-mentions')||'';
             if (mentions.indexOf(kand)>=0) { el.style.opacity='1'; el.style.display=''; }
             else { el.style.opacity='0.12'; }
           });
-          // Filter heatmap rows
           document.querySelectorAll('tr[style*="border-top"]').forEach(function(tr) {
             tr.style.opacity = '1';
           });
-          // Show active filter label
           var labelEl = document.getElementById('media-filter-label');
           if (labelEl) labelEl.textContent = kand ? ('▸ Filter: '+kand) : '';
         };
