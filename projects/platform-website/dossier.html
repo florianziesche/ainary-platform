@@ -2264,11 +2264,15 @@ function renderBriefing() {
       // Filter buttons
       h += '<div id="'+netId+'-filters" style="display:flex;gap:4px;flex-wrap:wrap">';
       h += '<button onclick="window._netFilter(\''+netId+'\',null)" style="font:500 5.5pt var(--m);padding:2px 8px;border-radius:3px;border:1px solid var(--border);background:var(--accent);color:#fff;cursor:pointer">Alle</button>';
-      var kandColors = {Eichmann:'#c0392b',Böhm:'#0a4d8c',Stamp:'#4a8c3f','Micheler-Jones':'#8F99A8',Gold:'#AB8D4B',Dörfler:'#8b1a1a'};
-      var kandList = ['Eichmann','Böhm','Stamp','Micheler-Jones','Gold','Dörfler'];
-      for (var ki=0;ki<kandList.length;ki++) {
-        var kn = kandList[ki];
-        h += '<button onclick="window._netFilter(\''+netId+'\',\''+kn+'\')" style="font:500 5.5pt var(--m);padding:2px 8px;border-radius:3px;border:1px solid '+(kandColors[kn]||'var(--border)')+';background:transparent;color:'+(kandColors[kn]||'var(--text2)')+';cursor:pointer">'+kn+'</button>';
+      // Dynamic candidate buttons from network data + KB
+      var kandNodes = mNet.nodes.filter(function(n){return n.type==='kandidat'});
+      var kbColors = {};
+      if (data.kb) { for (var kk in data.kb) { var kv=data.kb[kk]; if(kv.color) kbColors[kv.name]=kv.color; } }
+      if (data.kandidatenBlock) { data.kandidatenBlock.forEach(function(kb){if(kb.color) kbColors[kb.name]=kb.color;}); }
+      for (var ki=0;ki<kandNodes.length;ki++) {
+        var kn = kandNodes[ki].label;
+        var knCol = kbColors[kn] || kandNodes[ki].color || 'var(--border)';
+        h += '<button onclick="window._netFilter(\''+netId+'\',\''+kn+'\')" style="font:500 5.5pt var(--m);padding:2px 8px;border-radius:3px;border:1px solid '+knCol+';background:transparent;color:'+knCol+';cursor:pointer">'+kn+'</button>';
       }
       h += '</div></div>';
       h += '<div id="'+netId+'" style="width:100%;height:360px;position:relative;overflow:hidden;background:var(--bg);border-radius:4px"></div>';
@@ -2284,7 +2288,7 @@ function renderBriefing() {
       // So-What cards per candidate
       if (mSoWhats.length) {
         h += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px;margin-bottom:8px">';
-        var swKandColors = {Eichmann:'#c0392b',Böhm:'#0a4d8c',Stamp:'#4a8c3f','Micheler-Jones':'#8F99A8',Gold:'#AB8D4B',Dörfler:'#8b1a1a'};
+        var swKandColors = kbColors;
         for (var swi=0; swi<mSoWhats.length; swi++) {
           var sw = mSoWhats[swi];
           var swCol = swKandColors[sw.kandidat] || 'var(--muted)';
@@ -2367,7 +2371,15 @@ function renderBriefing() {
           var activeNodes = new Set();
           var activeLinks = [];
           if (filterKand) {
-            var kandId = 'kand_' + filterKand.toLowerCase().replace(/-/g,'_').replace(/ö/g,'oe');
+            // Find matching node by label or ID
+            var kandId = null;
+            var fkLower = filterKand.toLowerCase();
+            mNet.nodes.forEach(function(n) {
+              if (n.type==='kandidat' && (n.label===filterKand || n.id===filterKand || n.label.toLowerCase().indexOf(fkLower)>=0 || n.id.toLowerCase().indexOf(fkLower)>=0)) {
+                kandId = n.id;
+              }
+            });
+            if (!kandId) kandId = 'kand_' + fkLower.replace(/-/g,'_').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ä/g,'ae').replace(/\s+/g,'_');
             activeNodes.add(kandId);
             mNet.links.forEach(function(l) {
               if (l.source === kandId || l.target === kandId) {
