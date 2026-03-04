@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Firmennetzwerk Glashütte · Ainary</title>
+<link rel="stylesheet" href="shared.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--text:#1a1a1a;--text2:#444;--muted:#777;--light:#bbb;--border:#d0d0d0;--border2:#e8e8e8;--surface:#fafafa;--accent:#9d7f3b;--green:#2d8a4e;--red:#c0392b;--amber:#b45309;--f:'Inter',-apple-system,sans-serif;--m:'JetBrains Mono',monospace}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--f);color:var(--text);font-size:9.5pt;line-height:1.65;background:#fff;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.page{max-width:960px;margin:0 auto;padding:var(--page-pad)}
+
+/* Graph */
+.graph-wrap{position:relative;width:100%;height:520px;border:1px solid var(--border2);border-radius:var(--card-radius);background:var(--surface);margin-bottom:24px;overflow:hidden}
+.graph-wrap svg{width:100%;height:100%}
+.node-group{cursor:pointer}
+.node-group:hover .node-circle{filter:brightness(.92)}
+.node-circle{transition:filter .15s}
+.node-label{font-family:var(--f);font-weight:600;fill:var(--text);text-anchor:middle}
+.node-sub{font-family:var(--m);font-size:6.5pt;fill:var(--muted);text-anchor:middle}
+.edge{stroke:var(--border);stroke-width:1.5;fill:none}
+.edge-supply{stroke:var(--accent);stroke-width:2;stroke-dasharray:6 3}
+.edge-konzern{stroke:var(--muted);stroke-width:2}
+.edge-conflict{stroke:var(--red);stroke-width:1.5;stroke-dasharray:3 3;opacity:.5}
+.edge-label{font-family:var(--m);font-size:6pt;fill:var(--muted);text-anchor:middle}
+
+/* Legend */
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:24px;font-size:7.5pt;color:var(--muted)}
+.legend-item{display:flex;align-items:center;gap:6px}
+.legend-line{width:24px;height:0;border-top:2px solid}
+.legend-line.supply{border-color:var(--accent);border-style:dashed}
+.legend-line.konzern{border-color:var(--muted)}
+.legend-line.conflict{border-color:var(--red);border-style:dashed;opacity:.5}
+.legend-dot{width:10px;height:10px;border-radius:50%}
+
+/* Timeline */
+.tl{position:relative;padding-left:24px;border-left:2px solid var(--border2);margin-left:12px}
+.tl-item{position:relative;padding-bottom:16px}
+.tl-item:last-child{padding-bottom:0}
+.tl-dot{position:absolute;left:-29px;top:4px;width:10px;height:10px;border-radius:50%;border:2px solid var(--accent);background:#fff}
+.tl-dot.highlight{background:var(--accent)}
+.tl-year{font-family:var(--m);font-size:7.5pt;color:var(--accent);font-weight:600}
+.tl-text{font-size:8.5pt;color:var(--text2)}
+.tl-source{font-family:var(--m);font-size:6pt;color:var(--light)}
+
+.sec-label{font-family:var(--m);font-size:var(--fs-label);font-weight:500;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-top:32px;margin-bottom:4px}
+.sec-title{font-size:18pt;font-weight:700;letter-spacing:-.02em;margin-bottom:16px}
+.tag{font-family:var(--m);font-size:5.5pt;padding:1px 4px;border-radius:2px;font-weight:600;vertical-align:super}
+.tag-e{background:rgba(45,138,78,.1);color:var(--green)}
+.ftr{text-align:center;padding:24px 0;font-family:var(--m);font-size:var(--fs-tag);color:var(--light);border-top:1px solid var(--border2);margin-top:40px}
+@media(max-width:700px){.page{padding:var(--page-pad-mobile)}.graph-wrap{height:400px}}
+</style>
+<link rel="stylesheet" href="mia-chat.css"><script src="mia-chat.js" defer></script><script src="bookmarks.js" defer></script><script src="shared-header.js" defer></script>
+<script src="shared-footer.js" defer></script>
+<meta property="og:title" content="Firmennetzwerk Glashütte · Ainary">
+<meta property="og:description" content="Beziehungen, Lieferketten und Abhängigkeiten der Glashütter Wirtschaft.">
+<meta property="og:image" content="./og-image.svg">
+</head>
+<body>
+<div class="page">
+  <div id="shared-header"></div>
+
+  <a href="wirtschaft.html" style="font-family:var(--m);font-size:7.5pt;color:var(--accent);display:inline-block;margin-bottom:16px">← Zurück zum Wirtschaftsverzeichnis</a>
+
+  <div id="mia-slot"></div>
+
+  <div style="font-family:var(--m);font-size:var(--fs-label);color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px">Ainary Netzwerkanalyse</div>
+  <div style="font-size:28pt;font-weight:700;letter-spacing:-.03em;margin-bottom:4px">Firmennetzwerk Glashütte</div>
+  <div style="font-size:var(--fs-body);color:var(--text2);margin-bottom:16px">Beziehungen · Lieferketten · Abhängigkeiten — nur verifizierte Verbindungen</div>
+
+  <div style="display:flex;gap:16px;flex-wrap:wrap;font-family:var(--m);font-size:7.5pt;color:var(--muted);margin-bottom:24px">
+    <span>Stand: 2026-03-04</span><span>Quellen: 12</span><span>Nur belegte Verbindungen</span>
+  </div>
+
+  <!-- Network Graph -->
+  <div class="graph-wrap">
+    <svg viewBox="0 0 900 500" xmlns="http://www.w3.org/2000/svg">
+      <!-- Edges -->
+      <!-- Lange → Richemont (Konzern) -->
+      <line x1="450" y1="120" x2="700" y2="80" class="edge edge-konzern"/>
+      <text x="580" y="90" class="edge-label">Tochter seit 2000</text>
+
+      <!-- Gurofa → Sellita (Konzern) -->
+      <line x1="200" y1="320" x2="80" y2="200" class="edge edge-konzern"/>
+      <text x="120" y="248" class="edge-label">100% Tochter</text>
+
+      <!-- Gurofa → Mühle (Zulieferung) -->
+      <path d="M 250 300 Q 350 260 420 280" class="edge edge-supply"/>
+      <text x="330" y="270" class="edge-label">SW200-1 Kaliber</text>
+
+      <!-- Nomos ↔ Mühle (historischer Konflikt) -->
+      <line x1="580" y1="300" x2="470" y2="300" class="edge edge-conflict"/>
+      <text x="525" y="290" class="edge-label">Rechtsstreit ~2006</text>
+
+      <!-- Nomos: unabhängig von Sellita seit 2014 -->
+      <path d="M 630 320 Q 400 420 200 340" class="edge edge-conflict" style="opacity:.2"/>
+      <text x="400" y="390" class="edge-label" style="font-size:5.5pt">Nomos seit 2014 unabhängig (eigenes Swing-System)</text>
+
+      <!-- Nodes -->
+      <!-- A. Lange & Söhne -->
+      <a href="analyse-lange.html">
+      <g class="node-group" transform="translate(450,120)">
+        <circle r="36" class="node-circle" fill="#1a1a1a" opacity=".08" stroke="var(--muted)" stroke-width="1.5"/>
+        <text y="-4" class="node-label" style="font-size:8.5pt">A. Lange</text>
+        <text y="10" class="node-sub">~750 MA · Richemont</text>
+        <text y="22" class="node-sub" style="fill:var(--accent)">€15k–500k+</text>
+      </g>
+      </a>
+
+      <!-- Richemont (extern) -->
+      <g transform="translate(700,80)">
+        <rect x="-40" y="-16" width="80" height="32" rx="4" fill="none" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3 2"/>
+        <text y="1" class="node-label" style="font-size:7pt;fill:var(--muted)">Richemont</text>
+        <text y="12" class="node-sub">~€21 Mrd.</text>
+      </g>
+
+      <!-- Sellita (extern) -->
+      <g transform="translate(80,200)">
+        <rect x="-32" y="-16" width="64" height="32" rx="4" fill="none" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3 2"/>
+        <text y="1" class="node-label" style="font-size:7pt;fill:var(--muted)">Sellita</text>
+        <text y="12" class="node-sub">Schweiz</text>
+      </g>
+
+      <!-- Nomos -->
+      <a href="analyse-nomos.html">
+      <g class="node-group" transform="translate(630,310)">
+        <circle r="38" class="node-circle" fill="var(--green)" opacity=".08" stroke="var(--green)" stroke-width="1.5"/>
+        <text y="-8" class="node-label" style="font-size:8.5pt">Nomos</text>
+        <text y="5" class="node-sub">~240 MA · Unabhängig</text>
+        <text y="17" class="node-sub" style="fill:var(--green)">~€80M · Wachstum</text>
+      </g>
+      </a>
+
+      <!-- Mühle -->
+      <a href="analyse-muehle.html">
+      <g class="node-group" transform="translate(430,300)">
+        <circle r="30" class="node-circle" fill="var(--accent)" opacity=".08" stroke="var(--accent)" stroke-width="1.5"/>
+        <text y="-4" class="node-label" style="font-size:8.5pt">Mühle</text>
+        <text y="8" class="node-sub">~80 MA · Familie</text>
+        <text y="20" class="node-sub" style="fill:var(--accent)">seit 1869</text>
+      </g>
+      </a>
+
+      <!-- Gurofa -->
+      <a href="analyse-gurofa.html">
+      <g class="node-group" transform="translate(220,320)">
+        <circle r="28" class="node-circle" fill="#1a1a1a" opacity=".06" stroke="var(--muted)" stroke-width="1.5"/>
+        <text y="-4" class="node-label" style="font-size:8.5pt">Gurofa</text>
+        <text y="8" class="node-sub">~90 MA · Sellita</text>
+        <text y="20" class="node-sub">Bärenstein</text>
+      </g>
+      </a>
+
+      <!-- Löffler -->
+      <a href="analyse-loeffler.html">
+      <g class="node-group" transform="translate(750,300)">
+        <circle r="20" class="node-circle" fill="var(--green)" opacity=".06" stroke="var(--green)" stroke-width="1"/>
+        <text y="-2" class="node-label" style="font-size:7.5pt">Löffler</text>
+        <text y="10" class="node-sub">StB · Rückenhain</text>
+      </g>
+      </a>
+
+      <!-- Standort-Label -->
+      <text x="450" y="470" style="font-family:var(--m);font-size:7pt;fill:var(--light);text-anchor:middle">Gemeinde Glashütte · 6.800 Einwohner · ~1.160 Arbeitsplätze in analysierten Unternehmen</text>
+    </svg>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-line konzern"></div> Konzernzugehörigkeit</div>
+    <div class="legend-item"><div class="legend-line supply"></div> Zulieferbeziehung</div>
+    <div class="legend-item"><div class="legend-line conflict"></div> Hist. Konflikt / ehem. Abhängigkeit</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--green);opacity:.3;border:1.5px solid var(--green)"></div> Unabhängig</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#1a1a1a;opacity:.1;border:1.5px solid var(--muted)"></div> Konzern-Tochter</div>
+  </div>
+
+  <!-- Key Insight -->
+  <div style="border:1px solid var(--border2);border-radius:var(--card-radius);padding:16px;margin-bottom:32px;background:var(--surface)">
+    <div style="font-weight:600;margin-bottom:8px">Was das Netzwerk zeigt</div>
+    <ul style="margin:0;padding-left:16px;color:var(--text2);font-size:8.5pt;line-height:1.8">
+      <li><strong>Zwei Abhängigkeitsachsen:</strong> Lange → Genf (Richemont), Gurofa → Schweiz (Sellita). Entscheidungen über diese Standorte fallen außerhalb Sachsens.</li>
+      <li><strong>Zulieferkette:</strong> Mühle nutzt Sellita-Kaliber SW200-1 (muehle-glashuette.de). Gurofa (Sellita-Tochter) ist potenzieller lokaler Zulieferer.</li>
+      <li><strong>Nomos = unabhängig seit 2014:</strong> Eigenes Swing-System (Hemmung), eigene DUW-Kaliber. Keine Abhängigkeit von Sellita mehr (Wikipedia).</li>
+      <li><strong>Historischer Konflikt:</strong> Rechtsstreit Nomos ↔ Mühle (~2006) führte zur Mühle-Insolvenz 2007 (n-tv).</li>
+    </ul>
+  </div>
+
+  <!-- Timeline -->
+  <div class="sec-label">Zeitachse</div>
+  <div class="sec-title">175+ Jahre Glashütter Uhrenindustrie</div>
+
+  <div class="tl">
+    <div class="tl-item">
+      <div class="tl-dot highlight"></div>
+      <div class="tl-year">1845</div>
+      <div class="tl-text"><strong>A. Lange & Söhne</strong> gegründet von Ferdinand Adolph Lange</div>
+      <div class="tl-source">Wikipedia <span class="tag tag-e">E</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot highlight"></div>
+      <div class="tl-year">1869</div>
+      <div class="tl-text"><strong>Robert Mühle & Sohn</strong> gegründet — Präzisionsinstrumente</div>
+      <div class="tl-source">muehle-glashuette.de <span class="tag tag-e">E</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-year">1948</div>
+      <div class="tl-text">A. Lange & Söhne <strong>enteignet</strong> — DDR-Ära beginnt</div>
+      <div class="tl-source">Wikipedia <span class="tag tag-e">E</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot highlight"></div>
+      <div class="tl-year">1990</div>
+      <div class="tl-text"><strong>Nomos</strong> gegründet (Roland Schwertner) · <strong>A. Lange</strong> neu gegründet (Walter Lange)</div>
+      <div class="tl-source">DDW, Wikipedia <span class="tag tag-e">E</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-year">1994</div>
+      <div class="tl-text">Mühle: Wiedergründung als GmbH, BSH-Marinechronometer konstruiert</div>
+      <div class="tl-source">muehle-glashuette.de, WatchTime <span class="tag tag-e">E</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-year">2000</div>
+      <div class="tl-text">A. Lange & Söhne wird Teil des <strong>Richemont-Konzerns</strong></div>
+      <div class="tl-source">Wikipedia <span class="tag tag-e">E</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot highlight"></div>
+      <div class="tl-year">2005</div>
+      <div class="tl-text"><strong>Gurofa</strong> gegründet — Sellita-Tochter in Sachsen</div>
+      <div class="tl-source">gurofa.de <span class="tag tag-e">E</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot" style="border-color:var(--red)"></div>
+      <div class="tl-year">2007</div>
+      <div class="tl-text"><strong>Mühle Insolvenz</strong> nach Rechtsstreit mit Nomos</div>
+      <div class="tl-source">n-tv, Wikipedia <span class="tag tag-e">E</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-year">2008</div>
+      <div class="tl-text">Mühle: Insolvenzplan bestätigt, Sanierung erfolgreich</div>
+      <div class="tl-source">Wikipedia <span class="tag tag-e">E</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-year">2010</div>
+      <div class="tl-text">Gurofa bezieht Standort in Bärenstein (OT Glashütte)</div>
+      <div class="tl-source">gurofa.de <span class="tag tag-e">E</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot highlight"></div>
+      <div class="tl-year">2014</div>
+      <div class="tl-text">Nomos: <strong>Eigenes Swing-System</strong> (Hemmung) — unabhängig von Sellita/Nivarox</div>
+      <div class="tl-source">Watch-Wiki, Wikipedia <span class="tag tag-e">E</span></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot highlight"></div>
+      <div class="tl-year">2024</div>
+      <div class="tl-text"><strong>Mühle: 6. Generation</strong> (Fanny + Dustin Mühle) · <strong>Nomos: Bundesverdienstkreuz</strong></div>
+      <div class="tl-source">Wikipedia, WatchTime <span class="tag tag-e">E</span></div>
+    </div>
+  </div>
+
+  <!-- Supply Chain Detail -->
+  <div class="sec-label" style="margin-top:40px">Lieferkette</div>
+  <div class="sec-title">Wer liefert an wen?</div>
+
+  <div style="border:1px solid var(--border2);border-radius:var(--card-radius);overflow:hidden;margin-bottom:24px">
+    <table style="width:100%;border-collapse:collapse">
+      <thead>
+        <tr style="background:var(--surface)">
+          <th style="padding:8px 12px;text-align:left;font-size:7.5pt;font-family:var(--m);color:var(--muted);font-weight:500;border-bottom:1px solid var(--border2)">Verbindung</th>
+          <th style="padding:8px 12px;text-align:left;font-size:7.5pt;font-family:var(--m);color:var(--muted);font-weight:500;border-bottom:1px solid var(--border2)">Art</th>
+          <th style="padding:8px 12px;text-align:left;font-size:7.5pt;font-family:var(--m);color:var(--muted);font-weight:500;border-bottom:1px solid var(--border2)">Quelle</th>
+          <th style="padding:8px 12px;text-align:center;font-size:7.5pt;font-family:var(--m);color:var(--muted);font-weight:500;border-bottom:1px solid var(--border2)">Trust</th>
+        </tr>
+      </thead>
+      <tbody style="font-size:8.5pt;color:var(--text2)">
+        <tr>
+          <td style="padding:8px 12px;border-bottom:1px solid var(--border2)">Gurofa → Sellita</td>
+          <td style="padding:8px 12px;border-bottom:1px solid var(--border2)">100% Tochtergesellschaft</td>
+          <td style="padding:8px 12px;border-bottom:1px solid var(--border2)"><a href="https://www.gurofa.de" style="color:var(--accent)">gurofa.de</a></td>
+          <td style="padding:8px 12px;border-bottom:1px solid var(--border2);text-align:center"><span class="tag tag-e">E</span></td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px;border-bottom:1px solid var(--border2)">A. Lange → Richemont</td>
+          <td style="padding:8px 12px;border-bottom:1px solid var(--border2)">Konzerntochter seit 2000</td>
+          <td style="padding:8px 12px;border-bottom:1px solid var(--border2)"><a href="https://de.wikipedia.org/wiki/A._Lange_%26_S%C3%B6hne" style="color:var(--accent)">Wikipedia</a></td>
+          <td style="padding:8px 12px;border-bottom:1px solid var(--border2);text-align:center"><span class="tag tag-e">E</span></td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px;border-bottom:1px solid var(--border2)">Sellita/Gurofa → Mühle</td>
+          <td style="padding:8px 12px;border-bottom:1px solid var(--border2)">Kaliber SW200-1 "Version Mühle"</td>
+          <td style="padding:8px 12px;border-bottom:1px solid var(--border2)"><a href="https://www.muehle-glashuette.de/uhr/29er-schwarz-lederband/" style="color:var(--accent)">muehle-glashuette.de</a></td>
+          <td style="padding:8px 12px;border-bottom:1px solid var(--border2);text-align:center"><span class="tag tag-e">E</span></td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px;border-bottom:1px solid var(--border2)">Nomos ↔ Mühle</td>
+          <td style="padding:8px 12px;border-bottom:1px solid var(--border2)">Hist. Rechtsstreit (~2006), führte zur Mühle-Insolvenz</td>
+          <td style="padding:8px 12px;border-bottom:1px solid var(--border2)"><a href="https://www.n-tv.de/wirtschaft/meldungen/Muehle-Glashuette-insolvent-article346006.html" style="color:var(--accent)">n-tv</a></td>
+          <td style="padding:8px 12px;border-bottom:1px solid var(--border2);text-align:center"><span class="tag tag-e">E</span></td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px">Nomos ↛ Sellita</td>
+          <td style="padding:8px 12px">Seit 2014 eigenes Swing-System — unabhängig</td>
+          <td style="padding:8px 12px"><a href="https://de.wikipedia.org/wiki/Nomos_Glash%C3%BCtte" style="color:var(--accent)">Wikipedia</a></td>
+          <td style="padding:8px 12px;text-align:center"><span class="tag tag-e">E</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Kommunale Relevanz -->
+  <div class="sec-label">Kommunale Relevanz</div>
+  <div class="sec-title">Was heißt das für die Gemeinde?</div>
+
+  <div style="border-left:3px solid var(--accent);padding-left:16px;font-size:9pt;color:var(--text2);line-height:1.8;margin-bottom:24px">
+    <strong>Abhängigkeit von externen Entscheidern:</strong> ~840 der ~1.160 analysierten Arbeitsplätze (Lange ~750 + Gurofa ~90) hängen von Konzernentscheidungen in Genf und La Chaux-de-Fonds ab. Diese Arbeitsplätze sind nicht durch kommunale Maßnahmen direkt beeinflussbar. <span class="tag tag-e">E</span><br><br>
+    <strong>Unabhängige Unternehmen:</strong> Nomos (~240 MA) und Mühle (~80 MA) sind die einzigen unabhängigen größeren Arbeitgeber. Hier kann kommunale Wirtschaftsförderung direkt wirken: Infrastruktur, Fachkräfte, Fördermittel-Beratung. <span class="tag tag-e">E</span><br><br>
+    <strong>Zulieferkette als Risiko:</strong> Mühle nutzt Sellita-Kaliber. Wenn Sellita die Strategie ändert (Preise, Prioritäten, Lieferzeiten), ist Mühle direkt betroffen — als einziges verbliebenes Familienunternehmen der Branche in Glashütte. <span class="tag tag-e">E</span>
+  </div>
+
+  <!-- Quellenverzeichnis -->
+  <div style="font-family:var(--m);font-size:var(--fs-label);color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:32px;margin-bottom:8px">Quellenverzeichnis</div>
+  <table style="width:100%;border-collapse:collapse;margin-bottom:24px">
+    <tr><td style="padding:4px 8px;font-family:var(--m);font-size:var(--fs-label);color:var(--accent);vertical-align:top">[1]</td><td style="padding:4px 8px;font-size:var(--fs-meta)"><a href="https://de.wikipedia.org/wiki/A._Lange_%26_S%C3%B6hne" style="color:var(--accent)">Wikipedia — A. Lange & Söhne</a></td><td style="padding:4px 8px;font-size:7.5pt;color:var(--muted)">1845, Enteignung, Richemont 2000</td></tr>
+    <tr><td style="padding:4px 8px;font-family:var(--m);font-size:var(--fs-label);color:var(--accent);vertical-align:top">[2]</td><td style="padding:4px 8px;font-size:var(--fs-meta)"><a href="https://de.wikipedia.org/wiki/M%C3%BChle_Glash%C3%BCtte" style="color:var(--accent)">Wikipedia — Mühle Glashütte</a></td><td style="padding:4px 8px;font-size:7.5pt;color:var(--muted)">1869, Insolvenz, 6. Gen</td></tr>
+    <tr><td style="padding:4px 8px;font-family:var(--m);font-size:var(--fs-label);color:var(--accent);vertical-align:top">[3]</td><td style="padding:4px 8px;font-size:var(--fs-meta)"><a href="https://de.wikipedia.org/wiki/Nomos_Glash%C3%BCtte" style="color:var(--accent)">Wikipedia — Nomos Glashütte</a></td><td style="padding:4px 8px;font-size:7.5pt;color:var(--muted)">1990, Swing-System 2014, BVK 2024</td></tr>
+    <tr><td style="padding:4px 8px;font-family:var(--m);font-size:var(--fs-label);color:var(--accent);vertical-align:top">[4]</td><td style="padding:4px 8px;font-size:var(--fs-meta)"><a href="https://www.gurofa.de" style="color:var(--accent)">gurofa.de</a></td><td style="padding:4px 8px;font-size:7.5pt;color:var(--muted)">Sellita-Tochter, 2005, Bärenstein</td></tr>
+    <tr><td style="padding:4px 8px;font-family:var(--m);font-size:var(--fs-label);color:var(--accent);vertical-align:top">[5]</td><td style="padding:4px 8px;font-size:var(--fs-meta)"><a href="https://www.muehle-glashuette.de/uhr/29er-schwarz-lederband/" style="color:var(--accent)">muehle-glashuette.de — 29er</a></td><td style="padding:4px 8px;font-size:7.5pt;color:var(--muted)">SW200-1 Version Mühle (Sellita-Kaliber)</td></tr>
+    <tr><td style="padding:4px 8px;font-family:var(--m);font-size:var(--fs-label);color:var(--accent);vertical-align:top">[6]</td><td style="padding:4px 8px;font-size:var(--fs-meta)"><a href="https://www.n-tv.de/wirtschaft/meldungen/Muehle-Glashuette-insolvent-article346006.html" style="color:var(--accent)">n-tv — Insolvenz 2007</a></td><td style="padding:4px 8px;font-size:7.5pt;color:var(--muted)">Rechtsstreit Nomos/Mühle</td></tr>
+    <tr><td style="padding:4px 8px;font-family:var(--m);font-size:var(--fs-label);color:var(--accent);vertical-align:top">[7]</td><td style="padding:4px 8px;font-size:var(--fs-meta)"><a href="https://die-deutsche-wirtschaft.de/unternehmen/nomos-glashuette-sa-roland-schwertner-kg-glashuette/" style="color:var(--accent)">DDW — Nomos</a></td><td style="padding:4px 8px;font-size:7.5pt;color:var(--muted)">~€80M, Gründung 1990</td></tr>
+    <tr><td style="padding:4px 8px;font-family:var(--m);font-size:var(--fs-label);color:var(--accent);vertical-align:top">[8]</td><td style="padding:4px 8px;font-size:var(--fs-meta)"><a href="https://www.richemont.com" style="color:var(--accent)">Richemont Annual Report FY2024</a></td><td style="padding:4px 8px;font-size:7.5pt;color:var(--muted)">~€21 Mrd. Konzernumsatz</td></tr>
+    <tr><td style="padding:4px 8px;font-family:var(--m);font-size:var(--fs-label);color:var(--accent);vertical-align:top">[9]</td><td style="padding:4px 8px;font-size:var(--fs-meta)"><a href="https://www.rathaus-altenberg.de/bilder/2023/05/gurofa-inserat-0523.pdf" style="color:var(--accent)">Rathaus Altenberg 2023</a></td><td style="padding:4px 8px;font-size:7.5pt;color:var(--muted)">~90 MA lokal</td></tr>
+    <tr><td style="padding:4px 8px;font-family:var(--m);font-size:var(--fs-label);color:var(--accent);vertical-align:top">[10]</td><td style="padding:4px 8px;font-size:var(--fs-meta)"><a href="https://presse.nomos-glashuette.com/wp-content/uploads/2025/03/NOMOS_Daten-Fakten-Selbstverstaendnis_2025_DE1.pdf" style="color:var(--accent)">Nomos Pressemappe 2025</a></td><td style="padding:4px 8px;font-size:7.5pt;color:var(--muted)">240 MA</td></tr>
+    <tr><td style="padding:4px 8px;font-family:var(--m);font-size:var(--fs-label);color:var(--accent);vertical-align:top">[11]</td><td style="padding:4px 8px;font-size:var(--fs-meta)"><a href="https://watch-wiki.org/index.php?title=NOMOS_Glash%C3%BCtte/SA" style="color:var(--accent)">Watch-Wiki — Nomos</a></td><td style="padding:4px 8px;font-size:7.5pt;color:var(--muted)">DUW-Kaliber, eigene Hemmung</td></tr>
+    <tr><td style="padding:4px 8px;font-family:var(--m);font-size:var(--fs-label);color:var(--accent);vertical-align:top">[12]</td><td style="padding:4px 8px;font-size:var(--fs-meta)"><a href="https://www.watchtime.net/brands/deutsche-uhrenhersteller/im-portraet-das-erfolgsgeheimnis-von-nomos-glashuette" style="color:var(--accent)">WatchTime — Porträt Nomos</a></td><td style="padding:4px 8px;font-size:7.5pt;color:var(--muted)">Wachstumskurs</td></tr>
+  </table>
+
+  <div style="border:1px solid var(--border2);border-radius:var(--card-radius);padding:12px 16px;background:rgba(192,57,43,.02)">
+    <div style="font-family:var(--m);font-size:var(--fs-label);font-weight:600;color:var(--red);margin-bottom:4px">Transparenzhinweis</div>
+    <div style="font-size:7.5pt;color:var(--text2);line-height:1.6">
+      Dieses Netzwerk zeigt nur öffentlich dokumentierte Verbindungen. Informelle Beziehungen, persönliche Netzwerke und nicht-öffentliche Verträge sind nicht dargestellt. Die Zulieferbeziehung Sellita→Mühle ist aus dem Produktdatenblatt (SW200-1 "Version Mühle") abgeleitet, ob Gurofa (Bärenstein) konkret der liefernde Sellita-Standort ist, ist nicht bestätigt. Ainary hat keine Geschäftsbeziehung mit den genannten Unternehmen.
+    </div>
+  </div>
+
+  <footer class="ftr">© 2026 Ainary · florian@ainaryventures.com · ainaryventures.com</footer>
+</div>
+
+<div id="shared-footer"></div>
+</body>
+</html>
