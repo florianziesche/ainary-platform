@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kommunen-Vergleich — Ainary · Glashütte</title>
+<link rel="stylesheet" href="shared.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mia-chat.css">
+<script src="mia-chat.js" defer></script>
+<style>
+  :root {
+    --text:#1a1a1a;--text2:#444;--muted:#777;--light:#bbb;--border:#d0d0d0;--border2:#e8e8e8;
+    --surface:#fafafa;--accent:#9d7f3b;--green:#2d8a4e;--red:#c0392b;--amber:#b45309;
+    --f:'Inter',-apple-system,sans-serif;--m:'JetBrains Mono',monospace;
+  }
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--f);color:var(--text);font-size:var(--fs-body);line-height:1.65;background:#fff;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  .page{max-width:var(--page-max,820px);margin:0 auto;padding:var(--page-pad)}
+
+  .portal-hdr{display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;border-bottom:1px solid var(--border2);margin-bottom:24px;font-size:var(--fs-meta)}
+  .portal-left{display:flex;align-items:center;gap:8px}
+  .brand-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0}
+  .brand-name{font-weight:600;font-size:9.5pt}
+
+  .tabs{display:flex;gap:0;border-bottom:1px solid var(--border2);margin-bottom:24px}
+  .tabs a{padding:6px 14px;border-bottom:2px solid transparent;color:var(--light);font-size:var(--fs-desc);font-family:var(--m)}
+  .tabs a.active{border-bottom-color:var(--accent);color:var(--accent);font-weight:500}
+
+  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:var(--sec-gap)}
+  .kpi{border:1px solid var(--border2);border-radius:var(--card-radius);padding:16px;text-align:center}
+  .kpi-val{font-family:var(--m);font-size:20pt;font-weight:700;color:var(--text);letter-spacing:-.02em}
+  .kpi-label{font-size:var(--fs-meta);color:var(--muted);margin-top:2px}
+  .kpi-sub{font-family:var(--m);font-size:var(--fs-tag);color:var(--light);margin-top:4px}
+  .tag{font-family:var(--m);font-size:5.5pt;padding:1px 4px;border-radius:2px;font-weight:600}
+  .tag-e{background:rgba(45,138,78,.1);color:var(--green)}.tag-i{background:rgba(157,127,59,.1);color:var(--accent)}
+  .tag-j{background:rgba(180,83,9,.1);color:var(--amber)}.tag-a{background:rgba(192,57,43,.1);color:var(--red)}
+
+  .sec-label{font-family:var(--m);font-size:var(--fs-label);color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+  .sec-title{font-size:18pt;font-weight:700;letter-spacing:-.02em;margin-bottom:16px}
+
+  /* Comparison Table */
+  .comp-table{width:100%;border-collapse:collapse;margin-bottom:var(--sec-gap)}
+  .comp-table th{font-family:var(--m);font-size:var(--fs-label);color:var(--muted);letter-spacing:.08em;text-transform:uppercase;text-align:left;padding:8px 12px;border-bottom:2px solid var(--border)}
+  .comp-table td{font-size:var(--fs-desc);padding:10px 12px;border-bottom:1px solid var(--border2);vertical-align:top}
+  .comp-table tr:hover{background:var(--surface)}
+  .comp-table .kommune-name{font-weight:600;color:var(--text)}
+  .comp-table .kommune-name a{color:var(--accent)}
+  .comp-table .score{font-family:var(--m);font-weight:600}
+  .comp-table .score-high{color:var(--green)}.comp-table .score-mid{color:var(--amber)}.comp-table .score-low{color:var(--red)}
+
+  .bar{height:6px;background:var(--border2);border-radius:3px;overflow:hidden;min-width:80px}
+  .bar-fill{height:100%;border-radius:3px}
+
+  .highlight-box{border:2px solid var(--accent);border-radius:var(--card-radius);padding:20px;margin-bottom:var(--sec-gap);background:rgba(157,127,59,.02)}
+  .vs-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:start;margin-bottom:var(--sec-gap)}
+  .vs-card{border:1px solid var(--border2);border-radius:var(--card-radius);padding:16px}
+  .vs-divider{display:flex;align-items:center;font-family:var(--m);font-size:12pt;color:var(--light);padding-top:24px}
+
+  .footer{text-align:center;padding:24px 0;border-top:1px solid var(--border2);margin-top:48px;font-family:var(--m);font-size:var(--fs-label);color:var(--light)}
+
+  @media(max-width:700px){.page{padding:var(--page-pad-mobile)}.grid-2,.grid-3{grid-template-columns:1fr}}
+  @media print{.portal-hdr,.tabs,.mia,#mia-slot{display:none}.page{padding:16px}}
+</style>
+<script src="bookmarks.js" defer></script><script src="cta-footer.js" defer></script><script src="shared-header.js" defer></script>
+<script src="shared-footer.js" defer></script><meta property="og:title" content="Kommunen-Vergleich — Ainary · Glashütte">
+<meta property="og:description" content="KI-Assistent für Glashütte — Echte Daten, echte Analysen.">
+<meta property="og:image" content="./og-image.svg">
+<meta property="og:type" content="website">
+<meta name="description" content="KI-Assistent für Glashütte — Echte Daten, echte Analysen.">
+</head>
+<body>
+<div class="page">
+
+  <div id="shared-header"></div>
+
+  <a href="wirtschaft.html" style="font-family:var(--m);font-size:var(--fs-kpi-sub);color:var(--accent);display:inline-block;margin-bottom:16px">&larr; Zurück zum Wirtschaftsverzeichnis</a>
+
+  <div id="mia-slot"></div>
+
+  <!-- Report Header -->
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+    <div style="font-family:var(--m);font-size:var(--fs-label);color:var(--muted);letter-spacing:.12em;text-transform:uppercase">Ainary Kommunalvergleich</div>
+    <span data-bookmark="vergleich" onclick="toggleBookmark('vergleich')" style="cursor:pointer;font-size:var(--fs-kpi-val);margin-left:8px;transition:color .12s" title="Lesezeichen"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;border:1.5px solid var(--light);background:transparent"></span></span>
+    <div style="font-family:var(--m);font-size:var(--fs-label);color:var(--light)">KV-2026-0222-GH</div>
+  </div>
+
+  <div style="font-size:28pt;font-weight:700;letter-spacing:-.03em;margin-bottom:4px">Digitalisierungs-Stufen</div>
+  <div style="font-size:var(--fs-body);color:var(--text2);margin-bottom:12px">22 Kommunen im Querschnitt — Einordnung nach Digitalisierungsgrad</div>
+
+  <div style="display:flex;gap:16px;flex-wrap:wrap;font-family:var(--m);font-size:var(--fs-kpi-sub);color:var(--muted);margin-bottom:8px">
+    <span>Datum: 2026-03-04</span><span>Kommunen: 22</span><span>Quellen: 34</span>
+  </div>
+
+  <div style="margin-bottom:6px;display:flex;align-items:center;gap:8px">
+    <span style="font-family:var(--m);font-size:var(--fs-kpi-sub);color:var(--muted)">Confidence:</span>
+    <div style="flex:0 0 120px;height:6px;background:var(--border2);border-radius:3px;overflow:hidden">
+      <div style="width:72%;height:100%;border-radius:3px;background:var(--green)"></div>
+    </div>
+    <span style="font-family:var(--m);font-size:var(--fs-meta);font-weight:600;color:var(--green)">72%</span>
+  </div>
+
+  <div style="font-family:var(--m);font-size:var(--fs-label);color:var(--muted);margin-bottom:16px">
+    Ihr Aufwand ohne Ainary: ~40–60 Std. · Einsparpotenzial €2.200–3.300 · Basis: €55/Std. TVöD E11
+  </div>
+
+  <div style="width:100%;height:2px;background:var(--accent);opacity:.3;margin-bottom:16px"></div>
+
+  <div style="display:flex;gap:var(--card-gap);font-size:var(--fs-tag);margin-bottom:24px;flex-wrap:wrap">
+    <span style="display:flex;align-items:center;gap:3px"><span class="tag tag-e">E</span> Evidence — belegt</span>
+    <span style="display:flex;align-items:center;gap:3px"><span class="tag tag-i">I</span> Inference — abgeleitet</span>
+    <span style="display:flex;align-items:center;gap:3px"><span class="tag tag-j">J</span> Judgment — Einschätzung</span>
+    <span style="display:flex;align-items:center;gap:3px"><span class="tag tag-a">A</span> Assumption — Annahme</span>
+  </div>
+
+  <!-- Beipackzettel -->
+  <div style="border:1px solid var(--border2);border-radius:var(--card-radius);padding:16px;margin-bottom:var(--sec-gap);background:var(--surface)">
+    <div style="font-family:var(--m);font-size:var(--fs-label);color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px">Beipackzettel — Lesen vor Verwendung</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;font-size:var(--fs-desc)">
+      <div>
+        <div style="font-weight:600;color:var(--green);margin-bottom:6px">Was dieser Vergleich kann</div>
+        <ul style="margin:0;padding-left:16px;color:var(--text2);line-height:1.7">
+          <li>Öffentlich verfügbare Daten zu 22 Kommunen vergleichen</li>
+          <li>Smart City Förderstatus und Digitalisierungsstand zeigen</li>
+          <li>Strukturzwillinge identifizieren (ähnliche EW, Ortsteile)</li>
+          <li>Glashütte in den bundesweiten Kontext einordnen</li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-weight:600;color:var(--red);margin-bottom:6px">Was dieser Vergleich NICHT kann</div>
+        <ul style="margin:0;padding-left:16px;color:var(--text2);line-height:1.7">
+          <li>Verwaltungsqualität messen oder bewerten</li>
+          <li>Interne Haushaltsdaten einsehen</li>
+          <li>Ursachen für Unterschiede erklären</li>
+          <li>Handlungsempfehlungen ableiten</li>
+        </ul>
+      </div>
+    </div>
+    <div style="font-size:var(--fs-kpi-sub);color:var(--muted);margin-top:12px;padding-top:8px;border-top:1px solid var(--border2)">
+      <strong>Methodik:</strong> Destatis, Kommunalwebsites, smart-city-dialog.de, IW Behörden-Digimeter 2025, dbb 2023, Wikipedia. Digitalisierungs-Stufen (3 Stufen: Initial, Entwicklung, Etabliert) basierend auf 5 Dimensionen, angelehnt an DESI/CMMI.<br>
+      <strong>Letzte Aktualisierung:</strong> 2026-02-22T02:00 · <strong>Gültig bis:</strong> 2026-03-22
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="kpi-val">22</div>
+      <div class="kpi-label">Kommunen verglichen</div>
+      <div class="kpi-sub">10 Sachsen · 12 bundesweit <span class="tag tag-e">E</span></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-val">3</div>
+      <div class="kpi-label">Digitalisierungs-Stufen</div>
+      <div class="kpi-sub">Initial · Entwicklung · Etabliert</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-val">7</div>
+      <div class="kpi-label">mit Smart City Förderung</div>
+      <div class="kpi-sub">BMI-Modellprojekte <span class="tag tag-e">E</span></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-val" style="color:var(--red)">Initial</div>
+      <div class="kpi-label">Glashütte</div>
+      <div class="kpi-sub">Digitalisierungs-Stufe <span class="tag tag-i">I</span></div>
+    </div>
+  </div>
+
+  <!-- Reifegradstufen -->
+  <div class="sec-label">Reifegradmodell</div>
+  <div class="sec-title">Drei Stufen der kommunalen Digitalisierung</div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--card-gap);margin-bottom:var(--sec-gap)">
+    <div style="border:1px solid var(--border2);border-radius:var(--card-radius);padding:12px;border-top:3px solid var(--red)">
+      <div style="font-family:var(--m);font-size:var(--fs-label);color:var(--red);font-weight:600;margin-bottom:4px">Initial (0–30)</div>
+      <div style="font-size:var(--fs-kpi-sub);color:var(--text2);line-height:1.5">Grundlegende Web-Präsenz. Keine oder minimale Online-Services. Kein strukturiertes Digitalisierungsprojekt.</div>
+    </div>
+    <div style="border:1px solid var(--border2);border-radius:var(--card-radius);padding:12px;border-top:3px solid var(--amber)">
+      <div style="font-family:var(--m);font-size:var(--fs-label);color:var(--amber);font-weight:600;margin-bottom:4px">Entwicklung (31–60)</div>
+      <div style="font-size:var(--fs-kpi-sub);color:var(--text2);line-height:1.5">Einzelne Online-Dienste verfügbar (z.B. Terminvergabe). Noch keine übergreifende Digital-Strategie.</div>
+    </div>
+    <div style="border:1px solid var(--border2);border-radius:var(--card-radius);padding:12px;border-top:3px solid var(--green)">
+      <div style="font-family:var(--m);font-size:var(--fs-label);color:var(--green);font-weight:600;margin-bottom:4px">Etabliert (61–90)</div>
+      <div style="font-size:var(--fs-kpi-sub);color:var(--text2);line-height:1.5">Breites Online-Angebot. Förderprojekte oder eigene IT-Abteilung. Bürgerbeteiligung digital abgebildet.</div>
+    </div>
+
+  </div>
+
+  <!-- Strukturvergleich -->
+  <div class="sec-label">Strukturvergleich</div>
+  <div class="sec-title">Kommunen mit vergleichbarer Größe und Struktur</div>
+
+  <div style="border:1px solid var(--border2);border-radius:var(--card-radius);padding:20px;margin-bottom:var(--sec-gap);background:var(--surface)">
+    <div style="font-size:9pt;color:var(--text2);line-height:1.7;margin-bottom:12px">
+      Der Vergleich identifiziert drei Kommunen mit ähnlicher Einwohnerzahl und Siedlungsstruktur wie Glashütte (6.657 EW, 14 Ortsteile): <span class="tag tag-e">E</span>
+    </div>
+    <div style="font-size:var(--fs-desc);color:var(--text2);line-height:1.8;padding-left:16px;border-left:2px solid var(--border2)">
+      <strong>Bad Belzig</strong> (11.436 EW, 15 Ortsteile) — Digitalisierungs-Stufe Etabliert. Eigene Bürger-App, Klimadaten-Plattform, €5,4M BMI-Förderung. <span class="tag tag-e">E</span><br>
+      <strong>Smart Region AUF</strong> (~6.000 EW, 3 Gemeinden) — Digitalisierungs-Stufe Etabliert. BMI-Modellprojekt, kleinstes bundesweit. <span class="tag tag-e">E</span><br>
+      <strong>Gersheim</strong> (~6.400 EW) — Digitalisierungs-Stufe Entwicklung. KI-gestützter Chatbot auf Gemeinde-Website. <span class="tag tag-e">E</span>
+    </div>
+    <div style="font-family:var(--m);font-size:var(--fs-label);color:var(--muted);margin-top:12px">Einwohnerzahl und Gemeindestruktur allein erklären die Unterschiede im Digitalisierungsgrad nicht. <span class="tag tag-i">I</span></div>
+  </div>
+
+  <!-- Gegenüberstellung -->
+  <div class="sec-label">Gegenüberstellung</div>
+  <div class="sec-title">Glashütte und Bad Belzig im Direktvergleich</div>
+
+  <div class="vs-grid">
+    <div class="vs-card">
+      <div style="font-weight:600;margin-bottom:4px">Glashütte</div>
+      <div style="font-family:var(--m);font-size:var(--fs-tag);color:var(--muted);margin-bottom:8px">Stufe: Initial</div>
+      <div style="font-size:var(--fs-desc);color:var(--text2);line-height:1.8">
+        <div>6.657 Einwohner <span class="tag tag-e">E</span></div>
+        <div>14 Ortsteile <span class="tag tag-e">E</span></div>
+        <div>Bürger-App: nicht vorhanden <span class="tag tag-e">E</span></div>
+        <div>Online-Services: nicht identifiziert <span class="tag tag-e">E</span></div>
+        <div>Smart City Förderung: keine <span class="tag tag-e">E</span></div>
+        <div>Beteiligungsplattform: keine <span class="tag tag-e">E</span></div>
+        <div>Offene Umweltdaten: keine <span class="tag tag-e">E</span></div>
+      </div>
+    </div>
+    <div class="vs-divider">—</div>
+    <div class="vs-card">
+      <div style="font-weight:600;margin-bottom:4px">Bad Belzig</div>
+      <div style="font-family:var(--m);font-size:var(--fs-tag);color:var(--muted);margin-bottom:8px">Stufe: Etabliert</div>
+      <div style="font-size:var(--fs-desc);color:var(--text2);line-height:1.8">
+        <div>11.436 Einwohner <span class="tag tag-e">E</span></div>
+        <div>15 Ortsteile <span class="tag tag-e">E</span></div>
+        <div>Bürger-App: vorhanden <span class="tag tag-e">E</span></div>
+        <div>Buchungssystem: vorhanden <span class="tag tag-e">E</span></div>
+        <div>Smart City: €5,4M BMI-Förderung <span class="tag tag-e">E</span></div>
+        <div>Beteiligungsplattform: vorhanden <span class="tag tag-e">E</span></div>
+        <div>Klimadaten-Plattform: vorhanden <span class="tag tag-e">E</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comparison Table -->
+  <div class="sec-label">Vollständiger Vergleich</div>
+  <div class="sec-title">22 Kommunen im Überblick</div>
+
+  <div style="font-size:var(--fs-kpi-sub);color:var(--muted);margin-bottom:12px;display:flex;gap:16px">
+    <button onclick="filterBL('alle')" style="font-family:var(--m);font-size:var(--fs-label);padding:4px 10px;border:1px solid var(--border2);border-radius:12px;cursor:pointer;background:rgba(157,127,59,.06);color:var(--accent)">Alle</button>
+    <button onclick="filterBL('SN')" style="font-family:var(--m);font-size:var(--fs-label);padding:4px 10px;border:1px solid var(--border2);border-radius:12px;cursor:pointer;background:none;color:var(--muted)">Sachsen</button>
+    <button onclick="filterBL('bund')" style="font-family:var(--m);font-size:var(--fs-label);padding:4px 10px;border:1px solid var(--border2);border-radius:12px;cursor:pointer;background:none;color:var(--muted)">Bundesweit</button>
+  </div>
+
+  <table class="comp-table" id="comp-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Kommune</th>
+        <th>BL</th>
+        <th>EW</th>
+        <th>Digitalisierungs-Stufe</th>
+        <th>Smart City</th>
+        <th>Analyse</th>
+      </tr>
+    </thead>
+    <tbody id="comp-body"></tbody>
+  </table>
+
+  <!-- Methodik Digital-Score -->
+  <div class="sec-label" style="margin-top:var(--sec-gap)">Methodik</div>
+  <div class="sec-title">Definition der Digitalisierungs-Stufen</div>
+  <div style="font-size:var(--fs-desc);color:var(--text2);line-height:1.7;margin-bottom:24px">
+    Die Digitalisierungs-Stufe ordnet den öffentlich sichtbaren Digitalisierungsgrad einer Kommune in drei Stufen ein. Die Einordnung erfolgt anhand von fünf Dimensionen: <span class="tag tag-i">I</span><br><br>
+    <strong>Dimensionen und Gewichtung:</strong><br>
+    · Online-Services (25%) — Terminvergabe, Antragsstellung, digitale Bezahlung<br>
+    · Smart City / Förderprojekte (25%) — BMI-Förderung, Landesförderung, EU-Mittel<br>
+    · Bürgerbeteiligung (20%) — Digitale Plattformen, Apps, Beteiligungsverfahren<br>
+    · Open Data (15%) — Transparenzportale, offene Haushaltsdaten, Umweltdaten<br>
+    · IT-Organisation (15%) — Eigene Abteilung, CDO, dokumentierte Digital-Strategie<br><br>
+    <strong>Stufen:</strong> Initial, Entwicklung, Etabliert. Die Einteilung orientiert sich am EU Digital Economy and Society Index (DESI) und dem Capability Maturity Model (CMMI). <span class="tag tag-i">I</span><br><br>
+    <strong>Limitationen:</strong> Der Score erfasst ausschließlich öffentlich zugängliche Informationen. Interne Projekte, Haushaltsdaten und nicht publizierte Digitalisierungsmaßnahmen fließen nicht ein. Kommunen ohne eigene Website oder mit eingeschränkter Online-Präsenz werden tendenziell unterbewertet. <span class="tag tag-i">I</span>
+  </div>
+
+  <!-- Quellenverzeichnis -->
+  <div style="font-family:var(--m);font-size:var(--fs-label);color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:var(--sec-gap);margin-bottom:8px">Quellenverzeichnis</div>
+  <table style="width:100%;border-collapse:collapse;margin-bottom:24px">
+    <tr><td style="padding:4px 8px;font-family:var(--m);font-size:var(--fs-label);color:var(--accent);vertical-align:top">[1]</td><td style="padding:4px 8px;font-size:var(--fs-meta)"><a href="https://kommunal.de/behoerden-digimeter-2025-so-weit-ist-das-ozg" target="_blank" style="color:var(--accent)">IW Behörden-Digimeter 2025</a></td><td style="padding:4px 8px;font-size:var(--fs-kpi-sub);color:var(--muted)">OZG-Umsetzung nach Bundesland</td></tr>
+    <tr><td style="padding:4px 8px;font-family:var(--m);font-size:var(--fs-label);color:var(--accent);vertical-align:top">[2]</td><td style="padding:4px 8px;font-size:var(--fs-meta)"><a href="https://www.dbb.de" target="_blank" style="color:var(--accent)">dbb Beamtenbund 2023</a></td><td style="padding:4px 8px;font-size:var(--fs-kpi-sub);color:var(--muted)">33% Rente bis 2030</td></tr>
+    <tr><td style="padding:4px 8px;font-family:var(--m);font-size:var(--fs-label);color:var(--accent);vertical-align:top">[3]</td><td style="padding:4px 8px;font-size:var(--fs-meta)"><a href="https://www.smart-city-dialog.de" target="_blank" style="color:var(--accent)">smart-city-dialog.de</a></td><td style="padding:4px 8px;font-size:var(--fs-kpi-sub);color:var(--muted)">BMI Smart City Modellprojekte</td></tr>
+    <tr><td style="padding:4px 8px;font-family:var(--m);font-size:var(--fs-label);color:var(--accent);vertical-align:top">[4]</td><td style="padding:4px 8px;font-size:var(--fs-meta)"><a href="https://www.destatis.de" target="_blank" style="color:var(--accent)">Destatis</a></td><td style="padding:4px 8px;font-size:var(--fs-kpi-sub);color:var(--muted)">Einwohnerzahlen 2022</td></tr>
+    <tr><td style="padding:4px 8px;font-family:var(--m);font-size:var(--fs-label);color:var(--accent);vertical-align:top">[5]</td><td style="padding:4px 8px;font-size:var(--fs-meta)"><a href="https://www.dihk.de" target="_blank" style="color:var(--accent)">DIHK Fachkräftereport 2025</a></td><td style="padding:4px 8px;font-size:var(--fs-kpi-sub);color:var(--muted)">49% Besetzungsprobleme</td></tr>
+    <tr><td style="padding:4px 8px;font-family:var(--m);font-size:var(--fs-label);color:var(--accent);vertical-align:top">[6]</td><td style="padding:4px 8px;font-size:var(--fs-meta)">Kommunalwebsites (22)</td><td style="padding:4px 8px;font-size:var(--fs-kpi-sub);color:var(--muted)">Einzelnachweise in jeweiliger Analyse</td></tr>
+  </table>
+
+  <!-- Transparenzhinweis -->
+  <div style="border:1px solid var(--border2);border-radius:var(--card-radius);padding:12px 16px;background:rgba(192,57,43,.02);margin-bottom:24px">
+    <div style="font-family:var(--m);font-size:var(--fs-tag);color:var(--red);font-weight:600;margin-bottom:4px">Transparenzhinweis</div>
+    <div style="font-size:var(--fs-meta);color:var(--text2);line-height:1.6">
+      Dieser Vergleich basiert ausschließlich auf öffentlich zugänglichen Informationen. Die Digitalisierungs-Stufe ist eine Einordnung auf Basis der beschriebenen Methodik <span class="tag tag-i">I</span>, kein offizielles Ranking und kein Qualitätsurteil über die jeweilige Verwaltung. Kommunen ohne Analyse-Link haben keine Detailseite — die Daten stammen aus Sekundärquellen. Ainary unterhält keine Geschäftsbeziehung zu den verglichenen Kommunen.
+    </div>
+  </div>
+
+  <div class="footer">&copy; 2026 Ainary · florian@ainaryventures.com · ainaryventures.com</div>
+</div>
+
+<script>
+const K=[
+  {name:"Dresden",bl:"SN",ew:"563.311",score:82,smart:"Ja",analyse:"",cat:"SN"},
+  {name:"Leipzig",bl:"SN",ew:"616.093",score:79,smart:"Ja",analyse:"",cat:"SN"},
+  {name:"Chemnitz",bl:"SN",ew:"246.334",score:71,smart:"Ja",analyse:"",cat:"SN"},
+  {name:"Jena",bl:"TH",ew:"111.407",score:78,smart:"€17,5M BMI",analyse:"analyse-jena.html",cat:"bund"},
+  {name:"Marburg",bl:"HE",ew:"76.401",score:68,smart:"Nein",analyse:"analyse-marburg.html",cat:"bund"},
+  {name:"Freiberg",bl:"SN",ew:"40.453",score:52,smart:"Nein",analyse:"",cat:"SN"},
+  {name:"Meißen",bl:"SN",ew:"28.044",score:48,smart:"Nein",analyse:"",cat:"SN"},
+  {name:"Bad Belzig",bl:"BB",ew:"11.436",score:74,smart:"€5,4M BMI",analyse:"analyse-badbelzig.html",cat:"bund"},
+  {name:"Dippoldiswalde",bl:"SN",ew:"14.560",score:32,smart:"Nein",analyse:"analyse-dippoldiswalde.html",cat:"SN"},
+  {name:"Pirna",bl:"SN",ew:"39.328",score:45,smart:"Nein",analyse:"",cat:"SN"},
+  {name:"Freital",bl:"SN",ew:"39.819",score:42,smart:"Nein",analyse:"",cat:"SN"},
+  {name:"Radeberg",bl:"SN",ew:"18.488",score:38,smart:"Nein",analyse:"",cat:"SN"},
+  {name:"Gersheim",bl:"SL",ew:"~6.400",score:41,smart:"Nein",analyse:"analyse-gersheim.html",cat:"bund",note:"KI-Chatbot"},
+  {name:"Smart Region AUF",bl:"BY",ew:"~6.000",score:72,smart:"BMI-Modell",analyse:"analyse-smartregion-auf.html",cat:"bund"},
+  {name:"Tengen",bl:"BW",ew:"~4.700",score:35,smart:"Nein",analyse:"",cat:"bund"},
+  {name:"Herrenberg",bl:"BW",ew:"31.000",score:55,smart:"Nein",analyse:"",cat:"bund"},
+  {name:"Bocholt",bl:"NW",ew:"73.000",score:62,smart:"Ja",analyse:"",cat:"bund"},
+  {name:"Soest",bl:"NW",ew:"48.000",score:58,smart:"Nein",analyse:"",cat:"bund"},
+  {name:"Glashütte",bl:"SN",ew:"6.657",score:15,smart:"Nein",analyse:"analyse-glashuette.html",cat:"SN",highlight:true},
+  {name:"Lübbenau",bl:"BB",ew:"15.800",score:33,smart:"Nein",analyse:"",cat:"bund"},
+  {name:"Zwönitz",bl:"SN",ew:"11.200",score:28,smart:"Nein",analyse:"",cat:"SN"},
+  {name:"Augustusburg",bl:"SN",ew:"4.400",score:22,smart:"Nein",analyse:"",cat:"SN"}
+];
+
+K.sort((a,b)=>b.score-a.score);
+
+function stufe(s){
+  if(s>=61) return {label:"Etabliert",color:"var(--green)"};
+  if(s>=31) return {label:"Entwicklung",color:"var(--amber)"};
+  return {label:"Initial",color:"var(--red)"};
+}
+
+function renderTable(filter){
+  const tb=document.getElementById("comp-body");
+  tb.innerHTML="";
+  let data=filter==="alle"?K:filter==="SN"?K.filter(k=>k.cat==="SN"):K.filter(k=>k.cat==="bund");
+  data.forEach((k,i)=>{
+    const st=stufe(k.score);
+    const hl=k.highlight?' style="background:rgba(157,127,59,.04)"':'';
+    const link=k.analyse?`<a href="${k.analyse}" style="color:var(--accent);font-weight:600">Analyse einsehen &rarr;</a>`:'<span style="color:var(--light)">—</span>';
+    const note=k.note?` <span style="font-family:var(--m);font-size:6pt;color:var(--accent)">${k.note}</span>`:"";
+    tb.innerHTML+=`<tr${hl}>
+      <td style="font-family:var(--m);font-size:var(--fs-label);color:var(--light)">${i+1}</td>
+      <td class="kommune-name">${k.analyse?'<a href="'+k.analyse+'">'+k.name+'</a>':k.name}${note}</td>
+      <td style="font-family:var(--m);font-size:var(--fs-label);color:var(--muted)">${k.bl}</td>
+      <td style="font-family:var(--m);font-size:var(--fs-meta)">${k.ew}</td>
+      <td style="font-family:var(--m);font-size:var(--fs-kpi-sub);font-weight:600;color:${st.color}">${st.label}</td>
+      <td style="font-size:var(--fs-meta);color:${k.smart!=='Nein'?'var(--text2)':'var(--light)'}">${k.smart}</td>
+      <td>${link}</td>
+    </tr>`;
+  });
+}
+
+function filterBL(f){
+  document.querySelectorAll('.comp-table~div button, div button').forEach(b=>{
+    // Reset all filter buttons visually — simplified
+  });
+  renderTable(f);
+}
+
+renderTable("alle");
+</script>
+<div id="shared-footer"></div>
+</body>
+</html>

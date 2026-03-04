@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Übersicht — Ainary · Glashütte</title>
+<link rel="stylesheet" href="shared.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ── Reset ── */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: var(--f); color: var(--text); font-size: var(--fs-body);
+    line-height: 1.65; background: #fff; -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  /* ── Layout ── */
+  .page { max-width: var(--page-max, 820px); margin: 0 auto; padding: var(--page-pad); }
+
+  /* ── Portal Header ── */
+  .portal-hdr {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-bottom: 12px; margin-bottom: var(--sec-gap); border-bottom: 1px solid var(--border2);
+    font-size: var(--fs-meta);
+  }
+  .portal-left { display: flex; align-items: center; gap: 8px; }
+  .brand-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+  .brand-name { font-weight: 500; color: var(--muted); }
+  .portal-sep { color: var(--border2); }
+  .portal-action { color: var(--light); }
+  .portal-center { display: flex; align-items: center; gap: 8px; color: var(--muted); }
+  .portal-center svg { width: 10px; height: 10px; stroke: var(--muted); fill: none; stroke-width: 1.8; }
+  .portal-right { display: flex; align-items: center; gap: 12px; font-family: var(--m); color: var(--muted); }
+  .portal-trial { color: var(--muted); }
+  .portal-credits { color: var(--accent); }
+
+  /* ── Document Header ── */
+  .doc-hdr { border-bottom: 1px solid var(--border2); padding-bottom: 16px; margin-bottom: 24px; }
+  .doc-title { font-size: var(--fs-doc-title); font-weight: 600; letter-spacing: -0.025em; margin-bottom: 4px; }
+  .doc-sub { font-size: var(--fs-body); color: var(--text2); }
+
+  /* ── KPI Row ── */
+  .kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--card-gap); margin-bottom: 8px; }
+  .kpi {
+    text-align: center; padding: 16px 12px;
+    background: var(--surface); border-radius: var(--card-radius);
+  }
+  .kpi-val { font-family: var(--m); font-size: var(--fs-kpi-val); font-weight: 700; margin-bottom: 4px; }
+  .kpi-label { font-size: var(--fs-kpi-label); color: var(--text2); margin-bottom: 2px; }
+  .kpi-sub { font-size: var(--fs-kpi-sub); color: var(--muted); font-style: italic; }
+  .kpi-aside {
+    font-family: var(--m); font-size: var(--fs-kpi-sub); color: var(--muted);
+    text-align: right; margin-bottom: var(--sec-gap);
+  }
+  .kpi-aside a { color: var(--light); }
+
+  /* ── Mia Chat ── */
+  .mia { border: 1px solid var(--border2); border-radius: var(--card-radius); margin-bottom: var(--sec-gap); overflow: hidden; }
+  .mia-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px; cursor: pointer; transition: background .12s;
+  }
+  .mia-header:hover { background: var(--surface); }
+  .mia-av {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--surface); border: 1px solid var(--border2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 7.5pt; font-weight: 600; color: var(--accent); flex-shrink: 0;
+  }
+  .mia-greeting { flex: 1; font-size: 9pt; color: var(--text2); }
+  .mia-greeting strong { color: var(--text); font-weight: 500; }
+  .mia-toggle { font-size: 7pt; color: var(--light); font-family: var(--m); }
+  .mia-body { display: none; border-top: 1px solid var(--border2); }
+  .mia-body.open { display: block; }
+  .mia-messages { padding: 12px 16px; max-height: 240px; overflow-y: auto; }
+  .mia-msg { margin-bottom: 8px; display: flex; gap: 8px; align-items: flex-start; }
+  .mia-msg-a {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--surface); border: 1px solid var(--border2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 6.5pt; font-weight: 600; color: var(--accent); flex-shrink: 0; margin-top: 2px;
+  }
+  .mia-msg-t {
+    font-size: 8.5pt; color: var(--text2); line-height: 1.5;
+    background: var(--surface); border-radius: 0 6px 6px 6px; padding: 8px 12px; max-width: 85%;
+  }
+  .mia-msg-t strong { color: var(--text); }
+  .mia-msg.user { flex-direction: row-reverse; }
+  .mia-msg.user .mia-msg-t { background: rgba(157,127,59,.06); border-radius: 6px 0 6px 6px; color: var(--text); }
+  .mia-msg.user .mia-msg-a { display: none; }
+  .mia-input-row { display: flex; gap: 8px; padding: 8px 16px; border-top: 1px solid var(--border2); background: var(--surface); }
+  .mia-input {
+    flex: 1; font-family: var(--f); font-size: 8.5pt;
+    border: 1px solid var(--border2); border-radius: 4px;
+    padding: 7px 12px; background: #fff; outline: none; color: var(--text);
+  }
+  .mia-input:focus { border-color: var(--accent); }
+  .mia-input::placeholder { color: var(--light); }
+  .mia-send {
+    background: var(--accent); color: #fff; border: none; border-radius: 4px;
+    padding: 7px 16px; font-family: var(--f); font-size: 8pt; font-weight: 500; cursor: pointer;
+  }
+  .mia-send:hover { background: #b8972e; }
+  .mia-chips { display: flex; gap: 6px; flex-wrap: wrap; padding: 8px 16px; border-top: 1px solid var(--border2); }
+  .mia-chip {
+    font-family: var(--m); font-size: 7pt; color: var(--muted);
+    padding: 4px 10px; border: 1px solid var(--border2); border-radius: 12px;
+    cursor: pointer; transition: all .12s;
+  }
+  .mia-chip:hover { color: var(--text2); border-color: var(--accent); background: rgba(157,127,59,.04); }
+  .mia-badge { font-family: var(--m); font-size: 6.5pt; color: var(--light); padding: 4px 16px; text-align: center; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+  .mia-msg { animation: fadeIn .3s ease; }
+
+  /* ── Section Labels ── */
+  .sec-label {
+    font-size: var(--fs-meta); font-weight: 600; text-transform: uppercase;
+    letter-spacing: .08em; color: var(--muted); margin-bottom: var(--card-gap);
+  }
+
+  /* ── Featured Card (Daily Intel) ── */
+  .featured {
+    display: block; border: 1px solid var(--border2); border-radius: var(--card-radius);
+    padding: 24px; margin-bottom: var(--sec-gap); transition: border-color .12s; color: inherit;
+  }
+  .featured:hover { border-color: var(--border); }
+  .featured-top { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
+  .featured-title { font-size: 11pt; font-weight: 600; }
+  .featured-badge { font-family: var(--m); font-size: 7pt; color: var(--green); }
+  .featured-body { font-size: 9.5pt; color: var(--text2); margin-bottom: 8px; }
+  .featured-insights {
+    font-family: var(--m); font-size: 7.5pt; color: var(--muted);
+    line-height: 1.8; margin-bottom: 12px;
+  }
+  .featured-stats {
+    display: flex; gap: 8px; font-family: var(--m); font-size: 7.5pt;
+    color: var(--muted); margin-bottom: 12px;
+  }
+  .featured-stats .sep { color: var(--border); }
+  .featured-footer { display: flex; align-items: center; justify-content: space-between; }
+  .featured-meta { font-family: var(--m); font-size: 7pt; color: var(--light); }
+  .featured-cta { font-size: 9.5pt; font-weight: 600; color: var(--accent); }
+
+  /* ── Analysis Tiles (2×2 Grid) ── */
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: var(--card-gap); margin-bottom: 8px; }
+  .tile {
+    display: flex; flex-direction: column;
+    border: 1px solid var(--border2); border-radius: var(--card-radius);
+    padding: 20px; transition: border-color .12s; color: inherit;
+  }
+  .tile:hover { border-color: var(--border); }
+  .tile-title { font-size: var(--fs-card-title); font-weight: 600; margin-bottom: 4px; }
+  .tile-desc { font-size: var(--fs-desc); color: var(--text2); line-height: 1.55; flex: 1; margin-bottom: var(--card-gap); }
+  .tile-row {
+    display: flex; gap: 6px; flex-wrap: wrap; align-items: baseline;
+    font-family: var(--m); font-size: 7pt; color: var(--muted); margin-bottom: 4px;
+  }
+  .tile-row .sep { color: var(--border2); }
+  .tile-potential {
+    font-family: var(--m); font-size: 7pt; color: var(--muted);
+    min-height: 16px; margin-bottom: 4px;
+  }
+  .tile-cta { font-size: 9pt; font-weight: 600; color: var(--accent); margin-top: 8px; }
+  .tiles-aside {
+    font-family: var(--m); font-size: var(--fs-tag); color: var(--light);
+    text-align: right; margin-bottom: var(--sec-gap);
+  }
+  .tiles-aside a { color: var(--light); }
+
+  /* ── Projects Section ── */
+  .proj-empty {
+    text-align: center; padding: 24px; border: 1px dashed var(--border2);
+    border-radius: var(--card-radius); margin-bottom: 8px;
+  }
+  .proj-empty-text { font-size: var(--fs-desc); color: var(--muted); margin-bottom: 8px; }
+  .proj-actions { display: flex; gap: 16px; justify-content: center; }
+  .proj-action {
+    font-size: 8pt; color: var(--muted); display: inline-flex;
+    align-items: center; gap: 4px; transition: color .12s;
+  }
+  .proj-action:hover { color: var(--text2); }
+  .proj-action svg { width: 10px; height: 10px; stroke: currentColor; fill: none; stroke-width: 2; }
+  .proj-aside {
+    font-family: var(--m); font-size: 6.5pt; color: var(--light);
+    text-align: right; margin-bottom: 32px;
+  }
+
+  /* ── Auf einen Blick (Visual Cards) ── */
+  .glance { display: grid; grid-template-columns: 1fr 1fr; gap: var(--card-gap); margin-bottom: var(--sec-gap); }
+  .glance-card {
+    border: 1px solid var(--border2); border-radius: var(--card-radius); padding: 20px;
+    transition: border-color .12s;
+  }
+  .glance-card:hover { border-color: var(--border); }
+  .glance-title { font-size: var(--fs-meta); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: var(--card-gap); }
+  /* Timeline */
+  .tl { position: relative; padding-left: 20px; }
+  .tl::before { content: ''; position: absolute; left: 5px; top: 4px; bottom: 4px; width: 1px; background: var(--border2); }
+  .tl-item { position: relative; margin-bottom: 14px; }
+  .tl-item:last-child { margin-bottom: 0; }
+  .tl-dot {
+    position: absolute; left: -20px; top: 3px;
+    width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--border);
+    background: #fff;
+  }
+  .tl-dot.urgent { border-color: var(--red); background: rgba(192,57,43,.08); }
+  .tl-dot.soon { border-color: var(--amber); background: rgba(180,83,9,.06); }
+  .tl-dot.normal { border-color: var(--border); }
+  .tl-date { font-family: var(--m); font-size: 7pt; color: var(--muted); margin-bottom: 1px; }
+  .tl-label { font-size: 8.5pt; font-weight: 500; color: var(--text); margin-bottom: 1px; }
+  .tl-amount { font-family: var(--m); font-size: 7.5pt; color: var(--muted); }
+  /* Comparison bars */
+  .cmp-item { margin-bottom: 10px; }
+  .cmp-item:last-child { margin-bottom: 0; }
+  .cmp-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px; }
+  .cmp-name { font-size: 8.5pt; color: var(--text2); }
+  .cmp-val { font-family: var(--m); font-size: 7.5pt; color: var(--muted); }
+  .cmp-bar { height: 6px; background: var(--border2); border-radius: 3px; overflow: hidden; }
+  .cmp-fill { height: 100%; border-radius: 3px; transition: width .6s ease; }
+  .cmp-fill.low { background: var(--red); opacity: .65; }
+  .cmp-fill.mid { background: var(--amber); opacity: .6; }
+  .cmp-fill.high { background: var(--green); opacity: .55; }
+  .cmp-fill.you { background: var(--accent); }
+  @media (max-width: 700px) { .glance { grid-template-columns: 1fr; } }
+
+  /* ── Footer ── */
+  .ftr {
+    margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);
+    display: flex; justify-content: center; gap: 6px; flex-wrap: wrap;
+    font-family: var(--m); font-size: 7pt; color: var(--light);
+  }
+  .ftr a { color: var(--light); }
+
+  /* ── Responsive ── */
+  @media (max-width: 700px) {
+    .page { padding: var(--page-pad-mobile); }
+    .tiles, .kpi-row { grid-template-columns: 1fr; }
+    .portal-center { display: none; }
+    .proj-actions { flex-direction: column; align-items: center; }
+    .ftr { flex-direction: column; align-items: center; }
+  }
+  @media print {
+    .portal-hdr, .mia, .rag, .proj-empty { display: none; }
+    body { font-size: 9.5pt; }
+    .page { padding: 0; max-width: 100%; }
+    @page { margin: 20mm 18mm; size: A4; }
+  }
+</style>
+<script src="bookmarks.js" defer></script><script src="shared-header.js" defer></script>
+<script src="shared-footer.js" defer></script>
+<meta property="og:title" content="Übersicht — Ainary · Glashütte">
+<meta property="og:description" content="KI-Assistent für Glashütte — Echte Daten, echte Analysen.">
+<meta property="og:image" content="./og-image.svg">
+<meta property="og:type" content="website">
+<meta name="description" content="KI-Assistent für Glashütte — Echte Daten, echte Analysen.">
+</head>
+<body>
+<div class="page">
+
+  <div id="shared-header"></div>
+
+  <!-- E/I/J/A Legend -->
+  <div style="display:flex;gap:10px;font-size:6.5pt;margin-bottom:12px;flex-wrap:wrap">
+    <span style="display:flex;align-items:center;gap:3px"><span style="font-family:var(--m);font-size:5.5pt;padding:1px 4px;border-radius:2px;font-weight:600;background:rgba(45,138,78,.1);color:var(--green)">E</span> Evidence</span>
+    <span style="display:flex;align-items:center;gap:3px"><span style="font-family:var(--m);font-size:5.5pt;padding:1px 4px;border-radius:2px;font-weight:600;background:rgba(157,127,59,.1);color:var(--accent)">I</span> Inference</span>
+    <span style="display:flex;align-items:center;gap:3px"><span style="font-family:var(--m);font-size:5.5pt;padding:1px 4px;border-radius:2px;font-weight:600;background:rgba(180,83,9,.1);color:var(--amber)">J</span> Judgment</span>
+    <span style="display:flex;align-items:center;gap:3px"><span style="font-family:var(--m);font-size:5.5pt;padding:1px 4px;border-radius:2px;font-weight:600;background:rgba(192,57,43,.1);color:var(--red)">A</span> Assumption</span>
+  </div>
+
+  <!-- KPI Row -->
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="kpi-val">93 → 550 Std.</div>
+      <div class="kpi-label">Bisher → Jahrespotenzial</div>
+      <div class="kpi-sub">5 Analysen fertig · 6 Anwendungen geplant <span style="font-family:var(--m);font-size:5pt;padding:1px 3px;border-radius:2px;background:rgba(45,138,78,.1);color:var(--green)">E</span></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-val">40%</div>
+      <div class="kpi-label">Routineanteil</div>
+      <div class="kpi-sub">Automatisierbar durch KI <span style="font-family:var(--m);font-size:5pt;padding:1px 3px;border-radius:2px;background:rgba(45,138,78,.1);color:var(--green)">E</span></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-val">€200k–500k</div>
+      <div class="kpi-label">Identifiziertes Potenzial</div>
+      <div class="kpi-sub">Über alle Analysen <span style="font-family:var(--m);font-size:5pt;padding:1px 3px;border-radius:2px;background:rgba(157,127,59,.1);color:var(--accent)">I</span></div>
+    </div>
+  </div>
+  <div class="kpi-aside">Bisher: ~€5.100 eingespart (TVöD E11) · Woche 1 · <a href="methodik.html">Methodik</a></div>
+
+  <!-- Mia -->
+  <div class="mia" id="mia">
+    <div class="mia-header" onclick="toggleMia()">
+      <div class="mia-av">M</div>
+      <div class="mia-greeting"><strong>Mia:</strong> <span id="greeting">Guten Morgen</span>, Herr Gleißberg. Kann ich Ihnen heute weiterhelfen?</div>
+      <span class="mia-toggle" id="mia-toggle-label">↓</span>
+    </div>
+    <div class="mia-body" id="mia-body">
+      <div class="mia-messages" id="mia-messages">
+        <div class="mia-msg"><div class="mia-msg-a">M</div><div class="mia-msg-t">Ihr <strong>Daily Intel</strong> ist fertig — 3 Handlungsempfehlungen warten. Fragen Sie mich, oder sagen Sie <strong>„Projektvorschlag"</strong>.</div></div>
+      </div>
+      <div class="mia-input-row">
+        <input class="mia-input" id="mia-input" type="text" placeholder="Frage, Projektauftrag, oder Dokument hochladen..." onkeydown="if(event.key==='Enter')sendMia()">
+        <button class="mia-send" onclick="sendMia()">Senden</button>
+      </div>
+      <div class="mia-chips">
+        <span class="mia-chip" onclick="sendChip('Fördermittel')">Fördermittel</span>
+        <span class="mia-chip" onclick="sendChip('Windkraft')">Windkraft</span>
+        <span class="mia-chip" onclick="sendChip('Digitalisierung')">Digitalisierung</span>
+        <span class="mia-chip" onclick="sendChip('Projektvorschlag')">Projektvorschlag</span>
+        <span class="mia-chip" onclick="sendChip('Uhrenindustrie')">Uhrenindustrie</span>
+      </div>
+      <div class="mia-badge">Mia ist eine KI-Assistentin · Antworten basieren auf Ihren Reports</div>
+    </div>
+  </div>
+
+  <!-- Aktuell -->
+  <div class="sec-label">Aktuell</div>
+
+  <a href="weekly-intel.html" class="featured">
+    <div class="featured-top">
+      <span class="featured-title">Weekly Intel — KW 10 · 2026</span>
+      <span class="featured-badge">Neu</span>
+    </div>
+    <div class="featured-body">12 Meldungen aus 8 Quellen. 3 Handlungsempfehlungen.</div>
+    <div class="featured-insights">Einblicke: Freistaat Sachsen stellt €153.800 für Ehrenamt bereit · Breitband-Ausbau Müglitztal: Frist 28.02. · Entsorgungskalender 2026 sorgt für Bürgerfragen · Windkraft-Petition erreicht 1.200 Unterschriften</div>
+    <div class="featured-stats">
+      <span>Ihr Aufwand: ~5–9 Std.</span>
+      <span class="sep">·</span>
+      <span>Einsparpotenzial €275–495</span>
+      <span class="sep">·</span>
+      <span>68% Confidence</span>
+      <span class="sep">·</span>
+      <span>Inkl. im Abo</span>
+    </div>
+    <div class="featured-footer">
+      <span class="featured-meta">3 min · 6 Seiten · 25 Quellen</span>
+      <span class="featured-cta">Lesen →</span>
+    </div>
+  </a>
+
+  <!-- Archiv -->
+  <div style="display:flex;gap:12px;margin-top:8px;margin-bottom:8px">
+    <a href="weekly-intel-kw08.html" style="flex:1;display:block;border:1px solid var(--border2);border-radius:6px;padding:10px 14px;text-decoration:none;color:inherit;transition:border-color .12s">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:8.5pt;font-weight:600">Weekly Intel — KW 08</div>
+          <div style="font-family:var(--m);font-size:7pt;color:var(--muted);margin-top:2px">17.–23. Feb · 8 Quellen · 12 Meldungen</div>
+        </div>
+        <span style="font-family:var(--m);font-size:7pt;color:var(--accent)">→</span>
+      </div>
+    </a>
+    <a href="daily-intel-buergermeister.html" style="flex:1;display:block;border:1px solid var(--border2);border-radius:6px;padding:10px 14px;text-decoration:none;color:inherit;transition:border-color .12s">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:8.5pt;font-weight:600">Daily Intel — 20. Feb</div>
+          <div style="font-family:var(--m);font-size:7pt;color:var(--muted);margin-top:2px">Erstausgabe · 8 Quellen · 12 Meldungen</div>
+        </div>
+        <span style="font-family:var(--m);font-size:7pt;color:var(--accent)">→</span>
+      </div>
+    </a>
+  </div>
+
+  <!-- Themenübersicht -->
+  <div class="sec-label">Themenübersicht</div>
+  <div class="sec-title" style="font-size:14pt;margin-bottom:16px">Wie alles zusammenhängt</div>
+
+  <style>
+    .tmap{position:relative;width:100%;max-width:780px;margin:0 auto 32px;height:320px}
+    .tnode{position:absolute;z-index:1;text-decoration:none;color:inherit;border:1px solid var(--border2);border-radius:8px;padding:8px 14px;background:#fff;text-align:center;transition:border-color .15s,box-shadow .15s}
+    .tnode:hover{border-color:var(--accent);box-shadow:0 2px 12px rgba(157,127,59,.15)}
+    .tnode .tdot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px rgba(157,127,59,.35);margin:0 auto 5px}
+    .tnode .tname{font-size:8pt;font-weight:600;white-space:nowrap}
+    .tnode .tmeta{font-family:var(--m);font-size:6.5pt;color:var(--muted);white-space:nowrap}
+    .tnode.center{border-color:var(--accent);border-width:1.5px}
+    .tnode.center .tdot{width:10px;height:10px;box-shadow:0 0 10px rgba(157,127,59,.5)}
+    .tnode.center .tname{font-size:9pt;font-weight:700}
+    
+    /* Mobile: Replace absolute map with vertical grid list */
+    @media (max-width: 700px) {
+      .tmap { display: grid; grid-template-columns: 1fr; gap: 8px; height: auto; }
+      .tmap svg { display: none; }
+      .tnode { position: static !important; transform: none !important; }
+      .tnode .tname, .tnode .tmeta { white-space: normal; }
+    }
+  </style>
+
+  <div style="border:1px solid var(--border2);border-radius:8px;padding:20px 20px 12px;background:var(--surface);margin-bottom:32px">
+  <div class="tmap">
+    <svg style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none" viewBox="0 0 780 320" fill="none">
+      <!-- Primary connections (solid, 0.8px) -->
+      <line x1="390" y1="130" x2="390" y2="42" stroke="#d0d0d0" stroke-width=".8"/>
+      <line x1="390" y1="130" x2="168" y2="130" stroke="#d0d0d0" stroke-width=".8"/>
+      <line x1="390" y1="130" x2="612" y2="130" stroke="#d0d0d0" stroke-width=".8"/>
+      <line x1="390" y1="155" x2="390" y2="248" stroke="#d0d0d0" stroke-width=".8"/>
+      <line x1="168" y1="255" x2="390" y2="255" stroke="#d0d0d0" stroke-width=".8"/>
+      <line x1="390" y1="255" x2="612" y2="255" stroke="#d0d0d0" stroke-width=".8"/>
+      <!-- Secondary connections (dotted, 0.5px) -->
+      <line x1="168" y1="155" x2="168" y2="248" stroke="#e8e8e8" stroke-width=".5" stroke-dasharray="3 3"/>
+      <line x1="612" y1="155" x2="612" y2="248" stroke="#e8e8e8" stroke-width=".5" stroke-dasharray="3 3"/>
+      <line x1="340" y1="42" x2="200" y2="118" stroke="#e8e8e8" stroke-width=".5" stroke-dasharray="3 3"/>
+    </svg>
+
+    <a href="analyse-buergerstimmung.html" class="tnode" style="left:50%;top:6px;transform:translateX(-50%)">
+      <div class="tdot"></div>
+      <div class="tname">Bürgerstimmung</div>
+      <div class="tmeta">78% negativ · Windkraft</div>
+    </a>
+
+    <a href="analyse-foerdermittel.html" class="tnode" style="left:68px;top:105px">
+      <div class="tdot"></div>
+      <div class="tname">Fördermittel</div>
+      <div class="tmeta">11 Programme · 3 Fristen</div>
+    </a>
+
+    <a href="analyse.html" class="tnode center" style="left:50%;top:105px;transform:translateX(-50%)">
+      <div class="tdot"></div>
+      <div class="tname">Personal</div>
+      <div class="tmeta" style="color:var(--accent)">Kernproblem</div>
+    </a>
+
+    <a href="analyse-digitalisierung.html" class="tnode" style="right:68px;top:105px">
+      <div class="tdot"></div>
+      <div class="tname">Digitalisierung</div>
+      <div class="tmeta">1/6 Services · Quick Win</div>
+    </a>
+
+    <a href="analyse-uhrenindustrie.html" class="tnode" style="left:68px;top:225px">
+      <div class="tdot"></div>
+      <div class="tname">Uhrenindustrie</div>
+      <div class="tmeta">+3.2% · 11 Hersteller</div>
+    </a>
+
+    <a href="wirtschaft.html" class="tnode" style="left:50%;top:225px;transform:translateX(-50%)">
+      <div class="tdot"></div>
+      <div class="tname">Wirtschaft</div>
+      <div class="tmeta">167 Unternehmen</div>
+    </a>
+
+    <a href="vergleich.html" class="tnode" style="right:68px;top:225px">
+      <div class="tdot"></div>
+      <div class="tname">Kommunen</div>
+      <div class="tmeta">22 verglichen · Initial</div>
+    </a>
+  </div>
+  <div style="font-family:var(--m);font-size:6.5pt;color:var(--light);text-align:center;margin-top:4px">7 Themen · 79 Quellen · 16 Einzelanalysen · Letzte Aktualisierung: 04.03.2026</div>
+  </div>
+
+  <div style="margin-bottom:32px"></div>
+
+  <!-- Verfügbare Analysen -->
+  <div class="sec-label">Verfügbare Analysen</div>
+
+  <div style="display:flex;flex-direction:column;gap:0;border:1px solid var(--border2);border-radius:8px;overflow:hidden;margin-bottom:8px">
+    <a href="analyse-foerdermittel.html" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;text-decoration:none;color:inherit;border-bottom:1px solid var(--border2);transition:background .1s">
+      <div>
+        <span style="font-size:9pt;font-weight:600">Fördermittel-Komplettscan</span>
+        <span style="font-size:8pt;color:var(--text2);margin-left:8px">11 Programme, 3 Fristen</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-family:var(--m);font-size:7pt;color:var(--muted)">23 Quellen · 78%</span>
+        <span style="font-family:var(--m);font-size:7pt;color:var(--accent)">→</span>
+      </div>
+    </a>
+    <a href="analyse-digitalisierung.html" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;text-decoration:none;color:inherit;border-bottom:1px solid var(--border2);transition:background .1s">
+      <div>
+        <span style="font-size:9pt;font-weight:600">Digitalisierungsstrategie</span>
+        <span style="font-size:8pt;color:var(--text2);margin-left:8px">1/6 Services · Quick Win</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-family:var(--m);font-size:7pt;color:var(--muted)">18 Quellen · 75%</span>
+        <span style="font-family:var(--m);font-size:7pt;color:var(--accent)">→</span>
+      </div>
+    </a>
+    <a href="analyse-buergerstimmung.html" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;text-decoration:none;color:inherit;border-bottom:1px solid var(--border2);transition:background .1s">
+      <div>
+        <span style="font-size:9pt;font-weight:600">Bürgerstimmung 90-Tage</span>
+        <span style="font-size:8pt;color:var(--text2);margin-left:8px">78% negativ · Windkraft</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-family:var(--m);font-size:7pt;color:var(--muted)">15 Quellen · 65%</span>
+        <span style="font-family:var(--m);font-size:7pt;color:var(--accent)">→</span>
+      </div>
+    </a>
+    <a href="analyse-uhrenindustrie.html" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;text-decoration:none;color:inherit;border-bottom:1px solid var(--border2);transition:background .1s">
+      <div>
+        <span style="font-size:9pt;font-weight:600">Uhrenindustrie Marktbericht</span>
+        <span style="font-size:8pt;color:var(--text2);margin-left:8px">Stabil +3.2%</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-family:var(--m);font-size:7pt;color:var(--muted)">11 Quellen · 60%</span>
+        <span style="font-family:var(--m);font-size:7pt;color:var(--accent)">→</span>
+      </div>
+    </a>
+    <a href="vergleich.html" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;text-decoration:none;color:inherit;transition:background .1s">
+      <div>
+        <span style="font-size:9pt;font-weight:600">Kommunen-Vergleich</span>
+        <span style="font-size:8pt;color:var(--text2);margin-left:8px">22 Kommunen · 3 Stufen</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-family:var(--m);font-size:7pt;color:var(--muted)">34 Quellen · 72%</span>
+        <span style="font-family:var(--m);font-size:7pt;color:var(--accent)">→</span>
+      </div>
+    </a>
+  </div>
+  <div style="font-family:var(--m);font-size:6.5pt;color:var(--light);text-align:right;margin-bottom:8px">Confidence = Anteil belegter Aussagen · <a href="methodik.html" style="color:var(--light)">Methodik</a></div>
+
+  <!-- Nächste Schritte — datengetrieben -->
+  <div class="sec-label">Empfohlene nächste Schritte</div>
+
+  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+
+    <div style="border:1px solid var(--border2);border-radius:8px;padding:14px 16px;background:var(--surface);display:flex;gap:14px;align-items:flex-start">
+      <div style="flex-shrink:0;width:6px;height:6px;border-radius:50%;background:var(--red);margin-top:5px"></div>
+      <div style="flex:1">
+        <div style="font-size:9pt;font-weight:600;margin-bottom:3px">Kulturraum-Förderantrag vorbereiten</div>
+        <div style="font-size:8pt;color:var(--text2);line-height:1.5">Frist 31.08.2026 <span style="font-family:var(--m);font-size:5pt;padding:1px 3px;border-radius:2px;background:rgba(45,138,78,.1);color:var(--green)">E</span> · 11 Programme identifiziert <span style="font-family:var(--m);font-size:5pt;padding:1px 3px;border-radius:2px;background:rgba(45,138,78,.1);color:var(--green)">E</span> · €200k–500k Potenzial <span style="font-family:var(--m);font-size:5pt;padding:1px 3px;border-radius:2px;background:rgba(157,127,59,.1);color:var(--accent)">I</span>. Entwurf kann sofort starten.</div>
+        <div style="display:flex;gap:12px;margin-top:8px">
+          <a href="#mia" onclick="openMiaWith('Bitte bereite einen Entwurf für den Kulturraum-Förderantrag vor.')" style="font-family:var(--m);font-size:7.5pt;color:var(--accent);font-weight:500;text-decoration:none">Mia: Entwurf starten →</a>
+          <a href="analyse-foerdermittel.html" style="font-family:var(--m);font-size:7.5pt;color:var(--muted);text-decoration:none">Analyse lesen</a>
+        </div>
+      </div>
+    </div>
+
+    <div style="border:1px solid var(--border2);border-radius:8px;padding:14px 16px;background:var(--surface);display:flex;gap:14px;align-items:flex-start">
+      <div style="flex-shrink:0;width:6px;height:6px;border-radius:50%;background:var(--amber);margin-top:5px"></div>
+      <div style="flex:1">
+        <div style="font-size:9pt;font-weight:600;margin-bottom:3px">OZG-Services aktivieren — Quick Win</div>
+        <div style="font-size:8pt;color:var(--text2);line-height:1.5">Glashütte: 1/6 Online-Services <span style="font-family:var(--m);font-size:5pt;padding:1px 3px;border-radius:2px;background:rgba(45,138,78,.1);color:var(--green)">E</span>. Dippoldiswalde: 5/6 <span style="font-family:var(--m);font-size:5pt;padding:1px 3px;border-radius:2px;background:rgba(45,138,78,.1);color:var(--green)">E</span>. Gleicher Anbieter, 2–4 Wochen <span style="font-family:var(--m);font-size:5pt;padding:1px 3px;border-radius:2px;background:rgba(157,127,59,.1);color:var(--accent)">I</span>, ~€2–5k/Jahr <span style="font-family:var(--m);font-size:5pt;padding:1px 3px;border-radius:2px;background:rgba(180,83,9,.1);color:var(--amber)">J</span>.</div>
+        <div style="display:flex;gap:12px;margin-top:8px">
+          <a href="#mia" onclick="openMiaWith('Erstelle ein Briefing zur Aktivierung der OZG-Services für die Verwaltung.')" style="font-family:var(--m);font-size:7.5pt;color:var(--accent);font-weight:500;text-decoration:none">Mia: Briefing erstellen →</a>
+          <a href="analyse-digitalisierung.html" style="font-family:var(--m);font-size:7.5pt;color:var(--muted);text-decoration:none">Analyse lesen</a>
+        </div>
+      </div>
+    </div>
+
+    <div style="border:1px solid var(--border2);border-radius:8px;padding:14px 16px;background:var(--surface);display:flex;gap:14px;align-items:flex-start">
+      <div style="flex-shrink:0;width:6px;height:6px;border-radius:50%;background:var(--amber);margin-top:5px"></div>
+      <div style="flex:1">
+        <div style="font-size:9pt;font-weight:600;margin-bottom:3px">Bürgerdialog Windkraft vorbereiten</div>
+        <div style="font-size:8pt;color:var(--text2);line-height:1.5">78% negativ <span style="font-family:var(--m);font-size:5pt;padding:1px 3px;border-radius:2px;background:rgba(45,138,78,.1);color:var(--green)">E</span>, 1.200 Unterschriften <span style="font-family:var(--m);font-size:5pt;padding:1px 3px;border-radius:2px;background:rgba(45,138,78,.1);color:var(--green)">E</span>. Eskalationsrisiko steigt <span style="font-family:var(--m);font-size:5pt;padding:1px 3px;border-radius:2px;background:rgba(180,83,9,.1);color:var(--amber)">J</span>. Proaktive Kommunikation empfohlen <span style="font-family:var(--m);font-size:5pt;padding:1px 3px;border-radius:2px;background:rgba(180,83,9,.1);color:var(--amber)">J</span>.</div>
+        <div style="display:flex;gap:12px;margin-top:8px">
+          <a href="#mia" onclick="openMiaWith('Bereite eine Kommunikationsstrategie zum Thema Windkraft vor.')" style="font-family:var(--m);font-size:7.5pt;color:var(--accent);font-weight:500;text-decoration:none">Mia: Kommunikation vorbereiten →</a>
+          <a href="analyse-buergerstimmung.html" style="font-family:var(--m);font-size:7.5pt;color:var(--muted);text-decoration:none">Analyse lesen</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div style="font-family:var(--m);font-size:6.5pt;color:var(--light);text-align:center">Empfehlungen basieren auf Ihren Analysen und aktuellen Daten · <a href="#mia" onclick="openMiaWith('Welche weiteren Projekte empfiehlst du?')" style="color:var(--accent)">Weitere Vorschläge von Mia</a></div>
+
+  
+<!-- Quellenverzeichnis -->
+<div style="max-width:var(--page-max,820px);margin:0 auto;padding:0 var(--page-pad,48px) 48px">
+  <div style="margin-top:40px;padding-top:24px;border-top:1px solid var(--border2)">
+    <div style="font-family:var(--m);font-size:7pt;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px">Quellenverzeichnis — Übersicht</div>
+    <div style="font-size:8pt;line-height:1.8;color:var(--text2)">
+
+      <div class="source-item"><span class="source-num">[1]</span> dbb beamtenbund — Monitor öffentlicher Dienst 2026 <span class="source-trust high">Primär</span></div>
+      <div class="source-item"><span class="source-num">[2]</span> McKinsey — GenAI im öffentlichen Sektor, Jul 2024: 550.000 VZÄ Lücke <span class="source-trust high">Primär</span></div>
+      <div class="source-item"><span class="source-num">[3]</span> KGSt / Fraunhofer FOKUS — 40% Routineanteil kommunale Verwaltung <span class="source-trust high">Primär</span></div>
+      <div class="source-item"><span class="source-num">[4]</span> Sächsische Zeitung — Glashütte Lokalnachrichten, div. Artikel <span class="source-trust high">Primär</span></div>
+
+    </div>
+  </div>
+</div>
+<div id="shared-footer"></div>
+</div>
+
+<script>
+function toggleMia(){const b=document.getElementById('mia-body'),l=document.getElementById('mia-toggle-label');if(b.classList.contains('open')){b.classList.remove('open');l.textContent='↓'}else{b.classList.add('open');l.textContent='↑';document.getElementById('mia-input').focus()}}
+function openMiaWith(t){const b=document.getElementById('mia-body'),l=document.getElementById('mia-toggle-label');if(!b.classList.contains('open')){b.classList.add('open');l.textContent='↑'}setTimeout(()=>{addMsg(t,true);setTimeout(()=>{const[r]=findResponse(t);addMsg(r,false)},700+Math.random()*600)},200);document.getElementById('mia').scrollIntoView({behavior:'smooth'})}
+const R={
+'fördermittel':['11 Förderprogramme für Glashütte identifiziert. Top 3: Kulturraum (Frist 31.08.), Glasfaser-Bundesförderung, Smarte Regionen.<br><a href="analyse-foerdermittel.html" style="color:var(--accent);font-weight:600;font-size:8pt">Fördermittel-Komplettscan →</a>'],
+'windkraft':['Windkraft/Umspannwerk: 46% der Bürgerdiskussionen, 78% negativ. 342 Posts analysiert, Trend steigend seit Dezember.<br><a href="analyse-buergerstimmung.html" style="color:var(--accent);font-weight:600;font-size:8pt">Bürgerstimmung 90-Tage →</a>'],
+'digital':['Glashütte: 1/6 digitale Services vs. Dippoldiswalde 5/6. Gleicher Anbieter (communicetime.de), 2-4 Wochen Umsetzung, ~€2-5k/Jahr.<br><a href="analyse-digitalisierung.html" style="color:var(--accent);font-weight:600;font-size:8pt">Digitalisierungsstrategie →</a>'],
+'uhren':['Luxusuhrenmarkt stabil (+3.2%). Alle Glashütter Manufakturen im Luxussegment. Leichte Sorge bei Nomos (Mittelsegment).<br><a href="analyse-uhrenindustrie.html" style="color:var(--accent);font-weight:600;font-size:8pt">Uhrenindustrie Marktbericht →</a>'],
+'danke':['Gern geschehen. Ich bin hier wenn Sie Fragen haben.'],
+'empfehlung':['Vielen Dank für Ihre Empfehlung. Das hilft uns und dem Empfänger.'],
+'termin':['Ich verbinde Sie mit Florian Ziesche.<br><a href="https://calendly.com/florian-ainaryventures/15-minutes-chat" style="color:var(--accent);font-weight:600;font-size:8pt" target="_blank">30-Minuten-Termin buchen →</a>'],
+'projekt_anfragen':['Was für ein Projekt schwebt Ihnen vor? Beschreiben Sie was Sie brauchen — ich erstelle ein Angebot mit Umfang und Confidence-Schätzung. Lieferung innerhalb von 2 Werktagen.'],
+'projektvorschlag':['Basierend auf Ihrem Profil und aktuellen Themen:<br><br><strong>1. Tourismuskonzept Uhrenstadt</strong> (~85% Confidence)<br><strong>2. Fachkräfte-Kampagne</strong> (~70% Confidence)<br><strong>3. Energie-Audit Kommune</strong> (~75% Confidence)<br><br>Lieferung jeweils ca. 2 Werktage.'],
+'upload':['Formate: PDF, Word, Excel, Bilder. Alles verschlüsselt, nur für Ihre Analysen.<br><br><label style="display:inline-block;padding:6px 14px;border:1px solid var(--border2);border-radius:4px;font-size:7.5pt;color:var(--accent);cursor:pointer;transition:border-color .12s"><input type="file" style="display:none" onchange="addMsg(\'Datei: \'+this.files[0].name+\' (wird verarbeitet...)\',true);setTimeout(()=>addMsg(\'Danke! <strong>\'+this.files[0].name+\'</strong> wird analysiert. Ich melde mich in wenigen Minuten mit einer Zusammenfassung.\',false),1200)">Datei auswählen</label>'],
+};
+function findResponse(t){t=t.toLowerCase();if(t.includes('projekt anfragen')||t.includes('eigenes projekt'))return R['projekt_anfragen'];if(t.includes('vorschlag')||t.includes('vorschläge')||t.includes('empfiehlst'))return R['projektvorschlag'];if(t.includes('hochladen')||t.includes('upload')||t.includes('dokument'))return R['upload'];if(t.includes('förder')||t.includes('geld')||t.includes('antrag'))return R['fördermittel'];if(t.includes('wind')||t.includes('umspann'))return R['windkraft'];if(t.includes('digital')||t.includes('online')||t.includes('dippoldi'))return R['digital'];if(t.includes('uhr')||t.includes('lange')||t.includes('nomos'))return R['uhren'];if(t.includes('danke')||t.includes('super'))return R['danke'];if(t.includes('empfehl')||t.includes('teilen'))return R['empfehlung'];if(t.includes('termin')||t.includes('florian'))return R['termin'];return['Ich kann zu <strong>Fördermitteln</strong>, <strong>Digitalisierung</strong>, <strong>Bürgerstimmung</strong> und <strong>Uhrenindustrie</strong> Auskunft geben. Oder sagen Sie <strong>„Projektvorschlag"</strong>.'];}
+function addMsg(t,u){const m=document.getElementById('mia-messages'),d=document.createElement('div');d.className='mia-msg'+(u?' user':'');if(u){d.innerHTML='<div class="mia-msg-t">'+t+'</div>';m.appendChild(d);m.scrollTop=m.scrollHeight}else{const av=document.createElement('div');av.className='mia-msg-a';av.textContent='M';const tb=document.createElement('div');tb.className='mia-msg-t';d.appendChild(av);d.appendChild(tb);m.appendChild(d);m.scrollTop=m.scrollHeight;const chars=t.split('');let i=0,buf='',inTag=false;function tick(){if(i>=chars.length){tb.innerHTML=t;m.scrollTop=m.scrollHeight;return}buf+=chars[i];if(chars[i]==='<')inTag=true;if(chars[i]==='>')inTag=false;i++;if(inTag){tick()}else{tb.innerHTML=buf;m.scrollTop=m.scrollHeight;setTimeout(tick,14+Math.random()*10)}}tick()}}
+function sendChip(t){const b=document.getElementById('mia-body'),l=document.getElementById('mia-toggle-label');if(!b.classList.contains('open')){b.classList.add('open');l.textContent='↑'}addMsg(t,true);setTimeout(()=>{const[r]=findResponse(t);addMsg(r,false)},600+Math.random()*600)}
+function sendMia(){const i=document.getElementById('mia-input'),t=i.value.trim();if(!t)return;addMsg(t,true);i.value='';setTimeout(()=>{const[r]=findResponse(t);addMsg(r,false)},600+Math.random()*800)}
+</script>
+
+</body>
+</html>

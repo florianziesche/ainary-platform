@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analyse — Ainary · Glashütte</title>
+<link rel="stylesheet" href="shared.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--f);color:var(--text);font-size:var(--fs-body);line-height:1.65;background:#fff;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  .page{max-width:var(--page-max,820px);margin:0 auto;padding:var(--page-pad)}
+
+  /* Portal Header */
+  .portal-hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;margin-bottom:32px;border-bottom:1px solid var(--border2);font-size:8pt}
+  .portal-left{display:flex;align-items:center;gap:8px}
+  .brand-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0}
+  .brand-name{font-weight:500;color:var(--muted)}
+  .portal-center{display:flex;align-items:center;gap:8px;color:var(--muted)}
+  .portal-right{display:flex;align-items:center;gap:12px;font-family:var(--m);color:var(--muted)}
+  .portal-credits{color:var(--accent)}
+  .portal-back{color:var(--muted)}
+
+  /* Section header */
+  .sec{margin-top:40px}
+  .sec:first-child{margin-top:0}
+  .sec-title{font-family:var(--m);font-size:var(--fs-label);font-weight:500;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:var(--card-gap)}
+  .sec-rule{height:1px;background:var(--accent);opacity:.15;margin-bottom:24px}
+
+  /* Headline */
+  .hero-h{font-size:28pt;font-weight:700;letter-spacing:-.03em;line-height:1.15;margin-bottom:4px}
+  .hero-sub{font-size:10pt;color:var(--text2);margin-bottom:24px}
+  .hero-rule{width:48px;height:2px;background:var(--accent);opacity:.5;margin-bottom:20px}
+
+  /* Waffle chart */
+  .waffle{display:flex;gap:6px;margin-bottom:8px}
+  .waffle-cell{width:48px;height:48px;border-radius:4px}
+  .waffle-cell.dark{background:var(--text)}
+  .waffle-cell.light{background:#d0d0d0}
+  .waffle-legend{display:flex;gap:16px;font-size:8pt;color:var(--muted);margin-bottom:32px}
+  .waffle-legend span::before{content:'';display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+  .waffle-legend .leg-dark::before{background:var(--text)}
+  .waffle-legend .leg-light::before{background:#d0d0d0}
+
+  /* Evidence cards */
+  .ev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:var(--sec-gap)}
+  .ev-card{border:1px solid var(--border2);border-radius:var(--card-radius);padding:20px 24px;background:var(--surface)}
+  .ev-num{font-family:var(--m);font-size:24pt;font-weight:700;color:var(--red);line-height:1.1;margin-bottom:8px}
+  .ev-title{font-size:var(--fs-card-title);font-weight:600;margin-bottom:4px}
+  .ev-desc{font-size:var(--fs-desc);color:var(--text2);line-height:1.4}
+  .ev-source{font-family:var(--m);font-size:var(--fs-tag);color:var(--light);margin-top:8px}
+
+  /* Comparison bars (reuse from index) */
+  .cmp-item{margin-bottom:8px}
+  .cmp-top{display:flex;justify-content:space-between;font-size:8pt;margin-bottom:3px}
+  .cmp-name{color:var(--text2)}
+  .cmp-val{font-family:var(--m);font-weight:500}
+  .cmp-bar{height:6px;background:var(--border2);border-radius:3px;overflow:hidden}
+  .cmp-fill{height:100%;border-radius:3px}
+  .cmp-fill.high{background:var(--green)}
+  .cmp-fill.mid{background:var(--amber)}
+  .cmp-fill.low{background:var(--red)}
+  .cmp-fill.you{background:var(--accent)}
+
+  /* Glance grid */
+  .glance{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:var(--sec-gap)}
+  .glance-card{border:1px solid var(--border2);border-radius:var(--card-radius);padding:20px 24px;background:var(--surface)}
+  .glance-title{font-family:var(--m);font-size:var(--fs-label);font-weight:500;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:var(--card-gap)}
+
+  /* Fristen timeline */
+  .tl-item{display:flex;gap:12px;padding:8px 0;align-items:flex-start}
+  .tl-dot{width:8px;height:8px;border-radius:50%;border:2px solid var(--accent);flex-shrink:0;margin-top:4px}
+  .tl-dot.urgent{background:var(--accent)}
+  .tl-date{font-family:var(--m);font-size:7pt;color:var(--muted)}
+  .tl-label{font-size:9pt;font-weight:500}
+  .tl-amount{font-size:8pt;color:var(--text2)}
+
+  /* Bottom statement */
+  .bottom-stmt{text-align:center;padding:32px 0 16px;border-top:1px solid var(--border2);margin-top:40px}
+  .bottom-stmt .stmt{font-size:14pt;font-weight:600;letter-spacing:-.02em}
+  .bottom-stmt .stmt-src{font-family:var(--m);font-size:7pt;color:var(--light);margin-top:4px}
+
+  /* KPI inline stats */
+  .inline-stats{display:flex;gap:24px;justify-content:center;font-size:9pt;color:var(--text2);margin-top:16px}
+  .inline-stats strong{font-family:var(--m);font-weight:700;color:var(--text);font-size:10pt}
+
+  @media(max-width:700px){
+    .page{padding:var(--page-pad-mobile)}
+    .ev-grid{grid-template-columns:1fr}
+    .glance{grid-template-columns:1fr}
+    .portal-center{display:none}
+  }
+</style>
+<link rel="stylesheet" href="mia-chat.css"><script src="mia-chat.js" defer></script><script src="bookmarks.js" defer></script><script src="cta-footer.js" defer></script><script src="shared-header.js" defer></script>
+<script src="shared-footer.js" defer></script><meta property="og:title" content="Analyse — Ainary · Glashütte">
+<meta property="og:description" content="KI-Assistent für Glashütte — Echte Daten, echte Analysen.">
+<meta property="og:image" content="./og-image.svg">
+<meta property="og:type" content="website">
+<meta name="description" content="KI-Assistent für Glashütte — Echte Daten, echte Analysen.">
+</head>
+<body>
+<div class="page">
+
+  <div id="shared-header"></div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:8px">
+    <div style="border:1px solid var(--border2);border-radius:8px;padding:16px;text-align:center;background:var(--surface)">
+      <div style="font-family:var(--m);font-size:14pt;font-weight:700">29</div>
+      <div style="font-size:9pt;color:var(--text2);margin-top:2px">Renteneintritt bis 2030</div>
+      <div style="font-family:var(--m);font-size:7pt;color:var(--light);margin-top:2px">von 100 Modell-Mitarbeitern</div>
+    </div>
+    <div style="border:1px solid var(--border2);border-radius:8px;padding:16px;text-align:center;background:var(--surface)">
+      <div style="font-family:var(--m);font-size:14pt;font-weight:700">9</div>
+      <div style="font-size:9pt;color:var(--text2);margin-top:2px">Nicht nachbesetzbar</div>
+      <div style="font-family:var(--m);font-size:7pt;color:var(--light);margin-top:2px">31% Nichtbesetzungsquote [I]</div>
+    </div>
+    <div style="border:1px solid var(--border2);border-radius:8px;padding:16px;text-align:center;background:var(--surface)">
+      <div style="font-family:var(--m);font-size:14pt;font-weight:700">40%</div>
+      <div style="font-size:9pt;color:var(--text2);margin-top:2px">Routine-Anteil</div>
+      <div style="font-family:var(--m);font-size:7pt;color:var(--light);margin-top:2px">Automatisierbar durch KI</div>
+    </div>
+  </div>
+  <div style="text-align:right;font-family:var(--m);font-size:7pt;color:var(--light);margin-bottom:8px">Datenstand: März 2026 · Quellen: dbb, McKinsey, IW-Consult, Demografieportal · <a href="methodik.html" style="color:var(--accent)">Methodik</a></div>
+
+  <div id="mia-slot"></div>
+
+  <!-- Hero -->
+  <div class="hero-h">40% der Arbeitszeit geht für Routine drauf.</div>
+  <div class="hero-rule"></div>
+  <div class="hero-sub">Die Frage ist nicht ob Sie KI brauchen. Sondern wann.</div>
+
+  <!-- E/I/J/A Legend -->
+  <div style="display:flex;gap:12px;font-size:6.5pt;margin:16px 0 24px;flex-wrap:wrap">
+    <span style="display:flex;align-items:center;gap:3px"><span style="font-family:var(--m);font-size:5.5pt;padding:1px 4px;border-radius:2px;font-weight:600;background:rgba(45,138,78,.1);color:var(--green)">E</span> Evidence</span>
+    <span style="display:flex;align-items:center;gap:3px"><span style="font-family:var(--m);font-size:5.5pt;padding:1px 4px;border-radius:2px;font-weight:600;background:rgba(157,127,59,.1);color:var(--accent)">I</span> Inference</span>
+    <span style="display:flex;align-items:center;gap:3px"><span style="font-family:var(--m);font-size:5.5pt;padding:1px 4px;border-radius:2px;font-weight:600;background:rgba(180,83,9,.1);color:var(--amber)">J</span> Judgment</span>
+    <span style="display:flex;align-items:center;gap:3px"><span style="font-family:var(--m);font-size:5.5pt;padding:1px 4px;border-radius:2px;font-weight:600;background:rgba(192,57,43,.1);color:var(--red)">A</span> Assumption</span>
+  </div>
+
+  <!-- Two unit charts side by side — same structure -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin:0 0 24px">
+
+    <!-- 1 Rathaus -->
+    <div>
+      <div style="font-family:var(--m);font-size:7pt;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">1 Rathaus — 100 Mitarbeiter</div>
+      <div id="unit-chart" style="display:grid;grid-template-columns:repeat(10,1fr);gap:4px"></div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;font-size:7pt">
+        <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#1a1a1a;flex-shrink:0"></span> <span style="color:var(--muted)">27 Routine — 40% der Arbeitszeit</span> <span style="font-family:var(--m);font-size:5pt;padding:1px 3px;border-radius:2px;background:rgba(45,138,78,.1);color:var(--green)">E</span></span>
+        <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#c0392b;flex-shrink:0"></span> <span style="color:var(--muted)">33 Rente bis 2030</span> <span style="font-family:var(--m);font-size:5pt;padding:1px 3px;border-radius:2px;background:rgba(45,138,78,.1);color:var(--green)">E</span></span>
+        <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#e0dfdb;flex-shrink:0"></span> <span style="color:var(--muted)">40 wertschöpfend</span></span>
+      </div>
+      <div style="font-family:var(--m);font-size:6.5pt;color:var(--light);margin-top:6px">
+        33% gehen bis 2030 in Rente <span style="color:var(--light)">(<a href="https://www.dbb.de/fileadmin/user_upload/dbb_Broschuere_Zahlen_Daten_Fakten_2023.pdf" target="_blank" rel="noopener" style="color:var(--light)">dbb Beamtenbund, Zahlen Daten Fakten, 2023</a>)</span><br>
+        40% der Arbeitszeit geht für Routine drauf <span style="color:var(--light)">(<a href="https://www.kgst.de" target="_blank" rel="noopener" style="color:var(--light)">KGSt / Fraunhofer FOKUS, Prozessanalyse kommunaler Verwaltung, 2024</a>)</span>
+      </div>
+    </div>
+
+    <!-- 1 Betrieb -->
+    <div>
+      <div style="font-family:var(--m);font-size:7pt;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">1 Betrieb — 100 Mitarbeiter</div>
+      <div id="unit-fk" style="display:grid;grid-template-columns:repeat(10,1fr);gap:4px"></div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;font-size:7pt">
+        <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#1a1a1a;flex-shrink:0"></span> <span style="color:var(--muted)">9 Bürokratie</span> <span style="font-family:var(--m);font-size:5pt;padding:1px 3px;border-radius:2px;background:rgba(45,138,78,.1);color:var(--green)">E</span></span>
+        <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#c0392b;flex-shrink:0"></span> <span style="color:var(--muted)">29 Rente bis 2036</span> <span style="font-family:var(--m);font-size:5pt;padding:1px 3px;border-radius:2px;background:rgba(45,138,78,.1);color:var(--green)">E</span></span>
+        <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;border:1.5px dashed #c0392b;background:none;flex-shrink:0"></span> <span style="color:var(--muted)">9 nicht nachbesetzbar</span> <span style="font-family:var(--m);font-size:5pt;padding:1px 3px;border-radius:2px;background:rgba(157,127,59,.1);color:var(--accent)">I</span></span>
+        <span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#e0dfdb;flex-shrink:0"></span> <span style="color:var(--muted)">48 produktiv</span></span>
+      </div>
+      <div style="font-family:var(--m);font-size:6.5pt;color:var(--light);margin-top:6px">
+        29% erreichen bis 2036 Rentenalter <span style="color:var(--light)">(Destatis 2022: 12,9 Mio von 44,5 Mio)</span><br>
+        9% der Arbeitszeit für Administration <span style="color:var(--light)">(Sage/Plum Consulting 2017)</span><br>
+        9 = 31% der 29 Rentenstellen nicht nachbesetzbar <span style="color:var(--light)">(Demografieportal des Bundes und der Länder, 2024: 31% Nichtbesetzungsquote im öffentlichen Dienst)</span> <span style="font-family:var(--m);font-size:5pt;padding:1px 3px;border-radius:2px;background:rgba(157,127,59,.1);color:var(--accent)">I</span><br>
+        73% der Betriebe finden keine ausreichend qualifizierten Bewerber <span style="color:var(--light)">(<a href="https://www.dihk.de/de/themen-und-positionen/fachkraefte/ausbildung/dihk-ausbildungsumfrage" target="_blank" rel="noopener" style="color:var(--light)">DIHK Ausbildungsumfrage, 2025</a>)</span> <span style="font-family:var(--m);font-size:5pt;padding:1px 3px;border-radius:2px;background:rgba(45,138,78,.1);color:var(--green)">E</span>
+      </div>
+    </div>
+
+  </div>
+
+    <script>
+  (function(){
+    function dots(el,groups){
+      groups.forEach(g=>{
+        for(let i=0;i<g.n;i++){const d=document.createElement('div');
+          d.style.cssText='width:100%;aspect-ratio:1;border-radius:3px;';
+          if(g.dashed){d.style.border='1.5px dashed '+(g.bg||'#bbb');d.style.background='none';}
+          else{d.style.background=g.bg;}
+          el.appendChild(d);}
+      });
+    }
+    // Rathaus: 27 routine (top) + 33 retire + 40 productive (bottom) = 100
+    dots(document.getElementById('unit-chart'),[
+      {n:27,bg:'#1a1a1a'},{n:33,bg:'#c0392b'},{n:40,bg:'#e0dfdb'}
+    ]);
+    // Betrieb: 9 admin (top) + 29 retire + 9 unbesetzbar + 53 productive (bottom) = 100
+    dots(document.getElementById('unit-fk'),[
+      {n:9,bg:'#1a1a1a'},{n:29,bg:'#c0392b'},{n:9,bg:'#c0392b',dashed:true},{n:53,bg:'#e0dfdb'}
+    ]);
+  })();
+  </script>
+
+    <!-- Was das für Glashütte bedeutet -->
+  <div style="margin:32px 0;padding:24px;border:1px solid var(--border2);border-radius:8px;background:var(--surface)">
+    <div style="font-family:var(--m);font-size:7pt;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Was das für Glashütte bedeutet</div>
+    <div style="font-size:11pt;font-weight:600;margin-bottom:8px">Von 100 Verwaltungsmitarbeitern gehen 33 in Rente. 40 verbringen ihre Zeit mit Routine.</div>
+    <div style="font-size:9pt;color:var(--text2);line-height:1.7">
+      Glashütte hat 14 Ortsteile und eine Kernverwaltung, die bereits heute an der Kapazitätsgrenze arbeitet. <span style="font-family:var(--m);font-size:5.5pt;padding:1px 3px;border-radius:2px;background:rgba(157,127,59,.1);color:var(--accent)">I</span>
+      Wenn ein Drittel der Belegschaft in den nächsten Jahren ausscheidet und 31% der Stellen nicht nachbesetzt werden können, 
+      stehen zwei Optionen: Leistungen kürzen — oder die 40% Routine-Anteil durch Automatisierung auffangen. <span style="font-family:var(--m);font-size:5.5pt;padding:1px 3px;border-radius:2px;background:rgba(157,127,59,.1);color:var(--accent)">I</span>
+    </div>
+    <div style="display:flex;gap:16px;margin-top:16px;font-family:var(--m);font-size:7.5pt">
+      <a href="projekte.html" style="color:var(--accent);font-weight:500">6 konkrete Anwendungen →</a>
+      <a href="analyse-foerdermittel.html" style="color:var(--accent);font-weight:500">Förderung dafür →</a>
+      <a href="vergleich.html" style="color:var(--accent);font-weight:500">Wie andere es machen →</a>
+    </div>
+  </div>
+
+<!-- Inline Stats -->
+  <div class="inline-stats">
+    <span><strong>31%</strong> Nichtbesetzungsquote · <a href="https://www.demografieportal.de/DE/Fakten/arbeitskraeftemangel-oeffentlicher-dienst.html" target="_blank" rel="noopener" style="color:var(--accent)">Demografieportal des Bundes und der Länder, 2024</a></span>
+    <span><strong>165.000</strong> Stellen durch KI auffangbar · <a href="https://www.mckinsey.de/~/media/mckinsey/locations/europe%20and%20middle%20east/deutschland/news/presse/2024/2024-06-18%20mgi%20genai%20public%20sector/mckinsey_generative_ai_im_oeffentlichen_sektor.pdf" target="_blank" rel="noopener" style="color:var(--accent)">McKinsey, Generative AI im öffentlichen Sektor, 2024</a></span>
+    <span><strong>€23,9 Mrd.</strong> KI-Potenzial Verwaltung · <a href="https://www.iwconsult.de" target="_blank" rel="noopener" style="color:var(--accent)">IW-Consult, KI-Potenzialanalyse, 2024</a></span>
+  </div>
+
+  <!-- Verfügbare Analysen -->
+  <div style="font-family:var(--m);font-size:7pt;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-top:32px;margin-bottom:6px">Verfügbare Analysen</div>
+  <div style="font-size:18pt;font-weight:700;letter-spacing:-.02em;margin-bottom:16px">Alle Recherche-Ergebnisse</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px">
+    <a href="analyse-foerdermittel.html" style="display:block;border:1px solid var(--border2);border-radius:8px;padding:20px;transition:border-color .12s;text-decoration:none;color:inherit">
+      <div style="display:flex;justify-content:space-between;align-items:start"><div style="font-size:13pt;font-weight:700;margin-bottom:6px">Fördermittel-Komplettscan</div><span data-bookmark="analyse-foerdermittel" onclick="event.preventDefault();toggleBookmark('analyse-foerdermittel')" style="cursor:pointer;font-size:14pt" title="Lesezeichen"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;border:1.5px solid var(--light);background:transparent"></span></span></div>
+      <div style="font-size:8.5pt;color:var(--text2);margin-bottom:8px">11 Programme identifiziert, 3 mit Frist in 8 Wochen.</div>
+      <div style="font-family:var(--m);font-size:7pt;color:var(--muted);margin-bottom:4px">23 Quellen · 14 Seiten · 78% Confidence</div>
+      <div style="font-family:var(--m);font-size:7pt;color:var(--muted);margin-bottom:12px">~24–40 Std. · Einsparpotenzial €1.320–2.200</div>
+      <div style="font-family:var(--m);font-size:8pt;color:var(--accent);font-weight:600">Lesen →</div>
+    </a>
+    <a href="analyse-digitalisierung.html" style="display:block;border:1px solid var(--border2);border-radius:8px;padding:20px;transition:border-color .12s;text-decoration:none;color:inherit">
+      <div style="display:flex;justify-content:space-between;align-items:start"><div style="font-size:13pt;font-weight:700;margin-bottom:6px">Digitalisierungsstrategie</div><span data-bookmark="analyse-digitalisierung" onclick="event.preventDefault();toggleBookmark('analyse-digitalisierung')" style="cursor:pointer;font-size:14pt" title="Lesezeichen"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;border:1.5px solid var(--light);background:transparent"></span></span></div>
+      <div style="font-size:8.5pt;color:var(--text2);margin-bottom:8px">Glashütte 1/6 Services vs. Dippoldiswalde 5/6. Quick Win möglich.</div>
+      <div style="font-family:var(--m);font-size:7pt;color:var(--muted);margin-bottom:4px">18 Quellen · 11 Seiten · 75% Confidence</div>
+      <div style="font-family:var(--m);font-size:7pt;color:var(--muted);margin-bottom:12px">~14–22 Std. · Einsparpotenzial €770–1.210</div>
+      <div style="font-family:var(--m);font-size:8pt;color:var(--accent);font-weight:600">Lesen →</div>
+    </a>
+    <a href="analyse-buergerstimmung.html" style="display:block;border:1px solid var(--border2);border-radius:8px;padding:20px;transition:border-color .12s;text-decoration:none;color:inherit">
+      <div style="display:flex;justify-content:space-between;align-items:start"><div style="font-size:13pt;font-weight:700;margin-bottom:6px">Bürgerstimmung 90-Tage</div><span data-bookmark="analyse-buergerstimmung" onclick="event.preventDefault();toggleBookmark('analyse-buergerstimmung')" style="cursor:pointer;font-size:14pt" title="Lesezeichen"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;border:1.5px solid var(--light);background:transparent"></span></span></div>
+      <div style="font-size:8.5pt;color:var(--text2);margin-bottom:8px">Windkraft dominiert 46% der Diskussion, 78% negativ. Handlungsbedarf.</div>
+      <div style="font-family:var(--m);font-size:7pt;color:var(--muted);margin-bottom:4px">15 Quellen · 9 Seiten · 65% Confidence</div>
+      <div style="font-family:var(--m);font-size:7pt;color:var(--muted);margin-bottom:12px">~18–30 Std. · Einsparpotenzial €990–1.650</div>
+      <div style="font-family:var(--m);font-size:8pt;color:var(--accent);font-weight:600">Lesen →</div>
+    </a>
+    <a href="analyse-uhrenindustrie.html" style="display:block;border:1px solid var(--border2);border-radius:8px;padding:20px;transition:border-color .12s;text-decoration:none;color:inherit">
+      <div style="display:flex;justify-content:space-between;align-items:start"><div style="font-size:13pt;font-weight:700;margin-bottom:6px">Uhrenindustrie Marktbericht</div><span data-bookmark="analyse-uhrenindustrie" onclick="event.preventDefault();toggleBookmark('analyse-uhrenindustrie')" style="cursor:pointer;font-size:14pt" title="Lesezeichen"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;border:1.5px solid var(--light);background:transparent"></span></span></div>
+      <div style="font-size:8.5pt;color:var(--text2);margin-bottom:8px">Markt stabil (+3.2%). Kein Gegenwind. Leichte Sorge Mittelsegment.</div>
+      <div style="font-family:var(--m);font-size:7pt;color:var(--muted);margin-bottom:4px">11 Quellen · 8 Seiten · 60% Confidence</div>
+      <div style="font-family:var(--m);font-size:7pt;color:var(--muted);margin-bottom:12px">~9–15 Std. · Einsparpotenzial €495–825</div>
+      <div style="font-family:var(--m);font-size:8pt;color:var(--accent);font-weight:600">Lesen →</div>
+    </a>
+    <a href="vergleich.html" style="display:block;border:1px solid var(--border2);border-radius:8px;padding:20px;transition:border-color .12s;text-decoration:none;color:inherit">
+      <div style="display:flex;justify-content:space-between;align-items:start"><div style="font-size:13pt;font-weight:700;margin-bottom:6px">Digitalisierungsvergleich</div><span data-bookmark="vergleich" onclick="event.preventDefault();toggleBookmark('vergleich')" style="cursor:pointer;font-size:14pt" title="Lesezeichen"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;border:1.5px solid var(--light);background:transparent"></span></span></div>
+      <div style="font-size:8.5pt;color:var(--text2);margin-bottom:8px">22 Kommunen im Querschnitt. 3 Stufen: Initial, Entwicklung, Etabliert.</div>
+      <div style="font-family:var(--m);font-size:7pt;color:var(--muted);margin-bottom:4px">34 Quellen · 72% Confidence</div>
+      <div style="font-family:var(--m);font-size:7pt;color:var(--muted);margin-bottom:12px">~40–60 Std. · Einsparpotenzial €2.200–3.300</div>
+      <div style="font-family:var(--m);font-size:8pt;color:var(--accent);font-weight:600">Lesen →</div>
+    </a>
+    <a href="wirtschaft.html" style="display:block;border:1px solid var(--border2);border-radius:8px;padding:20px;transition:border-color .12s;text-decoration:none;color:inherit">
+      <div style="font-size:13pt;font-weight:700;margin-bottom:6px">Wirtschaftsstandort</div>
+      <div style="font-size:8.5pt;color:var(--text2);margin-bottom:8px">167 Unternehmen. 12 Einzelanalysen. Uhrenindustrie + Gewerbe + Kommunen.</div>
+      <div style="font-family:var(--m);font-size:7pt;color:var(--muted);margin-bottom:12px">5 Firmenanalysen · 7 Kommunalanalysen</div>
+      <div style="font-family:var(--m);font-size:8pt;color:var(--accent);font-weight:600">Öffnen →</div>
+    </a>
+  </div>
+
+  <!-- Quellenverzeichnis -->
+  <div style="margin-top:40px;padding-top:24px;border-top:1px solid var(--border2)">
+    <div style="font-family:var(--m);font-size:7pt;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px">Quellenverzeichnis — Personalanalyse</div>
+    <div style="font-size:8pt;line-height:1.8;color:var(--text2)">
+      <div class="source-item"><span class="source-num">[1]</span> dbb beamtenbund — Monitor öffentlicher Dienst 2025: „Der Personalmangel wächst" <span class="source-trust high">Primär</span></div>
+      <div class="source-item"><span class="source-num">[2]</span> dbb beamtenbund — Monitor öffentlicher Dienst 2026: „Immer neue Aufgaben – abnehmende Personalstärke"; 23% halten Staat für handlungsfähig (forsa-Umfrage Juli 2025) <span class="source-trust high">Primär</span></div>
+      <div class="source-item"><span class="source-num">[3]</span> tagesschau.de — „Beamtenbund dbb sieht wachsende Fachkräftelücke im öffentlichen Dienst", 11.01.2026; 600.000 fehlende Beschäftigte, -30.000 in einem Jahr <span class="source-trust high">Primär</span></div>
+      <div class="source-item"><span class="source-num">[4]</span> McKinsey — „Generative KI könnte Fachkräftelücke im öffentlichen Dienst um ein Drittel verkleinern", 15.07.2024; 550.000 VZÄ fehlen, 165.000 durch GenAI auffangbar <span class="source-trust high">Primär</span></div>
+      <div class="source-item"><span class="source-num">[5]</span> McKinsey — Generative KI in der öffentlichen Verwaltung (Vollstudie PDF), Sept 2024 <span class="source-trust high">Primär</span></div>
+      <div class="source-item"><span class="source-num">[6]</span> dbb Beamtenbund — Zahlen Daten Fakten 2023 (PDF): Altersstruktur öffentlicher Dienst, 33% Renteneintritt bis 2030 <span class="source-trust high">Primär</span></div>
+      <div class="source-item"><span class="source-num">[7]</span> KGSt / Fraunhofer FOKUS — Prozessanalyse kommunaler Verwaltung, 2024: 40% Routine-Anteil <span class="source-trust high">Primär</span></div>
+      <div class="source-item"><span class="source-num">[8]</span> Demografieportal des Bundes und der Länder — Arbeitskräftemangel öffentlicher Dienst, 2024: 31% Nichtbesetzungsquote <span class="source-trust high">Primär</span></div>
+      <div class="source-item"><span class="source-num">[9]</span> DIHK — Ausbildungsumfrage 2025: 73% der Betriebe finden keine ausreichend qualifizierten Bewerber <span class="source-trust high">Primär</span></div>
+      <div class="source-item"><span class="source-num">[10]</span> Destatis — Bevölkerungsstatistik 2022: 12,9 Mio von 44,5 Mio Erwerbstätigen erreichen bis 2036 Rentenalter (29%) <span class="source-trust high">Primär</span></div>
+      <div class="source-item"><span class="source-num">[11]</span> Sage / Plum Consulting — Studie 2017: 9% der Arbeitszeit für Administration in KMU <span class="source-trust med">Sekundär</span></div>
+      <div class="source-item"><span class="source-num">[12]</span> IW-Consult — KI-Potenzialanalyse 2024: €23,9 Mrd. KI-Potenzial Verwaltung <span class="source-trust high">Primär</span></div>
+      <div class="source-item"><span class="source-num">[13]</span> Sächsische Zeitung — „So unterschiedlich entwickeln sich die Ortsteile in Glashütte", 10.02.2026: Kernstadt + Schlottwitz = 40% der Bevölkerung, sinkende Einwohnerzahlen <span class="source-trust high">Primär</span></div>
+      <div class="source-item"><span class="source-num">[14]</span> Statistisches Landesamt Sachsen — 8. Regionalisierte Bevölkerungsvorausberechnung Gemeinde Glashütte (PDF) <span class="source-trust high">Primär</span></div>
+    </div>
+  </div>
+
+</div>
+<div id="shared-footer"></div>
+</body>
+</html>

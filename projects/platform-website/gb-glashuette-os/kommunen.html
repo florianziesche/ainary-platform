@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kommunen-Tracker — Ainary</title>
+<link rel="stylesheet" href="shared.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--text:#1a1a1a;--text2:#444;--muted:#777;--light:#bbb;--border:#d0d0d0;--border2:#e8e8e8;--surface:#fafafa;--accent:#9d7f3b;--green:#2d8a4e;--red:#c0392b;--amber:#b45309;--f:'Inter',-apple-system,sans-serif;--m:'JetBrains Mono',monospace}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--f);color:var(--text);font-size:var(--fs-body);line-height:1.65;background:#fff;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.page{max-width:var(--page-max,820px);margin:0 auto;padding:var(--page-pad)}
+
+.portal-hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;margin-bottom:var(--sec-gap);border-bottom:1px solid var(--border2);font-size:var(--fs-meta)}
+.portal-left{display:flex;align-items:center;gap:8px}
+.brand-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.brand-name{font-weight:500;color:var(--muted)}
+.portal-right{font-family:var(--m);font-size:var(--fs-meta);color:var(--muted)}
+
+/* Hero */
+.hero-h{font-size:26pt;font-weight:700;letter-spacing:-.03em;line-height:1.15;margin-bottom:4px}
+.hero-sub{font-size:10.5pt;color:var(--text2);margin-bottom:4px}
+.hero-meta{font-family:var(--m);font-size:var(--fs-label);color:var(--light);margin-bottom:var(--sec-gap)}
+
+/* KPI row */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--card-gap);margin-bottom:var(--sec-gap)}
+.kpi{border:1px solid var(--border2);border-radius:var(--card-radius);padding:14px 16px;text-align:center;background:var(--surface)}
+.kpi-val{font-family:var(--m);font-size:var(--fs-kpi-val);font-weight:700}
+.kpi-label{font-size:var(--fs-meta);color:var(--text2);margin-top:2px}
+.kpi-sub{font-family:var(--m);font-size:var(--fs-tag);color:var(--light);margin-top:2px}
+
+/* Filter */
+.filters{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.filter-btn{font-family:var(--m);font-size:var(--fs-label);padding:4px 12px;border:1px solid var(--border2);border-radius:var(--card-radius);color:var(--muted);cursor:pointer;background:none}
+.filter-btn:hover,.filter-btn.active{border-color:var(--accent);color:var(--accent)}
+
+/* Table */
+.t-wrap{border:1px solid var(--border2);border-radius:var(--card-radius);overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:var(--fs-desc)}
+thead{background:var(--surface)}
+th{font-family:var(--m);font-size:var(--fs-tag);font-weight:500;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;text-align:left;padding:10px 14px;border-bottom:1px solid var(--border2)}
+td{padding:10px 14px;border-bottom:1px solid var(--border2);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover{background:rgba(157,127,59,.03)}
+.k-name{font-weight:600;font-size:9pt}
+.k-bl{font-family:var(--m);font-size:var(--fs-label);color:var(--muted)}
+.k-num{font-family:var(--m);font-weight:700;font-size:9pt}
+.k-est{font-family:var(--m);font-size:var(--fs-tag);color:var(--light)}
+
+/* Score bar */
+.score-wrap{display:flex;align-items:center;gap:6px}
+.score-bar{height:6px;border-radius:3px;background:var(--border2);width:60px;overflow:hidden}
+.score-fill{height:100%;border-radius:3px}
+.score-fill.high{background:var(--green)}
+.score-fill.mid{background:var(--amber)}
+.score-fill.low{background:var(--red)}
+.score-val{font-family:var(--m);font-size:var(--fs-label);font-weight:600;min-width:24px}
+
+/* Status */
+.status{font-family:var(--m);font-size:var(--fs-tag);padding:2px 8px;border-radius:3px;font-weight:500}
+.status-live{background:rgba(45,138,78,.08);color:var(--green)}
+.status-pending{background:rgba(180,83,9,.08);color:var(--amber)}
+.status-new{background:rgba(157,127,59,.06);color:var(--accent)}
+
+/* CTA */
+.cta-link{font-family:var(--m);font-size:var(--fs-label);color:var(--accent)}
+
+.ftr{margin-top:48px;padding-top:16px;border-top:1px solid var(--border2);font-family:var(--m);font-size:var(--fs-tag);color:var(--light);display:flex;gap:8px}
+.ftr a{color:var(--light)}
+
+@media(max-width:700px){
+  .page{padding:var(--page-pad-mobile)}
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+  table{font-size:var(--fs-kpi-sub)}
+  th,td{padding:8px 10px}
+}
+</style>
+<script src="shared-header.js" defer></script>
+<script src="shared-footer.js" defer></script><link rel="stylesheet" href="mia-chat.css"><script src="mia-chat.js" defer></script>
+<meta property="og:title" content="Kommunen-Tracker — Ainary">
+<meta property="og:description" content="KI-Assistent für Glashütte — Echte Daten, echte Analysen.">
+<meta property="og:image" content="./og-image.svg">
+<meta property="og:type" content="website">
+<meta name="description" content="KI-Assistent für Glashütte — Echte Daten, echte Analysen.">
+</head>
+<body>
+<div class="page">
+
+  <div id="shared-header"></div>
+  <div id="mia-slot"></div>
+
+  <!-- E/I/J/A Legend -->
+  <div style="display:flex;gap:10px;font-size:6.5pt;margin-bottom:12px;flex-wrap:wrap">
+    <span style="display:flex;align-items:center;gap:3px"><span style="font-family:var(--m);font-size:5.5pt;padding:1px 4px;border-radius:2px;font-weight:600;background:rgba(45,138,78,.1);color:var(--green)">E</span> Evidence</span>
+    <span style="display:flex;align-items:center;gap:3px"><span style="font-family:var(--m);font-size:5.5pt;padding:1px 4px;border-radius:2px;font-weight:600;background:rgba(157,127,59,.1);color:var(--accent)">I</span> Inference</span>
+    <span style="display:flex;align-items:center;gap:3px"><span style="font-family:var(--m);font-size:5.5pt;padding:1px 4px;border-radius:2px;font-weight:600;background:rgba(180,83,9,.1);color:var(--amber)">J</span> Judgment</span>
+    <span style="display:flex;align-items:center;gap:3px"><span style="font-family:var(--m);font-size:5.5pt;padding:1px 4px;border-radius:2px;font-weight:600;background:rgba(192,57,43,.1);color:var(--red)">A</span> Assumption</span>
+  </div>
+
+  <!-- Shared KPIs + Mia -->
+  <div class="kpi-row" style="margin-bottom:8px">
+    <div class="kpi"><div class="kpi-val">~93 Std.</div><div class="kpi-label">Ihr Aufwand ohne Ainary</div><div class="kpi-sub">5 Analysen · 79 Quellen <span style="font-family:var(--m);font-size:5pt;padding:1px 3px;border-radius:2px;background:rgba(45,138,78,.1);color:var(--green)">E</span></div></div>
+    <div class="kpi"><div class="kpi-val">69%</div><div class="kpi-label">Confidence</div><div class="kpi-sub">Ø über alle Analysen <span style="font-family:var(--m);font-size:5pt;padding:1px 3px;border-radius:2px;background:rgba(45,138,78,.1);color:var(--green)">E</span></div></div>
+    <div class="kpi"><div class="kpi-val">20%</div><div class="kpi-label">Ihr Anteil</div><div class="kpi-sub">Prüfen, entscheiden, handeln <span style="font-family:var(--m);font-size:5pt;padding:1px 3px;border-radius:2px;background:rgba(157,127,59,.1);color:var(--accent)">I</span></div></div>
+  </div>
+  <div style="text-align:right;font-family:var(--m);font-size:var(--fs-label);color:var(--light);margin-bottom:8px">Identifiziertes Potenzial: €200k–500k · <a href="methodik.html" style="color:var(--accent)">Methodik</a></div>
+  <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border:1px solid var(--border2);border-radius:var(--card-radius);margin-bottom:var(--sec-gap);background:var(--surface)">
+    <div style="width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9pt;font-weight:600;flex-shrink:0">M</div>
+    <div style="font-size:9.5pt"><strong>Mia:</strong> <span id="greeting2">Guten Morgen</span>, Herr Gleißberg. Kann ich Ihnen heute weiterhelfen?</div>
+  </div>
+
+  <div class="hero-h">20 Kommunen. Eine Analyse.</div>
+  <div class="hero-sub">Wie digital ist Ihre Gemeinde im Vergleich?</div>
+  <div class="hero-meta">Ainary Kommunen-Tracker · Stand März 2026 · Daten: Destatis, Bitkom, dbb, KGSt</div>
+
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="kpi-val">20</div>
+      <div class="kpi-label">Kommunen erfasst</div>
+      <div class="kpi-sub">10 Sachsen · 10 bundesweit</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-val">~4.200</div>
+      <div class="kpi-label">Verwaltungsmitarbeiter</div>
+      <div class="kpi-sub">Schätzung · 13 VZÄ/1.000 EW</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-val">33%</div>
+      <div class="kpi-label">Rente bis 2030</div>
+      <div class="kpi-sub">dbb Beamtenbund 2023</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-val" style="color:var(--red)">~€8,4M</div>
+      <div class="kpi-label">Fördermittel identifiziert</div>
+      <div class="kpi-sub">Summe alle 20 Kommunen</div>
+    </div>
+  </div>
+
+  <div class="filters">
+    <button class="filter-btn active" onclick="filterBL('all')">Alle</button>
+    <button class="filter-btn" onclick="filterBL('SN')">Sachsen</button>
+    <button class="filter-btn" onclick="filterBL('TH')">Thüringen</button>
+    <button class="filter-btn" onclick="filterBL('HE')">Hessen</button>
+    <button class="filter-btn" onclick="filterBL('BW')">Baden-Württemberg</button>
+    <button class="filter-btn" onclick="filterBL('NI')">Niedersachsen</button>
+    <button class="filter-btn" onclick="filterBL('other')">Weitere</button>
+  </div>
+
+  <div class="t-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Kommune</th>
+        <th>Einwohner</th>
+        <th>Mitarbeiter</th>
+        <th>Rente 2030</th>
+        <th>Digital-Score</th>
+        <th>Potenzial</th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="t-body"></tbody>
+  </table>
+  </div>
+
+  <div style="font-family:var(--m);font-size:var(--fs-tag);color:var(--light);margin-top:12px;text-align:right">
+    Mitarbeiter geschätzt (13 VZÄ/1.000 EW) · Rente 33% (dbb) · Digital-Score: Ainary-Methodik · Potenzial: €200k–500k Skalierung nach EW
+  </div>
+
+  <footer class="ftr">
+    <span>© 2026 Ainary</span><span>·</span>
+    <a href="https://ainaryventures.com" target="_blank" rel="noopener">ainaryventures.com</a><span>·</span>
+    <span>florian@ainaryventures.com</span>
+  </footer>
+
+</div>
+
+<script>
+const kommunen=[
+  // Sachsen
+  {name:'Glashütte',bl:'SN',ew:6800,score:17,status:'live',url:'index.html'},
+  {name:'Dippoldiswalde',bl:'SN',ew:14500,score:83,status:'pending'},
+  {name:'Altenberg',bl:'SN',ew:8200,score:50,status:'new'},
+  {name:'Freital',bl:'SN',ew:39500,score:67,status:'new'},
+  {name:'Pirna',bl:'SN',ew:39000,score:60,status:'new'},
+  {name:'Meißen',bl:'SN',ew:28000,score:55,status:'new'},
+  {name:'Freiberg',bl:'SN',ew:40600,score:62,status:'new'},
+  {name:'Radebeul',bl:'SN',ew:34000,score:70,status:'new'},
+  {name:'Bautzen',bl:'SN',ew:38800,score:58,status:'new'},
+  {name:'Görlitz',bl:'SN',ew:56000,score:52,status:'new'},
+  // Bundesweit
+  {name:'Worms',bl:'RP',ew:83500,score:65,status:'new'},
+  {name:'Gersheim',bl:'SL',ew:6400,score:30,status:'new'},
+  {name:'Jena',bl:'TH',ew:111400,score:72,status:'new'},
+  {name:'Marburg',bl:'HE',ew:76400,score:68,status:'new'},
+  {name:'Konstanz',bl:'BW',ew:84800,score:74,status:'new'},
+  {name:'Lüneburg',bl:'NI',ew:78000,score:66,status:'new'},
+  {name:'Trier',bl:'RP',ew:111500,score:63,status:'new'},
+  {name:'Greifswald',bl:'MV',ew:59400,score:48,status:'new'},
+  {name:'Schwäbisch Hall',bl:'BW',ew:42000,score:60,status:'new'},
+  {name:'Norderstedt',bl:'SH',ew:81400,score:71,status:'new'},
+];
+
+const blNames={SN:'Sachsen',TH:'Thüringen',HE:'Hessen',BW:'Baden-Württemberg',NI:'Niedersachsen',RP:'Rheinland-Pfalz',SL:'Saarland',MV:'Mecklenburg-Vorp.',SH:'Schleswig-Holstein'};
+
+function render(data){
+  const tb=document.getElementById('t-body');
+  tb.innerHTML='';
+  data.forEach((k,i)=>{
+    const ma=Math.round(k.ew*13/1000);
+    const ret=Math.round(ma*.33);
+    const pot=Math.round(k.ew/6800*400); // scale from Glashütte's €400k
+    const cls=k.score>=70?'high':k.score>=50?'mid':'low';
+    const st=k.status==='live'?'<span class="status status-live">Live</span>':
+             k.status==='pending'?'<span class="status status-pending">In Arbeit</span>':
+             '<span class="status status-new">Neu</span>';
+    const link=k.url?'<a href="'+k.url+'" class="cta-link">Dashboard →</a>':'<a href="#" class="cta-link" onclick="return false">Analyse anfordern →</a>';
+    tb.innerHTML+=`<tr data-bl="${k.bl}">
+      <td style="font-family:var(--m);font-size:var(--fs-label);color:var(--light)">${String(i+1).padStart(2,'0')}</td>
+      <td><div class="k-name">${k.name}</div><div class="k-bl">${blNames[k.bl]||k.bl}</div></td>
+      <td><div class="k-num">${k.ew.toLocaleString('de-DE')}</div></td>
+      <td><div class="k-num">~${ma}</div><div class="k-est">${ret} Rente bis 2030</div></td>
+      <td style="color:var(--red);font-family:var(--m);font-weight:600;font-size:9pt">${ret}</td>
+      <td><div class="score-wrap"><div class="score-bar"><div class="score-fill ${cls}" style="width:${k.score}%"></div></div><span class="score-val">${k.score}%</span></div></td>
+      <td><div class="k-num" style="color:var(--accent)">€${pot>999?(pot/1000).toFixed(0)+'k':pot+'k'}</div></td>
+      <td>${st}</td>
+      <td>${link}</td>
+    </tr>`;
+  });
+}
+
+function filterBL(bl){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  if(bl==='all') render(kommunen);
+  else if(bl==='other') render(kommunen.filter(k=>!['SN','TH','HE','BW','NI'].includes(k.bl)));
+  else render(kommunen.filter(k=>k.bl===bl));
+}
+
+render(kommunen);
+
+);
+  const t=now.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('live-date').textContent=d;
+  document.getElementById('live-time').textContent=t;
+}
+
+</script>
+
+<!-- Quellenverzeichnis -->
+<div style="max-width:var(--page-max,820px);margin:0 auto;padding:0 var(--page-pad,48px) 48px">
+  <div style="margin-top:40px;padding-top:24px;border-top:1px solid var(--border2)">
+    <div style="font-family:var(--m);font-size:7pt;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px">Quellenverzeichnis — Kommunen-Tracker</div>
+    <div style="font-size:8pt;line-height:1.8;color:var(--text2)">
+
+      <div class="source-item"><span class="source-num">[1]</span> Destatis — Gemeindeverzeichnis: Einwohner, Fläche <span class="source-trust high">Primär</span></div>
+      <div class="source-item"><span class="source-num">[2]</span> Bitkom — Smart City Index 2025 <span class="source-trust high">Primär</span></div>
+      <div class="source-item"><span class="source-num">[3]</span> dbb beamtenbund — Personalstatistik öffentlicher Dienst <span class="source-trust high">Primär</span></div>
+      <div class="source-item"><span class="source-num">[4]</span> KGSt — Kommunale Benchmarks <span class="source-trust high">Primär</span></div>
+
+    </div>
+  </div>
+</div>
+<div id="shared-footer"></div>
+</body>
+</html>

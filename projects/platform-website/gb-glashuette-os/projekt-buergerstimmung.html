@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bürgerstimmung · 90-Tage-Analyse — Ainary</title>
+<link rel="stylesheet" href="shared.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--text:#1a1a1a;--text2:#444;--muted:#777;--light:#bbb;--border:#d0d0d0;--border2:#e8e8e8;--surface:#fafafa;--accent:#9d7f3b;--green:#2d8a4e;--red:#c0392b;--amber:#b45309;--blue:#2563eb;--f:'Inter',-apple-system,sans-serif;--m:'JetBrains Mono',monospace}
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--f);color:var(--text);font-size:var(--fs-body);line-height:1.65;background:#fff;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  .page{max-width:var(--page-max,820px);margin:0 auto;padding:var(--page-pad)}
+
+  .back{display:inline-flex;align-items:center;gap:5px;font-size:9pt;color:var(--muted);text-decoration:none;margin-bottom:16px}
+  .back:hover{color:var(--text2);text-decoration:none}
+  .back svg{width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:2}
+
+  .doc-hdr{border-bottom:2px solid var(--text);padding-bottom:16px;margin-bottom:20px}
+  .doc-hdr-row{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px}
+  .doc-brand{font-size:9pt;font-weight:500;color:var(--muted);letter-spacing:0.03em}
+  .doc-id{font-family:var(--m);font-size:var(--fs-meta);color:var(--muted)}
+  .doc-title{font-size:var(--fs-doc-title);font-weight:600;letter-spacing:-0.02em;margin-bottom:4px}
+  .doc-sub{font-size:var(--fs-body);color:var(--text2);margin-bottom:8px}
+  .doc-meta-row{display:flex;gap:16px;font-size:var(--fs-meta);color:var(--muted);font-family:var(--m)}
+
+  .ev{font-family:var(--m);font-size:var(--fs-label);padding:1px 4px;border-radius:2px;font-weight:600;vertical-align:super;margin-left:1px;cursor:help}
+  .ev-e{color:var(--green);background:rgba(45,138,78,0.08)}
+  .ev-i{color:var(--blue);background:rgba(37,99,235,0.08)}
+  .ev-j{color:var(--accent);background:rgba(200,170,80,0.08)}
+  .ev-a{color:var(--amber);background:rgba(180,83,9,0.08)}
+
+  .sec-label{font-family:var(--m);font-size:var(--fs-label);font-weight:500;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-top:var(--sec-gap);margin-bottom:4px}
+  .sec-title{font-size:18pt;font-weight:700;letter-spacing:-.02em;margin-bottom:16px}
+
+  .kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+  .kpi{border:1px solid var(--border2);border-radius:var(--card-radius);padding:16px;text-align:center;background:var(--surface)}
+  .kpi-val{font-family:var(--m);font-size:18pt;font-weight:700;line-height:1.2}
+  .kpi-label{font-size:var(--fs-meta);color:var(--text2);margin-top:2px}
+  .kpi-sub{font-family:var(--m);font-size:var(--fs-tag);color:var(--light);margin-top:2px}
+
+  .topic-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:24px}
+  .topic-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--border2);border-radius:6px;background:var(--surface)}
+  .topic-name{font-size:9pt;font-weight:500;width:220px}
+  .topic-bar{flex:1;height:6px;background:#eee;border-radius:3px;overflow:hidden;max-width:400px}
+  .topic-fill{height:100%;border-radius:3px}
+  .topic-fill.neg{background:var(--red)}
+  .topic-fill.mix{background:var(--amber)}
+  .topic-fill.pos{background:var(--green)}
+  .topic-fill.inf{background:var(--blue)}
+  .topic-pct{font-family:var(--m);font-size:var(--fs-meta);font-weight:600;width:35px;text-align:right}
+
+  .sentiment-trend{border:1px solid var(--border2);border-radius:var(--card-radius);padding:20px;background:var(--surface);margin-bottom:24px}
+  .sentiment-title{font-size:9pt;font-weight:600;margin-bottom:12px}
+  .trend-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--card-gap)}
+  .trend-week{text-align:center}
+  .trend-label{font-family:var(--m);font-size:var(--fs-label);color:var(--muted);margin-bottom:6px}
+  .trend-bar-container{display:flex;flex-direction:column-reverse;height:80px;background:var(--border2);border-radius:var(--card-radius);overflow:hidden}
+  .trend-bar{width:100%;transition:height 0.3s}
+  .trend-bar.neg{background:var(--red)}
+  .trend-bar.neu{background:var(--muted)}
+  .trend-bar.pos{background:var(--green)}
+  .trend-val{font-family:var(--m);font-size:7.5pt;font-weight:600;margin-top:4px}
+  .trend-val.neg{color:var(--red)}
+
+  .deep-dive{border:1px solid var(--border2);border-radius:var(--card-radius);padding:20px;background:var(--surface);margin-bottom:24px}
+  .deep-title{font-size:var(--fs-body);font-weight:600;margin-bottom:12px}
+  .deep-sentiment{display:flex;gap:16px;margin-bottom:12px;font-family:var(--m);font-size:9pt}
+  .deep-val{font-weight:700}
+  .deep-val.neg{color:var(--red)}
+  .deep-val.neu{color:var(--muted)}
+  .deep-val.pos{color:var(--green)}
+  .deep-list{margin-bottom:12px}
+  .deep-list-title{font-size:var(--fs-desc);font-weight:600;margin-bottom:4px}
+  .deep-list ul{font-size:var(--fs-desc);color:var(--text2);line-height:1.6;padding-left:16px}
+  .deep-source{font-family:var(--m);font-size:var(--fs-label);color:var(--light)}
+
+  .actions{border:1px solid var(--green);border-radius:var(--card-radius);padding:16px;background:rgba(45,138,78,.03);margin-bottom:24px}
+  .actions-title{font-size:9pt;font-weight:600;color:var(--green);margin-bottom:12px}
+  .action{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--border2);font-size:9pt;color:var(--text2)}
+  .action:last-child{border-bottom:none}
+  .action-num{font-family:var(--m);font-size:var(--fs-meta);color:var(--green);width:18px;flex-shrink:0}
+  .action strong{color:var(--text)}
+
+  .warning{border:2px solid var(--red);border-radius:var(--card-radius);padding:16px;background:rgba(192,57,43,.03);margin-bottom:24px}
+  .warning-title{font-size:9pt;font-weight:600;color:var(--red);margin-bottom:8px}
+  .warning-text{font-size:9pt;color:var(--text2);line-height:1.6}
+
+  .footer-msg{text-align:center;padding:20px;border-top:1px solid var(--border2);margin-top:var(--sec-gap)}
+  .footer-msg-text{font-size:var(--fs-body);color:var(--text2)}
+
+  @media(max-width:700px){
+    .page{padding:var(--page-pad-mobile)}
+    .kpi-grid,.trend-grid{grid-template-columns:1fr}
+    .topic-name{width:auto}
+    .topic-bar{max-width:none}
+  }
+</style>
+<link rel="stylesheet" href="mia-chat.css"><script src="mia-chat.js" defer></script><script src="bookmarks.js" defer></script><script src="cta-footer.js" defer></script><script src="shared-header.js" defer></script>
+<script src="shared-footer.js" defer></script>
+<meta property="og:title" content="Bürgerstimmung · 90-Tage-Analyse — Ainary">
+<meta property="og:description" content="KI-Assistent für Glashütte — Echte Daten, echte Analysen.">
+<meta property="og:image" content="./og-image.svg">
+<meta property="og:type" content="website">
+<meta name="description" content="KI-Assistent für Glashütte — Echte Daten, echte Analysen.">
+</head>
+<body>
+<div class="page">
+
+  <div id="shared-header"></div>
+  <div id="mia-slot"></div>
+
+  <a href="projekte.html" class="back"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg> Zurück zu Projekte</a>
+
+  <div class="doc-hdr">
+    <div class="doc-hdr-row">
+      <span class="doc-brand">Ainary Bürgerstimmung</span>
+      <span class="doc-id">BS-2026-0222-GH</span>
+    </div>
+    <div class="doc-title">Bürgerstimmung · 90-Tage-Analyse</div>
+    <div class="doc-sub">342 Posts analysiert · 5 Plattformen · Letzte Aktualisierung: 04.03.2026<span class="ev ev-e">E</span></div>
+    <div class="doc-meta-row">
+      <span>Zeitraum: Nov 2025 – Feb 2026</span>
+      <span>Quellen: FB, Google Reviews, SZ, MDR, Versammlungen</span>
+    </div>
+  </div>
+
+  <div class="sec-label">Übersicht</div>
+  <div class="sec-title">Die Zahlen auf einen Blick</div>
+
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-val">342</div><div class="kpi-label">Posts analysiert</div><div class="kpi-sub">Nov 2025 – Feb 2026 <span class="ev ev-e">E</span></div></div>
+    <div class="kpi"><div class="kpi-val">5</div><div class="kpi-label">Plattformen</div><div class="kpi-sub">FB, Google, SZ, MDR, Protokolle <span class="ev ev-e">E</span></div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--red)">78%</div><div class="kpi-label">Windkraft negativ</div><div class="kpi-sub">Hauptthema der Diskussion <span class="ev ev-i">I</span></div></div>
+  </div>
+
+  <div class="sec-label">Top-Themen</div>
+  <div class="sec-title">Worüber Ihre Gemeinde spricht</div>
+
+  <div class="topic-grid">
+    <div class="topic-item">
+      <div class="topic-name">Windkraft / Umspannwerk</div>
+      <div class="topic-bar"><div class="topic-fill neg" style="width:46%"></div></div>
+      <div class="topic-pct">46%</div>
+    </div>
+    <div class="topic-item">
+      <div class="topic-name">Infrastruktur (Straßen, Breitband)</div>
+      <div class="topic-bar"><div class="topic-fill mix" style="width:23%"></div></div>
+      <div class="topic-pct">23%</div>
+    </div>
+    <div class="topic-item">
+      <div class="topic-name">Tourismus / Uhrenstadt</div>
+      <div class="topic-bar"><div class="topic-fill pos" style="width:15%"></div></div>
+      <div class="topic-pct">15%</div>
+    </div>
+    <div class="topic-item">
+      <div class="topic-name">Verwaltung / Digitalisierung</div>
+      <div class="topic-bar"><div class="topic-fill inf" style="width:10%"></div></div>
+      <div class="topic-pct">10%</div>
+    </div>
+    <div class="topic-item">
+      <div class="topic-name">Sonstiges</div>
+      <div class="topic-bar"><div class="topic-fill mix" style="width:6%"></div></div>
+      <div class="topic-pct">6%</div>
+    </div>
+  </div>
+
+  <div class="sec-label">Sentiment-Trend</div>
+  <div class="sec-title">Wie sich die Stimmung entwickelt hat</div>
+
+  <div class="sentiment-trend">
+    <div class="sentiment-title">Letzte 4 Wochen — Windkraft wird negativer</div>
+    <div class="trend-grid">
+      <div class="trend-week">
+        <div class="trend-label">KW 05</div>
+        <div class="trend-bar-container">
+          <div class="trend-bar pos" style="height:10%"></div>
+          <div class="trend-bar neu" style="height:25%"></div>
+          <div class="trend-bar neg" style="height:65%"></div>
+        </div>
+        <div class="trend-val">65% neg</div>
+      </div>
+      <div class="trend-week">
+        <div class="trend-label">KW 06</div>
+        <div class="trend-bar-container">
+          <div class="trend-bar pos" style="height:8%"></div>
+          <div class="trend-bar neu" style="height:20%"></div>
+          <div class="trend-bar neg" style="height:72%"></div>
+        </div>
+        <div class="trend-val">72% neg</div>
+      </div>
+      <div class="trend-week">
+        <div class="trend-label">KW 07</div>
+        <div class="trend-bar-container">
+          <div class="trend-bar pos" style="height:7%"></div>
+          <div class="trend-bar neu" style="height:18%"></div>
+          <div class="trend-bar neg" style="height:75%"></div>
+        </div>
+        <div class="trend-val neg">75% neg</div>
+      </div>
+      <div class="trend-week">
+        <div class="trend-label">KW 08</div>
+        <div class="trend-bar-container">
+          <div class="trend-bar pos" style="height:7%"></div>
+          <div class="trend-bar neu" style="height:15%"></div>
+          <div class="trend-bar neg" style="height:78%"></div>
+        </div>
+        <div class="trend-val neg">78% neg</div>
+      </div>
+    </div>
+    <div style="font-family:var(--m);font-size:var(--fs-label);color:var(--muted);margin-top:12px">Trend: Windkraft wird negativer. ↑ 3% seit letzter Woche <span class="ev ev-i">I</span></div>
+  </div>
+
+  <div class="sec-label">Deep Dive: Windkraft</div>
+  <div class="sec-title">Was die Bürger wirklich bewegt</div>
+
+  <div class="deep-dive">
+    <div class="deep-title">Windkraft / Umspannwerk Reinhardtsgrimma</div>
+    <div class="deep-sentiment">
+      <div><span class="deep-val neg">78%</span> negativ</div>
+      <div><span class="deep-val neu">15%</span> neutral</div>
+      <div><span class="deep-val pos">7%</span> positiv</div>
+    </div>
+    <div class="deep-list">
+      <div class="deep-list-title">Top-Argumente GEGEN:</div>
+      <ul>
+        <li>Naturschutz — "Zerstörung des Landschaftsbilds"</li>
+        <li>Lärm — "Anwohner werden nicht geschützt"</li>
+        <li>Landschaftsbild — "Uhrenstadt-Identität leidet"</li>
+        <li>Dialog — "Wir werden nicht gefragt"</li>
+      </ul>
+    </div>
+    <div class="deep-list">
+      <div class="deep-list-title">Top-Argumente FÜR:</div>
+      <ul>
+        <li>Energieunabhängigkeit — "Sachsen braucht erneuerbare Energie"</li>
+        <li>Einnahmen — "Kommune profitiert finanziell"</li>
+        <li>Klimaschutz — "Wir haben Verantwortung"</li>
+      </ul>
+    </div>
+    <div class="deep-source">Quellen: FB Glashütte (1.152 Follower), Google Reviews, SZ-Kommentare, Bürgerversammlungs-Protokoll Reinhardtsgrimma <span class="ev ev-e">E</span></div>
+  </div>
+
+  <div class="sec-label">Handlungsempfehlungen</div>
+  <div class="sec-title">Was Sie tun können</div>
+
+  <div class="actions">
+    <div class="actions-title">3 konkrete Handlungsempfehlungen</div>
+    <div class="action"><span class="action-num">01</span><div><strong>Bürgersprechstunde Windkraft (innerhalb 4 Wochen)</strong> — Dampf ablassen, Dialog zeigen. Best Practice: Gemeinde Moritzburg hat 2024 Windkraft-Bürgerforum durchgeführt — Stimmung von 72% negativ auf 51% neutral gedreht.<span class="ev ev-i">I</span> Nicht lösen, aber auffangen.</div></div>
+    <div class="action"><span class="action-num">02</span><div><strong>Faktenblatt erstellen (1 Seite, 5 Fakten)</strong> — Zahlen vs. Emotionen. Wie viele Anlagen? Abstand zu Wohngebieten? Lärmgutachten? Finanzielle Beteiligung? Veröffentlichen auf glashuette-sachs.de + FB-Post. Aufwand: 2 Stunden.<span class="ev ev-j">J</span></div></div>
+    <div class="action"><span class="action-num">03</span><div><strong>Tourismus-Narrative stärken (Gegengewicht)</strong> — Uhrenstadt-Identität als positives Narrativ. EDEKA-Ansiedlung, Uhrenmuseum-Erfolge, Tourismuszahlen aktiv kommunizieren. Positive News neutralisieren negative Windkraft-Stimmung teilweise.<span class="ev ev-j">J</span></div></div>
+  </div>
+
+  <div class="sec-label">Frühwarnung</div>
+  <div class="sec-title">Eskalationsrisiko beachten</div>
+
+  <div class="warning">
+    <div class="warning-title">⚠️ Petition erreicht kritische Schwelle</div>
+    <div class="warning-text">
+      Petition gegen Umspannwerk Reinhardtsgrimma hat <strong>1.200 Unterschriften</strong> erreicht.<span class="ev ev-e">E</span><br><br>
+      <strong>Schwelle für Stadtrats-Befassung:</strong> 1.500 Unterschriften<br>
+      <strong>Geschätzte Tage bis Schwelle:</strong> ~14 Tage bei aktuellem Tempo (Ø 25 Unterschriften/Tag)<span class="ev ev-i">I</span><br><br>
+      <strong>Empfehlung:</strong> Proaktiv Dialog anbieten BEVOR Schwelle erreicht wird. Reaktiv = "Wir werden gezwungen" vs. proaktiv = "Wir hören zu".<span class="ev ev-j">J</span>
+    </div>
+  </div>
+
+  <div class="footer-msg">
+    <div class="footer-msg-text">Analyse läuft automatisch. Eskalationen werden sofort gemeldet.</div>
+  </div>
+
+  <footer style="margin-top:24px;padding-top:14px;border-top:1px solid #d0d0d0;font-family:'JetBrains Mono',monospace;font-size:var(--fs-label);color:#bbb;display:flex;justify-content:center;gap:6px;flex-wrap:wrap">
+    <span>© 2026 Ainary</span><span>·</span>
+    <a href="methodik.html" style="color:#bbb;text-decoration:none">Methodik</a><span>·</span>
+    <a href="https://ainaryventures.com/de/privacy.html" target="_blank" style="color:#bbb;text-decoration:none">Datenschutz</a><span>·</span>
+    <span>Verschlüsselt</span>
+  </footer>
+
+</div>
+
+
+<!-- Quellenverzeichnis -->
+<div style="max-width:var(--page-max,820px);margin:0 auto;padding:0 var(--page-pad,48px) 48px">
+  <div style="margin-top:40px;padding-top:24px;border-top:1px solid var(--border2)">
+    <div style="font-family:var(--m);font-size:7pt;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px">Quellenverzeichnis — Bürgerstimmung 90-Tage-Analyse</div>
+    <div style="font-size:8pt;line-height:1.8;color:var(--text2)">
+
+      <div class="source-item"><span class="source-num">[1]</span> Facebook — Seite Glashütte (Sachsen): 342 Posts analysiert <span class="source-trust high">Primär</span></div>
+      <div class="source-item"><span class="source-num">[2]</span> Google Reviews — Öffentliche Einrichtungen <span class="source-trust med">Sekundär</span></div>
+      <div class="source-item"><span class="source-num">[3]</span> Sächsische Zeitung — Leserkommentare <span class="source-trust high">Primär</span></div>
+
+    </div>
+  </div>
+</div>
+<div id="shared-footer"></div>
+</body>
+</html>
