@@ -3937,8 +3937,42 @@ function renderGraph() {
   const width = container.clientWidth;
   const height = container.clientHeight;
 
-  const colorMap = {"ally":"#2d8a4e","threat":"#c0392b","neutral":"#b45309","org_ally":"#2d8a4e","org_threat":"#c0392b","org_neutral":"#9d7f3b","institution":"#555e70","theme_hot":"#c0392b","theme":"#777","incumbent":"#2D72D2","CSU":"#0a4d8c","SPD":"#c0392b","Grüne":"#238551","Bündnis 90/Die Grünen":"#238551","AfD":"#8E292C","FDP":"#e8c84a","Freie Wähler":"#f59e0b","Parteifreie Bürger":"#9d7f3b","CSU/FDP":"#0a4d8c","Wirtschaft":"#555e70","Thema":"#6b7280","Medien":"#8b5cf6"};
-  const linkColorMap = {"party":"#9d7f3b","opponent":"#c0392b","ally":"#2d8a4e","network":"#2563eb","conflict":"#b45309","threat":"#c0392b"};
+  // ═══ UNIFIED COLOR SYSTEM ═══
+  // Palantir principle: Color encodes ONE dimension (party/entity-type). Shape encodes entity-type.
+  function partyColor(p) {
+    if (!p) return '#8F99A8';
+    if (p.includes('CSU') || p.includes('CDU')) return '#0a4d8c';
+    if (p.includes('SPD')) return '#c0392b';
+    if (p.includes('Grün')) return '#238551';
+    if (p === 'AfD') return '#8E292C';
+    if (p === 'FDP') return '#e8c84a';
+    if (p.includes('Freie Wähler') || p === 'FW') return '#f59e0b';
+    if (p.includes('Linke')) return '#BE3075';
+    if (p.includes('ÖDP')) return '#F57C00';
+    if (p.includes('Guten')) return '#4CAF50';
+    if (p.includes('Parteifreie') || p.includes('PFB')) return '#9d7f3b';
+    return '#8F99A8';
+  }
+  var MEDIA_COLOR = '#8b5cf6';   // purple — distinct from all party colors
+  var THEME_COLOR = '#6b7280';   // steel grey — neutral backdrop for content
+  var THEME_HOT_COLOR = '#ef4444'; // red — hot/contested themes
+  var INST_COLOR = '#555e70';    // dark steel
+  function nodeColor(d) {
+    var t = d.type || d.group || '';
+    if (t === 'kandidat' || t === 'Kandidaten') return partyColor(d.party);
+    if (t === 'media' || t === 'Medien' || t === 'Medium') return MEDIA_COLOR;
+    if (t === 'theme_hot') return THEME_HOT_COLOR;
+    if (t === 'theme' || t === 'Thema' || t === 'Themen') return THEME_COLOR;
+    if (t === 'institution' || t === 'Institutionen') return INST_COLOR;
+    // Legacy Friedberg groups
+    if (['ally','threat','neutral','incumbent'].includes(t)) return partyColor(d.party);
+    // Fallback: try party from KB
+    var kbId = d.id ? d.id.replace('kand_','') : '';
+    if (KB[kbId] && KB[kbId].party) return partyColor(KB[kbId].party);
+    return '#8F99A8';
+  }
+  function sentimentColor(s) { return s === 'POS' ? '#238551' : s === 'NEG' ? '#c0392b' : '#555e70'; }
+  function linkWidth(d) { return Math.max(1, Math.min(4.5, (d.weight || d.count || 1) * 0.7)); }
 
   // Filter bar
   var filterBar = document.createElement('div');
@@ -3972,20 +4006,35 @@ function renderGraph() {
   container.style.position = 'relative';
   container.appendChild(filterBar);
 
+  // ═══ GRAPH LEGEND ═══
+  var legend = document.createElement('div');
+  legend.style.cssText = 'position:absolute;bottom:8px;left:8px;z-index:10;padding:6px 10px;background:rgba(28,33,39,0.92);border:1px solid var(--border);border-radius:5px;backdrop-filter:blur(8px);font:400 5.5pt var(--m);color:var(--muted);line-height:1.8';
+  legend.innerHTML = '<div style="font:600 6pt var(--m);color:var(--text);margin-bottom:2px">Legende</div>'
+    + '<div><svg width="10" height="10" style="vertical-align:middle"><circle cx="5" cy="5" r="4" fill="var(--accent)" stroke="#fff" stroke-width="1"/></svg> Kandidat (Farbe = Partei)</div>'
+    + '<div><svg width="12" height="10" style="vertical-align:middle"><rect x="1" y="1" width="10" height="8" rx="2" fill="#8b5cf6" opacity="0.85"/></svg> Medium</div>'
+    + '<div><svg width="12" height="12" style="vertical-align:middle"><polygon points="6,1 11,4 11,9 6,12 1,9 1,4" fill="#6b7280" opacity="0.75"/></svg> Thema</div>'
+    + '<div style="margin-top:3px;border-top:1px solid var(--border);padding-top:3px">'
+    + '<span style="display:inline-block;width:16px;border-top:2px solid #238551;margin-right:4px;vertical-align:middle"></span>positiv '
+    + '<span style="display:inline-block;width:16px;border-top:2px dashed #555e70;margin:0 4px;vertical-align:middle"></span>neutral '
+    + '<span style="display:inline-block;width:16px;border-top:2px solid #c0392b;margin:0 4px;vertical-align:middle"></span>negativ</div>'
+    + '<div><span style="color:var(--text2)">Linienstärke</span> = Artikelanzahl</div>';
+  container.appendChild(legend);
+
   const nodes = JSON.parse(JSON.stringify(GRAPH.nodes));
   var partyGroups = ['CSU','SPD','Grüne','Bündnis 90/Die Grünen','AfD','FDP','Freie Wähler','FW','Linke','ÖDP','Parteifreie Bürger','CSU/FDP','Die Guten','Sonstige','Linke Liste Nürnberg','DIE LINKE'];
   var mediaGroups = ['Medien','Medium'];
   var themaGroups = ['Thema','Wirtschaft','Struktur'];
   nodes.forEach(n => {
     n.r = n.r || n.size || 12; n.group = n.group || n.type || "neutral"; n.info = n.info || n.sub || "";
-    // Derive filterGroup for filter buttons
+    // Derive filterGroup from type (primary) and group (legacy Friedberg)
+    var t = n.type || '';
     var g = n.group || '';
-    var isKB = KB[n.id] || KB[n.id.replace('kand_','')] || null;
-    if (isKB && (isKB.role||'').match(/Kandidat|Bürgermeister/i)) { n.filterGroup = 'kandidaten'; }
-    else if (partyGroups.indexOf(g) >= 0 && !n.filterGroup) { n.filterGroup = (isKB && isKB.type === 'medium') ? 'medien' : 'parteien'; }
-    else if (mediaGroups.indexOf(g) >= 0 || (isKB && isKB.type === 'medium')) { n.filterGroup = 'medien'; }
-    else if (themaGroups.indexOf(g) >= 0 || g === 'theme' || g === 'theme_hot') { n.filterGroup = 'themen'; }
-    else if (g === 'institution' || g === 'Institutionen') { n.filterGroup = 'institutionen'; }
+    var isKB = KB[n.id] || KB[(n.id||'').replace('kand_','')] || null;
+    if (t === 'kandidat' || g === 'Kandidaten' || (isKB && (isKB.role||'').match(/Kandidat|Bürgermeister/i))) { n.filterGroup = 'kandidaten'; }
+    else if (t === 'media' || g === 'Medien' || g === 'Medium' || mediaGroups.indexOf(g) >= 0 || (isKB && isKB.type === 'medium')) { n.filterGroup = 'medien'; }
+    else if (t === 'theme' || t === 'theme_hot' || g === 'Themen' || g === 'Thema' || themaGroups.indexOf(g) >= 0) { n.filterGroup = 'themen'; }
+    else if (t === 'institution' || g === 'institution' || g === 'Institutionen') { n.filterGroup = 'institutionen'; }
+    else if (partyGroups.indexOf(g) >= 0) { n.filterGroup = 'parteien'; }
     else if (isKB && isKB.role) { n.filterGroup = 'kandidaten'; }
     else { n.filterGroup = 'parteien'; }
   });
@@ -4000,10 +4049,14 @@ function renderGraph() {
     .force('center', d3.forceCenter(width / 2, height / 2))
     .force('collision', d3.forceCollide().radius(d => d.r + 6));
 
+  // ═══ SEMANTIC EDGES ═══
+  // Width = article count (weight). Color = sentiment. Style = relationship type.
   const link = svg.append('g').selectAll('line').data(links).join('line')
     .attr('class', 'link')
-    .attr('stroke', d => linkColorMap[d.type] || '#555')
-    .attr('stroke-width', 1.5);
+    .attr('stroke', d => sentimentColor(d.sentiment))
+    .attr('stroke-width', d => linkWidth(d))
+    .attr('stroke-dasharray', d => d.type === 'covers' ? '4,3' : 'none')
+    .attr('stroke-opacity', 0.5);
 
   const linkLabel = svg.append('g').selectAll('text').data(links).join('text')
     .attr('class', 'link-label')
@@ -4016,24 +4069,61 @@ function renderGraph() {
       .on('end', (e, d) => { if (!e.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; })
     );
 
-  node.append('circle')
-    .attr('class', 'node-circle')
-    .attr('r', d => d.r)
-    .attr('fill', d => colorMap[d.group] || '#777')
-    .attr('stroke', d => ['ally','threat','neutral'].includes(d.group) ? '#fff' : 'none')
-    .attr('stroke-width', 2)
-    .on('click', (e, d) => { if (KB[d.id]) showEntity(d.id); });
+  // ═══ ENTITY-TYPED SHAPES ═══
+  // Palantir principle: Shape = entity type. Color = party/property.
+  // ● Circle = Kandidat (person), ■ Rounded-Rect = Medium (publication),
+  // ⬡ Hexagon = Thema (topic cluster), ◇ Diamond = Institution
+  function hexPoints(r) {
+    return Array.from({length:6},function(_,i){ var a=Math.PI/3*i-Math.PI/2; return (r*Math.cos(a)).toFixed(1)+','+(r*Math.sin(a)).toFixed(1); }).join(' ');
+  }
+  node.each(function(d) {
+    var el = d3.select(this);
+    var t = d.type || d.group || '';
+    var c = nodeColor(d);
+    var isKand = (t === 'kandidat' || t === 'Kandidaten' || ['ally','threat','neutral','incumbent'].includes(t));
+    var isMedia = (t === 'media' || t === 'Medien' || t === 'Medium');
+    var isTheme = (t === 'theme' || t === 'theme_hot' || t === 'Thema' || t === 'Themen');
+    if (isKand) {
+      el.append('circle').attr('class','node-shape').attr('r', d.r).attr('fill', c).attr('stroke','#fff').attr('stroke-width',2);
+    } else if (isMedia) {
+      var w = d.r * 1.6, h = d.r * 1.3;
+      el.append('rect').attr('class','node-shape').attr('x', -w/2).attr('y', -h/2).attr('width', w).attr('height', h).attr('rx', 3).attr('fill', c).attr('opacity', 0.85);
+    } else if (isTheme) {
+      el.append('polygon').attr('class','node-shape').attr('points', hexPoints(d.r)).attr('fill', c).attr('opacity', 0.75);
+    } else {
+      // Diamond for institutions / other
+      var s = d.r * 0.9;
+      el.append('polygon').attr('class','node-shape').attr('points', '0,'+(-s)+' '+s+',0 0,'+s+' '+(-s)+',0').attr('fill', c).attr('opacity', 0.8);
+    }
+  });
+  // Click handler on shapes
+  node.selectAll('.node-shape').on('click', (e, d) => {
+    var nd = d3.select(e.target.parentNode).datum();
+    var kbId = nd.id ? nd.id.replace('kand_','') : nd.id;
+    if (KB[kbId] || KB[nd.id]) showEntity(kbId || nd.id);
+  });
 
   node.append('text').attr('class', 'node-label').attr('dy', d => -d.r - 6)
-    .attr('font-size', d => ['ally','threat','neutral'].includes(d.group) ? '7pt' : '6pt')
-    .attr('fill', d => colorMap[d.group] || '#777').text(d => d.label);
+    .attr('font-size', d => { var t=d.type||d.group||''; return (t==='kandidat'||t==='Kandidaten') ? '7pt' : '6pt'; })
+    .attr('fill', d => nodeColor(d)).text(d => d.label);
 
   node.append('text').attr('class', 'node-sublabel').attr('dy', d => -d.r + 3)
     .attr('font-size', '4.5pt').text(d => d.sub);
 
   const tooltip = document.getElementById('graph-tooltip');
   node.on('mouseover', (e, d) => {
-    tooltip.innerHTML = '<h4>' + d.label + '</h4><div style="font:400 6pt var(--m);color:var(--text2)">' + d.sub + '</div><div style="font-size:6.5pt;color:var(--text2);margin-top:4px">' + d.info + '</div>';
+    var t = d.type || d.group || '';
+    var isKand = (t === 'kandidat' || t === 'Kandidaten' || ['ally','threat','neutral','incumbent'].includes(t));
+    var isMedia = (t === 'media' || t === 'Medien' || t === 'Medium');
+    var kbId = d.id ? d.id.replace('kand_','') : d.id;
+    var kb = KB[kbId] || KB[d.id] || null;
+    var html = '<h4 style="color:'+nodeColor(d)+'">' + d.label + '</h4>';
+    if (isKand && d.party) html += '<div style="font:600 5.5pt var(--m);color:'+nodeColor(d)+'">'+d.party+'</div>';
+    if (d.sub) html += '<div style="font:400 6pt var(--m);color:var(--text2);margin-top:2px">' + d.sub + '</div>';
+    if (d.info) html += '<div style="font-size:6.5pt;color:var(--text2);margin-top:3px">' + d.info + '</div>';
+    if (isMedia && d.count) html += '<div style="font:500 5.5pt var(--m);color:var(--accent);margin-top:3px">' + d.count + ' Artikel</div>';
+    if (kb && kb.role) html += '<div style="font:400 5.5pt var(--m);color:var(--muted);margin-top:2px">' + kb.role + '</div>';
+    tooltip.innerHTML = html;
     tooltip.style.opacity = 1;
   }).on('mousemove', e => {
     tooltip.style.left = (e.offsetX + 14) + 'px';
