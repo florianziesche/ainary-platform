@@ -3958,17 +3958,30 @@ function renderGraph() {
   var THEME_HOT_COLOR = '#ef4444'; // red — hot/contested themes
   var INST_COLOR = '#555e70';    // dark steel
   function nodeColor(d) {
-    var t = d.type || d.group || '';
-    if (t === 'kandidat' || t === 'Kandidaten') return partyColor(d.party);
-    if (t === 'media' || t === 'Medien' || t === 'Medium') return MEDIA_COLOR;
-    if (t === 'theme_hot') return THEME_HOT_COLOR;
-    if (t === 'theme' || t === 'Thema' || t === 'Themen') return THEME_COLOR;
-    if (t === 'institution' || t === 'Institutionen') return INST_COLOR;
-    // Legacy Friedberg groups
-    if (['ally','threat','neutral','incumbent'].includes(t)) return partyColor(d.party);
-    // Fallback: try party from KB
-    var kbId = d.id ? d.id.replace('kand_','') : '';
-    if (KB[kbId] && KB[kbId].party) return partyColor(KB[kbId].party);
+    var t = d.type || '';
+    var g = d.group || '';
+    var fg = d.filterGroup || '';
+    // 1. Kandidaten: always party-colored
+    if (fg === 'kandidaten' || t === 'kandidat' || t === 'Kandidaten') {
+      var p = d.party || g; // group might be "CSU", "SPD" etc.
+      var kbId = d.id ? d.id.replace('kand_','') : d.id;
+      if (!p && KB[kbId]) p = KB[kbId].party;
+      return partyColor(p);
+    }
+    // 2. Medien
+    if (fg === 'medien' || t === 'media' || g === 'Medien' || g === 'Medium') return MEDIA_COLOR;
+    // 3. Themen
+    if (fg === 'themen' || t === 'theme_hot') return THEME_HOT_COLOR;
+    if (fg === 'themen' || t === 'theme' || g === 'Thema' || g === 'Themen') return THEME_COLOR;
+    // 4. Institutionen
+    if (fg === 'institutionen' || t === 'institution' || g === 'Institutionen') return INST_COLOR;
+    // 5. Parteien (group IS a party name)
+    if (fg === 'parteien') return partyColor(g);
+    // 6. Legacy
+    if (['ally','threat','neutral','incumbent'].includes(g)) return partyColor(d.party);
+    // 7. Fallback: try KB
+    var kbId2 = d.id ? d.id.replace('kand_','') : '';
+    if (KB[kbId2] && KB[kbId2].party) return partyColor(KB[kbId2].party);
     return '#8F99A8';
   }
   function sentimentColor(s) { return s === 'POS' ? '#238551' : s === 'NEG' ? '#c0392b' : '#555e70'; }
@@ -4080,9 +4093,11 @@ function renderGraph() {
     var el = d3.select(this);
     var t = d.type || d.group || '';
     var c = nodeColor(d);
-    var isKand = (t === 'kandidat' || t === 'Kandidaten' || ['ally','threat','neutral','incumbent'].includes(t));
-    var isMedia = (t === 'media' || t === 'Medien' || t === 'Medium');
-    var isTheme = (t === 'theme' || t === 'theme_hot' || t === 'Thema' || t === 'Themen');
+    // Use filterGroup (reliable, KB-derived) as primary shape signal
+    var fg = d.filterGroup || '';
+    var isKand = fg === 'kandidaten' || t === 'kandidat' || t === 'Kandidaten';
+    var isMedia = fg === 'medien' || t === 'media' || t === 'Medien' || t === 'Medium';
+    var isTheme = fg === 'themen' || t === 'theme' || t === 'theme_hot' || t === 'Thema' || t === 'Themen';
     if (isKand) {
       el.append('circle').attr('class','node-shape').attr('r', d.r).attr('fill', c).attr('stroke','#fff').attr('stroke-width',2);
     } else if (isMedia) {
@@ -4104,7 +4119,7 @@ function renderGraph() {
   });
 
   node.append('text').attr('class', 'node-label').attr('dy', d => -d.r - 6)
-    .attr('font-size', d => { var t=d.type||d.group||''; return (t==='kandidat'||t==='Kandidaten') ? '7pt' : '6pt'; })
+    .attr('font-size', d => d.filterGroup === 'kandidaten' ? '7pt' : '6pt')
     .attr('fill', d => nodeColor(d)).text(d => d.label);
 
   node.append('text').attr('class', 'node-sublabel').attr('dy', d => -d.r + 3)
@@ -4112,9 +4127,9 @@ function renderGraph() {
 
   const tooltip = document.getElementById('graph-tooltip');
   node.on('mouseover', (e, d) => {
-    var t = d.type || d.group || '';
-    var isKand = (t === 'kandidat' || t === 'Kandidaten' || ['ally','threat','neutral','incumbent'].includes(t));
-    var isMedia = (t === 'media' || t === 'Medien' || t === 'Medium');
+    var fg = d.filterGroup || '';
+    var isKand = fg === 'kandidaten';
+    var isMedia = fg === 'medien';
     var kbId = d.id ? d.id.replace('kand_','') : d.id;
     var kb = KB[kbId] || KB[d.id] || null;
     var html = '<h4 style="color:'+nodeColor(d)+'">' + d.label + '</h4>';
