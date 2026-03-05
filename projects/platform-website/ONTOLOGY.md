@@ -89,6 +89,38 @@ CLAIM (überprüfbare Behauptung)
 ├── sources: string[]
 ├── confidence: number
 └── soWhat: string
+
+RESEARCH_REPORT (Input-Dokument das Claims generiert)
+├── id: string (e.g. "rr-palantir-deep-2026-03")
+├── title: string
+├── type: "research_report"
+├── date: string (ISO)
+├── author: string (→ PERSON.id | "mia" | external)
+├── url: string | null
+├── domain: string (e.g. "agent-architecture", "kommunalpolitik", "ai-governance")
+├── sourceCount: number
+├── claimCount: number (auto-computed)
+├── topicLinks: string[] (→ TOPIC.id)
+├── admiralty: string (overall report quality)
+├── confidence: number
+├── abstract: string
+├── methodology: string | null
+└── status: "draft" | "published" | "superseded"
+
+TOPIC (Wissens-Cluster, cross-report)
+├── id: string (e.g. "topic-agent-memory", "topic-ontology")
+├── label: string
+├── type: "topic"
+├── domain: string
+├── claimCount: number (auto: alle Claims die hierhin linken)
+├── reportCount: number (auto: alle Reports die hierhin linken)
+├── verifiedClaimCount: number
+├── contradictionCount: number
+├── konsistenz: string (auto: "Bestätigt durch X Quellen")
+├── lastUpdated: string (ISO)
+├── subscribers: string[] (future: wer bekommt Updates)
+├── executiveSummary: string (auto-generated from top claims)
+└── openQuestions: string[]
 ```
 
 ### Link Types
@@ -108,6 +140,16 @@ ARTIKEL --[gehört_zu]--> THEMA
 ARTIKEL --[bestätigt|widerspricht]--> CLAIM
 CLAIM --[aufgestellt_von]--> PERSON
 THEMA --[beeinflusst]--> PERSON (sentiment: POS/NEG/NEUTRAL)
+
+// Research Ontology Network Links
+RESEARCH_REPORT --[enthält]--> CLAIM (1:N)
+RESEARCH_REPORT --[behandelt]--> TOPIC (M:N)
+RESEARCH_REPORT --[zitiert]--> RESEARCH_REPORT (cross-reference)
+CLAIM --[gehört_zu]--> TOPIC (M:N)
+CLAIM --[bestätigt]--> CLAIM (cross-report verification)
+CLAIM --[widerspricht]--> CLAIM (contradiction detection)
+TOPIC --[verwandt_mit]--> TOPIC (semantic proximity)
+TOPIC --[subsumiert]--> TOPIC (hierarchy: "AI Governance" > "Agent Memory")
 ```
 
 ---
@@ -166,6 +208,45 @@ ENRICH_PERSON
     3. Graph-Links zu Themen aus Artikeln ableiten
     4. trustScore setzen
     5. soWhat formulieren
+
+EXTRACT_CLAIMS (Research Ontology Network — CORE ACTION)
+  trigger: Neuer Research Report abgeschlossen
+  input: report_text, sources[], domain
+  output: RESEARCH_REPORT + CLAIM[] + TOPIC links
+  steps:
+    1. Report-Metadaten erfassen (title, date, author, sources)
+    2. Claims extrahieren: jede überprüfbare Aussage = 1 Claim
+    3. EIJA-Tag pro Claim: E=Evidenz, I=Interpretation, J=Bewertung, A=Annahme
+    4. Admiralty pro Claim (von Quellen-Qualität ableiten)
+    5. Topic-Zuordnung: existierender Topic oder neuer Topic?
+    6. Cross-Check: bestätigt/widerspricht Claim einen bestehenden Claim?
+    7. Konsistenz-Badges updaten auf betroffenen Topics
+    8. Verified Truths updaten wenn ≥3 unabhängige Bestätigungen
+  compound_effect: "Jeder neue Report macht alle bestehenden Topics reicher"
+
+COMPOUND_TOPICS (Network Effect Engine)
+  trigger: Nach EXTRACT_CLAIMS oder periodisch
+  input: topic_id oder "all"
+  steps:
+    1. Alle Claims für Topic aggregieren
+    2. Contradictions identifizieren (Claims die sich widersprechen)
+    3. Konsistenz berechnen: verified / total claims
+    4. Executive Summary regenerieren (top claims, gewichtet nach confidence)
+    5. Open Questions identifizieren: Topics mit <3 Claims oder hohem A-Anteil
+    6. Cross-Topic Connections: Claims die in >1 Topic auftauchen
+    7. Subscriber-Notification: "Topic X hat 3 neue Claims seit deinem letzten Check"
+  output: Updated TOPIC objects, contradiction alerts, konsistenz badges
+
+INGEST_EXTERNAL_RESEARCH (Scale-Action für 500+ Reports)
+  trigger: Neue externe Quelle (Paper, Blog, Report)
+  input: url | pdf | text
+  steps:
+    1. Content extrahieren (web_fetch / pdf)
+    2. Qualität bewerten: Admiralty-Code für Gesamtquelle
+    3. → EXTRACT_CLAIMS pipeline
+    4. Deduplizierung: Claim schon vorhanden? → Link statt Duplikat
+    5. Domain-Routing: welche Topics betroffen?
+  scale: 500 Reports → ~5.000 Claims → ~50 Topics → Network Effect
 ```
 
 ### Logic Functions (deterministic)
