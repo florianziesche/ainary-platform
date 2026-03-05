@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ainary Research Network</title>
+<style>
+:root {
+  --bg: #fafaf8; --surface: #f5f4f0; --border: #e5e3dc;
+  --text: #1a1a1a; --text2: #555e70; --muted: #8a9199;
+  --gold: #c8aa50; --green: #1a5c2a; --red: #991b1b; --blue: #2563eb;
+  --f: 'Inter', -apple-system, sans-serif;
+  --m: 'JetBrains Mono', 'SF Mono', monospace;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:var(--f); background:var(--bg); color:var(--text); }
+.page { max-width:960px; margin:0 auto; padding:32px 24px; }
+
+/* Header */
+.header { text-align:center; padding:40px 0 32px; border-bottom:2px solid var(--gold); margin-bottom:32px; }
+.header h1 { font:700 24pt var(--f); letter-spacing:-0.5px; }
+.header .sub { font:400 10pt var(--f); color:var(--text2); margin-top:8px; }
+
+/* Stats bar */
+.stats { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:32px; }
+.stat { flex:1; min-width:120px; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:16px; text-align:center; }
+.stat .num { font:700 24pt var(--m); color:var(--gold); }
+.stat .label { font:500 8pt var(--m); color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-top:4px; }
+
+/* Topic cards */
+.topic-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:16px; margin-bottom:32px; }
+.topic-card { background:#fff; border:1px solid var(--border); border-radius:8px; padding:20px; cursor:pointer; transition:all 0.2s; }
+.topic-card:hover { border-color:var(--gold); box-shadow:0 2px 12px rgba(200,170,80,0.15); }
+.topic-card.expanded { grid-column:1/-1; }
+.topic-name { font:600 11pt var(--f); margin-bottom:8px; }
+.topic-meta { font:400 8pt var(--m); color:var(--muted); margin-bottom:12px; }
+.konsistenz { display:inline-block; font:500 7pt var(--m); padding:2px 8px; border-radius:3px; }
+.konsistenz.high { background:rgba(26,92,42,0.1); color:var(--green); }
+.konsistenz.medium { background:rgba(200,170,80,0.15); color:var(--gold); }
+.konsistenz.low { background:var(--surface); color:var(--muted); }
+.topic-summary { font:400 9pt var(--f); color:var(--text2); line-height:1.6; margin-top:8px; }
+
+/* Claims list */
+.claims-list { margin-top:16px; display:none; }
+.topic-card.expanded .claims-list { display:block; }
+.claim-item { padding:12px 0; border-top:1px solid var(--border); }
+.claim-text { font:400 9pt var(--f); line-height:1.5; }
+.claim-meta { font:400 7pt var(--m); color:var(--muted); margin-top:4px; }
+.eija-badge { display:inline-block; font:700 6pt var(--m); padding:1px 5px; border-radius:2px; margin-right:4px; }
+.eija-E { background:#e8f5e9; color:var(--green); }
+.eija-I { background:#e3f2fd; color:var(--blue); }
+.eija-J { background:#fff3e0; color:#e65100; }
+.eija-A { background:#fce4ec; color:var(--red); }
+.conf-bar { display:inline-block; width:40px; height:4px; background:var(--border); border-radius:2px; margin-left:8px; vertical-align:middle; }
+.conf-fill { height:100%; border-radius:2px; }
+
+/* Reports */
+.reports { margin-bottom:32px; }
+.report-row { display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:var(--surface); border:1px solid var(--border); border-radius:6px; margin-bottom:8px; }
+.report-title { font:500 9pt var(--f); }
+.report-meta { font:400 7pt var(--m); color:var(--muted); }
+
+/* Section titles */
+h2 { font:600 14pt var(--f); margin-bottom:16px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+h2 .count { font:400 10pt var(--m); color:var(--muted); margin-left:8px; }
+
+/* Compound metric */
+.compound { background:linear-gradient(135deg, var(--surface) 0%, rgba(200,170,80,0.08) 100%); border:2px solid var(--gold); border-radius:8px; padding:24px; margin-bottom:32px; text-align:center; }
+.compound .big { font:700 32pt var(--m); color:var(--gold); }
+.compound .desc { font:500 9pt var(--f); color:var(--text2); margin-top:4px; }
+
+/* Footer */
+.footer { text-align:center; padding:32px 0; border-top:1px solid var(--border); margin-top:48px; }
+.footer p { font:400 8pt var(--m); color:var(--muted); }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <h1>Ainary Research Network</h1>
+    <div class="sub">Claim-Level Knowledge Graph · Jeder neue Report macht alle Topics reicher</div>
+  </div>
+
+  <div id="compound" class="compound"></div>
+  <div id="stats" class="stats"></div>
+
+  <h2>Topics <span id="topicCount" class="count"></span></h2>
+  <div id="topics" class="topic-grid"></div>
+
+  <h2>Reports <span id="reportCount" class="count"></span></h2>
+  <div id="reports" class="reports"></div>
+
+  <div class="footer">
+    <p>Ainary Ventures · Research Ontology Network v1.0</p>
+    <p style="margin-top:4px">EIJA: <span class="eija-badge eija-E">E</span> Evidenz <span class="eija-badge eija-I">I</span> Interpretation <span class="eija-badge eija-J">J</span> Bewertung <span class="eija-badge eija-A">A</span> Annahme</p>
+  </div>
+</div>
+
+<script>
+// Load knowledge graph
+fetch('graph/knowledge-graph.json')
+  .then(r => r.json())
+  .then(render)
+  .catch(e => {
+    document.getElementById('stats').innerHTML = '<p style="color:var(--red)">Error loading knowledge graph: ' + e.message + '</p>';
+  });
+
+function render(G) {
+  var reports = Object.values(G.reports || {});
+  var claims = Object.values(G.claims || {});
+  var topics = Object.values(G.topics || {}).sort((a,b) => (b.claimIds||[]).length - (a.claimIds||[]).length);
+  var vt = G.verifiedTruths || [];
+
+  // EIJA dist
+  var eija = {E:0,I:0,J:0,A:0};
+  claims.forEach(c => { if(eija[c.eija]!==undefined) eija[c.eija]++; });
+
+  // Cross-topic
+  var crossTopic = claims.filter(c => (c.topics||[]).length > 1).length;
+  var crossPct = claims.length > 0 ? Math.round(crossTopic/claims.length*100) : 0;
+
+  // Compound metric
+  document.getElementById('compound').innerHTML =
+    '<div class="big">' + crossPct + '%</div>' +
+    '<div class="desc">Cross-Topic Vernetzung · ' + claims.length + ' Claims über ' + topics.length + ' Topics aus ' + reports.length + ' Reports</div>';
+
+  // Stats
+  document.getElementById('stats').innerHTML = [
+    {n: reports.length, l: 'Reports'},
+    {n: claims.length, l: 'Claims'},
+    {n: topics.length, l: 'Topics'},
+    {n: vt.length, l: 'Verified Truths'},
+    {n: eija.E, l: 'Evidenz'},
+    {n: eija.I + eija.J + eija.A, l: 'I+J+A'}
+  ].map(s => '<div class="stat"><div class="num">' + s.n + '</div><div class="label">' + s.l + '</div></div>').join('');
+
+  // Topics
+  document.getElementById('topicCount').textContent = '(' + topics.length + ')';
+  document.getElementById('topics').innerHTML = topics.map(function(t) {
+    var tc = (t.claimIds||[]).map(id => G.claims[id]).filter(Boolean);
+    var kLevel = t.konsistenzLevel || 'low';
+    var kText = t.konsistenz || '△ Wenige Daten';
+
+    var claimsHtml = tc.sort((a,b) => (b.confidence||0) - (a.confidence||0)).map(function(c) {
+      var confColor = c.confidence >= 80 ? 'var(--green)' : c.confidence >= 60 ? 'var(--gold)' : 'var(--red)';
+      return '<div class="claim-item">' +
+        '<div class="claim-text"><span class="eija-badge eija-' + c.eija + '">' + c.eija + '</span>' + esc(c.claim) + '</div>' +
+        '<div class="claim-meta">' + c.confidence + '% · ' + c.status + ' · ' + c.reportId +
+        '<span class="conf-bar"><span class="conf-fill" style="width:' + c.confidence + '%;background:' + confColor + '"></span></span></div>' +
+        (c.soWhat ? '<div style="font:italic 8pt var(--f);color:var(--text2);margin-top:4px">' + esc(c.soWhat) + '</div>' : '') +
+        '</div>';
+    }).join('');
+
+    return '<div class="topic-card" onclick="this.classList.toggle(\'expanded\')">' +
+      '<div class="topic-name">' + esc(t.label || t.id) + '</div>' +
+      '<div class="topic-meta">' + tc.length + ' Claims · ' + (t.reportIds||[]).length + ' Reports · <span class="konsistenz ' + kLevel + '">' + kText + '</span></div>' +
+      (t.executiveSummary ? '<div class="topic-summary">' + esc(t.executiveSummary).substring(0, 200) + '...</div>' : '') +
+      '<div class="claims-list">' + claimsHtml + '</div>' +
+      '</div>';
+  }).join('');
+
+  // Reports
+  document.getElementById('reportCount').textContent = '(' + reports.length + ')';
+  document.getElementById('reports').innerHTML = reports.map(function(r) {
+    return '<div class="report-row">' +
+      '<div class="report-title">' + esc(r.title) + '</div>' +
+      '<div class="report-meta">' + r.date + ' · ' + r.domain + ' · ' + (r.claimCount || '?') + ' claims · ' + r.admiralty + '</div>' +
+      '</div>';
+  }).join('');
+}
+
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
+</body>
+</html>
