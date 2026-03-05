@@ -517,9 +517,11 @@ function renderReportBuilder(){
   h+='<button class="fbtn" onclick="closeModal()">Cancel</button>';
   h+='<button class="fbtn" onclick="downloadReport()">⤓ Download JSON</button>';
   h+='<button class="fbtn" onclick="copyReport()">Copy JSON</button>';
-  h+='<button class="fbtn primary" onclick="executeResearch()" style="font-size:8pt;padding:7px 16px">◉ Execute Research → Mia</button>';
+  h+='<button class="fbtn primary" onclick="executeResearch(\'research\')" style="font-size:8pt;padding:7px 16px">◉ Research (20+ Quellen)</button>';
+  h+='<button class="fbtn" onclick="executeResearch(\'assets\')" style="font-size:8pt;padding:7px 14px;background:rgba(37,99,235,.1);color:var(--blue);border-color:var(--blue)">◈ Assets bauen</button>';
+  h+='<button class="fbtn" onclick="executeResearch(\'build\')" style="font-size:8pt;padding:7px 14px;background:rgba(26,92,42,.1);color:var(--green);border-color:var(--green)">◇ Feature bauen</button>';
   h+='</div>';
-  h+='<div style="font:400 6pt var(--f);color:var(--muted);text-align:right;margin-top:4px">Execute = Full AR-Format Report (20+ Quellen, Beipackzettel, Claim Ledger, Follow-Ups)</div>';
+  h+='<div style="font:400 6pt var(--f);color:var(--muted);text-align:right;margin-top:4px">Research → Assets → Build · EXEC-RESEARCH-FACTORY → ASSET-BUILDER → DEV-PROMPT</div>';
   
   m.innerHTML=h;
 }
@@ -566,7 +568,7 @@ function buildReport(){
 }
 
 // ═══ GENERATE EXEC RESEARCH INTAKE ═══
-window.executeResearch=function(){
+window.executeResearch=function(mode){
   var r=buildReport();
   var d=DOS[_rb.topicId];
   
@@ -585,74 +587,102 @@ window.executeResearch=function(){
   var openQs=[];
   if(d&&d.openQuestions){d.openQuestions.slice(0,5).forEach(function(q){openQs.push(q.text)})}
 
-  // Build EXEC RESEARCH INTAKE (standard/EXEC-RESEARCH-FACTORY.md)
-  var intake='EXEC RESEARCH INTAKE\n';
-  intake+='- TOPIC: '+_rb.topicLabel+'\n';
-  intake+='- DECISION_TO_INFORM: Should Ainary invest research time into '+_rb.topicLabel+'? What are the key claims, trade-offs, and practical implications?\n';
-  intake+='- DECISION_OWNER: Florian Ziesche\n';
-  intake+='- AUDIENCE: Founder\n';
-  intake+='- RISK_TIER: 2\n';
-  intake+='- FRESHNESS: last_12m\n';
-  intake+='- BROWSING: allowed\n';
-  intake+='- OUTPUT_WRITEBACK: true\n';
-  intake+='- OUTPUT_LENGTH: extensive\n';
-  intake+='- OUTPUT FORMAT REQUIREMENTS: AR-format HTML report + JSON report for knowledge graph ingest\n';
-  intake+='- SCOPE CONSTRAINTS: AI/LLM domain, practitioner + academic sources\n';
-  intake+='- MUST-INCLUDE: Beipackzettel, Claim Ledger, Source Log, Contradiction Register\n';
-  intake+='- MUST-NOT: No claims without sources, no sources without URLs\n';
-  intake+='- SUCCESS CRITERIA:\n';
-  intake+='  - Min 20 Tier-1 sources (A1/A2/B2)\n';
-  intake+='  - 10-25 load-bearing claims with EIJA tags\n';
-  intake+='  - Beipackzettel: stark belegt / unsicher / nicht gefunden / widersprüche\n';
-  intake+='  - 3-5 follow-up questions\n';
-  intake+='  - JSON output for research-network/reports/'+r.id+'.json\n';
-  intake+='  - HTML output for research/'+r.id+'.html\n';
-  intake+='- WHAT HAPPENS IF WRONG: Bad claims enter knowledge graph, compound errors across topics\n';
+  // Shared context block
+  var ctx='--- EXISTING KNOWLEDGE CONTEXT ---\n';
+  ctx+='Topic: '+_rb.topicLabel+'\n';
+  ctx+='Current Confidence: '+(d&&d.confidence?d.confidence.score+'% — '+d.confidence.reason:'0% — Gap topic, no data')+'\n';
+  if(existingClaims.length){ctx+='\nExisting Claims ('+existingClaims.length+'):\n';existingClaims.forEach(function(c){ctx+=c+'\n'})}
+  if(crossContext.length){ctx+='\nCross-Learnings:\n';crossContext.forEach(function(c){ctx+='- '+c+'\n'})}
+  if(openQs.length){ctx+='\nOpen Questions:\n';openQs.forEach(function(q){ctx+='- '+q+'\n'})}
+  if(_rb.sources.length){ctx+='\nSuggested Sources:\n';_rb.sources.forEach(function(s){ctx+='- ['+s.admiralty+'] '+s.label+(s.url?' → '+s.url:'')+'\n'})}
+  if(_rb.researchQuestions&&_rb.researchQuestions.length){ctx+='\nResearch Questions:\n';_rb.researchQuestions.forEach(function(q){ctx+='- '+q+'\n'})}
 
-  // Add existing knowledge context
-  intake+='\n--- EXISTING KNOWLEDGE CONTEXT ---\n';
-  intake+='Current Confidence: '+(d&&d.confidence?d.confidence.score+'% — '+d.confidence.reason:'0% — Gap topic, no data')+'\n';
-  if(existingClaims.length){
-    intake+='\nExisting Claims ('+existingClaims.length+'):\n';
-    existingClaims.forEach(function(c){intake+=c+'\n'});
-  }
-  if(crossContext.length){
-    intake+='\nCross-Learnings from adjacent topics:\n';
-    crossContext.forEach(function(c){intake+='- '+c+'\n'});
-  }
-  if(openQs.length){
-    intake+='\nOpen Questions:\n';
-    openQs.forEach(function(q){intake+='- '+q+'\n'});
+  var output='';
+
+  if(mode==='research'){
+    // ═══ MODE A: EXEC RESEARCH FACTORY ═══
+    output='EXEC RESEARCH INTAKE\n';
+    output+='- TOPIC: '+_rb.topicLabel+'\n';
+    output+='- DECISION_TO_INFORM: What are the key claims, trade-offs, and practical implications of '+_rb.topicLabel+'?\n';
+    output+='- DECISION_OWNER: Florian Ziesche\n';
+    output+='- AUDIENCE: Founder\n';
+    output+='- RISK_TIER: 2\n';
+    output+='- FRESHNESS: last_12m\n';
+    output+='- BROWSING: allowed\n';
+    output+='- OUTPUT_WRITEBACK: true\n';
+    output+='- OUTPUT_LENGTH: extensive\n';
+    output+='- OUTPUT FORMAT REQUIREMENTS: AR-format HTML + JSON for knowledge graph\n';
+    output+='- MUST-INCLUDE: Beipackzettel, Claim Ledger, Source Log, Contradiction Register\n';
+    output+='- MUST-NOT: No claims without sources, no sources without URLs\n';
+    output+='- SUCCESS CRITERIA:\n';
+    output+='  - Min 20 Tier-1 sources (A1/A2/B2)\n';
+    output+='  - 10-25 load-bearing claims with EIJA tags\n';
+    output+='  - Beipackzettel: stark belegt / unsicher / nicht gefunden / widersprüche\n';
+    output+='  - 3-5 follow-up questions\n';
+    output+='  - JSON: research-network/reports/'+r.id+'.json\n';
+    output+='  - HTML: research/'+r.id+'.html\n';
+    output+='- WHAT HAPPENS IF WRONG: Bad claims enter knowledge graph, compound errors\n';
+    output+='\n'+ctx;
+    output+='\n--- INSTRUCTIONS ---\n';
+    output+='Standard: standards/EXEC-RESEARCH-FACTORY.md (Phase 1-4.5)\n';
+    output+='Then: standards/ASSET-BUILDER.md for writeback\n';
+    output+='Ingest: node extract-claims.js --ingest research-network/reports/'+r.id+'.json && node enrich-topics.js\n';
+    output+='Run full report.\n';
+
+  } else if(mode==='assets'){
+    // ═══ MODE B: ASSET BUILDER ═══
+    output='ASSET BUILDER — INTAKE\n\n';
+    output+='Source Report: research-network/reports/'+r.id+'.json\n';
+    output+='Topic Slug: '+_rb.topicId.replace(/^t-|^topic-/,'')+'\n\n';
+    output+='Standard: standards/ASSET-BUILDER.md\n\n';
+    output+='INSTRUCTIONS:\n';
+    output+='1. Read the research report (JSON + any HTML version)\n';
+    output+='2. Extract: Key Takeaways, recommendations, decision criteria, failure modes, definitions, entities\n';
+    output+='3. Build Asset Pack:\n';
+    output+='   - Atomic Notes (concept/claim-level, retrieval-optimized)\n';
+    output+='   - Playbooks (Trigger → Goal → Steps → Outputs → Failure modes)\n';
+    output+='   - Templates (When to use → Copy/paste block → Pitfalls)\n';
+    output+='   - RAG JSON Writeback (entities + relations + retrieval hints)\n';
+    output+='4. Quality Checks: Coverage, Dedupe, Traceability, Actionability, JSON integrity\n';
+    output+='5. Save assets to: memory/knowledge/'+_rb.topicId.replace(/^t-|^topic-/,'')+'-assets.md\n';
+    output+='\nClassification per asset: Evidenced | Derived | Operational\n';
+    output+='Confidence per asset: High | Med | Low\n';
+    output+='IDs: AB-'+_rb.topicId.replace(/^t-|^topic-/,'')+'-{TYPE}-{0001}\n';
+    output+='\n'+ctx;
+
+  } else if(mode==='build'){
+    // ═══ MODE C: EXPERT DEV PROMPT ENGINEER ═══
+    output='EXPERT AI DEVELOPMENT PROMPT — INTAKE\n\n';
+    output+='Topic: '+_rb.topicLabel+'\n';
+    output+='Goal: Transform research insights into a buildable feature/product\n\n';
+    output+='RESEARCH CONTEXT:\n'+ctx+'\n';
+    output+='TRANSFORMATION PROCESS:\n';
+    output+='1. ANALYZE: Extract core functionality from research claims\n';
+    output+='2. STRUCTURE: Apply CLEAR framework\n';
+    output+='   - Context: What problem does this solve?\n';
+    output+='   - Language: Specific, actionable specifications\n';
+    output+='   - Examples: Concrete input/output examples\n';
+    output+='   - Audience: Who uses this? (Florian / Customers / Agent)\n';
+    output+='   - Results: Success metrics, quality standards\n';
+    output+='3. OPTIMIZE: Progressive development stages (MVP → Enhanced → Production)\n';
+    output+='4. SPECIFY:\n';
+    output+='   - Technical stack + architecture\n';
+    output+='   - Testing + validation requirements\n';
+    output+='   - Deployment plan\n';
+    output+='   - A/B test criteria: What metric proves this works?\n';
+    output+='\nOUTPUT:\n';
+    output+='- Development spec (buildable by Mia or coding agent)\n';
+    output+='- A/B test design: control vs variant, success metric, sample size\n';
+    output+='- Definition of Done: When is it shipped?\n';
+    output+='\nPRINCIPLE: Neues Wissen → direkt umsetzen → A/B testen.\n';
+    output+='Kein Wissen ohne Anwendung. Kein Build ohne Messung.\n';
   }
 
-  // Suggested sources
-  if(_rb.sources.length){
-    intake+='\nSuggested Starting Sources:\n';
-    _rb.sources.forEach(function(s){
-      intake+='- ['+s.admiralty+'] '+s.label;
-      if(s.url)intake+=' → '+s.url;
-      intake+='\n';
-    });
-  }
-
-  // Research questions
-  if(_rb.researchQuestions&&_rb.researchQuestions.length){
-    intake+='\nResearch Questions:\n';
-    _rb.researchQuestions.forEach(function(q){intake+='- '+q+'\n'});
-  }
-
-  intake+='\n--- INSTRUCTIONS ---\n';
-  intake+='Use standard: standards/EXEC-RESEARCH-FACTORY.md (Phase 1-4.5)\n';
-  intake+='Then: standards/ASSET-BUILDER.md for knowledge writeback\n';
-  intake+='Output JSON to: research-network/reports/'+r.id+'.json\n';
-  intake+='Output HTML to: research/'+r.id+'.html\n';
-  intake+='Ingest: node extract-claims.js --ingest research-network/reports/'+r.id+'.json && node enrich-topics.js\n';
-  intake+='Run full report.\n';
-
-  navigator.clipboard.writeText(intake).then(function(){
-    document.getElementById('rb-preview').textContent=intake;
-    alert('EXEC RESEARCH INTAKE kopiert!\n\nSende an Mia → volle Pipeline (Phase 1-4.5 + Asset Builder)\n\n'+existingClaims.length+' Claims Kontext · '+_rb.sources.length+' Quellen · '+(_rb.researchQuestions||[]).length+' Fragen');
-  }).catch(function(){window.prompt('Copy:',intake)});
+  navigator.clipboard.writeText(output).then(function(){
+    document.getElementById('rb-preview').textContent=output;
+    var labels={research:'EXEC RESEARCH (Phase 1-4.5)',assets:'ASSET BUILDER (Notes + Playbooks + Templates)',build:'DEV PROMPT (Feature Spec + A/B Test)'};
+    alert(labels[mode]+' kopiert!\n\nSende an Mia zur Ausführung.');
+  }).catch(function(){window.prompt('Copy:',output)});
 };
 
 window.downloadReport=function(){
