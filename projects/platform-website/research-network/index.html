@@ -427,7 +427,15 @@ var _rb={topicId:null,topicLabel:'',sources:[],claims:[],adjacentTopics:[]};
 
 window.trigRes=function(tid,label){
   var d=DOS[tid];
-  _rb={topicId:tid,topicLabel:label,sources:[],claims:[],adjacentTopics:d?d.adjacentTopics:[]};
+  var sug=d&&d.suggestions?d.suggestions:{sources:[],claims:[],researchQuestions:[]};
+  
+  // Pre-fill with suggested sources
+  var prefillSources=sug.sources.map(function(s,i){return{id:'s'+(i+1),label:s.label,url:s.url||'',admiralty:s.admiralty||'B2',reason:s.reason||'',suggested:true}});
+  
+  // Pre-fill with suggested claims
+  var prefillClaims=sug.claims.map(function(c){return{claim:c.claim,eija:c.eija||'E',admiralty:c.admiralty||'B2',sources:[],soWhat:c.soWhat||'',reason:c.reason||'',suggested:true}});
+  
+  _rb={topicId:tid,topicLabel:label,sources:prefillSources,claims:prefillClaims,adjacentTopics:d?d.adjacentTopics:[],researchQuestions:sug.researchQuestions||[]};
   renderReportBuilder();
   document.getElementById('report-modal').classList.add('open');
 };
@@ -449,10 +457,22 @@ function renderReportBuilder(){
   }
   h+='</div>';
 
+  // ═══ RESEARCH QUESTIONS ═══
+  if(_rb.researchQuestions&&_rb.researchQuestions.length){
+    h+='<div class="form-section"><h4>Research Questions</h4>';
+    _rb.researchQuestions.forEach(function(q){
+      h+='<div style="font:400 7.5pt var(--f);color:var(--text2);padding:3px 0">? '+E(q)+'</div>';
+    });
+    h+='</div>';
+  }
+  
   // ═══ SOURCES ═══
   h+='<div class="form-section"><h4>Sources <span class="cnt">('+_rb.sources.length+')</span></h4>';
+  if(_rb.sources.some(function(s){return s.suggested}))h+='<div style="font:400 6.5pt var(--f);color:var(--gold);margin-bottom:4px">◉ Pre-filled from adjacent topics + domain knowledge. Edit or remove as needed.</div>';
   _rb.sources.forEach(function(s,i){
     h+='<div class="source-item"><span class="remove" onclick="rmSrc('+i+')">×</span>';
+    if(s.suggested)h+='<span style="font:600 5pt var(--m);color:var(--gold);float:right;margin-right:14px">SUGGESTED</span>';
+    if(s.reason)h+='<div style="font:italic 6pt var(--f);color:var(--muted);margin-bottom:3px">'+E(s.reason)+'</div>';
     h+='<div class="form-row"><input class="finput" placeholder="Label (e.g. Anthropic Research Blog)" value="'+E(s.label)+'" onchange="updSrc('+i+',\'label\',this.value)">';
     h+='<select class="fselect" onchange="updSrc('+i+',\'admiralty\',this.value)">';
     ['A1','A2','B1','B2','B3','C1','C2','C3','D4','E2'].forEach(function(a){h+='<option'+(s.admiralty===a?' selected':'')+'>'+a+'</option>'});
@@ -467,6 +487,8 @@ function renderReportBuilder(){
   h+='<div class="form-section"><h4>Claims <span class="cnt">('+_rb.claims.length+')</span></h4>';
   _rb.claims.forEach(function(c,i){
     h+='<div class="claim-item"><span class="remove" onclick="rmClaim('+i+')">×</span>';
+    if(c.suggested)h+='<span style="font:600 5pt var(--m);color:var(--gold);float:right;margin-right:14px">SUGGESTED</span>';
+    if(c.reason)h+='<div style="font:italic 6pt var(--f);color:var(--muted);margin-bottom:3px">'+E(c.reason)+'</div>';
     h+='<div class="form-row"><textarea class="ftextarea" placeholder="Claim (überprüfbare Aussage)" onchange="updClaim('+i+',\'claim\',this.value)">'+E(c.claim)+'</textarea></div>';
     h+='<div class="form-row">';
     h+='<select class="fselect" onchange="updClaim('+i+',\'eija\',this.value)">';

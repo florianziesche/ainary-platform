@@ -260,6 +260,120 @@ function getResearchDocs(topicClaims) {
   }).filter(Boolean);
 }
 
+// ═══ RESEARCH SUGGESTIONS (for gap topics + report builder) ═══
+function generateSuggestions(topicId, topicClaims, allTopicClaims, adjacentTopics) {
+  // Collect sources from adjacent topics that have data
+  const suggestedSources = [];
+  const seenSourceLabels = new Set();
+  
+  adjacentTopics.forEach(adj => {
+    const adjClaims = allTopicClaims[adj.id] || [];
+    adjClaims.forEach(c => {
+      (c.realSources || []).forEach(src => {
+        if (src.label && !seenSourceLabels.has(src.label)) {
+          seenSourceLabels.add(src.label);
+          suggestedSources.push({
+            label: src.label,
+            url: src.url || '',
+            admiralty: src.admiralty || 'B2',
+            reason: 'Used in adjacent topic: ' + (adj.label || adj.id)
+          });
+        }
+      });
+    });
+  });
+  
+  // Domain-specific standard sources based on topic keywords
+  const topicText = topicId.toLowerCase();
+  const domainSources = [];
+  
+  if (topicText.match(/agent|memory|tool|reflection|architecture/)) {
+    domainSources.push(
+      { label: 'Anthropic Research Blog', url: 'https://www.anthropic.com/research', admiralty: 'A1', reason: 'Primary source for agent architecture' },
+      { label: 'OpenAI Cookbook', url: 'https://cookbook.openai.com/', admiralty: 'A2', reason: 'Implementation patterns for agents' },
+      { label: 'LangChain Docs', url: 'https://docs.langchain.com/', admiralty: 'B2', reason: 'Agent framework documentation' }
+    );
+  }
+  if (topicText.match(/ontology|knowledge|graph|entity|semantic/)) {
+    domainSources.push(
+      { label: 'Palantir Ontology Blog', url: 'https://blog.palantir.com/', admiralty: 'A2', reason: 'Ontology design patterns' },
+      { label: 'W3C Knowledge Graphs', url: 'https://www.w3.org/standards/', admiralty: 'A1', reason: 'Semantic web standards' }
+    );
+  }
+  if (topicText.match(/llm|prompt|reasoning|training|embedding/)) {
+    domainSources.push(
+      { label: 'arXiv cs.CL', url: 'https://arxiv.org/list/cs.CL/recent', admiralty: 'A2', reason: 'Latest research papers' },
+      { label: 'Simon Willison\'s Weblog', url: 'https://simonwillison.net/', admiralty: 'B2', reason: 'LLM practitioner insights' }
+    );
+  }
+  if (topicText.match(/governance|safety|alignment|bias|regulation|transparen/)) {
+    domainSources.push(
+      { label: 'EU AI Act Full Text', url: 'https://eur-lex.europa.eu/eli/reg/2024/1689/oj', admiralty: 'A1', reason: 'Legal framework' },
+      { label: 'NIST AI Risk Management', url: 'https://airc.nist.gov/AI_RMF_Interactivity', admiralty: 'A1', reason: 'US risk framework' },
+      { label: 'Anthropic Safety Research', url: 'https://www.anthropic.com/research#safety', admiralty: 'A1', reason: 'Alignment research' }
+    );
+  }
+  if (topicText.match(/market|consulting|pricing|distribution|gtm|sales/)) {
+    domainSources.push(
+      { label: 'Stratechery', url: 'https://stratechery.com/', admiralty: 'B2', reason: 'Tech strategy analysis' },
+      { label: 'a16z Blog', url: 'https://a16z.com/blog/', admiralty: 'B2', reason: 'VC/market perspective' }
+    );
+  }
+  if (topicText.match(/palantir|foundry|gotham|fde|oag/)) {
+    domainSources.push(
+      { label: 'Palantir SEC 10-K', url: 'https://investors.palantir.com/sec-filings', admiralty: 'A1', reason: 'Financial data' },
+      { label: 'Palantir Docs', url: 'https://www.palantir.com/docs/foundry/', admiralty: 'A2', reason: 'Technical documentation' }
+    );
+  }
+  
+  // Deduplicate domain sources against already found
+  domainSources.forEach(ds => {
+    if (!seenSourceLabels.has(ds.label)) {
+      seenSourceLabels.add(ds.label);
+      suggestedSources.push(ds);
+    }
+  });
+  
+  // Suggested claims from adjacent topics (claims that partially relate)
+  const suggestedClaims = [];
+  const seenClaims = new Set();
+  
+  adjacentTopics.forEach(adj => {
+    const adjClaims = allTopicClaims[adj.id] || [];
+    adjClaims.forEach(c => {
+      if (seenClaims.has(c.id)) return;
+      // Check if claim text contains topic keywords
+      const topicKws = topicId.replace(/^t-|^topic-/, '').split('-').filter(w => w.length > 2);
+      const claimText = (c.claim || '').toLowerCase();
+      const hits = topicKws.filter(kw => claimText.includes(kw)).length;
+      if (hits > 0) {
+        seenClaims.add(c.id);
+        suggestedClaims.push({
+          claim: c.claim,
+          eija: c.eija || 'E',
+          admiralty: c.admiralty || 'B2',
+          soWhat: c.soWhat || '',
+          reason: 'Related claim from: ' + (adj.label || adj.id),
+          trust: (c.trustScore || {}).score || 50
+        });
+      }
+    });
+  });
+  
+  // Research questions derived from the topic + gaps
+  const researchQuestions = [];
+  const topicLabel = topicId.replace(/^t-|^topic-/, '').replace(/-/g, ' ');
+  researchQuestions.push('What are the current best practices for ' + topicLabel + '?');
+  researchQuestions.push('What are the main trade-offs and limitations of ' + topicLabel + '?');
+  researchQuestions.push('How does ' + topicLabel + ' compare across different implementations?');
+  
+  return {
+    sources: suggestedSources.slice(0, 10),
+    claims: suggestedClaims.sort((a, b) => b.trust - a.trust).slice(0, 5),
+    researchQuestions
+  };
+}
+
 // ═══ BUILD ALL DOSSIERS ═══
 const keywordMap = buildKeywordMap();
 const allTopicClaims = mapClaims(keywordMap);
@@ -271,6 +385,8 @@ function processTopic(node) {
   const tc = allTopicClaims[node.id] || [];
   if (tc.length > 0) stats.withClaims++; else stats.gaps++;
   
+  const adjTopics = findAdjacentTopics(node.id);
+  
   dossiers[node.id] = {
     id: node.id,
     label: node.label,
@@ -280,10 +396,11 @@ function processTopic(node) {
     playbook: generatePlaybook(tc),
     categorizedClaims: categorizeClaims(tc, node.id),
     crossLearnings: findCrossLearnings(node.id, tc, allTopicClaims),
-    adjacentTopics: findAdjacentTopics(node.id),
+    adjacentTopics: adjTopics,
     openQuestions: findOpenQuestions(tc),
     researchDocs: getResearchDocs(tc),
-    confidence: calculateConfidence(tc)
+    confidence: calculateConfidence(tc),
+    suggestions: generateSuggestions(node.id, tc, allTopicClaims, adjTopics)
   };
   
   (node.children || []).forEach(processTopic);
