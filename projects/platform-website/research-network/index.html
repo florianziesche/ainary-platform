@@ -22,6 +22,14 @@ a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}
 .proj:hover{border-color:var(--gold);background:rgba(200,170,80,.06)}
 .proj .dot{width:5px;height:5px;border-radius:50%}.proj .dot.a{background:var(--green)}.proj .dot.p{background:var(--gold)}.proj .dot.pl{background:var(--muted)}
 .proj .g{color:var(--red);font:400 6pt var(--m)}
+/* Sources bar */
+.srcbar{margin-bottom:12px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 14px}
+.srcbar h3{font:600 7pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.src{display:inline-flex;align-items:center;gap:5px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;margin:2px 3px;font:400 7pt var(--f);cursor:pointer;transition:all .15s}
+.src:hover{border-color:var(--gold);background:rgba(200,170,80,.06)}
+.src .sdot{width:5px;height:5px;border-radius:50%}.src .sdot.s-active{background:var(--green)}.src .sdot.s-planned{background:var(--muted)}.src .sdot.s-paused{background:var(--gold)}
+.src .stype{font:600 5pt var(--m);text-transform:uppercase;padding:1px 3px;border-radius:2px;background:var(--surface);color:var(--muted)}
+.src .scount{font:400 6pt var(--m);color:var(--muted)}
 /* Layout */
 .layout{display:grid;grid-template-columns:220px 1fr;gap:12px}@media(max-width:768px){.layout{grid-template-columns:1fr}}
 /* Sidebar */
@@ -101,13 +109,14 @@ a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}
 <div class="footer">Ainary Ventures · Research Network v2.0 · <span class="eija eija-E">E</span> Evidence <span class="eija eija-I">I</span> Interpretation <span class="eija eija-J">J</span> Judgment <span class="eija eija-A">A</span> Assumption</div>
 </div>
 <script>
-var G,TAX,DOS,PROJ,_tp={};
+var G,TAX,DOS,PROJ,SRC,_tp={};
 Promise.all([
   fetch('graph/knowledge-graph.json').then(r=>r.json()),
   fetch('taxonomy.json').then(r=>r.json()),
   fetch('graph/topic-dossiers.json').then(r=>r.json()),
-  fetch('projects.json').then(r=>r.json())
-]).then(function(d){G=d[0];TAX=d[1];DOS=d[2];PROJ=d[3];init()}).catch(function(e){
+  fetch('projects.json').then(r=>r.json()),
+  fetch('sources.json').then(r=>r.json())
+]).then(function(d){G=d[0];TAX=d[1];DOS=d[2];PROJ=d[3];SRC=d[4];init()}).catch(function(e){
   document.getElementById('main').innerHTML='<p style="color:var(--red);padding:20px">'+e.message+'</p>'});
 
 function init(){
@@ -121,7 +130,7 @@ function init(){
   // Stats
   document.getElementById('stats').innerHTML=[
     {n:reports.length,l:'Reports'},{n:claims.length,l:'Claims'},{n:dossiers.length,l:'Topics'},
-    {n:wc,l:'With Data'},{n:gaps,l:'Gaps'},{n:projects.length,l:'Projects'}
+    {n:wc,l:'With Data'},{n:gaps,l:'Gaps'},{n:projects.length,l:'Projects'},{n:((SRC||{}).sources||[]).length,l:'Sources'}
   ].map(function(s){return'<div class="stat"><div class="num">'+s.n+'</div><div class="label">'+s.l+'</div></div>'}).join('');
 
   // Topic→Projects reverse map
@@ -137,6 +146,23 @@ function init(){
     pb+='</div>';
   });
   pb+='</div>';
+  
+  // Sources bar
+  var sources=(SRC||{}).sources||[];
+  var activeS=sources.filter(function(s){return s.status==='active'}).length;
+  var plannedS=sources.filter(function(s){return s.status==='planned'}).length;
+  pb+='<div class="srcbar"><h3>Input Sources <span style="font-weight:400;color:var(--text2)">('+activeS+' active, '+plannedS+' planned)</span></h3>';
+  sources.forEach(function(s){
+    var typeColors={rss:'#2563eb','page-tracker':'#7c3aed',manual:'var(--green)','auto-ingest':'var(--gold)',vault:'#e65100'};
+    pb+='<div class="src" onclick="showSrc(\''+s.id+'\')">';
+    pb+='<span class="sdot s-'+s.status+'"></span>';
+    pb+='<span class="stype" style="color:'+(typeColors[s.type]||'var(--muted)')+'">'+s.type+'</span>';
+    pb+=E(s.label);
+    if(s.itemCount>0)pb+=' <span class="scount">'+s.itemCount+'</span>';
+    pb+='</div>';
+  });
+  pb+='</div>';
+  
   document.getElementById('pbar').innerHTML=pb;
 
   // Sidebar
@@ -328,6 +354,49 @@ window.showProj=function(pid){
     h+='</div>';
   }
   h+='</div>';document.getElementById('main').innerHTML=h;
+};
+
+window.showSrc=function(sid){
+  var s=((SRC||{}).sources||[]).find(function(x){return x.id===sid});if(!s)return;
+  var typeColors={rss:'#2563eb','page-tracker':'#7c3aed',manual:'var(--green)','auto-ingest':'var(--gold)',vault:'#e65100'};
+  var h='<div class="dos"><div class="bluf"><div class="bluf-title">'+E(s.label)+'</div>';
+  h+='<div style="font:400 8pt var(--f);color:var(--text2);margin-top:4px">'+E(s.description)+'</div>';
+  h+='<div class="bluf-metrics" style="margin-top:10px">';
+  h+='<div class="bm"><div class="v" style="color:'+(s.status==='active'?'var(--green)':s.status==='planned'?'var(--muted)':'var(--gold)')+'">'+s.status.toUpperCase()+'</div><div class="l">Status</div></div>';
+  h+='<div class="bm"><div class="v" style="color:'+(typeColors[s.type]||'var(--muted)')+'">'+s.type+'</div><div class="l">Type</div></div>';
+  h+='<div class="bm"><div class="v">'+s.frequency+'</div><div class="l">Frequency</div></div>';
+  h+='<div class="bm"><div class="v">'+s.trustFloor+'</div><div class="l">Trust Floor</div></div>';
+  h+='<div class="bm"><div class="v">'+s.itemCount+'</div><div class="l">Items</div></div>';
+  if(s.lastInput)h+='<div class="bm"><div class="v">'+s.lastInput+'</div><div class="l">Last Input</div></div>';
+  h+='</div></div>';
+  // URL
+  if(s.url){h+='<div class="sec"><h4>URL</h4><a href="'+s.url+'" target="_blank" style="font:400 8pt var(--f)">'+E(s.url)+'</a></div>';}
+  // Note
+  if(s.note){h+='<div class="sec"><h4>Note</h4><p style="font:400 8pt var(--f);color:var(--text2)">'+E(s.note)+'</p></div>';}
+  // Feeds topics
+  var ft=s.feedsTopics||[];
+  if(ft.length&&ft[0]!=='*'){
+    h+='<div class="sec"><h4>Feeds Topics ('+ft.length+')</h4>';
+    ft.forEach(function(tid){
+      var d=DOS[tid];var label=d?d.label:tid;var isGap=!d||d.isGap;
+      h+='<span class="adj'+(isGap?' gap':'')+'" style="cursor:pointer;'+(isGap?'border-color:var(--red);color:var(--red)':'')+'" onclick="show(\''+tid+'\')">'+E(label)+(isGap?' △':'')+'</span>';
+    });
+    h+='</div>';
+  } else if(ft[0]==='*'){
+    h+='<div class="sec"><h4>Feeds Topics</h4><p style="font:400 8pt var(--f);color:var(--text2)">Alle Topics (universelle Quelle)</p></div>';
+  }
+  // Pipeline status
+  if(s.status==='planned'){
+    h+='<div class="sec" style="text-align:center;padding:20px"><p style="font:400 8pt var(--f);color:var(--muted)">Quelle noch nicht angeschlossen.</p>';
+    h+='<button class="rbtn" onclick="trigSrc(\''+sid+'\',\''+E(s.label)+'\')">◉ Aktivieren</button></div>';
+  }
+  h+='</div>';
+  document.getElementById('main').innerHTML=h;
+};
+
+window.trigSrc=function(sid,label){
+  var prompt='Source aktivieren: '+label+'\n\nPipeline: RSS/Page → Fetch → Claim Extraction → Graph Ingest\nTools: blogwatcher (RSS), changedetection (Page Tracker)\nOutput: Claims mit EIJA + Admiralty → knowledge-graph.json';
+  navigator.clipboard.writeText(prompt).then(function(){alert('Activation prompt kopiert!')}).catch(function(){window.prompt('Copy:',prompt)});
 };
 
 window.trigRes=function(tid,label){
