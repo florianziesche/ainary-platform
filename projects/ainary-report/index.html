@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ainary Report — Intelligence Scanner</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:root {
+  --bg: #1a1c2e;
+  --surface: #252842;
+  --surface2: #2d3154;
+  --border: #3d4270;
+  --text: #e4e4f0;
+  --text2: #8888a8;
+  --accent: #f0c040;
+  --accent2: #ffd700;
+  --green: #50d890;
+  --red: #f06060;
+  --orange: #f0a040;
+  --blue: #60a0f0;
+  --purple: #a060f0;
+  --pixel: 'Press Start 2P', monospace;
+  --sans: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─── Scanline overlay ─── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.03) 2px,
+    rgba(0,0,0,0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ─── Layout ─── */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* ─── Header ─── */
+.header {
+  text-align: center;
+  padding: 40px 20px 30px;
+}
+
+.logo {
+  font-family: var(--pixel);
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.title {
+  font-family: var(--pixel);
+  font-size: 18px;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: var(--text2);
+  margin-top: 12px;
+}
+
+/* ─── Game Screen ─── */
+.game-screen {
+  background: var(--surface);
+  border: 3px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.05),
+    0 20px 60px rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+/* ─── Scene: Researcher Room ─── */
+.scene {
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%);
+  height: 220px;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 3px solid var(--border);
+}
+
+/* Pixel art room */
+.room-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    /* Floor */
+    linear-gradient(0deg, #2a2a4a 0%, #2a2a4a 30%, transparent 30%),
+    /* Wall */
+    linear-gradient(180deg, #1a1a3a 0%, #22224a 100%);
+}
+
+/* Desk */
+.desk {
+  position: absolute;
+  bottom: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 60px;
+  background: #5c3a1a;
+  border: 2px solid #4a2a10;
+  border-radius: 4px 4px 0 0;
+}
+
+.desk::after {
+  content: '';
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 45px;
+  background: #333;
+  border: 2px solid #555;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(96, 160, 240, 0.3);
+}
+
+/* Monitor glow */
+.monitor-glow {
+  position: absolute;
+  bottom: calc(30% + 35px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 35px;
+  background: rgba(96, 160, 240, 0.15);
+  border-radius: 2px;
+  animation: monitorPulse 3s ease-in-out infinite;
+}
+
+@keyframes monitorPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* Researcher character */
+.researcher {
+  position: absolute;
+  bottom: calc(30% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.researcher-sprite {
+  font-size: 48px;
+  animation: breathe 4s ease-in-out infinite;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+@keyframes breathe {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+/* Bookshelf */
+.bookshelf {
+  position: absolute;
+  top: 15px;
+  right: 60px;
+  font-size: 20px;
+  opacity: 0.6;
+}
+
+/* Plant */
+.plant {
+  position: absolute;
+  bottom: 30%;
+  left: 80px;
+  font-size: 24px;
+  opacity: 0.7;
+}
+
+/* ─── Dialogue Box ─── */
+.dialogue-box {
+  background: var(--surface2);
+  border-top: 3px solid var(--border);
+  padding: 20px 24px;
+  min-height: 80px;
+  position: relative;
+}
+
+.dialogue-name {
+  font-family: var(--pixel);
+  font-size: 9px;
+  color: var(--accent);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.dialogue-text {
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 40px;
+}
+
+.dialogue-text .cursor {
+  display: inline-block;
+  width: 8px;
+  height: 14px;
+  background: var(--accent);
+  animation: blink 0.8s step-end infinite;
+  vertical-align: middle;
+  margin-left: 2px;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* ─── Input Section ─── */
+.input-section {
+  padding: 24px;
+  background: var(--surface);
+}
+
+.mode-selector {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.mode-btn {
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 8px;
+  color: var(--text2);
+  font-family: var(--pixel);
+  font-size: 7px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.mode-btn:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.mode-btn.active {
+  border-color: var(--accent);
+  background: rgba(240, 192, 64, 0.1);
+  color: var(--accent);
+}
+
+.mode-btn .mode-icon {
+  font-size: 20px;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.input-field {
+  flex: 1;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: var(--text);
+  font-size: 15px;
+  font-family: var(--sans);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input-field:focus {
+  border-color: var(--accent);
+}
+
+.input-field::placeholder {
+  color: var(--text2);
+}
+
+.scan-btn {
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-family: var(--pixel);
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.scan-btn:hover {
+  background: var(--accent2);
+  transform: translateY(-1px);
+}
+
+.scan-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.url-row {
+  display: none;
+}
+
+.url-row.show {
+  display: flex;
+}
+
+.vs-row {
+  display: none;
+}
+
+.vs-row.show {
+  display: flex;
+}
+
+/* ─── Progress / Scanner ─── */
+.scanner {
+  display: none;
+  padding: 24px;
+  background: var(--surface);
+}
+
+.scanner.active {
+  display: block;
+}
+
+.scan-steps {
+  list-style: none;
+}
+
+.scan-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  font-size: 13px;
+  color: var(--text2);
+  transition: all 0.3s;
+}
+
+.scan-step.running {
+  color: var(--accent);
+}
+
+.scan-step.done {
+  color: var(--green);
+}
+
+.scan-step.error {
+  color: var(--red);
+}
+
+.step-icon {
+  width: 20px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.scan-step.running .step-icon::after {
+  content: '◉';
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.scan-step.done .step-icon::after {
+  content: '✓';
+}
+
+.scan-step.error .step-icon::after {
+  content: '✗';
+}
+
+.scan-step .step-icon::after {
+  content: '○';
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+/* ─── Pokédex Card ─── */
+.pokedex-card {
+  display: none;
+  background: var(--surface);
+  padding: 24px;
+}
+
+.pokedex-card.active {
+  display: block;
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.poke-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.poke-name {
+  font-family: var(--pixel);
+  font-size: 14px;
+  color: var(--text);
+}
+
+.poke-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px;
+  color: var(--text2);
+}
+
+.poke-risk {
+  font-family: var(--pixel);
+  font-size: 10px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+/* Stats bars */
+.stats-grid {
+  display: grid;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.stat-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 40px;
+  align-items: center;
+  gap: 12px;
+}
+
+.stat-label {
+  font-family: var(--pixel);
+  font-size: 8px;
+  color: var(--text2);
+  text-transform: uppercase;
+}
+
+.stat-bar-bg {
+  height: 10px;
+  background: var(--bg);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.stat-bar {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 1s ease-out;
+  width: 0;
+}
+
+.stat-bar.hp { background: linear-gradient(90deg, var(--green), #40f090); }
+.stat-bar.atk { background: linear-gradient(90deg, var(--red), #f08080); }
+.stat-bar.def { background: linear-gradient(90deg, var(--blue), #80c0f0); }
+.stat-bar.spd { background: linear-gradient(90deg, var(--purple), #c080f0); }
+
+.stat-value {
+  font-family: var(--pixel);
+  font-size: 9px;
+  color: var(--text);
+  text-align: right;
+}
+
+/* Actions */
+.poke-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.poke-btn {
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  color: var(--text);
+  font-family: var(--pixel);
+  font-size: 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.poke-btn:hover {
+  border-color: var(--accent);
+  background: rgba(240, 192, 64, 0.1);
+}
+
+.poke-btn .btn-icon {
+  font-size: 18px;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.poke-btn.primary {
+  border-color: var(--accent);
+  background: rgba(240, 192, 64, 0.15);
+  color: var(--accent);
+}
+
+/* ─── Footer ─── */
+.footer {
+  text-align: center;
+  padding: 24px;
+  font-size: 11px;
+  color: var(--text2);
+}
+
+.footer a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/* ─── Stars background ─── */
+.stars {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.8; }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .mode-selector { grid-template-columns: repeat(2, 1fr); }
+  .title { font-size: 13px; }
+  .poke-actions { grid-template-columns: 1fr; }
+  .stat-row { grid-template-columns: 70px 1fr 35px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Stars -->
+<div class="stars" id="stars"></div>
+
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">♔ Ainary Intelligence</div>
+    <h1 class="title">AINARY REPORT</h1>
+    <p class="subtitle">Firmen-Intelligence im Pokédex-Stil. Echte Daten. Echte Reports.</p>
+  </div>
+
+  <!-- Game Screen -->
+  <div class="game-screen">
+
+    <!-- Scene: Researcher room -->
+    <div class="scene">
+      <div class="room-bg"></div>
+      <div class="bookshelf">📚</div>
+      <div class="plant">🌿</div>
+      <div class="desk"></div>
+      <div class="monitor-glow"></div>
+      <div class="researcher">
+        <div class="researcher-sprite" id="researcher">🧑‍💻</div>
+      </div>
+    </div>
+
+    <!-- Dialogue -->
+    <div class="dialogue-box">
+      <div class="dialogue-name">Agent Mia ♔</div>
+      <div class="dialogue-text" id="dialogue">
+        Willkommen! Ich bin Mia, dein Intelligence Agent. Gib mir einen Firmennamen und ich scanne alle öffentlichen Datenquellen.<span class="cursor"></span>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div class="input-section" id="inputSection">
+      <div class="mode-selector">
+        <button class="mode-btn active" data-mode="dd" onclick="setMode('dd')">
+          <span class="mode-icon">🔍</span>
+          Due Diligence
+        </button>
+        <button class="mode-btn" data-mode="pitch" onclick="setMode('pitch')">
+          <span class="mode-icon">💼</span>
+          Pitch Prep
+        </button>
+        <button class="mode-btn" data-mode="compete" onclick="setMode('compete')">
+          <span class="mode-icon">⚔️</span>
+          Vergleich
+        </button>
+        <button class="mode-btn" data-mode="city" onclick="setMode('city')">
+          <span class="mode-icon">🏙️</span>
+          Standort
+        </button>
+      </div>
+
+      <div class="input-row">
+        <input class="input-field" id="companyInput" placeholder="Firmenname eingeben..." autofocus>
+        <button class="scan-btn" id="scanBtn" onclick="startScan()">SCAN!</button>
+      </div>
+
+      <div class="input-row url-row" id="urlRow">
+        <input class="input-field" id="urlInput" placeholder="Website URL (optional)">
+      </div>
+
+      <div class="input-row vs-row" id="vsRow">
+        <input class="input-field" id="vsInput" placeholder="Vergleich mit...">
+      </div>
+    </div>
+
+    <!-- Scanner Progress -->
+    <div class="scanner" id="scanner">
+      <ul class="scan-steps" id="scanSteps"></ul>
+    </div>
+
+    <!-- Pokédex Result Card -->
+    <div class="pokedex-card" id="pokedexCard">
+      <div class="poke-header">
+        <div>
+          <div class="poke-name" id="pokeName">—</div>
+          <div class="poke-type" id="pokeType">
+            <span id="pokeTypeIcon">🏢</span>
+            <span id="pokeTypeName">Unternehmen</span>
+          </div>
+        </div>
+        <div class="poke-risk" id="pokeRisk">—</div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-row">
+          <span class="stat-label">HP</span>
+          <div class="stat-bar-bg"><div class="stat-bar hp" id="barHp"></div></div>
+          <span class="stat-value" id="valHp">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">ATK</span>
+          <div class="stat-bar-bg"><div class="stat-bar atk" id="barAtk"></div></div>
+          <span class="stat-value" id="valAtk">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">DEF</span>
+          <div class="stat-bar-bg"><div class="stat-bar def" id="barDef"></div></div>
+          <span class="stat-value" id="valDef">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">SPD</span>
+          <div class="stat-bar-bg"><div class="stat-bar spd" id="barSpd"></div></div>
+          <span class="stat-value" id="valSpd">0</span>
+        </div>
+      </div>
+
+      <div class="poke-actions">
+        <a class="poke-btn primary" id="reportLink" href="#" target="_blank">
+          <span class="btn-icon">📄</span>
+          FULL REPORT
+        </a>
+        <button class="poke-btn" onclick="resetUI()">
+          <span class="btn-icon">🔄</span>
+          NEUER SCAN
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>♔ <a href="https://ainary.com">Ainary Intelligence</a> — Powered by Open Data</p>
+    <p style="margin-top:4px">Bundesanzeiger · Handelsregister · Insolvenzbekanntmachungen</p>
+  </div>
+</div>
+
+<script>
+// ─── State ───
+let currentMode = 'dd';
+
+// ─── Stars ───
+(function createStars() {
+  const c = document.getElementById('stars');
+  for (let i = 0; i < 50; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.left = Math.random() * 100 + '%';
+    s.style.top = Math.random() * 100 + '%';
+    s.style.animationDelay = Math.random() * 3 + 's';
+    s.style.opacity = Math.random() * 0.5 + 0.1;
+    c.appendChild(s);
+  }
+})();
+
+// ─── Mode switching ───
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === mode);
+  });
+
+  const urlRow = document.getElementById('urlRow');
+  const vsRow = document.getElementById('vsRow');
+  const input = document.getElementById('companyInput');
+
+  urlRow.classList.toggle('show', mode === 'pitch' || mode === 'dd');
+  vsRow.classList.toggle('show', mode === 'compete');
+
+  if (mode === 'city') {
+    input.placeholder = 'Stadtname eingeben...';
+  } else if (mode === 'compete') {
+    input.placeholder = 'Firma 1 eingeben...';
+  } else {
+    input.placeholder = 'Firmenname eingeben...';
+  }
+}
+
+// ─── Dialogue typewriter ───
+function typeDialogue(text, speed = 30) {
+  const el = document.getElementById('dialogue');
+  el.innerHTML = '';
+  let i = 0;
+  function type() {
+    if (i < text.length) {
+      el.innerHTML = text.substring(0, i + 1) + '<span class="cursor"></span>';
+      i++;
+      setTimeout(type, speed);
+    }
+  }
+  type();
+}
+
+// ─── Scan ───
+async function startScan() {
+  const company = document.getElementById('companyInput').value.trim();
+  if (!company) return;
+
+  const url = document.getElementById('urlInput')?.value.trim() || '';
+  const vs = document.getElementById('vsInput')?.value.trim() || '';
+
+  // Disable UI
+  document.getElementById('scanBtn').disabled = true;
+  document.getElementById('inputSection').style.display = 'none';
+  document.getElementById('scanner').classList.add('active');
+  document.getElementById('pokedexCard').classList.remove('active');
+
+  // Researcher animation
+  const researcher = document.getElementById('researcher');
+  researcher.textContent = '🧑‍💻';
+
+  const modeNames = { dd: 'Due Diligence', pitch: 'Pitch Prep', compete: 'Vergleich', city: 'Standort-Analyse' };
+  typeDialogue(`${modeNames[currentMode]} für "${company}" läuft... Bitte warten.`);
+
+  // Start scan
+  try {
+    const res = await fetch('/api/scan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ company, mode: currentMode, url, vs })
+    });
+
+    const { job_id } = await res.json();
+
+    // SSE progress
+    const evtSource = new EventSource(`/api/progress/${job_id}`);
+    const stepsList = document.getElementById('scanSteps');
+    stepsList.innerHTML = '';
+
+    evtSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      if (data.type === 'progress') {
+        const step = data.step;
+        let li = document.getElementById(`step-${step.index}`);
+        if (!li) {
+          li = document.createElement('li');
+          li.id = `step-${step.index}`;
+          li.className = 'scan-step';
+          li.innerHTML = `<span class="step-icon"></span><span>${step.step}</span>`;
+          stepsList.appendChild(li);
+        }
+        li.className = `scan-step ${step.status}`;
+      }
+
+      if (data.type === 'done') {
+        evtSource.close();
+
+        if (data.status === 'complete' && data.result) {
+          showPokedex(data.result);
+        } else {
+          typeDialogue('Fehler beim Scan. Bitte versuche es erneut.');
+          setTimeout(resetUI, 3000);
+        }
+      }
+    };
+
+    evtSource.onerror = () => {
+      evtSource.close();
+      typeDialogue('Verbindung verloren. Versuche es erneut.');
+      setTimeout(resetUI, 3000);
+    };
+
+  } catch (e) {
+    typeDialogue('Server nicht erreichbar. Läuft der Server?');
+    setTimeout(resetUI, 3000);
+  }
+}
+
+// ─── Show Pokédex Card ───
+function showPokedex(result) {
+  const stats = result.stats;
+
+  // Hide scanner
+  document.getElementById('scanner').classList.remove('active');
+  document.getElementById('pokedexCard').classList.add('active');
+
+  // Researcher celebrates
+  document.getElementById('researcher').textContent = '🎉';
+  typeDialogue(`Scan abgeschlossen! ${result.company} wurde analysiert. ${stats.sources || '?'} Quellen, ${result.duration}s.`);
+
+  // Fill card
+  document.getElementById('pokeName').textContent = result.company.toUpperCase();
+  document.getElementById('pokeTypeIcon').textContent = stats.type_icon || '🏢';
+  document.getElementById('pokeTypeName').textContent = stats.type || 'Unternehmen';
+
+  const riskEl = document.getElementById('pokeRisk');
+  riskEl.textContent = stats.risk || '—';
+  riskEl.style.background = stats.risk_color || '#6366f1';
+  riskEl.style.color = '#fff';
+
+  // Animate bars
+  setTimeout(() => {
+    animateBar('Hp', stats.hp || 0);
+    animateBar('Atk', stats.atk || 0);
+    animateBar('Def', stats.def || 0);
+    animateBar('Spd', stats.spd || 0);
+  }, 200);
+
+  // Report link
+  document.getElementById('reportLink').href = result.report_url;
+
+  // Update stat labels with descriptions
+  const labels = document.querySelectorAll('.stat-label');
+  if (labels[0]) labels[0].textContent = stats.hp_label || 'HP';
+  if (labels[1]) labels[1].textContent = stats.atk_label || 'ATK';
+  if (labels[2]) labels[2].textContent = stats.def_label || 'DEF';
+  if (labels[3]) labels[3].textContent = stats.spd_label || 'SPD';
+}
+
+function animateBar(stat, value) {
+  const bar = document.getElementById(`bar${stat}`);
+  const val = document.getElementById(`val${stat}`);
+  bar.style.width = `${value}%`;
+  // Count up number
+  let current = 0;
+  const step = Math.max(1, Math.floor(value / 30));
+  const interval = setInterval(() => {
+    current = Math.min(current + step, value);
+    val.textContent = current;
+    if (current >= value) clearInterval(interval);
+  }, 30);
+}
+
+// ─── Reset ───
+function resetUI() {
+  document.getElementById('inputSection').style.display = 'block';
+  document.getElementById('scanner').classList.remove('active');
+  document.getElementById('pokedexCard').classList.remove('active');
+  document.getElementById('scanBtn').disabled = false;
+  document.getElementById('scanSteps').innerHTML = '';
+  document.getElementById('companyInput').value = '';
+  document.getElementById('researcher').textContent = '🧑‍💻';
+  typeDialogue('Bereit für den nächsten Scan! Gib einen Firmennamen ein.');
+}
+
+// ─── Enter key ───
+document.getElementById('companyInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') startScan();
+});
+</script>
+</body>
+</html>
