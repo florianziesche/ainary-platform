@@ -513,11 +513,13 @@ function renderReportBuilder(){
   // ═══ PREVIEW + ACTIONS ═══
   h+='<div class="form-section"><h4>Report Preview</h4>';
   h+='<div class="preview-box" id="rb-preview">'+E(JSON.stringify(buildReport(),null,2))+'</div></div>';
-  h+='<div class="form-row" style="justify-content:flex-end;gap:8px">';
+  h+='<div class="form-row" style="justify-content:flex-end;gap:8px;flex-wrap:wrap">';
   h+='<button class="fbtn" onclick="closeModal()">Cancel</button>';
   h+='<button class="fbtn" onclick="downloadReport()">⤓ Download JSON</button>';
-  h+='<button class="fbtn primary" onclick="copyReport()">◉ Copy JSON</button>';
+  h+='<button class="fbtn" onclick="copyReport()">Copy JSON</button>';
+  h+='<button class="fbtn primary" onclick="executeResearch()" style="font-size:8pt;padding:7px 16px">◉ Execute Research → Mia</button>';
   h+='</div>';
+  h+='<div style="font:400 6pt var(--f);color:var(--muted);text-align:right;margin-top:4px">Execute = Generiert optimalen Prompt aus Kontext + Quellen + Fragen → Clipboard → an Mia senden</div>';
   
   m.innerHTML=h;
 }
@@ -562,6 +564,101 @@ function buildReport(){
     }})
   };
 }
+
+// ═══ GENERATE EXECUTION PROMPT ═══
+window.executeResearch=function(){
+  var r=buildReport();
+  var d=DOS[_rb.topicId];
+  
+  // Gather existing knowledge context
+  var existingClaims=[];
+  if(d&&d.categorizedClaims){
+    var cc=d.categorizedClaims;
+    ['evidence','interpretation','judgment'].forEach(function(cat){
+      (cc[cat]||[]).slice(0,3).forEach(function(c){existingClaims.push('['+c.eija+'] '+c.claim.substring(0,100))});
+    });
+  }
+  
+  // Cross-learnings context
+  var crossContext=[];
+  if(d&&d.crossLearnings){
+    d.crossLearnings.slice(0,3).forEach(function(cl){
+      crossContext.push(cl.topicId.replace(/^t-|^topic-/g,'').replace(/-/g,' ')+' ('+cl.sharedClaims+' shared claims)');
+    });
+  }
+  
+  // Open questions
+  var openQs=[];
+  if(d&&d.openQuestions){d.openQuestions.slice(0,3).forEach(function(q){openQs.push(q.text)})}
+  
+  // Build the execution prompt
+  var prompt='# RESEARCH AUFTRAG: '+_rb.topicLabel+'\n\n';
+  
+  prompt+='## KONTEXT (was wir bereits wissen)\n';
+  if(existingClaims.length){
+    prompt+='Existierende Claims ('+existingClaims.length+'):\n';
+    existingClaims.forEach(function(c){prompt+='- '+c+'\n'});
+  } else {
+    prompt+='Keine existierenden Claims — Gap-Topic, Neuland.\n';
+  }
+  if(crossContext.length){
+    prompt+='\nCross-Learnings:\n';
+    crossContext.forEach(function(c){prompt+='- '+c+'\n'});
+  }
+  prompt+='\nAktueller Confidence Score: '+(d&&d.confidence?d.confidence.score+'% — '+d.confidence.reason:'0% — keine Daten')+'\n';
+  
+  prompt+='\n## FORSCHUNGSFRAGEN\n';
+  (_rb.researchQuestions||[]).forEach(function(q){prompt+='- '+q+'\n'});
+  
+  if(openQs.length){
+    prompt+='\nOffene Fragen aus existierendem Wissen:\n';
+    openQs.forEach(function(q){prompt+='- '+q+'\n'});
+  }
+  
+  prompt+='\n## VORGESCHLAGENE QUELLEN (starte hier)\n';
+  _rb.sources.forEach(function(s){
+    prompt+='- ['+s.admiralty+'] '+s.label;
+    if(s.url)prompt+=' → '+s.url;
+    if(s.reason)prompt+=' ('+s.reason+')';
+    prompt+='\n';
+  });
+  
+  if(_rb.claims.length){
+    prompt+='\n## VORGESCHLAGENE CLAIMS (verifiziere/erweitere)\n';
+    _rb.claims.forEach(function(c){
+      prompt+='- ['+c.eija+'] '+c.claim+'\n';
+      if(c.soWhat)prompt+='  → So What: '+c.soWhat+'\n';
+    });
+  }
+  
+  prompt+='\n## ANFORDERUNGEN\n';
+  prompt+='1. Mind. 10 Tier-1 Quellen (A1/A2/B2). Jede URL muss erreichbar sein.\n';
+  prompt+='2. Jeder Claim: EIJA-Tag + Admiralty-Code + soWhat\n';
+  prompt+='3. Widersprüche zu existierendem Wissen explizit identifizieren\n';
+  prompt+='4. Keine Claim ohne Quelle. Keine Quelle ohne URL.\n';
+  prompt+='5. Output: JSON Report (Schema wie rr-*.json)\n';
+  
+  prompt+='\n## TRANSPARENZ-STANDARD (Beipackzettel)\n';
+  prompt+='Am Ende des Reports:\n';
+  prompt+='- STARK BELEGT: Claims mit ≥2 unabhängigen Quellen + Trust ≥85%\n';
+  prompt+='- UNSICHER: Claims mit nur 1 Quelle oder Trust <70%\n';
+  prompt+='- NICHT GEFUNDEN: Forschungsfragen die unbeantwortet blieben\n';
+  prompt+='- WIDERSPRÜCHE: Wo widerspricht neues Wissen existierendem?\n';
+  
+  prompt+='\n## FOLLOW-UP\n';
+  prompt+='Schlage 3-5 Follow-Up Fragen vor die sich aus der Research ergeben.\n';
+  prompt+='Welche angrenzenden Topics profitieren von diesem Report?\n';
+  
+  prompt+='\n## OUTPUT FORMAT\n';
+  prompt+='Speichere als: research-network/reports/'+r.id+'.json\n';
+  prompt+='Dann: node extract-claims.js --ingest && node enrich-topics.js\n';
+
+  navigator.clipboard.writeText(prompt).then(function(){
+    // Show prompt in preview
+    document.getElementById('rb-preview').textContent=prompt;
+    alert('Research-Prompt kopiert! Sende ihn an Mia zur Ausführung.\n\nDer Prompt enthält:\n- '+existingClaims.length+' existierende Claims als Kontext\n- '+_rb.sources.length+' vorgeschlagene Quellen\n- '+(_rb.researchQuestions||[]).length+' Forschungsfragen\n- Transparenz-Standard (Beipackzettel)\n- Follow-Up Generierung');
+  }).catch(function(){window.prompt('Copy prompt:',prompt)});
+};
 
 window.downloadReport=function(){
   var r=buildReport();
