@@ -6,170 +6,344 @@
 <title>Ainary Research Network</title>
 <style>
 :root {
-  --bg: #fafaf8; --surface: #f5f4f0; --border: #e5e3dc;
-  --text: #1a1a1a; --text2: #555e70; --muted: #8a9199;
-  --gold: #c8aa50; --green: #1a5c2a; --red: #991b1b; --blue: #2563eb;
-  --f: 'Inter', -apple-system, sans-serif;
-  --m: 'JetBrains Mono', 'SF Mono', monospace;
+  --bg:#fafaf8;--surface:#f5f4f0;--border:#e5e3dc;--text:#1a1a1a;--text2:#555e70;--muted:#8a9199;
+  --gold:#c8aa50;--green:#1a5c2a;--red:#991b1b;--blue:#2563eb;
+  --f:'Inter',-apple-system,sans-serif;--m:'JetBrains Mono','SF Mono',monospace;
 }
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:var(--f); background:var(--bg); color:var(--text); }
-.page { max-width:960px; margin:0 auto; padding:32px 24px; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--f);background:var(--bg);color:var(--text)}
+.page{max-width:1100px;margin:0 auto;padding:24px 20px}
+.header{text-align:center;padding:32px 0 24px;border-bottom:2px solid var(--gold);margin-bottom:24px}
+.header h1{font:700 22pt var(--f);letter-spacing:-.5px}
+.header .sub{font:400 9pt var(--f);color:var(--text2);margin-top:6px}
 
-/* Header */
-.header { text-align:center; padding:40px 0 32px; border-bottom:2px solid var(--gold); margin-bottom:32px; }
-.header h1 { font:700 24pt var(--f); letter-spacing:-0.5px; }
-.header .sub { font:400 10pt var(--f); color:var(--text2); margin-top:8px; }
+/* Stats */
+.stats{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px}
+.stat{flex:1;min-width:100px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px;text-align:center}
+.stat .num{font:700 20pt var(--m);color:var(--gold)}
+.stat .label{font:500 7pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
 
-/* Stats bar */
-.stats { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:32px; }
-.stat { flex:1; min-width:120px; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:16px; text-align:center; }
-.stat .num { font:700 24pt var(--m); color:var(--gold); }
-.stat .label { font:500 8pt var(--m); color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-top:4px; }
+/* Compound hero */
+.compound{background:linear-gradient(135deg,var(--surface) 0%,rgba(200,170,80,.08) 100%);border:2px solid var(--gold);border-radius:8px;padding:20px;margin-bottom:24px;text-align:center}
+.compound .big{font:700 28pt var(--m);color:var(--gold)}
+.compound .desc{font:500 8pt var(--f);color:var(--text2);margin-top:2px}
 
-/* Topic cards */
-.topic-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:16px; margin-bottom:32px; }
-.topic-card { background:#fff; border:1px solid var(--border); border-radius:8px; padding:20px; cursor:pointer; transition:all 0.2s; }
-.topic-card:hover { border-color:var(--gold); box-shadow:0 2px 12px rgba(200,170,80,0.15); }
-.topic-card.expanded { grid-column:1/-1; }
-.topic-name { font:600 11pt var(--f); margin-bottom:8px; }
-.topic-meta { font:400 8pt var(--m); color:var(--muted); margin-bottom:12px; }
-.konsistenz { display:inline-block; font:500 7pt var(--m); padding:2px 8px; border-radius:3px; }
-.konsistenz.high { background:rgba(26,92,42,0.1); color:var(--green); }
-.konsistenz.medium { background:rgba(200,170,80,0.15); color:var(--gold); }
-.konsistenz.low { background:var(--surface); color:var(--muted); }
-.topic-summary { font:400 9pt var(--f); color:var(--text2); line-height:1.6; margin-top:8px; }
+/* Layout: sidebar + main */
+.layout{display:grid;grid-template-columns:260px 1fr;gap:20px}
+@media(max-width:768px){.layout{grid-template-columns:1fr}}
 
-/* Claims list */
-.claims-list { margin-top:16px; display:none; }
-.topic-card.expanded .claims-list { display:block; }
-.claim-item { padding:12px 0; border-top:1px solid var(--border); }
-.claim-text { font:400 9pt var(--f); line-height:1.5; }
-.claim-meta { font:400 7pt var(--m); color:var(--muted); margin-top:4px; }
-.eija-badge { display:inline-block; font:700 6pt var(--m); padding:1px 5px; border-radius:2px; margin-right:4px; }
-.eija-E { background:#e8f5e9; color:var(--green); }
-.eija-I { background:#e3f2fd; color:var(--blue); }
-.eija-J { background:#fff3e0; color:#e65100; }
-.eija-A { background:#fce4ec; color:var(--red); }
-.conf-bar { display:inline-block; width:40px; height:4px; background:var(--border); border-radius:2px; margin-left:8px; vertical-align:middle; }
-.conf-fill { height:100%; border-radius:2px; }
+/* Sidebar tree */
+.sidebar{background:#fff;border:1px solid var(--border);border-radius:8px;padding:16px;height:fit-content;position:sticky;top:20px}
+.sidebar h3{font:600 9pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.domain{margin-bottom:12px}
+.domain-label{font:600 9pt var(--f);cursor:pointer;padding:4px 0;display:flex;align-items:center;gap:6px}
+.domain-label:hover{color:var(--gold)}
+.domain-label .icon{font-size:10pt}
+.domain-children{padding-left:16px;display:none}
+.domain.open>.domain-children{display:block}
+.topic-link{font:400 8pt var(--f);color:var(--text2);padding:3px 0;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.topic-link:hover{color:var(--text)}
+.topic-link .count{font:400 7pt var(--m);color:var(--muted)}
+.topic-link.gap{color:var(--red);font-style:italic}
+.topic-link.gap::after{content:'△ GAP';font:700 5pt var(--m);color:var(--red);background:rgba(153,27,27,.08);padding:1px 4px;border-radius:2px;margin-left:4px}
+.topic-link.rich::after{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin-left:4px}
+.sub-topic{padding-left:12px}
+.sub-topic .topic-link{font-size:7.5pt}
 
-/* Reports */
-.reports { margin-bottom:32px; }
-.report-row { display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:var(--surface); border:1px solid var(--border); border-radius:6px; margin-bottom:8px; }
-.report-title { font:500 9pt var(--f); }
-.report-meta { font:400 7pt var(--m); color:var(--muted); }
+/* Main panel */
+.main-panel h2{font:600 13pt var(--f);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.topic-detail{background:#fff;border:1px solid var(--border);border-radius:8px;padding:20px;margin-bottom:16px}
+.topic-detail h3{font:600 11pt var(--f);margin-bottom:4px}
+.topic-detail .meta{font:400 7.5pt var(--m);color:var(--muted);margin-bottom:12px}
+.konsistenz{display:inline-block;font:500 7pt var(--m);padding:2px 6px;border-radius:3px}
+.konsistenz.high{background:rgba(26,92,42,.1);color:var(--green)}
+.konsistenz.medium{background:rgba(200,170,80,.15);color:var(--gold)}
+.konsistenz.low{background:var(--surface);color:var(--muted)}
 
-/* Section titles */
-h2 { font:600 14pt var(--f); margin-bottom:16px; padding-bottom:8px; border-bottom:1px solid var(--border); }
-h2 .count { font:400 10pt var(--m); color:var(--muted); margin-left:8px; }
+/* Claims */
+.claim-item{padding:10px 0;border-top:1px solid var(--border)}
+.claim-text{font:400 8.5pt var(--f);line-height:1.5}
+.claim-meta{font:400 7pt var(--m);color:var(--muted);margin-top:3px}
+.eija{display:inline-block;font:700 6pt var(--m);padding:1px 4px;border-radius:2px;margin-right:3px}
+.eija-E{background:#e8f5e9;color:var(--green)}.eija-I{background:#e3f2fd;color:var(--blue)}
+.eija-J{background:#fff3e0;color:#e65100}.eija-A{background:#fce4ec;color:var(--red)}
+.conf-bar{display:inline-block;width:36px;height:3px;background:var(--border);border-radius:2px;margin-left:6px;vertical-align:middle}
+.conf-fill{height:100%;border-radius:2px}
 
-/* Compound metric */
-.compound { background:linear-gradient(135deg, var(--surface) 0%, rgba(200,170,80,0.08) 100%); border:2px solid var(--gold); border-radius:8px; padding:24px; margin-bottom:32px; text-align:center; }
-.compound .big { font:700 32pt var(--m); color:var(--gold); }
-.compound .desc { font:500 9pt var(--f); color:var(--text2); margin-top:4px; }
+/* Research trigger */
+.research-btn{display:inline-flex;align-items:center;gap:6px;font:600 8pt var(--m);color:#fff;background:var(--gold);border:none;border-radius:4px;padding:8px 16px;cursor:pointer;margin-top:12px}
+.research-btn:hover{background:#b8982a}
 
-/* Footer */
-.footer { text-align:center; padding:32px 0; border-top:1px solid var(--border); margin-top:48px; }
-.footer p { font:400 8pt var(--m); color:var(--muted); }
+/* Gap summary */
+.gap-summary{background:rgba(153,27,27,.04);border:1px solid rgba(153,27,27,.15);border-radius:8px;padding:16px;margin-bottom:16px}
+.gap-summary h3{font:600 10pt var(--f);color:var(--red);margin-bottom:8px}
+.gap-item{font:400 8pt var(--f);padding:4px 0;cursor:pointer;color:var(--text2)}
+.gap-item:hover{color:var(--text)}
+
+/* Connected projects */
+.project-tag{display:inline-block;font:500 7pt var(--m);padding:2px 8px;border-radius:3px;background:rgba(37,99,235,.08);color:var(--blue);margin:2px 4px 2px 0}
+
+.footer{text-align:center;padding:24px 0;border-top:1px solid var(--border);margin-top:32px}
+.footer p{font:400 7pt var(--m);color:var(--muted)}
 </style>
 </head>
 <body>
 <div class="page">
   <div class="header">
     <h1>Ainary Research Network</h1>
-    <div class="sub">Claim-Level Knowledge Graph · Jeder neue Report macht alle Topics reicher</div>
+    <div class="sub">Hierarchical Knowledge Graph · Click any gap to trigger research</div>
   </div>
-
   <div id="compound" class="compound"></div>
   <div id="stats" class="stats"></div>
-
-  <h2>Topics <span id="topicCount" class="count"></span></h2>
-  <div id="topics" class="topic-grid"></div>
-
-  <h2>Reports <span id="reportCount" class="count"></span></h2>
-  <div id="reports" class="reports"></div>
-
+  <div class="layout">
+    <div class="sidebar" id="sidebar">
+      <h3>Knowledge Map</h3>
+    </div>
+    <div class="main-panel" id="main">
+      <div id="gaps"></div>
+      <div id="detail"></div>
+    </div>
+  </div>
   <div class="footer">
-    <p>Ainary Ventures · Research Ontology Network v1.0</p>
-    <p style="margin-top:4px">EIJA: <span class="eija-badge eija-E">E</span> Evidenz <span class="eija-badge eija-I">I</span> Interpretation <span class="eija-badge eija-J">J</span> Bewertung <span class="eija-badge eija-A">A</span> Annahme</p>
+    <p>Ainary Ventures · Research Ontology Network v1.0 · EIJA: <span class="eija eija-E">E</span> Evidenz <span class="eija eija-I">I</span> Interpretation <span class="eija eija-J">J</span> Bewertung <span class="eija eija-A">A</span> Annahme</p>
   </div>
 </div>
 
 <script>
-// Load knowledge graph
-fetch('graph/knowledge-graph.json')
-  .then(r => r.json())
-  .then(render)
-  .catch(e => {
-    document.getElementById('stats').innerHTML = '<p style="color:var(--red)">Error loading knowledge graph: ' + e.message + '</p>';
+var G, TAX;
+Promise.all([
+  fetch('graph/knowledge-graph.json').then(r=>r.json()),
+  fetch('taxonomy.json').then(r=>r.json())
+]).then(function(res) {
+  G = res[0]; TAX = res[1];
+  render();
+}).catch(function(e) {
+  document.getElementById('main').innerHTML = '<p style="color:var(--red)">Error: '+e.message+'</p>';
+});
+
+// ═══ MAP flat claims → taxonomy ═══
+function mapClaimsToTaxonomy() {
+  // Build keyword→taxonomyId mapping
+  var mapping = {};
+  function walkTax(node, path) {
+    var id = node.id;
+    var keywords = (node.label||'').toLowerCase().split(/[\s\/&()+]+/).filter(function(w){return w.length>2});
+    // Add id-derived keywords
+    id.replace(/^[td]-/,'').split('-').forEach(function(w){if(w.length>2)keywords.push(w)});
+    keywords.forEach(function(kw) {
+      if (!mapping[kw]) mapping[kw] = [];
+      mapping[kw].push(id);
+    });
+    (node.children||[]).forEach(function(c){walkTax(c, path.concat(id))});
+  }
+  (TAX.domains||[]).forEach(function(d){walkTax(d,[])});
+
+  // For each claim, find matching taxonomy topics
+  var taxClaims = {}; // taxId → [claimId]
+  Object.values(G.claims||{}).forEach(function(c) {
+    var text = ((c.claim||'') + ' ' + (c.topics||[]).join(' ')).toLowerCase();
+    var matched = new Set();
+    Object.entries(mapping).forEach(function(entry) {
+      if (text.includes(entry[0])) {
+        entry[1].forEach(function(tid){matched.add(tid)});
+      }
+    });
+    matched.forEach(function(tid) {
+      if (!taxClaims[tid]) taxClaims[tid] = [];
+      taxClaims[tid].push(c.id);
+    });
   });
-
-function render(G) {
-  var reports = Object.values(G.reports || {});
-  var claims = Object.values(G.claims || {});
-  var topics = Object.values(G.topics || {}).sort((a,b) => (b.claimIds||[]).length - (a.claimIds||[]).length);
-  var vt = G.verifiedTruths || [];
-
-  // EIJA dist
-  var eija = {E:0,I:0,J:0,A:0};
-  claims.forEach(c => { if(eija[c.eija]!==undefined) eija[c.eija]++; });
-
-  // Cross-topic
-  var crossTopic = claims.filter(c => (c.topics||[]).length > 1).length;
-  var crossPct = claims.length > 0 ? Math.round(crossTopic/claims.length*100) : 0;
-
-  // Compound metric
-  document.getElementById('compound').innerHTML =
-    '<div class="big">' + crossPct + '%</div>' +
-    '<div class="desc">Cross-Topic Vernetzung · ' + claims.length + ' Claims über ' + topics.length + ' Topics aus ' + reports.length + ' Reports</div>';
-
-  // Stats
-  document.getElementById('stats').innerHTML = [
-    {n: reports.length, l: 'Reports'},
-    {n: claims.length, l: 'Claims'},
-    {n: topics.length, l: 'Topics'},
-    {n: vt.length, l: 'Verified Truths'},
-    {n: eija.E, l: 'Evidenz'},
-    {n: eija.I + eija.J + eija.A, l: 'I+J+A'}
-  ].map(s => '<div class="stat"><div class="num">' + s.n + '</div><div class="label">' + s.l + '</div></div>').join('');
-
-  // Topics
-  document.getElementById('topicCount').textContent = '(' + topics.length + ')';
-  document.getElementById('topics').innerHTML = topics.map(function(t) {
-    var tc = (t.claimIds||[]).map(id => G.claims[id]).filter(Boolean);
-    var kLevel = t.konsistenzLevel || 'low';
-    var kText = t.konsistenz || '△ Wenige Daten';
-
-    var claimsHtml = tc.sort((a,b) => (b.confidence||0) - (a.confidence||0)).map(function(c) {
-      var confColor = c.confidence >= 80 ? 'var(--green)' : c.confidence >= 60 ? 'var(--gold)' : 'var(--red)';
-      return '<div class="claim-item">' +
-        '<div class="claim-text"><span class="eija-badge eija-' + c.eija + '">' + c.eija + '</span>' + esc(c.claim) + '</div>' +
-        '<div class="claim-meta">' + c.confidence + '% · ' + c.status + ' · ' + c.reportId +
-        '<span class="conf-bar"><span class="conf-fill" style="width:' + c.confidence + '%;background:' + confColor + '"></span></span></div>' +
-        (c.soWhat ? '<div style="font:italic 8pt var(--f);color:var(--text2);margin-top:4px">' + esc(c.soWhat) + '</div>' : '') +
-        '</div>';
-    }).join('');
-
-    return '<div class="topic-card" onclick="this.classList.toggle(\'expanded\')">' +
-      '<div class="topic-name">' + esc(t.label || t.id) + '</div>' +
-      '<div class="topic-meta">' + tc.length + ' Claims · ' + (t.reportIds||[]).length + ' Reports · <span class="konsistenz ' + kLevel + '">' + kText + '</span></div>' +
-      (t.executiveSummary ? '<div class="topic-summary">' + esc(t.executiveSummary).substring(0, 200) + '...</div>' : '') +
-      '<div class="claims-list">' + claimsHtml + '</div>' +
-      '</div>';
-  }).join('');
-
-  // Reports
-  document.getElementById('reportCount').textContent = '(' + reports.length + ')';
-  document.getElementById('reports').innerHTML = reports.map(function(r) {
-    return '<div class="report-row">' +
-      '<div class="report-title">' + esc(r.title) + '</div>' +
-      '<div class="report-meta">' + r.date + ' · ' + r.domain + ' · ' + (r.claimCount || '?') + ' claims · ' + r.admiralty + '</div>' +
-      '</div>';
-  }).join('');
+  return taxClaims;
 }
 
-function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function render() {
+  var claims = Object.values(G.claims||{});
+  var reports = Object.values(G.reports||{});
+  var topics = Object.values(G.topics||{});
+  var taxClaims = mapClaimsToTaxonomy();
+
+  // Stats
+  var eija = {E:0,I:0,J:0,A:0};
+  claims.forEach(function(c){if(eija[c.eija]!==undefined)eija[c.eija]++});
+  var crossTopic = claims.filter(function(c){return(c.topics||[]).length>1}).length;
+  var crossPct = claims.length>0?Math.round(crossTopic/claims.length*100):0;
+
+  document.getElementById('compound').innerHTML =
+    '<div class="big">'+claims.length+'</div><div class="desc">Claims aus '+reports.length+' Reports · '+Object.keys(taxClaims).length+' Taxonomy-Topics mit Daten</div>';
+
+  document.getElementById('stats').innerHTML = [
+    {n:reports.length,l:'Reports'},{n:claims.length,l:'Claims'},{n:Object.keys(taxClaims).length,l:'Mapped Topics'},
+    {n:eija.E,l:'Evidenz'},{n:eija.I+eija.J+eija.A,l:'I+J+A'}
+  ].map(function(s){return '<div class="stat"><div class="num">'+s.n+'</div><div class="label">'+s.l+'</div></div>'}).join('');
+
+  // ═══ SIDEBAR: Taxonomy Tree ═══
+  var gaps = [];
+  var sidebarHtml = '';
+  (TAX.domains||[]).forEach(function(domain) {
+    sidebarHtml += '<div class="domain open">';
+    sidebarHtml += '<div class="domain-label" onclick="this.parentElement.classList.toggle(\'open\')"><span class="icon">'+(domain.icon||'◉')+'</span> '+esc(domain.label)+'</div>';
+    sidebarHtml += '<div class="domain-children">';
+    (domain.children||[]).forEach(function(topic) {
+      var count = (taxClaims[topic.id]||[]).length;
+      var isGap = count === 0;
+      var isRich = count >= 10;
+      if (isGap) gaps.push(topic);
+      sidebarHtml += '<div class="topic-link'+(isGap?' gap':'')+(isRich?' rich':'')+'" onclick="showTopic(\''+topic.id+'\')">';
+      sidebarHtml += esc(topic.label)+' <span class="count">'+count+'</span></div>';
+      if (topic.children) {
+        sidebarHtml += '<div class="sub-topic">';
+        topic.children.forEach(function(sub) {
+          var sc = (taxClaims[sub.id]||[]).length;
+          var sg = sc === 0;
+          if (sg) gaps.push(sub);
+          sidebarHtml += '<div class="topic-link'+(sg?' gap':'')+'" onclick="showTopic(\''+sub.id+'\')">'+esc(sub.label)+' <span class="count">'+sc+'</span></div>';
+        });
+        sidebarHtml += '</div>';
+      }
+    });
+    sidebarHtml += '</div></div>';
+  });
+  document.getElementById('sidebar').innerHTML = '<h3>Knowledge Map</h3>' + sidebarHtml;
+
+  // ═══ GAP SUMMARY ═══
+  if (gaps.length > 0) {
+    var gapHtml = '<div class="gap-summary"><h3>△ '+gaps.length+' Knowledge Gaps</h3>';
+    gapHtml += '<p style="font:400 7.5pt var(--f);color:var(--text2);margin-bottom:8px">Topics ohne Claims — klicken für Research-Trigger</p>';
+    gaps.slice(0,15).forEach(function(g) {
+      gapHtml += '<div class="gap-item" onclick="showTopic(\''+g.id+'\')">△ '+esc(g.label)+'</div>';
+    });
+    if (gaps.length > 15) gapHtml += '<div style="font:400 7pt var(--m);color:var(--muted);margin-top:4px">... und '+(gaps.length-15)+' weitere</div>';
+    gapHtml += '</div>';
+    document.getElementById('gaps').innerHTML = gapHtml;
+  }
+
+  // Show first non-gap topic by default
+  var firstRich = (TAX.domains||[]).flatMap(function(d){return d.children||[]}).find(function(t){return(taxClaims[t.id]||[]).length>0});
+  if (firstRich) showTopic(firstRich.id);
+}
+
+// ═══ SHOW TOPIC DETAIL ═══
+window.showTopic = function(topicId) {
+  var taxClaims = mapClaimsToTaxonomy();
+  var claimIds = taxClaims[topicId] || [];
+
+  // Find topic in taxonomy
+  var topicNode = null;
+  function findTopic(node) {
+    if (node.id === topicId) { topicNode = node; return; }
+    (node.children||[]).forEach(findTopic);
+  }
+  (TAX.domains||[]).forEach(findTopic);
+
+  var label = topicNode ? topicNode.label : topicId;
+  var isGap = claimIds.length === 0;
+
+  var html = '<div class="topic-detail">';
+  html += '<h3>' + esc(label) + '</h3>';
+  html += '<div class="meta">' + claimIds.length + ' Claims';
+
+  // Find connected projects
+  var projects = [];
+  if (/election|kommunal|wahl|dossier/i.test(label)) projects.push('Election Intelligence');
+  if (/research|network|claim|ontology/i.test(label)) projects.push('Research Network');
+  if (/depo|legal/i.test(label)) projects.push('DepoDigest');
+  if (/schüller|client/i.test(label)) projects.push('Schüller Dashboard');
+  if (/palantir/i.test(label)) projects.push('Palantir Research');
+  if (projects.length) {
+    html += ' · Projekte: ';
+    projects.forEach(function(p){html += '<span class="project-tag">'+p+'</span>'});
+  }
+  html += '</div>';
+
+  // Subtopics
+  if (topicNode && topicNode.children) {
+    html += '<div style="margin:8px 0">';
+    topicNode.children.forEach(function(sub) {
+      var sc = (taxClaims[sub.id]||[]).length;
+      var cls = sc === 0 ? 'low' : sc >= 5 ? 'high' : 'medium';
+      html += '<span class="konsistenz '+cls+'" style="margin-right:6px;cursor:pointer" onclick="showTopic(\''+sub.id+'\')">'+esc(sub.label)+' ('+sc+')</span>';
+    });
+    html += '</div>';
+  }
+
+  if (isGap) {
+    html += '<div style="background:rgba(153,27,27,.04);border:1px solid rgba(153,27,27,.15);border-radius:6px;padding:16px;margin-top:12px">';
+    html += '<p style="font:500 9pt var(--f);color:var(--red)">△ Keine Claims zu diesem Topic</p>';
+    html += '<p style="font:400 8pt var(--f);color:var(--text2);margin-top:6px">Dieses Topic hat noch keine Research-Daten. Ein Research Report mit mindestens 30 Quellen würde dieses und angrenzende Topics anreichern.</p>';
+    html += '<button class="research-btn" onclick="triggerResearch(\''+topicId+'\',\''+esc(label)+'\')">◉ Research starten: '+esc(label)+'</button>';
+    html += '</div>';
+  } else {
+    // Show claims sorted by confidence
+    var claimObjs = claimIds.map(function(id){return G.claims[id]}).filter(Boolean)
+      .sort(function(a,b){return(b.confidence||0)-(a.confidence||0)});
+
+    // Konsistenz
+    var sources = new Set();
+    claimObjs.forEach(function(c){(c.sources||[]).forEach(function(s){sources.add(s)})});
+    var srcCount = sources.size;
+    var kLevel = srcCount>=3?'high':srcCount>=2?'medium':'low';
+    var kText = srcCount>=3?'◉ '+srcCount+' unabh. Quellen':srcCount>=2?'◉ '+srcCount+' Quellen':'△ Wenige Quellen';
+    html += '<div style="margin:8px 0"><span class="konsistenz '+kLevel+'">'+kText+'</span></div>';
+
+    // Executive summary (top 3 E-claims)
+    var topE = claimObjs.filter(function(c){return c.eija==='E'}).slice(0,3);
+    if (topE.length) {
+      html += '<div style="font:400 8.5pt var(--f);color:var(--text2);line-height:1.6;margin:8px 0;padding:8px 12px;background:var(--surface);border-radius:4px">';
+      html += topE.map(function(c){return esc(c.claim)}).join(' ');
+      html += '</div>';
+    }
+
+    // All claims
+    html += '<div style="margin-top:12px">';
+    claimObjs.slice(0,30).forEach(function(c) {
+      var confColor = c.confidence>=80?'var(--green)':c.confidence>=60?'var(--gold)':'var(--red)';
+      html += '<div class="claim-item">';
+      html += '<div class="claim-text"><span class="eija eija-'+c.eija+'">'+c.eija+'</span>'+esc(c.claim)+'</div>';
+      html += '<div class="claim-meta">'+c.confidence+'% · '+c.status+' · '+(c.reportId||'?');
+      html += '<span class="conf-bar"><span class="conf-fill" style="width:'+c.confidence+'%;background:'+confColor+'"></span></span></div>';
+      if (c.soWhat) html += '<div style="font:italic 7.5pt var(--f);color:var(--text2);margin-top:2px">'+esc(c.soWhat)+'</div>';
+      html += '</div>';
+    });
+    if (claimObjs.length > 30) html += '<div style="font:400 7pt var(--m);color:var(--muted);margin-top:8px">... und '+(claimObjs.length-30)+' weitere Claims</div>';
+    html += '</div>';
+
+    // Research button even for non-gaps (to deepen)
+    if (claimObjs.length < 10) {
+      html += '<button class="research-btn" onclick="triggerResearch(\''+topicId+'\',\''+esc(label)+'\')">◉ Vertiefen: '+esc(label)+'</button>';
+    }
+  }
+
+  html += '</div>';
+  document.getElementById('detail').innerHTML = html;
+};
+
+// ═══ RESEARCH TRIGGER ═══
+window.triggerResearch = function(topicId, label) {
+  var prompt = 'Research-Auftrag generiert:\\n\\n' +
+    'Topic: ' + label + '\\n' +
+    'Standard: Mind. 30 Tier-1 Quellen\\n' +
+    'Output: Structured Report (JSON) mit Claims, EIJA-Tags, Admiralty-Codes\\n' +
+    'Ziel: Knowledge Gap schließen und angrenzende Topics anreichern\\n\\n' +
+    'Befehl für Mia:\\n' +
+    'Erstelle einen Research Report zu "' + label + '" mit mindestens 30 Quellen. ' +
+    'Extrahiere Claims mit EIJA-Tags. Speichere als research-network/reports/rr-' + topicId.replace(/^t-/,'') + '.json und führe --ingest aus.';
+  
+  // Copy to clipboard
+  navigator.clipboard.writeText(prompt).then(function() {
+    alert('Research-Prompt kopiert! Paste an Mia.');
+  }).catch(function() {
+    // Fallback
+    var ta = document.createElement('textarea');
+    ta.value = prompt;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    alert('Research-Prompt kopiert!');
+  });
+};
+
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 </script>
 </body>
 </html>
