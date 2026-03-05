@@ -74,6 +74,18 @@
 .gap-icon{font-size:28pt;color:var(--red);opacity:.3}
 .research-btn{display:inline-flex;align-items:center;gap:6px;font:600 8pt var(--m);color:#fff;background:var(--gold);border:none;border-radius:4px;padding:8px 16px;cursor:pointer;margin-top:8px}
 .research-btn:hover{background:#b8982a}
+/* Projects bar */
+.projects-bar{margin-bottom:16px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 16px}
+.projects-bar h3{font:600 8pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.proj{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border:1px solid var(--border);border-radius:4px;margin:3px 4px 3px 0;font:500 7.5pt var(--f);cursor:pointer;transition:all .15s}
+.proj:hover{border-color:var(--gold);background:rgba(200,170,80,.06)}
+.proj.active{border-color:var(--gold);background:rgba(200,170,80,.1);font-weight:600}
+.proj .dot{width:6px;height:6px;border-radius:50%}
+.proj .dot.active-s{background:var(--green)}.proj .dot.paused-s{background:var(--gold)}.proj .dot.planned-s{background:var(--muted)}
+.proj .links{font:400 6.5pt var(--m);color:var(--muted)}
+.proj-unlinked{color:var(--red);font:400 7pt var(--f);margin-top:6px}
+/* Topic project badges */
+.proj-badge{display:inline-block;font:500 5.5pt var(--m);padding:1px 5px;border-radius:2px;background:rgba(200,170,80,.1);color:var(--gold);margin:1px 2px}
 .footer{text-align:center;padding:20px 0;margin-top:24px;font:400 7pt var(--m);color:var(--muted)}
 </style>
 </head>
@@ -91,12 +103,13 @@
 <div class="footer">Ainary Ventures · Research Ontology Network v2.0 · <span class="eija eija-E">E</span> Evidenz <span class="eija eija-I">I</span> Interpretation <span class="eija eija-J">J</span> Bewertung <span class="eija eija-A">A</span> Annahme</div>
 </div>
 <script>
-var G,TAX,DOS;
+var G,TAX,DOS,PROJ;
 Promise.all([
   fetch('graph/knowledge-graph.json').then(r=>r.json()),
   fetch('taxonomy.json').then(r=>r.json()),
-  fetch('graph/topic-dossiers.json').then(r=>r.json())
-]).then(function(r){G=r[0];TAX=r[1];DOS=r[2];render()}).catch(function(e){
+  fetch('graph/topic-dossiers.json').then(r=>r.json()),
+  fetch('projects.json').then(r=>r.json())
+]).then(function(r){G=r[0];TAX=r[1];DOS=r[2];PROJ=r[3];render()}).catch(function(e){
   document.getElementById('main').innerHTML='<p style="color:var(--red);padding:20px">Error: '+e.message+'</p>';
 });
 
@@ -107,11 +120,34 @@ function render(){
   var withClaims=dossiers.filter(function(d){return d.claimCount>0}).length;
   var gaps=dossiers.filter(function(d){return d.isGap}).length;
 
+  var projects=(PROJ||{}).projects||[];
+
   // Stats
   document.getElementById('stats').innerHTML=[
     {n:reports.length,l:'Reports'},{n:claims.length,l:'Claims'},{n:dossiers.length,l:'Topics'},
-    {n:withClaims,l:'With Data'},{n:gaps,l:'Gaps'}
+    {n:withClaims,l:'With Data'},{n:gaps,l:'Gaps'},{n:projects.length,l:'Projects'}
   ].map(function(s){return'<div class="stat"><div class="num">'+s.n+'</div><div class="label">'+s.l+'</div></div>'}).join('');
+
+  // Build topic→projects reverse map
+  window._topicProjects={};
+  projects.forEach(function(p){
+    (p.topicLinks||[]).forEach(function(tid){
+      if(!window._topicProjects[tid])window._topicProjects[tid]=[];
+      window._topicProjects[tid].push(p);
+    });
+  });
+
+  // Check for unlinked topics per project
+  var projBar='<div class="projects-bar"><h3>Projects</h3>';
+  projects.forEach(function(p){
+    var unlinkedCount=0;
+    (p.topicLinks||[]).forEach(function(tid){var d=DOS[tid];if(!d||d.isGap)unlinkedCount++});
+    projBar+='<div class="proj" onclick="showProject(\''+p.id+'\')"><span class="dot '+p.status+'-s"></span>'+esc(p.label)+' <span class="links">'+p.topicLinks.length+' topics';
+    if(unlinkedCount>0)projBar+=' · <span style="color:var(--red)">'+unlinkedCount+' gaps</span>';
+    projBar+='</span></div>';
+  });
+  projBar+='</div>';
+  document.getElementById('stats').insertAdjacentHTML('afterend',projBar);
 
   // Sidebar
   var html='<h3>Knowledge Map</h3>';
@@ -158,7 +194,11 @@ window.show=function(topicId){
   // Header
   var confColor=d.confidence.score>=70?'var(--green)':d.confidence.score>=40?'var(--gold)':'var(--red)';
   h+='<div class="dos-header"><div class="dos-title">'+esc(d.label)+'</div>';
-  h+='<div class="dos-meta">'+d.claimCount+' Claims · '+d.insights.length+' Insights · '+(d.researchDocs||[]).length+' Research Docs · '+d.openQuestions.length+' Open Questions</div>';
+  h+='<div class="dos-meta">'+d.claimCount+' Claims · '+d.insights.length+' Insights · '+(d.researchDocs||[]).length+' Research Docs · '+d.openQuestions.length+' Open Questions';
+  // Project badges
+  var topicProjs=window._topicProjects[topicId]||[];
+  if(topicProjs.length){topicProjs.forEach(function(p){h+=' <span class="proj-badge" onclick="showProject(\''+p.id+'\')">'+esc(p.label)+'</span>'});}
+  h+='</div>';
   if(!d.isGap){
     h+='<div class="dos-conf"><div class="conf-ring" style="background:'+confColor+'15;color:'+confColor+';border:2px solid'+confColor+'">'+d.confidence.score+'</div>';
     h+='<div class="conf-label">'+esc(d.confidence.reason)+'<br>E-Rate: '+d.confidence.evidenceRatio+'% · Verified: '+d.confidence.verifiedRatio+'% · '+d.confidence.reportCount+' Reports</div></div>';
@@ -235,6 +275,33 @@ window.show=function(topicId){
     }
   }
 
+  h+='</div>';
+  document.getElementById('main').innerHTML=h;
+};
+
+window.showProject=function(projectId){
+  var p=(PROJ||{}).projects.find(function(pr){return pr.id===projectId});
+  if(!p)return;
+  var h='<div class="dossier"><div class="dos-header"><div class="dos-title">'+esc(p.label)+'</div>';
+  h+='<div class="dos-meta">'+esc(p.description)+' · Status: '+p.status+' · '+p.topicLinks.length+' linked topics</div></div>';
+  h+='<div class="dos-section"><h4>Linked Topics</h4>';
+  var gapTopics=[];
+  (p.topicLinks||[]).forEach(function(tid){
+    var d=DOS[tid];var isGap=!d||d.isGap;
+    if(isGap)gapTopics.push(tid);
+    var label=d?d.label:tid;var count=d?d.claimCount:0;
+    h+='<span class="adj'+(isGap?' gap':'')+'" style="cursor:pointer;'+(isGap?'border-color:var(--red);color:var(--red)':'')+'" onclick="show(\''+tid+'\')">'+esc(label)+' ('+count+')'+(isGap?' △':'')+'</span>';
+  });
+  h+='</div>';
+  if(gapTopics.length){
+    h+='<div class="dos-section"><h4 style="color:var(--red)">△ '+gapTopics.length+' Knowledge Gaps</h4>';
+    h+='<p style="font:400 7.5pt var(--f);color:var(--text2);margin-bottom:8px">Diese Topics haben keine Research-Daten. Das Projekt hat hier blinde Flecken.</p>';
+    gapTopics.forEach(function(tid){
+      var d=DOS[tid];var label=d?d.label:tid;
+      h+='<div style="padding:4px 0"><span style="color:var(--red);font:400 7.5pt var(--f);cursor:pointer" onclick="show(\''+tid+'\')">△ '+esc(label)+'</span></div>';
+    });
+    h+='</div>';
+  }
   h+='</div>';
   document.getElementById('main').innerHTML=h;
 };
