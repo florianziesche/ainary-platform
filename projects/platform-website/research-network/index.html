@@ -408,10 +408,119 @@ window.showSrc=function(sid){
   } else if(ft[0]==='*'){
     h+='<div class="sec"><h4>Feeds Topics</h4><p style="font:400 8pt var(--f);color:var(--text2)">Alle Topics (universelle Quelle)</p></div>';
   }
+  // Linked Reports — find reports that cite this source
+  var linkedReports=[];
+  (KG.reports||[]).forEach(function(rpt){
+    var srcs=rpt.sources||[];
+    var match=srcs.some(function(rs){
+      var u=rs.url||'',l=(rs.label||'').toLowerCase(),sl=s.label.toLowerCase();
+      // Match by URL domain overlap or label keyword overlap
+      if(s.url&&u){
+        try{var sd=new URL(s.url).hostname.replace('www.',''),rd=new URL(u).hostname.replace('www.','');if(sd&&rd&&(sd.indexOf(rd)>=0||rd.indexOf(sd)>=0))return true}catch(e){}
+      }
+      // Match by label keywords
+      var kws=sl.split(/\s+/);
+      return kws.some(function(kw){return kw.length>3&&l.indexOf(kw)>=0});
+    });
+    if(match)linkedReports.push(rpt);
+  });
+  // Also check if source feeds topics that have claims from reports
+  if(!linkedReports.length&&ft.length&&ft[0]!=='*'){
+    (KG.reports||[]).forEach(function(rpt){
+      var rClaims=(KG.claims||[]).filter(function(c){return c.reportId===rpt.id});
+      var rTopics={};rClaims.forEach(function(c){(c.topics||[]).forEach(function(t){rTopics[t]=true})});
+      var overlap=ft.some(function(t){return rTopics[t]});
+      if(overlap&&linkedReports.indexOf(rpt)<0)linkedReports.push(rpt);
+    });
+  }
+
+  if(linkedReports.length){
+    h+='<div class="sec"><h4>Verknüpfte Reports ('+linkedReports.length+')</h4>';
+    linkedReports.forEach(function(rpt){
+      var claimCount=(KG.claims||[]).filter(function(c){return c.reportId===rpt.id}).length;
+      var avgTrust=0;
+      var rClaims=(KG.claims||[]).filter(function(c){return c.reportId===rpt.id});
+      if(rClaims.length){var sum=0;rClaims.forEach(function(c){sum+=(c.trust||0)});avgTrust=Math.round(sum/rClaims.length)}
+      h+='<div style="padding:6px 8px;margin:3px 0;background:var(--surface);border-radius:4px;border-left:3px solid var(--gold);cursor:pointer" onclick="showReport(\''+rpt.id+'\')">';
+      h+='<div style="font:600 8pt var(--f)">'+E(rpt.title||rpt.id)+'</div>';
+      h+='<div style="font:400 7pt var(--f);color:var(--text2);margin-top:2px">';
+      h+=claimCount+' Claims · '+avgTrust+'% avg Trust';
+      if(rpt.date)h+=' · '+rpt.date;
+      // Show how many sources from this feed
+      var srcCount=(rpt.sources||[]).filter(function(rs){
+        var u=rs.url||'',l=(rs.label||'').toLowerCase(),sl=s.label.toLowerCase();
+        if(s.url&&u){try{var sd=new URL(s.url).hostname.replace('www.',''),rd=new URL(u).hostname.replace('www.','');if(sd&&rd&&(sd.indexOf(rd)>=0||rd.indexOf(sd)>=0))return true}catch(e){}}
+        var kws=sl.split(/\s+/);return kws.some(function(kw){return kw.length>3&&l.indexOf(kw)>=0});
+      }).length;
+      if(srcCount)h+=' · '+srcCount+' Quellen aus dieser Source';
+      h+='</div></div>';
+    });
+    h+='</div>';
+  } else if(s.lastHeadline){
+    h+='<div class="sec"><h4>Letzter Artikel</h4><p style="font:400 8pt var(--f);color:var(--text2)">'+E(s.lastHeadline)+'</p>';
+    h+='<p style="font:400 7pt var(--f);color:var(--muted);margin-top:4px">Noch kein Report erstellt. Nutze den Evidence Extractor (○) um Fakten zu extrahieren.</p></div>';
+  }
+
   // Pipeline status
   if(s.status==='planned'){
     h+='<div class="sec" style="text-align:center;padding:20px"><p style="font:400 8pt var(--f);color:var(--muted)">Quelle noch nicht angeschlossen.</p>';
     h+='<button class="rbtn" onclick="trigSrc(\''+sid+'\',\''+E(s.label)+'\')">◉ Aktivieren</button></div>';
+  }
+  h+='</div>';
+  document.getElementById('main').innerHTML=h;
+};
+
+window.showReport=function(rid){
+  var rpt=(KG.reports||[]).find(function(r){return r.id===rid});if(!rpt)return;
+  var rClaims=(KG.claims||[]).filter(function(c){return c.reportId===rid});
+  var avgTrust=0;if(rClaims.length){var sum=0;rClaims.forEach(function(c){sum+=(c.trust||0)});avgTrust=Math.round(sum/rClaims.length)}
+  var h='<div class="dos"><div class="bluf"><div class="bluf-title">'+E(rpt.title||rpt.id)+'</div>';
+  h+='<div style="font:400 8pt var(--f);color:var(--text2);margin-top:4px">'+(rpt.summary||'Research Report')+'</div>';
+  h+='<div class="bluf-metrics" style="margin-top:10px">';
+  h+='<div class="bm"><div class="v">'+rClaims.length+'</div><div class="l">Claims</div></div>';
+  h+='<div class="bm"><div class="v">'+avgTrust+'%</div><div class="l">Avg Trust</div></div>';
+  h+='<div class="bm"><div class="v">'+(rpt.sources||[]).length+'</div><div class="l">Sources</div></div>';
+  if(rpt.date)h+='<div class="bm"><div class="v">'+rpt.date+'</div><div class="l">Date</div></div>';
+  h+='</div></div>';
+  // Sources
+  if((rpt.sources||[]).length){
+    h+='<div class="sec"><h4>Source Log ('+(rpt.sources||[]).length+')</h4>';
+    (rpt.sources||[]).forEach(function(s,i){
+      h+='<div style="padding:4px 0;border-bottom:1px solid var(--border);font:400 7pt var(--f)">';
+      h+='<span style="font:600 7pt var(--m);color:var(--gold);width:24px;display:inline-block">S'+(i+1)+'</span>';
+      h+='<span style="font:500 6pt var(--m);color:var(--muted);margin-right:4px">['+(s.admiralty||'?')+'</span>';
+      if(s.url)h+='<a href="'+s.url+'" target="_blank">'+E(s.label||s.url)+'</a>';else h+=E(s.label||'?');
+      h+='</div>';
+    });
+    h+='</div>';
+  }
+  // Claims
+  if(rClaims.length){
+    h+='<div class="sec"><h4>Claims ('+rClaims.length+')</h4>';
+    var eija={E:[],I:[],J:[],A:[]};
+    rClaims.forEach(function(c){var t=c.eija||'E';if(!eija[t])eija[t]=[];eija[t].push(c)});
+    ['E','I','J','A'].forEach(function(tag){
+      if(!eija[tag]||!eija[tag].length)return;
+      var labels={E:'Evidence',I:'Interpretation',J:'Judgment',A:'Assumption'};
+      h+='<div style="margin:6px 0"><span class="eija-'+tag.toLowerCase()+'" style="font:700 6pt var(--m);padding:2px 5px;border-radius:3px">'+tag+' — '+labels[tag]+' ('+eija[tag].length+')</span></div>';
+      eija[tag].forEach(function(c){
+        h+='<div class="cl"><div class="cl-text">'+E(c.text)+'</div>';
+        if(c.soWhat)h+='<div class="cl-so">→ '+E(c.soWhat)+'</div>';
+        h+='<div class="cl-meta">['+c.trust+'%] '+(c.sources||[]).map(function(s){return s}).join(', ')+'</div></div>';
+      });
+    });
+    h+='</div>';
+  }
+  // Topics covered
+  var topicSet={};rClaims.forEach(function(c){(c.topics||[]).forEach(function(t){topicSet[t]=true})});
+  var topicIds=Object.keys(topicSet);
+  if(topicIds.length){
+    h+='<div class="sec"><h4>Topics Covered ('+topicIds.length+')</h4>';
+    topicIds.forEach(function(tid){
+      var d=DOS[tid];var label=d?d.label:tid;
+      h+='<span class="adj" style="cursor:pointer" onclick="show(\''+tid+'\')">'+E(label)+'</span>';
+    });
+    h+='</div>';
   }
   h+='</div>';
   document.getElementById('main').innerHTML=h;
