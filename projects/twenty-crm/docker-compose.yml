@@ -1,0 +1,49 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: twenty
+      POSTGRES_PASSWORD: twenty
+      POSTGRES_DB: twenty
+    volumes:
+      - twenty-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U twenty"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    volumes:
+      - twenty-redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  twenty:
+    image: twentycrm/twenty:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "3001:3000"
+    environment:
+      PG_DATABASE_URL: "postgresql://twenty:twenty@db:5432/twenty"
+      REDIS_URL: "redis://redis:6379"
+      APP_SECRET: "ec0edf4def80bb85acc39efeda21b7d4b66cd3d4fddbdc77a1c76d20f9d32a4f"
+      SERVER_URL: "http://localhost:3001"
+      SIGN_IN_PREFILLED: "true"
+      IS_SIGN_UP_DISABLED: "false"
+
+volumes:
+  twenty-db:
+  twenty-redis:

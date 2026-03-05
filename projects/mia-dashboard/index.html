@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>♔ Mia Mission Control</title>
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --surface2: #1a1a25;
+  --border: #2a2a3a;
+  --text: #e4e4ed;
+  --text2: #8888a0;
+  --accent: #c8aa50;
+  --accent2: #a08830;
+  --green: #34d399;
+  --red: #f87171;
+  --orange: #fb923c;
+  --blue: #60a5fa;
+  --purple: #a78bfa;
+  --font: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+/* Grid */
+.dashboard {
+  display: grid;
+  grid-template-columns: 280px 1fr 320px;
+  grid-template-rows: 56px 1fr;
+  min-height: 100vh;
+  gap: 1px;
+  background: var(--border);
+}
+/* Header */
+.header {
+  grid-column: 1 / -1;
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.logo { font-size: 18px; font-weight: 700; color: var(--accent); }
+.logo span { color: var(--text2); font-weight: 400; font-size: 13px; margin-left: 8px; }
+.header-stats {
+  display: flex;
+  gap: 24px;
+  margin-left: auto;
+  font-family: var(--font);
+  font-size: 12px;
+}
+.header-stat { display: flex; align-items: center; gap: 6px; }
+.header-stat .dot { width: 6px; height: 6px; border-radius: 50%; }
+.dot-green { background: var(--green); box-shadow: 0 0 8px var(--green); }
+.dot-orange { background: var(--orange); }
+.dot-red { background: var(--red); }
+.clock { color: var(--text2); font-family: var(--font); font-size: 12px; }
+
+/* Sidebar */
+.sidebar {
+  background: var(--surface);
+  padding: 16px;
+  overflow-y: auto;
+}
+.sidebar h3 {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text2);
+  margin: 16px 0 8px;
+}
+.sidebar h3:first-child { margin-top: 0; }
+.agent-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.agent-card:hover { border-color: var(--accent); }
+.agent-card.active { border-color: var(--accent); background: rgba(200,170,80,0.05); }
+.agent-name { font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+.agent-status { font-size: 11px; color: var(--text2); margin-top: 4px; }
+.agent-cost { font-family: var(--font); font-size: 11px; color: var(--accent); margin-top: 4px; }
+.badge {
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.badge-live { background: rgba(52,211,153,0.15); color: var(--green); }
+.badge-idle { background: rgba(136,136,160,0.15); color: var(--text2); }
+.badge-error { background: rgba(248,113,113,0.15); color: var(--red); }
+
+/* Main */
+.main {
+  background: var(--bg);
+  padding: 20px;
+  overflow-y: auto;
+}
+/* Metric Cards */
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.metric-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+.metric-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; }
+.metric-value { font-size: 28px; font-weight: 700; font-family: var(--font); margin-top: 4px; }
+.metric-delta { font-size: 11px; margin-top: 4px; }
+.metric-delta.up { color: var(--green); }
+.metric-delta.down { color: var(--red); }
+.metric-spark {
+  height: 30px;
+  margin-top: 8px;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+}
+.spark-bar {
+  flex: 1;
+  background: var(--accent);
+  border-radius: 2px 2px 0 0;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  min-height: 2px;
+}
+.spark-bar:last-child { opacity: 1; }
+
+/* Feed */
+.feed {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.feed-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.feed-header .pulse {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.feed-items { max-height: 400px; overflow-y: auto; }
+.feed-item {
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(42,42,58,0.5);
+  font-size: 12px;
+  display: flex;
+  gap: 10px;
+  transition: background 0.15s;
+}
+.feed-item:hover { background: var(--surface2); }
+.feed-time { color: var(--text2); font-family: var(--font); white-space: nowrap; min-width: 50px; }
+.feed-agent { color: var(--accent); font-weight: 600; min-width: 80px; }
+.feed-msg { color: var(--text); flex: 1; }
+
+/* Right Panel */
+.right-panel {
+  background: var(--surface);
+  padding: 16px;
+  overflow-y: auto;
+}
+.panel-section { margin-bottom: 20px; }
+.panel-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text2);
+  margin-bottom: 10px;
+}
+/* Memory */
+.memory-file {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.memory-file:hover { border-color: var(--accent); }
+.memory-file .name { font-family: var(--font); }
+.memory-file .age { color: var(--text2); font-size: 10px; }
+/* Intelligence Stack */
+.intel-tool {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 12px;
+}
+.intel-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.intel-name { flex: 1; }
+.intel-status { color: var(--text2); font-size: 10px; font-family: var(--font); }
+/* Task Queue - Linear style */
+.task {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.task:hover { border-color: var(--accent); transform: translateX(2px); }
+.task-title { font-size: 12px; font-weight: 500; }
+.task-meta { font-size: 10px; color: var(--text2); margin-top: 4px; display: flex; gap: 8px; }
+.task-priority { width: 3px; border-radius: 2px; margin-right: 4px; }
+.priority-urgent { background: var(--red); }
+.priority-high { background: var(--orange); }
+.priority-medium { background: var(--accent); }
+.priority-low { background: var(--text2); }
+
+/* Command Bar */
+.command-bar {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(600px, 80vw);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  z-index: 100;
+}
+.command-input {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+  padding: 10px 14px;
+  outline: none;
+}
+.command-input::placeholder { color: var(--text2); }
+.command-hint {
+  font-size: 10px;
+  color: var(--text2);
+  padding: 0 12px;
+  font-family: var(--font);
+}
+/* Responsive */
+@media (max-width: 1200px) {
+  .dashboard { grid-template-columns: 1fr; }
+  .sidebar, .right-panel { display: none; }
+  .metrics { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+<div class="dashboard">
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">♔ Mia Mission Control <span>v1.0</span></div>
+    <div class="header-stats">
+      <div class="header-stat"><div class="dot dot-green"></div> Gateway: running</div>
+      <div class="header-stat"><div class="dot dot-green"></div> 3 agents active</div>
+      <div class="header-stat"><div class="dot dot-orange"></div> Rate: 72%</div>
+    </div>
+    <div class="clock" id="clock">22:35 CET</div>
+  </header>
+
+  <!-- Sidebar: Agents -->
+  <nav class="sidebar">
+    <h3>Active Sessions</h3>
+    <div class="agent-card active">
+      <div class="agent-name">♔ Main (Telegram) <span class="badge badge-live">live</span></div>
+      <div class="agent-status">Last: 2min ago · Opus 4</div>
+      <div class="agent-cost">$4.82 today</div>
+    </div>
+    <div class="agent-card">
+      <div class="agent-name">🎯 HUNTER</div>
+      <div class="agent-status">VC applications · idle 45min</div>
+      <div class="agent-cost">$1.20 today</div>
+    </div>
+    <div class="agent-card">
+      <div class="agent-name">🔬 RESEARCHER <span class="badge badge-live">live</span></div>
+      <div class="agent-status">Deep dive: Glashütte Firmen</div>
+      <div class="agent-cost">$2.15 today</div>
+    </div>
+    <div class="agent-card">
+      <div class="agent-name">✍️ WRITER <span class="badge badge-idle">idle</span></div>
+      <div class="agent-status">Last: LinkedIn post draft</div>
+      <div class="agent-cost">$0.40 today</div>
+    </div>
+
+    <h3>Sub-Agents (today)</h3>
+    <div class="agent-card">
+      <div class="agent-name">🧮 Intel-Crawler</div>
+      <div class="agent-status">Completed: 14 firms crawled</div>
+      <div class="agent-cost">$0.85</div>
+    </div>
+    <div class="agent-card">
+      <div class="agent-name">📊 BA-Scanner</div>
+      <div class="agent-status">Completed: 6 Bundesanzeiger pulls</div>
+      <div class="agent-cost">$0.12</div>
+    </div>
+
+    <h3>Quick Actions</h3>
+    <button style="width:100%;padding:8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;font-size:12px;margin-bottom:6px" onclick="alert('Spawning sub-agent...')">+ Spawn Agent</button>
+    <button style="width:100%;padding:8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;font-size:12px;margin-bottom:6px">🔄 Restart Gateway</button>
+    <button style="width:100%;padding:8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;font-size:12px">📊 Export Costs CSV</button>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main">
+    <!-- Metrics -->
+    <div class="metrics">
+      <div class="metric-card">
+        <div class="metric-label">Today's Cost</div>
+        <div class="metric-value" style="color:var(--accent)">$9.54</div>
+        <div class="metric-delta up">↓ 23% vs yesterday</div>
+        <div class="metric-spark" id="cost-spark"></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Sessions</div>
+        <div class="metric-value">7</div>
+        <div class="metric-delta up">3 active · 4 completed</div>
+        <div class="metric-spark" id="session-spark"></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Tokens (24h)</div>
+        <div class="metric-value">284K</div>
+        <div class="metric-delta">In: 180K · Out: 104K</div>
+        <div class="metric-spark" id="token-spark"></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Sends Today</div>
+        <div class="metric-value" id="sends-value" style="color:var(--red)">0</div>
+        <div class="metric-delta down">⚠️ SEND FIRST — nothing shipped</div>
+      </div>
+    </div>
+
+    <!-- Live Feed -->
+    <div class="feed">
+      <div class="feed-header"><div class="pulse"></div> Live Agent Feed</div>
+      <div class="feed-items" id="feed">
+        <div class="feed-item">
+          <span class="feed-time">22:32</span>
+          <span class="feed-agent">♔ Main</span>
+          <span class="feed-msg">Installed 8 intelligence tools → ainary-intel toolkit ready</span>
+        </div>
+        <div class="feed-item">
+          <span class="feed-time">22:28</span>
+          <span class="feed-agent">♔ Main</span>
+          <span class="feed-msg">Bundesanzeiger: 20 Berichte für Lange Uhren GmbH pulled</span>
+        </div>
+        <div class="feed-item">
+          <span class="feed-time">22:25</span>
+          <span class="feed-agent">🔬 RESEARCH</span>
+          <span class="feed-msg">offeneregister.de: 251 Firmen in Glashütte identifiziert</span>
+        </div>
+        <div class="feed-item">
+          <span class="feed-time">22:20</span>
+          <span class="feed-agent">♔ Main</span>
+          <span class="feed-msg">Crawl4AI: 45K chars from muehle-glashuette.de extracted</span>
+        </div>
+        <div class="feed-item">
+          <span class="feed-time">22:15</span>
+          <span class="feed-agent">🎯 HUNTER</span>
+          <span class="feed-msg">VC Application: Earlybird draft saved to outreach/</span>
+        </div>
+        <div class="feed-item">
+          <span class="feed-time">22:10</span>
+          <span class="feed-agent">♔ Main</span>
+          <span class="feed-msg">Memory: tech.md updated with Intelligence Toolkit</span>
+        </div>
+        <div class="feed-item">
+          <span class="feed-time">21:45</span>
+          <span class="feed-agent">✍️ WRITER</span>
+          <span class="feed-msg">LinkedIn post: "Why German Mittelstand needs AI" — draft complete</span>
+        </div>
+        <div class="feed-item">
+          <span class="feed-time">21:30</span>
+          <span class="feed-agent">🧮 OPS</span>
+          <span class="feed-msg">Heartbeat: all systems nominal, memory clean</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Right Panel -->
+  <aside class="right-panel">
+    <div class="panel-section">
+      <div class="panel-title">🧠 Memory Files</div>
+      <div class="memory-file"><span class="name">SOUL.md</span><span class="age">core</span></div>
+      <div class="memory-file"><span class="name">USER.md</span><span class="age">core</span></div>
+      <div class="memory-file"><span class="name">daily/2026-03-04.md</span><span class="age">today</span></div>
+      <div class="memory-file"><span class="name">daily/2026-03-03.md</span><span class="age">1d ago</span></div>
+      <div class="memory-file"><span class="name">decisions.md</span><span class="age">2d ago</span></div>
+      <div class="memory-file"><span class="name">projects.md</span><span class="age">5d ago</span></div>
+      <div class="memory-file"><span class="name">people.md</span><span class="age">7d ago</span></div>
+      <div class="memory-file"><span class="name">tech.md</span><span class="age">today</span></div>
+      <div class="memory-file"><span class="name">verified-truths.md</span><span class="age">3d ago</span></div>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-title">🧰 Intelligence Stack</div>
+      <div class="intel-tool"><div class="intel-dot" style="background:var(--green)"></div><span class="intel-name">Bundesanzeiger</span><span class="intel-status">ready</span></div>
+      <div class="intel-tool"><div class="intel-dot" style="background:var(--green)"></div><span class="intel-name">Crawl4AI</span><span class="intel-status">ready</span></div>
+      <div class="intel-tool"><div class="intel-dot" style="background:var(--green)"></div><span class="intel-name">GPT-Researcher</span><span class="intel-status">ready</span></div>
+      <div class="intel-tool"><div class="intel-dot" style="background:var(--green)"></div><span class="intel-name">LightRAG</span><span class="intel-status">ready</span></div>
+      <div class="intel-tool"><div class="intel-dot" style="background:var(--green)"></div><span class="intel-name">Scrapling</span><span class="intel-status">ready</span></div>
+      <div class="intel-tool"><div class="intel-dot" style="background:var(--green)"></div><span class="intel-name">browser-use</span><span class="intel-status">ready</span></div>
+      <div class="intel-tool"><div class="intel-dot" style="background:var(--orange)"></div><span class="intel-name">ChangeDetection</span><span class="intel-status">docker</span></div>
+      <div class="intel-tool"><div class="intel-dot" style="background:var(--orange)"></div><span class="intel-name">Twenty CRM</span><span class="intel-status">docker</span></div>
+      <div class="intel-tool"><div class="intel-dot" style="background:var(--blue)"></div><span class="intel-name">offeneregister</span><span class="intel-status">160MB</span></div>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-title">📋 Priority Queue</div>
+      <div class="task">
+        <div style="display:flex">
+          <div class="task-priority priority-urgent"></div>
+          <div>
+            <div class="task-title">⚠️ Send First — 0 sends today</div>
+            <div class="task-meta"><span>🔴 Urgent</span><span>Revenue</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="task">
+        <div style="display:flex">
+          <div class="task-priority priority-high"></div>
+          <div>
+            <div class="task-title">Docker Desktop: approve privileged access</div>
+            <div class="task-meta"><span>🟠 High</span><span>Infra</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="task">
+        <div style="display:flex">
+          <div class="task-priority priority-medium"></div>
+          <div>
+            <div class="task-title">offeneregister.de download complete</div>
+            <div class="task-meta"><span>🟡 Medium</span><span>Data</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="task">
+        <div style="display:flex">
+          <div class="task-priority priority-low"></div>
+          <div>
+            <div class="task-title">Set up Splink entity resolution</div>
+            <div class="task-meta"><span>⚪ Low</span><span>Intel</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-title">📊 Model Usage (today)</div>
+      <div style="font-size:12px;font-family:var(--font)">
+        <div style="display:flex;justify-content:space-between;padding:4px 0"><span>opus-4</span><span style="color:var(--accent)">$6.20</span></div>
+        <div style="height:4px;background:var(--surface2);border-radius:2px;margin-bottom:8px"><div style="height:100%;width:65%;background:var(--accent);border-radius:2px"></div></div>
+        <div style="display:flex;justify-content:space-between;padding:4px 0"><span>sonnet-4.5</span><span style="color:var(--accent)">$2.84</span></div>
+        <div style="height:4px;background:var(--surface2);border-radius:2px;margin-bottom:8px"><div style="height:100%;width:30%;background:var(--blue);border-radius:2px"></div></div>
+        <div style="display:flex;justify-content:space-between;padding:4px 0"><span>haiku-4.5</span><span style="color:var(--accent)">$0.50</span></div>
+        <div style="height:4px;background:var(--surface2);border-radius:2px"><div style="height:100%;width:5%;background:var(--green);border-radius:2px"></div></div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- Command Bar -->
+<div class="command-bar">
+  <input class="command-input" placeholder="⌘K — Ask Mia anything, spawn agent, run intel..." autofocus>
+  <span class="command-hint">⌘K</span>
+</div>
+
+<script>
+// Clock
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent = 
+    now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Berlin' }) + ' CET';
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Sparklines
+function renderSpark(id, data) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const max = Math.max(...data);
+  data.forEach(v => {
+    const bar = document.createElement('div');
+    bar.className = 'spark-bar';
+    bar.style.height = (v / max * 100) + '%';
+    el.appendChild(bar);
+  });
+}
+renderSpark('cost-spark', [2.1, 3.4, 1.8, 4.2, 3.1, 2.8, 5.1, 4.5, 3.2, 6.8, 4.2, 9.5]);
+renderSpark('session-spark', [3, 5, 4, 7, 3, 6, 8, 5, 4, 7, 6, 7]);
+renderSpark('token-spark', [120, 180, 95, 220, 150, 190, 280, 200, 160, 250, 220, 284]);
+
+// Command bar
+document.querySelector('.command-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const cmd = e.target.value;
+    const feed = document.getElementById('feed');
+    const now = new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+    const item = document.createElement('div');
+    item.className = 'feed-item';
+    item.innerHTML = `<span class="feed-time">${now}</span><span class="feed-agent" style="color:var(--green)">→ YOU</span><span class="feed-msg">${cmd}</span>`;
+    feed.insertBefore(item, feed.firstChild);
+    e.target.value = '';
+  }
+});
+
+// Keyboard shortcut
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault();
+    document.querySelector('.command-input').focus();
+  }
+});
+
+// ─── WebSocket Live Connection ───────────────────────────
+const WS_URL = `ws://${location.hostname}:${location.port}/ws`;
+let ws = null;
+let reconnectTimer = null;
+const connDot = document.querySelector('.dot-green') || document.createElement('div');
+
+function connectWS() {
+  try {
+    ws = new WebSocket(WS_URL);
+  } catch(e) { return; }
+  
+  ws.onopen = () => {
+    console.log('♔ WebSocket connected');
+    if (connDot) connDot.style.background = 'var(--green)';
+  };
+  
+  ws.onclose = () => {
+    if (connDot) connDot.style.background = 'var(--orange)';
+    reconnectTimer = setTimeout(connectWS, 3000);
+  };
+  
+  ws.onerror = () => {};
+  
+  ws.onmessage = (event) => {
+    try {
+      const data = JSON.parse(event.data);
+      if (data.type === 'state') updateDashboard(data);
+    } catch(e) { console.error('WS parse error', e); }
+  };
+}
+
+function updateDashboard(state) {
+  // ── Sessions sidebar ──
+  const sidebar = document.querySelector('.sidebar');
+  if (state.sessions && state.sessions.length > 0) {
+    let activeHtml = '<h3>Active Sessions</h3>';
+    let subHtml = '';
+    let activeCount = 0;
+    
+    for (const s of state.sessions.slice(0, 10)) {
+      const isActive = s.active;
+      if (isActive) activeCount++;
+      const badge = isActive ? '<span class="badge badge-live">live</span>' : '<span class="badge badge-idle">idle</span>';
+      const model = s.model ? s.model.split('/').pop().slice(0, 12) : '';
+      const ageMins = Math.round(s.ageMs / 60000);
+      const ageStr = ageMins < 1 ? 'now' : ageMins < 60 ? ageMins + 'min ago' : Math.round(ageMins/60) + 'h ago';
+      const channel = s.channel !== 'unknown' ? ` · ${s.channel}` : '';
+      const msg = s.lastMessage ? s.lastMessage.slice(0, 60) : '';
+      
+      activeHtml += `
+        <div class="agent-card ${isActive ? 'active' : ''}">
+          <div class="agent-name">${isActive ? '🟢' : '⚪'} ${s.id} ${badge}</div>
+          <div class="agent-status">${ageStr}${channel} · ${model}</div>
+          ${msg ? `<div class="agent-cost" style="color:var(--text2);font-size:10px;margin-top:2px">${msg}…</div>` : ''}
+          <div class="agent-cost">${s.sizeKB}KB</div>
+        </div>`;
+    }
+    
+    // Update header
+    const headerStats = document.querySelector('.header-stats');
+    if (headerStats && state.health) {
+      const gw = state.health.gateway;
+      const gwDot = gw === 'running' ? 'dot-green' : 'dot-red';
+      headerStats.innerHTML = `
+        <div class="header-stat"><div class="dot ${gwDot}"></div> Gateway: ${gw}</div>
+        <div class="header-stat"><div class="dot dot-green"></div> ${activeCount} active</div>
+        <div class="header-stat"><div class="dot ${state.health.memoryUsedPct > 85 ? 'dot-orange' : 'dot-green'}"></div> RAM: ${state.health.memoryUsedPct}%</div>
+        <div class="header-stat"><div class="dot dot-green"></div> ${state.health.uptime}</div>
+      `;
+    }
+    
+    sidebar.innerHTML = activeHtml + '<h3>Quick Actions</h3>' +
+      '<button style="width:100%;padding:8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;font-size:12px;margin-bottom:6px" onclick="sendRefresh()">🔄 Refresh</button>' +
+      '<button style="width:100%;padding:8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;font-size:12px" onclick="exportState()">📊 Export JSON</button>';
+  }
+  
+  // ── Metrics ──
+  if (state.sessions) {
+    const activeCount = state.sessions.filter(s => s.active).length;
+    const totalCount = state.sessions.length;
+    const totalKB = state.sessions.reduce((a, s) => a + (s.sizeKB || 0), 0);
+    
+    const metricCards = document.querySelectorAll('.metric-card');
+    if (metricCards[1]) {
+      metricCards[1].querySelector('.metric-value').textContent = totalCount;
+      metricCards[1].querySelector('.metric-delta').textContent = `${activeCount} active · ${totalCount - activeCount} idle`;
+    }
+    if (metricCards[2]) {
+      metricCards[2].querySelector('.metric-value').textContent = Math.round(totalKB) + 'K';
+      metricCards[2].querySelector('.metric-delta').textContent = `Total session data`;
+    }
+  }
+  
+  if (state.costs && state.costs.today && state.costs.today.total > 0) {
+    const metricCards = document.querySelectorAll('.metric-card');
+    if (metricCards[0]) {
+      metricCards[0].querySelector('.metric-value').textContent = '$' + state.costs.today.total.toFixed(2);
+    }
+  }
+  
+  // ── Feed ──
+  if (state.feed && state.feed.length > 0) {
+    const feedEl = document.getElementById('feed');
+    feedEl.innerHTML = '';
+    for (const item of state.feed.slice(0, 15)) {
+      const time = new Date(item.time).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+      const div = document.createElement('div');
+      div.className = 'feed-item';
+      div.innerHTML = `
+        <span class="feed-time">${time}</span>
+        <span class="feed-agent">${item.agent}</span>
+        <span class="feed-msg">${item.message}</span>
+      `;
+      feedEl.appendChild(div);
+    }
+  }
+  
+  // ── Memory Files (right panel) ──
+  if (state.memory) {
+    const memSection = document.querySelector('.panel-section');
+    if (memSection) {
+      let html = '<div class="panel-title">🧠 Memory Files</div>';
+      for (const f of state.memory.slice(0, 15)) {
+        const age = f.ageMs < 3600000 ? 'just now' :
+                    f.ageMs < 86400000 ? Math.round(f.ageMs / 3600000) + 'h ago' :
+                    Math.round(f.ageMs / 86400000) + 'd ago';
+        const core = f.core ? ' style="border-left:2px solid var(--accent)"' : '';
+        html += `<div class="memory-file"${core} onclick="viewMemory('${f.path}')"><span class="name">${f.name}</span><span class="age">${age}</span></div>`;
+      }
+      memSection.innerHTML = html;
+    }
+  }
+  
+  // ── Intelligence Stack ──
+  if (state.intel) {
+    const sections = document.querySelectorAll('.panel-section');
+    const intelSection = sections[1]; // second panel section
+    if (intelSection) {
+      let html = '<div class="panel-title">🧰 Intelligence Stack</div>';
+      for (const tool of state.intel) {
+        const color = tool.status === 'ready' ? 'var(--green)' :
+                      tool.status === 'partial' ? 'var(--blue)' :
+                      tool.status === 'docker-pending' ? 'var(--orange)' : 'var(--red)';
+        const extra = tool.sizeMB ? ` (${tool.sizeMB}MB)` : '';
+        html += `<div class="intel-tool"><div class="intel-dot" style="background:${color}"></div><span class="intel-name">${tool.name}</span><span class="intel-status">${tool.status}${extra}</span></div>`;
+      }
+      intelSection.innerHTML = html;
+    }
+  }
+}
+
+function sendRefresh() {
+  if (ws && ws.readyState === 1) ws.send(JSON.stringify({ type: 'refresh' }));
+}
+
+function exportState() {
+  fetch('/api/state').then(r => r.json()).then(data => {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `mia-state-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+  });
+}
+
+function viewMemory(path) {
+  fetch(`/api/memory/read?path=${encodeURIComponent(path)}`).then(r => r.text()).then(text => {
+    // Show in a modal-like overlay
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;display:flex;justify-content:center;align-items:center;cursor:pointer';
+    overlay.onclick = () => overlay.remove();
+    const box = document.createElement('pre');
+    box.style.cssText = 'background:var(--surface);color:var(--text);padding:24px;border-radius:12px;max-width:700px;max-height:80vh;overflow:auto;font-size:12px;font-family:var(--font);line-height:1.6;white-space:pre-wrap;cursor:text';
+    box.textContent = text;
+    box.onclick = e => e.stopPropagation();
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+  });
+}
+
+// Connect on load
+connectWS();
+// Also fetch via HTTP as fallback
+fetch('/api/state').then(r => r.json()).then(data => updateDashboard(data)).catch(() => {});
+</script>
+</body>
+</html>
