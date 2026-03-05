@@ -246,7 +246,13 @@ window.show=function(topicId){
     d.claims.slice(0,20).forEach(function(c){
       var confColor=c.confidence>=80?'var(--green)':c.confidence>=60?'var(--gold)':'var(--red)';
       h+='<div class="claim"><div class="claim-text"><span class="eija eija-'+c.eija+'">'+c.eija+'</span> '+esc(c.claim)+'</div>';
-      h+='<div class="claim-meta">'+c.confidence+'% · '+c.status+' · '+c.reportId+'</div>';
+      var ts=c.trustScore||{};var srcHtml='';
+      (c.realSources||[]).forEach(function(s){
+        if(s.url)srcHtml+=' <a href="'+s.url+'" target="_blank" style="color:var(--blue);font:400 6.5pt var(--m);text-decoration:none" title="'+esc(s.admiralty)+'">'+esc(s.label.substring(0,35))+'</a>';
+        else srcHtml+=' <span style="font:400 6.5pt var(--m);color:var(--muted)">'+esc(s.label.substring(0,35))+'</span>';
+      });
+      var relScore=c.relevance&&c.relevance[topicId]?c.relevance[topicId]:'-';
+      h+='<div class="claim-meta">Trust '+(ts.score||c.confidence)+'%'+(ts.sourceCount>1?' ('+ts.sourceCount+' src, +'+ts.sourceBoost+')':'')+' · Relevance '+relScore+'/10 · '+c.status+(srcHtml?' ·'+srcHtml:'')+'</div>';
       if(c.soWhat)h+='<div class="so-what">'+esc(c.soWhat)+'</div>';
       h+='</div>';
     });
