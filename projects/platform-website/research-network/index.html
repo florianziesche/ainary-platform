@@ -94,6 +94,29 @@ a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}
 .gap-box{padding:30px;text-align:center}.gap-icon{font-size:28pt;color:var(--red);opacity:.25}
 .gap-box p{font:400 8pt var(--f);color:var(--text2);margin:6px 0}
 .rbtn{display:inline-flex;align-items:center;gap:5px;font:600 7.5pt var(--m);color:#fff;background:var(--gold);border:none;border-radius:4px;padding:7px 14px;cursor:pointer}.rbtn:hover{background:#b8982a}
+/* Report Builder Modal */
+.modal-bg{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:999;overflow-y:auto;padding:20px}
+.modal-bg.open{display:flex;align-items:flex-start;justify-content:center}
+.modal{background:#fff;border-radius:8px;width:100%;max-width:800px;margin:20px auto;border:2px solid var(--gold)}
+.modal-header{padding:16px 20px;border-bottom:2px solid var(--gold);display:flex;justify-content:space-between;align-items:center}
+.modal-header h2{font:600 12pt var(--f)}.modal-close{font:400 16pt var(--f);cursor:pointer;color:var(--muted);border:none;background:none}
+.modal-body{padding:20px}
+.form-section{margin-bottom:16px}
+.form-section h4{font:600 8pt var(--m);color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.form-row{display:flex;gap:8px;margin-bottom:6px;align-items:center;flex-wrap:wrap}
+.finput{font:400 8pt var(--f);padding:6px 8px;border:1px solid var(--border);border-radius:4px;background:#fff;flex:1;min-width:100px}
+.finput:focus{border-color:var(--gold);outline:none}
+.fselect{font:400 7.5pt var(--f);padding:5px 6px;border:1px solid var(--border);border-radius:4px;background:#fff;min-width:60px}
+.ftextarea{font:400 8pt var(--f);padding:6px 8px;border:1px solid var(--border);border-radius:4px;width:100%;min-height:60px;resize:vertical}
+.fbtn{font:600 7pt var(--m);padding:5px 10px;border:1px solid var(--border);border-radius:4px;cursor:pointer;background:var(--surface)}
+.fbtn:hover{border-color:var(--gold)}.fbtn.primary{background:var(--gold);color:#fff;border-color:var(--gold)}.fbtn.primary:hover{background:#b8982a}
+.fbtn.danger{color:var(--red);border-color:var(--red)}.fbtn.danger:hover{background:rgba(153,27,27,.05)}
+.source-item,.claim-item{padding:8px;background:var(--surface);border-radius:4px;margin-bottom:6px;position:relative}
+.source-item .remove,.claim-item .remove{position:absolute;top:4px;right:6px;font:400 10pt var(--f);cursor:pointer;color:var(--muted)}
+.source-item .remove:hover,.claim-item .remove:hover{color:var(--red)}
+.preview-box{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:10px;font:400 7pt var(--m);max-height:200px;overflow-y:auto;white-space:pre-wrap}
+.topic-tag{display:inline-block;padding:2px 6px;border:1px solid var(--gold);border-radius:3px;font:400 6.5pt var(--f);color:var(--gold);margin:2px;cursor:pointer}
+.topic-tag.selected{background:rgba(200,170,80,.15);font-weight:600}
 .footer{text-align:center;padding:16px 0;margin-top:20px;font:400 6.5pt var(--m);color:var(--muted)}
 </style>
 </head>
@@ -399,13 +422,143 @@ window.trigSrc=function(sid,label){
   navigator.clipboard.writeText(prompt).then(function(){alert('Activation prompt kopiert!')}).catch(function(){window.prompt('Copy:',prompt)});
 };
 
+// ═══ REPORT BUILDER ═══
+var _rb={topicId:null,topicLabel:'',sources:[],claims:[],adjacentTopics:[]};
+
 window.trigRes=function(tid,label){
-  var d=DOS[tid];var adj=(d?d.adjacentTopics:[]).filter(function(a){return a.relation==='sibling'}).map(function(a){return a.label}).slice(0,3);
-  var prompt='Research-Auftrag:\n\nTopic: '+label+'\nStandard: Mind. 30 Tier-1 Quellen (A1/A2/B2)\nOutput: JSON Report mit Claims, EIJA-Tags, Admiralty-Codes, soWhat\n\nAngrenzende Topics die profitieren: '+adj.join(', ')+'\n\nBefehl:\nErstelle Research Report → research-network/reports/rr-'+tid.replace(/^t-/,'')+'.json → node extract-claims.js --ingest';
-  navigator.clipboard.writeText(prompt).then(function(){alert('Research-Prompt kopiert!')}).catch(function(){window.prompt('Copy:',prompt)});
+  var d=DOS[tid];
+  _rb={topicId:tid,topicLabel:label,sources:[],claims:[],adjacentTopics:d?d.adjacentTopics:[]};
+  renderReportBuilder();
+  document.getElementById('report-modal').classList.add('open');
+};
+
+window.closeModal=function(){document.getElementById('report-modal').classList.remove('open')};
+
+function renderReportBuilder(){
+  var m=document.getElementById('rb-body');if(!m)return;
+  var h='';
+  
+  // Topic info
+  h+='<div class="form-section"><h4>Topic</h4>';
+  h+='<div style="font:500 10pt var(--f);margin-bottom:4px">'+E(_rb.topicLabel)+'</div>';
+  h+='<div style="font:400 7pt var(--f);color:var(--muted)">Report ID: rr-'+_rb.topicId.replace(/^t-/,'').replace(/^topic-/,'')+'-'+new Date().toISOString().slice(0,7)+'</div>';
+  // Adjacent topics that will benefit
+  if(_rb.adjacentTopics.length){
+    h+='<div style="margin-top:6px;font:400 7pt var(--f);color:var(--text2)">Angrenzende Topics die profitieren:</div>';
+    _rb.adjacentTopics.forEach(function(a){h+='<span class="topic-tag">'+E(a.label)+'</span>'});
+  }
+  h+='</div>';
+
+  // ═══ SOURCES ═══
+  h+='<div class="form-section"><h4>Sources <span class="cnt">('+_rb.sources.length+')</span></h4>';
+  _rb.sources.forEach(function(s,i){
+    h+='<div class="source-item"><span class="remove" onclick="rmSrc('+i+')">×</span>';
+    h+='<div class="form-row"><input class="finput" placeholder="Label (e.g. Anthropic Research Blog)" value="'+E(s.label)+'" onchange="updSrc('+i+',\'label\',this.value)">';
+    h+='<select class="fselect" onchange="updSrc('+i+',\'admiralty\',this.value)">';
+    ['A1','A2','B1','B2','B3','C1','C2','C3','D4','E2'].forEach(function(a){h+='<option'+(s.admiralty===a?' selected':'')+'>'+a+'</option>'});
+    h+='</select></div>';
+    h+='<div class="form-row"><input class="finput" placeholder="URL" value="'+E(s.url)+'" onchange="updSrc('+i+',\'url\',this.value)"></div>';
+    h+='</div>';
+  });
+  h+='<button class="fbtn" onclick="addSrc()">+ Add Source</button>';
+  h+='</div>';
+
+  // ═══ CLAIMS ═══
+  h+='<div class="form-section"><h4>Claims <span class="cnt">('+_rb.claims.length+')</span></h4>';
+  _rb.claims.forEach(function(c,i){
+    h+='<div class="claim-item"><span class="remove" onclick="rmClaim('+i+')">×</span>';
+    h+='<div class="form-row"><textarea class="ftextarea" placeholder="Claim (überprüfbare Aussage)" onchange="updClaim('+i+',\'claim\',this.value)">'+E(c.claim)+'</textarea></div>';
+    h+='<div class="form-row">';
+    h+='<select class="fselect" onchange="updClaim('+i+',\'eija\',this.value)">';
+    [{v:'E',l:'Evidence'},{v:'I',l:'Interpretation'},{v:'J',l:'Judgment'},{v:'A',l:'Assumption'}].forEach(function(o){h+='<option value="'+o.v+'"'+(c.eija===o.v?' selected':'')+'>'+o.v+' — '+o.l+'</option>'});
+    h+='</select>';
+    h+='<select class="fselect" onchange="updClaim('+i+',\'admiralty\',this.value)">';
+    ['A1','A2','B2','B3','C2','C3'].forEach(function(a){h+='<option'+(c.admiralty===a?' selected':'')+'>'+a+'</option>'});
+    h+='</select>';
+    // Source checkboxes
+    h+='<span style="font:400 6.5pt var(--m);color:var(--muted);margin-left:4px">Sources:</span>';
+    _rb.sources.forEach(function(s,si){
+      var checked=c.sources&&c.sources.indexOf('s'+(si+1))>=0;
+      h+='<label style="font:400 6.5pt var(--f);cursor:pointer;display:inline-flex;align-items:center;gap:2px"><input type="checkbox"'+(checked?' checked':'')+' onchange="toggleClaimSrc('+i+','+si+')"> '+E(s.label.substring(0,15))+'</label>';
+    });
+    h+='</div>';
+    h+='<div class="form-row"><input class="finput" placeholder="→ So What? (Warum ist das relevant?)" value="'+E(c.soWhat||'')+'" onchange="updClaim('+i+',\'soWhat\',this.value)"></div>';
+    h+='</div>';
+  });
+  h+='<button class="fbtn" onclick="addClaim()">+ Add Claim</button>';
+  h+='</div>';
+
+  // ═══ PREVIEW + ACTIONS ═══
+  h+='<div class="form-section"><h4>Report Preview</h4>';
+  h+='<div class="preview-box" id="rb-preview">'+E(JSON.stringify(buildReport(),null,2))+'</div></div>';
+  h+='<div class="form-row" style="justify-content:flex-end;gap:8px">';
+  h+='<button class="fbtn" onclick="closeModal()">Cancel</button>';
+  h+='<button class="fbtn" onclick="downloadReport()">⤓ Download JSON</button>';
+  h+='<button class="fbtn primary" onclick="copyReport()">◉ Copy JSON</button>';
+  h+='</div>';
+  
+  m.innerHTML=h;
+}
+
+window.addSrc=function(){_rb.sources.push({id:'s'+(_rb.sources.length+1),label:'',url:'',admiralty:'B2'});renderReportBuilder()};
+window.rmSrc=function(i){_rb.sources.splice(i,1);renderReportBuilder()};
+window.updSrc=function(i,k,v){_rb.sources[i][k]=v;document.getElementById('rb-preview').textContent=JSON.stringify(buildReport(),null,2)};
+
+window.addClaim=function(){_rb.claims.push({claim:'',eija:'E',admiralty:'B2',sources:[],soWhat:''});renderReportBuilder()};
+window.rmClaim=function(i){_rb.claims.splice(i,1);renderReportBuilder()};
+window.updClaim=function(i,k,v){_rb.claims[i][k]=v;document.getElementById('rb-preview').textContent=JSON.stringify(buildReport(),null,2)};
+window.toggleClaimSrc=function(ci,si){
+  var sid='s'+(si+1);var c=_rb.claims[ci];if(!c.sources)c.sources=[];
+  var idx=c.sources.indexOf(sid);if(idx>=0)c.sources.splice(idx,1);else c.sources.push(sid);
+  document.getElementById('rb-preview').textContent=JSON.stringify(buildReport(),null,2);
+};
+
+function buildReport(){
+  var id='rr-'+_rb.topicId.replace(/^t-/,'').replace(/^topic-/,'')+'-'+new Date().toISOString().slice(0,7);
+  return{
+    id:id,
+    title:'Research Report: '+_rb.topicLabel,
+    date:new Date().toISOString().slice(0,10),
+    author:'Ainary Research Network',
+    domain:_rb.topicId,
+    admiralty:'B2',
+    confidence:80,
+    sourceCount:_rb.sources.length,
+    status:'draft',
+    topics:[_rb.topicId],
+    sources:_rb.sources.map(function(s,i){return{id:'s'+(i+1),label:s.label,url:s.url,admiralty:s.admiralty}}),
+    claims:_rb.claims.map(function(c,i){return{
+      id:id+'-c'+(i+1),
+      claim:c.claim,
+      eija:c.eija,
+      admiralty:c.admiralty,
+      confidence:({A1:95,A2:90,B2:80,B3:70,C2:65,C3:60})[c.admiralty]||70,
+      sources:c.sources||[],
+      topics:[_rb.topicId],
+      soWhat:c.soWhat||null,
+      status:'unverified'
+    }})
+  };
+}
+
+window.downloadReport=function(){
+  var r=buildReport();
+  var blob=new Blob([JSON.stringify(r,null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=r.id+'.json';a.click();
+};
+
+window.copyReport=function(){
+  var json=JSON.stringify(buildReport(),null,2);
+  navigator.clipboard.writeText(json).then(function(){alert('Report JSON copied! Save as research-network/reports/'+buildReport().id+'.json then run:\nnode extract-claims.js --ingest\nnode enrich-topics.js')}).catch(function(){window.prompt('Copy:',json)});
 };
 
 function E(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 </script>
+<div class="modal-bg" id="report-modal" onclick="if(event.target===this)closeModal()">
+<div class="modal">
+<div class="modal-header"><h2>◉ Research Report Builder</h2><button class="modal-close" onclick="closeModal()">×</button></div>
+<div class="modal-body" id="rb-body"></div>
+</div>
+</div>
 </body>
 </html>
