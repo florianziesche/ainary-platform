@@ -28,6 +28,55 @@ const HTML_DIR = path.join(__dirname, '../research');
 
 function load(f) { return JSON.parse(fs.readFileSync(f, 'utf8')); }
 
+function buildGraphSources(topic, graph) {
+  const claims = Object.values(graph.claims || {}).filter(c => (c.topics || []).includes(topic));
+  const sourceCounts = new Map();
+  const sourceFallbacks = new Map();
+  const reportCache = new Map();
+
+  const loadReport = (reportId) => {
+    if (reportCache.has(reportId)) return reportCache.get(reportId);
+    const reportPath = path.join(REPORTS_DIR, `${reportId}.json`);
+    if (!fs.existsSync(reportPath)) {
+      reportCache.set(reportId, null);
+      return null;
+    }
+    const report = load(reportPath);
+    reportCache.set(reportId, report);
+    return report;
+  };
+
+  claims.forEach(claim => {
+    (claim.sources || []).forEach(sourceId => {
+      const key = `${claim.reportId}::${sourceId}`;
+      sourceCounts.set(key, (sourceCounts.get(key) || 0) + 1);
+      if (claim.realSources) {
+        const fallback = claim.realSources.find(s => s.id === sourceId);
+        if (fallback) sourceFallbacks.set(key, fallback);
+      }
+    });
+  });
+
+  const sources = [];
+  for (const [key, claimCount] of sourceCounts.entries()) {
+    const [reportId, sourceId] = key.split('::');
+    const report = loadReport(reportId);
+    let source = report && (report.sources || []).find(s => s.id === sourceId);
+    if (!source) source = sourceFallbacks.get(key) || null;
+    if (!source) continue;
+    sources.push({
+      id: sourceId,
+      reportId,
+      label: source.label,
+      url: source.url || '',
+      admiralty: source.admiralty || 'B2',
+      claimCount
+    });
+  }
+
+  return sources.sort((a, b) => b.claimCount - a.claimCount);
+}
+
 const args = process.argv.slice(2);
 const topicId = args[0];
 const userQuery = args.find((a, i) => args[i - 1] === '--query') || null;
@@ -57,6 +106,19 @@ const sug = dossier.suggestions || { sources: [], claims: [], researchQuestions:
 const existing = dossier.categorizedClaims || {};
 const cross = dossier.crossLearnings || [];
 const conf = dossier.confidence || { score: 0, reason: 'No data' };
+const graphSources = buildGraphSources(topicId, G);
+const adjacentSources = (sug.sources || []).map(s => ({
+  ...s,
+  label: `[ADJACENT] ${s.label}`
+}));
+const usedGraphSourceKeys = new Set(graphSources.map(s => `${s.label}::${s.url || ''}`));
+const fallbackAdj = adjacentSources.filter(s => {
+  const baseLabel = s.label.replace(/^\[ADJACENT\] /, '');
+  return !usedGraphSourceKeys.has(`${baseLabel}::${s.url || ''}`);
+});
+const suggestedSources = graphSources.length >= 3
+  ? graphSources
+  : graphSources.concat(fallbackAdj.slice(0, Math.max(3 - graphSources.length, 0)));
 
 // Generate report ID
 const reportId = 'rr-' + topicId.replace(/^t-|^topic-/, '') + '-' + new Date().toISOString().slice(0, 7);
@@ -113,7 +175,7 @@ if (oq.length) {
 
 // Suggested sources
 prompt += `\n## QUELLEN (starte hier, dann erweitere auf 20+)\n`;
-(sug.sources || []).forEach(s => {
+suggestedSources.forEach(s => {
   prompt += `- [${s.admiralty}] ${s.label}`;
   if (s.url) prompt += ` → ${s.url}`;
   prompt += `\n`;
@@ -122,18 +184,21 @@ prompt += `\n## QUELLEN (starte hier, dann erweitere auf 20+)\n`;
 // Execution instructions
 prompt += `
 ## EXECUTION STEPS
-1. web_search für jede Forschungsfrage (mind. 3 Searches)
-2. web_fetch für die Top-20 Ergebnisse
-3. Für jede Quelle: Admiralty-Code vergeben (A1/A2/B2/B3/C2/C3)
-4. Claims extrahieren: EIJA-Tag + Admiralty + soWhat
-5. Widersprüche zu existierenden Claims identifizieren
-6. Beipackzettel erstellen:
-   - STARK BELEGT: ≥2 unabhängige Quellen, Trust ≥85%
-   - UNSICHER: 1 Quelle oder Trust <70%
-   - NICHT GEFUNDEN: unbeantwortete Fragen
-   - WIDERSPRÜCHE: Konflikte mit existierendem Wissen
-7. Follow-Up Fragen (3-5)
-8. Angrenzende Topics die profitieren
+1. BLUF zuerst: 2–4 Sätze/Bullets ganz am Anfang des Reports, vor allen anderen Sektionen.
+2. Hypothese VOR dem Suchen formulieren (1–2 Sätze). Danach gezielt widerlegen.
+3. MECE-Decomposition: Zerlege die Hauptfrage in 3–7 Sub-Fragen (nicht überlappend).
+4. Für jede Sub-Frage: web_search (mind. 3 Searches) + web_fetch der besten Ergebnisse.
+5. Disconfirmation: Suche aktiv nach Gegenbelegen (kritisch/kontra/negative keywords).
+6. Stopping Criteria: Wenn 3 konsekutive Sources keine neue Info liefern → STOP für diese Sub-Frage.
+7. Für jede Quelle: Admiralty-Code vergeben (A1/A2/B2/B3/C2/C3).
+8. Claims extrahieren: EIJA-Tag (E/I/J/A) + Admiralty + soWhat pro Claim.
+9. Widersprüche zu existierenden Claims identifizieren (beide Seiten dokumentieren).
+10. Beipackzettel erstellen (Pflicht):
+   - STARK BELEGT
+   - UNSICHER
+   - WIDERSPRÜCHE
+   - NICHT GEFUNDEN
+11. Follow-Up Fragen (3-5) + angrenzende Topics die profitieren.
 
 ## OUTPUT
 1. JSON Report: research-network/reports/${reportId}.json
@@ -153,7 +218,7 @@ const reportTemplate = {
   sourceCount: 0,
   status: 'template',
   topics: [topicId],
-  sources: (sug.sources || []).map((s, i) => ({
+  sources: suggestedSources.map((s, i) => ({
     id: 's' + (i + 1),
     label: s.label,
     url: s.url || '',
