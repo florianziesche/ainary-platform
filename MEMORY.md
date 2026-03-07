@@ -18,7 +18,7 @@
 - 1 Empfehlung > 5 Optionen
 - Max 1 Telegram-Nachricht pro Delivery
 - GitHub repos PRIVATE bis Launch
-- Send First: Vor jedem Build-Task → "Wurde heute gesendet?"
+- Best Agent Wins: Vor jedem Task → "Macht das den Agent/Knowledge Graph besser?"
 
 ## Meine Limitationen
 1. Vergesse ALLES zwischen Sessions → Dateien sind alles

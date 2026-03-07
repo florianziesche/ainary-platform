@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palantir Technologies — Firmenanalyse · Ainary</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--text:#1a1a1a;--text2:#444;--muted:#777;--light:#bbb;--border:#d0d0d0;--border2:#e8e8e8;--surface:#fafafa;--accent:#9d7f3b;--green:#2d8a4e;--red:#c0392b;--amber:#b45309;--blue:#1565c0;--f:'Inter',-apple-system,sans-serif;--m:'JetBrains Mono',monospace}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--f);color:var(--text);font-size:10pt;line-height:1.65;background:#fff;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.page{max-width:1040px;margin:0 auto;padding:32px 48px 48px}
+.portal-hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;margin-bottom:32px;border-bottom:1px solid var(--border2);font-size:8pt}
+.portal-left{display:flex;align-items:center;gap:8px}
+.brand-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.brand-name{font-weight:500;color:var(--muted)}
+.portal-right{font-family:var(--m);color:var(--muted)}
+
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.kpi{border:1px solid var(--border2);border-radius:8px;padding:16px;text-align:center;background:var(--surface)}
+.kpi-val{font-family:var(--m);font-size:18pt;font-weight:700;line-height:1.2}
+.kpi-label{font-size:8pt;color:var(--text2);margin-top:2px}
+.kpi-sub{font-family:var(--m);font-size:6.5pt;color:var(--light);margin-top:2px}
+
+.tag{font-family:var(--m);font-size:5.5pt;padding:1px 4px;border-radius:2px;font-weight:600;vertical-align:super}
+.tag-e{background:rgba(45,138,78,.1);color:var(--green)}
+.tag-i{background:rgba(157,127,59,.1);color:var(--accent)}
+.tag-j{background:rgba(180,83,9,.1);color:var(--amber)}
+.tag-a{background:rgba(192,57,43,.1);color:var(--red)}
+
+.sec-label{font-family:var(--m);font-size:7pt;font-weight:500;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-top:32px;margin-bottom:4px}
+.sec-title{font-size:18pt;font-weight:700;letter-spacing:-.02em;margin-bottom:16px}
+.content{font-size:9.5pt;line-height:1.7;color:var(--text2);margin-bottom:16px}
+.content strong{color:var(--text)}
+
+/* Tables */
+.data-tbl{width:100%;border-collapse:collapse;margin:12px 0 20px}
+.data-tbl th{text-align:left;font-family:var(--m);font-size:7pt;font-weight:600;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;padding:8px 10px;background:var(--surface);border-bottom:2px solid var(--border2)}
+.data-tbl td{font-size:8.5pt;color:var(--text2);padding:7px 10px;border-bottom:1px solid var(--border2)}
+.data-tbl .num{font-family:var(--m);text-align:right;font-variant-numeric:tabular-nums}
+.data-tbl .highlight{color:var(--accent);font-weight:700}
+.data-tbl .pos{color:var(--green)}
+.data-tbl .neg{color:var(--red)}
+.data-tbl .warn{color:var(--amber)}
+
+/* Insight blocks */
+.insight{border-left:3px solid var(--accent);padding:10px 14px;margin:10px 0;font-size:8.5pt;line-height:1.65;color:var(--text2);background:rgba(157,127,59,.03)}
+.insight strong{color:var(--text)}
+
+/* Risk cards */
+.risk-grid{display:flex;flex-direction:column;gap:10px;margin:12px 0}
+.risk-card{border:1px solid var(--border2);border-radius:8px;padding:14px 16px}
+.risk-card.critical{border-left:3px solid var(--red);background:rgba(192,57,43,.02)}
+.risk-card.moderate{border-left:3px solid var(--amber);background:rgba(180,83,9,.02)}
+.risk-card.positive{border-left:3px solid var(--green);background:rgba(45,138,78,.02)}
+.risk-card h4{font-size:9pt;font-weight:700;margin-bottom:4px}
+.risk-card.critical h4{color:var(--red)}
+.risk-card.moderate h4{color:var(--amber)}
+.risk-card.positive h4{color:var(--green)}
+.risk-card p,.risk-card li{font-size:8.5pt;line-height:1.6;color:var(--text2)}
+.risk-card ul{list-style:none;padding:0;margin:4px 0 0}
+.risk-card ul li{padding:2px 0}
+.risk-card ul li::before{content:'·';margin-right:6px;color:var(--light);font-weight:700}
+
+/* Recommendation blocks */
+.rec-block{border:1px solid var(--border2);border-radius:8px;padding:14px 16px;margin:10px 0;background:var(--surface)}
+.rec-block h4{font-family:var(--m);font-size:7pt;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:8px}
+.rec-block ol{padding-left:16px;margin:0}
+.rec-block ol li{font-size:8.5pt;padding:3px 0;line-height:1.6;color:var(--text2)}
+.rec-block ol li strong{color:var(--text)}
+
+/* Confidence */
+.conf-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.conf-item{border:1px solid var(--border2);border-radius:6px;padding:10px 12px;background:var(--surface)}
+.conf-tier{font-family:var(--m);font-size:6.5pt;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;font-weight:600}
+.conf-tier.high{color:var(--green)}
+.conf-tier.mid{color:var(--amber)}
+.conf-tier.low{color:var(--red)}
+.conf-item p{font-size:7.5pt;color:var(--muted);margin:0;line-height:1.5}
+
+/* Numbered list */
+.gap-list{list-style:none;padding:0;counter-reset:gap}
+.gap-list li{counter-increment:gap;padding:8px 0 8px 28px;position:relative;font-size:8.5pt;line-height:1.6;color:var(--text2);border-bottom:1px solid var(--border2)}
+.gap-list li:last-child{border-bottom:none}
+.gap-list li::before{content:counter(gap);position:absolute;left:0;top:8px;font-family:var(--m);font-size:7pt;font-weight:700;color:var(--accent);width:18px;height:18px;border:1px solid var(--border2);border-radius:3px;text-align:center;line-height:18px;background:var(--surface)}
+.gap-list li strong{color:var(--text)}
+
+.ftr{text-align:center;padding:24px 0;font-family:var(--m);font-size:6.5pt;color:var(--light);border-top:1px solid var(--border2);margin-top:40px}
+
+/* Structure table */
+.struct-tbl{width:100%;border-collapse:collapse;margin:8px 0 16px}
+.struct-tbl td{font-size:8.5pt;padding:5px 10px;border-bottom:1px solid var(--border2);vertical-align:top}
+.struct-tbl td:first-child{font-weight:600;color:var(--text);width:180px;white-space:nowrap}
+.struct-tbl td:last-child{color:var(--text2)}
+
+@media(max-width:700px){.page{padding:20px 16px}.kpi-row{grid-template-columns:1fr 1fr}.conf-grid{grid-template-columns:1fr}}
+@media print{
+  @page{size:A4;margin:2cm}
+  .page{page-break-after:always}
+  .risk-card,.insight,.rec-block{page-break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="portal-hdr">
+    <div class="portal-left">
+      <span class="brand-dot"></span>
+      <span class="brand-name">Ainary</span>
+    </div>
+    <div class="portal-right">FA-2026-0305-PLTR</div>
+  </div>
+
+  <!-- Report Title -->
+  <div style="font-family:var(--m);font-size:7pt;color:var(--muted);letter-spacing:.12em;text-transform:uppercase">Ainary Firmenanalyse</div>
+  <div style="font-size:28pt;font-weight:700;letter-spacing:-.03em;margin-bottom:4px;margin-top:4px">Palantir Technologies</div>
+  <div style="font-size:10pt;color:var(--text2);margin-bottom:12px">Enterprise Software · Data Analytics · AI Platform · US-Government Contractor</div>
+
+  <div style="display:flex;gap:16px;flex-wrap:wrap;font-family:var(--m);font-size:7.5pt;color:var(--muted);margin-bottom:8px">
+    <span>Datum: 2026-03-05</span>
+    <span>Quellen: 8</span>
+    <span>Bundesanzeiger: 20 Berichte</span>
+  </div>
+
+  <!-- Confidence Bar -->
+  <div style="margin-bottom:6px;display:flex;align-items:center;gap:8px">
+    <span style="font-family:var(--m);font-size:7.5pt;color:var(--muted)">Confidence:</span>
+    <div style="flex:0 0 120px;height:6px;background:var(--border2);border-radius:3px;overflow:hidden">
+      <div style="width:70%;height:100%;border-radius:3px;background:var(--green)"></div>
+    </div>
+    <span style="font-family:var(--m);font-size:8pt;font-weight:600;color:var(--green)">70%</span>
+  </div>
+
+  <div style="font-family:var(--m);font-size:7pt;color:var(--muted);margin-bottom:16px">
+    Ihr Aufwand ohne Ainary: ~16–24 Std. · Einsparpotenzial €880–1.320 · Basis: €55/Std. TVöD E11
+  </div>
+
+  <div style="width:100%;height:2px;background:var(--accent);opacity:.3;margin-bottom:16px"></div>
+
+  <!-- Legend -->
+  <div style="display:flex;gap:12px;font-size:6.5pt;margin-bottom:24px;flex-wrap:wrap">
+    <span style="display:flex;align-items:center;gap:3px"><span class="tag tag-e">E</span> Evidence — belegt</span>
+    <span style="display:flex;align-items:center;gap:3px"><span class="tag tag-i">I</span> Inference — abgeleitet</span>
+    <span style="display:flex;align-items:center;gap:3px"><span class="tag tag-j">J</span> Judgment — Einschätzung</span>
+    <span style="display:flex;align-items:center;gap:3px"><span class="tag tag-a">A</span> Assumption — Annahme</span>
+  </div>
+
+  <!-- Beipackzettel -->
+  <div style="border:1px solid var(--border2);border-radius:8px;padding:16px;margin-bottom:24px;background:var(--surface)">
+    <div style="font-family:var(--m);font-size:7pt;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px">Beipackzettel — Lesen vor Verwendung</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;font-size:8.5pt">
+      <div>
+        <div style="font-weight:600;color:var(--green);margin-bottom:6px">Was dieser Report kann</div>
+        <ul style="margin:0;padding-left:16px;color:var(--text2);line-height:1.7">
+          <li>Konzern- und DE-Tochter-Daten zusammenführen</li>
+          <li>Bundesanzeiger-Jahresabschlüsse analysieren</li>
+          <li>Bewertung mit aktuellen Marktdaten einordnen</li>
+          <li>Regulatorische Risiken identifizieren</li>
+          <li>False Positives erkennen und kennzeichnen</li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-weight:600;color:var(--red);margin-bottom:6px">Was dieser Report NICHT kann</div>
+        <ul style="margin:0;padding-left:16px;color:var(--text2);line-height:1.7">
+          <li>Interne Strategie oder Roadmap bewerten</li>
+          <li>Verbindliche Anlageberatung ersetzen</li>
+          <li>Net Retention Rate oder Churn verifizieren</li>
+          <li>Kundenliste der DE-Tochter identifizieren</li>
+          <li>Insider-Transaktionen aktuell auswerten</li>
+        </ul>
+      </div>
+    </div>
+    <div style="font-size:7.5pt;color:var(--muted);margin-top:12px;padding-top:8px;border-top:1px solid var(--border2)">
+      <strong>Datenquellen:</strong> Bundesanzeiger (20 Berichte, DE-Tochter), offeneregister.de, SEC/10-K, MacroTrends, Lobbyregister Bundestag, The Hill, The Guardian, Alpha Spread<br>
+      <strong>Einschränkungen:</strong> Bundesanzeiger zeigt nur DE-Tochter (Cost-Plus-Dienstleister). Offeneregister-Treffer "Palantiri GmbH" = False Positive. Insolvenz-Check fehlgeschlagen (SSL).<br>
+      <strong>Letzte Aktualisierung:</strong> 2026-03-05T17:45 · <strong>Gültig bis:</strong> 2026-04-05
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-val">$4,5B</div><div class="kpi-label">Revenue 2025</div><div class="kpi-sub">+56% YoY <span class="tag tag-e">E</span></div></div>
+    <div class="kpi"><div class="kpi-val">$313B</div><div class="kpi-label">Market Cap</div><div class="kpi-sub">Stand Feb 2026 <span class="tag tag-e">E</span></div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--red)">203×</div><div class="kpi-label">P/E Ratio</div><div class="kpi-sub">extrem hoch <span class="tag tag-e">E</span></div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--green)">+70%</div><div class="kpi-label">Q4 2025 YoY</div><div class="kpi-sub">Beschleunigung <span class="tag tag-e">E</span></div></div>
+  </div>
+
+  <!-- Executive Summary -->
+  <div class="sec-label">Executive Summary</div>
+  <div class="sec-title">Bestes Unternehmen, teuerster Preis</div>
+  <div class="content" style="border-left:3px solid var(--accent);padding-left:16px">
+    Palantir ist das derzeit am aggressivsten bewertete Enterprise-Software-Unternehmen der Welt — <strong>$313 Mrd. Market Cap bei $4,5 Mrd. Umsatz</strong>, P/E ~203. <span class="tag tag-e">E</span> Das operative Geschäft zeigt genuines Momentum: +56% Umsatzwachstum 2025, Q4 sogar +70% YoY, getrieben durch AIP (AI Platform) und US-Regierungsverträge. <span class="tag tag-e">E</span> Die fundamentale Frage ist nicht ob Palantir ein gutes Unternehmen ist — das ist es — sondern <strong>ob der aktuelle Preis ein Jahrzehnt perfekter Execution bereits eingepreist hat.</strong> <span class="tag tag-j">J</span> Die deutsche Tochter ist eine reine Cost-Plus-Servicegesellschaft mit €22 Mio. Umsatz (2021) und gibt keinen Einblick in das operative Geschäft. <span class="tag tag-e">E</span>
+  </div>
+
+  <!-- Unternehmensstruktur -->
+  <div class="sec-label">Struktur</div>
+  <div class="sec-title">Konzern und deutsche Tochter</div>
+
+  <div class="content"><strong>Konzern (SEC-Daten)</strong> <span class="tag tag-e">E</span></div>
+  <table class="struct-tbl">
+    <tr><td>Rechtsform</td><td>Delaware Corporation, börsennotiert (Nasdaq: PLTR)</td></tr>
+    <tr><td>Gründung</td><td>2003, Denver, Colorado</td></tr>
+    <tr><td>CEO</td><td>Alexander Karp</td></tr>
+    <tr><td>Gründer</td><td>Peter Thiel, Alex Karp, Stephen Cohen, Joe Lonsdale</td></tr>
+    <tr><td>Mitarbeiter</td><td>>4.000 weltweit, >50% Engineers (Lobbyregister Bundestag)</td></tr>
+    <tr><td>Produkte</td><td>Gotham (Government), Foundry (Commercial), Apollo (Deployment), AIP (AI Platform)</td></tr>
+  </table>
+
+  <div class="content"><strong>Deutsche Tochter (Bundesanzeiger)</strong> <span class="tag tag-e">E</span></div>
+  <table class="struct-tbl">
+    <tr><td>Firma</td><td>Palantir Technologies GmbH</td></tr>
+    <tr><td>Sitz</td><td>Mainzer Landstraße 46, Frankfurt am Main → München</td></tr>
+    <tr><td>Register</td><td>HRB 93940 (AG Frankfurt) → HRB 293772 (AG München)</td></tr>
+    <tr><td>Stammkapital</td><td>€25.000</td></tr>
+    <tr><td>Geschäftsführer</td><td>Ana Soro, Sean J. Stenstrom</td></tr>
+    <tr><td>Status</td><td>100%-Tochter von Palantir International Inc.</td></tr>
+  </table>
+
+  <div class="insight"><strong>Kein operatives Unternehmen:</strong> Die deutsche GmbH ist eine konzerninterne Dienstleistungsgesellschaft. Sie erbringt "allgemeine Unterstützungsleistungen" für die US-Mutter und wird auf Cost-Plus-Basis (5-7% Markup) vergütet. Klassisches Transfer-Pricing — minimale Gewinne in Deutschland, Wertschöpfung fließt in die USA. <span class="tag tag-e">E</span> <span class="tag tag-i">I</span></div>
+
+  <div class="insight"><strong>False Positive erkannt:</strong> Handelsregister-Treffer "Palantiri GmbH" (GF: Konrath, Harzheim) hat nichts mit Palantir Technologies zu tun — andere Firma. <span class="tag tag-e">E</span></div>
+
+  <div class="insight"><strong>Standortwechsel:</strong> Sitz-Verlagerung Frankfurt → München deutet auf operative Verschiebung hin — München ist der stärkere Tech-Standort in Deutschland. <span class="tag tag-i">I</span></div>
+
+  <!-- Finanzanalyse -->
+  <div class="sec-label">Finanzen</div>
+  <div class="sec-title">Globale Revenue-Entwicklung</div>
+
+  <table class="data-tbl">
+    <tr><th>Jahr</th><th class="num">Umsatz</th><th class="num">Wachstum YoY</th></tr>
+    <tr><td>2019</td><td class="num">$743 Mio.</td><td class="num" style="color:var(--light)">—</td></tr>
+    <tr><td>2020</td><td class="num">$1.093 Mio.</td><td class="num pos">+47%</td></tr>
+    <tr><td>2021</td><td class="num">$1.542 Mio.</td><td class="num pos">+41%</td></tr>
+    <tr><td>2022</td><td class="num">$1.906 Mio.</td><td class="num warn">+24%</td></tr>
+    <tr><td>2023</td><td class="num">$2.225 Mio.</td><td class="num warn">+17%</td></tr>
+    <tr><td>2024</td><td class="num">$2.866 Mio.</td><td class="num pos">+29%</td></tr>
+    <tr><td class="highlight">2025</td><td class="num highlight">$4.475 Mio.</td><td class="num pos" style="font-weight:700">+56%</td></tr>
+  </table>
+
+  <div class="content"><strong>Quartals-Trajectory 2025:</strong> Q1: $884M → Q2: $1.004M → Q3: $1.181M → Q4: $1.407M. Jedes Quartal signifikant höher — kein Einmal-Effekt. <span class="tag tag-e">E</span></div>
+
+  <div class="sec-label">Bewertung</div>
+  <div class="sec-title">Stand Februar 2026</div>
+
+  <table class="data-tbl">
+    <tr><th>Kennzahl</th><th class="num">Wert</th><th>Einordnung</th></tr>
+    <tr><td>Market Cap</td><td class="num">~$313 Mrd.</td><td style="color:var(--muted)">Top 50 weltweit</td></tr>
+    <tr><td>P/E Ratio</td><td class="num neg" style="font-weight:700">~203</td><td style="color:var(--muted)">Extrem hoch, auch für Software</td></tr>
+    <tr><td>P/S Ratio</td><td class="num neg">~70</td><td style="color:var(--muted)">Abgeleitet (313/4.5)</td></tr>
+    <tr><td>Alpha Spread</td><td class="num neg">77% überbewertet</td><td style="color:var(--muted)">Intrinsic Value Modell</td></tr>
+  </table>
+
+  <div class="sec-label">Deutsche Tochter</div>
+  <div class="sec-title">Bundesanzeiger-Analyse</div>
+
+  <table class="data-tbl">
+    <tr><th>Jahr</th><th class="num">Servicegebühren</th><th class="num">Markup</th><th class="num">Bilanzsumme</th></tr>
+    <tr><td>2017</td><td class="num" style="color:var(--light)">n/a</td><td class="num" style="color:var(--light)">—</td><td class="num">€8,2 Mio.</td></tr>
+    <tr><td>2018</td><td class="num">~€72,8 Mio.</td><td class="num">5%</td><td class="num neg" style="font-weight:700">€72,8 Mio.</td></tr>
+    <tr><td>2019</td><td class="num">~€6,5 Mio.</td><td class="num">7%</td><td class="num">€2,0 Mio.</td></tr>
+    <tr><td>2020</td><td class="num">€14,1 Mio.</td><td class="num">5%</td><td class="num" style="color:var(--light)">n/a</td></tr>
+    <tr><td>2021</td><td class="num">€22,2 Mio.</td><td class="num">5%</td><td class="num" style="color:var(--light)">n/a</td></tr>
+  </table>
+
+  <div class="insight"><strong>Anomalie 2018:</strong> Bilanzsumme springt von €8,2 Mio. auf €72,8 Mio. (+786%). Gleichzeitig €58 Mio. Verbindlichkeiten + €13 Mio. RAP. Einmalige konzerninterne Transaktion — vermutlich Umstrukturierung im IPO-Vorlauf (IPO war 2020). 2019 schrumpft die Bilanz zurück auf €2 Mio. <span class="tag tag-e">E</span> <span class="tag tag-i">I</span></div>
+
+  <div class="insight"><strong>Funktionswandel:</strong> 2019 noch "Marketing und Vertrieb", ab 2021 nur noch "allgemeine Unterstützungsleistungen". Palantir hat wertschöpfende Funktionen aus Deutschland abgezogen. <span class="tag tag-e">E</span> <span class="tag tag-i">I</span></div>
+
+  <div class="insight"><strong>Minimales Eigenkapital:</strong> €672.745 (2018), €3.130 (2017) — bei €25.000 Stammkapital. Die GmbH hat kein eigenständiges Substanz-Polster. <span class="tag tag-e">E</span></div>
+
+  <!-- Risiken -->
+  <div class="sec-label">Risiken</div>
+  <div class="sec-title">Risikoeinschätzung</div>
+
+  <div class="risk-grid">
+    <div class="risk-card critical">
+      <h4>Bewertungsrisiko <span class="tag tag-e">E</span> <span class="tag tag-j">J</span></h4>
+      <p>P/E von 203 und P/S von ~70: Der Markt erwartet eine Verdreifachung bis Verfünffachung des Umsatzes in 5-7 Jahren — bei hoher Profitabilität. Bei jedem Wachstumsdämpfer wird die Aktie brutal korrigieren. Das Unternehmen ist gesund — der <strong>Preis</strong> trägt das Risiko.</p>
+    </div>
+
+    <div class="risk-card critical">
+      <h4>Regulatorisches / Reputationsrisiko <span class="tag tag-e">E</span></h4>
+      <ul>
+        <li>>$900 Mio. US-Bundesverträge 2025, inkl. ICE-Vertrag (The Hill, Jan 2026)</li>
+        <li>UK-Parlamentarier hinterfragen Palantir-Verträge (Guardian, Dez 2025)</li>
+        <li>Schweizer Armee: Expertenbericht warnt vor US-Datenzugriff (Guardian, Dez 2025)</li>
+        <li>EU-Datenschutzbedenken wegen CLOUD Act und FISA 702 werden zunehmen</li>
+      </ul>
+    </div>
+
+    <div class="risk-card critical">
+      <h4>Konzentrationsrisiko <span class="tag tag-i">I</span></h4>
+      <p>US-Regierung ist historisch der größte Kunde. AIP treibt Commercial, aber: wenn die politische Landschaft kippt (2028?), steht ein signifikanter Revenue-Block zur Disposition.</p>
+    </div>
+
+    <div class="risk-card moderate">
+      <h4>Deutsche Tochter als Hülle <span class="tag tag-e">E</span> <span class="tag tag-i">I</span></h4>
+      <p>Konzerninterne Servicegesellschaft ohne operative Substanz. Für deutsche Kunden: kein lokales Commitment, keine eigenständige Entscheidungsfähigkeit, Standortschließungsrisiko.</p>
+    </div>
+
+    <div class="risk-card moderate">
+      <h4>Transfer Pricing <span class="tag tag-i">I</span></h4>
+      <p>5% Markup auf Kosten ist am unteren Ende des Fremdvergleichsgrundsatzes. Minimale Steuerlast in DE. Bei verschärfter Betriebsprüfung ein Thema — branchenüblich.</p>
+    </div>
+
+    <div class="risk-card moderate">
+      <h4>Talent-Abhängigkeit <span class="tag tag-j">J</span></h4>
+      <p>Alex Karp ist Gesicht und strategische Seele des Unternehmens. Key-Man-Risk — wenngleich Board und Managementtiefe mittlerweile solide.</p>
+    </div>
+
+    <div class="risk-card positive">
+      <h4>Positive Signale</h4>
+      <ul>
+        <li><strong>Wachstum beschleunigt sich</strong> — von +17% (2023) auf +56% (2025). Selten bei $4,5 Mrd. Umsatz <span class="tag tag-e">E</span></li>
+        <li><strong>AIP = echtes Produkt</strong> — US Commercial Revenue +71% Q1, +121% Q3 2025 <span class="tag tag-e">E</span></li>
+        <li><strong>Keine Insolvenzverfahren</strong> — weder US noch DE <span class="tag tag-e">E</span></li>
+        <li><strong>Profitabel</strong> — nachhaltig seit 2023, Operating Leverage steigt <span class="tag tag-e">E</span></li>
+        <li><strong>Network Effects</strong> — Je mehr Daten auf der Plattform, desto schwerer der Wechsel <span class="tag tag-i">I</span></li>
+        <li><strong>Lobbyregister Bundestag</strong> — nimmt den deutschen Markt ernst <span class="tag tag-e">E</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Was fehlt -->
+  <div class="sec-label">Datenlücken</div>
+  <div class="sec-title">Was fehlt — und warum das wichtig ist</div>
+
+  <ol class="gap-list">
+    <li><strong>Jahresabschlüsse DE-Tochter 2022-2025</strong> — Im Bundesanzeiger nur bis 2021 verfügbar. Entweder Veröffentlichungsverzug oder Umfirmierung. Münchner HRB 293772 könnte neuere Abschlüsse haben.</li>
+    <li><strong>Kundenliste Deutschland</strong> — BND, BKA, Bundeswehr werden vermutet. Öffentliche Vergabedaten könnten das klären.</li>
+    <li><strong>Net Retention Rate</strong> — Entscheidend für die Bewertung: bleiben Kunden und geben sie mehr aus? SEC 10-K enthält das.</li>
+    <li><strong>Insider-Verkäufe</strong> — Karp und Thiel haben historisch regelmäßig verkauft. Aktueller Stand unklar.</li>
+    <li><strong>EU AI Act Impact</strong> — Kernprodukt fällt potenziell unter High-Risk AI Systems. Compliance-Kosten könnten signifikant sein.</li>
+  </ol>
+
+  <!-- Empfehlungen -->
+  <div class="sec-label">Empfehlungen</div>
+  <div class="sec-title">Handlungsempfehlung</div>
+
+  <div class="rec-block">
+    <h4>Für Investoren</h4>
+    <ol>
+      <li><strong>Die Bewertung ist der einzige relevante Risikofaktor.</strong> Das Unternehmen ist stark. Frage: Wie viel Perfektion ist bei P/E 203 eingepreist? Viel.</li>
+      <li><strong>AIP-Adoption tracken</strong> — US Commercial Revenue Growth ist der Leading Indicator. Solange >50% YoY → Momentum intakt.</li>
+      <li><strong>Warten auf Korrektur</strong> — bei Macro-Schock oder schwachem Quartal wird PLTR überproportional fallen. Das wäre der Einstiegspunkt.</li>
+    </ol>
+  </div>
+
+  <div class="rec-block">
+    <h4>Für deutsche Kunden / Partner</h4>
+    <ol>
+      <li><strong>Vertragspartner klären:</strong> GmbH oder US-Inc? Massive Auswirkungen auf Datenschutz, Gerichtsstand, CLOUD Act.</li>
+      <li><strong>EU-Alternativen evaluieren</strong> — für DSGVO-sensible Anwendungen ist ein US-Provider unter FISA/CLOUD Act strukturell riskant.</li>
+      <li><strong>Cost-Plus verstehen</strong> — Deutschland ist Kostenzentrum, keine Priorität. US-Kunden werden bevorzugt.</li>
+    </ol>
+  </div>
+
+  <!-- Confidence Detail -->
+  <div class="sec-label">Methodik</div>
+  <div class="sec-title">Confidence Rating — 7/10</div>
+
+  <div class="conf-grid">
+    <div class="conf-item">
+      <div class="conf-tier high">Solide (8-9)</div>
+      <p>Finanzdaten Konzern (SEC, geprüft), Bundesanzeiger DE-Tochter, Unternehmensstruktur</p>
+    </div>
+    <div class="conf-item">
+      <div class="conf-tier mid">Gut (6-7)</div>
+      <p>Risikoeinschätzung (verifizierte Quellen), Bewertungskennzahlen aktuell</p>
+    </div>
+    <div class="conf-item">
+      <div class="conf-tier low">Dünn (3-4)</div>
+      <p>DE-Tochter nur bis 2021, keine Kundenliste, keine NRR, kein Insider-Check</p>
+    </div>
+    <div class="conf-item">
+      <div class="conf-tier low">Fehlt komplett</div>
+      <p>Wettbewerbsvergleich (C3.ai, Databricks), Management-Interviews, Kunden-Referenzen</p>
+    </div>
+  </div>
+
+  <!-- Quellenverzeichnis -->
+  <div style="font-family:var(--m);font-size:7pt;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:32px;margin-bottom:8px">Quellenverzeichnis</div>
+  <table style="width:100%;border-collapse:collapse;margin-bottom:24px">
+    <tr><td style="padding:4px 8px;font-family:var(--m);font-size:7pt;color:var(--accent);vertical-align:top">[1]</td><td style="padding:4px 8px;font-size:8pt"><a href="https://www.bundesanzeiger.de" target="_blank" rel="noopener" style="color:var(--accent)">Bundesanzeiger</a></td><td style="padding:4px 8px;font-size:7.5pt;color:var(--muted)">20 Berichte, Palantir Technologies GmbH (HRB 93940)</td></tr>
+    <tr><td style="padding:4px 8px;font-family:var(--m);font-size:7pt;color:var(--accent);vertical-align:top">[2]</td><td style="padding:4px 8px;font-size:8pt"><a href="https://www.sec.gov/Archives/edgar/data/1321655/000132165525000022/pltr-20241231.htm" target="_blank" rel="noopener" style="color:var(--accent)">SEC 10-K (FY 2024)</a></td><td style="padding:4px 8px;font-size:7.5pt;color:var(--muted)">Annual Report on Form 10-K</td></tr>
+    <tr><td style="padding:4px 8px;font-family:var(--m);font-size:7pt;color:var(--accent);vertical-align:top">[3]</td><td style="padding:4px 8px;font-size:8pt"><a href="https://www.macrotrends.net/stocks/charts/PLTR/palantir-technologies/revenue" target="_blank" rel="noopener" style="color:var(--accent)">MacroTrends — PLTR Revenue</a></td><td style="padding:4px 8px;font-size:7.5pt;color:var(--muted)">Revenue 2019-2025, quartalsweise</td></tr>
+    <tr><td style="padding:4px 8px;font-family:var(--m);font-size:7pt;color:var(--accent);vertical-align:top">[4]</td><td style="padding:4px 8px;font-size:8pt"><a href="https://www.lobbyregister.bundestag.de/suche/R003212" target="_blank" rel="noopener" style="color:var(--accent)">Lobbyregister Bundestag</a></td><td style="padding:4px 8px;font-size:7.5pt;color:var(--muted)">Palantir Technologies GmbH, >4.000 MA</td></tr>
+    <tr><td style="padding:4px 8px;font-family:var(--m);font-size:7pt;color:var(--accent);vertical-align:top">[5]</td><td style="padding:4px 8px;font-size:8pt"><a href="https://thehill.com/policy/technology/5667232-palantir-trump-administration-surveillance/" target="_blank" rel="noopener" style="color:var(--accent)">The Hill (Jan 2026)</a></td><td style="padding:4px 8px;font-size:7.5pt;color:var(--muted)">$900M+ Bundesverträge, ICE-Kontroverse</td></tr>
+    <tr><td style="padding:4px 8px;font-family:var(--m);font-size:7pt;color:var(--accent);vertical-align:top">[6]</td><td style="padding:4px 8px;font-size:8pt"><a href="https://www.theguardian.com/technology/2025/dec/22/mps-question-uk-palantir-contracts-security-concerns-investigation" target="_blank" rel="noopener" style="color:var(--accent)">The Guardian (Dez 2025)</a></td><td style="padding:4px 8px;font-size:7.5pt;color:var(--muted)">UK + Schweizer Sicherheitsbedenken</td></tr>
+    <tr><td style="padding:4px 8px;font-family:var(--m);font-size:7pt;color:var(--accent);vertical-align:top">[7]</td><td style="padding:4px 8px;font-size:8pt"><a href="https://www.alphaspread.com/security/nasdaq/pltr/summary" target="_blank" rel="noopener" style="color:var(--accent)">Alpha Spread</a></td><td style="padding:4px 8px;font-size:7.5pt;color:var(--muted)">Intrinsic Valuation: 77% überbewertet</td></tr>
+    <tr><td style="padding:4px 8px;font-family:var(--m);font-size:7pt;color:var(--accent);vertical-align:top">[8]</td><td style="padding:4px 8px;font-size:8pt"><a href="https://www.northdata.com/Palantir%20Technologies%20GmbH" target="_blank" rel="noopener" style="color:var(--accent)">North Data</a></td><td style="padding:4px 8px;font-size:7.5pt;color:var(--muted)">Handelsregister München HRB 293772</td></tr>
+  </table>
+
+  <!-- Transparenzhinweis -->
+  <div style="border:1px solid var(--border2);border-radius:8px;padding:12px 16px;background:rgba(192,57,43,.02);margin:32px 0 0">
+    <div style="font-family:var(--m);font-size:7pt;font-weight:600;color:var(--red);margin-bottom:4px">Transparenzhinweis</div>
+    <div style="font-size:7.5pt;color:var(--text2);line-height:1.6">
+      Diese Analyse basiert auf öffentlich zugänglichen Informationen. Bundesanzeiger-Daten der DE-Tochter reichen nur bis 2021. Bewertungskennzahlen ändern sich täglich. Keine Anlageberatung — keine Gewähr. Ainary hat keine Geschäftsbeziehung mit Palantir Technologies. LLM-gestützte Analyse mit manueller Qualitätskontrolle.
+    </div>
+  </div>
+
+  <footer class="ftr">© 2026 Ainary · florian@ainaryventures.com · ainaryventures.com</footer>
+</div>
+</body>
+</html>

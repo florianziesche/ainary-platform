@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intelligence Reports — Ainary</title>
+<meta name="description" content="Strukturierte Intelligence Reports mit epistemischem Layering. Jede Aussage klassifiziert, jede Quelle nachvollziehbar.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff;--surface:#fafafa;--surface2:#f5f4f0;
+  --text:#1a1a1a;--text2:#444;--muted:#777;--light:#bbb;
+  --border:#d0d0d0;--border2:#e8e8e8;
+  --accent:#9d7f3b;--accent-pale:rgba(157,127,59,.06);
+  --green:#2d8a4e;--blue:#2b6cb0;--amber:#b45309;--red:#c0392b;
+  --f:'Inter',-apple-system,sans-serif;--m:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--f);color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;font-size:10pt;line-height:1.65}
+a{color:inherit;text-decoration:none}
+
+/* Layout */
+.page{max-width:1040px;margin:0 auto;padding:32px 48px 48px}
+
+/* Header */
+.hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;margin-bottom:40px;border-bottom:1px solid var(--border2)}
+.hdr-left{display:flex;align-items:center;gap:8px}
+.brand-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.brand-name{font-weight:500;font-size:9pt;color:var(--muted)}
+.hdr-nav{display:flex;gap:16px;font-family:var(--m);font-size:7pt;color:var(--muted)}
+.hdr-nav a{transition:color .15s}
+.hdr-nav a:hover{color:var(--accent)}
+
+/* Hero */
+.hero{margin-bottom:48px}
+.hero-label{font-family:var(--m);font-size:7pt;font-weight:500;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+.hero h1{font-size:28pt;font-weight:700;letter-spacing:-.03em;line-height:1.15;margin-bottom:12px}
+.hero p{font-size:10.5pt;color:var(--text2);line-height:1.7;max-width:640px}
+
+/* Ontology Section */
+.ontology{border:1px solid var(--border2);border-radius:8px;padding:20px 24px;margin-bottom:48px;background:var(--surface)}
+.ontology-title{font-family:var(--m);font-size:7pt;font-weight:600;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px}
+.ontology-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.ontology-block h3{font-size:9pt;font-weight:700;margin-bottom:6px}
+.ontology-block p{font-size:8pt;color:var(--text2);line-height:1.65}
+.ontology-block ul{list-style:none;padding:0;margin:6px 0 0}
+.ontology-block ul li{font-size:8pt;color:var(--text2);padding:3px 0;display:flex;align-items:center;gap:6px}
+
+/* Tags */
+.tag{font-family:var(--m);font-size:5.5pt;padding:1px 5px;border-radius:2px;font-weight:600;display:inline-block}
+.tag-e{background:rgba(45,138,78,.1);color:var(--green)}
+.tag-i{background:rgba(43,108,176,.1);color:var(--blue)}
+.tag-j{background:rgba(180,83,9,.1);color:var(--amber)}
+.tag-a{background:rgba(192,57,43,.1);color:var(--red)}
+
+/* Trust meter */
+.trust-meter{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border2)}
+.trust-meter-label{font-family:var(--m);font-size:6.5pt;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.trust-levels{display:flex;gap:4px}
+.trust-level{font-family:var(--m);font-size:6pt;padding:2px 6px;border-radius:3px;border:1px solid var(--border2);color:var(--muted)}
+.trust-level.active{border-color:var(--accent);color:var(--accent);background:var(--accent-pale)}
+
+/* Report Type Cards */
+.types-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:48px}
+.type-card{border:1px solid var(--border2);border-radius:8px;padding:20px 24px;background:var(--bg);transition:all .2s;position:relative;overflow:hidden}
+.type-card:hover{border-color:var(--border);box-shadow:0 2px 12px rgba(0,0,0,.04)}
+.type-card.live{border-color:var(--accent);border-left:3px solid var(--accent)}
+.type-card.live:hover{box-shadow:0 2px 16px rgba(157,127,59,.1)}
+.type-card.coming{opacity:.7}
+.type-card.coming:hover{opacity:.85}
+
+.type-icon{font-size:20pt;margin-bottom:8px}
+.type-status{font-family:var(--m);font-size:6pt;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border-radius:3px;display:inline-block;margin-bottom:8px}
+.type-status.live{background:rgba(45,138,78,.1);color:var(--green)}
+.type-status.soon{background:rgba(157,127,59,.08);color:var(--accent)}
+
+.type-card h3{font-size:11pt;font-weight:700;margin-bottom:4px}
+.type-card p{font-size:8.5pt;color:var(--text2);line-height:1.6}
+
+.type-meta{margin-top:12px;padding-top:10px;border-top:1px solid var(--border2);display:flex;gap:12px;flex-wrap:wrap}
+.type-meta span{font-family:var(--m);font-size:6.5pt;color:var(--muted)}
+
+/* Primitives section */
+.primitives{margin-bottom:48px}
+.primitives-title{font-family:var(--m);font-size:7pt;font-weight:500;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px}
+.prim-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.prim{border:1px solid var(--border2);border-radius:8px;padding:16px 20px;background:var(--surface)}
+.prim h4{font-size:9pt;font-weight:700;margin-bottom:4px}
+.prim p{font-size:8pt;color:var(--text2);line-height:1.6}
+.prim-ref{font-family:var(--m);font-size:6.5pt;color:var(--light);margin-top:6px}
+
+/* Footer */
+.ftr{text-align:center;padding:24px 0;font-family:var(--m);font-size:6.5pt;color:var(--light);border-top:1px solid var(--border2);margin-top:40px}
+
+@media(max-width:700px){
+  .page{padding:20px 16px}
+  .ontology-grid{grid-template-columns:1fr}
+  .prim-grid{grid-template-columns:1fr}
+  .types-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="hdr">
+    <div class="hdr-left">
+      <span class="brand-dot"></span>
+      <span class="brand-name">Ainary</span>
+    </div>
+    <div class="hdr-nav">
+      <a href="/">Home</a>
+      <a href="/research/">Research</a>
+      <a href="/reports/" style="color:var(--accent)">Reports</a>
+    </div>
+  </div>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-label">Intelligence Reports</div>
+    <h1>Jede Aussage klassifiziert.<br>Jede Quelle nachvollziehbar.</h1>
+    <p>Strukturierte Intelligence mit epistemischem Layering. Kein Report ohne Beipackzettel — Sie wissen immer was belegt ist, was abgeleitet ist, und wo wir unsicher sind.</p>
+  </div>
+
+  <!-- Ontology / Trust System -->
+  <div class="ontology">
+    <div class="ontology-title">Ontologie — Das Ainary Trust System</div>
+    <div class="ontology-grid">
+      <div class="ontology-block">
+        <h3>Epistemisches Layering</h3>
+        <p>Jede Aussage in jedem Report trägt eine Klassifikation. Nicht als Dekoration — sondern damit Sie wissen, wie viel Gewicht eine Aussage verdient.</p>
+        <ul>
+          <li><span class="tag tag-e">E</span> Evidence — belegt durch externe, zitierbare Quelle</li>
+          <li><span class="tag tag-i">I</span> Inference — logisch abgeleitet aus mehreren E-Claims</li>
+          <li><span class="tag tag-j">J</span> Judgment — Bewertung basierend auf Evidenz + Erfahrung</li>
+          <li><span class="tag tag-a">A</span> Assumption — vorausgesetzt, nicht geprüft</li>
+        </ul>
+      </div>
+      <div class="ontology-block">
+        <h3>Trust Score</h3>
+        <p>Jeder Report wird automatisch bewertet. Der Score reflektiert Kalibrierung — nicht Überzeugung. Ehrliche Unsicherheit wird belohnt. Überkonfidenz bestraft.</p>
+        <ul>
+          <li><strong style="font-family:var(--m);font-size:7pt">0-30</strong> Untrusted — jede Aussage wird geprüft</li>
+          <li><strong style="font-family:var(--m);font-size:7pt">31-60</strong> Supervised — Flags werden geprüft</li>
+          <li><strong style="font-family:var(--m);font-size:7pt">61-80</strong> Spot-Check — 20% Stichprobe</li>
+          <li><strong style="font-family:var(--m);font-size:7pt">81+</strong> Autonomous — direkter Versand</li>
+        </ul>
+        <div class="trust-meter">
+          <span class="trust-meter-label">Agent Level</span>
+          <div class="trust-levels">
+            <span class="trust-level">0-30</span>
+            <span class="trust-level">31-60</span>
+            <span class="trust-level active">61-80</span>
+            <span class="trust-level">81+</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Report Types -->
+  <div class="types-grid">
+
+    <!-- LIVE: Firmen-Report -->
+    <a href="/reports/firmen/" class="type-card live">
+      <div class="type-icon"><span style="font-family:var(--m);font-size:11pt;color:var(--accent);font-weight:700">CO</span></div>
+      <span class="type-status live">Live</span>
+      <h3>Firmen-Report</h3>
+      <p>Bundesanzeiger + SEC + Handelsregister + Web → Struktur, Finanzen, Risiken, Transfer Pricing. Mit Beipackzettel und Claim Register.</p>
+      <div class="type-meta">
+        <span>Quellen: Bundesanzeiger, SEC, Lobbyregister</span>
+        <span>Ontologie: Entity → Structure → Financials → Risk</span>
+      </div>
+    </a>
+
+    <!-- LIVE: Research-Report -->
+    <a href="/research/" class="type-card live">
+      <div class="type-icon"><span style="font-family:var(--m);font-size:11pt;color:var(--accent);font-weight:700">RE</span></div>
+      <span class="type-status live">Live</span>
+      <h3>Research-Report</h3>
+      <p>Deep Dives in Technologie, Märkte, Regulierung. Hypothese → Evidenz → Widerlegungsversuch → Conclusion. MECE-Struktur.</p>
+      <div class="type-meta">
+        <span>Quellen: Arxiv, PMC, SEC, Gartner, Primary</span>
+        <span>Ontologie: Thesis → Evidence → Counter → Judgment</span>
+      </div>
+    </a>
+
+    <!-- Coming: Asset-Report -->
+    <div class="type-card coming">
+      <div class="type-icon"><span style="font-family:var(--m);font-size:11pt;color:var(--accent);font-weight:700">AS</span></div>
+      <span class="type-status soon">Coming Q2</span>
+      <h3>Asset-Report</h3>
+      <p>Bewertung, Marktvergleich, historische Multiples. Für Aktien, Immobilien, alternative Assets. Intrinsic Value + Relative Valuation.</p>
+      <div class="type-meta">
+        <span>Ontologie: Asset → Valuation → Comparables → Verdict</span>
+      </div>
+    </div>
+
+    <!-- Coming: Cross-Finding Report -->
+    <div class="type-card coming">
+      <div class="type-icon"><span style="font-family:var(--m);font-size:11pt;color:var(--accent);font-weight:700">XF</span></div>
+      <span class="type-status soon">Coming Q2</span>
+      <h3>Cross-Finding Report</h3>
+      <p>Verbindungen zwischen Entitäten die in Einzel-Reports nicht sichtbar sind. Personen ↔ Firmen ↔ Assets ↔ Regulierung. Knowledge Graph Queries.</p>
+      <div class="type-meta">
+        <span>Ontologie: Entity A → Relation → Entity B → Implication</span>
+      </div>
+    </div>
+
+    <!-- Coming: Unique Insight Report -->
+    <div class="type-card coming">
+      <div class="type-icon"><span style="font-family:var(--m);font-size:11pt;color:var(--accent);font-weight:700">UI</span></div>
+      <span class="type-status soon">Coming Q2</span>
+      <h3>Unique Insight Report</h3>
+      <p>Nicht-offensichtliche Erkenntnisse aus der Kombination von Datenquellen. Was der Markt noch nicht sieht — mit Confidence-Rating und Invalidierungsbedingungen.</p>
+      <div class="type-meta">
+        <span>Ontologie: Signal → Hypothesis → Evidence → Invalidation Condition</span>
+      </div>
+    </div>
+
+    <!-- Coming: Personensuche -->
+    <div class="type-card coming">
+      <div class="type-icon"><span style="font-family:var(--m);font-size:11pt;color:var(--accent);font-weight:700">PE</span></div>
+      <span class="type-status soon">Coming Q2</span>
+      <h3>Personensuche</h3>
+      <p>Öffentliche Profile, Rollen, Netzwerke, Veröffentlichungen. Für Due Diligence, Recruiting, Stakeholder-Analyse. OSINT-basiert, DSGVO-konform.</p>
+      <div class="type-meta">
+        <span>Ontologie: Person → Roles → Network → Publications → Risk</span>
+      </div>
+    </div>
+
+    <!-- Coming: Golden Standard -->
+    <div class="type-card coming">
+      <div class="type-icon"><span style="font-family:var(--m);font-size:11pt;color:var(--accent);font-weight:700">GS</span></div>
+      <span class="type-status soon">Coming Q3</span>
+      <h3>Golden Standard</h3>
+      <p>Verifizierte Best Practices aus Competitive Intelligence. Wenn ein Research-Report genug E-Claims akkumuliert → wird er zum Standard. Versioniert, auditierbar.</p>
+      <div class="type-meta">
+        <span>Ontologie: CI Report → Verification → Standard → Version History</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Three Primitives -->
+  <div class="primitives">
+    <div class="primitives-title">Die drei Primitives — AgentTrust Framework</div>
+    <div class="prim-grid">
+      <div class="prim">
+        <h4>Kalibrierung</h4>
+        <p>Gleiche Frage 3× unabhängig stellen. Übereinstimmung messen. Echte Confidence statt Bauchgefühl. Budget-CoCoA basierend auf Xiong et al. (2024).</p>
+        <div class="prim-ref">3/3 → HIGH · 2/3 → MEDIUM · else → LOW</div>
+      </div>
+      <div class="prim">
+        <h4>Trust Score</h4>
+        <p>Jeder Agent baut eine Reputation. Gute Kalibrierung → mehr Autonomie. Überkonfidenz → mehr Oversight. Credit Score für KI.</p>
+        <div class="prim-ref">+1 korrekt · +2 Unsicherheit erkannt · -3 überkonfident falsch</div>
+      </div>
+      <div class="prim">
+        <h4>Beipackzettel</h4>
+        <p>Pflicht-Metadaten auf jedem Output: Confidence, Quellen, Unsicherheiten, Risiken. Die Nährwerttabelle für KI-Ergebnisse.</p>
+        <div class="prim-ref">Confidence · Sources · Uncertainties · Risks · Model</div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="ftr">© 2026 Ainary Ventures · <a href="/imprint.html" style="color:var(--muted)">Impressum</a> · <a href="/privacy.html" style="color:var(--muted)">Datenschutz</a></footer>
+</div>
+</body>
+</html>

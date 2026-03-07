@@ -1,73 +1,78 @@
-# Daily Learnings — Capability Evolver
+# Capability Evolver — Daily Learnings
 
-## 2026-03-04 — OpenClaw v2026.3.2 + Showcase Patterns
+## 2026-03-06 (05:00 CET)
 
-### OpenClaw Platform Updates (v2026.3.2, Released March 3)
-**Relevant Features:**
-- ✅ **First-class PDF tool** — Native Anthropic/Google support, extraction fallback for other models. Config: `agents.defaults.pdfModel`, `pdfMaxBytesMb`, `pdfMaxPages`
-- ✅ **sessions_spawn attachments** — Inline file attachments (base64/utf8) for sub-agents. Config: `tools.sessions_spawn.attachments`
-- ✅ **Ollama embeddings** — `memorySearch.provider = "ollama"` for local memory embeddings
-- ✅ **Telegram streaming** — Defaults to "partial" (live preview) for new setups
-- ⚠️ **BREAKING:** tools.profile defaults to "messaging" (not broad coding tools) for new installs
-- ⚠️ **BREAKING:** ACP dispatch defaults to enabled
+### External Scan
+**OpenClaw v2026.3.2 (Mar 3):**
+- ✅ PDF tool with native Anthropic+Google support — already using `pdf` tool, native support is incremental
+- ✅ `sessions_spawn` attachments (base64/utf8, subagent-only) — could improve Research→Build pipeline (pass context files directly)
+- ✅ Ollama embeddings for `memory_search` — alternative to OpenAI, cost-saving potential
+- ⚠️ BREAKING: `tools.profile` defaults to `messaging` for new installs (broad coding tools opt-in only)
+- ⚠️ BREAKING: ACP dispatch enabled by default
 
-**Not Immediately Relevant:**
-- MiniMax-M2.5-highspeed provider
-- Zalo Personal plugin rebuild
-- Android node capabilities (camera.list, device.permissions, notifications)
-- Feishu/Discord/Slack enhancements
+**AI Agent Workflows 2026:**
+- **4 workflow categories** (StackAI): Single Agent / Hierarchical / Sequential Pipeline / Decentralized Swarm — we use Hierarchical (main orchestrates sub-agents)
+- **Reflection+Iteration** (Dextralabs) — we have REFLECTION-PROTOCOL.md, but iteration loop missing
+- **Agent Supervisors** (Deloitte) — humans at exception points = matches D-207 (Definition of Done)
 
-### ClawHub Ecosystem
-- **2,857+ skills** available (growing)
-- No new Florian-specific skills identified (already has 45+ skills installed)
+### Internal Analysis (last 48h)
 
-### AI Agent Workflow Patterns 2026
-**Emerging Standards:**
-1. **ReAct, Reflection, Tool Use, Planning, Multi-Agent Collaboration** — Core design patterns
-2. **Full workflow automation** — Move from single-step to end-to-end process ownership
-3. **LangGraph stable** — Production-ready multi-agent orchestration
-4. **80% workplace embedding** — Prediction for agent penetration
+**Wins:**
+- Research Network v2.0: Ontology Schema, Claim Extraction, Trust×Relevance scoring, Project Layer
+- Quality Ladder visible: Fürth/Nürnberg (Gold) vs Base cities (~350 errors)
+- Strategiewechsel documented: Send First → Best Agent Wins
+- Palantir Deep Research structured (50 sources, 9 categories)
 
-**Showcase Use Case Patterns (50+ examples analyzed):**
-1. **Multi-agent orchestration** — 4-5 specialized agents (dev, marketing, business, research) with shared memory + individual contexts
-2. **Daily cron workflows** — Email summaries, health tracking, morning briefings, research spawning
-3. **Voice-first execution** — Phone → Telegram → actions on VPS/desktop
-4. **Coding agent orchestration** — OpenClaw drives Claude Code/Codex, monitors progress, spawns PRs
-5. **Overnight experiments** — Cron picks tasks, spawns sub-agents, delivers results in morning
-6. **Log → Decision pipeline** — Capture ideas as tasks → overnight research → decision records (ADR-style)
-7. **Daily roll call** — 10+ agents report status, coordinate work
+**Recurring Errors:**
+1. **D-200 Violation (05.03. 18:48):** Sub-Agent spawned despite Single Agent Default (NON-NEGOTIABLE)
+   - Root Cause: decisions.md not loaded by default
+   - Fix: decisions.md → IMMER-laden-Liste (done per memory)
+2. **Pre-Delivery Check missing (05.03. multiple):** "Würde Florian es akzeptieren?" in AGENTS.md, but not enforced
+   - Current: Rule exists, no executable
+   - Need: Pre-send validation step
+3. **Vault noise (05.03. 22:00):** 12,623 ingested claims → 40 curated (99.7% noise)
+   - Root Cause: Line-pattern-matching > LLM-extraction
+   - Lesson: ingest-vault.js needs LLM rewrite
 
-### Confidence Analysis — Yesterday's Execution (2026-03-03)
-**Strengths:**
-- Shipped 7 major features (BLUF, Momentum, Watchlist, Graph filters, Apple emoji removal, Palantir Intelligence Layer)
-- Systematic debugging (Graph filter bug: 5 iterations, root cause identified, CSS solution)
-- Self-audit discipline (Research Protocol compliance check, confidence ratings)
-- Friedberg Production Lock maintained (0 violations)
+**Quantified Improvements (since 04.03.):**
+- 3 cities: 557 ontology errors → 0 errors (Fürth/Nürnberg/Ottobrunn)
+- Knowledge Graph: 4 reports, 55 claims, 15 enriched topics
+- Trust Score: 25% multi-source claims, 89% avg trust
+- Research→Schema→Build gap closed (ONTOLOGY.md v1.0, validate-ontology.js, extract-claims.js)
 
-**Weaknesses:**
-- Sentiment bulk-default (85% NEUTRAL = no signal)
-- Theme assignment via keyword fallback (55% generic "Kandidaten & Wahlkampf")
-- 168 URLs unverified (HTTP 200 status not checked)
-- Nürnberg graph density 0.12 vs Friedberg 0.31 (quality gap)
+### Actionable Findings
 
-**Confidence Ratings:**
-- Friedberg: 85% (manual audit, Stamp-feedback loop, full ACH hypotheses)
-- Fürth: 72% (structural parity, sentiment audit done, 4 orphan candidates)
-- Nürnberg: 70% (bulk import, sentiment audit done, partial ACH hypotheses)
+**1. Iteration Loop Missing (NEW PATTERN)**
+- We have Reflection (REFLECTION-PROTOCOL.md: 5 questions before delivery)
+- Missing: Explicit iteration after DoD-Check fails
+- Industry pattern: Planning → Execution → Reflection → **Iteration** → Ship
+- **Recommendation:** Add to AGENTS.md Task Loop Step 3: "PRÜFEN: Beantwortet? Belegt? Nutzbar? → Nein = **Retry (max 2×)**, dann flag für Florian"
 
-### Actionable Improvements for Florian's Workflow
-1. **PDF tool integration** — Use native PDF analysis for CV/report work (replaces extract-fallback)
-2. **Daily cron patterns** — Expand morning briefing: VC news, research summaries, deal flow updates
-3. **Multi-agent formalization** — HUNTER/WRITER/RESEARCHER already exist, could add explicit orchestration layer
-4. **Overnight experiments** — Spawn research sub-agents for VC thesis work (market analysis, competitor research)
-5. **Log → Decision pipeline** — Formalize idea capture → decision records (fits Memory-R1 system)
-6. **sessions_spawn attachments** — Pass research docs/PDFs to sub-agents directly
+**2. sessions_spawn Attachments (NEW OPENCLAW FEATURE)**
+- Can now pass files directly to sub-agents (base64/utf8)
+- Use case: Research Report → pass markdown+sources → sub-agent extracts claims without re-reading
+- **Recommendation:** Update SUB-AGENT-CONTEXT.md with attachment pattern (wenn Research Output >10KB → attach statt paste)
 
-### No Evolver Code Changes Needed
-- 0 recurring bugs identified
-- System patterns stable
-- Yesterday's execution within normal variance
-- Graph filter bug = edge case (D3 v7 stale selections), solved with CSS workaround
+**3. Pre-Delivery Validation (ENFORCEMENT GAP)**
+- Rule exists in AGENTS.md (Step 3 "Prüfen")
+- Not enforced programmatically
+- **Recommendation:** `scripts/pre-delivery-check.js` — runs before `message(action=send)`:
+  - Frage beantwortet? (LLM self-audit)
+  - Externe Zahlen belegt? (regex check for unverified claims)
+  - Sofort nutzbar? (confidence ≥ threshold)
+
+### No Action Needed
+- OpenClaw features are incremental (PDF native support, Ollama embeddings)
+- AI agent workflow patterns align with existing architecture (we're already Hierarchical + Reflection)
+- Last 48h work quality high: 0 ontology errors on 3 cities, Research Network shipped
+
+### Summary
+**3 actionable improvements identified:**
+1. Iteration Loop (add to AGENTS.md Task Loop)
+2. sessions_spawn attachments pattern (update SUB-AGENT-CONTEXT.md)
+3. Pre-Delivery Validation script (create scripts/pre-delivery-check.js)
+
+**No critical bugs. No breaking patterns. System stable.**
 
 ---
-*Next scan: 2026-03-05 05:00 CET*
+*Next scan: 2026-03-07 05:00 CET*

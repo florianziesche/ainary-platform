@@ -105,7 +105,9 @@ function generatePlaybook(topicClaims) {
       text: c.soWhat,
       trust: (c.trustScore || {}).score || 0,
       sourceCount: (c.trustScore || {}).sourceCount || 0,
-      from: c.claim.substring(0, 60)
+      from: c.claim.substring(0, 60),
+      claimId: c.id || null,
+      influencesTopics: (c.topics || []).slice()
     });
   });
   
@@ -116,7 +118,9 @@ function generatePlaybook(topicClaims) {
       type: 'judgment',
       text: c.claim,
       trust: (c.trustScore || {}).score || 0,
-      sourceCount: (c.trustScore || {}).sourceCount || 0
+      sourceCount: (c.trustScore || {}).sourceCount || 0,
+      claimId: c.id || null,
+      influencesTopics: (c.topics || []).slice()
     });
   });
   

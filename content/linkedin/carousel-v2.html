@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--f:'Inter',sans-serif;--m:'JetBrains Mono',monospace}
+body{font-family:var(--f);background:#222;display:flex;flex-direction:column;align-items:center;gap:60px;padding:40px 20px}
+.label{font:800 16px var(--f);color:#fff;text-transform:uppercase;letter-spacing:3px;margin-bottom:-40px;opacity:0.5}
+
+/* === SLIDE BASE === */
+.slide{width:1080px;height:1080px;position:relative;overflow:hidden;flex-shrink:0}
+.slide-inner{padding:72px 80px;height:100%;display:flex;flex-direction:column;position:relative;z-index:2}
+
+/* === MERGING DOTS === */
+.dots-wrap{position:absolute;top:0;left:0;right:0;bottom:0;z-index:1;pointer-events:none;overflow:hidden}
+.dot-a,.dot-b{position:absolute;border-radius:50%;filter:blur(60px);mix-blend-mode:screen}
+
+/* === DARK THEME === */
+.dark{background:#08080c;color:#ededf0}
+.dark .dot-a{width:350px;height:350px;background:radial-gradient(circle,#c8aa50,transparent 70%);top:15%;left:8%;opacity:0.09}
+.dark .dot-b{width:300px;height:300px;background:radial-gradient(circle,#ffffff,transparent 70%);bottom:15%;right:8%;opacity:0.06}
+.dark .brand{font:500 13px var(--m);color:#55555e;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.dark .brand .d{color:#c8aa50}
+.dark .gold{color:#c8aa50}
+.dark .sub{color:#8b8b95}
+.dark .pill{display:inline-block;padding:6px 14px;border-radius:20px;font:600 13px var(--m);margin:3px}
+.dark .pill-gold{background:rgba(200,170,80,.15);color:#c8aa50;border:1px solid rgba(200,170,80,.3)}
+.dark .role-card{background:#111116;border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:22px 26px;margin-bottom:12px}
+.dark .role-card .title{font:700 19px var(--f);color:#ededf0;margin-bottom:4px}
+.dark .role-card .desc{font:400 15px/1.5 var(--f);color:#8b8b95}
+.dark .cta-box{background:linear-gradient(135deg,rgba(200,170,80,.12),rgba(200,170,80,.04));border:1px solid rgba(200,170,80,.3);border-radius:16px;padding:28px 32px}
+.dark .snum{position:absolute;bottom:36px;right:50px;font:700 14px var(--m);color:#55555e}
+.dark .snum .cur{color:#c8aa50}
+.dark .pbar{position:absolute;top:0;left:0;right:0;height:3px;background:#111116;z-index:3}
+.dark .pfill{height:100%;background:#c8aa50}
+.dark .step-num{font:800 38px var(--m);color:#c8aa50;min-width:54px}
+.dark .step-title{font:700 24px var(--f);color:#ededf0;margin-bottom:4px}
+.dark .step-desc{font:400 17px/1.5 var(--f);color:#8b8b95}
+.dark .graph-frame{background:#111116;border:2px solid rgba(200,170,80,.25);border-radius:14px;overflow:hidden;flex:1;position:relative;box-shadow:0 4px 24px rgba(200,170,80,.08),0 0 0 1px rgba(200,170,80,.1)}
+.dark .graph-frame img{width:100%;height:100%;object-fit:cover;object-position:center 55%;opacity:0.92;border-radius:12px}
+.dark .graph-overlay{position:absolute;bottom:0;left:0;right:0;padding:20px 24px;background:linear-gradient(transparent,rgba(8,8,12,.97));border-radius:0 0 12px 12px}
+.dark .graph-overlay .t{font:700 18px var(--f);color:#ededf0}
+.dark .graph-overlay .s{font:400 14px var(--f);color:#8b8b95;margin-top:4px}
+.dark .dot-grid::before{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);background-size:32px 32px;pointer-events:none;z-index:1}
+
+/* === LIGHT THEME === */
+.light{background:#fafaf8;color:#1a1a1a}
+.light .dot-a{width:350px;height:350px;background:radial-gradient(circle,#c8aa50,transparent 70%);top:15%;left:8%;opacity:0.06}
+.light .dot-b{width:300px;height:300px;background:radial-gradient(circle,#8b8b95,transparent 70%);bottom:15%;right:8%;opacity:0.04;mix-blend-mode:multiply}
+.light .brand{font:500 13px var(--m);color:#8b8b95;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.light .brand .d{color:#a38a3a}
+.light .gold{color:#a38a3a}
+.light .sub{color:#555e70}
+.light .pill{display:inline-block;padding:6px 14px;border-radius:20px;font:600 13px var(--m);margin:3px}
+.light .pill-gold{background:rgba(200,170,80,.12);color:#8a7530;border:1px solid rgba(200,170,80,.3)}
+.light .role-card{background:#fff;border:1px solid #e5e3dc;border-radius:14px;padding:22px 26px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.light .role-card .title{font:700 19px var(--f);color:#1a1a1a;margin-bottom:4px}
+.light .role-card .desc{font:400 15px/1.5 var(--f);color:#555e70}
+.light .cta-box{background:linear-gradient(135deg,rgba(200,170,80,.10),rgba(200,170,80,.03));border:1px solid rgba(200,170,80,.35);border-radius:16px;padding:28px 32px}
+.light .snum{position:absolute;bottom:36px;right:50px;font:700 14px var(--m);color:#8b8b95}
+.light .snum .cur{color:#a38a3a}
+.light .pbar{position:absolute;top:0;left:0;right:0;height:3px;background:#e5e3dc;z-index:3}
+.light .pfill{height:100%;background:#c8aa50}
+.light .step-num{font:800 38px var(--m);color:#a38a3a;min-width:54px}
+.light .step-title{font:700 24px var(--f);color:#1a1a1a;margin-bottom:4px}
+.light .step-desc{font:400 17px/1.5 var(--f);color:#555e70}
+.light .graph-frame{background:#fff;border:1px solid #e5e3dc;border-radius:14px;overflow:hidden;flex:1;position:relative;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.light .graph-frame img{width:100%;height:100%;object-fit:cover;object-position:center 60%}
+.light .graph-overlay{position:absolute;bottom:0;left:0;right:0;padding:20px 24px;background:linear-gradient(transparent,rgba(250,250,248,.95))}
+.light .graph-overlay .t{font:700 18px var(--f);color:#1a1a1a}
+.light .graph-overlay .s{font:400 14px var(--f);color:#555e70;margin-top:4px}
+.light .dot-grid::before{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(0,0,0,0.03) 1px, transparent 1px);background-size:32px 32px;pointer-events:none;z-index:1}
+
+h1{font:800 50px/1.1 var(--f);letter-spacing:-1.5px;margin-bottom:20px}
+h2{font:700 38px/1.15 var(--f);letter-spacing:-1px;margin-bottom:16px}
+.strike{text-decoration:line-through;color:#ef4444;opacity:0.6}
+</style>
+</head>
+<body>
+
+<!-- ============ DARK VERSION ============ -->
+<div class="label">Version A — Dark</div>
+
+<!-- DARK SLIDE 1: How it works -->
+<div class="slide dark dot-grid" id="dark-1">
+  <div class="pbar"><div class="pfill" style="width:33%"></div></div>
+  <div class="dots-wrap"><div class="dot-a"></div><div class="dot-b"></div></div>
+  <div class="slide-inner">
+    <div class="brand">ainary <span class="d">·</span> research network</div>
+    <h2>How it works</h2>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:space-evenly">
+      <div style="display:flex;align-items:flex-start;gap:24px">
+        <div class="step-num">01</div>
+        <div><div class="step-title">Ingest</div><div class="step-desc">6 RSS feeds scanned daily — TechCrunch, Stratechery,<br>Simon Willison, Palantir, OpenAI, Anthropic</div></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:24px">
+        <div class="step-num">02</div>
+        <div><div class="step-title">Extract & Score</div><div class="step-desc">Claims extracted, trust-scored (Admiralty Code),<br>linked to 115 topics across 10 domains</div></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:24px">
+        <div class="step-num">03</div>
+        <div><div class="step-title">Calibrate</div><div class="step-desc">Confidence adjusted by evidence quality —<br>not signal volume. Weak match → lower score.</div></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:24px">
+        <div class="step-num">04</div>
+        <div><div class="step-title">Brief</div><div class="step-desc">Role-specific intelligence briefings +<br>predictions + gap detection. Updated daily.</div></div>
+      </div>
+    </div>
+    <div class="snum"><span class="cur">1</span> / 3</div>
+  </div>
+</div>
+
+<!-- DARK SLIDE 2: Knowledge Graph -->
+<div class="slide dark dot-grid" id="dark-2">
+  <div class="pbar"><div class="pfill" style="width:66%"></div></div>
+  <div class="dots-wrap"><div class="dot-a" style="top:auto;bottom:10%;left:auto;right:5%"></div><div class="dot-b" style="top:10%;bottom:auto;right:auto;left:5%"></div></div>
+  <div class="slide-inner">
+    <div class="brand">ainary <span class="d">·</span> research network</div>
+    <h2 style="margin-bottom:12px">The knowledge graph</h2>
+    <p class="sub" style="font:400 18px/1.5 var(--f);margin-bottom:16px">55 claims. 115 topics. 30 live signals. 7 predictions.<br>Every node scored. Every connection traced.</p>
+    <div class="graph-frame">
+      <img src="graph-screenshot.jpg" alt="Knowledge Graph">
+      <div class="graph-overlay">
+        <div class="t">Live topology — topics, claims, signals, reports</div>
+        <div class="s">Updated automatically from 6 independent sources</div>
+      </div>
+    </div>
+    <div class="snum"><span class="cur">2</span> / 3</div>
+  </div>
+</div>
+
+<!-- DARK SLIDE 3: 5 Spots CTA -->
+<div class="slide dark dot-grid" id="dark-3">
+  <div class="pbar"><div class="pfill" style="width:100%"></div></div>
+  <div class="dots-wrap"><div class="dot-a"></div><div class="dot-b"></div></div>
+  <div class="slide-inner">
+    <div class="brand">ainary <span class="d">·</span> research network</div>
+    <h2 style="margin-bottom:6px"><span class="gold">5 spots.</span> Free access.<br>One condition.</h2>
+    <p class="sub" style="font:400 17px/1.5 var(--f);margin-bottom:24px">I built this for myself. I use it daily.<br>Now I'll customize it for 5 people — and learn what's valuable.</p>
+    
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
+      <div class="role-card" style="display:flex;align-items:center;gap:16px;padding:16px 24px">
+        <span style="font-size:22px">🚀</span><span class="title" style="font:600 17px var(--f)">1 Founder</span><span class="desc" style="font:400 14px var(--f);margin-left:auto">building in AI or adjacent</span>
+      </div>
+      <div class="role-card" style="display:flex;align-items:center;gap:16px;padding:16px 24px">
+        <span style="font-size:22px">🔬</span><span class="title" style="font:600 17px var(--f)">1 Developer</span><span class="desc" style="font:400 14px var(--f);margin-left:auto">working with LLMs or agents</span>
+      </div>
+      <div class="role-card" style="display:flex;align-items:center;gap:16px;padding:16px 24px">
+        <span style="font-size:22px">💰</span><span class="title" style="font:600 17px var(--f)">1 VC / Angel</span><span class="desc" style="font:400 14px var(--f);margin-left:auto">tracking the AI landscape</span>
+      </div>
+      <div class="role-card" style="display:flex;align-items:center;gap:16px;padding:16px 24px">
+        <span style="font-size:22px">🏢</span><span class="title" style="font:600 17px var(--f)">1 SME Leader</span><span class="desc" style="font:400 14px var(--f);margin-left:auto">evaluating AI for business</span>
+      </div>
+      <div class="role-card" style="display:flex;align-items:center;gap:16px;padding:16px 24px">
+        <span style="font-size:22px">🃏</span><span class="title" style="font:600 17px var(--f)">1 Wildcard</span><span class="desc" style="font:400 14px var(--f);margin-left:auto">surprise me</span>
+      </div>
+    </div>
+
+    <div class="cta-box">
+      <div style="font:700 20px var(--f);margin-bottom:6px">The deal</div>
+      <div class="sub" style="font:400 16px/1.6 var(--f)">Full access. I'll customize your briefing for your role.<br>In return: 15 min feedback every two weeks. Picking by <span style="color:var(--text,#ededf0);font-weight:600">March 14.</span></div>
+      <div style="font:700 17px var(--f);margin-top:14px" class="gold">↓ Comment what you'd use it for</div>
+    </div>
+    <div class="snum"><span class="cur">3</span> / 3</div>
+  </div>
+</div>
+
+<!-- ============ LIGHT VERSION ============ -->
+<div class="label" style="margin-top:40px">Version B — Light</div>
+
+<!-- LIGHT SLIDE 1: How it works -->
+<div class="slide light dot-grid" id="light-1">
+  <div class="pbar"><div class="pfill" style="width:33%"></div></div>
+  <div class="dots-wrap"><div class="dot-a"></div><div class="dot-b"></div></div>
+  <div class="slide-inner">
+    <div class="brand">ainary <span class="d">·</span> research network</div>
+    <h2>How it works</h2>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:space-evenly">
+      <div style="display:flex;align-items:flex-start;gap:24px">
+        <div class="step-num">01</div>
+        <div><div class="step-title">Ingest</div><div class="step-desc">6 RSS feeds scanned daily — TechCrunch, Stratechery,<br>Simon Willison, Palantir, OpenAI, Anthropic</div></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:24px">
+        <div class="step-num">02</div>
+        <div><div class="step-title">Extract & Score</div><div class="step-desc">Claims extracted, trust-scored (Admiralty Code),<br>linked to 115 topics across 10 domains</div></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:24px">
+        <div class="step-num">03</div>
+        <div><div class="step-title">Calibrate</div><div class="step-desc">Confidence adjusted by evidence quality —<br>not signal volume. Weak match → lower score.</div></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:24px">
+        <div class="step-num">04</div>
+        <div><div class="step-title">Brief</div><div class="step-desc">Role-specific intelligence briefings +<br>predictions + gap detection. Updated daily.</div></div>
+      </div>
+    </div>
+    <div class="snum"><span class="cur">1</span> / 3</div>
+  </div>
+</div>
+
+<!-- LIGHT SLIDE 2: Knowledge Graph -->
+<div class="slide light dot-grid" id="light-2">
+  <div class="pbar"><div class="pfill" style="width:66%"></div></div>
+  <div class="dots-wrap"><div class="dot-a" style="top:auto;bottom:10%;left:auto;right:5%"></div><div class="dot-b" style="top:10%;bottom:auto;right:auto;left:5%"></div></div>
+  <div class="slide-inner">
+    <div class="brand">ainary <span class="d">·</span> research network</div>
+    <h2 style="margin-bottom:12px">The knowledge graph</h2>
+    <p class="sub" style="font:400 18px/1.5 var(--f);margin-bottom:16px">55 claims. 115 topics. 30 live signals. 7 predictions.<br>Every node scored. Every connection traced.</p>
+    <div class="graph-frame">
+      <img src="graph-screenshot.jpg" alt="Knowledge Graph">
+      <div class="graph-overlay">
+        <div class="t">Live topology — topics, claims, signals, reports</div>
+        <div class="s">Updated automatically from 6 independent sources</div>
+      </div>
+    </div>
+    <div class="snum"><span class="cur">2</span> / 3</div>
+  </div>
+</div>
+
+<!-- LIGHT SLIDE 3: 5 Spots CTA -->
+<div class="slide light dot-grid" id="light-3">
+  <div class="pbar"><div class="pfill" style="width:100%"></div></div>
+  <div class="dots-wrap"><div class="dot-a"></div><div class="dot-b"></div></div>
+  <div class="slide-inner">
+    <div class="brand">ainary <span class="d">·</span> research network</div>
+    <h2 style="margin-bottom:6px"><span class="gold">5 spots.</span> Free access.<br>One condition.</h2>
+    <p class="sub" style="font:400 17px/1.5 var(--f);margin-bottom:24px">I built this for myself. I use it daily.<br>Now I'll customize it for 5 people — and learn what's valuable.</p>
+    
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
+      <div class="role-card" style="display:flex;align-items:center;gap:16px;padding:16px 24px">
+        <span style="font-size:22px">🚀</span><span class="title" style="font:600 17px var(--f)">1 Founder</span><span class="desc" style="font:400 14px var(--f);margin-left:auto">building in AI or adjacent</span>
+      </div>
+      <div class="role-card" style="display:flex;align-items:center;gap:16px;padding:16px 24px">
+        <span style="font-size:22px">🔬</span><span class="title" style="font:600 17px var(--f)">1 Developer</span><span class="desc" style="font:400 14px var(--f);margin-left:auto">working with LLMs or agents</span>
+      </div>
+      <div class="role-card" style="display:flex;align-items:center;gap:16px;padding:16px 24px">
+        <span style="font-size:22px">💰</span><span class="title" style="font:600 17px var(--f)">1 VC / Angel</span><span class="desc" style="font:400 14px var(--f);margin-left:auto">tracking the AI landscape</span>
+      </div>
+      <div class="role-card" style="display:flex;align-items:center;gap:16px;padding:16px 24px">
+        <span style="font-size:22px">🏢</span><span class="title" style="font:600 17px var(--f)">1 SME Leader</span><span class="desc" style="font:400 14px var(--f);margin-left:auto">evaluating AI for business</span>
+      </div>
+      <div class="role-card" style="display:flex;align-items:center;gap:16px;padding:16px 24px">
+        <span style="font-size:22px">🃏</span><span class="title" style="font:600 17px var(--f)">1 Wildcard</span><span class="desc" style="font:400 14px var(--f);margin-left:auto">surprise me</span>
+      </div>
+    </div>
+
+    <div class="cta-box">
+      <div style="font:700 20px var(--f);margin-bottom:6px">The deal</div>
+      <div class="sub" style="font:400 16px/1.6 var(--f)">Full access. I'll customize your briefing for your role.<br>In return: 15 min feedback every two weeks. Picking by <span style="font-weight:600;color:#1a1a1a">March 14.</span></div>
+      <div style="font:700 17px var(--f);margin-top:14px" class="gold">↓ Comment what you'd use it for</div>
+    </div>
+    <div class="snum"><span class="cur">3</span> / 3</div>
+  </div>
+</div>
+
+</body>
+</html>

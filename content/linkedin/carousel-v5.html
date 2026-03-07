@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--f:'Inter',sans-serif;--m:'JetBrains Mono',monospace;--gold:#c8aa50;--gold-glow:rgba(200,170,80,.35)}
+body{font-family:var(--f);background:#000;display:flex;flex-direction:column;align-items:center;gap:60px;padding:40px 20px}
+.label{font:800 14px var(--f);color:#555;text-transform:uppercase;letter-spacing:3px;margin-bottom:-40px}
+
+.slide{width:1080px;height:1350px;position:relative;overflow:hidden;flex-shrink:0;background:#06060a}
+
+/* ====== GLOBAL LAYERS ====== */
+/* Dot grid - subtle */
+.slide::before{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,0.018) 1px, transparent 1px);background-size:28px 28px;z-index:1;pointer-events:none}
+/* Vignette */
+.slide::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 40%,rgba(6,6,10,.6) 100%);z-index:2;pointer-events:none}
+
+.inner{position:relative;z-index:10;padding:64px 72px;height:100%;display:flex;flex-direction:column}
+
+/* Brand watermark */
+.brand{font:600 20px var(--m);color:rgba(255,255,255,.22);letter-spacing:3px;text-transform:uppercase}
+
+/* Page num */
+.pg{position:absolute;bottom:32px;right:48px;font:600 20px var(--m);color:rgba(255,255,255,.12);z-index:10}
+.pg .c{color:var(--gold);opacity:.6}
+
+/* Progress */
+.prog{position:absolute;top:0;left:0;right:0;height:2px;z-index:20}
+.prog .bar{height:100%;background:linear-gradient(90deg,var(--gold),rgba(200,170,80,.3))}
+
+/* ====== NETWORK SVG LAYER ====== */
+.net{position:absolute;inset:0;z-index:3}
+.net line{stroke:rgba(200,170,80,.06);stroke-width:1}
+.net circle{fill:rgba(200,170,80,.08);stroke:rgba(200,170,80,.15);stroke-width:1}
+.net .glow{fill:none;stroke:rgba(200,170,80,.04);stroke-width:20}
+.net text{font:500 8px var(--m);fill:rgba(255,255,255,.06);text-anchor:middle}
+
+/* ====== PIPELINE (Slide 1) ====== */
+.pipe-node{position:absolute;z-index:5}
+.pipe-dot{width:10px;height:10px;background:var(--gold);box-shadow:0 0 20px var(--gold-glow),0 0 60px rgba(200,170,80,.15)}
+.pipe-ring{display:none}
+.pipe-line{position:absolute;z-index:4}
+.pipe-label{font:800 11px var(--m);color:rgba(200,170,80,.6);letter-spacing:2px;text-transform:uppercase;margin-top:12px}
+.pipe-desc{font:400 13px var(--f);color:rgba(255,255,255,.35);margin-top:4px;max-width:200px;line-height:1.4}
+
+/* Giant type */
+.hero-type{font:900 80px/0.95 var(--f);letter-spacing:-3px;color:#ededf0}
+.hero-type .dim{color:rgba(255,255,255,.12)}
+.hero-type .gold{color:var(--gold)}
+.hero-sub{font:400 19px/1.6 var(--f);color:rgba(255,255,255,.4);max-width:480px}
+
+/* Glass panel */
+.glass{background:rgba(255,255,255,.03);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:28px 32px}
+
+/* Stats */
+.stat-strip{display:flex;gap:2px}
+.stat-item{flex:1;text-align:center;padding:20px 6px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04)}
+.stat-item:first-child{border-radius:12px 0 0 12px}
+.stat-item:last-child{border-radius:0 12px 12px 0}
+.stat-item .n{font:700 40px var(--m);color:var(--gold)}
+.stat-item .l{font:600 22px var(--m);color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:1.5px;margin-top:2px}
+
+/* Role constellation (Slide 3) */
+.constellation{position:absolute;inset:0;z-index:3}
+.role-node{position:absolute;z-index:6}
+.role-icon-bg{width:68px;height:68px;border-radius:18px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.role-label{font:700 24px var(--f);color:rgba(255,255,255,.7);margin-top:8px;text-align:center}
+.role-sublabel{font:500 24px var(--f);color:rgba(255,255,255,.35);text-align:center;margin-top:2px}
+.center-node{position:absolute;z-index:7;text-align:center}
+.center-glow{width:110px;height:110px;border-radius:50%;background:radial-gradient(circle,rgba(200,170,80,.2),transparent 70%);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
+
+/* CTA area */
+.cta-panel{position:relative;z-index:10}
+</style>
+</head>
+<body>
+
+<div class="label">Version A — Dark</div>
+
+<!-- ====== SLIDE 1: PIPELINE ====== -->
+<div class="slide" id="dark-1">
+  <div class="prog"><div class="bar" style="width:33%"></div></div>
+  
+  <!-- Network background -->
+  <svg class="net" width="1080" height="1350" viewBox="0 0 1080 1350">
+    <!-- Ambient network lines -->
+    <line x1="120" y1="180" x2="380" y2="320"/>
+    <line x1="380" y1="320" x2="650" y2="250"/>
+    <line x1="650" y1="250" x2="900" y2="380"/>
+    <line x1="200" y1="500" x2="500" y2="450"/>
+    <line x1="500" y1="450" x2="780" y2="520"/>
+    <line x1="150" y1="700" x2="420" y2="650"/>
+    <line x1="420" y1="650" x2="700" y2="720"/>
+    <line x1="700" y1="720" x2="950" y2="680"/>
+    <line x1="300" y1="850" x2="600" y2="800"/>
+    <line x1="600" y1="800" x2="880" y2="870"/>
+    <line x1="80" y1="400" x2="250" y2="600"/>
+    <line x1="900" y1="200" x2="980" y2="450"/>
+    <line x1="500" y1="150" x2="450" y2="400"/>
+    <line x1="750" y1="400" x2="820" y2="650"/>
+    <line x1="350" y1="550" x2="550" y2="750"/>
+    <!-- Ambient nodes as + crosses -->
+    <line x1="116" y1="180" x2="124" y2="180" style="stroke:rgba(200,170,80,.15);stroke-width:1"/><line x1="120" y1="176" x2="120" y2="184" style="stroke:rgba(200,170,80,.15);stroke-width:1"/>
+    <line x1="376" y1="320" x2="384" y2="320" style="stroke:rgba(200,170,80,.18);stroke-width:1"/><line x1="380" y1="316" x2="380" y2="324" style="stroke:rgba(200,170,80,.18);stroke-width:1"/>
+    <line x1="646" y1="250" x2="654" y2="250" style="stroke:rgba(200,170,80,.15);stroke-width:1"/><line x1="650" y1="246" x2="650" y2="254" style="stroke:rgba(200,170,80,.15);stroke-width:1"/>
+    <line x1="895" y1="380" x2="905" y2="380" style="stroke:rgba(200,170,80,.2);stroke-width:1"/><line x1="900" y1="375" x2="900" y2="385" style="stroke:rgba(200,170,80,.2);stroke-width:1"/>
+    <line x1="196" y1="500" x2="204" y2="500" style="stroke:rgba(200,170,80,.15);stroke-width:1"/><line x1="200" y1="496" x2="200" y2="504" style="stroke:rgba(200,170,80,.15);stroke-width:1"/>
+    <line x1="496" y1="450" x2="504" y2="450" style="stroke:rgba(200,170,80,.18);stroke-width:1"/><line x1="500" y1="446" x2="500" y2="454" style="stroke:rgba(200,170,80,.18);stroke-width:1"/>
+    <line x1="776" y1="520" x2="784" y2="520" style="stroke:rgba(200,170,80,.15);stroke-width:1"/><line x1="780" y1="516" x2="780" y2="524" style="stroke:rgba(200,170,80,.15);stroke-width:1"/>
+    <line x1="146" y1="700" x2="154" y2="700" style="stroke:rgba(200,170,80,.18);stroke-width:1"/><line x1="150" y1="696" x2="150" y2="704" style="stroke:rgba(200,170,80,.18);stroke-width:1"/>
+    <line x1="415" y1="650" x2="425" y2="650" style="stroke:rgba(200,170,80,.2);stroke-width:1"/><line x1="420" y1="645" x2="420" y2="655" style="stroke:rgba(200,170,80,.2);stroke-width:1"/>
+    <line x1="696" y1="720" x2="704" y2="720" style="stroke:rgba(200,170,80,.15);stroke-width:1"/><line x1="700" y1="716" x2="700" y2="724" style="stroke:rgba(200,170,80,.15);stroke-width:1"/>
+    <line x1="946" y1="680" x2="954" y2="680" style="stroke:rgba(200,170,80,.18);stroke-width:1"/><line x1="950" y1="676" x2="950" y2="684" style="stroke:rgba(200,170,80,.18);stroke-width:1"/>
+    <line x1="596" y1="800" x2="604" y2="800" style="stroke:rgba(200,170,80,.2);stroke-width:1"/><line x1="600" y1="796" x2="600" y2="804" style="stroke:rgba(200,170,80,.2);stroke-width:1"/>
+    <line x1="816" y1="650" x2="824" y2="650" style="stroke:rgba(200,170,80,.18);stroke-width:1"/><line x1="820" y1="646" x2="820" y2="654" style="stroke:rgba(200,170,80,.18);stroke-width:1"/>
+    <!-- Labels (ghosted) -->
+    <text x="380" y="310">agent-architecture</text>
+    <text x="700" y="710">ontology</text>
+    <text x="500" y="440">multi-agent</text>
+    <text x="900" y="370">gtm-strategy</text>
+    <text x="600" y="790">memory</text>
+  </svg>
+
+  <!-- Pipeline connections (SVG) -->
+  <svg style="position:absolute;inset:0;z-index:4" width="1080" height="1350" viewBox="0 0 1080 1350">
+    <!-- Step connections with gradient -->
+    <defs>
+      <linearGradient id="pline" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="rgba(200,170,80,0.4)"/>
+        <stop offset="100%" stop-color="rgba(200,170,80,0.05)"/>
+      </linearGradient>
+    </defs>
+    <!-- Vertical flow: step dots at specific positions -->
+    <line x1="108" y1="380" x2="108" y2="500" stroke="url(#pline)" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <line x1="108" y1="560" x2="108" y2="670" stroke="url(#pline)" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <line x1="108" y1="730" x2="108" y2="840" stroke="url(#pline)" stroke-width="1.5" stroke-dasharray="4 4"/>
+  </svg>
+
+  <div class="inner">
+    <div class="brand">ainary · research network</div>
+    
+    <div style="margin-top:40px">
+      <div class="hero-type">How it<br><span class="dim">actually</span><br>works<span class="gold">.</span></div>
+    </div>
+
+    <!-- Pipeline steps - fixed left column for dot alignment -->
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;margin-top:20px;padding-left:48px;gap:48px">
+      
+      <div style="display:flex;align-items:flex-start;gap:28px">
+        <div style="width:14px;flex-shrink:0;position:relative;padding-top:4px">
+          <div class="pipe-dot"></div>
+          <div class="pipe-ring" style="width:32px;height:32px"></div>
+          <div class="pipe-ring" style="width:48px;height:48px;opacity:.5"></div>
+        </div>
+        <div>
+          <div style="font:800 22px var(--m);color:var(--gold);letter-spacing:2px;text-transform:uppercase;opacity:.7">01 · Ingest</div>
+          <div style="font:500 30px/1.4 var(--f);color:rgba(255,255,255,.55);margin-top:4px">6 sources scanned daily. TechCrunch, Stratechery,<br>Simon Willison, Palantir, OpenAI, Anthropic.</div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:flex-start;gap:28px">
+        <div style="width:14px;flex-shrink:0;position:relative;padding-top:4px">
+          <div class="pipe-dot"></div>
+          <div class="pipe-ring" style="width:32px;height:32px"></div>
+        </div>
+        <div>
+          <div style="font:800 22px var(--m);color:var(--gold);letter-spacing:2px;text-transform:uppercase;opacity:.7">02 · Extract</div>
+          <div style="font:500 30px/1.4 var(--f);color:rgba(255,255,255,.55);margin-top:4px">Every claim trust-scored via Admiralty Code.<br>Linked to 115 topics across 10 research domains.</div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:flex-start;gap:28px">
+        <div style="width:14px;flex-shrink:0;position:relative;padding-top:4px">
+          <div class="pipe-dot"></div>
+          <div class="pipe-ring" style="width:32px;height:32px"></div>
+        </div>
+        <div>
+          <div style="font:800 22px var(--m);color:var(--gold);letter-spacing:2px;text-transform:uppercase;opacity:.7">03 · Calibrate</div>
+          <div style="font:500 30px/1.4 var(--f);color:rgba(255,255,255,.55);margin-top:4px">Volume is not intelligence. Weak evidence,<br>lower score. Confidence tracks proof, not noise.</div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:flex-start;gap:28px">
+        <div style="width:14px;flex-shrink:0;position:relative;padding-top:4px">
+          <div class="pipe-dot"></div>
+          <div class="pipe-ring" style="width:32px;height:32px"></div>
+          <div class="pipe-ring" style="width:48px;height:48px;opacity:.5"></div>
+        </div>
+        <div>
+          <div style="font:800 22px var(--m);color:var(--gold);letter-spacing:2px;text-transform:uppercase;opacity:.7">04 · Brief</div>
+          <div style="font:500 30px/1.4 var(--f);color:rgba(255,255,255,.55);margin-top:4px">Your daily intelligence briefing. Predictions,<br>gap detection, recommended actions. By role.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pg"><span class="c">1</span> / 5</div>
+</div>
+
+<!-- ====== SLIDE 2: KNOWLEDGE GRAPH ====== -->
+<div class="slide" id="dark-2">
+  <div class="prog"><div class="bar" style="width:66%"></div></div>
+  
+  <!-- Full-bleed network graph - HIGH CONTRAST -->
+  <svg class="net" width="1080" height="1350" viewBox="0 0 1080 1350">
+    <!-- Central cluster -->
+    <circle cx="540" cy="420" r="80" style="fill:none;stroke:rgba(200,170,80,.12);stroke-width:30"/>
+    <circle cx="540" cy="420" r="16" style="fill:rgba(200,170,80,.65);stroke:rgba(200,170,80,.85);stroke-width:2"/>
+    <text x="540" y="455" style="font-size:12px;fill:rgba(255,255,255,.2);text-anchor:middle">agent-architecture</text>
+    
+    <!-- Connected nodes - HIGH VISIBILITY -->
+    <line x1="540" y1="420" x2="310" y2="280" style="stroke:rgba(200,170,80,.4);stroke-width:1.5"/>
+    <line x1="540" y1="420" x2="780" y2="320" style="stroke:rgba(200,170,80,.35);stroke-width:1.5"/>
+    <line x1="540" y1="420" x2="370" y2="570" style="stroke:rgba(200,170,80,.35);stroke-width:1.5"/>
+    <line x1="540" y1="420" x2="740" y2="550" style="stroke:rgba(200,170,80,.4);stroke-width:1.5"/>
+    <line x1="540" y1="420" x2="320" y2="460" style="stroke:rgba(200,170,80,.25);stroke-width:1"/>
+    <line x1="540" y1="420" x2="700" y2="240" style="stroke:rgba(200,170,80,.25);stroke-width:1"/>
+    <line x1="540" y1="420" x2="420" y2="200" style="stroke:rgba(200,170,80,.2);stroke-width:1"/>
+    
+    <!-- Secondary nodes -->
+    <circle cx="310" cy="280" r="11" style="fill:rgba(200,170,80,.5);stroke:rgba(200,170,80,.75);stroke-width:1.5"/>
+    <text x="310" y="262" style="font-size:11px;fill:rgba(255,255,255,.25);text-anchor:middle">multi-agent</text>
+    <circle cx="310" cy="280" r="35" style="fill:none;stroke:rgba(200,170,80,.08);stroke-width:20"/>
+    
+    <circle cx="780" cy="320" r="12" style="fill:rgba(200,170,80,.55);stroke:rgba(200,170,80,.8);stroke-width:1.5"/>
+    <text x="780" y="302" style="font-size:11px;fill:rgba(255,255,255,.25);text-anchor:middle">gtm-strategy</text>
+    <circle cx="780" cy="320" r="40" style="fill:none;stroke:rgba(200,170,80,.08);stroke-width:20"/>
+    
+    <circle cx="370" cy="570" r="10" style="fill:rgba(200,170,80,.45);stroke:rgba(200,170,80,.65);stroke-width:1.5"/>
+    <text x="370" y="595" style="font-size:10px;fill:rgba(255,255,255,.2);text-anchor:middle">ontology</text>
+    
+    <circle cx="740" cy="550" r="9" style="fill:rgba(200,170,80,.4);stroke:rgba(200,170,80,.6);stroke-width:1"/>
+    <text x="740" y="575" style="font-size:10px;fill:rgba(255,255,255,.18);text-anchor:middle">fde-model</text>
+    
+    <circle cx="320" cy="460" r="7" style="fill:rgba(200,170,80,.35);stroke:rgba(200,170,80,.5);stroke-width:1"/>
+    <text x="320" y="482" style="font-size:9px;fill:rgba(255,255,255,.15);text-anchor:middle">oag-vs-rag</text>
+    
+    <circle cx="700" cy="240" r="8" style="fill:rgba(200,170,80,.4);stroke:rgba(200,170,80,.6);stroke-width:1"/>
+    <text x="700" y="222" style="font-size:9px;fill:rgba(255,255,255,.18);text-anchor:middle">agent-memory</text>
+    
+    <circle cx="420" cy="200" r="6" style="fill:rgba(200,170,80,.3);stroke:rgba(200,170,80,.5);stroke-width:1"/>
+    <text x="420" y="185" style="font-size:9px;fill:rgba(255,255,255,.12);text-anchor:middle">palantir-culture</text>
+
+    <!-- Cross-links -->
+    <line x1="310" y1="280" x2="420" y2="200" style="stroke:rgba(200,170,80,.18);stroke-width:1"/>
+    <line x1="310" y1="280" x2="320" y2="460" style="stroke:rgba(200,170,80,.2);stroke-width:1"/>
+    <line x1="780" y1="320" x2="740" y2="550" style="stroke:rgba(200,170,80,.18);stroke-width:1"/>
+    <line x1="780" y1="320" x2="700" y2="240" style="stroke:rgba(200,170,80,.2);stroke-width:1"/>
+    <line x1="370" y1="570" x2="320" y2="460" style="stroke:rgba(200,170,80,.18);stroke-width:1"/>
+    <line x1="370" y1="570" x2="740" y2="550" style="stroke:rgba(200,170,80,.15);stroke-width:1"/>
+    
+    <!-- Outer nodes -->
+    <circle cx="140" cy="180" r="4" style="fill:rgba(200,170,80,.2);stroke:rgba(200,170,80,.35);stroke-width:1"/>
+    <circle cx="920" cy="160" r="5" style="fill:rgba(200,170,80,.22);stroke:rgba(200,170,80,.38);stroke-width:1"/>
+    <circle cx="120" cy="650" r="4" style="fill:rgba(200,170,80,.15);stroke:rgba(200,170,80,.28);stroke-width:1"/>
+    <circle cx="940" cy="620" r="4" style="fill:rgba(200,170,80,.15);stroke:rgba(200,170,80,.28);stroke-width:1"/>
+    <line x1="140" y1="180" x2="310" y2="280" style="stroke:rgba(200,170,80,.12);stroke-width:1"/>
+    <line x1="920" y1="160" x2="780" y2="320" style="stroke:rgba(200,170,80,.12);stroke-width:1"/>
+    <line x1="120" y1="650" x2="370" y2="570" style="stroke:rgba(200,170,80,.1);stroke-width:1"/>
+    <line x1="940" y1="620" x2="740" y2="550" style="stroke:rgba(200,170,80,.1);stroke-width:1"/>
+  </svg>
+
+  <!-- Central glow - stronger -->
+  <div style="position:absolute;top:38%;left:50%;transform:translate(-50%,-50%);width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(200,170,80,.1),transparent 70%);z-index:4;pointer-events:none"></div>
+
+  <div class="inner">
+    <div class="brand">ainary · research network</div>
+    
+    <!-- Giant number overlay -->
+    <div style="position:absolute;top:60px;right:72px;text-align:right;z-index:10">
+      <div style="font:900 120px var(--m);color:rgba(200,170,80,.08);letter-spacing:-5px;line-height:1">115+</div>
+      <div style="font:600 20px var(--m);color:rgba(255,255,255,.18);letter-spacing:3px;text-transform:uppercase;margin-top:-8px">topics tracked</div>
+    </div>
+
+    <div style="margin-top:auto">
+      <!-- SOLID WHITE FOOTER -->
+      <div style="background:#fafaf8;border-radius:20px 20px 0 0;padding:40px 48px 36px;margin:0 -72px -64px -72px">
+        <div style="font:800 44px var(--f);color:#111;letter-spacing:-1px;margin-bottom:12px">The knowledge graph</div>
+        <div style="font:400 26px/1.5 var(--f);color:rgba(0,0,0,.45);margin-bottom:24px">Every node is trust-scored. Every connection traced.<br>Gaps detected automatically. Updated daily from 6 sources.</div>
+        <!-- KPIs with dark background -->
+        <div style="display:flex;gap:3px">
+          <div style="flex:1;text-align:center;padding:18px 6px;background:#111;border-radius:12px 0 0 12px"><div style="font:700 40px var(--m);color:var(--gold)">55+</div><div style="font:600 22px var(--m);color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1.5px;margin-top:2px">Claims</div></div>
+          <div style="flex:1;text-align:center;padding:18px 6px;background:#111"><div style="font:700 40px var(--m);color:var(--gold)">115+</div><div style="font:600 22px var(--m);color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1.5px;margin-top:2px">Topics</div></div>
+          <div style="flex:1;text-align:center;padding:18px 6px;background:#111"><div style="font:700 40px var(--m);color:var(--gold)">30+</div><div style="font:600 22px var(--m);color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1.5px;margin-top:2px">Signals</div></div>
+          <div style="flex:1;text-align:center;padding:18px 6px;background:#111"><div style="font:700 40px var(--m);color:var(--gold)">7+</div><div style="font:600 22px var(--m);color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1.5px;margin-top:2px">Predict.</div></div>
+          <div style="flex:1;text-align:center;padding:18px 6px;background:#111;border-radius:0 12px 12px 0"><div style="font:700 40px var(--m);color:var(--gold)">27+</div><div style="font:600 22px var(--m);color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1.5px;margin-top:2px">Gaps</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pg"><span class="c">2</span> / 5</div>
+</div>
+
+<!-- ====== SLIDE 3: OUTPUT SAMPLE ====== -->
+<div class="slide" id="dark-3">
+  <div class="prog"><div class="bar" style="width:40%"></div></div>
+  <div class="inner">
+    <div class="brand">ainary · research network</div>
+    <div style="margin-top:36px">
+      <div class="hero-type" style="font-size:56px;letter-spacing:-2px">What you<br>get<span class="gold">.</span></div>
+    </div>
+    <!-- Sample prediction card -->
+    <div style="margin-top:48px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:36px 40px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div style="font:700 16px var(--m);color:rgba(255,255,255,.2);letter-spacing:3px;text-transform:uppercase">Sample Prediction</div>
+        <div style="font:600 14px var(--m);color:var(--gold);letter-spacing:1px;background:rgba(200,170,80,.1);padding:6px 14px;border-radius:6px">72% CONFIDENCE</div>
+      </div>
+      <div style="font:700 32px/1.3 var(--f);color:rgba(255,255,255,.75);margin-bottom:16px">Agent frameworks will consolidate around 2-3 winners by Q3 2026</div>
+      <div style="font:400 24px/1.5 var(--f);color:rgba(255,255,255,.3);margin-bottom:24px">Based on 12 signals across 4 sources. Trust-scored via Admiralty Code. Matches your tracked topics.</div>
+      <div style="display:flex;gap:12px">
+        <div style="font:600 20px var(--m);color:var(--gold);background:rgba(200,170,80,.08);border:1px solid rgba(200,170,80,.15);padding:10px 20px;border-radius:8px">Deep Research</div>
+        <div style="font:600 20px var(--m);color:rgba(255,255,255,.3);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);padding:10px 20px;border-radius:8px">Review Claims</div>
+        <div style="font:600 20px var(--m);color:rgba(255,255,255,.3);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);padding:10px 20px;border-radius:8px">Monitor</div>
+      </div>
+    </div>
+    <!-- Second card: gap detection -->
+    <div style="margin-top:16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:28px 40px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="font:700 16px var(--m);color:rgba(255,255,255,.2);letter-spacing:3px;text-transform:uppercase">Gap Detected</div>
+        <div style="font:600 14px var(--m);color:#ef4444;letter-spacing:1px;background:rgba(239,68,68,.1);padding:6px 14px;border-radius:6px">RESEARCH NEEDED</div>
+      </div>
+      <div style="font:700 28px/1.3 var(--f);color:rgba(255,255,255,.7)">No trusted data on MCP adoption rates in production</div>
+      <div style="font:400 22px/1.5 var(--f);color:rgba(255,255,255,.25);margin-top:8px">3 claims found, all source reliability B3 or lower. Insufficient for prediction.</div>
+    </div>
+    <div style="margin-top:auto;font:400 24px var(--f);color:rgba(255,255,255,.2);text-align:center">Every output is actionable. Every confidence is earned.</div>
+  </div>
+  <div class="pg"><span class="c">3</span> / 5</div>
+</div>
+
+<!-- ====== SLIDE 4: PROCESS ====== -->
+<div class="slide" id="dark-4">
+  <div class="prog"><div class="bar" style="width:60%"></div></div>
+  <div class="inner">
+    <div class="brand">ainary · research network</div>
+    <div style="margin-top:36px">
+      <div class="hero-type" style="font-size:56px;letter-spacing:-2px">Three steps<span class="gold">.</span><br><span class="dim">Daily.</span></div>
+    </div>
+    <!-- 3 process blocks -->
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:24px;margin-top:20px">
+      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:32px 40px;display:flex;gap:32px;align-items:flex-start">
+        <div style="font:800 48px var(--m);color:var(--gold);opacity:.4;line-height:1;flex-shrink:0;width:60px">01</div>
+        <div>
+          <div style="font:700 28px var(--f);color:rgba(255,255,255,.7)">Signal Ingest</div>
+          <div style="font:400 24px/1.5 var(--f);color:rgba(255,255,255,.3);margin-top:6px">6 sources scanned. Claims extracted, trust-scored, linked to your topics.</div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:32px 40px;display:flex;gap:32px;align-items:flex-start">
+        <div style="font:800 48px var(--m);color:var(--gold);opacity:.4;line-height:1;flex-shrink:0;width:60px">02</div>
+        <div>
+          <div style="font:700 28px var(--f);color:rgba(255,255,255,.7)">Trust Calibration</div>
+          <div style="font:400 24px/1.5 var(--f);color:rgba(255,255,255,.3);margin-top:6px">Weak evidence, lower score. Contradictions flagged. Gaps detected across your research domains.</div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:32px 40px;display:flex;gap:32px;align-items:flex-start">
+        <div style="font:800 48px var(--m);color:var(--gold);opacity:.4;line-height:1;flex-shrink:0;width:60px">03</div>
+        <div>
+          <div style="font:700 28px var(--f);color:rgba(255,255,255,.7)">Your Briefing</div>
+          <div style="font:400 24px/1.5 var(--f);color:rgba(255,255,255,.3);margin-top:6px">Predictions, gaps, recommended actions. Customized by role. One page, no noise.</div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:auto;font:400 24px var(--f);color:rgba(255,255,255,.2);text-align:center">Built for decisions, not dashboards.</div>
+  </div>
+  <div class="pg"><span class="c">4</span> / 5</div>
+</div>
+
+<!-- ====== SLIDE 5: CTA ====== -->
+<div class="slide" id="dark-5">
+  <div class="prog"><div class="bar" style="width:100%"></div></div>
+  
+  <div class="inner">
+    <div class="brand">ainary · research network</div>
+    
+    <div style="margin-top:36px">
+      <div class="hero-type" style="font-size:64px;letter-spacing:-2px"><span class="gold">5 spots.</span><br>Free access<span class="gold">.</span></div>
+    </div>
+
+    <!-- Roles as structured briefing list -->
+    <div style="margin-top:48px">
+      <div style="font:600 16px var(--m);color:rgba(255,255,255,.2);letter-spacing:3px;text-transform:uppercase;margin-bottom:20px">Roles</div>
+      
+      <div style="display:flex;flex-direction:column;gap:0">
+        <div style="display:flex;align-items:center;gap:16px;padding:18px 0;border-top:1px solid rgba(255,255,255,.06)">
+          <div style="width:8px;height:8px;background:#c8aa50;flex-shrink:0"></div>
+          <div style="font:600 26px var(--f);color:rgba(255,255,255,.7);width:220px">Founder</div>
+          <div style="font:400 24px var(--f);color:rgba(255,255,255,.3)">Validating product-market signal</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;padding:18px 0;border-top:1px solid rgba(255,255,255,.06)">
+          <div style="width:8px;height:8px;background:#3b82f6;flex-shrink:0"></div>
+          <div style="font:600 26px var(--f);color:rgba(255,255,255,.7);width:220px">Developer</div>
+          <div style="font:400 24px var(--f);color:rgba(255,255,255,.3)">Evaluating agent frameworks</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;padding:18px 0;border-top:1px solid rgba(255,255,255,.06)">
+          <div style="width:8px;height:8px;background:#22c55e;flex-shrink:0"></div>
+          <div style="font:600 26px var(--f);color:rgba(255,255,255,.7);width:220px">VC / Angel</div>
+          <div style="font:400 24px var(--f);color:rgba(255,255,255,.3)">Tracking infrastructure bets</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;padding:18px 0;border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06)">
+          <div style="width:8px;height:8px;background:#a855f7;flex-shrink:0"></div>
+          <div style="font:600 26px var(--f);color:rgba(255,255,255,.7);width:220px">Operator</div>
+          <div style="font:400 24px var(--f);color:rgba(255,255,255,.3)">Deploying AI into GTM/ops</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Solid white footer — 3 boxes only -->
+    <div style="margin-top:auto">
+      <div style="background:#fafaf8;border-radius:20px 20px 0 0;padding:36px 48px 32px;margin:0 -72px -64px -72px">
+        <div style="display:flex;gap:3px;margin-bottom:20px">
+          <div style="flex:1;text-align:center;padding:16px 6px;background:#111;border-radius:12px 0 0 12px"><div style="font:700 32px var(--m);color:var(--gold)">Free</div><div style="font:600 18px var(--m);color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1.5px;margin-top:2px">Access</div></div>
+          <div style="flex:1;text-align:center;padding:16px 6px;background:#111"><div style="font:700 32px var(--m);color:var(--gold)">5</div><div style="font:600 18px var(--m);color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1.5px;margin-top:2px">Spots</div></div>
+          <div style="flex:1;text-align:center;padding:16px 6px;background:#111;border-radius:0 12px 12px 0"><div style="font:700 32px var(--m);color:var(--gold)">Mar 14</div><div style="font:600 18px var(--m);color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1.5px;margin-top:2px">Deadline</div></div>
+        </div>
+        <div style="font:700 28px var(--f);color:var(--gold)">Comment your role and what you'd track first.</div>
+      </div>
+    </div>
+  </div>
+  <div class="pg"><span class="c">5</span> / 5</div>
+</div>
+
+<!-- ====== LIGHT VERSIONS ====== -->
+<div class="label" style="margin-top:40px">Version B — Light</div>
+
+<!-- LIGHT SLIDE 1 -->
+<div class="slide" id="light-1" style="background:#fafaf8">
+  <div class="prog"><div class="bar" style="width:33%"></div></div>
+  <style>
+    #light-1::before{background-image:radial-gradient(rgba(0,0,0,.03) 1px, transparent 1px) !important}
+    #light-1::after{background:radial-gradient(ellipse at center,transparent 40%,rgba(250,250,248,.5) 100%) !important}
+    #light-1 .net line{stroke:rgba(160,140,80,.06)}
+    #light-1 .net circle{fill:rgba(160,140,80,.06);stroke:rgba(160,140,80,.1)}
+    #light-1 .net text{fill:rgba(0,0,0,.04)}
+    #light-1 .pipe-dot{background:#a38a3a;box-shadow:0 0 20px rgba(163,138,58,.2)}
+    #light-1 .pipe-ring{border-color:rgba(163,138,58,.15)}
+    #light-1 .hero-type{color:#1a1a1a}
+    #light-1 .hero-type .dim{color:rgba(0,0,0,.08)}
+    #light-1 .hero-type .gold{color:#a38a3a}
+  </style>
+  <svg class="net" width="1080" height="1350" viewBox="0 0 1080 1350">
+    <line x1="120" y1="180" x2="380" y2="320"/><line x1="380" y1="320" x2="650" y2="250"/>
+    <line x1="650" y1="250" x2="900" y2="380"/><line x1="200" y1="500" x2="500" y2="450"/>
+    <line x1="500" y1="450" x2="780" y2="520"/><line x1="150" y1="700" x2="420" y2="650"/>
+    <line x1="420" y1="650" x2="700" y2="720"/><line x1="700" y1="720" x2="950" y2="680"/>
+    <line x1="116" y1="180" x2="124" y2="180" style="stroke:rgba(160,140,80,.12);stroke-width:1"/><line x1="120" y1="176" x2="120" y2="184" style="stroke:rgba(160,140,80,.12);stroke-width:1"/>
+    <line x1="376" y1="320" x2="384" y2="320" style="stroke:rgba(160,140,80,.15);stroke-width:1"/><line x1="380" y1="316" x2="380" y2="324" style="stroke:rgba(160,140,80,.15);stroke-width:1"/>
+    <line x1="646" y1="250" x2="654" y2="250" style="stroke:rgba(160,140,80,.12);stroke-width:1"/><line x1="650" y1="246" x2="650" y2="254" style="stroke:rgba(160,140,80,.12);stroke-width:1"/>
+    <line x1="895" y1="380" x2="905" y2="380" style="stroke:rgba(160,140,80,.15);stroke-width:1"/><line x1="900" y1="375" x2="900" y2="385" style="stroke:rgba(160,140,80,.15);stroke-width:1"/>
+    <line x1="496" y1="450" x2="504" y2="450" style="stroke:rgba(160,140,80,.12);stroke-width:1"/><line x1="500" y1="446" x2="500" y2="454" style="stroke:rgba(160,140,80,.12);stroke-width:1"/>
+    <line x1="415" y1="650" x2="425" y2="650" style="stroke:rgba(160,140,80,.15);stroke-width:1"/><line x1="420" y1="645" x2="420" y2="655" style="stroke:rgba(160,140,80,.15);stroke-width:1"/>
+    <text x="380" y="310">agent-architecture</text><text x="500" y="440">multi-agent</text>
+  </svg>
+  <svg style="position:absolute;inset:0;z-index:4" width="1080" height="1350" viewBox="0 0 1080 1350">
+    <line x1="108" y1="380" x2="108" y2="500" stroke="rgba(163,138,58,.2)" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <line x1="108" y1="560" x2="108" y2="670" stroke="rgba(163,138,58,.2)" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <line x1="108" y1="730" x2="108" y2="840" stroke="rgba(163,138,58,.2)" stroke-width="1.5" stroke-dasharray="4 4"/>
+  </svg>
+  <div class="inner">
+    <div class="brand" style="color:rgba(0,0,0,.2)">ainary · research network</div>
+    <div style="margin-top:40px"><div class="hero-type">How it<br><span class="dim">actually</span><br>works<span class="gold">.</span></div></div>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding-left:48px;gap:48px;margin-top:20px">
+      <div style="display:flex;align-items:flex-start;gap:28px">
+        <div style="width:14px;flex-shrink:0;position:relative;padding-top:4px"><div class="pipe-dot"></div><div class="pipe-ring" style="width:32px;height:32px"></div><div class="pipe-ring" style="width:48px;height:48px;opacity:.5"></div></div>
+        <div><div style="font:800 22px var(--m);color:#a38a3a;letter-spacing:2px;text-transform:uppercase;opacity:.7">01 · Ingest</div><div style="font:500 30px/1.4 var(--f);color:rgba(0,0,0,.4);margin-top:4px">6 sources scanned daily. TechCrunch, Stratechery,<br>Simon Willison, Palantir, OpenAI, Anthropic.</div></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:28px">
+        <div style="width:14px;flex-shrink:0;position:relative;padding-top:4px"><div class="pipe-dot"></div><div class="pipe-ring" style="width:32px;height:32px"></div></div>
+        <div><div style="font:800 22px var(--m);color:#a38a3a;letter-spacing:2px;text-transform:uppercase;opacity:.7">02 · Extract</div><div style="font:500 30px/1.4 var(--f);color:rgba(0,0,0,.4);margin-top:4px">Every claim trust-scored via Admiralty Code.<br>Linked to 115 topics across 10 research domains.</div></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:28px">
+        <div style="width:14px;flex-shrink:0;position:relative;padding-top:4px"><div class="pipe-dot"></div><div class="pipe-ring" style="width:32px;height:32px"></div></div>
+        <div><div style="font:800 22px var(--m);color:#a38a3a;letter-spacing:2px;text-transform:uppercase;opacity:.7">03 · Calibrate</div><div style="font:500 30px/1.4 var(--f);color:rgba(0,0,0,.4);margin-top:4px">Volume is not intelligence. Weak evidence,<br>lower score. Confidence tracks proof, not noise.</div></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:28px">
+        <div style="width:14px;flex-shrink:0;position:relative;padding-top:4px"><div class="pipe-dot"></div><div class="pipe-ring" style="width:32px;height:32px"></div><div class="pipe-ring" style="width:48px;height:48px;opacity:.5"></div></div>
+        <div><div style="font:800 22px var(--m);color:#a38a3a;letter-spacing:2px;text-transform:uppercase;opacity:.7">04 · Brief</div><div style="font:500 30px/1.4 var(--f);color:rgba(0,0,0,.4);margin-top:4px">Your daily intelligence briefing. Predictions,<br>gap detection, recommended actions. By role.</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="pg" style="color:rgba(0,0,0,.1)"><span class="c" style="color:#a38a3a;opacity:.5">1</span> / 5</div>
+</div>
+
+<!-- LIGHT SLIDE 2 -->
+<div class="slide" id="light-2" style="background:#fafaf8">
+  <div class="prog"><div class="bar" style="width:66%"></div></div>
+  <style>
+    #light-2::before{background-image:radial-gradient(rgba(0,0,0,.03) 1px, transparent 1px) !important}
+    #light-2::after{background:radial-gradient(ellipse at center,transparent 50%,rgba(250,250,248,.25) 100%) !important}
+    #light-2 .net line{stroke:rgba(100,80,25,0.54)}
+    #light-2 .net circle{fill:#7A6525;stroke:#9B8540}
+    #light-2 .net text{fill:rgba(0,0,0,.35)}
+  </style>
+  <svg class="net" width="1080" height="1350" viewBox="0 0 1080 1350">
+    <!-- Central cluster -->
+    <circle cx="540" cy="420" r="80" style="fill:none;stroke:rgba(100,80,25,0.22);stroke-width:30"/>
+    <circle cx="540" cy="420" r="16" style="fill:#6B5820;stroke:#5A4A18;stroke-width:2"/>
+    <text x="540" y="455" style="font:500 12px 'JetBrains Mono',monospace;fill:rgba(0,0,0,.3);text-anchor:middle">agent-architecture</text>
+    
+    <!-- Main lines -->
+    <line x1="540" y1="420" x2="310" y2="280" style="stroke:rgba(100,80,25,0.63);stroke-width:1.5"/>
+    <line x1="540" y1="420" x2="780" y2="320" style="stroke:rgba(100,80,25,0.54);stroke-width:1.5"/>
+    <line x1="540" y1="420" x2="370" y2="570" style="stroke:rgba(100,80,25,0.54);stroke-width:1.5"/>
+    <line x1="540" y1="420" x2="740" y2="550" style="stroke:rgba(100,80,25,0.63);stroke-width:1.5"/>
+    <line x1="540" y1="420" x2="320" y2="460" style="stroke:rgba(100,80,25,0.40);stroke-width:1"/>
+    <line x1="540" y1="420" x2="700" y2="240" style="stroke:rgba(100,80,25,0.40);stroke-width:1"/>
+    
+    <!-- Secondary nodes -->
+    <circle cx="310" cy="280" r="11" style="fill:#7A6525;stroke:#5A4A18;stroke-width:1.5"/>
+    <text x="310" y="262" style="font:500 11px 'JetBrains Mono',monospace;fill:rgba(0,0,0,.25);text-anchor:middle">multi-agent</text>
+    <circle cx="310" cy="280" r="35" style="fill:none;stroke:rgba(100,80,25,0.14);stroke-width:20"/>
+    
+    <circle cx="780" cy="320" r="12" style="fill:#7A6525;stroke:#5A4A18;stroke-width:1.5"/>
+    <text x="780" y="302" style="font:500 11px 'JetBrains Mono',monospace;fill:rgba(0,0,0,.25);text-anchor:middle">gtm-strategy</text>
+    <circle cx="780" cy="320" r="40" style="fill:none;stroke:rgba(100,80,25,0.14);stroke-width:20"/>
+    
+    <circle cx="370" cy="570" r="10" style="fill:#6B5820;stroke:#5A4A18;stroke-width:1.5"/>
+    <text x="370" y="595" style="font:500 10px 'JetBrains Mono',monospace;fill:rgba(0,0,0,.2);text-anchor:middle">ontology</text>
+    
+    <circle cx="740" cy="550" r="9" style="fill:#6B5820;stroke:#5A4A18;stroke-width:1"/>
+    <circle cx="320" cy="460" r="7" style="fill:#5A4A18;stroke:#4A3A12;stroke-width:1"/>
+    <circle cx="700" cy="240" r="8" style="fill:#6B5820;stroke:#5A4A18;stroke-width:1"/>
+    
+    <!-- Cross-links -->
+    <line x1="310" y1="280" x2="320" y2="460" style="stroke:rgba(100,80,25,0.36);stroke-width:1"/>
+    <line x1="780" y1="320" x2="740" y2="550" style="stroke:rgba(100,80,25,0.36);stroke-width:1"/>
+    
+    <!-- Outer nodes -->
+    <circle cx="140" cy="180" r="4" style="fill:rgba(100,80,25,0.45);stroke:rgba(100,80,25,0.72);stroke-width:1"/>
+    <circle cx="920" cy="160" r="5" style="fill:rgba(100,80,25,0.50);stroke:rgba(100,80,25,0.81);stroke-width:1"/>
+    <circle cx="120" cy="650" r="4" style="fill:rgba(100,80,25,0.36);stroke:rgba(100,80,25,0.63);stroke-width:1"/>
+    <line x1="140" y1="180" x2="310" y2="280" style="stroke:rgba(100,80,25,0.27);stroke-width:1"/>
+    <line x1="920" y1="160" x2="780" y2="320" style="stroke:rgba(100,80,25,0.27);stroke-width:1"/>
+  </svg>
+  <div style="position:absolute;top:38%;left:50%;transform:translate(-50%,-50%);width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(100,85,40,.04),transparent 70%);z-index:4;pointer-events:none"></div>
+  <div class="inner">
+    <div class="brand" style="color:rgba(0,0,0,.2)">ainary · research network</div>
+    <div style="position:absolute;top:60px;right:72px;text-align:right;z-index:10">
+      <div style="font:900 120px var(--m);color:rgba(100,85,40,.06);letter-spacing:-5px;line-height:1">115+</div>
+      <div style="font:600 20px var(--m);color:rgba(0,0,0,.12);letter-spacing:3px;text-transform:uppercase;margin-top:-8px">topics tracked</div>
+    </div>
+    <div style="margin-top:auto">
+      <!-- SOLID DARK FOOTER on light -->
+      <div style="background:#111;border-radius:20px 20px 0 0;padding:40px 48px 36px;margin:0 -72px -64px -72px">
+        <div style="font:800 44px var(--f);color:#fafaf8;letter-spacing:-1px;margin-bottom:12px">The knowledge graph</div>
+        <div style="font:400 26px/1.5 var(--f);color:rgba(255,255,255,.5);margin-bottom:24px">Every node is trust-scored. Every connection traced.<br>Gaps detected automatically. Updated daily from 6 sources.</div>
+        <div style="display:flex;gap:3px">
+          <div style="flex:1;text-align:center;padding:18px 6px;background:#fafaf8;border-radius:12px 0 0 12px"><div style="font:700 40px var(--m);color:#a38a3a">55+</div><div style="font:600 22px var(--m);color:rgba(0,0,0,.4);text-transform:uppercase;letter-spacing:1.5px;margin-top:2px">Claims</div></div>
+          <div style="flex:1;text-align:center;padding:18px 6px;background:#fafaf8"><div style="font:700 40px var(--m);color:#a38a3a">115+</div><div style="font:600 22px var(--m);color:rgba(0,0,0,.4);text-transform:uppercase;letter-spacing:1.5px;margin-top:2px">Topics</div></div>
+          <div style="flex:1;text-align:center;padding:18px 6px;background:#fafaf8"><div style="font:700 40px var(--m);color:#a38a3a">30+</div><div style="font:600 22px var(--m);color:rgba(0,0,0,.4);text-transform:uppercase;letter-spacing:1.5px;margin-top:2px">Signals</div></div>
+          <div style="flex:1;text-align:center;padding:18px 6px;background:#fafaf8"><div style="font:700 40px var(--m);color:#a38a3a">7+</div><div style="font:600 22px var(--m);color:rgba(0,0,0,.4);text-transform:uppercase;letter-spacing:1.5px;margin-top:2px">Predict.</div></div>
+          <div style="flex:1;text-align:center;padding:18px 6px;background:#fafaf8;border-radius:0 12px 12px 0"><div style="font:700 40px var(--m);color:#a38a3a">27+</div><div style="font:600 22px var(--m);color:rgba(0,0,0,.4);text-transform:uppercase;letter-spacing:1.5px;margin-top:2px">Gaps</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pg" style="color:rgba(0,0,0,.1)"><span class="c" style="color:#a38a3a;opacity:.5">2</span> / 5</div>
+</div>
+
+<!-- LIGHT SLIDE 3: OUTPUT SAMPLE -->
+<div class="slide" id="light-3" style="background:#fafaf8">
+  <div class="prog"><div class="bar" style="width:40%"></div></div>
+  <style>
+    #light-3::before{background-image:radial-gradient(rgba(0,0,0,.03) 1px, transparent 1px) !important}
+    #light-3::after{background:radial-gradient(ellipse at center,transparent 50%,rgba(250,250,248,.25) 100%) !important}
+    #light-3 .hero-type{color:#1a1a1a}
+    #light-3 .hero-type .gold{color:#a38a3a}
+  </style>
+  <div class="inner">
+    <div class="brand" style="color:rgba(0,0,0,.2)">ainary · research network</div>
+    <div style="margin-top:36px">
+      <div class="hero-type" style="font-size:56px;letter-spacing:-2px">What you<br>get<span class="gold">.</span></div>
+    </div>
+    <div style="margin-top:48px;background:rgba(0,0,0,.02);border:1px solid rgba(0,0,0,.06);border-radius:16px;padding:36px 40px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div style="font:700 16px var(--m);color:rgba(0,0,0,.15);letter-spacing:3px;text-transform:uppercase">Sample Prediction</div>
+        <div style="font:600 14px var(--m);color:#a38a3a;letter-spacing:1px;background:rgba(163,138,58,.08);padding:6px 14px;border-radius:6px">72% CONFIDENCE</div>
+      </div>
+      <div style="font:700 32px/1.3 var(--f);color:rgba(0,0,0,.7);margin-bottom:16px">Agent frameworks will consolidate around 2-3 winners by Q3 2026</div>
+      <div style="font:400 24px/1.5 var(--f);color:rgba(0,0,0,.3);margin-bottom:24px">Based on 12 signals across 4 sources. Trust-scored via Admiralty Code. Matches your tracked topics.</div>
+      <div style="display:flex;gap:12px">
+        <div style="font:600 20px var(--m);color:#a38a3a;background:rgba(163,138,58,.06);border:1px solid rgba(163,138,58,.12);padding:10px 20px;border-radius:8px">Deep Research</div>
+        <div style="font:600 20px var(--m);color:rgba(0,0,0,.3);background:rgba(0,0,0,.02);border:1px solid rgba(0,0,0,.06);padding:10px 20px;border-radius:8px">Review Claims</div>
+        <div style="font:600 20px var(--m);color:rgba(0,0,0,.3);background:rgba(0,0,0,.02);border:1px solid rgba(0,0,0,.06);padding:10px 20px;border-radius:8px">Monitor</div>
+      </div>
+    </div>
+    <div style="margin-top:16px;background:rgba(0,0,0,.02);border:1px solid rgba(0,0,0,.06);border-radius:16px;padding:28px 40px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="font:700 16px var(--m);color:rgba(0,0,0,.15);letter-spacing:3px;text-transform:uppercase">Gap Detected</div>
+        <div style="font:600 14px var(--m);color:#ef4444;letter-spacing:1px;background:rgba(239,68,68,.06);padding:6px 14px;border-radius:6px">RESEARCH NEEDED</div>
+      </div>
+      <div style="font:700 28px/1.3 var(--f);color:rgba(0,0,0,.65)">No trusted data on MCP adoption rates in production</div>
+      <div style="font:400 22px/1.5 var(--f);color:rgba(0,0,0,.25);margin-top:8px">3 claims found, all source reliability B3 or lower. Insufficient for prediction.</div>
+    </div>
+    <div style="margin-top:auto;font:400 24px var(--f);color:rgba(0,0,0,.15);text-align:center">Every output is actionable. Every confidence is earned.</div>
+  </div>
+  <div class="pg" style="color:rgba(0,0,0,.1)"><span class="c" style="color:#a38a3a;opacity:.5">3</span> / 5</div>
+</div>
+
+<!-- LIGHT SLIDE 4: PROCESS -->
+<div class="slide" id="light-4" style="background:#fafaf8">
+  <div class="prog"><div class="bar" style="width:60%"></div></div>
+  <style>
+    #light-4::before{background-image:radial-gradient(rgba(0,0,0,.03) 1px, transparent 1px) !important}
+    #light-4::after{background:radial-gradient(ellipse at center,transparent 50%,rgba(250,250,248,.25) 100%) !important}
+    #light-4 .hero-type{color:#1a1a1a}
+    #light-4 .hero-type .dim{color:rgba(0,0,0,.08)}
+    #light-4 .hero-type .gold{color:#a38a3a}
+  </style>
+  <div class="inner">
+    <div class="brand" style="color:rgba(0,0,0,.2)">ainary · research network</div>
+    <div style="margin-top:36px">
+      <div class="hero-type" style="font-size:56px;letter-spacing:-2px">Three steps<span class="gold">.</span><br><span class="dim">Daily.</span></div>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:24px;margin-top:20px">
+      <div style="background:rgba(0,0,0,.02);border:1px solid rgba(0,0,0,.06);border-radius:16px;padding:32px 40px;display:flex;gap:32px;align-items:flex-start">
+        <div style="font:800 48px var(--m);color:#a38a3a;opacity:.3;line-height:1;flex-shrink:0;width:60px">01</div>
+        <div>
+          <div style="font:700 28px var(--f);color:rgba(0,0,0,.65)">Signal Ingest</div>
+          <div style="font:400 24px/1.5 var(--f);color:rgba(0,0,0,.3);margin-top:6px">6 sources scanned. Claims extracted, trust-scored, linked to your topics.</div>
+        </div>
+      </div>
+      <div style="background:rgba(0,0,0,.02);border:1px solid rgba(0,0,0,.06);border-radius:16px;padding:32px 40px;display:flex;gap:32px;align-items:flex-start">
+        <div style="font:800 48px var(--m);color:#a38a3a;opacity:.3;line-height:1;flex-shrink:0;width:60px">02</div>
+        <div>
+          <div style="font:700 28px var(--f);color:rgba(0,0,0,.65)">Trust Calibration</div>
+          <div style="font:400 24px/1.5 var(--f);color:rgba(0,0,0,.3);margin-top:6px">Weak evidence, lower score. Contradictions flagged. Gaps detected across your research domains.</div>
+        </div>
+      </div>
+      <div style="background:rgba(0,0,0,.02);border:1px solid rgba(0,0,0,.06);border-radius:16px;padding:32px 40px;display:flex;gap:32px;align-items:flex-start">
+        <div style="font:800 48px var(--m);color:#a38a3a;opacity:.3;line-height:1;flex-shrink:0;width:60px">03</div>
+        <div>
+          <div style="font:700 28px var(--f);color:rgba(0,0,0,.65)">Your Briefing</div>
+          <div style="font:400 24px/1.5 var(--f);color:rgba(0,0,0,.3);margin-top:6px">Predictions, gaps, recommended actions. Customized by role. One page, no noise.</div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:auto;font:400 24px var(--f);color:rgba(0,0,0,.12);text-align:center">Built for decisions, not dashboards.</div>
+  </div>
+  <div class="pg" style="color:rgba(0,0,0,.1)"><span class="c" style="color:#a38a3a;opacity:.5">4</span> / 5</div>
+</div>
+
+<!-- LIGHT SLIDE 5: CTA -->
+<div class="slide" id="light-5" style="background:#fafaf8">
+  <div class="prog"><div class="bar" style="width:100%"></div></div>
+  <style>
+    #light-5::before{background-image:radial-gradient(rgba(0,0,0,.03) 1px, transparent 1px) !important}
+    #light-5::after{background:radial-gradient(ellipse at center,transparent 50%,rgba(250,250,248,.25) 100%) !important}
+    #light-5 .hero-type{color:#1a1a1a}
+    #light-5 .hero-type .gold{color:#a38a3a}
+  </style>
+  <div class="inner">
+    <div class="brand" style="color:rgba(0,0,0,.2)">ainary · research network</div>
+    
+    <div style="margin-top:36px">
+      <div class="hero-type" style="font-size:64px;letter-spacing:-2px"><span class="gold">5 spots.</span><br>Free access<span class="gold">.</span></div>
+    </div>
+
+    <div style="margin-top:48px">
+      <div style="font:600 16px var(--m);color:rgba(0,0,0,.15);letter-spacing:3px;text-transform:uppercase;margin-bottom:20px">Roles</div>
+      
+      <div style="display:flex;flex-direction:column;gap:0">
+        <div style="display:flex;align-items:center;gap:16px;padding:18px 0;border-top:1px solid rgba(0,0,0,.06)">
+          <div style="width:8px;height:8px;background:#a38a3a;flex-shrink:0"></div>
+          <div style="font:600 26px var(--f);color:rgba(0,0,0,.6);width:220px">Founder</div>
+          <div style="font:400 24px var(--f);color:rgba(0,0,0,.3)">Validating product-market signal</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;padding:18px 0;border-top:1px solid rgba(0,0,0,.06)">
+          <div style="width:8px;height:8px;background:#3b82f6;flex-shrink:0"></div>
+          <div style="font:600 26px var(--f);color:rgba(0,0,0,.6);width:220px">Developer</div>
+          <div style="font:400 24px var(--f);color:rgba(0,0,0,.3)">Evaluating agent frameworks</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;padding:18px 0;border-top:1px solid rgba(0,0,0,.06)">
+          <div style="width:8px;height:8px;background:#22c55e;flex-shrink:0"></div>
+          <div style="font:600 26px var(--f);color:rgba(0,0,0,.6);width:220px">VC / Angel</div>
+          <div style="font:400 24px var(--f);color:rgba(0,0,0,.3)">Tracking infrastructure bets</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;padding:18px 0;border-top:1px solid rgba(0,0,0,.06);border-bottom:1px solid rgba(0,0,0,.06)">
+          <div style="width:8px;height:8px;background:#a855f7;flex-shrink:0"></div>
+          <div style="font:600 26px var(--f);color:rgba(0,0,0,.6);width:220px">Operator</div>
+          <div style="font:400 24px var(--f);color:rgba(0,0,0,.3)">Deploying AI into GTM/ops</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Solid dark footer — 3 boxes only -->
+    <div style="margin-top:auto">
+      <div style="background:#111;border-radius:20px 20px 0 0;padding:36px 48px 32px;margin:0 -72px -64px -72px">
+        <div style="display:flex;gap:3px;margin-bottom:20px">
+          <div style="flex:1;text-align:center;padding:16px 6px;background:#fafaf8;border-radius:12px 0 0 12px"><div style="font:700 32px var(--m);color:#a38a3a">Free</div><div style="font:600 18px var(--m);color:rgba(0,0,0,.4);text-transform:uppercase;letter-spacing:1.5px;margin-top:2px">Access</div></div>
+          <div style="flex:1;text-align:center;padding:16px 6px;background:#fafaf8"><div style="font:700 32px var(--m);color:#a38a3a">5</div><div style="font:600 18px var(--m);color:rgba(0,0,0,.4);text-transform:uppercase;letter-spacing:1.5px;margin-top:2px">Spots</div></div>
+          <div style="flex:1;text-align:center;padding:16px 6px;background:#fafaf8;border-radius:0 12px 12px 0"><div style="font:700 32px var(--m);color:#a38a3a">Mar 14</div><div style="font:600 18px var(--m);color:rgba(0,0,0,.4);text-transform:uppercase;letter-spacing:1.5px;margin-top:2px">Deadline</div></div>
+        </div>
+        <div style="font:700 28px var(--f);color:#a38a3a">Comment your role and what you'd track first.</div>
+      </div>
+    </div>
+  </div>
+  <div class="pg" style="color:rgba(255,255,255,.15)"><span class="c" style="color:#a38a3a;opacity:.5">5</span> / 5</div>
+</div>
+
+</body>
+</html>

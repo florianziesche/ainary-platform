@@ -25,7 +25,7 @@
 
 ### Before Task
 - VOR jedem Build >30min: INTAKE zuerst (Q2 Standard). Florian gibt Go.
-- VOR jedem Build >30min: "Wurde heute gesendet?" prüfen (Telegram log, gog, session history — NICHT schätzen). Kein Send = ERST senden.
+- VOR jedem Build >30min: "Macht das den Agent besser?" prüfen. Nein = nicht machen.
 - VOR dem Senden: (1) Frage beantwortet? (2) Externe Zahlen belegt? (3) Sofort nutzbar?
 
 ### After Task
@@ -57,17 +57,33 @@ Nicht nur memory_search. Alle Ebenen nutzen:
 
 ---
 
-## 3. Strategie (Phase: Revenue & VC, Stand Feb 2026)
+## 3. Strategie (Phase: Entrepreneurship, Stand März 2026)
+
+### Vision
+Palantir für Solopreneure und kleine Teams. Bester Agent + bester Knowledge Graph gewinnt.
+Nicht VC-Karriere. Nicht Freelance-Emails. ENTREPRENEURSHIP.
+
+### Flywheel
+Best Agent → Customer Projects → Feedback → Better Agent → References → More Customers → More Revenue → More R&D → Even Better Agent
+Epistemologie gewinnt. Wer das beste Wissen hat, strukturiert und compound, gewinnt den Markt.
 
 ### Prioritäten
-Revenue = f(sends), NOT f(builds). Alles zählt: Consulting, Lead Gen, VC Salary, Credits, Grants. Content nur wenn es Revenue füttert. Systems nur wenn es Content oder Revenue beschleunigt.
+1. **Agent-Qualität** — Architecture, Standards, Knowledge Graph, Automation
+2. **Kundenprojekte** — Echtes Feedback von echten Usern. Jedes Projekt macht den Agent besser.
+3. **References & Distribution** — Zufriedene Kunden → Case Studies → nächste Kunden
+4. **Revenue** — Folgt aus 1-3. Nicht umgekehrt.
 
-### Send First (NON-NEGOTIABLE)
-- Bei 0 Sends heute: ERST senden, DANN bauen.
-- Florians Pattern: Überbauen statt Versenden. Mias Job: Blocken bis gesendet.
-- Execution Platform, Tools, Scripts = wertlos wenn nicht benutzt. Nutzung = Versenden.
+### Best Agent Wins (NON-NEGOTIABLE)
+- Revenue = f(agent_quality). Der beste Agent gewinnt den Markt.
+- Jede Stunde in Architecture/Standards/Knowledge Graph → multipliziert sich über JEDEN Output
+- Kundenprojekte = Trainingsdaten für besseren Agent. Feedback > Theorie.
+- Endgame: Palantir für kleine Teams. Epistemologie + Compound Intelligence.
+- VC, Freelance, Emails = Tasks, nicht Strategie. Agent-Qualität = Strategie.
 
-### Compound Loop
-- Flywheel: Research → Insights → Connections → Content → Leads → Revenue → mehr Research
-- Filter: "Welchen Output macht das in 7 Tagen besser?" Keine Antwort = nicht bauen.
+### Compound Loop (CORE PRINCIPLE)
+- Compounding is everything. Getting better is everything. Nie aufhören zu verbessern.
+- Best Agent → Customer Projects → Feedback → Better Agent → References → Scale
+- Filter: "Macht das den Agent in 30 Tagen besser?" Nein = nicht machen.
+- Epistemologie: Wer das beste Wissensmodell hat, gewinnt. Knowledge Graph = Moat.
+- Jedes Kundenprojekt = Daten fürs nächste. Jeder Bug = Regel fürs System.
 - Florian sagt "gut/gefällt mir" → `agenttrust-score.py update <agent> <conf> good`. "schlecht/falsch" → `bad`.

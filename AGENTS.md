@@ -1,18 +1,21 @@
 # AGENTS.md — Workspace Rules
 
+## Orchestrator Pattern (EVERY sub-agent spawn)
+When spawning a sub-agent: (1) model=haiku|sonnet, NEVER opus (2) paste context INTO task, don't say "read file X" (3) make verification a TASK STEP, not a suggestion (4) after completion → auto-spawn haiku knowledge-worker on the output
+
 ## Task → Standards Trigger Map (LOAD FIRST, NOT OPTIONAL)
 
 | Task contains... | Load ONLY these | Do NOT load |
 |------------------|----------------|-------------|
-| Website, CSS, HTML, Deploy | `standards/COLOR-SYSTEM.md` + `standards/BRAND.md` + `projects/platform-website/DATA-SCHEMA.md` | RESEARCH-PROTOCOL, CONTENT-VOICE |
+| Website, CSS, HTML, Deploy | `standards/DESIGN-EXPRESSIONS.md` + `standards/COLOR-SYSTEM.md` + `standards/BRAND.md` + `projects/platform-website/DATA-SCHEMA.md` | RESEARCH-PROTOCOL, CONTENT-VOICE |
 | Blog, Artikel, Article, HTML Article | `standards/COLOR-SYSTEM.md` → `node test_article.js` VOR und NACH jeder Änderung. Kein Deploy ohne 75/75 PASS. | RESEARCH-PROTOCOL |
 | Dossier, Dashboard, dossier.html, Platform | `projects/platform-website/DEV-STANDARD.md` → `projects/platform-website/PRODUCT-SPEC.md` (§-Nr identifizieren) → `node test_dossier.js` VOR und NACH jeder Änderung | Alles andere |
 | X, Twitter, Post, Tweet | `memory/knowledge/x-algorithm-rules.md` (1-2/day, story, no links, morning approval) | BRAND, RESEARCH-PROTOCOL |
 | Research, Analyse, Report | `standards/RESEARCH-PROTOCOL.md` | BRAND, WEBSITE-DESIGN-GUIDE |
 | Content, Post, Artikel, LinkedIn | `standards/CONTENT-VOICE.md` | RESEARCH-PROTOCOL, BRAND |
+| Carousel, Slide, LinkedIn Visual, Social Media Design | `standards/SOCIAL-MEDIA-DESIGN.md` + `standards/BRAND.md` + `standards/COLOR-SYSTEM.md` | RESEARCH-PROTOCOL |
 | Dokument, PDF, LaTeX, Report | `skills/report-design/SKILL.md` | WEBSITE-DESIGN-GUIDE |
-| Outreach, Email, Send | `outreach/TEMPLATES.md` + `outreach/PLAN.md` | BRAND, WEBSITE-DESIGN-GUIDE |
-| Email, Outreach, Pitch, Message | `standards/FLORIAN.md` | BRAND, RESEARCH-PROTOCOL |
+| Email, Message, Pitch | `standards/CONTENT-VOICE.md` + `standards/FLORIAN.md` | BRAND, RESEARCH-PROTOCOL |
 | Bewerbung, VC Application | `skills/vc-application/SKILL.md` | CONTENT-VOICE |
 | Entscheidung, Strategie, Trade-off | `TWIN.md` (full) | all standards |
 | Sub-Agent spawnen | `SUB-AGENT-CONTEXT.md` | — |
@@ -20,12 +23,13 @@
 | City JSON, neues Dossier, Deep Research Output | `standards/Q3-VERIFICATION-PIPELINE.md` + `projects/platform-website/DEV-STANDARD.md` | BRAND |
 | Quality, Parity, Compounding, Benchmark | `standards/Q4-COMPOUNDING-QUALITY.md` | CONTENT-VOICE |
 | Presentation, Slides | `skills/presentation-design/SKILL.md` | RESEARCH-PROTOCOL |
+| Reflektiere, 3 Fragen, Prüf das | `standards/REFLECTION-PROTOCOL.md` | all standards |
 | Heartbeat | `ref/HEARTBEAT.md` | all standards |
 
 ## Task Loop (5 Schritte, mandatory)
 1. **AKTIVIEREN:** `memory_search` + relevanten Kontext laden — was wissen wir schon?
 2. **AUSFÜHREN:** Die Arbeit machen
-3. **PRÜFEN:** Beantwortet? Belegt? Nutzbar? → Nein = Retry
+3. **PRÜFEN:** Beantwortet? Belegt? Nutzbar? → Nein = Retry (max 2×, dann flag für Florian)
 4. **SPEICHERN:** Memory-R1 Check → wenn ja: memory/daily/YYYY-MM-DD.md
 5. **LIEFERN**
 
@@ -166,10 +170,9 @@ Violation = Trust sinkt. "Ich bin sicher es geht" ist KEIN Beweis.
 ## Active Agents
 | Agent | Role | Trigger |
 |-------|------|---------|
-| 🎯 HUNTER | VC Job Search | Applications, interviews |
-| ✍️ WRITER | Content & Blog | Posts, articles |
-| 🔬 RESEARCHER | Deep Dives | Research, analysis |
-| 🧮 OPERATOR | Systems | Automation, process |
-| 💼 DEALMAKER | Freelance & Sales | Proposals, outreach |
+| 🔬 RESEARCHER | Deep Dives & Knowledge Graph | Research, analysis, verified-truths |
+| 🏗️ ARCHITECT | Agent Architecture & Standards | Systems, automation, quality |
+| ✍️ WRITER | Content = Agent Showcase | Posts, articles, build-in-public |
+| 🧮 OPERATOR | Customer Projects & Delivery | Implementation, feedback loops |
 
 *One per task. Hands back to main. Can request input.*

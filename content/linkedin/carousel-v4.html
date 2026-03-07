@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--f:'Inter',sans-serif;--m:'JetBrains Mono',monospace;--gold:#c8aa50;--gold-glow:rgba(200,170,80,.35)}
+body{font-family:var(--f);background:#000;display:flex;flex-direction:column;align-items:center;gap:60px;padding:40px 20px}
+.label{font:800 14px var(--f);color:#555;text-transform:uppercase;letter-spacing:3px;margin-bottom:-40px}
+
+.slide{width:1080px;height:1080px;position:relative;overflow:hidden;flex-shrink:0;background:#06060a}
+
+/* ====== GLOBAL LAYERS ====== */
+/* Dot grid - subtle */
+.slide::before{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,0.018) 1px, transparent 1px);background-size:28px 28px;z-index:1;pointer-events:none}
+/* Vignette */
+.slide::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 40%,rgba(6,6,10,.6) 100%);z-index:2;pointer-events:none}
+
+.inner{position:relative;z-index:10;padding:64px 72px;height:100%;display:flex;flex-direction:column}
+
+/* Brand watermark */
+.brand{font:500 12px var(--m);color:rgba(255,255,255,.15);letter-spacing:3px;text-transform:uppercase}
+
+/* Page num */
+.pg{position:absolute;bottom:32px;right:48px;font:600 13px var(--m);color:rgba(255,255,255,.12);z-index:10}
+.pg .c{color:var(--gold);opacity:.6}
+
+/* Progress */
+.prog{position:absolute;top:0;left:0;right:0;height:2px;z-index:20}
+.prog .bar{height:100%;background:linear-gradient(90deg,var(--gold),rgba(200,170,80,.3))}
+
+/* ====== NETWORK SVG LAYER ====== */
+.net{position:absolute;inset:0;z-index:3}
+.net line{stroke:rgba(200,170,80,.06);stroke-width:1}
+.net circle{fill:rgba(200,170,80,.08);stroke:rgba(200,170,80,.15);stroke-width:1}
+.net .glow{fill:none;stroke:rgba(200,170,80,.04);stroke-width:20}
+.net text{font:500 8px var(--m);fill:rgba(255,255,255,.06);text-anchor:middle}
+
+/* ====== PIPELINE (Slide 1) ====== */
+.pipe-node{position:absolute;z-index:5}
+.pipe-dot{width:14px;height:14px;border-radius:50%;background:var(--gold);box-shadow:0 0 20px var(--gold-glow),0 0 60px rgba(200,170,80,.15)}
+.pipe-ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:50%;border:1px solid rgba(200,170,80,.2)}
+.pipe-line{position:absolute;z-index:4}
+.pipe-label{font:800 11px var(--m);color:rgba(200,170,80,.6);letter-spacing:2px;text-transform:uppercase;margin-top:12px}
+.pipe-desc{font:400 13px var(--f);color:rgba(255,255,255,.35);margin-top:4px;max-width:200px;line-height:1.4}
+
+/* Giant type */
+.hero-type{font:900 72px/0.95 var(--f);letter-spacing:-3px;color:#ededf0}
+.hero-type .dim{color:rgba(255,255,255,.12)}
+.hero-type .gold{color:var(--gold)}
+.hero-sub{font:400 19px/1.6 var(--f);color:rgba(255,255,255,.4);max-width:480px}
+
+/* Glass panel */
+.glass{background:rgba(255,255,255,.03);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:28px 32px}
+
+/* Stats */
+.stat-strip{display:flex;gap:2px}
+.stat-item{flex:1;text-align:center;padding:16px 8px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04)}
+.stat-item:first-child{border-radius:12px 0 0 12px}
+.stat-item:last-child{border-radius:0 12px 12px 0}
+.stat-item .n{font:700 28px var(--m);color:var(--gold)}
+.stat-item .l{font:500 9px var(--m);color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:1.5px;margin-top:2px}
+
+/* Role constellation (Slide 3) */
+.constellation{position:absolute;inset:0;z-index:3}
+.role-node{position:absolute;z-index:6}
+.role-icon-bg{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.role-label{font:700 13px var(--f);color:rgba(255,255,255,.7);margin-top:8px;text-align:center}
+.role-sublabel{font:400 10px var(--f);color:rgba(255,255,255,.25);text-align:center;margin-top:2px}
+.center-node{position:absolute;z-index:7;text-align:center}
+.center-glow{width:100px;height:100px;border-radius:50%;background:radial-gradient(circle,rgba(200,170,80,.2),transparent 70%);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
+
+/* CTA area */
+.cta-panel{position:relative;z-index:10}
+</style>
+</head>
+<body>
+
+<div class="label">Version A — Dark</div>
+
+<!-- ====== SLIDE 1: PIPELINE ====== -->
+<div class="slide" id="dark-1">
+  <div class="prog"><div class="bar" style="width:33%"></div></div>
+  
+  <!-- Network background -->
+  <svg class="net" width="1080" height="1080" viewBox="0 0 1080 1080">
+    <!-- Ambient network lines -->
+    <line x1="120" y1="180" x2="380" y2="320"/>
+    <line x1="380" y1="320" x2="650" y2="250"/>
+    <line x1="650" y1="250" x2="900" y2="380"/>
+    <line x1="200" y1="500" x2="500" y2="450"/>
+    <line x1="500" y1="450" x2="780" y2="520"/>
+    <line x1="150" y1="700" x2="420" y2="650"/>
+    <line x1="420" y1="650" x2="700" y2="720"/>
+    <line x1="700" y1="720" x2="950" y2="680"/>
+    <line x1="300" y1="850" x2="600" y2="800"/>
+    <line x1="600" y1="800" x2="880" y2="870"/>
+    <line x1="80" y1="400" x2="250" y2="600"/>
+    <line x1="900" y1="200" x2="980" y2="450"/>
+    <line x1="500" y1="150" x2="450" y2="400"/>
+    <line x1="750" y1="400" x2="820" y2="650"/>
+    <line x1="350" y1="550" x2="550" y2="750"/>
+    <!-- Ambient nodes -->
+    <circle cx="120" cy="180" r="3"/><circle cx="380" cy="320" r="4"/>
+    <circle cx="650" cy="250" r="3"/><circle cx="900" cy="380" r="5"/>
+    <circle cx="200" cy="500" r="3"/><circle cx="500" cy="450" r="4"/>
+    <circle cx="780" cy="520" r="3"/><circle cx="150" cy="700" r="4"/>
+    <circle cx="420" cy="650" r="5"/><circle cx="700" cy="720" r="3"/>
+    <circle cx="950" cy="680" r="4"/><circle cx="300" cy="850" r="3"/>
+    <circle cx="600" cy="800" r="5"/><circle cx="880" cy="870" r="3"/>
+    <circle cx="80" cy="400" r="3"/><circle cx="980" cy="450" r="4"/>
+    <circle cx="550" cy="750" r="3"/><circle cx="820" cy="650" r="4"/>
+    <!-- Labels (ghosted) -->
+    <text x="380" y="310">agent-architecture</text>
+    <text x="700" y="710">ontology</text>
+    <text x="500" y="440">multi-agent</text>
+    <text x="900" y="370">gtm-strategy</text>
+    <text x="600" y="790">memory</text>
+  </svg>
+
+  <!-- Pipeline connections (SVG) -->
+  <svg style="position:absolute;inset:0;z-index:4" width="1080" height="1080" viewBox="0 0 1080 1080">
+    <!-- Step connections with gradient -->
+    <defs>
+      <linearGradient id="pline" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="rgba(200,170,80,0.4)"/>
+        <stop offset="100%" stop-color="rgba(200,170,80,0.05)"/>
+      </linearGradient>
+    </defs>
+    <!-- Vertical flow: step dots at specific positions -->
+    <line x1="108" y1="380" x2="108" y2="500" stroke="url(#pline)" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <line x1="108" y1="560" x2="108" y2="670" stroke="url(#pline)" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <line x1="108" y1="730" x2="108" y2="840" stroke="url(#pline)" stroke-width="1.5" stroke-dasharray="4 4"/>
+  </svg>
+
+  <div class="inner">
+    <div class="brand">ainary · research network</div>
+    
+    <div style="margin-top:40px">
+      <div class="hero-type">How it<br><span class="dim">actually</span><br>works<span class="gold">.</span></div>
+    </div>
+
+    <!-- Pipeline steps - left aligned, large spacing -->
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding-left:48px;gap:52px;margin-top:20px">
+      
+      <div style="display:flex;align-items:flex-start;gap:28px">
+        <div style="position:relative">
+          <div class="pipe-dot"></div>
+          <div class="pipe-ring" style="width:32px;height:32px"></div>
+          <div class="pipe-ring" style="width:48px;height:48px;opacity:.5"></div>
+        </div>
+        <div style="padding-top:0">
+          <div style="font:800 13px var(--m);color:var(--gold);letter-spacing:2px;text-transform:uppercase;opacity:.7">01 · Ingest</div>
+          <div style="font:500 17px var(--f);color:rgba(255,255,255,.55);margin-top:4px">6 feeds scanned daily — TechCrunch, Stratechery,<br>Simon Willison, Palantir, OpenAI, Anthropic</div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:flex-start;gap:28px">
+        <div style="position:relative">
+          <div class="pipe-dot"></div>
+          <div class="pipe-ring" style="width:32px;height:32px"></div>
+        </div>
+        <div>
+          <div style="font:800 13px var(--m);color:var(--gold);letter-spacing:2px;text-transform:uppercase;opacity:.7">02 · Extract & Score</div>
+          <div style="font:500 17px var(--f);color:rgba(255,255,255,.55);margin-top:4px">Claims extracted, trust-scored via Admiralty Code,<br>linked to 115 topics across 10 research domains</div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:flex-start;gap:28px">
+        <div style="position:relative">
+          <div class="pipe-dot"></div>
+          <div class="pipe-ring" style="width:32px;height:32px"></div>
+        </div>
+        <div>
+          <div style="font:800 13px var(--m);color:var(--gold);letter-spacing:2px;text-transform:uppercase;opacity:.7">03 · Calibrate</div>
+          <div style="font:500 17px var(--f);color:rgba(255,255,255,.55);margin-top:4px">Confidence adjusted by evidence quality —<br>weak match → lower score. Volume ≠ intelligence.</div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:flex-start;gap:28px">
+        <div style="position:relative">
+          <div class="pipe-dot"></div>
+          <div class="pipe-ring" style="width:32px;height:32px"></div>
+          <div class="pipe-ring" style="width:48px;height:48px;opacity:.5"></div>
+        </div>
+        <div>
+          <div style="font:800 13px var(--m);color:var(--gold);letter-spacing:2px;text-transform:uppercase;opacity:.7">04 · Brief</div>
+          <div style="font:500 17px var(--f);color:rgba(255,255,255,.55);margin-top:4px">Role-specific intelligence briefings,<br>predictions, gap detection. Updated daily.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pg"><span class="c">1</span> / 3</div>
+</div>
+
+<!-- ====== SLIDE 2: KNOWLEDGE GRAPH ====== -->
+<div class="slide" id="dark-2">
+  <div class="prog"><div class="bar" style="width:66%"></div></div>
+  
+  <!-- Full-bleed network graph -->
+  <svg class="net" width="1080" height="1080" viewBox="0 0 1080 1080">
+    <!-- Dense network - real topic names -->
+    <!-- Central cluster -->
+    <circle class="glow" cx="540" cy="480" r="60"/>
+    <circle cx="540" cy="480" r="12" style="fill:rgba(200,170,80,.25);stroke:rgba(200,170,80,.4);stroke-width:2"/>
+    <text x="540" y="510" style="font-size:10px;fill:rgba(255,255,255,.12)">agent-architecture</text>
+    
+    <!-- Connected nodes -->
+    <line x1="540" y1="480" x2="340" y2="350" style="stroke:rgba(200,170,80,.12)"/>
+    <line x1="540" y1="480" x2="750" y2="380" style="stroke:rgba(200,170,80,.1)"/>
+    <line x1="540" y1="480" x2="400" y2="620" style="stroke:rgba(200,170,80,.1)"/>
+    <line x1="540" y1="480" x2="720" y2="600" style="stroke:rgba(200,170,80,.12)"/>
+    <line x1="540" y1="480" x2="350" y2="520" style="stroke:rgba(200,170,80,.08)"/>
+    <line x1="540" y1="480" x2="680" y2="300" style="stroke:rgba(200,170,80,.08)"/>
+    <line x1="540" y1="480" x2="450" y2="250" style="stroke:rgba(200,170,80,.06)"/>
+    
+    <!-- Secondary nodes -->
+    <circle cx="340" cy="350" r="9" style="fill:rgba(200,170,80,.18);stroke:rgba(200,170,80,.3);stroke-width:1.5"/>
+    <text x="340" y="335" style="font-size:9px;fill:rgba(255,255,255,.08)">multi-agent</text>
+    <circle class="glow" cx="340" cy="350" r="40"/>
+    
+    <circle cx="750" cy="380" r="10" style="fill:rgba(200,170,80,.2);stroke:rgba(200,170,80,.35);stroke-width:1.5"/>
+    <text x="750" y="365" style="font-size:9px;fill:rgba(255,255,255,.08)">gtm-strategy</text>
+    <circle class="glow" cx="750" cy="380" r="45"/>
+    
+    <circle cx="400" cy="620" r="8" style="fill:rgba(200,170,80,.15);stroke:rgba(200,170,80,.25);stroke-width:1.5"/>
+    <text x="400" y="645" style="font-size:9px;fill:rgba(255,255,255,.08)">ontology</text>
+    
+    <circle cx="720" cy="600" r="7" style="fill:rgba(200,170,80,.12);stroke:rgba(200,170,80,.2);stroke-width:1"/>
+    <text x="720" y="625" style="font-size:9px;fill:rgba(255,255,255,.06)">fde-model</text>
+    
+    <circle cx="350" cy="520" r="6" style="fill:rgba(200,170,80,.1);stroke:rgba(200,170,80,.18);stroke-width:1"/>
+    <text x="350" y="540" style="font-size:8px;fill:rgba(255,255,255,.05)">oag-vs-rag</text>
+    
+    <circle cx="680" cy="300" r="7" style="fill:rgba(200,170,80,.12);stroke:rgba(200,170,80,.2);stroke-width:1"/>
+    <text x="680" y="285" style="font-size:8px;fill:rgba(255,255,255,.06)">agent-memory</text>
+    
+    <circle cx="450" cy="250" r="5" style="fill:rgba(200,170,80,.08);stroke:rgba(200,170,80,.15);stroke-width:1"/>
+    <text x="450" y="238" style="font-size:8px;fill:rgba(255,255,255,.04)">palantir-culture</text>
+
+    <!-- Cross-links -->
+    <line x1="340" y1="350" x2="450" y2="250" style="stroke:rgba(200,170,80,.05)"/>
+    <line x1="340" y1="350" x2="350" y2="520" style="stroke:rgba(200,170,80,.06)"/>
+    <line x1="750" y1="380" x2="720" y2="600" style="stroke:rgba(200,170,80,.05)"/>
+    <line x1="750" y1="380" x2="680" y2="300" style="stroke:rgba(200,170,80,.06)"/>
+    <line x1="400" y1="620" x2="350" y2="520" style="stroke:rgba(200,170,80,.05)"/>
+    <line x1="400" y1="620" x2="720" y2="600" style="stroke:rgba(200,170,80,.04)"/>
+    
+    <!-- Outer scattered nodes (depth) -->
+    <circle cx="150" cy="200" r="3" style="fill:rgba(200,170,80,.04)"/>
+    <circle cx="900" cy="180" r="4" style="fill:rgba(200,170,80,.05)"/>
+    <circle cx="130" cy="700" r="3" style="fill:rgba(200,170,80,.04)"/>
+    <circle cx="920" cy="750" r="3" style="fill:rgba(200,170,80,.03)"/>
+    <circle cx="200" cy="900" r="4" style="fill:rgba(200,170,80,.04)"/>
+    <circle cx="850" cy="900" r="3" style="fill:rgba(200,170,80,.03)"/>
+    <circle cx="100" cy="450" r="2" style="fill:rgba(200,170,80,.03)"/>
+    <circle cx="980" cy="550" r="3" style="fill:rgba(200,170,80,.03)"/>
+    <line x1="150" y1="200" x2="340" y2="350" style="stroke:rgba(200,170,80,.02)"/>
+    <line x1="900" y1="180" x2="750" y2="380" style="stroke:rgba(200,170,80,.02)"/>
+    <line x1="130" y1="700" x2="400" y2="620" style="stroke:rgba(200,170,80,.02)"/>
+    <line x1="920" y1="750" x2="720" y2="600" style="stroke:rgba(200,170,80,.02)"/>
+  </svg>
+
+  <!-- Central glow -->
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(200,170,80,.06),transparent 70%);z-index:4;pointer-events:none"></div>
+
+  <div class="inner">
+    <div class="brand">ainary · research network</div>
+    
+    <!-- Giant number overlay -->
+    <div style="position:absolute;top:60px;right:72px;text-align:right;z-index:10">
+      <div style="font:900 120px var(--m);color:rgba(200,170,80,.06);letter-spacing:-5px;line-height:1">115</div>
+      <div style="font:500 11px var(--m);color:rgba(255,255,255,.1);letter-spacing:3px;text-transform:uppercase;margin-top:-8px">topics tracked</div>
+    </div>
+
+    <div style="margin-top:auto">
+      <!-- Glass panel at bottom -->
+      <div class="glass" style="max-width:580px">
+        <div style="font:800 32px var(--f);color:#ededf0;letter-spacing:-1px;margin-bottom:12px">The knowledge graph</div>
+        <div style="font:400 15px/1.6 var(--f);color:rgba(255,255,255,.45);margin-bottom:20px">Every node is trust-scored. Every connection traced.<br>Gaps detected automatically. Updated daily from 6 sources.</div>
+        <div class="stat-strip">
+          <div class="stat-item"><div class="n">55</div><div class="l">Claims</div></div>
+          <div class="stat-item"><div class="n">115</div><div class="l">Topics</div></div>
+          <div class="stat-item"><div class="n">30</div><div class="l">Signals</div></div>
+          <div class="stat-item"><div class="n">7</div><div class="l">Predictions</div></div>
+          <div class="stat-item"><div class="n">27</div><div class="l">Gaps</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pg"><span class="c">2</span> / 3</div>
+</div>
+
+<!-- ====== SLIDE 3: CONSTELLATION CTA ====== -->
+<div class="slide" id="dark-3">
+  <div class="prog"><div class="bar" style="width:100%"></div></div>
+  
+  <!-- Constellation lines connecting roles to center -->
+  <svg style="position:absolute;inset:0;z-index:3" width="1080" height="1080" viewBox="0 0 1080 1080">
+    <defs>
+      <radialGradient id="cg"><stop offset="0%" stop-color="rgba(200,170,80,.15)"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+    </defs>
+    <!-- Center glow -->
+    <circle cx="540" cy="440" r="120" fill="url(#cg)"/>
+    <!-- Lines to role positions -->
+    <line x1="540" y1="440" x2="180" y2="280" stroke="rgba(200,170,80,.08)" stroke-width="1" stroke-dasharray="3 6"/>
+    <line x1="540" y1="440" x2="900" y2="280" stroke="rgba(59,130,246,.06)" stroke-width="1" stroke-dasharray="3 6"/>
+    <line x1="540" y1="440" x2="140" y2="560" stroke="rgba(34,197,94,.06)" stroke-width="1" stroke-dasharray="3 6"/>
+    <line x1="540" y1="440" x2="940" y2="560" stroke="rgba(168,85,247,.06)" stroke-width="1" stroke-dasharray="3 6"/>
+    <line x1="540" y1="440" x2="540" y2="720" stroke="rgba(236,72,153,.06)" stroke-width="1" stroke-dasharray="3 6"/>
+    <!-- Cross connections -->
+    <line x1="180" y1="280" x2="900" y2="280" stroke="rgba(255,255,255,.01)" stroke-width="0.5"/>
+    <line x1="140" y1="560" x2="940" y2="560" stroke="rgba(255,255,255,.01)" stroke-width="0.5"/>
+  </svg>
+
+  <!-- Role nodes positioned as constellation -->
+  <!-- Founder - top left -->
+  <div class="role-node" style="left:132px;top:228px">
+    <div class="role-icon-bg" style="background:rgba(200,170,80,.08)">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="#c8aa50" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="role-label">Founder</div>
+    <div class="role-sublabel">AI or adjacent</div>
+  </div>
+  
+  <!-- Developer - top right -->
+  <div class="role-node" style="right:132px;top:228px">
+    <div class="role-icon-bg" style="background:rgba(59,130,246,.08)">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><polyline points="16 18 22 12 16 6" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="8 6 2 12 8 18" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="role-label">Developer</div>
+    <div class="role-sublabel">LLMs & agents</div>
+  </div>
+
+  <!-- VC - mid left -->
+  <div class="role-node" style="left:92px;top:508px">
+    <div class="role-icon-bg" style="background:rgba(34,197,94,.08)">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><line x1="12" y1="1" x2="12" y2="23" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="role-label">VC / Angel</div>
+    <div class="role-sublabel">AI landscape</div>
+  </div>
+
+  <!-- SME - mid right -->
+  <div class="role-node" style="right:92px;top:508px">
+    <div class="role-icon-bg" style="background:rgba(168,85,247,.08)">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1" stroke="#a855f7" stroke-width="1.5"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="#a855f7" stroke-width="1.5"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="#a855f7" stroke-width="1.5"/><rect x="14" y="14" width="7" height="7" rx="1" stroke="#a855f7" stroke-width="1.5"/></svg>
+    </div>
+    <div class="role-label">SME Leader</div>
+    <div class="role-sublabel">AI for business</div>
+  </div>
+
+  <!-- Wildcard - bottom center -->
+  <div class="role-node" style="left:50%;transform:translateX(-50%);top:670px">
+    <div class="role-icon-bg" style="background:rgba(236,72,153,.08)">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#ec4899" stroke-width="1.5"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" stroke="#ec4899" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="17" r="0.5" fill="#ec4899" stroke="#ec4899"/></svg>
+    </div>
+    <div class="role-label">Wildcard</div>
+    <div class="role-sublabel">Surprise me</div>
+  </div>
+
+  <!-- Center node -->
+  <div class="center-node" style="left:50%;top:400px;transform:translate(-50%,-50%)">
+    <div style="width:80px;height:80px;border-radius:50%;background:rgba(200,170,80,.1);border:2px solid rgba(200,170,80,.25);display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 0 40px rgba(200,170,80,.1)">
+      <div style="font:700 11px var(--m);color:var(--gold);letter-spacing:1px">ACCESS</div>
+    </div>
+    <div style="font:600 10px var(--m);color:rgba(255,255,255,.15);margin-top:8px;letter-spacing:2px;text-transform:uppercase">5 spots open</div>
+  </div>
+
+  <div class="inner" style="pointer-events:none">
+    <div class="brand" style="pointer-events:auto">ainary · research network</div>
+    
+    <div style="margin-top:24px;pointer-events:auto">
+      <div class="hero-type" style="font-size:56px;letter-spacing:-2px"><span class="gold">5 spots.</span><br>Free access<span class="gold">.</span></div>
+    </div>
+
+    <!-- Bottom CTA -->
+    <div style="margin-top:auto;pointer-events:auto">
+      <div class="glass" style="max-width:520px">
+        <div style="font:700 18px var(--f);color:#ededf0;margin-bottom:6px">The deal</div>
+        <div style="font:400 15px/1.6 var(--f);color:rgba(255,255,255,.4)">Full access. Customized for your role.<br>15 min feedback every two weeks. Picking by <span style="color:#ededf0;font-weight:600">March 14.</span></div>
+        <div style="font:700 15px var(--f);color:var(--gold);margin-top:14px">↓ Comment what you'd use it for</div>
+      </div>
+    </div>
+  </div>
+  <div class="pg"><span class="c">3</span> / 3</div>
+</div>
+
+<!-- ====== LIGHT VERSIONS ====== -->
+<div class="label" style="margin-top:40px">Version B — Light</div>
+
+<!-- LIGHT SLIDE 1 -->
+<div class="slide" id="light-1" style="background:#fafaf8">
+  <div class="prog"><div class="bar" style="width:33%"></div></div>
+  <style>
+    #light-1::before{background-image:radial-gradient(rgba(0,0,0,.03) 1px, transparent 1px) !important}
+    #light-1::after{background:radial-gradient(ellipse at center,transparent 40%,rgba(250,250,248,.5) 100%) !important}
+    #light-1 .net line{stroke:rgba(160,140,80,.06)}
+    #light-1 .net circle{fill:rgba(160,140,80,.06);stroke:rgba(160,140,80,.1)}
+    #light-1 .net text{fill:rgba(0,0,0,.04)}
+    #light-1 .pipe-dot{background:#a38a3a;box-shadow:0 0 20px rgba(163,138,58,.2)}
+    #light-1 .pipe-ring{border-color:rgba(163,138,58,.15)}
+    #light-1 .hero-type{color:#1a1a1a}
+    #light-1 .hero-type .dim{color:rgba(0,0,0,.08)}
+    #light-1 .hero-type .gold{color:#a38a3a}
+  </style>
+  <svg class="net" width="1080" height="1080" viewBox="0 0 1080 1080">
+    <line x1="120" y1="180" x2="380" y2="320"/><line x1="380" y1="320" x2="650" y2="250"/>
+    <line x1="650" y1="250" x2="900" y2="380"/><line x1="200" y1="500" x2="500" y2="450"/>
+    <line x1="500" y1="450" x2="780" y2="520"/><line x1="150" y1="700" x2="420" y2="650"/>
+    <line x1="420" y1="650" x2="700" y2="720"/><line x1="700" y1="720" x2="950" y2="680"/>
+    <circle cx="120" cy="180" r="3"/><circle cx="380" cy="320" r="4"/><circle cx="650" cy="250" r="3"/>
+    <circle cx="900" cy="380" r="5"/><circle cx="500" cy="450" r="4"/><circle cx="420" cy="650" r="5"/>
+    <text x="380" y="310">agent-architecture</text><text x="500" y="440">multi-agent</text>
+  </svg>
+  <svg style="position:absolute;inset:0;z-index:4" width="1080" height="1080" viewBox="0 0 1080 1080">
+    <line x1="108" y1="380" x2="108" y2="500" stroke="rgba(163,138,58,.2)" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <line x1="108" y1="560" x2="108" y2="670" stroke="rgba(163,138,58,.2)" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <line x1="108" y1="730" x2="108" y2="840" stroke="rgba(163,138,58,.2)" stroke-width="1.5" stroke-dasharray="4 4"/>
+  </svg>
+  <div class="inner">
+    <div class="brand" style="color:rgba(0,0,0,.2)">ainary · research network</div>
+    <div style="margin-top:40px"><div class="hero-type">How it<br><span class="dim">actually</span><br>works<span class="gold">.</span></div></div>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding-left:48px;gap:52px;margin-top:20px">
+      <div style="display:flex;align-items:flex-start;gap:28px">
+        <div style="position:relative"><div class="pipe-dot"></div><div class="pipe-ring" style="width:32px;height:32px"></div><div class="pipe-ring" style="width:48px;height:48px;opacity:.5"></div></div>
+        <div><div style="font:800 13px var(--m);color:#a38a3a;letter-spacing:2px;text-transform:uppercase;opacity:.7">01 · Ingest</div><div style="font:500 17px var(--f);color:rgba(0,0,0,.4);margin-top:4px">6 feeds scanned daily — TechCrunch, Stratechery,<br>Simon Willison, Palantir, OpenAI, Anthropic</div></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:28px">
+        <div style="position:relative"><div class="pipe-dot"></div><div class="pipe-ring" style="width:32px;height:32px"></div></div>
+        <div><div style="font:800 13px var(--m);color:#a38a3a;letter-spacing:2px;text-transform:uppercase;opacity:.7">02 · Extract & Score</div><div style="font:500 17px var(--f);color:rgba(0,0,0,.4);margin-top:4px">Claims extracted, trust-scored via Admiralty Code,<br>linked to 115 topics across 10 research domains</div></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:28px">
+        <div style="position:relative"><div class="pipe-dot"></div><div class="pipe-ring" style="width:32px;height:32px"></div></div>
+        <div><div style="font:800 13px var(--m);color:#a38a3a;letter-spacing:2px;text-transform:uppercase;opacity:.7">03 · Calibrate</div><div style="font:500 17px var(--f);color:rgba(0,0,0,.4);margin-top:4px">Confidence adjusted by evidence quality —<br>weak match → lower score. Volume ≠ intelligence.</div></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:28px">
+        <div style="position:relative"><div class="pipe-dot"></div><div class="pipe-ring" style="width:32px;height:32px"></div><div class="pipe-ring" style="width:48px;height:48px;opacity:.5"></div></div>
+        <div><div style="font:800 13px var(--m);color:#a38a3a;letter-spacing:2px;text-transform:uppercase;opacity:.7">04 · Brief</div><div style="font:500 17px var(--f);color:rgba(0,0,0,.4);margin-top:4px">Role-specific intelligence briefings,<br>predictions, gap detection. Updated daily.</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="pg" style="color:rgba(0,0,0,.1)"><span class="c" style="color:#a38a3a;opacity:.5">1</span> / 3</div>
+</div>
+
+<!-- LIGHT SLIDE 2 -->
+<div class="slide" id="light-2" style="background:#fafaf8">
+  <div class="prog"><div class="bar" style="width:66%"></div></div>
+  <style>
+    #light-2::before{background-image:radial-gradient(rgba(0,0,0,.03) 1px, transparent 1px) !important}
+    #light-2::after{background:radial-gradient(ellipse at center,transparent 40%,rgba(250,250,248,.5) 100%) !important}
+    #light-2 .net line{stroke:rgba(160,140,80,.08)}
+    #light-2 .net circle{fill:rgba(160,140,80,.08);stroke:rgba(160,140,80,.12)}
+    #light-2 .net .glow{stroke:rgba(160,140,80,.03)}
+    #light-2 .net text{fill:rgba(0,0,0,.05)}
+    #light-2 .glass{background:rgba(255,255,255,.7);border-color:rgba(0,0,0,.06)}
+    #light-2 .stat-item{background:rgba(0,0,0,.02);border-color:rgba(0,0,0,.04)}
+    #light-2 .stat-item .n{color:#a38a3a}
+    #light-2 .stat-item .l{color:rgba(0,0,0,.3)}
+  </style>
+  <svg class="net" width="1080" height="1080" viewBox="0 0 1080 1080">
+    <circle class="glow" cx="540" cy="480" r="60"/>
+    <circle cx="540" cy="480" r="12" style="fill:rgba(160,140,80,.15);stroke:rgba(160,140,80,.25);stroke-width:2"/>
+    <text x="540" y="510" style="font-size:10px">agent-architecture</text>
+    <line x1="540" y1="480" x2="340" y2="350"/><line x1="540" y1="480" x2="750" y2="380"/>
+    <line x1="540" y1="480" x2="400" y2="620"/><line x1="540" y1="480" x2="720" y2="600"/>
+    <line x1="540" y1="480" x2="350" y2="520"/><line x1="540" y1="480" x2="680" y2="300"/>
+    <circle cx="340" cy="350" r="9"/><text x="340" y="335" style="font-size:9px">multi-agent</text>
+    <circle class="glow" cx="340" cy="350" r="40"/>
+    <circle cx="750" cy="380" r="10"/><text x="750" y="365" style="font-size:9px">gtm-strategy</text>
+    <circle cx="400" cy="620" r="8"/><text x="400" y="645" style="font-size:9px">ontology</text>
+    <circle cx="720" cy="600" r="7"/><circle cx="350" cy="520" r="6"/><circle cx="680" cy="300" r="7"/>
+    <line x1="340" y1="350" x2="350" y2="520"/><line x1="750" y1="380" x2="720" y2="600"/>
+    <circle cx="150" cy="200" r="3"/><circle cx="900" cy="180" r="4"/><circle cx="130" cy="700" r="3"/>
+  </svg>
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(160,140,80,.04),transparent 70%);z-index:4;pointer-events:none"></div>
+  <div class="inner">
+    <div class="brand" style="color:rgba(0,0,0,.2)">ainary · research network</div>
+    <div style="position:absolute;top:60px;right:72px;text-align:right;z-index:10">
+      <div style="font:900 120px var(--m);color:rgba(160,140,80,.05);letter-spacing:-5px;line-height:1">115</div>
+      <div style="font:500 11px var(--m);color:rgba(0,0,0,.08);letter-spacing:3px;text-transform:uppercase;margin-top:-8px">topics tracked</div>
+    </div>
+    <div style="margin-top:auto">
+      <div class="glass" style="max-width:580px">
+        <div style="font:800 32px var(--f);color:#1a1a1a;letter-spacing:-1px;margin-bottom:12px">The knowledge graph</div>
+        <div style="font:400 15px/1.6 var(--f);color:rgba(0,0,0,.4);margin-bottom:20px">Every node is trust-scored. Every connection traced.<br>Gaps detected automatically. Updated daily from 6 sources.</div>
+        <div class="stat-strip">
+          <div class="stat-item"><div class="n">55</div><div class="l">Claims</div></div>
+          <div class="stat-item"><div class="n">115</div><div class="l">Topics</div></div>
+          <div class="stat-item"><div class="n">30</div><div class="l">Signals</div></div>
+          <div class="stat-item"><div class="n">7</div><div class="l">Predictions</div></div>
+          <div class="stat-item"><div class="n">27</div><div class="l">Gaps</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pg" style="color:rgba(0,0,0,.1)"><span class="c" style="color:#a38a3a;opacity:.5">2</span> / 3</div>
+</div>
+
+<!-- LIGHT SLIDE 3 -->
+<div class="slide" id="light-3" style="background:#fafaf8">
+  <div class="prog"><div class="bar" style="width:100%"></div></div>
+  <style>
+    #light-3::before{background-image:radial-gradient(rgba(0,0,0,.03) 1px, transparent 1px) !important}
+    #light-3::after{background:radial-gradient(ellipse at center,transparent 40%,rgba(250,250,248,.5) 100%) !important}
+    #light-3 .hero-type{color:#1a1a1a}
+    #light-3 .hero-type .gold{color:#a38a3a}
+    #light-3 .role-label{color:rgba(0,0,0,.6)}
+    #light-3 .role-sublabel{color:rgba(0,0,0,.25)}
+    #light-3 .role-icon-bg{border-color:rgba(0,0,0,.06);backdrop-filter:blur(8px)}
+    #light-3 .glass{background:rgba(255,255,255,.7);border-color:rgba(0,0,0,.06)}
+  </style>
+  <svg style="position:absolute;inset:0;z-index:3" width="1080" height="1080" viewBox="0 0 1080 1080">
+    <defs><radialGradient id="cgl"><stop offset="0%" stop-color="rgba(163,138,58,.08)"/><stop offset="100%" stop-color="transparent"/></radialGradient></defs>
+    <circle cx="540" cy="440" r="120" fill="url(#cgl)"/>
+    <line x1="540" y1="440" x2="180" y2="280" stroke="rgba(163,138,58,.06)" stroke-width="1" stroke-dasharray="3 6"/>
+    <line x1="540" y1="440" x2="900" y2="280" stroke="rgba(59,130,246,.04)" stroke-width="1" stroke-dasharray="3 6"/>
+    <line x1="540" y1="440" x2="140" y2="560" stroke="rgba(34,197,94,.04)" stroke-width="1" stroke-dasharray="3 6"/>
+    <line x1="540" y1="440" x2="940" y2="560" stroke="rgba(168,85,247,.04)" stroke-width="1" stroke-dasharray="3 6"/>
+    <line x1="540" y1="440" x2="540" y2="720" stroke="rgba(236,72,153,.04)" stroke-width="1" stroke-dasharray="3 6"/>
+  </svg>
+  <!-- Role nodes -->
+  <div class="role-node" style="left:132px;top:228px">
+    <div class="role-icon-bg" style="background:rgba(200,170,80,.06)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="#a38a3a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="role-label">Founder</div><div class="role-sublabel">AI or adjacent</div>
+  </div>
+  <div class="role-node" style="right:132px;top:228px">
+    <div class="role-icon-bg" style="background:rgba(59,130,246,.05)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><polyline points="16 18 22 12 16 6" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="8 6 2 12 8 18" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="role-label">Developer</div><div class="role-sublabel">LLMs & agents</div>
+  </div>
+  <div class="role-node" style="left:92px;top:508px">
+    <div class="role-icon-bg" style="background:rgba(34,197,94,.05)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><line x1="12" y1="1" x2="12" y2="23" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke="#22c55e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="role-label">VC / Angel</div><div class="role-sublabel">AI landscape</div>
+  </div>
+  <div class="role-node" style="right:92px;top:508px">
+    <div class="role-icon-bg" style="background:rgba(168,85,247,.05)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1" stroke="#a855f7" stroke-width="1.5"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="#a855f7" stroke-width="1.5"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="#a855f7" stroke-width="1.5"/><rect x="14" y="14" width="7" height="7" rx="1" stroke="#a855f7" stroke-width="1.5"/></svg></div>
+    <div class="role-label">SME Leader</div><div class="role-sublabel">AI for business</div>
+  </div>
+  <div class="role-node" style="left:50%;transform:translateX(-50%);top:670px">
+    <div class="role-icon-bg" style="background:rgba(236,72,153,.05)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#ec4899" stroke-width="1.5"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" stroke="#ec4899" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="17" r="0.5" fill="#ec4899" stroke="#ec4899"/></svg></div>
+    <div class="role-label">Wildcard</div><div class="role-sublabel">Surprise me</div>
+  </div>
+  <!-- Center -->
+  <div class="center-node" style="left:50%;top:400px;transform:translate(-50%,-50%)">
+    <div style="width:80px;height:80px;border-radius:50%;background:rgba(163,138,58,.06);border:2px solid rgba(163,138,58,.15);display:flex;align-items:center;justify-content:center;margin:0 auto">
+      <div style="font:700 11px var(--m);color:#a38a3a;letter-spacing:1px">ACCESS</div>
+    </div>
+    <div style="font:600 10px var(--m);color:rgba(0,0,0,.12);margin-top:8px;letter-spacing:2px;text-transform:uppercase">5 spots open</div>
+  </div>
+  <div class="inner" style="pointer-events:none">
+    <div class="brand" style="color:rgba(0,0,0,.2);pointer-events:auto">ainary · research network</div>
+    <div style="margin-top:24px;pointer-events:auto"><div class="hero-type" style="font-size:56px;letter-spacing:-2px"><span class="gold">5 spots.</span><br>Free access<span class="gold">.</span></div></div>
+    <div style="margin-top:auto;pointer-events:auto">
+      <div class="glass" style="max-width:520px">
+        <div style="font:700 18px var(--f);color:#1a1a1a;margin-bottom:6px">The deal</div>
+        <div style="font:400 15px/1.6 var(--f);color:rgba(0,0,0,.4)">Full access. Customized for your role.<br>15 min feedback every two weeks. Picking by <span style="color:#1a1a1a;font-weight:600">March 14.</span></div>
+        <div style="font:700 15px var(--f);color:#a38a3a;margin-top:14px">↓ Comment what you'd use it for</div>
+      </div>
+    </div>
+  </div>
+  <div class="pg" style="color:rgba(0,0,0,.1)"><span class="c" style="color:#a38a3a;opacity:.5">3</span> / 3</div>
+</div>
+
+</body>
+</html>

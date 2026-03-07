@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Firmen-Reports — Ainary Intelligence</title>
+<meta name="description" content="Strukturierte Firmenanalysen mit epistemischem Layering. Bundesanzeiger, SEC, Handelsregister — jede Aussage klassifiziert.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff;--surface:#fafafa;--surface2:#f5f4f0;
+  --text:#1a1a1a;--text2:#444;--muted:#777;--light:#bbb;
+  --border:#d0d0d0;--border2:#e8e8e8;
+  --accent:#9d7f3b;--accent-pale:rgba(157,127,59,.06);
+  --green:#2d8a4e;--blue:#2b6cb0;--amber:#b45309;--red:#c0392b;
+  --f:'Inter',-apple-system,sans-serif;--m:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--f);color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;font-size:10pt;line-height:1.65}
+a{color:inherit;text-decoration:none}
+
+.page{max-width:1040px;margin:0 auto;padding:32px 48px 48px}
+
+/* Header */
+.hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;margin-bottom:32px;border-bottom:1px solid var(--border2)}
+.hdr-left{display:flex;align-items:center;gap:8px}
+.brand-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.brand-name{font-weight:500;font-size:9pt;color:var(--muted)}
+.hdr-nav{display:flex;gap:16px;font-family:var(--m);font-size:7pt;color:var(--muted)}
+.hdr-nav a{transition:color .15s}
+.hdr-nav a:hover{color:var(--accent)}
+
+/* Breadcrumb */
+.breadcrumb{font-family:var(--m);font-size:7.5pt;color:var(--muted);margin-bottom:24px}
+.breadcrumb a{color:var(--accent)}
+.breadcrumb a:hover{text-decoration:underline}
+.breadcrumb span{margin:0 6px;color:var(--light)}
+
+/* Page title */
+.page-title{font-size:24pt;font-weight:700;letter-spacing:-.02em;margin-bottom:4px}
+.page-subtitle{font-size:10pt;color:var(--text2);margin-bottom:8px;max-width:600px;line-height:1.6}
+.page-meta{font-family:var(--m);font-size:7pt;color:var(--light);margin-bottom:32px}
+
+/* Ontology bar */
+.ontology-bar{display:flex;align-items:center;gap:16px;padding:12px 16px;border:1px solid var(--border2);border-radius:8px;background:var(--surface);margin-bottom:32px;flex-wrap:wrap}
+.ontology-bar-label{font-family:var(--m);font-size:6.5pt;font-weight:600;color:var(--accent);letter-spacing:.1em;text-transform:uppercase}
+.ontology-bar-items{display:flex;gap:8px;flex-wrap:wrap;font-size:7.5pt;color:var(--text2)}
+.ontology-bar-items span{display:flex;align-items:center;gap:4px}
+
+/* Tags */
+.tag{font-family:var(--m);font-size:5.5pt;padding:1px 5px;border-radius:2px;font-weight:600;display:inline-block}
+.tag-e{background:rgba(45,138,78,.1);color:var(--green)}
+.tag-i{background:rgba(43,108,176,.1);color:var(--blue)}
+.tag-j{background:rgba(180,83,9,.1);color:var(--amber)}
+.tag-a{background:rgba(192,57,43,.1);color:var(--red)}
+
+/* Report list */
+.report-list{display:flex;flex-direction:column;gap:12px}
+
+.report-card{border:1px solid var(--border2);border-radius:8px;padding:20px 24px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start;transition:all .2s}
+.report-card:hover{border-color:var(--border);box-shadow:0 2px 12px rgba(0,0,0,.04)}
+
+.report-card h3{font-size:13pt;font-weight:700;letter-spacing:-.01em;margin-bottom:2px}
+.report-card .subtitle{font-size:8.5pt;color:var(--text2);margin-bottom:8px}
+.report-card .tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.report-card .tags span{font-family:var(--m);font-size:6pt;padding:2px 6px;border-radius:3px;border:1px solid var(--border2);color:var(--muted)}
+
+.report-meta{display:flex;gap:12px;font-family:var(--m);font-size:7pt;color:var(--muted);flex-wrap:wrap}
+
+/* Right side: KPIs + Confidence */
+.report-right{text-align:right;min-width:140px}
+.report-conf{display:flex;align-items:center;gap:6px;justify-content:flex-end;margin-bottom:8px}
+.report-conf-label{font-family:var(--m);font-size:6.5pt;color:var(--muted)}
+.conf-bar{width:60px;height:5px;background:var(--border2);border-radius:3px;overflow:hidden}
+.conf-bar-fill{height:100%;border-radius:3px}
+.conf-val{font-family:var(--m);font-size:7.5pt;font-weight:700}
+
+.report-kpi{font-family:var(--m);font-size:7pt;color:var(--muted);margin-bottom:2px}
+.report-kpi strong{color:var(--text);font-size:8pt}
+
+/* Trust badge */
+.trust-badge{font-family:var(--m);font-size:6pt;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:3px;display:inline-block;margin-top:8px}
+.trust-badge.spot-check{border:1px solid var(--amber);color:var(--amber);background:rgba(180,83,9,.04)}
+
+/* Empty state */
+.empty{border:1px dashed var(--border2);border-radius:8px;padding:32px;text-align:center;color:var(--muted);font-size:9pt}
+.empty p{margin-bottom:8px}
+.empty small{font-family:var(--m);font-size:7pt;color:var(--light)}
+
+.ftr{text-align:center;padding:24px 0;font-family:var(--m);font-size:6.5pt;color:var(--light);border-top:1px solid var(--border2);margin-top:40px}
+
+@media(max-width:700px){
+  .page{padding:20px 16px}
+  .report-card{grid-template-columns:1fr}
+  .report-right{text-align:left}
+  .report-conf{justify-content:flex-start}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="hdr">
+    <div class="hdr-left">
+      <span class="brand-dot"></span>
+      <span class="brand-name">Ainary</span>
+    </div>
+    <div class="hdr-nav">
+      <a href="/">Home</a>
+      <a href="/reports/">Reports</a>
+      <a href="/reports/firmen/" style="color:var(--accent)">Firmen</a>
+    </div>
+  </div>
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="/reports/">Reports</a>
+    <span>→</span>
+    Firmen-Reports
+  </div>
+
+  <!-- Title -->
+  <div class="page-title">Firmen-Reports</div>
+  <div class="page-subtitle">Bundesanzeiger + SEC + Handelsregister + OSINT → Struktur, Finanzen, Risiken. Jede Aussage klassifiziert, jede Quelle nachvollziehbar.</div>
+  <div class="page-meta">Ontologie: Entity → Structure → Financials → Risk → Recommendation</div>
+
+  <!-- Ontology Bar -->
+  <div class="ontology-bar">
+    <span class="ontology-bar-label">Report-Ontologie</span>
+    <div class="ontology-bar-items">
+      <span>Entity ·</span>
+      <span>Legal Structure ·</span>
+      <span>Ownership ·</span>
+      <span>Financials ·</span>
+      <span>Valuation ·</span>
+      <span>Risk Assessment ·</span>
+      <span>Data Gaps ·</span>
+      <span>Recommendation</span>
+    </div>
+  </div>
+
+  <!-- Report List -->
+  <div class="report-list">
+
+    <!-- Palantir -->
+    <a href="/reports/firmen/palantir-2026/" class="report-card">
+      <div>
+        <h3>Palantir Technologies</h3>
+        <div class="subtitle">Enterprise Software · AI Platform · US-Government Contractor · DE-Tochter (GmbH)</div>
+        <div class="tags">
+          <span>Bundesanzeiger (20)</span>
+          <span>SEC 10-K</span>
+          <span>Lobbyregister</span>
+          <span>MacroTrends</span>
+          <span>Alpha Spread</span>
+        </div>
+        <div class="report-meta">
+          <span>FA-2026-0305-PLTR</span>
+          <span>2026-03-05</span>
+          <span>8 Quellen</span>
+          <span>~16-24 Std. Ersparnis</span>
+        </div>
+      </div>
+      <div class="report-right">
+        <div class="report-conf">
+          <span class="report-conf-label">Confidence</span>
+          <div class="conf-bar"><div class="conf-bar-fill" style="width:70%;background:var(--green)"></div></div>
+          <span class="conf-val" style="color:var(--green)">70%</span>
+        </div>
+        <div class="report-kpi"><strong>$4,5B</strong> Revenue 2025</div>
+        <div class="report-kpi"><strong>$313B</strong> Market Cap</div>
+        <div class="report-kpi"><strong style="color:var(--red)">203×</strong> P/E Ratio</div>
+        <div class="trust-badge spot-check">Spot-Check (QA 20%)</div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- Coming soon placeholder -->
+  <div class="empty" style="margin-top:16px">
+    <p>Weitere Firmen-Reports in Arbeit</p>
+    <small>Nächste: Deutsche Telekom · SAP · Rheinmetall · C3.ai</small>
+  </div>
+
+  <footer class="ftr">© 2026 Ainary Ventures · <a href="/imprint.html" style="color:var(--muted)">Impressum</a> · <a href="/privacy.html" style="color:var(--muted)">Datenschutz</a></footer>
+</div>
+</body>
+</html>
